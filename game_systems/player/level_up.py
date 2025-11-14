@@ -1,0 +1,100 @@
+"""
+Level Up System for Eldoria Quest
+
+This module handles:
+- Experience gain
+- Automatic level-up
+- Increasing base stats upon level-up
+- Auto scaling experience requirements per level
+- Integration with PlayerStats for recalculating derived stats (HP, MP)
+"""
+
+from typing import Dict
+from .player_stats import PlayerStats
+
+
+class LevelUpSystem:
+    """
+    Standalone Level-Up Manager.
+
+    Each level grants:
+        +1 STR
+        +1 DEX
+        +1 CON
+        +1 INT
+        +1 WIS
+        +1 CHA
+        +1 LCK
+    """
+
+    STAT_LIST = ["STR", "DEX", "CON", "INT", "WIS", "CHA", "LCK"]
+
+    def __init__(
+        self,
+        stats: PlayerStats,
+        level: int = 1,
+        exp: int = 0,
+        exp_to_next: int = 100
+    ):
+        self.stats = stats
+        self.level = level
+        self.exp = exp
+        self.exp_to_next = exp_to_next
+
+    # -----------------------------------------------------------
+    # EXP Handling
+    # -----------------------------------------------------------
+    def add_exp(self, amount: int) -> bool:
+        """
+        Adds EXP and checks for level-up.
+        Returns:
+            True if the player leveled up
+            False otherwise
+        """
+        self.exp += amount
+        leveled_up = False
+
+        # Handle multiple level-ups if EXP exceeds requirement
+        while self.exp >= self.exp_to_next:
+            self.exp -= self.exp_to_next
+            self.level_up()
+            leveled_up = True
+
+        return leveled_up
+
+    # -----------------------------------------------------------
+    # Level Up Logic
+    # -----------------------------------------------------------
+    def level_up(self):
+        """Apply the level-up bonuses."""
+        self.level += 1
+
+        # +1 to each stat
+        for stat in self.STAT_LIST:
+            self.stats.add_base_stat(stat, 1)
+
+        # Increase the EXP required for the next level
+        self.exp_to_next = int(self.exp_to_next * 1.15)  # 15% growth rate
+
+    # -----------------------------------------------------------
+    # Serialization
+    # -----------------------------------------------------------
+    def to_dict(self) -> Dict:
+        """Convert all level + stat data to a dictionary for saving."""
+        return {
+            "level": self.level,
+            "exp": self.exp,
+            "exp_to_next": self.exp_to_next,
+            "stats": self.stats.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict):
+        """Reconstruct a LevelUpSystem object from saved data."""
+        stats = PlayerStats.from_dict(data["stats"])
+        return cls(
+            stats=stats,
+            level=data.get("level", 1),
+            exp=data.get("exp", 0),
+            exp_to_next=data.get("exp_to_next", 100),
+        )

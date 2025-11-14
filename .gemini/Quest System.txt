@@ -1,0 +1,276 @@
+Below is a **complete, polished Quest System Guide** written *exactly* as if it were documentation for a professional RPG Discord bot.
+It explains:
+
+* How players unlock quests
+* How quests are presented
+* How quest details are shown (with literary, book-like descriptions)
+* How tracking, progression, and completion works
+* How guild ranks interact with quest availability
+* How the bot responds to players at every stage
+
+This guide is meant to be included in your project’s docs or shown to your users.
+
+---
+
+# 📜 **Eldoria Quest – Adventurer’s Handbook**
+
+### *A Complete Guide to the Quest System*
+
+*For players entering the Shattered Veil*
+
+---
+
+# ⭐ **1. Introduction**
+
+The world of **Eldoria** has fractured since the Veil cracked, releasing shadows, spirits, and corrupted beasts into once-peaceful regions. The **Adventurer’s Guild** stands as the last bulwark between order and chaos—an institution where wanderers, mages, sellswords, and fledgling heroes gather to earn coin, hone skill, and gradually stake their claim in legend.
+
+Quests in Eldoria are not mere chores—they are **living stories**, threads woven into the great tapestry of a world struggling to heal.
+
+As a newly registered adventurer, your journey begins now.
+
+---
+
+# ⭐ **2. How the Quest System Works**
+
+### **Step 1 — Join the Adventurer’s Guild**
+
+After character creation, the guild registrar invites you:
+
+> *“Before you wield steel or spell against the darkness, you must take the Oath.
+> Step forward and claim your place among Eldoria’s defenders.”*
+
+The player uses:
+
+```
+!guild register
+```
+
+You are assigned the starting rank: **F-Rank Initiate**.
+
+---
+
+# ⭐ **3. Viewing Available Quests**
+
+Use:
+
+```
+!quests
+```
+
+The bot will display quests available *based on your guild rank*.
+
+Example embed:
+
+**Quest Board — Forest Outskirts (F-Rank)**
+
+> The board is cluttered with parchment sheets—some crisp and new, others curled and water-stained.
+> The scent of pine resin clings to them. A few bear crude claw marks, as if beasts resented their posting.
+
+Each quest appears as:
+
+```
+[Quest ID: 001]
+Culling the Slimes  
+Tier: F-Rank (Initiate)  
+Type: Hunting  
+“Slime clusters are swelling near the old creek bed. Harmless alone, but in numbers they clog paths and swallow small livestock. Local farmers beg the Guild to thin their number before dusk becomes perilous.”  
+Reward: 15 EXP / 20 Gold / Small Healing Draught
+```
+
+---
+
+# ⭐ **4. Detailed Quest Example (Book-like Descriptions)**
+
+Here’s a fully fleshed-out quest as the bot will display it when viewed with:
+
+```
+!quest 001
+```
+
+---
+
+### **🌿 Quest ID 001 — *Culling the Slimes***
+
+**Tier:** F-Rank
+**Type:** Hunting
+**Objective:** Defeat 5 Forest Slimes
+
+> *In the quiet bends of the Willowcreek, an unnatural swelling of slimes has begun to choke the water’s flow.
+> Their gelatinous bodies quiver like disturbed lantern oil, and their numbers grow with each fog-laden night.
+> Farmers whisper that the forest has soured, its balance unsettled after the Veil’s fracture.
+> The Guild requires an Initiate to wade into the mire and restore harmony before the infestation spreads further.*
+
+**Rewards:**
+
+* **15 EXP**
+* **20 Gold**
+* **Small Healing Draught** (Consumable)
+
+---
+
+# ⭐ **5. Accepting a Quest**
+
+Players take a quest with:
+
+```
+!quest accept <quest_id>
+```
+
+Bot reply:
+
+> *“The parchment is yours. The Guild seal burns briefly across its top—marking your oath to see the task through.”*
+
+The quest is now tracked under:
+
+```
+!myquests
+```
+
+---
+
+# ⭐ **6. Progress Tracking**
+
+Progress automatically updates when the player performs relevant actions:
+
+Examples:
+
+* Killing **Forest Slime** increments progress on Quest 001.
+* Gathering **Moonpetal Herb** increments progress on Gathering Quests.
+* Entering a marked location affects Investigation Quests.
+
+Players can check their status:
+
+```
+!quest progress <quest_id>
+```
+
+Bot example:
+
+> **Progress for Quest 001**
+> Forest Slimes defeated: **3 / 5**
+> *The creek still trembles with gelatinous shapes. Your work is not yet done.*
+
+---
+
+# ⭐ **7. Completing a Quest**
+
+When requirements are met:
+
+```
+!quest complete <quest_id>
+```
+
+Bot:
+
+> *“With task fulfilled, you return to the Guild Hall. The guild clerk inspects your report, nods, and presses a wax seal upon it—a mark of completion. Your reward is counted with care.”*
+
+Rewards automatically applied to:
+
+* EXP
+* Gold
+* Items inventory
+* Guild Reputation (optional)
+
+If EXP thresholds are met, the bot triggers:
+
+> **You have leveled up!**
+> *A quiet strength settles into your limbs as your experience grows.*
+
+---
+
+# ⭐ **8. Quest Tiers & Guild Ranks**
+
+| Guild Rank            | Tier   | Difficulty | Unlocks                                     |
+| --------------------- | ------ | ---------- | ------------------------------------------- |
+| **F-Rank Initiate**   | F-Tier | Very Easy  | Basic monster hunts, simple gathering       |
+| **E-Rank Novice**     | E-Tier | Easy       | Goblin patrols, spider nests, escort quests |
+| **D-Rank Apprentice** | D-Tier | Moderate   | Boss hunts, corrupted forest sites          |
+
+Promotion happens when completing required quests:
+
+* **10 F-Tier quests → E-Rank**
+* **12 E-Tier quests → D-Rank**
+
+Bot example:
+
+> *“Your deeds echo across the Guild Hall.
+> By order of the Silvercrest Guildmaster, you are hereby elevated to **E-Rank Adventurer**.”*
+
+---
+
+# ⭐ **9. Beginner Forest Quest Catalog**
+
+You now have **30 quests** in your world (previously designed).
+Each will contain:
+
+* Atmospheric, high-fantasy description
+* Lore-driven objective
+* Monster or item requirements
+* Rewards & scaling
+* Ties to the corrupted forest area and Veil lore
+
+If you want, I can generate:
+
+✔ **All 30 fully written descriptions in book-quality prose**
+✔ **JSON format**
+✔ **SQL INSERT format**
+✔ **Embed-ready format**
+✔ **In-game cinematics / opening lines**
+✔ **NPC quest giver personalities**
+
+---
+
+# ⭐ **10. Player Flow Summary**
+
+1. **Create Character**
+2. **Register with Guild**
+3. **View Available Quests**
+4. **Accept a Quest**
+5. **Complete Objective (Combat / Gathering / Exploration)**
+6. **Claim Rewards**
+7. **Rank Up**
+8. **Unlock Harder Quests**
+
+---
+
+# ⭐ **11. Developer Notes (For Your Bot Integration)**
+
+**Recommended command structure:**
+
+* `/quests` — show available quests
+* `/quest view <id>` — detailed quest description
+* `/quest accept <id>` — take the quest
+* `/quest progress <id>` — see progress
+* `/quest complete <id>` — finalize
+
+**Recommended modules:**
+
+* `quest_manager.py`
+* `quest_data.py` (static descriptions)
+* `quest_commands.py` (discord slash commands)
+* `quest_rewards.py` (EXP/gold/item calculators)
+* `guild_rank_manager.py`
+
+---
+
+# ⭐ **If you want next:**
+
+Just say the word and I’ll produce:
+
+### **A. All 30 quests rewritten in full high-fantasy book style**
+
+(3–6 sentences each, atmospheric, loreful)
+
+### **B. Discord embeds for every quest**
+
+Button-based navigation, beautiful formatting.
+
+### **C. SQL INSERT statements for all quests**
+
+### **D. Quest acceptance and UI flows (Discord buttons)**
+
+### **E. Guild Hall NPC personalities & dialogues**
+
+(Guildmaster, receptionist, archivist, bounty officer)
+
+---

@@ -1,0 +1,178 @@
+"""
+CONSUMABLES — Eldoria Quest (Forest beginner zone)
+--------------------------------------------------
+20 consumables: healing, mana, antidotes, buff potions, food, throwable.
+Each consumable entry:
+{
+  "id": str,
+  "name": str,
+  "type": "hp"|"mp"|"buff"|"antidote"|"food"|"throwable",
+  "effect": dict,
+  "rarity": str,
+  "description": str
+}
+Tone: high-fantasy.
+"""
+
+CONSUMABLES = {
+    "hp_potion_1": {
+        "id": "hp_potion_1",
+        "name": "Dewfall Tonic",
+        "type": "hp",
+        "effect": {"heal": 50},
+        "rarity": "Common",
+        "description": "A modest vial of dew distilled from forest leaves. Restores a lick of vitality."
+    },
+    "hp_potion_2": {
+        "id": "hp_potion_2",
+        "name": "Glade Salve Vial",
+        "type": "hp",
+        "effect": {"heal": 120},
+        "rarity": "Uncommon",
+        "description": "Balmed with sap and honey; travelers swear by its steadying warmth."
+    },
+    "hp_large": {
+        "id": "hp_large",
+        "name": "Elixir of Verdant Heart",
+        "type": "hp",
+        "effect": {"heal": 300},
+        "rarity": "Rare",
+        "description": "Bottled heartwood essence; a boon for the gravely wounded."
+    },
+    "mp_potion_1": {
+        "id": "mp_potion_1",
+        "name": "Scholar's Draught",
+        "type": "mp",
+        "effect": {"mana": 40},
+        "rarity": "Common",
+        "description": "A chalk-sweet draught; aids in gathering stray sigils of power."
+    },
+    "mp_potion_2": {
+        "id": "mp_potion_2",
+        "name": "Lunaris Tonic",
+        "type": "mp",
+        "effect": {"mana": 110},
+        "rarity": "Uncommon",
+        "description": "Drawn from moon-scented mushrooms; used by apprentice mages."
+    },
+    "antidote_basic": {
+        "id": "antidote_basic",
+        "name": "Thicket Antidote",
+        "type": "antidote",
+        "effect": {"cure_poison": True},
+        "rarity": "Common",
+        "description": "A paste brewed from moss and nettle—pulls sting from the blood."
+    },
+    "stamina_tonic": {
+        "id": "stamina_tonic",
+        "name": "Runner's Cordial",
+        "type": "buff",
+        "effect": {"stamina_boost": 30, "duration_s": 180},
+        "rarity": "Common",
+        "description": "Sipped before a chase; steadies the legs and clears the head."
+    },
+    "strength_brew": {
+        "id": "strength_brew",
+        "name": "Captains' Ale (Embolden)",
+        "type": "buff",
+        "effect": {"STR": 3, "duration_s": 120},
+        "rarity": "Uncommon",
+        "description": "A warming draft that floods the arm with sudden might."
+    },
+    "dex_elixir": {
+        "id": "dex_elixir",
+        "name": "Starlit Tincture",
+        "type": "buff",
+        "effect": {"DEX": 3, "duration_s": 120},
+        "rarity": "Uncommon",
+        "description": "A shimmering sip that makes the hand deft for a time."
+    },
+    "food_ration": {
+        "id": "food_ration",
+        "name": "Trailman's Ration",
+        "type": "food",
+        "effect": {"hp": 10, "stamina": 25},
+        "rarity": "Common",
+        "description": "Dried meat and bread—plain, comforting, sustaining."
+    },
+    "campfire_stew": {
+        "id": "campfire_stew",
+        "name": "Warden's Stew",
+        "type": "food",
+        "effect": {"hp": 30, "stamina": 50},
+        "rarity": "Uncommon",
+        "description": "A thick, hearty stew that bolsters the weary heart."
+    },
+    "throwing_bomb": {
+        "id": "throwing_bomb",
+        "name": "Sporebomb",
+        "type": "throwable",
+        "effect": {"aoe_atk": 40, "status": "blind", "chance": 20},
+        "rarity": "Common",
+        "description": "When burst, it clouds sight with numbing spores."
+    },
+    "regen_potion": {
+        "id": "regen_potion",
+        "name": "Sap of Renewal",
+        "type": "hp",
+        "effect": {"regen": 5, "duration_s": 30},
+        "rarity": "Rare",
+        "description": "A dripping sap that mends slowly over time."
+    },
+    "resist_elixir": {
+        "id": "resist_elixir",
+        "name": "Wardkeeper's Vial",
+        "type": "buff",
+        "effect": {"damage_res": 5, "duration_s": 120},
+        "rarity": "Rare",
+        "description": "Hums faintly; pushes away the keen edges of harm."
+    },
+    "antidote_strong": {
+        "id": "antidote_strong",
+        "name": "Panacea Root Paste",
+        "type": "antidote",
+        "effect": {"cure_poison": True, "cure_bleed": True},
+        "rarity": "Rare",
+        "description": "A thick paste that quiets the worst venoms."
+    },
+    "elixir_of_focus": {
+        "id": "elixir_of_focus",
+        "name": "Scribe's Focus",
+        "type": "mp",
+        "effect": {"mana": 200},
+        "rarity": "Epic",
+        "description": "A scholar's secret: sharp as a quill."
+    },
+    "heroic_potion": {
+        "id": "heroic_potion",
+        "name": "Champion's Draught",
+        "type": "buff",
+        "effect": {"STR": 5, "DEF": 5, "duration_s": 45},
+        "rarity": "Epic",
+        "description": "A rare tonic gifted to those who stand against fate."
+    },
+    "mythic_amber": {
+        "id": "mythic_amber",
+        "name": "Amber of the Old World",
+        "type": "hp",
+        "effect": {"heal": 1500},
+        "rarity": "Mythical",
+        "description": "Found only in whispered legends; restores life like a dawn."
+    },
+    "smoke_pellet": {
+        "id": "smoke_pellet",
+        "name": "Whisper-Cloud Pellet",
+        "type": "throwable",
+        "effect": {"escape": True},
+        "rarity": "Common",
+        "description": "A quick, choking cloud that covers flight and trickery."
+    },
+    "elixir_luck": {
+        "id": "elixir_luck",
+        "name": "Luck-Blessed Cordial",
+        "type": "buff",
+        "effect": {"LCK": 4, "duration_s": 180},
+        "rarity": "Rare",
+        "description": "A whispered toast to fortune; coins seem to fall kinder."
+    }
+}
