@@ -1,4 +1,3 @@
-```markdown
 # 🌑 **Eldoria Quest**
 
 ### _A Dark High-Fantasy Idle RPG Discord Bot_
@@ -81,6 +80,7 @@ The game blends:
 ---
 
 # 🗂️ Project Structure
+
 ```
 
 eldoria-bot/
@@ -142,4 +142,3 @@ eldoria-bot/
 This repository is **private intellectual property**. All source code, lore, mechanics, and documentation belong solely to the project owner.
 
 **Not open-source. Not licensed for redistribution or reuse.**
-```
