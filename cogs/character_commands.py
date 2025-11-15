@@ -95,7 +95,7 @@ class CharacterCommands(commands.Cog):
         )
         embed.add_field(
             name="Wealth",
-            value=f"{E.AURUM} **Aurum:** {player['gold']}",
+            value=f"{E.AURUM} **Aurum:** {player['aurum']}",
             inline=True,
         )
 

@@ -21,14 +21,17 @@ from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
 
 # --- Local Imports ---
-# --- CORRECTED IMPORT ---
 from .ui_helpers import back_to_guild_card_callback
 
 # We import the Quest views from the other cog for the button callback
 from .quest_hub_cog import QuestBoardView, QuestLogView
 
+# --- NEW IMPORT ---
+# Import the AdventureSetupView to be launched from our new button
+from .adventure_commands import AdventureSetupView
 
-# =GA===================================================================
+
+# ======================================================================
 # GUILD CARD & MAIN MENU
 # ======================================================================
 
@@ -62,6 +65,17 @@ class GuildCardView(View):
         )
         quest_log_button.callback = self.view_quest_log_callback
         self.add_item(quest_log_button)
+
+        # --- NEW ADVENTURE BUTTON ---
+        adventure_button = Button(
+            label="Adventure",
+            style=discord.ButtonStyle.success,
+            custom_id="start_adventure",
+            emoji=E.MAP,
+        )
+        adventure_button.callback = self.adventure_callback
+        self.add_item(adventure_button)
+        # --- END NEW BUTTON ---
 
         exchange_button = Button(
             label="Guild Exchange",
@@ -115,12 +129,10 @@ class GuildCardView(View):
                 value="There are currently no quests available for your rank. Check back later, adventurer.",
             )
         else:
-            for quest in available_quests:
-                embed.add_field(
-                    name=f"[{quest['tier']}-Rank] {quest['title']} (ID: {quest['id']})",
-                    value=quest["summary"],
-                    inline=False,
-                )
+            embed.add_field(
+                name="Available Contracts",
+                value="Select an available quest from the dropdown menu to review its details.",
+            )
 
         view = QuestBoardView(self.db, available_quests)
         await interaction.edit_original_response(embed=embed, view=view)
@@ -167,6 +179,43 @@ class GuildCardView(View):
 
         view = QuestLogView(self.db)
         await interaction.edit_original_response(embed=embed, view=view)
+
+    # --- NEW CALLBACK FUNCTION ---
+    async def adventure_callback(self, interaction: discord.Interaction):
+        """
+        Callback for the 'Adventure' button.
+        Fetches the running AdventureManager and shows the setup view.
+        """
+        # Get the bot instance from the interaction
+        bot = interaction.client
+
+        # Find the AdventureCommands cog
+        adventure_cog = bot.get_cog("AdventureCommands")
+        if not adventure_cog:
+            await interaction.response.send_message(
+                f"{E.ERROR} Error: The Adventure system is currently offline. Please contact an administrator.",
+                ephemeral=True,
+            )
+            return
+
+        # Get the running manager from the cog
+        manager = adventure_cog.manager
+        discord_id = interaction.user.id
+        active_session = manager.get_active_session(discord_id)
+
+        if active_session and active_session["active"]:
+            await interaction.response.send_message(
+                "You are already on an adventure! Use `/adventure status` to check your progress.",
+                ephemeral=True,
+            )
+        else:
+            # Show the same view as the /adventure start command
+            view = AdventureSetupView(self.db, manager)
+            await interaction.response.send_message(
+                f"{E.MAP} **Select a Destination:**", view=view, ephemeral=True
+            )
+
+    # --- END NEW CALLBACK ---
 
     async def guild_exchange_callback(self, interaction: discord.Interaction):
         """
@@ -264,7 +313,7 @@ class GuildCardView(View):
         )
         embed.add_field(
             name="Wealth",
-            value=f"{E.AURUM} **Aurum:** {player['gold']}",
+            value=f"{E.AURUM} **Aurum:** {player['aurum']}",
             inline=True,
         )
         embed.set_footer(text="The hieroglyphs on your back glow faintly.")
@@ -469,7 +518,7 @@ class GuildExchangeView(View):
         await back_to_guild_card_callback(interaction, embed_to_show=receipt_embed)
 
 
-# ======================================================================
+# =G====================================================================
 # COG LOADER
 # ======================================================================
 

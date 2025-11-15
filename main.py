@@ -81,9 +81,12 @@ class EldoriaBot(commands.Bot):
 
         for filename in os.listdir(cogs_dir):
             # --- THIS IS THE FIX ---
-            # We only load files that end in .py AND do NOT start with an underscore.
-            # This correctly skips __init__.py and any _helper.py files.
-            if filename.endswith(".py") and not filename.startswith("_"):
+            # We load files that end in .py, NOT start with _, AND are NOT 'ui_helpers.py'
+            if (
+                filename.endswith(".py")
+                and not filename.startswith("_")
+                and filename != "ui_helpers.py"  # <-- ADD THIS CONDITION
+            ):
                 cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)

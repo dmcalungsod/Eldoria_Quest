@@ -124,12 +124,17 @@ class QuestBoardView(View):
         )
 
         objectives_text = ""
-        for obj_type, tasks in quest_details["objectives"].items():
-            if isinstance(tasks, dict):
-                for task, value in tasks.items():
-                    objectives_text += f"• **{obj_type.title()}:** {task} ({value})\n"
-            else:
-                objectives_text += f"• **{obj_type.title()}:** {tasks}\n"
+        if "objectives" in quest_details and quest_details["objectives"]:
+            for obj_type, tasks in quest_details["objectives"].items():
+                if isinstance(tasks, dict):
+                    for task, value in tasks.items():
+                        objectives_text += (
+                            f"• **{obj_type.title()}:** {task} ({value})\n"
+                        )
+                else:
+                    objectives_text += f"• **{obj_type.title()}:** {tasks}\n"
+        else:
+            objectives_text = "No objectives listed."
 
         embed.add_field(name="Objectives", value=objectives_text, inline=False)
 
@@ -182,15 +187,26 @@ class QuestDetailView(View):
         On success, automatically navigates back to the quest board.
         On failure, sends an ephemeral error.
         """
+        # Acknowledge the click instantly so the UI doesn't hang.
+        await interaction.response.defer()
+
         quest_system = QuestSystem(self.db)
         success = quest_system.accept_quest(interaction.user.id, self.quest_id)
 
         if success:
-            # Automatically go back to the quest board
+            # --- THIS IS THE FIX ---
+            # Send a private confirmation message to the user.
+            await interaction.followup.send(
+                f"{E.CHECK} Quest accepted! The details have been added to your log.",
+                ephemeral=True,
+            )
+            # --- END OF FIX ---
+
+            # Now, go back to the quest board by editing the original message
             await self.back_to_quest_board_callback(interaction)
         else:
-            # Failure (like already having the quest) IS a branching reply.
-            await interaction.response.send_message(
+            # Because we deferred, we must use followup.send for any new messages.
+            await interaction.followup.send(
                 f"{E.WARNING} You have already accepted this quest or an error occurred.",
                 ephemeral=True,
             )
@@ -199,6 +215,8 @@ class QuestDetailView(View):
         """
         Returns to the quest board view.
         """
+        # This check is important. If called from "Accept", is_done() will be True.
+        # If called from "Back", is_done() will be False.
         if not interaction.response.is_done():
             await interaction.response.defer()
 
@@ -226,6 +244,8 @@ class QuestDetailView(View):
             )
 
         view = QuestBoardView(db, available_quests)
+        # We use edit_original_response here, which is correct for both
+        # a deferred interaction and a new button click (if we defer first).
         await interaction.edit_original_response(embed=embed, view=view)
 
 
