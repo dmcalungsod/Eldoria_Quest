@@ -1,8 +1,8 @@
 """
 create_database.py
 
-Creates the full Eldoria Quest database schema from scratch.
-(Refactored for 6-stat system and new Guild name)
+Creates the full Eldoria Quest database schema from scratch
+IF IT DOES NOT ALREADY EXIST.
 """
 
 import sqlite3
@@ -15,29 +15,10 @@ def create_tables():
     cursor = conn.cursor()
 
     # -------------------------
-    # DROP OLD TABLES
+    # DROP OLD TABLES (REMOVED)
     # -------------------------
-    cursor.executescript(
-        """
-    DROP TABLE IF EXISTS classes;
-    DROP TABLE IF EXISTS players;
-    DROP TABLE IF EXISTS stats;
-    DROP TABLE IF EXISTS monsters;
-    DROP TABLE IF EXISTS quest_items;
-    DROP TABLE IF EXISTS consumables;
-    DROP TABLE IF EXISTS equipment;
-    DROP TABLE IF EXISTS class_equipment;
-    DROP TABLE IF EXISTS item_sets;
-    DROP TABLE IF EXISTS guild_members;
-    DROP TABLE IF EXISTS quests;
-    DROP TABLE IF EXISTS player_quests;
-    DROP TABLE IF EXISTS materials;
-    DROP TABLE IF EXISTS inventory;
-    DROP TABLE IF EXISTS adventure_sessions;
-    DROP TABLE IF EXISTS skills;
-    DROP TABLE IF EXISTS player_skills;
-    """
-    )
+    # All "DROP TABLE" commands have been removed to ensure data persistence.
+    # The script will now only create tables if they are missing.
 
     # -------------------------
     # CREATE TABLES
@@ -45,14 +26,14 @@ def create_tables():
     cursor.executescript(
         """
     -- 1. Class Definitions
-    CREATE TABLE classes (
+    CREATE TABLE IF NOT EXISTS classes (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT NOT NULL
     );
 
     -- 2. Player Data
-    CREATE TABLE players (
+    CREATE TABLE IF NOT EXISTS players (
         discord_id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         class_id INTEGER NOT NULL,
@@ -70,7 +51,7 @@ def create_tables():
     );
 
     -- 3. Player Stats
-    CREATE TABLE stats (
+    CREATE TABLE IF NOT EXISTS stats (
         discord_id INTEGER PRIMARY KEY,
         stats_json TEXT,
 
@@ -78,7 +59,7 @@ def create_tables():
     );
 
     -- 4. Monsters
-    CREATE TABLE monsters (
+    CREATE TABLE IF NOT EXISTS monsters (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
@@ -94,7 +75,7 @@ def create_tables():
     );
 
     -- 5. Quest Items
-    CREATE TABLE quest_items (
+    CREATE TABLE IF NOT EXISTS quest_items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
@@ -104,7 +85,7 @@ def create_tables():
     );
 
     -- 6. Consumables
-    CREATE TABLE consumables (
+    CREATE TABLE IF NOT EXISTS consumables (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
@@ -114,7 +95,7 @@ def create_tables():
     );
 
     -- 7. General Equipment (6-stat system)
-    CREATE TABLE equipment (
+    CREATE TABLE IF NOT EXISTS equipment (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
@@ -130,7 +111,7 @@ def create_tables():
     );
 
     -- 8. Class-Specific Equipment (6-stat system)
-    CREATE TABLE class_equipment (
+    CREATE TABLE IF NOT EXISTS class_equipment (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         class_id INTEGER NOT NULL,
         name TEXT NOT NULL,
@@ -150,14 +131,14 @@ def create_tables():
     );
 
     -- 9. Item Sets
-    CREATE TABLE item_sets (
+    CREATE TABLE IF NOT EXISTS item_sets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         set_name TEXT NOT NULL,
         bonus_description TEXT
     );
 
     -- 10. Guild Members
-    CREATE TABLE guild_members (
+    CREATE TABLE IF NOT EXISTS guild_members (
         discord_id INTEGER PRIMARY KEY,
         rank TEXT DEFAULT 'F',
         join_date TEXT NOT NULL,
@@ -172,7 +153,7 @@ def create_tables():
     );
 
     -- 11. Quests
-    CREATE TABLE quests (
+    CREATE TABLE IF NOT EXISTS quests (
         id INTEGER PRIMARY KEY,
         title TEXT NOT NULL,
         tier TEXT NOT NULL,
@@ -185,7 +166,7 @@ def create_tables():
     );
 
     -- 12. Player Quests
-    CREATE TABLE player_quests (
+    CREATE TABLE IF NOT EXISTS player_quests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         discord_id INTEGER NOT NULL,
         quest_id INTEGER NOT NULL,
@@ -212,10 +193,11 @@ def create_tables():
         discord_id INTEGER NOT NULL,
         item_key TEXT NOT NULL,
         item_name TEXT NOT NULL,
-        item_type TEXT NOT NULL,  -- 'material', 'consumable', 'equipment'
+        item_type TEXT NOT NULL,
         slot TEXT,
+        item_source_table TEXT,
         count INTEGER DEFAULT 1,
-        equipped INTEGER DEFAULT 0, -- 0 = False, 1 = True
+        equipped INTEGER DEFAULT 0,
         
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     );
@@ -230,22 +212,22 @@ def create_tables():
         active INTEGER DEFAULT 1,
         logs TEXT DEFAULT '[]',
         loot_collected TEXT DEFAULT '{}',
-        active_monster_json TEXT DEFAULT NULL -- <-- NEW
+        active_monster_json TEXT DEFAULT NULL
     );
     
-    -- 16. Skill Definitions (NEW)
+    -- 16. Skill Definitions
     CREATE TABLE IF NOT EXISTS skills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         key_id TEXT UNIQUE,
         name TEXT NOT NULL,
         description TEXT,
-        type TEXT DEFAULT 'Active', -- 'Active', 'Passive'
-        class_id INTEGER, -- Optional: 0 for all classes
+        type TEXT DEFAULT 'Active',
+        class_id INTEGER,
         
         FOREIGN KEY(class_id) REFERENCES classes(id)
     );
     
-    -- 17. Player Skills (NEW)
+    -- 17. Player Skills
     CREATE TABLE IF NOT EXISTS player_skills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         discord_id INTEGER NOT NULL,
@@ -260,9 +242,7 @@ def create_tables():
 
     conn.commit()
     conn.close()
-    print(
-        "✔ Eldoria Quest database created successfully! (Added Skills and inventory.slot)"
-    )
+    print("✔ Eldoria Quest database schema checked/created successfully.")
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ Exposes a static class 'DamageFormula' used by CombatEngine.
 
 import random
 import math
+from typing import Tuple  # <-- THIS IS THE FIX
 
 
 class DamageFormula:

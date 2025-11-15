@@ -23,8 +23,7 @@ import game_systems.data.emojis as E
 from .ui_helpers import back_to_profile_callback, build_inventory_embed
 
 # --- View Imports ---
-# --- UPDATED: We now need InventoryView from character_cog ---
-from .character_cog import InventoryView
+# (Import moved into callbacks to prevent circular import)
 
 
 class AdventureCommands(commands.Cog):
@@ -142,25 +141,42 @@ class ExplorationView(View):
         self.log = log
         self.log_limit = 10  # Max number of lines to show
         self.interaction_user = interaction_user
-
-        # --- NEW ---
         self.inv_manager = InventoryManager(self.db)
 
-        # --- Add the inventory button ---
-        inventory_button = Button(
+        # --- THIS IS THE FIX ---
+        # Define all buttons manually in __init__ to control order
+
+        # Button 1: Explore
+        self.explore_button = Button(
+            label="Explore",
+            style=discord.ButtonStyle.success,
+            custom_id="explore_step",
+            row=0,
+        )
+        self.explore_button.callback = self.explore_callback
+        self.add_item(self.explore_button)
+
+        # Button 2: Inventory
+        self.inventory_button = Button(
             label="Inventory",
             style=discord.ButtonStyle.secondary,
             custom_id="explore_inventory",
             emoji=E.BACKPACK,
-            row=0,  # Put it next to the Explore button
+            row=0,
         )
-        inventory_button.callback = self.inventory_callback
-        # We need to add it *after* the explore button but *before* the leave button
-        # self.children[0] is Explore
-        # self.children[1] is Return to City
-        # We insert at index 1
-        self.insert_item(1, inventory_button)
-        # --- END NEW ---
+        self.inventory_button.callback = self.inventory_callback
+        self.add_item(self.inventory_button)
+
+        # Button 3: Return to City
+        self.leave_button = Button(
+            label="Return to City",
+            style=discord.ButtonStyle.danger,
+            custom_id="explore_leave",
+            row=1,
+        )
+        self.leave_button.callback = self.leave_callback
+        self.add_item(self.leave_button)
+        # --- END OF FIX ---
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -170,13 +186,8 @@ class ExplorationView(View):
             return False
         return True
 
-    @discord.ui.button(
-        label="Explore",
-        style=discord.ButtonStyle.success,
-        custom_id="explore_step",
-        row=0,  # Ensure it's on row 0
-    )
-    async def explore_callback(self, interaction: discord.Interaction, button: Button):
+    # --- Removed the @discord.ui.button decorator ---
+    async def explore_callback(self, interaction: discord.Interaction):
         """
         The player takes a step forward in the dungeon.
         This is the new "tick" of progression.
@@ -185,8 +196,9 @@ class ExplorationView(View):
 
         # --- COMBAT LOOP START ---
         # Disable buttons during the action
-        for item in self.children:
-            item.disabled = True
+        self.explore_button.disabled = True
+        self.inventory_button.disabled = True
+        self.leave_button.disabled = True
         await interaction.edit_original_response(view=self)
 
         # This one function does all the backend work
@@ -213,7 +225,7 @@ class ExplorationView(View):
             embed.color = discord.Color.red()
             embed.set_footer(text="You have been defeated! Your adventure is over.")
 
-            # All buttons are already disabled
+            # Buttons are already disabled, just update embed
             await interaction.edit_original_response(embed=embed, view=self)
 
             return_embed = discord.Embed(
@@ -225,15 +237,18 @@ class ExplorationView(View):
 
         else:
             # Re-enable buttons
-            for item in self.children:
-                item.disabled = False
+            self.explore_button.disabled = False
+            self.inventory_button.disabled = False
+            self.leave_button.disabled = False
             await interaction.edit_original_response(embed=embed, view=self)
 
-    # --- NEW CALLBACK ---
     async def inventory_callback(self, interaction: discord.Interaction):
         """
         Opens the inventory UI from the exploration view.
         """
+        # --- Import locally to prevent circular import ---
+        from .character_cog import InventoryView
+
         await interaction.response.defer()
         items = self.inv_manager.get_inventory(interaction.user.id)
 
@@ -268,13 +283,8 @@ class ExplorationView(View):
 
         await interaction.edit_original_response(embed=embed, view=new_view)
 
-    @discord.ui.button(
-        label="Return to City",
-        style=discord.ButtonStyle.danger,
-        custom_id="explore_leave",
-        row=1,  # Move to row 1 to make space for inventory
-    )
-    async def leave_callback(self, interaction: discord.Interaction, button: Button):
+    # --- Removed the @discord.ui.button decorator ---
+    async def leave_callback(self, interaction: discord.Interaction):
         """
         The player decides to leave the adventure and return to the Guild Hall.
         """

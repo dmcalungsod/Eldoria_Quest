@@ -211,9 +211,6 @@ class CharacterMenuView(View):
                 "SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)
             )
             if cur.fetchone():
-                # This check is good, but the button shouldn't be visible
-                # if the player is already registered.
-                # For now, we'll just hand off to the profile.
                 conn.close()
                 await back_to_profile_callback(interaction, is_new_message=False)
                 return
@@ -225,25 +222,10 @@ class CharacterMenuView(View):
             conn.commit()
             conn.close()
 
-            # --- THIS IS THE FIX ---
-            #
-            # We no longer send an ephemeral message.
-            # We call the back_to_profile_callback directly.
-            # That helper function will defer the interaction and then
-            # edit the original message, which is the correct
-            # "ONE UI" behavior.
-            #
-            # [REMOVED] embed = discord.Embed(...)
-            # [REMOVED] await interaction.response.send_message(embed=embed, ephemeral=True)
-            #
-            # --- END OF FIX ---
-
-            # This call will now handle the response, defer, and edit.
             await back_to_profile_callback(interaction, is_new_message=False)
 
         except Exception as e:
             print(f"Error during guild registration: {e}")
-            # We still need to respond to the interaction on failure
             if not interaction.response.is_done():
                 await interaction.response.send_message(
                     f"{E.ERROR} An error occurred during registration.", ephemeral=True
@@ -266,12 +248,14 @@ class OnboardingCog(commands.Cog):
         The main entry point for new players.
         """
         if self.db.player_exists(interaction.user.id):
-            # --- FIX: Load profile in a NEW message ---
-            await interaction.response.send_message(
-                f"{E.WARNING} You are already an adventurer. Loading your profile...",
-                ephemeral=True,
-            )
-            # This creates a new, persistent "ONE UI" message
+
+            # --- THIS IS THE FIX ---
+            # Defer publicly. This will show a "Eldoria is thinking..."
+            # message that is visible to everyone, and is NOT ephemeral.
+            await interaction.response.defer()
+            # --- END OF FIX ---
+
+            # This will now use followup.send() to post the new UI panel
             await back_to_profile_callback(interaction, is_new_message=True)
             return
 
@@ -282,9 +266,6 @@ class OnboardingCog(commands.Cog):
             text="Once you have chosen a class, you can create your character."
         )
 
-        # --- THE FIX ---
-        # Send the first message as non-ephemeral.
-        # This becomes the "ONE UI" that everything else edits.
         view = StartMenuView(self.db, interaction.user)
         await interaction.response.send_message(embed=embed, view=view, ephemeral=False)
 

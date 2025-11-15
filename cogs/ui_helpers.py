@@ -1,5 +1,5 @@
 """
-_ui_helpers.py
+ui_helpers.py
 
 Contains shared helper functions for the UI, primarily the
 global "back" button callbacks for the main UI hubs.
@@ -22,7 +22,11 @@ def build_inventory_embed(items: list) -> discord.Embed:
     Builds the standard embed for the player's inventory,
     separating items by type and equipped status.
     """
-    embed = discord.Embed(title=f"{E.BACKPACK} Backpack", color=discord.Color.brown())
+    # --- THIS IS THE FIX ---
+    embed = discord.Embed(
+        title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange()
+    )
+    # --- END OF FIX ---
 
     categories = {
         "Equipped": [],
@@ -113,7 +117,6 @@ async def back_to_profile_callback(
         inline=True,
     )
 
-    # --- UPDATED TO SHOW CURRENT VITALS ---
     embed.add_field(
         name="Vitals",
         value=(
@@ -122,7 +125,6 @@ async def back_to_profile_callback(
         ),
         inline=True,
     )
-    # --- END OF UPDATE ---
 
     stat_block = (
         f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"

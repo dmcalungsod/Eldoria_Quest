@@ -20,7 +20,8 @@ class InventoryManager:
         item_name: str,
         item_type: str,
         amount: int = 1,
-        slot: str = None,  # <-- NEW PARAMETER
+        slot: str = None,
+        item_source_table: str = None,  # <-- THIS IS THE FIX (Part 1)
     ):
         """
         Adds an item to the player's inventory using its item_key.
@@ -29,9 +30,7 @@ class InventoryManager:
         conn = self.db.connect()
         cur = conn.cursor()
 
-        # Equipment should not stack, but materials/consumables should
         if item_type != "equipment":
-            # Check if stackable item exists in inventory by key
             cur.execute(
                 """
                 SELECT count FROM inventory 
@@ -41,7 +40,6 @@ class InventoryManager:
             )
             row = cur.fetchone()
         else:
-            # Equipment never stacks
             row = None
 
         if row:
@@ -55,12 +53,22 @@ class InventoryManager:
             )
         else:
             # Create new entry
+            # --- THIS IS THE FIX (Part 2) ---
             cur.execute(
                 """
-                INSERT INTO inventory (discord_id, item_key, item_name, item_type, slot, count)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO inventory (discord_id, item_key, item_name, item_type, 
+                                       slot, item_source_table, count)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-                (discord_id, item_key, item_name, item_type, slot, amount),
+                (
+                    discord_id,
+                    item_key,
+                    item_name,
+                    item_type,
+                    slot,
+                    item_source_table,
+                    amount,
+                ),
             )
 
         conn.commit()
@@ -73,6 +81,8 @@ class InventoryManager:
         conn = self.db.connect()
         cur = conn.cursor()
 
+        # --- UPDATED: We need to find the specific item_key AND item_type ---
+        # This prevents deleting an equipment piece named "heal"
         cur.execute(
             "SELECT id, count FROM inventory WHERE discord_id = ? AND item_key = ? LIMIT 1",
             (discord_id, item_key),
@@ -85,13 +95,11 @@ class InventoryManager:
 
         new_count = row["count"] - amount
         if new_count <= 0:
-            # If it's the last one, delete it (works for equipment and stackables)
             cur.execute(
                 "DELETE FROM inventory WHERE id = ?",
                 (row["id"],),
             )
         else:
-            # This branch will only run for stackable items
             cur.execute(
                 "UPDATE inventory SET count = ? WHERE id = ?",
                 (new_count, row["id"]),
@@ -110,7 +118,8 @@ class InventoryManager:
 
         cur.execute(
             """
-            SELECT id, item_key, item_name, item_type, slot, count, equipped 
+            SELECT id, item_key, item_name, item_type, slot, 
+                   item_source_table, count, equipped 
             FROM inventory 
             WHERE discord_id = ? 
             ORDER BY item_type, item_name

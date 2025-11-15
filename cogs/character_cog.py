@@ -16,8 +16,6 @@ from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.items.equipment_manager import EquipmentManager
-
-# --- NEW IMPORT ---
 from game_systems.items.consumable_manager import ConsumableManager
 import game_systems.data.emojis as E
 
@@ -30,7 +28,8 @@ from .ui_helpers import (
 
 # --- View Imports ---
 from .quest_hub_cog import QuestLogView
-from .adventure_commands import AdventureSetupView
+
+# --- FIX: REMOVED IMPORT from .adventure_commands ---
 
 
 # ======================================================================
@@ -183,6 +182,9 @@ class CharacterProfileView(View):
         """
         Edits the message to show the Adventure Setup (location picker) UI.
         """
+        # --- FIX: Import locally ---
+        from .adventure_commands import AdventureSetupView
+
         adventure_cog = interaction.client.get_cog("AdventureCommands")
         if not adventure_cog:
             await interaction.response.send_message(
@@ -242,13 +244,11 @@ class InventoryView(View):
         self.interaction_user = interaction_user
         self.inv_manager = InventoryManager(self.db)
         self.eq_manager = EquipmentManager(self.db)
-        self.con_manager = ConsumableManager(self.db)  # <-- NEW
+        self.con_manager = ConsumableManager(self.db)
 
-        # Store the callback for the back button
         self.previous_view_callback = previous_view_callback
         self.previous_view_label = previous_view_label
 
-        # Create components
         self.equip_select = Select(
             placeholder="Equip an item...", min_values=1, max_values=1, row=0
         )
@@ -257,26 +257,23 @@ class InventoryView(View):
         )
         self.use_select = Select(
             placeholder="Use an item...", min_values=1, max_values=1, row=2
-        )  # <-- NEW
+        )
         self.back_button = Button(
             label=self.previous_view_label,
             style=discord.ButtonStyle.secondary,
-            row=3,  # <-- NEW
+            row=3,
         )
 
-        # Populate options
         self._populate_selects()
 
-        # Assign callbacks
         self.equip_select.callback = self.equip_callback
         self.unequip_select.callback = self.unequip_callback
-        self.use_select.callback = self.use_callback  # <-- NEW
+        self.use_select.callback = self.use_callback
         self.back_button.callback = self.previous_view_callback
 
-        # Add components
         self.add_item(self.equip_select)
         self.add_item(self.unequip_select)
-        self.add_item(self.use_select)  # <-- NEW
+        self.add_item(self.use_select)
         self.add_item(self.back_button)
 
     def _populate_selects(self):
@@ -285,16 +282,16 @@ class InventoryView(View):
 
         self.equip_select.options.clear()
         self.unequip_select.options.clear()
-        self.use_select.options.clear()  # <-- NEW
+        self.use_select.options.clear()
 
         equip_options = []
         unequip_options = []
-        use_options = []  # <-- NEW
+        use_options = []
 
         for item in items:
             item_type = item["item_type"]
             label = f"{item['item_name']} (x{item['count']})"
-            value = str(item["id"])  # Use the inventory's primary key
+            value = str(item["id"])
 
             if item_type == "equipment":
                 label = f"{item['item_name']} (Slot: {item['slot']})"
@@ -308,7 +305,6 @@ class InventoryView(View):
                     )
 
             elif item_type == "consumable":
-                # <-- NEW
                 use_options.append(
                     discord.SelectOption(label=label, value=value, emoji="🧪")
                 )
@@ -328,11 +324,9 @@ class InventoryView(View):
             self.unequip_select.disabled = True
 
         if use_options:
-            # <-- NEW
             self.use_select.options = use_options
             self.use_select.disabled = False
         else:
-            # <-- NEW
             self.use_select.add_option(label="No usable items.", value="disabled")
             self.use_select.disabled = True
 
@@ -366,7 +360,6 @@ class InventoryView(View):
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
 
-    # --- NEW CALLBACK ---
     async def use_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         inv_db_id = int(self.use_select.values[0])
@@ -381,13 +374,9 @@ class InventoryView(View):
     async def _refresh_view(self, interaction: discord.Interaction):
         """Re-builds the embed and view to show changes."""
 
-        # 1. Re-fetch inventory
         items = self.inv_manager.get_inventory(self.interaction_user.id)
-
-        # 2. Re-build embed
         embed = build_inventory_embed(items)
 
-        # 3. Re-build view
         new_view = InventoryView(
             db_manager=self.db,
             interaction_user=self.interaction_user,
