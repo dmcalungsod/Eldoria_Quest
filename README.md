@@ -2,15 +2,15 @@
 
 ### _A Dark High-Fantasy Idle RPG Discord Bot_
 
-Inspired by **Danmachi**, **Grimgar of Fantasy and Ash**, and atmospheric literary fantasy
+Inspired by guild-based progression, grounded survival themes, and atmospheric literary fantasy
 
 ---
 
-<p align="center">
-  <img src="https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/built_for-personal_use-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/not_open_source-grey?style=for-the-badge"/>
-</p>
+\<p align="center"\>
+\<img src="[https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge](https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge)"/\>
+\<img src="[https://img.shields.io/badge/built_for-personal_use-blue?style=for-the-badge](https://img.shields.io/badge/built_for-personal_use-blue?style=for-the-badge)"/\>
+\<img src="[https://img.shields.io/badge/not_open_source-grey?style=for-the-badge](https://img.shields.io/badge/not_open_source-grey?style=for-the-badge)"/\>
+\</p\>
 
 ---
 
@@ -18,12 +18,12 @@ Inspired by **Danmachi**, **Grimgar of Fantasy and Ash**, and atmospheric litera
 
 **Eldoria Quest** is a private, personal RPG system built as a fully immersive **Dark High-Fantasy Idle RPG**.
 
-The world is shaped by **The Sundering**—a cataclysm that shattered the Veil “like weathered glass,” unleashing nightmares upon the fractured lands of Eldoria. Civilization now clings to fortified enclaves, and the **Eldorian Adventurer’s Consortium** stands as humanity’s last defense.
+The world is shaped by **The Sundering**—a cataclysm that shattered the Veil “like weathered glass,” unleashing nightmares upon the fractured lands of Eldoria. Civilization now clings to fortified enclaves, and the **Adventurer's Guild** stands as humanity’s last defense.
 
 The experience blends:
 
-- **Danmachi** — guild progression, adventurer ranks, Falna-style stats
-- **Grimgar of Fantasy & Ash** — grounded survival tone, emotional weight, realism
+- **Guild Progression** — adventurer ranks and a structured advancement system
+- **Grounded Survival** — a focus on tone, emotional weight, and realism
 - **Classic literary fantasy** — atmospheric narration, slow-burn storytelling
 
 This is not a typical power fantasy—its tone is gritty, grounded, and unforgiving.
@@ -34,7 +34,7 @@ This is not a typical power fantasy—its tone is gritty, grounded, and unforgiv
 
 ### **Grounded Adventuring**
 
-- Early-game danger reflects Grimgar’s realism
+- Early-game danger reflects a realistic survival tone
 - Monsters hit hard
 - Supplies and stamina matter
 - Death ends the adventure and shapes the story
@@ -59,7 +59,7 @@ Every message is styled like a fantasy novel:
 
 ### **1. Player Registration**
 
-Players register with the Adventurer’s Consortium
+Players register with the **Adventurer's Guild**
 and receive their **Guild Card**—their identity and lifeline.
 
 ---
@@ -73,7 +73,7 @@ The Quest Board presents simple but dangerous tasks:
 - Scouting ruined outskirts
 - Boundary patrols
 
-These are low-tier but deadly—reflecting Grimgar’s early team struggles.
+These are low-tier but deadly—reflecting the struggles of a new adventurer.
 
 ---
 
@@ -99,7 +99,7 @@ Enemies drop:
 - Shards & fragments
 
 Materials must be **sold manually** at the **Guild Exchange**
-—directly inspired by Grimgar’s realistic economy.
+—a core part of the realistic economy.
 
 ---
 
@@ -113,7 +113,7 @@ Death:
 
 ---
 
-### **6. Slow Falna Progression**
+# 6\. Slow Progression
 
 Players level up over time through:
 
@@ -128,9 +128,9 @@ The pace is deliberate—not a power fantasy.
 
 # 🧩 **Major Features**
 
-### ✔️ Danmachi-style guild ranking
+### ✔️ Detailed guild ranking system
 
-### ✔️ Grimgar-inspired scavenging economy
+### ✔️ Scavenging-based economy
 
 ### ✔️ Idle auto-adventure system
 
@@ -140,7 +140,7 @@ The pace is deliberate—not a power fantasy.
 
 ### ✔️ Sell items for Aurum at the Guild Exchange
 
-### ✔️ Falna-style level & stat tracking
+### ✔️ Detailed level & stat tracking
 
 ### ✔️ Atmospheric narration for every event
 
@@ -227,7 +227,7 @@ python bot.py
 ### Adventurer Commands
 
 - `/start` — Register as an adventurer
-- `/status` — View detailed Falna
+- `/status` — View detailed adventurer status
 - `/profile` — Open Guild Card UI
 
 ### Progression & Tasks
@@ -267,6 +267,6 @@ Not licensed for public distribution or reuse.**
 Eldoria Quest is a personal passion project built for immersion, mood, and grounded fantasy storytelling.
 It blends:
 
-- Danmachi’s structure
-- Grimgar’s emotional realism
+- A structured guild system
+- Grounded, realistic progression
 - Literary dark-fantasy prose
