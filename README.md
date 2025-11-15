@@ -1,3 +1,4 @@
+```markdown
 # 🌑 **Eldoria Quest**
 
 ### _A Dark High-Fantasy Idle RPG Discord Bot_
@@ -26,8 +27,8 @@ Civilization survives only within fortified enclaves like **Astraeon**, the capi
 
 The game blends:
 
-- **Guild-Driven Progression** (Danmachi)
-- **Material-Based Economy & Harsh Survival** (Grimgar)
+- **Guild-Driven Progression** (Danmachi-Style)
+- **Material-Based Economy & Harsh Survival** (Grimgar-Style)
 - **Literary, atmospheric narration** for every action
 
 ---
@@ -44,102 +45,95 @@ The game blends:
 ### 🜃 Immersive UI & Narrative (Grimgar-Style)
 
 - A single persistent **“ONE UI”** message — minimal slash commands.
-- Combat plays out automatically with suspenseful timed narration.
-- Narration is both **class-aware** and **monster-aware**.
-- Player HP/MP persists until healed.
+- Combat plays out automatically with suspenseful **1.5-second turn delays**.
+- Narration is both **class-aware** (Mages cast spells, Warriors cleave) and **monster-aware**.
+- Player **HP/MP persists** between actions and must be healed manually or by resting.
 
 ---
 
 # 🜂 Core Gameplay Loop
 
-1. **Register** — Use `/start` to create your character and receive your **Guild Card**.
-2. **Explore** — From the profile UI, choose a location and press **Explore**.
-3. **Survive** — Each exploration triggers combat, rest, or a story event; combat logs post every 5 minutes.
-4. **Manage** — Use Inventory to equip gear or consume potions during or after runs.
-5. **Return** — End the adventure to receive EXP and materials; heal and rest at the Guild Hall.
-6. **Progress** — Sell materials at the **Guild Exchange** for Aurum, turn in quests, and rank up (F → SSS).
+1.  **Register** — Use `/start` to create your character, choose a class, and receive your **Guild Card**.
+2.  **Explore** — From the profile UI, choose a location and press **"Explore"**.
+3.  **Survive** — Each press of "Explore" triggers one of two events:
+    - **Combat (60%):** You encounter a monster. The battle plays out automatically, with your character using skills and attacks via an "Auto-Skill AI".
+    - **Rest (40%):** You find nothing, "catch your breath," and regenerate a small amount of HP and MP based on your stats.
+4.  **Manage** — During the adventure, you can press **"Inventory"** to pause and use a potion or equip a newly looted item.
+5.  **Return** — Click **"Return to City"** to end your adventure. This banks your EXP and fully restores your HP and MP. If you die, you are forcibly returned with 1 HP.
+6.  **Progress** — Back at the **Guild Hall**, you can sell materials at the **Guild Exchange**, turn in quests, and request promotion to the next Guild Rank (F → SSS).
 
 ---
 
 # 🧩 Major Features
 
-- Persistent **ONE UI** system (no constant slash commands)
-- Idle adventure simulation with 5-minute log cadence
-- Auto-skill combat AI and class/monster-aware narration
-- Loot-only economy; materials sold at Guild Exchange for Aurum
-- Full equipment & consumable systems with persistent HP/MP
-- Quest system with automatic objective tracking
-- Rank progression (F → SSS) and Guild Merit mechanics
+- Persistent **"ONE UI" System** (No slash commands needed after `/start`)
+- **Manual Exploration** (button-driven, not timed)
+- **Turn-by-Turn Combat Playback** (1.5s delay for suspense)
+- **Auto-Skill Combat AI** (Mages cast spells, Clerics heal, Warriors strike)
+- **"Explore-to-Regen"** HP/MP System
+- **Loot-Only Economy** (Materials must be sold at the Guild)
+- **Full Equipment System** (Equip/Unequip from inventory, stats auto-recalculate)
+- **Full Consumable System** (Use potions to heal persistent HP)
+- **Persistent Player Vitals** (HP/MP are saved to the database)
+- **Detailed Guild Rank System** (F to SSS) with promotion checks
+- **Quest System** with automatic "defeat" and "collect" objective tracking
 
 ---
 
 # 🗂️ Project Structure
-
 ```
 
 eldoria-bot/
-├─ main.py # Bot entry point
-├─ config.py # Global configuration / constants
+├─ main.py \# Bot entry point
 ├─ README.md
 ├─ requirements.txt
 │
 ├─ cogs/
-│ ├─ onboarding_cog.py # /start, character creation
-│ ├─ character_cog.py # Profile, Inventory, Skills UI
-│ ├─ guild_hub_cog.py # Guild Hall, Rank Up, Exchange UI
-│ ├─ quest_hub_cog.py # Quest Board, Quest Log UI
-│ ├─ adventure_commands.py # Explore, adventure session UI
-│ └─ ui_helpers.py # Shared navigation utilities (no cross-cog imports)
-│
-├─ ui/
-│ ├─ guild_card_view.py # Views/buttons for main player card
-│ ├─ quest_board_view.py # Quest board dropdowns & pages
-│ ├─ quest_log_view.py # Quest progress views
-│ └─ navigation.py # back_to_guild_card callbacks (safe imports)
+│ ├─ onboarding_cog.py \# /start, character creation
+│ ├─ character_cog.py \# Profile, Inventory, Skills UI
+│ ├─ guild_hub_cog.py \# Guild Hall, Rank Up, Exchange UI
+│ ├─ quest_hub_cog.py \# Quest Board and Quest Log UI
+│ ├─ adventure_commands.py \# The main "Explore" adventure UI
+│ └─ ui_helpers.py \# Shared navigation functions (back_to_profile...)
 │
 ├─ database/
-│ ├─ database_manager.py # DB interface
-│ ├─ create_database.py # Schema creation script
-│ └─ populate_database.py # Seed data insertion
+│ ├─ database_manager.py \# DB interface (CRUD operations)
+│ ├─ create_database.py \# The master schema
+│ └─ populate_database.py \# Fills DB with items, monsters, quests
 │
 ├─ game_systems/
-│ ├─ adventure/
-│ │ ├─ adventure_manager.py
-│ │ └─ adventure_session.py
-│ ├─ combat/
-│ │ ├─ combat_engine.py
-│ │ ├─ combat_phrases.py
-│ │ └─ damage_formula.py
-│ ├─ data/
-│ │ ├─ class_data.py
-│ │ ├─ monster_data.py
-│ │ ├─ materials.py
-│ │ ├─ consumables.py
-│ │ └─ skills_data.py
-│ └─ guild_system/
+├─ adventure/
+│ ├─ adventure_manager.py
+│ └─ adventure_session.py
+├─ combat/
+│ ├─ combat_engine.py
+│ ├─ combat_phrases.py
+│ └─ damage_formula.py
+├─ data/
+│ ├─ class_data.py
+│ ├─ monsters.py
+│ ├─ materials.py
+│ ├─ consumables.py
+│ ├─ skills_data.py
+│ └─ ... (etc)
+├─ guild_system/
 │ ├─ guild_exchange.py
 │ ├─ quest_system.py
 │ ├─ rank_system.py
 │ └─ reward_system.py
-│
 ├─ items/
 │ ├─ item_manager.py
 │ ├─ inventory_manager.py
 │ ├─ equipment_manager.py
 │ └─ consumable_manager.py
-│
-└─ player/
+├─ monsters/
+│ └─ monster_actions.py
+├─ player/
 ├─ player_creator.py
 ├─ player_stats.py
 └─ level_up.py
 
 ```
-
-> **Notes:**
->
-> - `cogs/` modules **must not** import each other. They only import from `ui/`, `game_systems/`, and `database/`.
-> - Keep UI code in `ui/` to avoid circular imports. Import views lazily in callbacks if needed.
-> - Business logic lives under `game_systems/` and never imports from `cogs/` or `ui/`.
 
 ---
 
@@ -148,7 +142,4 @@ eldoria-bot/
 This repository is **private intellectual property**. All source code, lore, mechanics, and documentation belong solely to the project owner.
 
 **Not open-source. Not licensed for redistribution or reuse.**
-
-```
-
 ```
