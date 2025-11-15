@@ -63,8 +63,37 @@ class PlayerCreator:
             race=race,
             gender=gender,
             stats_data=stats.to_dict(),
-            initial_hp=initial_hp,  # <-- NEW
-            initial_mp=initial_mp,  # <-- NEW
+            initial_hp=initial_hp,
+            initial_mp=initial_mp,
         )
+
+        # --- THIS IS THE FIX: Add default skills ---
+        conn = None
+        try:
+            conn = self.db.connect()
+            cur = conn.cursor()
+
+            # 1. Find all default skills for this class_id
+            cur.execute("SELECT key_id FROM skills WHERE class_id = ?", (class_id,))
+            default_skills = cur.fetchall()
+
+            # 2. Add them to the player_skills table
+            for skill in default_skills:
+                cur.execute(
+                    """
+                    INSERT INTO player_skills (discord_id, skill_key, skill_level)
+                    VALUES (?, ?, 1)
+                    """,
+                    (discord_id, skill["key_id"]),
+                )
+
+            conn.commit()
+        except Exception as e:
+            print(f"Error adding default skills for {discord_id}: {e}")
+            # We can just log this and not fail character creation
+        finally:
+            if conn:
+                conn.close()
+        # --- END OF FIX ---
 
         return True, f"Welcome **{username}**, you are now a **{class_name}**!"

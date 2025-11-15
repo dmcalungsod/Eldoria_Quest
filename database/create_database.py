@@ -194,6 +194,7 @@ def create_tables():
         item_key TEXT NOT NULL,
         item_name TEXT NOT NULL,
         item_type TEXT NOT NULL,
+        rarity TEXT DEFAULT 'Common', -- <-- THIS IS THE FIX
         slot TEXT,
         item_source_table TEXT,
         count INTEGER DEFAULT 1,
@@ -224,7 +225,6 @@ def create_tables():
         type TEXT DEFAULT 'Active',
         class_id INTEGER,
         
-        -- FIX: ADDED MISSING COLUMNS --
         mp_cost INTEGER DEFAULT 0,
         power_multiplier REAL DEFAULT 1.0,
         heal_power INTEGER DEFAULT 0,

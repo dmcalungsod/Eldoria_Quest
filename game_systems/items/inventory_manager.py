@@ -19,9 +19,10 @@ class InventoryManager:
         item_key: str,
         item_name: str,
         item_type: str,
+        rarity: str = "Common",  # <-- THIS IS THE FIX (Part 1)
         amount: int = 1,
         slot: str = None,
-        item_source_table: str = None,  # <-- THIS IS THE FIX (Part 1)
+        item_source_table: str = None,
     ):
         """
         Adds an item to the player's inventory using its item_key.
@@ -57,14 +58,15 @@ class InventoryManager:
             cur.execute(
                 """
                 INSERT INTO inventory (discord_id, item_key, item_name, item_type, 
-                                       slot, item_source_table, count)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                                       rarity, slot, item_source_table, count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (
                     discord_id,
                     item_key,
                     item_name,
                     item_type,
+                    rarity,  # <-- Added rarity
                     slot,
                     item_source_table,
                     amount,
@@ -116,16 +118,18 @@ class InventoryManager:
         conn = self.db.connect()
         cur = conn.cursor()
 
+        # --- THIS IS THE FIX (Part 3) ---
         cur.execute(
             """
             SELECT id, item_key, item_name, item_type, slot, 
-                   item_source_table, count, equipped 
+                   rarity, item_source_table, count, equipped 
             FROM inventory 
             WHERE discord_id = ? 
             ORDER BY item_type, item_name
         """,
             (discord_id,),
         )
+        # --- END OF FIX ---
 
         items = [dict(row) for row in cur.fetchall()]
         conn.close()

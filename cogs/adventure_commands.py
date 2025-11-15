@@ -143,7 +143,6 @@ class ExplorationView(View):
         self.interaction_user = interaction_user
         self.inv_manager = InventoryManager(self.db)
 
-        # --- THIS IS THE FIX ---
         # Define all buttons manually in __init__ to control order
 
         # Button 1: Explore
@@ -176,7 +175,6 @@ class ExplorationView(View):
         )
         self.leave_button.callback = self.leave_callback
         self.add_item(self.leave_button)
-        # --- END OF FIX ---
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -186,16 +184,14 @@ class ExplorationView(View):
             return False
         return True
 
-    # --- Removed the @discord.ui.button decorator ---
     async def explore_callback(self, interaction: discord.Interaction):
         """
         The player takes a step forward in the dungeon.
-        This is the new "tick" of progression.
+        This now triggers a full auto-battle or non-combat event.
         """
         await interaction.response.defer()
 
-        # --- COMBAT LOOP START ---
-        # Disable buttons during the action
+        # --- BUTTONS DISABLED ---
         self.explore_button.disabled = True
         self.inventory_button.disabled = True
         self.leave_button.disabled = True
@@ -217,15 +213,17 @@ class ExplorationView(View):
             new_description = "\n".join(self.log)
             embed.description = new_description
             await interaction.edit_original_response(embed=embed)
+
+            # --- THE DELAY YOU WANTED ---
             await asyncio.sleep(1.5)
 
-        # --- COMBAT LOOP END ---
+        # --- PLAYBACK FINISHED ---
 
         if is_dead:
             embed.color = discord.Color.red()
             embed.set_footer(text="You have been defeated! Your adventure is over.")
 
-            # Buttons are already disabled, just update embed
+            # View is left with buttons disabled
             await interaction.edit_original_response(embed=embed, view=self)
 
             return_embed = discord.Embed(
@@ -246,7 +244,6 @@ class ExplorationView(View):
         """
         Opens the inventory UI from the exploration view.
         """
-        # --- Import locally to prevent circular import ---
         from .character_cog import InventoryView
 
         await interaction.response.defer()
@@ -254,7 +251,6 @@ class ExplorationView(View):
 
         embed = build_inventory_embed(items)
 
-        # Pass the 'back_to_exploration' callback
         view = InventoryView(
             db_manager=self.db,
             interaction_user=self.interaction_user,
@@ -269,26 +265,22 @@ class ExplorationView(View):
         """
         await interaction.response.defer()
 
-        # Re-build the embed
         embed = discord.Embed(
             title=f"{LOCATIONS[self.location_id].get('emoji', E.MAP)} Exploring: {LOCATIONS[self.location_id]['name']}",
             description="\n".join(self.log),
             color=discord.Color.green(),
         )
 
-        # Re-create the view to ensure buttons are enabled
         new_view = ExplorationView(
             self.db, self.manager, self.location_id, self.log, self.interaction_user
         )
 
         await interaction.edit_original_response(embed=embed, view=new_view)
 
-    # --- Removed the @discord.ui.button decorator ---
     async def leave_callback(self, interaction: discord.Interaction):
         """
         The player decides to leave the adventure and return to the Guild Hall.
         """
-        # 1. Mark the adventure as inactive and grant rewards
         self.manager.end_adventure(interaction.user.id)
 
         await interaction.response.defer()
@@ -299,7 +291,6 @@ class ExplorationView(View):
             color=discord.Color.blue(),
         )
 
-        # Send ephemeral notification, then edit the main UI
         await interaction.followup.send(embed=embed, ephemeral=True)
         await back_to_profile_callback(interaction, is_new_message=False)
 

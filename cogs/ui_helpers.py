@@ -22,11 +22,9 @@ def build_inventory_embed(items: list) -> discord.Embed:
     Builds the standard embed for the player's inventory,
     separating items by type and equipped status.
     """
-    # --- THIS IS THE FIX ---
     embed = discord.Embed(
         title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange()
     )
-    # --- END OF FIX ---
 
     categories = {
         "Equipped": [],
@@ -35,19 +33,25 @@ def build_inventory_embed(items: list) -> discord.Embed:
         "Material": [],
     }
 
+    # --- THIS IS THE FIX ---
     for item in items:
         item_type = item["item_type"].title()
+        rarity_str = f" ({item['rarity']})" if item["rarity"] else ""  # Add rarity text
+
         if item_type == "Equipment":
             if item["equipped"] == 1:
                 categories["Equipped"].append(
-                    f"• **{item['item_name']}** (Slot: *{item['slot']}*)"
+                    f"• **{item['item_name']}**{rarity_str} (Slot: *{item['slot']}*)"
                 )
             else:
                 categories["Equipment"].append(
-                    f"• {item['item_name']} (x{item['count']})"
+                    f"• {item['item_name']}{rarity_str} (x{item['count']})"
                 )
         elif item_type in categories:
-            categories[item_type].append(f"• {item['item_name']} (x{item['count']})")
+            categories[item_type].append(
+                f"• {item['item_name']}{rarity_str} (x{item['count']})"
+            )
+    # --- END OF FIX ---
 
     if not any(categories.values()):
         embed.description = "Your backpack is empty."
@@ -106,11 +110,17 @@ async def back_to_profile_callback(
     class_row = db.get_class(player["class_id"])
     class_name = class_row["name"] if class_row else "Unknown"
 
+    player_skills = db.get_player_skills(discord_id)
+
     embed = discord.Embed(
         title=f"{E.SCROLL} Adventurer Status — {player['name']}",
         description=f"**Guild:** Adventurer's Guild\n**Class:** {class_name}",
         color=discord.Color.dark_red(),
     )
+
+    if interaction.user.avatar:
+        embed.set_thumbnail(url=interaction.user.avatar.url)
+
     embed.add_field(
         name="Condition",
         value=f"**Lv.** {player['level']}\n**Rank:** {guild_data['rank']}",
@@ -131,6 +141,28 @@ async def back_to_profile_callback(
         f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
     )
     embed.add_field(name="Basic Abilities", value=stat_block, inline=False)
+
+    if not player_skills:
+        skills_str = "No skills learned."
+    else:
+        active_skills = []
+        passive_skills = []
+        for s in player_skills:
+            skill_line = f"• **{s['name']}** (Lv. {s['skill_level']})"
+            if s["type"] == "Active":
+                active_skills.append(skill_line)
+            else:
+                passive_skills.append(skill_line)
+
+        skills_parts = []
+        if active_skills:
+            skills_parts.append(f"**Active**\n" + "\n".join(active_skills))
+        if passive_skills:
+            skills_parts.append(f"**Passive**\n" + "\n".join(passive_skills))
+
+        skills_str = "\n".join(skills_parts)
+
+    embed.add_field(name="Acquired Skills", value=skills_str, inline=False)
 
     view = CharacterProfileView(db, interaction.user)
 

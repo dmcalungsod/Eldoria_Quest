@@ -9,9 +9,10 @@ Handles the simulation of combat steps and log generation.
 import json
 import random
 import datetime
+import logging
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
-from game_systems.combat.combat_phrases import CombatPhrases  # <-- THIS IS THE FIX
+from game_systems.combat.combat_phrases import CombatPhrases
 from game_systems.data.monsters import MONSTERS
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
@@ -23,15 +24,15 @@ from game_systems.data.materials import MATERIALS
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.items.item_manager import item_manager
 
-# --- NEW IMPORT ---
 from .adventure_events import AdventureEvents
+
+# Get the logger
+logger = logging.getLogger("discord")
 
 
 class AdventureSession:
 
-    # --- NEW: Event Chances ---
     REGEN_CHANCE = 70  # 70% chance to regen
-    # (The remaining 30% is for a quest event)
 
     def __init__(
         self,
@@ -64,30 +65,51 @@ class AdventureSession:
     def simulate_step(self) -> dict:
         """
         Simulates one 'step' (e.g., one button press).
-        Resolves combat, logs results, and updates quest progress.
-        Returns a dictionary with the results.
+        This will either be a non-combat event OR a full auto-battle.
         """
         location = LOCATIONS.get(self.location_id)
         if not location:
             return {"log": ["Error: Location data missing."], "dead": True}
 
-        if self.active_monster:
-            # We are in combat, so the "Explore" button means "Attack"
-            return self._resolve_combat_turn()
+        # This function is only called when not in combat.
+        # We roll for an event.
 
-        # Not in combat, so explore
         if random.randint(1, 100) > 40:
-            # 60% chance of combat
-            return self._initiate_combat(location)
+            # 60% chance: FULL COMBAT
+            logger.info("Simulate Step: Initiating full combat.")
+
+            # 1. Get the "encounter" line
+            log_entries = self._initiate_combat(location)
+
+            if not self.active_monster:
+                logger.error(
+                    "Simulate Step: _initiate_combat failed to create monster."
+                )
+                self.save_state()  # Save error log
+                return {"log": log_entries, "dead": False}
+
+            # 2. Run the battle loop until there is a winner
+            is_dead = False
+            while self.active_monster and not is_dead:
+                logger.info("Simulate Step: Running combat turn...")
+                combat_result = self._resolve_combat_turn()  # This runs one turn
+
+                log_entries.extend(combat_result["phrases"])
+
+                if combat_result.get("winner") == "monster":
+                    is_dead = True
+
+            logger.info(f"Simulate Step: Combat finished. Dead: {is_dead}")
+            return {"log": log_entries, "dead": is_dead}
+
         else:
-            # 40% chance of a non-combat event
+            # 40% chance: Non-combat event
+            logger.info("Simulate Step: Initiating non-combat step.")
             return self._resolve_non_combat_step()
 
-    # --- NEW METHOD ---
     def _resolve_non_combat_step(self) -> dict:
         """
-        Handles non-combat events.
-        Decides between regeneration or a quest-specific event.
+        Handles a single non-combat event.
         """
         if random.randint(1, 100) <= self.REGEN_CHANCE:
             result = self._perform_regeneration()
@@ -95,6 +117,7 @@ class AdventureSession:
             result = self._perform_quest_event()
 
         self.logs.extend(result["log"])
+        self.save_state()  # Save state after the event
         return result
 
     def _perform_regeneration(self) -> dict:
@@ -111,11 +134,9 @@ class AdventureSession:
         max_mp = stats.max_mp
 
         if current_hp >= max_hp and current_mp >= max_mp:
-            # No regen needed, just post a simple message
             log_entry = AdventureEvents.no_event_found()
             return {"log": [log_entry], "dead": False}
 
-        # Regen Formula: 1 + (5% of END/MAG stat)
         hp_regen = 1 + int(stats.endurance * 0.5)
         mp_regen = 1 + int(stats.magic * 0.5)
 
@@ -135,14 +156,11 @@ class AdventureSession:
 
         return {"log": log_lines, "dead": False}
 
-    # --- NEW METHOD ---
     def _perform_quest_event(self) -> dict:
         """
         Finds a non-combat quest objective (gather, locate, etc.)
         """
         active_quests = self.quest_system.get_player_quests(self.discord_id)
-
-        # Define the types of objectives we're looking for
         event_types = ["gather", "locate", "examine", "survey"]
 
         for quest in active_quests:
@@ -151,11 +169,9 @@ class AdventureSession:
 
             for obj_type in event_types:
                 if obj_type in objectives:
-                    # Find the first task of this type that is not complete
                     for task, required in objectives[obj_type].items():
                         current = progress.get(obj_type, {}).get(task, 0)
                         if current < required:
-                            # We found an event!
                             self.quest_system.update_progress(
                                 self.discord_id, quest["id"], obj_type, task, 1
                             )
@@ -165,20 +181,21 @@ class AdventureSession:
                             )
                             return {"log": [log_entry, quest_update], "dead": False}
 
-        # If we get here, no non-combat quest events were found
         log_entry = AdventureEvents.no_event_found()
         return {"log": [log_entry], "dead": False}
 
-    def _initiate_combat(self, location: dict) -> dict:
+    def _initiate_combat(self, location: dict) -> list:
         """
-        Finds a new monster and begins combat.
+        Finds a new monster, sets it as active, and saves the state.
+        Returns the opening log entry as a list.
         """
         monster_pool = location["monsters"]
         choices, weights = zip(*monster_pool)
         monster_key = random.choices(choices, weights=weights, k=1)[0]
         monster_template = MONSTERS.get(monster_key)
         if not monster_template:
-            return {"log": ["Error: Monster data missing."], "dead": False}
+            logger.error(f"Monster data missing for key: {monster_key}")
+            return ["Error: Monster data missing."]
 
         self.active_monster = {
             "name": monster_template["name"],
@@ -193,15 +210,19 @@ class AdventureSession:
             "drops": monster_template.get("drops", []),
         }
 
-        self.save_state()
-
         log_entry = CombatPhrases.opening(self.active_monster)
         self.logs.append(log_entry)
-        return {"log": [log_entry], "dead": False}
+
+        logger.info(f"Combat Initiated: {self.active_monster['name']}")
+
+        # Save the *start* of the combat
+        self.save_state()
+
+        return [log_entry]
 
     def _resolve_combat_turn(self) -> dict:
         """
-        Resolves ONE turn of combat against self.active_monster.
+        Resolves ONE turn of combat and saves the new state.
         """
         stats_json = self.db.get_player_stats_json(self.discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
@@ -256,22 +277,25 @@ class AdventureSession:
 
         self.active_monster["HP"] = result["monster_hp"]
 
-        is_dead = False
         combat_log = result["phrases"]
 
-        if result["winner"] == "player":
-            self.active_monster = None
+        if result.get("winner") == "player":
+            self.active_monster = None  # Clear monster for next loop check
             loot_text = []
             self.add_loot("exp", result["exp"])
             loot_text.append(f"`{result['exp']} EXP`")
 
+            # --- THIS IS THE FIX (Part 1) ---
+            # 1. Handle Material Drops
             for drop_key, chance in result["drops"]:
                 if random.randint(1, 100) <= chance:
                     self.add_loot(drop_key, 1)
                     mat_data = MATERIALS.get(drop_key)
-                    item_name = mat_data["name"] if mat_data else drop_key
-                    loot_text.append(f"`{item_name}`")
+                    item_name = mat_data.get("name", drop_key)
+                    item_rarity = mat_data.get("rarity", "Common")
+                    loot_text.append(f"`{item_name} ({item_rarity})`")
 
+            # 2. Handle Equipment Drops
             equipment_drops = item_manager.generate_monster_loot(result["monster_data"])
             for item in equipment_drops:
                 self.inventory_manager.add_item(
@@ -279,11 +303,15 @@ class AdventureSession:
                     item_key=str(item["id"]),
                     item_name=item["name"],
                     item_type="equipment",
+                    rarity=item["rarity"],  # <-- Pass rarity
                     amount=1,
                     slot=item["slot"],
                     item_source_table=item["source"],
                 )
-                loot_text.append(f"`{item['name']}`")
+                loot_text.append(
+                    f"`{item['name']} ({item['rarity']})`"
+                )  # <-- Show rarity in log
+            # --- END OF FIX ---
 
             if loot_text:
                 combat_log.append(f"\n{E.ITEM_BOX} **Loot:** {', '.join(loot_text)}")
@@ -296,14 +324,13 @@ class AdventureSession:
                     f"{E.QUEST_SCROLL} *Quest Updated: {', '.join(quest_updates)}*"
                 )
 
-        elif result["winner"] == "monster":
-            is_dead = True
-            self.active = False
+        elif result.get("winner") == "monster":
+            self.active = False  # Player is dead, end session
             self.active_monster = None
 
         self.logs.extend(combat_log)
-        self.save_state()
-        return {"log": combat_log, "dead": is_dead}
+        self.save_state()  # Save the result of this turn
+        return result
 
     def _update_quests(self, monster_name: str, drops: list) -> list:
         """
@@ -316,14 +343,12 @@ class AdventureSession:
             updated = False
             objectives = quest.get("objectives", {})
 
-            # A. Check for monster kill objectives
             if "defeat" in objectives and monster_name in objectives["defeat"]:
                 self.quest_system.update_progress(
                     self.discord_id, quest["id"], "defeat", monster_name
                 )
                 updated = True
 
-            # B. Check for item collection objectives
             if "collect" in objectives:
                 for drop_key, _ in drops:
                     if drop_key in objectives["collect"]:
