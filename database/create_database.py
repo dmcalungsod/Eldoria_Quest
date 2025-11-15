@@ -2,7 +2,7 @@
 create_database.py
 
 Creates the full Eldoria Quest database schema from scratch.
-(Refactored to remove 'gold_drop' from monsters table)
+(Refactored for 6-stat system and new Guild name)
 """
 
 import sqlite3
@@ -34,6 +34,8 @@ def create_tables():
     DROP TABLE IF EXISTS materials;
     DROP TABLE IF EXISTS inventory;
     DROP TABLE IF EXISTS adventure_sessions;
+    DROP TABLE IF EXISTS skills;
+    DROP TABLE IF EXISTS player_skills;
     """
     )
 
@@ -54,6 +56,8 @@ def create_tables():
         discord_id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         class_id INTEGER NOT NULL,
+        race TEXT,
+        gender TEXT,
         level INTEGER DEFAULT 1,
         experience INTEGER DEFAULT 0,
         exp_to_next INTEGER DEFAULT 100,
@@ -71,7 +75,7 @@ def create_tables():
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     );
 
-    -- 4. Monsters (NO gold_drop column)
+    -- 4. Monsters
     CREATE TABLE monsters (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -107,7 +111,7 @@ def create_tables():
         value INTEGER DEFAULT 0
     );
 
-    -- 7. General Equipment
+    -- 7. General Equipment (6-stat system)
     CREATE TABLE equipment (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -115,16 +119,15 @@ def create_tables():
         rarity TEXT NOT NULL,
         slot TEXT NOT NULL,
         str_bonus INTEGER DEFAULT 0,
+        end_bonus INTEGER DEFAULT 0,
         dex_bonus INTEGER DEFAULT 0,
-        con_bonus INTEGER DEFAULT 0,
-        int_bonus INTEGER DEFAULT 0,
-        wis_bonus INTEGER DEFAULT 0,
-        cha_bonus INTEGER DEFAULT 0,
+        agi_bonus INTEGER DEFAULT 0,
+        mag_bonus INTEGER DEFAULT 0,
         lck_bonus INTEGER DEFAULT 0,
         min_level INTEGER DEFAULT 1
     );
 
-    -- 8. Class-Specific Equipment
+    -- 8. Class-Specific Equipment (6-stat system)
     CREATE TABLE class_equipment (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         class_id INTEGER NOT NULL,
@@ -133,11 +136,10 @@ def create_tables():
         rarity TEXT NOT NULL,
         slot TEXT NOT NULL,
         str_bonus INTEGER DEFAULT 0,
+        end_bonus INTEGER DEFAULT 0,
         dex_bonus INTEGER DEFAULT 0,
-        con_bonus INTEGER DEFAULT 0,
-        int_bonus INTEGER DEFAULT 0,
-        wis_bonus INTEGER DEFAULT 0,
-        cha_bonus INTEGER DEFAULT 0,
+        agi_bonus INTEGER DEFAULT 0,
+        mag_bonus INTEGER DEFAULT 0,
         lck_bonus INTEGER DEFAULT 0,
         set_name TEXT,
         min_level INTEGER DEFAULT 1,
@@ -226,12 +228,35 @@ def create_tables():
         logs TEXT DEFAULT '[]',
         loot_collected TEXT DEFAULT '{}'
     );
+    
+    -- 16. Skill Definitions (NEW)
+    CREATE TABLE IF NOT EXISTS skills (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key_id TEXT UNIQUE,
+        name TEXT NOT NULL,
+        description TEXT,
+        type TEXT DEFAULT 'Active', -- 'Active', 'Passive'
+        class_id INTEGER, -- Optional: 0 for all classes
+        
+        FOREIGN KEY(class_id) REFERENCES classes(id)
+    );
+    
+    -- 17. Player Skills (NEW)
+    CREATE TABLE IF NOT EXISTS player_skills (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        discord_id INTEGER NOT NULL,
+        skill_key TEXT NOT NULL,
+        skill_level INTEGER DEFAULT 1,
+        
+        FOREIGN KEY(discord_id) REFERENCES players(discord_id),
+        FOREIGN KEY(skill_key) REFERENCES skills(key_id)
+    );
     """
     )
 
     conn.commit()
     conn.close()
-    print("✔ Eldoria Quest database created successfully! (Economy: Materials-Only)")
+    print("✔ Eldoria Quest database created successfully! (Added Skills)")
 
 
 if __name__ == "__main__":

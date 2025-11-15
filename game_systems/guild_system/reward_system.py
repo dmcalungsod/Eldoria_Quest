@@ -83,7 +83,7 @@ class RewardSystem:
         summary = (
             f"{E.MEDAL} **Quest Complete!**\n"
             "Your achievements have been recorded in the annals of the\n"
-            "**Eldorian Adventurer’s Consortium.**\n\n"
+            "**Adventurer's Guild**.\n\n"
             f"{E.EXP} **EXP Gained:** `+{exp_reward}`\n"
             f"{E.AURUM} **Aurum Earned:** `+{aurum_reward}`\n"
             f"{E.GUILD_MERIT} **Guild Merit:** `+{merit_reward}`"
@@ -103,7 +103,7 @@ class RewardSystem:
 
         summary += (
             "\n\nThe guild clerks inscribe your progress, while whispers of your deed ripple "
-            "through the marble halls."
+            "through the guild hall."
         )
 
         return summary

@@ -4,6 +4,8 @@ class_data.py
 Contains all class definitions for Eldoria Quest.
 Class descriptions are written in a high-fantasy, novel-like tone to match the world of
 'Eldoria: The Shattered Veil'.
+
+Stats: STR, END, DEX, AGI, MAG, LCK
 """
 
 CLASSES = {
@@ -16,11 +18,8 @@ CLASSES = {
             "presence alone turning the tide as they hold the line against horrors that would "
             "break lesser souls."
         ),
-        "stats": {
-            "STR": 8, "DEX": 4, "CON": 7, "INT": 2, "WIS": 3, "CHA": 4, "LCK": 2
-        }
+        "stats": {"STR": 8, "END": 7, "DEX": 5, "AGI": 3, "MAG": 1, "LCK": 1},
     },
-
     "Mage": {
         "id": 2,
         "description": (
@@ -29,11 +28,8 @@ CLASSES = {
             "and eldritch brilliance. A single misstep can spell doom—yet a single spell can "
             "reshape the battlefield, or unmake an enemy in a heartbeat."
         ),
-        "stats": {
-            "STR": 2, "DEX": 3, "CON": 3, "INT": 9, "WIS": 7, "CHA": 4, "LCK": 2
-        }
+        "stats": {"STR": 2, "END": 3, "DEX": 4, "AGI": 5, "MAG": 9, "LCK": 2},
     },
-
     "Rogue": {
         "id": 3,
         "description": (
@@ -42,11 +38,8 @@ CLASSES = {
             "Quick of hand and quicker of wit, they thrive on misdirection—turning every mistake "
             "their enemies make into a fatal opening."
         ),
-        "stats": {
-            "STR": 4, "DEX": 9, "CON": 4, "INT": 3, "WIS": 2, "CHA": 6, "LCK": 2
-        }
+        "stats": {"STR": 4, "END": 4, "DEX": 7, "AGI": 8, "MAG": 1, "LCK": 3},
     },
-
     "Cleric": {
         "id": 4,
         "description": (
@@ -55,11 +48,8 @@ CLASSES = {
             "the profane. To their allies they are salvation—to their enemies, the radiant judgment "
             "they never see coming."
         ),
-        "stats": {
-            "STR": 5, "DEX": 2, "CON": 6, "INT": 4, "WIS": 9, "CHA": 5, "LCK": 1
-        }
+        "stats": {"STR": 5, "END": 6, "DEX": 3, "AGI": 3, "MAG": 7, "LCK": 1},
     },
-
     "Ranger": {
         "id": 5,
         "description": (
@@ -68,8 +58,6 @@ CLASSES = {
             "tracking beasts twisted by the Sundering or scouting the edges of darkness, they strike "
             "with the wild’s silent fury and vanish just as swiftly."
         ),
-        "stats": {
-            "STR": 4, "DEX": 8, "CON": 5, "INT": 3, "WIS": 6, "CHA": 3, "LCK": 1
-        }
-    }
+        "stats": {"STR": 4, "END": 5, "DEX": 8, "AGI": 6, "MAG": 2, "LCK": 2},
+    },
 }

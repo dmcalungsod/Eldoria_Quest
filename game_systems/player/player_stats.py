@@ -3,7 +3,7 @@ Core Stats Module for Eldoria Quest
 
 Defines:
 - StatBlock: stores base + bonus values
-- PlayerStats: 7 core stats + derived stats (HP, MP)
+- PlayerStats: 6 core stats + derived stats (HP, MP)
 """
 
 from dataclasses import dataclass
@@ -16,6 +16,7 @@ from typing import Dict, List, Any
 @dataclass
 class StatBlock:
     """Stores the base and bonus values of a stat."""
+
     base: int = 1
     bonus: int = 0
 
@@ -32,50 +33,62 @@ class PlayerStats:
     Manages all stats for a player character.
 
     Core Stats:
-        STR, DEX, CON, INT, WIS, CHA, LCK
+        STR (Strength), END (Endurance), DEX (Dexterity),
+        AGI (Agility), MAG (Magic), LCK (Luck)
 
     Derived Stats:
-        HP = 50 + CON * 10
-        MP = 20 + INT * 5 + WIS * 3
+        HP = 50 + END * 10
+        MP = 20 + MAG * 5
     """
 
-    def __init__(self, str_base=1, dex_base=1, con_base=1,
-                 int_base=1, wis_base=1, cha_base=1, lck_base=1):
+    def __init__(
+        self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1
+    ):
 
         self._stats: Dict[str, StatBlock] = {
             "STR": StatBlock(base=str_base),
+            "END": StatBlock(base=end_base),
             "DEX": StatBlock(base=dex_base),
-            "CON": StatBlock(base=con_base),
-            "INT": StatBlock(base=int_base),
-            "WIS": StatBlock(base=wis_base),
-            "CHA": StatBlock(base=cha_base),
+            "AGI": StatBlock(base=agi_base),
+            "MAG": StatBlock(base=mag_base),
             "LCK": StatBlock(base=lck_base),
         }
 
     # --- Total stat properties ---
     @property
-    def strength(self): return self._stats["STR"].total
+    def strength(self):
+        return self._stats["STR"].total
+
     @property
-    def dexterity(self): return self._stats["DEX"].total
+    def endurance(self):
+        return self._stats["END"].total
+
     @property
-    def constitution(self): return self._stats["CON"].total
+    def dexterity(self):
+        return self._stats["DEX"].total
+
     @property
-    def intelligence(self): return self._stats["INT"].total
+    def agility(self):
+        return self._stats["AGI"].total
+
     @property
-    def wisdom(self): return self._stats["WIS"].total
+    def magic(self):
+        return self._stats["MAG"].total
+
     @property
-    def charisma(self): return self._stats["CHA"].total
-    @property
-    def luck(self): return self._stats["LCK"].total
+    def luck(self):
+        return self._stats["LCK"].total
 
     # --- Derived stats ---
     @property
     def max_hp(self) -> int:
-        return 50 + (self.constitution * 10)
+        # Formula uses Endurance
+        return 50 + (self.endurance * 10)
 
     @property
     def max_mp(self) -> int:
-        return 20 + (self.intelligence * 5) + (self.wisdom * 3)
+        # Formula uses Magic
+        return 20 + (self.magic * 5)
 
     # --- Stat modification ---
     def set_base_stat(self, stat_name, value):
@@ -125,11 +138,10 @@ class PlayerStats:
     def get_total_stats_dict(self):
         return {
             "STR": self.strength,
+            "END": self.endurance,
             "DEX": self.dexterity,
-            "CON": self.constitution,
-            "INT": self.intelligence,
-            "WIS": self.wisdom,
-            "CHA": self.charisma,
+            "AGI": self.agility,
+            "MAG": self.magic,
             "LCK": self.luck,
             "HP": self.max_hp,
             "MP": self.max_mp,

@@ -25,7 +25,10 @@ try:
     from game_systems.data import equipments
     from game_systems.data import class_equipments
     from game_systems.data import materials
-    from game_systems.data import quest_data  # <-- ADDED THIS IMPORT
+    from game_systems.data import quest_data
+
+    # --- NEW IMPORT ---
+    from game_systems.data import skills_data
     from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 except ImportError as e:
     print(f"Failed to import data modules from 'game_systems/data'.")
@@ -65,7 +68,6 @@ def insert_monsters(conn):
         xp = int(m.get("xp", max(1, level * 5)))
         biome = m.get("biome", "Forest")
 
-        # Insert monster (Note: gold_drop column is correctly removed)
         cur.execute(
             """
             INSERT INTO monsters (name, description, tier, level, hp, attack, defense, dexterity, magic, exp_drop, biome)
@@ -136,9 +138,9 @@ def insert_equipments(conn):
         cur.execute(
             """
             INSERT INTO equipment (name, description, rarity, slot,
-                                   str_bonus, dex_bonus, con_bonus, int_bonus,
-                                   wis_bonus, cha_bonus, lck_bonus, min_level)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                   str_bonus, end_bonus, dex_bonus, agi_bonus,
+                                   mag_bonus, lck_bonus, min_level)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 e.get("name"),
@@ -146,11 +148,10 @@ def insert_equipments(conn):
                 e.get("rarity", "Common"),
                 e.get("slot", "accessory"),
                 stats.get("STR", 0),
+                stats.get("END", 0),
                 stats.get("DEX", 0),
-                stats.get("CON", 0),
-                stats.get("INT", 0),
-                stats.get("WIS", 0),
-                stats.get("CHA", 0),
+                stats.get("AGI", 0),
+                stats.get("MAG", 0),
                 stats.get("LCK", 0),
                 e.get("level_req", 1),
             ),
@@ -181,12 +182,13 @@ def insert_class_equipments(conn):
     for key, ce in class_equipments.CLASS_EQUIPMENTS.items():
         class_id = class_map.get(ce.get("class"), 0)
         stats = ce.get("stats_bonus", {})
+
         cur.execute(
             """
             INSERT INTO class_equipment (class_id, name, description, rarity, slot,
-                                         str_bonus, dex_bonus, con_bonus, int_bonus,
-                                         wis_bonus, cha_bonus, lck_bonus, set_name, min_level)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                         str_bonus, end_bonus, dex_bonus, agi_bonus,
+                                         mag_bonus, lck_bonus, set_name, min_level)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 class_id,
@@ -195,11 +197,10 @@ def insert_class_equipments(conn):
                 ce.get("rarity", "Common"),
                 ce.get("slot", "accessory"),
                 stats.get("STR", 0),
+                stats.get("END", 0),
                 stats.get("DEX", 0),
-                stats.get("CON", 0),
-                stats.get("INT", 0),
-                stats.get("WIS", 0),
-                stats.get("CHA", 0),
+                stats.get("AGI", 0),
+                stats.get("MAG", 0),
                 stats.get("LCK", 0),
                 ce.get("set"),
                 ce.get("level_req", 1),
@@ -208,12 +209,10 @@ def insert_class_equipments(conn):
     conn.commit()
 
 
-# --- THIS FUNCTION IS NOW CLEAN ---
 def insert_quests(conn):
     cur = conn.cursor()
     print("Inserting quests...")
 
-    # The data is now imported from the quest_data module
     cur.executemany(
         """
         INSERT OR IGNORE INTO quests (id, title, tier, quest_giver, location, summary, description, objectives, rewards)
@@ -242,9 +241,31 @@ def insert_materials(conn):
     print(f"✔ Populated {count} material definitions.")
 
 
+# --- NEW FUNCTION ---
+def insert_skills(conn):
+    cur = conn.cursor()
+    print("Inserting skills...")
+    count = 0
+    for key, data in skills_data.SKILLS.items():
+        cur.execute(
+            """
+            INSERT OR IGNORE INTO skills (key_id, name, description, type, class_id)
+            VALUES (?, ?, ?, ?, ?)
+        """,
+            (
+                data["key_id"],
+                data["name"],
+                data["description"],
+                data["type"],
+                data.get("class_id", 0),  # 0 for 'all classes'
+            ),
+        )
+        count += 1
+    conn.commit()
+    print(f"✔ Populated {count} skill definitions.")
+
+
 def main():
-    # We must run create_tables() from the main bot file first.
-    # This script only populates.
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     try:
@@ -255,11 +276,12 @@ def main():
         insert_equipments(conn)
         insert_class_equipments(conn)
         insert_quests(conn)
-        insert_materials(conn)  # Ensure materials are added
+        insert_materials(conn)
+        # --- NEW FUNCTION CALL ---
+        insert_skills(conn)
         print("✔ Database population complete.")
     except Exception as e:
         print(f"Error populating database: {e}")
-        # Print full traceback for debugging
         import traceback
 
         traceback.print_exc()
@@ -268,6 +290,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # Note: It's safer to run create_database.py from main.py
-    # before running this, to ensure schema is 100% up to date.
     main()

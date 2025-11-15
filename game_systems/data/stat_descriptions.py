@@ -7,11 +7,10 @@ the dark high-fantasy tone of the world.
 """
 
 STAT_DESCRIPTIONS = {
-    "STR": "Physical might.",
-    "DEX": "Accuracy & evasion.",
-    "CON": "Health & resilience.",
-    "INT": "Spell strength.",
-    "WIS": "Mana & resistance.",
-    "CHA": "Influence & rewards.",
-    "LCK": "Criticals & rare finds."
+    "STR": "Physical might. Increases physical damage.",
+    "END": "Resilience. Increases Health and physical defense.",
+    "DEX": "Precision. Increases accuracy and weapon skill.",
+    "AGI": "Quickness. Increases evasion and speed.",
+    "MAG": "Arcane power. Increases Mana and spell strength.",
+    "LCK": "Fortune. Affects critical hits and rare finds.",
 }

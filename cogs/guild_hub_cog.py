@@ -1,15 +1,9 @@
 """
 guild_hub_cog.py
-
-Handles the main "Guild Hall" UI, which is the GuildCardView.
-This is the central hub for players.
-It also contains the direct sub-menus for administrative tasks:
-- Profile/Falna (which now also handles Adventure)
-- Guild Exchange
-- Rank Progress
+... (imports and GuildCardView) ...
 """
 
-import json  # <-- THIS IS THE FIX
+import json
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -19,6 +13,7 @@ from database.database_manager import DatabaseManager
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.guild_exchange import GuildExchange
 from game_systems.player.player_stats import PlayerStats
+from game_systems.items.inventory_manager import InventoryManager
 import game_systems.data.emojis as E
 
 # --- Local Imports ---
@@ -28,7 +23,6 @@ from .ui_helpers import back_to_guild_card_callback
 from .quest_hub_cog import QuestBoardView, QuestLogView
 
 # --- Adventure View Import ---
-# Import the AdventureSetupView to be launched from our new button
 from .adventure_commands import AdventureSetupView
 
 
@@ -47,6 +41,7 @@ class GuildCardView(View):
         super().__init__(timeout=None)
         self.db = db_manager
         self.rank_system = RankSystem(self.db)
+        self.inventory_manager = InventoryManager(self.db)
 
         # --- Row 1: Primary Actions ---
         quests_button = Button(
@@ -86,6 +81,15 @@ class GuildCardView(View):
         profile_button.callback = self.view_profile_callback
         self.add_item(profile_button)
 
+        inventory_button = Button(
+            label="Inventory",
+            style=discord.ButtonStyle.secondary,
+            custom_id="view_inventory",
+            emoji=E.BACKPACK,
+        )
+        inventory_button.callback = self.view_inventory_callback
+        self.add_item(inventory_button)
+
         check_rank_button = Button(
             label="Check Rank",
             style=discord.ButtonStyle.secondary,
@@ -100,7 +104,6 @@ class GuildCardView(View):
         Hands off to the QuestBoardView from the quest_hub_cog.
         """
         await interaction.response.defer()
-        # We must import the QuestSystem here to pass it
         from game_systems.guild_system.quest_system import QuestSystem
 
         quest_system = QuestSystem(self.db)
@@ -152,7 +155,6 @@ class GuildCardView(View):
         else:
             for quest in active_quests:
                 progress_text = []
-                # Ensure objectives are loaded correctly (they are dicts)
                 objectives = quest.get("objectives", {})
                 progress = quest.get("progress", {})
 
@@ -167,14 +169,12 @@ class GuildCardView(View):
 
                 embed.add_field(
                     name=f"{quest['title']} (ID: {quest['id']})",
-                    value="\n".join(progress_text)
-                    if progress_text
-                    else "No objectives.",
+                    value=(
+                        "\n".join(progress_text) if progress_text else "No objectives."
+                    ),
                     inline=False,
                 )
 
-        # Pass the list of quests and the user ID to the view
-        # so it can build the "Complete Quest" dropdown.
         view = QuestLogView(self.db, active_quests, interaction.user.id)
 
         await interaction.edit_original_response(embed=embed, view=view)
@@ -214,7 +214,7 @@ class GuildCardView(View):
 
     async def view_profile_callback(self, interaction: discord.Interaction):
         """
-        Displays the player's 'Falna' or profile.
+        Displays the player's profile/status.
         This screen is now ALSO the hub for adventure actions.
         """
         await interaction.response.defer()
@@ -242,8 +242,8 @@ class GuildCardView(View):
         class_name = class_row["name"] if class_row else "Unknown"
 
         embed = discord.Embed(
-            title=f"{E.SCROLL} Falna — {player['name']}",
-            description=f"**Familia:** Eldorian Consortium\n**Class:** {class_name}",
+            title=f"{E.SCROLL} Adventurer Status — {player['name']}",
+            description=f"**Guild:** Adventurer's Guild\n**Class:** {class_name}",
             color=discord.Color.dark_red(),
         )
         embed.set_thumbnail(
@@ -259,16 +259,13 @@ class GuildCardView(View):
             value=f"**EXP:** {player['experience']} / {player['exp_to_next']}\n**Merit:** {guild_data['merit_points']}",
             inline=True,
         )
+
         stat_block = (
-            f"{E.STR} **STR:** {stats.strength:<4}  "
-            f"{E.DEX} **DEX:** {stats.dexterity}\n"
-            f"{E.CON} **CON:** {stats.constitution:<4}  "
-            f"{E.INT} **INT:** {stats.intelligence}\n"
-            f"{E.WIS} **WIS:** {stats.wisdom:<4}  "
-            f"{E.CHA} **CHA:** {stats.charisma}\n"
-            f"{E.LCK} **LCK:** {stats.luck}"
+            f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
+            f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
         )
         embed.add_field(name="Basic Abilities", value=stat_block, inline=False)
+
         embed.add_field(
             name="Vitals",
             value=f"{E.HP} **HP:** {stats.max_hp}\n{E.MP} **MP:** {stats.max_mp}",
@@ -279,13 +276,54 @@ class GuildCardView(View):
             value=f"{E.AURUM} **Aurum:** {player['aurum']}",
             inline=True,
         )
-        embed.set_footer(text="The hieroglyphs on your back glow faintly.")
 
-        # --- VIEW CHANGE ---
-        # Pass the bot and discord_id to the ProfileView
-        # so it can manage adventure state.
+        # --- NEW SKILLS FIELD ---
+        player_skills = self.db.get_player_skills(discord_id)
+        if not player_skills:
+            skills_str = "You have not learned any skills."
+        else:
+            skills_str = "\n".join(
+                [
+                    f"• **{s['name']}** (Lv. {s['skill_level']}) - *{s['type']}*"
+                    for s in player_skills
+                ]
+            )
+
+        embed.add_field(name="Acquired Skills", value=skills_str, inline=False)
+        # --- END NEW FIELD ---
+
+        embed.set_footer(text="Your status is a record of your journey and strength.")
+
         view = ProfileView(self.db, interaction.client, discord_id)
         await interaction.edit_original_response(embed=embed, view=view)
+
+    async def view_inventory_callback(self, interaction: discord.Interaction):
+        """
+        Displays the player's inventory as an ephemeral message.
+        """
+        items = self.inventory_manager.get_inventory(interaction.user.id)
+
+        if not items:
+            await interaction.response.send_message(
+                f"{E.BACKPACK} Your backpack is empty.", ephemeral=True
+            )
+            return
+
+        embed = discord.Embed(
+            title=f"{E.BACKPACK} Backpack", color=discord.Color.brown()
+        )
+
+        categories = {}
+        for item in items:
+            itype = item["item_type"].title()
+            if itype not in categories:
+                categories[itype] = []
+            categories[itype].append(f"• {item['item_name']} (x{item['count']})")
+
+        for category, item_list in categories.items():
+            embed.add_field(name=category, value="\n".join(item_list), inline=False)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     async def check_rank_callback(self, interaction: discord.Interaction):
         """
@@ -310,16 +348,13 @@ class GuildCardView(View):
                 description="You have already reached the highest available rank. Your legend is known throughout the Guild.",
                 color=discord.Color.gold(),
             )
-            view = RankProgressView(
-                self.db, eligible=False
-            )  # Create view with disabled button
+            view = RankProgressView(self.db, eligible=False)
             await interaction.edit_original_response(embed=embed, view=view)
             return
 
         requirements = self.rank_system.RANKS[current_rank].get("requirements", {})
         next_rank_title = self.rank_system.RANKS[next_rank_key]["title"]
 
-        # Build the progress report embed
         embed = discord.Embed(
             title=f"{E.MEDAL} Promotion Evaluation: Rank {current_rank} → Rank {next_rank_key}",
             description=f"Here is your progress towards the rank of **{next_rank_title}**.",
@@ -344,7 +379,6 @@ class GuildCardView(View):
         else:
             embed.set_footer(text="Continue your efforts, adventurer.")
 
-        # Switch to the new view, passing eligibility to the button
         view = RankProgressView(self.db, eligible=eligible)
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -356,29 +390,24 @@ class GuildCardView(View):
 
 class ProfileView(View):
     """
-    Shows the player's Falna/Status and now handles adventure actions.
+    Shows the player's status and now handles adventure actions.
     """
 
-    def __init__(
-        self, db_manager: DatabaseManager, bot: commands.Bot, discord_id: int
-    ):
+    def __init__(self, db_manager: DatabaseManager, bot: commands.Bot, discord_id: int):
         super().__init__(timeout=None)
         self.db = db_manager
         self.bot = bot
         self.discord_id = discord_id
 
-        # Get the adventure manager from the bot
         adventure_cog = self.bot.get_cog("AdventureCommands")
         if not adventure_cog:
-            # Fallback if cog isn't loaded
             self.manager = None
-            is_active = True  # Disable buttons
+            is_active = True
         else:
             self.manager = adventure_cog.manager
             active_session = self.manager.get_active_session(self.discord_id)
             is_active = active_session and active_session["active"]
 
-        # --- Add Adventure Buttons ---
         start_button = Button(
             label="Start Adventure",
             style=discord.ButtonStyle.success,
@@ -407,19 +436,18 @@ class ProfileView(View):
         cancel_button.callback = self.cancel_adventure_callback
         self.add_item(cancel_button)
 
-        # --- Add Back Button ---
         back_button = Button(
             label="Back to Guild Card",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_card",
-            row=1,  # Put it on its own row
+            row=1,
         )
         back_button.callback = back_to_guild_card_callback
         self.add_item(back_button)
 
     async def start_adventure_callback(self, interaction: discord.Interaction):
         """
-        Launches the adventure setup menu.
+        Launches the adventure setup menu with an atmospheric embed.
         """
         if not self.manager:
             await interaction.response.send_message(
@@ -427,11 +455,18 @@ class ProfileView(View):
             )
             return
 
-        # Show the same view as the /adventure start command
-        view = AdventureSetupView(self.db, self.manager)
-        await interaction.response.send_message(
-            f"{E.MAP} **Select a Destination:**", view=view, ephemeral=True
+        embed = discord.Embed(
+            title=f"{E.MAP} Prepare for Expedition",
+            description=(
+                "You stand before the city gates, the Guild's clearance seal in your hand. "
+                "The wilderness beyond the walls of Ashgrave awaits.\n\n"
+                "Select a destination from the options below to begin your journey."
+            ),
+            color=discord.Color.dark_green(),
         )
+
+        view = AdventureSetupView(self.db, self.manager)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
     async def check_status_callback(self, interaction: discord.Interaction):
         """
@@ -450,7 +485,6 @@ class ProfileView(View):
             )
             return
 
-        # Logic copied from /adventure status
         try:
             logs = json.loads(active_session["logs"])
             loot = json.loads(active_session["loot_collected"])
@@ -480,7 +514,6 @@ class ProfileView(View):
             )
             return
 
-        # This is the placeholder logic from adventure_commands.py
         await interaction.response.send_message(
             "You signal for extraction. (Implementation pending)", ephemeral=True
         )
@@ -501,7 +534,6 @@ class RankProgressView(View):
         super().__init__(timeout=None)
         self.db = db_manager
 
-        # Button 1: Promote
         promote_button = Button(
             label="Request Promotion",
             style=discord.ButtonStyle.success,
@@ -511,7 +543,6 @@ class RankProgressView(View):
         promote_button.callback = self.promote_callback
         self.add_item(promote_button)
 
-        # Button 2: Back to Guild Card
         back_button = Button(
             label="Back to Guild Card",
             style=discord.ButtonStyle.secondary,
@@ -530,9 +561,7 @@ class RankProgressView(View):
 
         if success:
             await interaction.response.defer()
-            # Show the promotion message ephemerally
             await interaction.followup.send(message, ephemeral=True)
-            # Go back to the Guild Card, which will now show the new rank
             await back_to_guild_card_callback(interaction)
         else:
             await interaction.response.send_message(message, ephemeral=True)
@@ -552,7 +581,6 @@ class GuildExchangeView(View):
         super().__init__(timeout=None)
         self.db = db_manager
 
-        # Button 1: Sell Materials
         sell_button = Button(
             label="Sell All Materials",
             style=discord.ButtonStyle.success,
@@ -563,13 +591,12 @@ class GuildExchangeView(View):
         sell_button.callback = self.sell_materials_callback
         self.add_item(sell_button)
 
-        # Button 2: Back to Guild Card
         back_button = Button(
             label="Back to Guild Card",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_card",
         )
-        back_button.callback = back_to_guild_card_callback  # Use the global helper
+        back_button.callback = back_to_guild_card_callback
         self.add_item(back_button)
 
     async def sell_materials_callback(self, interaction: discord.Interaction):
@@ -582,7 +609,6 @@ class GuildExchangeView(View):
             await interaction.followup.send("You have nothing to sell.", ephemeral=True)
             return
 
-        # Create receipt
         sold_list = [f"• {item['item_name']} x{item['count']}" for item in sold_items]
 
         receipt_embed = discord.Embed(
@@ -592,7 +618,6 @@ class GuildExchangeView(View):
         )
         receipt_embed.add_field(name="Sold Materials", value="\n".join(sold_list))
 
-        # Go back to the main guild card, showing the receipt ephemerally
         await back_to_guild_card_callback(interaction, embed_to_show=receipt_embed)
 
 

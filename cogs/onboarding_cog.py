@@ -21,10 +21,7 @@ from game_systems.data.stat_descriptions import STAT_DESCRIPTIONS
 import game_systems.data.emojis as E
 
 # --- Handoff Import ---
-# We import the GuildCardView from the *other* cog.
-# This is the handoff from onboarding to the main guild menu.
-# --- CORRECTED IMPORT ---
-from .guild_hub_cog import GuildCardView 
+from .guild_hub_cog import GuildCardView
 
 
 # ======================================================================
@@ -77,14 +74,20 @@ class StartMenuView(View):
 
         class_data = CLASS_DEFINITIONS[class_name]
 
-        # Build the single description string
-        stats_line = "  ".join(
-            [f"`{stat}: {value}`" for stat, value in class_data["stats"].items()]
-        )
+        # Build the stat description strings
+        base_stats = []
+        for stat, value in class_data["stats"].items():
+            base_stats.append(f"`{stat:<3}: {value:>2}`")
+
+        # Create aligned pairs
+        stats_lines = []
+        for i in range(0, len(base_stats), 3):
+            stats_lines.append("  ".join(base_stats[i : i + 3]))
+        stats_block = "\n".join(stats_lines)
 
         descriptions = "\n".join(
             [
-                f"> `{stat}` – {STAT_DESCRIPTIONS.get(stat, 'No description available.')}"
+                f"> **{stat}** – {STAT_DESCRIPTIONS.get(stat, 'No description available.')}"
                 for stat in class_data["stats"]
             ]
         )
@@ -92,10 +95,9 @@ class StartMenuView(View):
         description_string = (
             f"{class_data['description']}\n\n"
             f"**Base Stats**\n"
-            f"{stats_line}\n\n"
-            f"> **Stat Descriptions:**\n"
-            f"{descriptions}\n\n"
-            f"**Class ID:** {class_data['id']}"
+            f"{stats_block}\n\n"
+            f"**Stat Descriptions:**\n"
+            f"{descriptions}"
         )
 
         embed = discord.Embed(
@@ -145,11 +147,13 @@ class ClassDetailView(View):
         )
 
         if success:
-            welcome_title = f"Welcome, {interaction.user.display_name}, to The Eldorian Adventurer’s Consortium."
+            welcome_title = (
+                f"Welcome, {interaction.user.display_name}, to Ashgrave City."
+            )
             welcome_description = (
-                "Your name has been recorded in the registry. The path ahead is fraught with peril, "
-                "shadows, and whispers of forgotten power. May your will be your guide and your courage be your shield.\n\n"
-                "Your journey begins now. Tread boldly."
+                "Your name is known, but your deeds are not. The path ahead is fraught with peril, "
+                "shadows, and whispers of forgotten power. \n\n"
+                "To seek purpose, coin, or redemption, you must register with the **Adventurer's Guild**."
             )
 
             embed = discord.Embed(
@@ -157,9 +161,7 @@ class ClassDetailView(View):
                 description=welcome_description,
                 color=discord.Color.dark_gold(),
             )
-            embed.set_footer(
-                text="Under the watchful eyes of Guildmaster Daemon Caelungarde."
-            )
+            embed.set_footer(text="Your journey begins now. Tread boldly.")
 
             view = CharacterMenuView(self.db)
             await interaction.response.edit_message(embed=embed, view=view)
@@ -193,7 +195,7 @@ class CharacterMenuView(View):
         self.db = db_manager
 
         register_button = Button(
-            label="Register with the Guild",
+            label="Register with the Adventurer's Guild",
             style=discord.ButtonStyle.success,
             custom_id="register_guild",
         )
@@ -253,7 +255,7 @@ class CharacterMenuView(View):
             # Create the Guild Card embed
             embed = discord.Embed(
                 title=f"{E.SCROLL} Guild Card",
-                description=f"This card certifies that **{card_data['name']}** is a registered member of The Eldorian Adventurer’s Consortium.",
+                description=f"This card certifies that **{card_data['name']}** is a registered member of the **Adventurer's Guild** (Ashgrave City branch).",
                 color=discord.Color.dark_gold(),
             )
             embed.add_field(name="Class", value=card_data["class_name"], inline=True)

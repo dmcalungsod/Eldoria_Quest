@@ -18,23 +18,14 @@ class LevelUpSystem:
     Standalone Level-Up Manager.
 
     Each level grants:
-        +1 STR
-        +1 DEX
-        +1 CON
-        +1 INT
-        +1 WIS
-        +1 CHA
-        +1 LCK
+        +1 to each of the 6 core stats
     """
 
-    STAT_LIST = ["STR", "DEX", "CON", "INT", "WIS", "CHA", "LCK"]
+    # Updated to the new 6-stat system
+    STAT_LIST = ["STR", "END", "DEX", "AGI", "MAG", "LCK"]
 
     def __init__(
-        self,
-        stats: PlayerStats,
-        level: int = 1,
-        exp: int = 0,
-        exp_to_next: int = 100
+        self, stats: PlayerStats, level: int = 1, exp: int = 0, exp_to_next: int = 100
     ):
         self.stats = stats
         self.level = level
