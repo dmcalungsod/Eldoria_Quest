@@ -17,33 +17,130 @@ from game_systems.guild_system.quest_system import QuestSystem
 import game_systems.data.emojis as E
 
 # --- Local Imports ---
-# --- CORRECTED IMPORT ---
 from .ui_helpers import back_to_guild_card_callback
 
 # ======================================================================
-# QUEST LOG VIEW
+# QUEST LOG VIEW (NOW WITH COMPLETION LOGIC)
 # ======================================================================
 
 
 class QuestLogView(View):
     """
-    Displays the player's currently accepted quests.
+    Displays the player's currently accepted quests and allows completion.
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        active_quests: list,
+        discord_id: int,
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.active_quests = active_quests
+        self.discord_id = discord_id
+        self.quest_system = QuestSystem(self.db)
 
-        # Button 1: Back to Guild Card
+        # --- Button 1: Back to Guild Card ---
         back_button = Button(
             label="Back to Guild Card",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_card",
+            row=1,  # Place it on the second row
         )
         back_button.callback = back_to_guild_card_callback
         self.add_item(back_button)
 
-        # In the future, we can add "Complete Quest" buttons here.
+        # --- Dropdown 1: Complete Quest ---
+        self.quest_select = Select(
+            placeholder="Report a completed quest...",
+            min_values=1,
+            max_values=1,
+            row=0,
+        )
+
+        completable_quests = []
+        for quest in self.active_quests:
+            # Check if all objectives for this quest are met
+            is_complete = self.quest_system.check_completion(
+                quest["progress"], quest["objectives"]
+            )
+            if is_complete:
+                completable_quests.append(quest)
+
+        if not completable_quests:
+            self.quest_select.add_option(
+                label="No quests are ready to turn in.",
+                value="disabled",
+                emoji=E.ERROR,
+            )
+            self.quest_select.disabled = True
+        else:
+            for quest in completable_quests:
+                self.quest_select.add_option(
+                    label=f"Complete: {quest['title']}",
+                    value=str(quest["id"]),
+                    emoji=E.MEDAL,
+                )
+
+        self.quest_select.callback = self.complete_quest_callback
+        self.add_item(self.quest_select)
+
+    async def complete_quest_callback(self, interaction: discord.Interaction):
+        """
+        Callback for the 'Complete Quest' dropdown.
+        """
+        await interaction.response.defer()
+        quest_id = int(self.quest_select.values[0])
+
+        # Attempt to complete the quest
+        success, message = self.quest_system.complete_quest(self.discord_id, quest_id)
+
+        # Send the result message (success or fail) as a private followup
+        await interaction.followup.send(message, ephemeral=True)
+
+        # --- Refresh the View ---
+        # Re-fetch the quest data
+        new_active_quests = self.quest_system.get_player_quests(self.discord_id)
+
+        # Re-build the embed
+        embed = discord.Embed(
+            title=f"{E.QUEST_SCROLL} Adventurer's Log",
+            description="A review of your currently accepted assignments from the Guild.",
+            color=discord.Color.from_rgb(139, 69, 19),  # Brown
+        )
+
+        if not new_active_quests:
+            embed.add_field(
+                name="No Active Quests",
+                value="You have no assignments. Please visit the Quest Board to accept a new task.",
+            )
+        else:
+            for quest in new_active_quests:
+                progress_text = []
+                objectives = quest.get("objectives", {})
+                progress = quest.get("progress", {})
+
+                for obj_type, tasks in objectives.items():
+                    if isinstance(tasks, dict):
+                        for task, required in tasks.items():
+                            current = progress.get(obj_type, {}).get(task, 0)
+                            progress_text.append(f"• {task}: {current} / {required}")
+                    else:
+                        current = progress.get(obj_type, {}).get(tasks, 0)
+                        progress_text.append(f"• {tasks}: {current} / 1")
+
+                embed.add_field(
+                    name=f"{quest['title']} (ID: {quest['id']})",
+                    value="\n".join(progress_text) if progress_text else "No objectives.",
+                    inline=False,
+                )
+
+        # Re-build the view with the new quest list
+        new_view = QuestLogView(self.db, new_active_quests, self.discord_id)
+
+        # Edit the original message to show the updated log
+        await interaction.edit_original_response(embed=embed, view=new_view)
 
 
 # ======================================================================
@@ -194,13 +291,11 @@ class QuestDetailView(View):
         success = quest_system.accept_quest(interaction.user.id, self.quest_id)
 
         if success:
-            # --- THIS IS THE FIX ---
             # Send a private confirmation message to the user.
             await interaction.followup.send(
                 f"{E.CHECK} Quest accepted! The details have been added to your log.",
                 ephemeral=True,
             )
-            # --- END OF FIX ---
 
             # Now, go back to the quest board by editing the original message
             await self.back_to_quest_board_callback(interaction)

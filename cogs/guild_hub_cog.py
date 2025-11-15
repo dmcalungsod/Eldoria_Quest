@@ -4,11 +4,12 @@ guild_hub_cog.py
 Handles the main "Guild Hall" UI, which is the GuildCardView.
 This is the central hub for players.
 It also contains the direct sub-menus for administrative tasks:
-- Profile/Falna
+- Profile/Falna (which now also handles Adventure)
 - Guild Exchange
 - Rank Progress
 """
 
+import json  # <-- THIS IS THE FIX
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -26,7 +27,7 @@ from .ui_helpers import back_to_guild_card_callback
 # We import the Quest views from the other cog for the button callback
 from .quest_hub_cog import QuestBoardView, QuestLogView
 
-# --- NEW IMPORT ---
+# --- Adventure View Import ---
 # Import the AdventureSetupView to be launched from our new button
 from .adventure_commands import AdventureSetupView
 
@@ -65,17 +66,6 @@ class GuildCardView(View):
         )
         quest_log_button.callback = self.view_quest_log_callback
         self.add_item(quest_log_button)
-
-        # --- NEW ADVENTURE BUTTON ---
-        adventure_button = Button(
-            label="Adventure",
-            style=discord.ButtonStyle.success,
-            custom_id="start_adventure",
-            emoji=E.MAP,
-        )
-        adventure_button.callback = self.adventure_callback
-        self.add_item(adventure_button)
-        # --- END NEW BUTTON ---
 
         exchange_button = Button(
             label="Guild Exchange",
@@ -162,60 +152,32 @@ class GuildCardView(View):
         else:
             for quest in active_quests:
                 progress_text = []
-                for obj_type, tasks in quest["objectives"].items():
+                # Ensure objectives are loaded correctly (they are dicts)
+                objectives = quest.get("objectives", {})
+                progress = quest.get("progress", {})
+
+                for obj_type, tasks in objectives.items():
                     if isinstance(tasks, dict):
                         for task, required in tasks.items():
-                            current = quest["progress"].get(obj_type, {}).get(task, 0)
+                            current = progress.get(obj_type, {}).get(task, 0)
                             progress_text.append(f"• {task}: {current} / {required}")
                     else:
-                        current = quest["progress"].get(obj_type, {}).get(tasks, 0)
+                        current = progress.get(obj_type, {}).get(tasks, 0)
                         progress_text.append(f"• {tasks}: {current} / 1")
 
                 embed.add_field(
                     name=f"{quest['title']} (ID: {quest['id']})",
-                    value="\n".join(progress_text),
+                    value="\n".join(progress_text)
+                    if progress_text
+                    else "No objectives.",
                     inline=False,
                 )
 
-        view = QuestLogView(self.db)
+        # Pass the list of quests and the user ID to the view
+        # so it can build the "Complete Quest" dropdown.
+        view = QuestLogView(self.db, active_quests, interaction.user.id)
+
         await interaction.edit_original_response(embed=embed, view=view)
-
-    # --- NEW CALLBACK FUNCTION ---
-    async def adventure_callback(self, interaction: discord.Interaction):
-        """
-        Callback for the 'Adventure' button.
-        Fetches the running AdventureManager and shows the setup view.
-        """
-        # Get the bot instance from the interaction
-        bot = interaction.client
-
-        # Find the AdventureCommands cog
-        adventure_cog = bot.get_cog("AdventureCommands")
-        if not adventure_cog:
-            await interaction.response.send_message(
-                f"{E.ERROR} Error: The Adventure system is currently offline. Please contact an administrator.",
-                ephemeral=True,
-            )
-            return
-
-        # Get the running manager from the cog
-        manager = adventure_cog.manager
-        discord_id = interaction.user.id
-        active_session = manager.get_active_session(discord_id)
-
-        if active_session and active_session["active"]:
-            await interaction.response.send_message(
-                "You are already on an adventure! Use `/adventure status` to check your progress.",
-                ephemeral=True,
-            )
-        else:
-            # Show the same view as the /adventure start command
-            view = AdventureSetupView(self.db, manager)
-            await interaction.response.send_message(
-                f"{E.MAP} **Select a Destination:**", view=view, ephemeral=True
-            )
-
-    # --- END NEW CALLBACK ---
 
     async def guild_exchange_callback(self, interaction: discord.Interaction):
         """
@@ -253,6 +215,7 @@ class GuildCardView(View):
     async def view_profile_callback(self, interaction: discord.Interaction):
         """
         Displays the player's 'Falna' or profile.
+        This screen is now ALSO the hub for adventure actions.
         """
         await interaction.response.defer()
         discord_id = interaction.user.id
@@ -318,7 +281,10 @@ class GuildCardView(View):
         )
         embed.set_footer(text="The hieroglyphs on your back glow faintly.")
 
-        view = ProfileView(self.db)
+        # --- VIEW CHANGE ---
+        # Pass the bot and discord_id to the ProfileView
+        # so it can manage adventure state.
+        view = ProfileView(self.db, interaction.client, discord_id)
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def check_rank_callback(self, interaction: discord.Interaction):
@@ -384,28 +350,140 @@ class GuildCardView(View):
 
 
 # ======================================================================
-# PROFILE VIEW
+# PROFILE VIEW (NOW THE ADVENTURE HUB)
 # ======================================================================
 
 
 class ProfileView(View):
     """
-    Simple view that just shows the player's Falna/Status.
-    Its only purpose is to provide a "Back" button.
+    Shows the player's Falna/Status and now handles adventure actions.
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(
+        self, db_manager: DatabaseManager, bot: commands.Bot, discord_id: int
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.bot = bot
+        self.discord_id = discord_id
 
-        # Button 1: Back to Guild Card
+        # Get the adventure manager from the bot
+        adventure_cog = self.bot.get_cog("AdventureCommands")
+        if not adventure_cog:
+            # Fallback if cog isn't loaded
+            self.manager = None
+            is_active = True  # Disable buttons
+        else:
+            self.manager = adventure_cog.manager
+            active_session = self.manager.get_active_session(self.discord_id)
+            is_active = active_session and active_session["active"]
+
+        # --- Add Adventure Buttons ---
+        start_button = Button(
+            label="Start Adventure",
+            style=discord.ButtonStyle.success,
+            custom_id="profile_start_adv",
+            emoji=E.MAP,
+            disabled=is_active or (self.manager is None),
+        )
+        start_button.callback = self.start_adventure_callback
+        self.add_item(start_button)
+
+        status_button = Button(
+            label="Check Status",
+            style=discord.ButtonStyle.secondary,
+            custom_id="profile_check_status",
+            disabled=not is_active or (self.manager is None),
+        )
+        status_button.callback = self.check_status_callback
+        self.add_item(status_button)
+
+        cancel_button = Button(
+            label="Return Early",
+            style=discord.ButtonStyle.danger,
+            custom_id="profile_cancel_adv",
+            disabled=not is_active or (self.manager is None),
+        )
+        cancel_button.callback = self.cancel_adventure_callback
+        self.add_item(cancel_button)
+
+        # --- Add Back Button ---
         back_button = Button(
             label="Back to Guild Card",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_card",
+            row=1,  # Put it on its own row
         )
         back_button.callback = back_to_guild_card_callback
         self.add_item(back_button)
+
+    async def start_adventure_callback(self, interaction: discord.Interaction):
+        """
+        Launches the adventure setup menu.
+        """
+        if not self.manager:
+            await interaction.response.send_message(
+                f"{E.ERROR} Adventure system is offline.", ephemeral=True
+            )
+            return
+
+        # Show the same view as the /adventure start command
+        view = AdventureSetupView(self.db, self.manager)
+        await interaction.response.send_message(
+            f"{E.MAP} **Select a Destination:**", view=view, ephemeral=True
+        )
+
+    async def check_status_callback(self, interaction: discord.Interaction):
+        """
+        Shows the player's current adventure log.
+        """
+        if not self.manager:
+            await interaction.response.send_message(
+                f"{E.ERROR} Adventure system is offline.", ephemeral=True
+            )
+            return
+
+        active_session = self.manager.get_active_session(self.discord_id)
+        if not active_session or not active_session["active"]:
+            await interaction.response.send_message(
+                "You are not currently on an adventure.", ephemeral=True
+            )
+            return
+
+        # Logic copied from /adventure status
+        try:
+            logs = json.loads(active_session["logs"])
+            loot = json.loads(active_session["loot_collected"])
+        except (json.JSONDecodeError, TypeError):
+            logs = []
+            loot = {}
+
+        embed = discord.Embed(
+            title=f"{E.QUEST_SCROLL} Adventure Log", color=discord.Color.green()
+        )
+        embed.description = "**Latest Events:**\n" + (
+            "\n".join(logs[-5:]) if logs else "The journey begins..."
+        )
+
+        loot_str = ", ".join([f"{k} x{v}" for k, v in loot.items()])
+        embed.add_field(name="Backpack", value=loot_str if loot_str else "Empty")
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    async def cancel_adventure_callback(self, interaction: discord.Interaction):
+        """
+        Cancels an ongoing adventure. (Placeholder)
+        """
+        if not self.manager:
+            await interaction.response.send_message(
+                f"{E.ERROR} Adventure system is offline.", ephemeral=True
+            )
+            return
+
+        # This is the placeholder logic from adventure_commands.py
+        await interaction.response.send_message(
+            "You signal for extraction. (Implementation pending)", ephemeral=True
+        )
 
 
 # ======================================================================
@@ -518,7 +596,7 @@ class GuildExchangeView(View):
         await back_to_guild_card_callback(interaction, embed_to_show=receipt_embed)
 
 
-# =G====================================================================
+# ======================================================================
 # COG LOADER
 # ======================================================================
 
