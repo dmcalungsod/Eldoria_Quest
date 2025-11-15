@@ -19,42 +19,47 @@ class InventoryManager:
         item_key: str,
         item_name: str,
         item_type: str,
-        rarity: str = "Common",  # <-- THIS IS THE FIX (Part 1)
+        rarity: str = "Common",
         amount: int = 1,
         slot: str = None,
         item_source_table: str = None,
     ):
         """
         Adds an item to the player's inventory using its item_key.
-        Stacks if it already exists (and is not equipment).
+        Stacks if it already exists (and is not equipped).
         """
         conn = self.db.connect()
         cur = conn.cursor()
 
-        if item_type != "equipment":
-            cur.execute(
-                """
-                SELECT count FROM inventory 
-                WHERE discord_id = ? AND item_key = ? AND item_type = ?
+        # --- THIS IS THE FIX ---
+        # We must find a stack that matches ALL properties, not just the key.
+        cur.execute(
+            """
+            SELECT id, count FROM inventory 
+            WHERE discord_id = ? 
+              AND item_key = ? 
+              AND rarity = ?
+              AND slot = ? 
+              AND item_source_table = ?
+              AND equipped = 0
+            LIMIT 1
             """,
-                (discord_id, item_key, item_type),
-            )
-            row = cur.fetchone()
-        else:
-            row = None
+            (discord_id, item_key, rarity, slot, item_source_table),
+        )
+        row = cur.fetchone()
+        # --- END OF FIX ---
 
         if row:
-            # Stack it
+            # Stack it on the existing unequipped row
             cur.execute(
                 """
                 UPDATE inventory SET count = count + ? 
-                WHERE discord_id = ? AND item_key = ? AND item_type = ?
+                WHERE id = ?
             """,
-                (amount, discord_id, item_key, item_type),
+                (amount, row["id"]),
             )
         else:
-            # Create new entry
-            # --- THIS IS THE FIX (Part 2) ---
+            # Create new entry (it will default to equipped=0)
             cur.execute(
                 """
                 INSERT INTO inventory (discord_id, item_key, item_name, item_type, 
@@ -66,7 +71,7 @@ class InventoryManager:
                     item_key,
                     item_name,
                     item_type,
-                    rarity,  # <-- Added rarity
+                    rarity,
                     slot,
                     item_source_table,
                     amount,
@@ -79,14 +84,16 @@ class InventoryManager:
     def remove_item(self, discord_id: int, item_key: str, amount: int = 1) -> bool:
         """
         Removes items by item_key. Returns True if successful.
+        This primarily targets unequipped stacks.
         """
         conn = self.db.connect()
         cur = conn.cursor()
 
-        # --- UPDATED: We need to find the specific item_key AND item_type ---
-        # This prevents deleting an equipment piece named "heal"
+        # Find an unequipped stack of the item
+        # Note: This is simplified and just finds *any* unequipped stack
+        # of the item. For selling, this is fine.
         cur.execute(
-            "SELECT id, count FROM inventory WHERE discord_id = ? AND item_key = ? LIMIT 1",
+            "SELECT id, count FROM inventory WHERE discord_id = ? AND item_key = ? AND equipped = 0 LIMIT 1",
             (discord_id, item_key),
         )
         row = cur.fetchone()
@@ -118,7 +125,6 @@ class InventoryManager:
         conn = self.db.connect()
         cur = conn.cursor()
 
-        # --- THIS IS THE FIX (Part 3) ---
         cur.execute(
             """
             SELECT id, item_key, item_name, item_type, slot, 
@@ -129,7 +135,6 @@ class InventoryManager:
         """,
             (discord_id,),
         )
-        # --- END OF FIX ---
 
         items = [dict(row) for row in cur.fetchall()]
         conn.close()

@@ -26,6 +26,11 @@ from game_systems.items.item_manager import item_manager
 
 from .adventure_events import AdventureEvents
 
+# --- THIS IS THE FIX ---
+from game_systems.data.emojis import get_rarity_ansi
+
+# --- END OF FIX ---
+
 # Get the logger
 logger = logging.getLogger("discord")
 
@@ -233,11 +238,14 @@ class AdventureSession:
 
         conn = self.db.connect()
         cur = conn.cursor()
+
         cur.execute(
-            "SELECT level, experience, exp_to_next FROM players WHERE discord_id = ?",
+            "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id = ?",
             (self.discord_id,),
         )
         p_row = cur.fetchone()
+
+        player_class_id = p_row["class_id"] if p_row else 0
 
         cur.execute(
             """
@@ -267,6 +275,7 @@ class AdventureSession:
             monster=self.active_monster,
             player_skills=player_skills,
             player_mp=current_mp,
+            player_class_id=player_class_id,
         )
 
         result = engine.run_combat_turn()
@@ -281,11 +290,15 @@ class AdventureSession:
 
         if result.get("winner") == "player":
             self.active_monster = None  # Clear monster for next loop check
-            loot_text = []
-            self.add_loot("exp", result["exp"])
-            loot_text.append(f"`{result['exp']} EXP`")
 
-            # --- THIS IS THE FIX (Part 1) ---
+            # --- THIS IS THE FIX ---
+            colored_loot_lines = []
+            self.add_loot("exp", result["exp"])
+            # Add EXP to the list, formatted with "Common" color
+            colored_loot_lines.append(
+                get_rarity_ansi("Common", f"• {result['exp']} EXP")
+            )
+
             # 1. Handle Material Drops
             for drop_key, chance in result["drops"]:
                 if random.randint(1, 100) <= chance:
@@ -293,7 +306,9 @@ class AdventureSession:
                     mat_data = MATERIALS.get(drop_key)
                     item_name = mat_data.get("name", drop_key)
                     item_rarity = mat_data.get("rarity", "Common")
-                    loot_text.append(f"`{item_name} ({item_rarity})`")
+                    # Add colored material line
+                    text = f"• {item_name} ({item_rarity})"
+                    colored_loot_lines.append(get_rarity_ansi(item_rarity, text))
 
             # 2. Handle Equipment Drops
             equipment_drops = item_manager.generate_monster_loot(result["monster_data"])
@@ -303,18 +318,22 @@ class AdventureSession:
                     item_key=str(item["id"]),
                     item_name=item["name"],
                     item_type="equipment",
-                    rarity=item["rarity"],  # <-- Pass rarity
+                    rarity=item["rarity"],
                     amount=1,
                     slot=item["slot"],
                     item_source_table=item["source"],
                 )
-                loot_text.append(
-                    f"`{item['name']} ({item['rarity']})`"
-                )  # <-- Show rarity in log
-            # --- END OF FIX ---
+                # Add colored equipment line
+                text = f"• {item['name']} ({item['rarity']})"
+                colored_loot_lines.append(get_rarity_ansi(item["rarity"], text))
 
-            if loot_text:
-                combat_log.append(f"\n{E.ITEM_BOX} **Loot:** {', '.join(loot_text)}")
+            if colored_loot_lines:
+                # Build the final ANSI block
+                loot_block = "\n".join(colored_loot_lines)
+                combat_log.append(
+                    f"\n{E.ITEM_BOX} **Loot**\n```ansi\n{loot_block}\n```"
+                )
+            # --- END OF FIX ---
 
             quest_updates = self._update_quests(
                 result["monster_data"]["name"], result["drops"]

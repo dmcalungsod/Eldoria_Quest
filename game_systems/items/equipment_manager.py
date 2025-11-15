@@ -101,43 +101,97 @@ class EquipmentManager:
 
     def equip_item(self, discord_id: int, inventory_db_id: int) -> Tuple[bool, str]:
         """
-        Equips an item from the inventory.
-        inventory_db_id is the PRIMARY KEY (id) from the inventory table.
+        Equips an item from an inventory stack.
+        If stack count > 1, it splits one off.
+        If count == 1, it equips the stack.
         """
         conn = self.db.connect()
         cur = conn.cursor()
 
+        # Get the full details of the stack we're equipping from
         cur.execute(
-            "SELECT item_type, slot, equipped FROM inventory WHERE id = ? AND discord_id = ?",
+            "SELECT * FROM inventory WHERE id = ? AND discord_id = ?",
             (inventory_db_id, discord_id),
         )
-        item = cur.fetchone()
+        item_stack = cur.fetchone()
 
-        if not item:
+        if not item_stack:
             conn.close()
             return False, "Item not found in your inventory."
-        if item["item_type"] != "equipment":
+        if item_stack["item_type"] != "equipment":
             conn.close()
             return False, "This item cannot be equipped."
-        if item["equipped"] == 1:
+        if item_stack["equipped"] == 1:
             conn.close()
             return False, "This item is already equipped."
 
-        slot_to_equip = item["slot"]
+        slot_to_equip = item_stack["slot"]
 
-        # Unequip any item currently in that slot
+        # Unequip any item currently in that slot (this is unchanged)
         cur.execute(
             """
-            UPDATE inventory SET equipped = 0 
+            SELECT id FROM inventory 
             WHERE discord_id = ? AND slot = ? AND equipped = 1
         """,
             (discord_id, slot_to_equip),
         )
+        item_to_unequip = cur.fetchone()
 
-        # Equip the new item
+        # --- We must close and re-open connection if we call another self. method ---
+        conn.close()
+
+        if item_to_unequip:
+            # Use the new unequip logic to handle stacking
+            self.unequip_item(discord_id, item_to_unequip["id"])
+
+        # Re-open connection to finish the equip
+        conn = self.db.connect()
+        cur = conn.cursor()
+
+        # Re-fetch the item_stack in case it was modified by the unequip
+        # (e.g., if you equip the same item you unequipped)
         cur.execute(
-            "UPDATE inventory SET equipped = 1 WHERE id = ?", (inventory_db_id,)
+            "SELECT * FROM inventory WHERE id = ? AND discord_id = ?",
+            (inventory_db_id, discord_id),
         )
+        item_stack = cur.fetchone()
+
+        # Final check
+        if not item_stack or item_stack["equipped"] == 1:
+            conn.close()
+            # This can happen if the item was merged by the unequip call
+            return True, "Item equipped."
+
+        # Now, equip the new item
+        if item_stack["count"] > 1:
+            # 1. Decrement the stack
+            cur.execute(
+                "UPDATE inventory SET count = count - 1 WHERE id = ?",
+                (inventory_db_id,),
+            )
+
+            # 2. Create a new, separate row for the equipped item
+            cur.execute(
+                """
+                INSERT INTO inventory (discord_id, item_key, item_name, item_type, rarity, 
+                                       slot, item_source_table, count, equipped)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1)
+                """,
+                (
+                    discord_id,
+                    item_stack["item_key"],
+                    item_stack["item_name"],
+                    item_stack["item_type"],
+                    item_stack["rarity"],
+                    item_stack["slot"],
+                    item_stack["item_source_table"],
+                ),
+            )
+        else:
+            # Just equip the stack of 1
+            cur.execute(
+                "UPDATE inventory SET equipped = 1 WHERE id = ?", (inventory_db_id,)
+            )
 
         conn.commit()
         conn.close()
@@ -148,28 +202,69 @@ class EquipmentManager:
 
     def unequip_item(self, discord_id: int, inventory_db_id: int) -> Tuple[bool, str]:
         """
-        Unequips an item from the inventory.
+        Unequips an item, merging it with an existing unequipped stack if possible.
         """
         conn = self.db.connect()
         cur = conn.cursor()
 
+        # Get the details of the item we are unequipping
         cur.execute(
-            "SELECT equipped FROM inventory WHERE id = ? AND discord_id = ?",
+            "SELECT * FROM inventory WHERE id = ? AND discord_id = ?",
             (inventory_db_id, discord_id),
         )
-        item = cur.fetchone()
+        item_to_unequip = cur.fetchone()
 
-        if not item:
+        if not item_to_unequip:
             conn.close()
             return False, "Item not found in your inventory."
-        if item["equipped"] == 0:
+        if item_to_unequip["equipped"] == 0:
             conn.close()
             return False, "This item is not equipped."
 
-        # Unequip the item
+        # --- THIS IS THE FIX ---
+        # Now, find an unequipped stack of the *exact same* item
         cur.execute(
-            "UPDATE inventory SET equipped = 0 WHERE id = ?", (inventory_db_id,)
+            """
+            SELECT id FROM inventory
+            WHERE discord_id = ? 
+              AND item_key = ? 
+              AND rarity = ?
+              AND slot = ?
+              AND item_source_table = ?
+              AND equipped = 0
+            LIMIT 1
+        """,
+            (
+                discord_id,
+                item_to_unequip["item_key"],
+                item_to_unequip["rarity"],
+                item_to_unequip["slot"],
+                item_to_unequip["item_source_table"],
+            ),
         )
+        stack_row = cur.fetchone()
+        # --- END OF FIX ---
+
+        if stack_row:
+            # A stack exists! Add this item to it and delete the equipped row.
+
+            # 1. Increment the stack
+            cur.execute(
+                "UPDATE inventory SET count = count + 1 WHERE id = ?",
+                (stack_row["id"],),
+            )
+
+            # 2. Delete the (now unequipped) item
+            cur.execute("DELETE FROM inventory WHERE id = ?", (inventory_db_id,))
+
+        else:
+            # No stack exists. This item becomes the new unequipped stack.
+            # We just set its equipped status to 0 and its count to 1.
+            cur.execute(
+                "UPDATE inventory SET equipped = 0, count = 1 WHERE id = ?",
+                (inventory_db_id,),
+            )
+
         conn.commit()
         conn.close()
 

@@ -53,3 +53,31 @@ FOREST = "🌲"
 THICKET = "🍃"
 CAVE = "🍄"
 HERB = "🌿"
+
+
+# --- NEW: ANSI Color Definitions ---
+RARITY_COLORS = {
+    "Common": "[0;37m",  # Grey/White
+    "Uncommon": "[0;32m",  # Green
+    "Rare": "[0;34m",  # Blue
+    "Epic": "[0;35m",  # Purple
+    "Legendary": "[0;33m",  # Yellow/Gold
+    "Mythical": "[0;31m",  # Red
+    "DEFAULT": "[0;37m",  # Default to grey
+}
+ANSI_RESET = "[0m"
+
+
+def get_rarity_ansi(rarity_name: str, text: str) -> str:
+    """Wraps text in ANSI color codes for a given rarity."""
+    if not rarity_name:
+        rarity_name = "DEFAULT"
+
+    # Get the color, defaulting to DEFAULT if not found
+    color = RARITY_COLORS.get(rarity_name.title(), RARITY_COLORS["DEFAULT"])
+
+    # Return the formatted string
+    return f"{color}{text}{ANSI_RESET}"
+
+
+# --- END NEW ---

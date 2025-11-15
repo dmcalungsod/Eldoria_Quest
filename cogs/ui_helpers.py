@@ -11,6 +11,12 @@ from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
 
+# --- THIS IS THE FIX ---
+# Import the helper function from its new central location
+from game_systems.data.emojis import get_rarity_ansi
+
+# --- END OF FIX ---
+
 
 # ======================================================================
 # EMBED BUILDER
@@ -21,6 +27,8 @@ def build_inventory_embed(items: list) -> discord.Embed:
     """
     Builds the standard embed for the player's inventory,
     separating items by type and equipped status.
+
+    --- NOW WITH ANSI COLORS ---
     """
     embed = discord.Embed(
         title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange()
@@ -33,38 +41,40 @@ def build_inventory_embed(items: list) -> discord.Embed:
         "Material": [],
     }
 
-    # --- THIS IS THE FIX ---
     for item in items:
         item_type = item["item_type"].title()
-        rarity_str = f" ({item['rarity']})" if item["rarity"] else ""  # Add rarity text
+        rarity = (
+            item.get("rarity") or "Common"
+        )  # Default to Common if rarity is None or empty
+
+        text = ""  # This will be the text we color
 
         if item_type == "Equipment":
             if item["equipped"] == 1:
-                categories["Equipped"].append(
-                    f"• **{item['item_name']}**{rarity_str} (Slot: *{item['slot']}*)"
-                )
+                # Build string WITHOUT markdown
+                text = f"• {item['item_name']} ({rarity}) (Slot: {item['slot']})"
+                # Add the color-wrapped string to the list
+                categories["Equipped"].append(get_rarity_ansi(rarity, text))
             else:
-                categories["Equipment"].append(
-                    f"• {item['item_name']}{rarity_str} (x{item['count']})"
-                )
+                text = f"• {item['item_name']} ({rarity}) (x{item['count']})"
+                categories["Equipment"].append(get_rarity_ansi(rarity, text))
+
         elif item_type in categories:
-            categories[item_type].append(
-                f"• {item['item_name']}{rarity_str} (x{item['count']})"
-            )
-    # --- END OF FIX ---
+            text = f"• {item['item_name']} ({rarity}) (x{item['count']})"
+            categories[item_type].append(get_rarity_ansi(rarity, text))
 
     if not any(categories.values()):
         embed.description = "Your backpack is empty."
         return embed
 
     if categories["Equipped"]:
-        embed.add_field(
-            name="Equipped Gear", value="\n".join(categories["Equipped"]), inline=False
-        )
+        value = "```ansi\n" + "\n".join(categories["Equipped"]) + "\n```"
+        embed.add_field(name="Equipped Gear", value=value, inline=False)
 
     for category, item_list in categories.items():
         if category != "Equipped" and item_list:
-            embed.add_field(name=category, value="\n".join(item_list), inline=False)
+            value = "```ansi\n" + "\n".join(item_list) + "\n```"
+            embed.add_field(name=category, value=value, inline=False)
 
     return embed
 

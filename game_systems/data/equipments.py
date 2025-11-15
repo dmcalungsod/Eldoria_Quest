@@ -5,7 +5,10 @@ Programmatically generates 50 equipment items (weapons, armor, accessories).
 Stats: STR, END, DEX, AGI, MAG, LCK
 """
 
-from math import floor
+# --- THIS IS THE FIX (Part 1) ---
+from math import ceil
+
+# --- END OF FIX ---
 
 WEAPON_POOL = [
     "Rusty Longsword",
@@ -53,22 +56,25 @@ for i in range(50):
     level_req = min(30, 1 + i // 2)
     # stat formula: rarer/higher index --> better stats
     rank_val = RARITY_ORDER.index(rarity) + 1
-    # build stats bonus
+
+    # --- THIS IS THE FIX (Part 2) ---
+    # build stats bonus (changed all 'floor' to 'ceil')
     if slot == "weapon":
         stats_bonus = {
-            "STR": floor(level_req * 0.4 * rank_val),
-            "DEX": floor(level_req * 0.15 * rank_val),
+            "STR": ceil(level_req * 0.4 * rank_val),
+            "DEX": ceil(level_req * 0.15 * rank_val),
         }
     elif slot == "armor":
         stats_bonus = {
-            "END": floor(level_req * 0.35 * rank_val),
-            "AGI": floor(level_req * 0.25 * rank_val),
+            "END": ceil(level_req * 0.35 * rank_val),
+            "AGI": ceil(level_req * 0.25 * rank_val),
         }
     else:
         stats_bonus = {
-            "LCK": floor(level_req * 0.2 * rank_val),
-            "MAG": floor(level_req * 0.1 * rank_val),
+            "LCK": ceil(level_req * 0.2 * rank_val),
+            "MAG": ceil(level_req * 0.1 * rank_val),
         }
+    # --- END OF FIX ---
 
     name = f"{base_name} {'+' + str(rank_val) if rank_val>1 else ''}".strip()
     EQUIPMENTS[f"eq_{id_counter:03d}"] = {

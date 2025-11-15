@@ -185,13 +185,22 @@ class AdventureManager:
         # Add Materials to Inventory
         for item_key, count in session.loot.items():
             mat_data = MATERIALS.get(item_key)
-            item_name = mat_data["name"] if mat_data else item_key
+
+            # --- FIX START ---
+            if mat_data:
+                item_name = mat_data["name"]
+                item_rarity = mat_data.get("rarity", "Common")  # Get the rarity
+            else:
+                item_name = item_key
+                item_rarity = "Common"  # Fallback
+            # --- FIX END ---
 
             self.inventory_manager.add_item(
                 discord_id=session.discord_id,
                 item_key=item_key,
                 item_name=item_name,
                 item_type="material",
+                rarity=item_rarity,  # <-- Pass the rarity here
                 amount=count,
             )
 

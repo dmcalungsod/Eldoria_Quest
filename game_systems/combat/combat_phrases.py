@@ -75,14 +75,20 @@ class CombatPhrases:
 
         return f"**{random.choice(phrases)}**"
 
+    # --- THIS IS THE FIX (Part 1) ---
     @staticmethod
     def player_attack(
-        player: LevelUpSystem, monster: dict, damage: int, is_crit: bool
+        player: LevelUpSystem,
+        monster: dict,
+        damage: int,
+        is_crit: bool,
+        player_class_id: int,
     ) -> str:
         """
         Called when the player hits the monster.
-        Uses stat-based inference for class-specific phrases.
+        Uses CLASS ID for class-specific phrases.
         """
+        # --- END OF FIX ---
         m_name = monster.get("name", "the enemy")
         crit_text = " **(CRITICAL!)**" if is_crit else ""
 
@@ -91,7 +97,7 @@ class CombatPhrases:
         d_a = stats.dexterity + stats.agility
         m = stats.magic
 
-        # MAGE
+        # MAGE (Class ID 2)
         mage = [
             f"Arcane energy crackles and slams into the {m_name} for `{damage}` damage!{crit_text}",
             f"A bolt of raw magic sears the {m_name}, dealing `{damage}` damage!{crit_text}",
@@ -101,7 +107,7 @@ class CombatPhrases:
             f"A ripple of arcane force warps the air, smashing the {m_name} for `{damage}` damage!{crit_text}",
         ]
 
-        # WARRIOR
+        # WARRIOR (Class ID 1)
         warrior = [
             f"You cleave into the {m_name} with brutal force, dealing `{damage}` damage!{crit_text}",
             f"A heavy blow shatters the {m_name}'s guard, inflicting `{damage}` damage.{crit_text}",
@@ -111,15 +117,25 @@ class CombatPhrases:
             f"A brutal overhead attack slams into the {m_name}, delivering `{damage}` damage!{crit_text}",
         ]
 
-        # ROGUE / RANGER
+        # --- THIS IS THE FIX (Part 2) ---
+        # ROGUE (Class ID 3)
         rogue = [
             f"You find an opening, striking the {m_name} with precision for `{damage}` damage!{crit_text}",
             f"A swift, silent strike hits a vital point on the {m_name} for `{damage}` damage.{crit_text}",
-            f"Your arrow finds its mark, piercing the {m_name} for `{damage}` damage!{crit_text}",
             f"You slip past its guard and deliver `{damage}` damage in a clean, effortless motion.{crit_text}",
             f"A flicker of movement— your attack lands before the {m_name} even reacts, `{damage}` damage dealt.{crit_text}",
             f"Your blades dance, carving `{damage}` damage from the {m_name} with practiced grace.{crit_text}",
+            f"Daggers flash as you weave inside the {m_name}'s reach for `{damage}` damage!{crit_text}",
         ]
+
+        # RANGER (Class ID 5)
+        ranger = [
+            f"Your arrow finds its mark, piercing the {m_name} for `{damage}` damage!{crit_text}",
+            f"A well-placed shot from the shadows strikes the {m_name} for `{damage}` damage.{crit_text}",
+            f"You loose an arrow that whistles true, dealing `{damage}` damage to the {m_name}.{crit_text}",
+            f"Your bow sings, and the {m_name} recoils from `{damage}` damage!{crit_text}",
+        ]
+        # --- END OF FIX ---
 
         # HYBRID (Cleric, etc.)
         hybrid = [
@@ -131,14 +147,20 @@ class CombatPhrases:
             f"A decisive blow hits the {m_name}, dealing `{damage}` damage!{crit_text}",
         ]
 
-        if m >= s and m >= d_a:
-            pool = mage
-        elif s > m and s > d_a:
+        # --- THIS IS THE FIX (Part 3) ---
+        # Class IDs: 1=Warrior, 2=Mage, 3=Rogue, 4=Cleric, 5=Ranger
+        if player_class_id == 1:
             pool = warrior
-        elif d_a > s and d_a > m:
+        elif player_class_id == 2:
+            pool = mage
+        elif player_class_id == 3:
             pool = rogue
+        elif player_class_id == 5:
+            pool = ranger
         else:
+            # Clerics (4) and others default to hybrid
             pool = hybrid
+        # --- END OF FIX ---
 
         return random.choice(pool)
 
