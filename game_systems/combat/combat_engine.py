@@ -7,7 +7,6 @@ Orchestrates combat and returns a result dictionary.
 
 from .damage_formula import DamageFormula
 from ..rewards.exp_calculator import ExpCalculator
-
 # GoldRewards import is REMOVED
 from ..monsters.monster_actions import MonsterAI
 from .combat_phrases import CombatPhrases
@@ -49,6 +48,7 @@ class CombatEngine:
         log.append(CombatPhrases.opening(self.monster))
 
         turn = 1
+        # Use player's current combat HP
         while self.player.hp_current > 0 and self.mon_hp > 0:
 
             log.append(f"\n--- Turn {turn} ---")
@@ -63,6 +63,7 @@ class CombatEngine:
             )
 
             if self.mon_hp <= 0:
+                # Pass the combat log to the victory handler
                 return self._player_victory(log)
 
             # ---------------------------
@@ -133,7 +134,7 @@ class CombatEngine:
         # Apply EXP to the player wrapper
         leveled_up = self.player.add_exp(exp)
 
-        # We pass gold=0 because the phrase no longer uses it
+        # We pass gold=0 because the phrase handler expects it, but it won't be used
         log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up))
 
         return {

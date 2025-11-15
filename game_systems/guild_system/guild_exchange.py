@@ -2,7 +2,7 @@
 guild_exchange.py
 
 Handles the logic for exchanging monster materials (Magic Stones, Drop Items)
-for Gold (Valis) at the Guild Hall.
+for Aurum (currency) at the Guild Hall.
 This is the core economic loop inspired by Danmachi.
 """
 
@@ -48,7 +48,7 @@ class GuildExchange:
         """
         Sells all materials in the player's inventory.
         1. Calculates total value.
-        2. Adds gold to player.
+        2. Adds gold (Aurum) to player.
         3. Deletes materials from inventory.
         Returns (total_earned, list_of_sold_items).
         """

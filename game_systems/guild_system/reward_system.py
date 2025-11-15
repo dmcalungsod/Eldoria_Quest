@@ -10,6 +10,7 @@ from game_systems.player.player_stats import PlayerStats
 from game_systems.player.level_up import LevelUpSystem
 import game_systems.data.emojis as E
 
+
 class RewardSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
@@ -27,7 +28,7 @@ class RewardSystem:
             return f"{E.ERROR} Error: Quest reward data not found."
 
         rewards_data = json.loads(row["rewards"])
-        
+
         exp_reward = rewards_data.get("exp", 0)
         gold_reward = rewards_data.get("gold", 0)
         merit_reward = rewards_data.get("merit", 5)
@@ -36,7 +37,7 @@ class RewardSystem:
         # Fetch Player Data
         cur.execute("SELECT * FROM players WHERE discord_id = ?", (discord_id,))
         player_row = cur.fetchone()
-        
+
         stats_json = self.db.get_player_stats_json(discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
 
@@ -44,30 +45,36 @@ class RewardSystem:
             stats=player_stats,
             level=player_row["level"],
             exp=player_row["experience"],
-            exp_to_next=player_row["exp_to_next"]
+            exp_to_next=player_row["exp_to_next"],
         )
 
         # Process EXP
         leveled_up = level_system.add_exp(exp_reward)
-        
+
         self.db.update_player_level_data(
-            discord_id, 
-            level_system.level, 
-            level_system.exp, 
-            level_system.exp_to_next
+            discord_id,
+            level_system.level,
+            level_system.exp,
+            level_system.exp_to_next,
         )
         self.db.update_player_stats(discord_id, level_system.stats.to_dict())
 
-        # Update Gold
-        cur.execute("UPDATE players SET gold = gold + ? WHERE discord_id = ?", (gold_reward, discord_id))
+        # Update Gold (internal name)
+        cur.execute(
+            "UPDATE players SET gold = gold + ? WHERE discord_id = ?",
+            (gold_reward, discord_id),
+        )
 
         # Update Merit
-        cur.execute("""
+        cur.execute(
+            """
             UPDATE guild_members 
             SET merit_points = merit_points + ?,
                 quests_completed = quests_completed + 1
             WHERE discord_id = ?
-        """, (merit_reward, discord_id))
+        """,
+            (merit_reward, discord_id),
+        )
 
         conn.commit()
         conn.close()
@@ -78,7 +85,7 @@ class RewardSystem:
             "Your achievements have been recorded in the annals of the\n"
             "**Eldorian Adventurer’s Consortium.**\n\n"
             f"{E.EXP} **EXP Gained:** `+{exp_reward}`\n"
-            f"{E.GOLD} **Gold Earned:** `+{gold_reward}`\n"
+            f"{E.AURUM} **Aurum Earned:** `+{gold_reward}`\n"
             f"{E.GUILD_MERIT} **Guild Merit:** `+{merit_reward}`"
         )
 
@@ -87,7 +94,7 @@ class RewardSystem:
                 f"\n\n{E.LEVEL_UP} **Level Up!**\n"
                 f"Your soul resonates with newfound strength — you are now **Level {level_system.level}**!"
             )
-        
+
         if item_reward:
             summary += (
                 f"\n{E.ITEM_BOX} **Item Acquired:** `{item_reward}`\n"

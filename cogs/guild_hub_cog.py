@@ -1,9 +1,12 @@
 """
-guild_cog.py
+guild_hub_cog.py
 
-Handles all persistent UI Views for the main Guild Hall.
-This cog has NO slash commands. It is a library of Views that
-other cogs (like onboarding_cog) can call.
+Handles the main "Guild Hall" UI, which is the GuildCardView.
+This is the central hub for players.
+It also contains the direct sub-menus for administrative tasks:
+- Profile/Falna
+- Guild Exchange
+- Rank Progress
 """
 
 import discord
@@ -12,76 +15,19 @@ from discord.ext import commands
 from discord.ui import View, Button
 
 from database.database_manager import DatabaseManager
-from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.guild_exchange import GuildExchange
+from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
 
+# --- Local Imports ---
+from .ui_helpers import back_to_guild_card_callback
 
-# ======================================================================
-# GLOBAL HELPER CALLBACK
-# ======================================================================
-
-
-async def back_to_guild_card_callback(
-    interaction: discord.Interaction, embed_to_show: discord.Embed = None
-):
-    """
-    A shared callback to return to the main Guild Card menu.
-    This prevents code duplication.
-    If embed_to_show is provided, it's shown ephemerally *before* the edit.
-    """
-    # Defer the response if it's the first action
-    if not interaction.response.is_done():
-        await interaction.response.defer()
-
-    # If we have a receipt (like from selling), show it ephemerally
-    if embed_to_show:
-        await interaction.followup.send(embed=embed_to_show, ephemeral=True)
-
-    discord_id = interaction.user.id
-    db = DatabaseManager()
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT p.name, c.name as class_name, p.level, p.experience, gm.rank, gm.join_date
-        FROM players p
-        JOIN classes c ON p.class_id = c.id
-        JOIN guild_members gm ON p.discord_id = gm.discord_id
-        WHERE p.discord_id = ?
-    """,
-        (discord_id,),
-    )
-    card_data = cur.fetchone()
-    conn.close()
-
-    if not card_data:
-        await interaction.edit_original_response(
-            content=f"{E.ERROR} Error retrieving your Guild Card.",
-            embed=None,
-            view=None,
-        )
-        return
-
-    embed = discord.Embed(
-        title=f"{E.SCROLL} Guild Card",
-        description=f"This card certifies that **{card_data['name']}** is a registered member of The Eldorian Adventurer’s Consortium.",
-        color=discord.Color.dark_gold(),
-    )
-    embed.add_field(name="Class", value=card_data["class_name"], inline=True)
-    embed.add_field(name="Rank", value=card_data["rank"], inline=True)
-    embed.add_field(name="Level", value=card_data["level"], inline=True)
-    embed.add_field(
-        name="Experience", value=f"{card_data['experience']} XP", inline=True
-    )
-    embed.set_footer(text=f"Joined: {card_data['join_date']}")
-
-    view = GuildCardView(db)
-    await interaction.edit_original_response(embed=embed, view=view)
+# We import the Quest views from the other cog for the button callback
+from .quest_hub_cog import QuestBoardView, QuestLogView
 
 
-# ======================================================================
+# =GA===================================================================
 # GUILD CARD & MAIN MENU
 # ======================================================================
 
@@ -96,19 +42,26 @@ class GuildCardView(View):
         super().__init__(timeout=None)
         self.db = db_manager
         self.rank_system = RankSystem(self.db)
-        self.quest_system = QuestSystem(self.db)
 
-        # Button 1: View Quests
+        # --- Row 1: Primary Actions ---
         quests_button = Button(
-            label="View Quests",
+            label="Quest Board",
             style=discord.ButtonStyle.primary,
             custom_id="view_quests",
-            emoji=E.QUEST_SCROLL,
+            emoji=E.HERB,
         )
         quests_button.callback = self.view_quests_callback
         self.add_item(quests_button)
 
-        # Button 2: Guild Exchange
+        quest_log_button = Button(
+            label="Quest Log",
+            style=discord.ButtonStyle.primary,
+            custom_id="view_quest_log",
+            emoji=E.QUEST_SCROLL,
+        )
+        quest_log_button.callback = self.view_quest_log_callback
+        self.add_item(quest_log_button)
+
         exchange_button = Button(
             label="Guild Exchange",
             style=discord.ButtonStyle.primary,
@@ -118,7 +71,16 @@ class GuildCardView(View):
         exchange_button.callback = self.guild_exchange_callback
         self.add_item(exchange_button)
 
-        # Button 3: Check Rank
+        # --- Row 2: Character Management ---
+        profile_button = Button(
+            label="View Profile",
+            style=discord.ButtonStyle.secondary,
+            custom_id="view_profile",
+            emoji=E.SCROLL,
+        )
+        profile_button.callback = self.view_profile_callback
+        self.add_item(profile_button)
+
         check_rank_button = Button(
             label="Check Rank",
             style=discord.ButtonStyle.secondary,
@@ -128,15 +90,17 @@ class GuildCardView(View):
         check_rank_button.callback = self.check_rank_callback
         self.add_item(check_rank_button)
 
-        # Note: The "Promote" button is now GONE from this view.
-        # It only appears on the Rank Progress screen if you are eligible.
-
     async def view_quests_callback(self, interaction: discord.Interaction):
         """
-        Displays the quest board with available quests for the player.
+        Hands off to the QuestBoardView from the quest_hub_cog.
         """
         await interaction.response.defer()
-        available_quests = self.quest_system.get_available_quests(interaction.user.id)
+        # We must import the QuestSystem here to pass it
+        from game_systems.guild_system.quest_system import QuestSystem
+
+        quest_system = QuestSystem(self.db)
+
+        available_quests = quest_system.get_available_quests(interaction.user.id)
 
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
@@ -160,6 +124,49 @@ class GuildCardView(View):
         view = QuestBoardView(self.db, available_quests)
         await interaction.edit_original_response(embed=embed, view=view)
 
+    async def view_quest_log_callback(self, interaction: discord.Interaction):
+        """
+        Hands off to the QuestLogView from the quest_hub_cog.
+        """
+        await interaction.response.defer()
+        from game_systems.guild_system.quest_system import QuestSystem
+
+        quest_system = QuestSystem(self.db)
+
+        active_quests = quest_system.get_player_quests(interaction.user.id)
+
+        embed = discord.Embed(
+            title=f"{E.QUEST_SCROLL} Adventurer's Log",
+            description="A review of your currently accepted assignments from the Guild.",
+            color=discord.Color.from_rgb(139, 69, 19),  # Brown
+        )
+
+        if not active_quests:
+            embed.add_field(
+                name="No Active Quests",
+                value="You have no assignments. Please visit the Quest Board to accept a new task.",
+            )
+        else:
+            for quest in active_quests:
+                progress_text = []
+                for obj_type, tasks in quest["objectives"].items():
+                    if isinstance(tasks, dict):
+                        for task, required in tasks.items():
+                            current = quest["progress"].get(obj_type, {}).get(task, 0)
+                            progress_text.append(f"• {task}: {current} / {required}")
+                    else:
+                        current = quest["progress"].get(obj_type, {}).get(tasks, 0)
+                        progress_text.append(f"• {tasks}: {current} / 1")
+
+                embed.add_field(
+                    name=f"{quest['title']} (ID: {quest['id']})",
+                    value="\n".join(progress_text),
+                    inline=False,
+                )
+
+        view = QuestLogView(self.db)
+        await interaction.edit_original_response(embed=embed, view=view)
+
     async def guild_exchange_callback(self, interaction: discord.Interaction):
         """
         Switches to the Guild Exchange view.
@@ -171,7 +178,7 @@ class GuildCardView(View):
 
         embed = discord.Embed(
             title=f"{E.EXCHANGE} Guild Exchange",
-            description='A guild receptionist looks up from her ledger. "Greetings, adventurer. Here to exchange your haul for Valis?"\n\nShe tallies your materials...',
+            description=f'A guild receptionist looks up from her ledger. "Greetings, adventurer. Here to exchange your haul for Aurum?"\n\nShe tallies your materials...',
             color=discord.Color.blue(),
         )
 
@@ -186,11 +193,82 @@ class GuildCardView(View):
             )
             embed.add_field(
                 name="Total Value",
-                value=f"{E.GOLD} **{total_value} Valis**",
+                value=f"{E.AURUM} **{total_value} Aurum**",
                 inline=False,
             )
 
         view = GuildExchangeView(self.db, total_value > 0)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def view_profile_callback(self, interaction: discord.Interaction):
+        """
+        Displays the player's 'Falna' or profile.
+        """
+        await interaction.response.defer()
+        discord_id = interaction.user.id
+        player = self.db.get_player(discord_id)
+
+        if not player:
+            await interaction.edit_original_response(
+                content="Could not find your player data.", embed=None, view=None
+            )
+            return
+
+        conn = self.db.connect()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT rank, merit_points FROM guild_members WHERE discord_id = ?",
+            (discord_id,),
+        )
+        guild_data = cur.fetchone()
+        conn.close()
+
+        stats_json = self.db.get_player_stats_json(discord_id)
+        stats = PlayerStats.from_dict(stats_json)
+        class_row = self.db.get_class(player["class_id"])
+        class_name = class_row["name"] if class_row else "Unknown"
+
+        embed = discord.Embed(
+            title=f"{E.SCROLL} Falna — {player['name']}",
+            description=f"**Familia:** Eldorian Consortium\n**Class:** {class_name}",
+            color=discord.Color.dark_red(),
+        )
+        embed.set_thumbnail(
+            url=interaction.user.avatar.url if interaction.user.avatar else None
+        )
+        embed.add_field(
+            name="Condition",
+            value=f"**Lv.** {player['level']}\n**Rank:** {guild_data['rank']}",
+            inline=True,
+        )
+        embed.add_field(
+            name="Progress",
+            value=f"**EXP:** {player['experience']} / {player['exp_to_next']}\n**Merit:** {guild_data['merit_points']}",
+            inline=True,
+        )
+        stat_block = (
+            f"{E.STR} **STR:** {stats.strength:<4}  "
+            f"{E.DEX} **DEX:** {stats.dexterity}\n"
+            f"{E.CON} **CON:** {stats.constitution:<4}  "
+            f"{E.INT} **INT:** {stats.intelligence}\n"
+            f"{E.WIS} **WIS:** {stats.wisdom:<4}  "
+            f"{E.CHA} **CHA:** {stats.charisma}\n"
+            f"{E.LCK} **LCK:** {stats.luck}"
+        )
+        embed.add_field(name="Basic Abilities", value=stat_block, inline=False)
+        embed.add_field(
+            name="Vitals",
+            value=f"{E.HP} **HP:** {stats.max_hp}\n{E.MP} **MP:** {stats.max_mp}",
+            inline=True,
+        )
+        embed.add_field(
+            name="Wealth",
+            value=f"{E.AURUM} **Aurum:** {player['gold']}",
+            inline=True,
+        )
+        embed.set_footer(text="The hieroglyphs on your back glow faintly.")
+
+        view = ProfileView(self.db)
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def check_rank_callback(self, interaction: discord.Interaction):
@@ -256,7 +334,32 @@ class GuildCardView(View):
 
 
 # ======================================================================
-# RANK PROGRESS VIEW (NEW)
+# PROFILE VIEW
+# ======================================================================
+
+
+class ProfileView(View):
+    """
+    Simple view that just shows the player's Falna/Status.
+    Its only purpose is to provide a "Back" button.
+    """
+
+    def __init__(self, db_manager: DatabaseManager):
+        super().__init__(timeout=None)
+        self.db = db_manager
+
+        # Button 1: Back to Guild Card
+        back_button = Button(
+            label="Back to Guild Card",
+            style=discord.ButtonStyle.secondary,
+            custom_id="back_to_guild_card",
+        )
+        back_button.callback = back_to_guild_card_callback
+        self.add_item(back_button)
+
+
+# ======================================================================
+# RANK PROGRESS VIEW
 # ======================================================================
 
 
@@ -327,7 +430,7 @@ class GuildExchangeView(View):
             style=discord.ButtonStyle.success,
             custom_id="sell_mats",
             disabled=not can_sell,
-            emoji=E.GOLD,
+            emoji=E.AURUM,
         )
         sell_button.callback = self.sell_materials_callback
         self.add_item(sell_button)
@@ -356,7 +459,7 @@ class GuildExchangeView(View):
 
         receipt_embed = discord.Embed(
             title=f"{E.EXCHANGE} Exchange Complete",
-            description=f'The receptionist stamps your ledger. "A fine haul, adventurer. Your payment has been processed."\n\n**Total Earned: {E.GOLD} {total_earned} Valis**',
+            description=f'The receptionist stamps your ledger. "A fine haul, adventurer. Your payment has been processed."\n\n**Total Earned: {E.AURUM} {total_earned} Aurum**',
             color=discord.Color.green(),
         )
         receipt_embed.add_field(name="Sold Materials", value="\n".join(sold_list))
@@ -366,166 +469,15 @@ class GuildExchangeView(View):
 
 
 # ======================================================================
-# QUEST BOARD VIEWS
-# ======================================================================
-
-
-class QuestBoardView(View):
-    """
-    Displays the list of available quests.
-    """
-
-    def __init__(self, db_manager: DatabaseManager, quests: list):
-        super().__init__(timeout=None)
-        self.db = db_manager
-        self.quests = quests
-
-        for quest in self.quests:
-            button = Button(
-                label=f"View ID: {quest['id']}", custom_id=f"view_quest_{quest['id']}"
-            )
-            button.callback = self.view_quest_details_callback
-            self.add_item(button)
-
-        back_button = Button(
-            label="Back to Guild Card",
-            style=discord.ButtonStyle.secondary,
-            custom_id="back_to_guild_card",
-        )
-        back_button.callback = back_to_guild_card_callback  # Use the global helper
-        self.add_item(back_button)
-
-    async def view_quest_details_callback(self, interaction: discord.Interaction):
-        quest_id = int(interaction.data["custom_id"].split("_")[-1])
-        quest_system = QuestSystem(self.db)
-        quest_details = quest_system.get_quest_details(quest_id)
-
-        if not quest_details:
-            await interaction.response.send_message(
-                f"{E.ERROR} Could not find details for this quest.", ephemeral=True
-            )
-            return
-
-        embed = discord.Embed(
-            title=f"{E.HERB} Quest: {quest_details['title']}",
-            description=quest_details["description"],
-            color=discord.Color.dark_teal(),
-        )
-
-        objectives_text = ""
-        for obj_type, tasks in quest_details["objectives"].items():
-            if isinstance(tasks, dict):
-                for task, value in tasks.items():
-                    objectives_text += f"• **{obj_type.title()}:** {task} ({value})\n"
-            else:
-                objectives_text += f"• **{obj_type.title()}:** {tasks}\n"
-
-        embed.add_field(name="Objectives", value=objectives_text, inline=False)
-
-        rewards_text = ""
-        if "rewards" in quest_details and quest_details["rewards"]:
-            for reward, value in quest_details["rewards"].items():
-                rewards_text += f"• **{reward.title()}:** {value}\n"
-        else:
-            rewards_text = "No rewards listed."
-
-        embed.add_field(name="Rewards", value=rewards_text, inline=False)
-        embed.set_footer(text=f"Quest ID: {quest_id} | Tier: {quest_details['tier']}")
-
-        view = QuestDetailView(self.db, quest_id)
-        await interaction.response.edit_message(embed=embed, view=view)
-
-
-class QuestDetailView(View):
-    """
-    Displays the details of a single quest and allows the player to accept it.
-    """
-
-    def __init__(self, db_manager: DatabaseManager, quest_id: int):
-        super().__init__(timeout=None)
-        self.db = db_manager
-        self.quest_id = quest_id
-
-        accept_button = Button(
-            label="Accept Quest",
-            style=discord.ButtonStyle.success,
-            custom_id=f"accept_quest_{self.quest_id}",
-        )
-        accept_button.callback = self.accept_quest_callback
-        self.add_item(accept_button)
-
-        back_button = Button(
-            label="Back to Quest Board",
-            style=discord.ButtonStyle.secondary,
-            custom_id="back_to_quest_board",
-        )
-        back_button.callback = self.back_to_quest_board_callback
-        self.add_item(back_button)
-
-    async def accept_quest_callback(self, interaction: discord.Interaction):
-        quest_system = QuestSystem(self.db)
-        success = quest_system.accept_quest(interaction.user.id, self.quest_id)
-
-        if success:
-            await interaction.response.send_message(
-                "Quest accepted! The Guild seal burns briefly across the parchment, marking your oath.",
-                ephemeral=True,
-            )
-            # Disable the accept button after accepting
-            for item in self.children:
-                if (
-                    isinstance(item, Button)
-                    and item.custom_id == f"accept_quest_{self.quest_id}"
-                ):
-                    item.disabled = True
-            await interaction.edit_original_response(view=self)
-        else:
-            await interaction.response.send_message(
-                "You have already accepted this quest or an error occurred.",
-                ephemeral=True,
-            )
-
-    async def back_to_quest_board_callback(self, interaction: discord.Interaction):
-        """
-        Returns to the quest board view.
-        """
-        await interaction.response.defer()
-        db = DatabaseManager()  # Need a fresh instance for the new view
-        quest_system = QuestSystem(db)
-        available_quests = quest_system.get_available_quests(interaction.user.id)
-
-        embed = discord.Embed(
-            title=f"{E.SCROLL} Quest Board",
-            description="The board is cluttered with parchment sheets—some crisp and new, others curled and water-stained. The scent of pine resin clings to them.",
-            color=discord.Color.dark_green(),
-        )
-
-        if not available_quests:
-            embed.add_field(
-                name="No Quests Available",
-                value="There are currently no quests available for your rank. Check back later, adventurer.",
-            )
-        else:
-            for quest in available_quests:
-                embed.add_field(
-                    name=f"[{quest['tier']}-Rank] {quest['title']} (ID: {quest['id']})",
-                    value=quest["summary"],
-                    inline=False,
-                )
-
-        view = QuestBoardView(db, available_quests)
-        await interaction.edit_original_response(embed=embed, view=view)
-
-
-# ======================================================================
 # COG LOADER
 # ======================================================================
 
 
-class GuildCog(commands.Cog):
+class GuildHubCog(commands.Cog):
     """
-    A cog for housing all Guild-related Views.
-    This cog has no commands, it just makes the Views loadable.
+    A cog for housing the main Guild Hub UI and its admin sub-views.
+    This cog has no commands, it just makes the Views loadable
+    and acts as the import hub for other UI cogs.
     """
 
     def __init__(self, bot: commands.Bot):
@@ -534,4 +486,4 @@ class GuildCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(GuildCog(bot))
+    await bot.add_cog(GuildHubCog(bot))

@@ -105,7 +105,7 @@ class AdventureSession:
             # --- This is the new loot logic ---
             loot_text = []
 
-            # Add EXP
+            # Add EXP to loot pool
             self.add_loot("exp", result["exp"])
             loot_text.append(f"{result['exp']} EXP")
 
@@ -130,10 +130,21 @@ class AdventureSession:
                     "defeat" in quest["objectives"]
                     and monster_instance["name"] in quest["objectives"]["defeat"]
                 ):
+                    # This function updates the DB
                     self.quest_system.update_progress(
                         self.discord_id, quest["id"], "defeat", monster_instance["name"]
                     )
                     log_entry += f"\n> *Quest Updated: {quest['title']}*"
+                
+                # Check for item collection objectives
+                if "collect" in quest["objectives"]:
+                    for drop_key, _ in result["drops"]:
+                        if drop_key in quest["objectives"]["collect"]:
+                             self.quest_system.update_progress(
+                                self.discord_id, quest["id"], "collect", drop_key
+                            )
+                             log_entry += f"\n> *Quest Item Found: {drop_key}*"
+
 
         else:
             # Player Died
@@ -149,12 +160,14 @@ class AdventureSession:
         return self.active
 
     def add_loot(self, key, amount):
+        """Adds loot to the session's temporary loot pool."""
         if key in self.loot:
             self.loot[key] += amount
         else:
             self.loot[key] = amount
 
     def save_state(self):
+        """Saves the session's current state to the database."""
         conn = self.db.connect()
         cur = conn.cursor()
         cur.execute(
