@@ -26,10 +26,11 @@ from game_systems.items.item_manager import item_manager
 
 from .adventure_events import AdventureEvents
 
-# --- THIS IS THE FIX ---
 from game_systems.data.emojis import get_rarity_ansi
 
-# --- END OF FIX ---
+# --- 1. DEFINE HIGH-TIER RARITIES (NEW) ---
+HIGH_RARITY_TIERS = ["Epic", "Legendary", "Mythical"]
+# --- END OF NEW CODE ---
 
 # Get the logger
 logger = logging.getLogger("discord")
@@ -291,7 +292,6 @@ class AdventureSession:
         if result.get("winner") == "player":
             self.active_monster = None  # Clear monster for next loop check
 
-            # --- THIS IS THE FIX ---
             colored_loot_lines = []
             self.add_loot("exp", result["exp"])
             # Add EXP to the list, formatted with "Common" color
@@ -299,16 +299,36 @@ class AdventureSession:
                 get_rarity_ansi("Common", f"• {result['exp']} EXP")
             )
 
+            # --- 2. LUCK CALCULATION (NEW FORMULA) ---
+            player_luck = player_wrapper.stats.luck
+            # Formula: Scales to +50% at 999 LCK
+            # (player_luck / 999) gives a 0-1 multiplier
+            luck_bonus = (player_luck / 999) * 50.0
+            # --- END OF NEW FORMULA ---
+
             # 1. Handle Material Drops
             for drop_key, chance in result["drops"]:
-                if random.randint(1, 100) <= chance:
-                    self.add_loot(drop_key, 1)
-                    mat_data = MATERIALS.get(drop_key)
-                    item_name = mat_data.get("name", drop_key)
+
+                # --- 3. APPLY LUCK BONUS CONDITIONALLY (NEW LOGIC) ---
+                final_chance = chance
+                mat_data = MATERIALS.get(drop_key)
+
+                item_rarity = "Common"  # Default rarity
+                if mat_data:
                     item_rarity = mat_data.get("rarity", "Common")
-                    # Add colored material line
-                    text = f"• {item_name} ({item_rarity})"
+                    # Apply bonus only if the item rarity is Epic or higher
+                    if item_rarity in HIGH_RARITY_TIERS:
+                        final_chance += luck_bonus
+
+                if random.randint(1, 100) <= final_chance:
+                    self.add_loot(drop_key, 1)
+                    item_name = mat_data.get("name", drop_key) if mat_data else drop_key
+
+                    # --- THIS IS THE FIX ---
+                    # Removed rarity text from the log
+                    text = f"• {item_name}"
                     colored_loot_lines.append(get_rarity_ansi(item_rarity, text))
+                # --- END OF NEW LOGIC ---
 
             # 2. Handle Equipment Drops
             equipment_drops = item_manager.generate_monster_loot(result["monster_data"])
@@ -323,8 +343,10 @@ class AdventureSession:
                     slot=item["slot"],
                     item_source_table=item["source"],
                 )
-                # Add colored equipment line
-                text = f"• {item['name']} ({item['rarity']})"
+
+                # --- THIS IS THE FIX ---
+                # Removed rarity text from the log
+                text = f"• {item['name']}"
                 colored_loot_lines.append(get_rarity_ansi(item["rarity"], text))
 
             if colored_loot_lines:
@@ -333,7 +355,6 @@ class AdventureSession:
                 combat_log.append(
                     f"\n{E.ITEM_BOX} **Loot**\n```ansi\n{loot_block}\n```"
                 )
-            # --- END OF FIX ---
 
             quest_updates = self._update_quests(
                 result["monster_data"]["name"], result["drops"]

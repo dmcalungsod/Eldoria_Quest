@@ -154,17 +154,24 @@ class AdventureManager:
         )
 
         if total_exp > 0:
+            # Add EXP to the level-up bar
             level_system.add_exp(total_exp)
 
+            # Update the player's level, exp, and exp_to_next
             self.db.update_player_level_data(
                 session.discord_id,
                 level_system.level,
                 level_system.exp,
                 level_system.exp_to_next,
             )
-            self.db.update_player_stats(
-                session.discord_id, level_system.stats.to_dict()
+
+            # --- THIS IS THE NEW LOGIC ---
+            # Add the same EXP to the spendable "Vestige" pool
+            cur.execute(
+                "UPDATE players SET vestige_pool = vestige_pool + ? WHERE discord_id = ?",
+                (total_exp, session.discord_id),
             )
+            # --- END OF NEW LOGIC ---
 
         # --- NEW: Restore Vitals ---
         # Get the new max_hp/mp (in case they leveled up)
@@ -179,6 +186,7 @@ class AdventureManager:
             hp_to_save = new_max_hp
 
         # If total_exp == 0, player died. hp_to_save remains 1.
+        # This opens its own connection, which is fine.
         self.db.set_player_vitals(session.discord_id, hp_to_save, mp_to_save)
         # --- END NEW ---
 
@@ -186,24 +194,25 @@ class AdventureManager:
         for item_key, count in session.loot.items():
             mat_data = MATERIALS.get(item_key)
 
-            # --- FIX START ---
             if mat_data:
                 item_name = mat_data["name"]
-                item_rarity = mat_data.get("rarity", "Common")  # Get the rarity
+                item_rarity = mat_data.get("rarity", "Common")
             else:
                 item_name = item_key
-                item_rarity = "Common"  # Fallback
-            # --- FIX END ---
+                item_rarity = "Common"
 
+            # This opens its own connection, which is fine.
             self.inventory_manager.add_item(
                 discord_id=session.discord_id,
                 item_key=item_key,
                 item_name=item_name,
                 item_type="material",
-                rarity=item_rarity,  # <-- Pass the rarity here
+                rarity=item_rarity,
                 amount=count,
             )
 
+        # Commit the Vestige pool update
+        conn.commit()
         conn.close()
 
     async def fail_adventure(self, session: AdventureSession):
@@ -216,7 +225,7 @@ class AdventureManager:
                 await user.send(
                     f"{E.DEFEAT} **You have been defeated!**\n"
                     "You collapsed in the wilds. A Guild rescue team retrieved your body, "
-                    "but any unbanked EXP was lost. Your recovered materials are in your inventory."
+                    "but any unbanked Vestige was lost. Your recovered materials are in your inventory."
                 )
             except:
                 pass

@@ -4,7 +4,6 @@ Level Up System for Eldoria Quest
 This module handles:
 - Experience gain
 - Automatic level-up
-- Increasing base stats upon level-up
 - Auto scaling experience requirements per level
 - Integration with PlayerStats for recalculating derived stats (HP, MP)
 """
@@ -17,15 +16,20 @@ class LevelUpSystem:
     """
     Standalone Level-Up Manager.
 
-    Each level grants:
-        +1 to each of the 6 core stats
+    Leveling up no longer grants stats automatically.
+    It only increases the level and the EXP requirement for the next level.
     """
 
     # Updated to the new 6-stat system
     STAT_LIST = ["STR", "END", "DEX", "AGI", "MAG", "LCK"]
 
     def __init__(
-        self, stats: PlayerStats, level: int = 1, exp: int = 0, exp_to_next: int = 100
+        self,
+        stats: PlayerStats,
+        level: int = 1,
+        exp: int = 0,
+        # --- CHANGE 1: Set new default ---
+        exp_to_next: int = 1000,
     ):
         self.stats = stats
         self.level = level
@@ -60,12 +64,13 @@ class LevelUpSystem:
         """Apply the level-up bonuses."""
         self.level += 1
 
-        # +1 to each stat
-        for stat in self.STAT_LIST:
-            self.stats.add_base_stat(stat, 1)
+        # --- CHANGE 2: REMOVED AUTOMATIC STAT GAINS ---
+        # for stat in self.STAT_LIST:
+        #    self.stats.add_base_stat(stat, 1)
+        # --- END OF CHANGE ---
 
         # Increase the EXP required for the next level
-        self.exp_to_next = int(self.exp_to_next * 1.15)  # 15% growth rate
+        self.exp_to_next = int(self.exp_to_next * 1.22)  # 22% growth rate
 
     # -----------------------------------------------------------
     # Serialization
@@ -87,5 +92,6 @@ class LevelUpSystem:
             stats=stats,
             level=data.get("level", 1),
             exp=data.get("exp", 0),
-            exp_to_next=data.get("exp_to_next", 100),
+            # --- CHANGE 3: Set new default ---
+            exp_to_next=data.get("exp_to_next", 1000),
         )

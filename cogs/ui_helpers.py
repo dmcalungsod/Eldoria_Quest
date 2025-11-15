@@ -69,15 +69,18 @@ def build_inventory_embed(items: list) -> discord.Embed:
 
             if item["equipped"] == 1:
                 # Build string WITHOUT markdown, WITH stats
-                text = f"• {item['item_name']} ({rarity}) (Slot: {item['slot']}){stats_str}"
+                # --- MODIFIED: Removed ({rarity}) ---
+                text = f"• {item['item_name']} (Slot: {item['slot']}){stats_str}"
                 categories["Equipped"].append(get_rarity_ansi(rarity, text))
             else:
                 # Build string WITHOUT markdown, WITH stats
-                text = f"• {item['item_name']} ({rarity}) (x{item['count']}){stats_str}"
+                # --- MODIFIED: Removed ({rarity}) ---
+                text = f"• {item['item_name']} (x{item['count']}){stats_str}"
                 categories["Equipment"].append(get_rarity_ansi(rarity, text))
 
         elif item_type in categories:
-            text = f"• {item['item_name']} ({rarity}) (x{item['count']})"
+            # --- MODIFIED: Removed ({rarity}) ---
+            text = f"• {item['item_name']} (x{item['count']})"
             categories[item_type].append(get_rarity_ansi(rarity, text))
 
     if not any(categories.values()):
@@ -170,7 +173,7 @@ async def back_to_profile_callback(
         f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
         f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
     )
-    embed.add_field(name="Basic Abilities", value=stat_block, inline=False)
+    embed.add_field(name="Overall Abilities", value=stat_block, inline=False)
 
     if not player_skills:
         skills_str = "No skills learned."

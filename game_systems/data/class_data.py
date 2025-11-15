@@ -19,6 +19,19 @@ CLASSES = {
             "break lesser souls."
         ),
         "stats": {"STR": 8, "END": 7, "DEX": 5, "AGI": 3, "MAG": 1, "LCK": 1},
+        "allowed_slots": [
+            "sword",
+            "greatsword",
+            "mace",
+            "shield",  # Weapons
+            "helm",
+            "heavy_armor",
+            "heavy_gloves",
+            "heavy_boots",
+            "heavy_legs",  # Armor
+            "belt",
+            "accessory",  # Misc
+        ],
     },
     "Mage": {
         "id": 2,
@@ -29,6 +42,18 @@ CLASSES = {
             "reshape the battlefield, or unmake an enemy in a heartbeat."
         ),
         "stats": {"STR": 2, "END": 3, "DEX": 4, "AGI": 5, "MAG": 9, "LCK": 2},
+        "allowed_slots": [
+            "staff",
+            "tome",
+            "orb",  # Weapons
+            "hood",
+            "robe",
+            "gloves",
+            "boots",
+            "legs",  # Armor
+            "belt",
+            "accessory",  # Misc
+        ],
     },
     "Rogue": {
         "id": 3,
@@ -39,6 +64,18 @@ CLASSES = {
             "their enemies make into a fatal opening."
         ),
         "stats": {"STR": 4, "END": 4, "DEX": 7, "AGI": 8, "MAG": 1, "LCK": 3},
+        "allowed_slots": [
+            "dagger",
+            "offhand_dagger",
+            "bow",  # Weapons
+            "leather_hood",
+            "medium_armor",
+            "medium_gloves",
+            "medium_boots",
+            "medium_legs",  # Armor
+            "belt",
+            "accessory",  # Misc
+        ],
     },
     "Cleric": {
         "id": 4,
@@ -49,6 +86,19 @@ CLASSES = {
             "they never see coming."
         ),
         "stats": {"STR": 5, "END": 6, "DEX": 3, "AGI": 3, "MAG": 7, "LCK": 1},
+        "allowed_slots": [
+            "mace",
+            "shield",
+            "staff",
+            "tome",  # Weapons
+            "miter",
+            "vestments",
+            "gloves",
+            "boots",
+            "legs",  # Armor
+            "belt",
+            "accessory",  # Misc
+        ],
     },
     "Ranger": {
         "id": 5,
@@ -59,5 +109,17 @@ CLASSES = {
             "with the wild’s silent fury and vanish just as swiftly."
         ),
         "stats": {"STR": 4, "END": 5, "DEX": 8, "AGI": 6, "MAG": 2, "LCK": 2},
+        "allowed_slots": [
+            "bow",
+            "dagger",
+            "quiver",  # Weapons
+            "leather_cap",
+            "medium_armor",
+            "medium_gloves",
+            "medium_boots",
+            "medium_legs",  # Armor
+            "belt",
+            "accessory",  # Misc
+        ],
     },
 }

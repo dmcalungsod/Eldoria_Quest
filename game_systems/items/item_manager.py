@@ -17,7 +17,7 @@ Also handles:
 import sqlite3
 import random
 import json
-from typing import Dict
+from typing import Dict, List
 
 DB_NAME = "EQ_Game.db"
 
@@ -55,7 +55,8 @@ class ItemManager:
         cur = conn.cursor()
 
         # f-string is safe here due to the valid_tables check
-        cur.execute(f"SELECT * FROM {source_table} WHERE id = ?", (item_key,))
+        query_table = "equipment" if source_table == "equipment" else "class_equipment"
+        cur.execute(f"SELECT * FROM {query_table} WHERE id = ?", (item_key,))
         item_row = cur.fetchone()
         conn.close()
 
@@ -166,41 +167,45 @@ class ItemManager:
         conn.close()
         return monster
 
-    def generate_monster_loot(self, monster_row):
+    # --- THIS FUNCTION IS REWRITTEN ---
+    def generate_monster_loot(self, monster_row: dict) -> List[dict]:
         """
-        Returns 0–2 random items for defeating a monster.
-        Loot pool = all items, filtered by rarity roll.
+        Generates 0-1 random equipment items from the general 'equipment' table.
+        It no longer drops class-specific equipment.
         """
         loot = []
         level = monster_row["level"]
 
+        # Only a chance to drop equipment at all
+        if random.randint(1, 100) > 20:  # 20% chance to drop an item
+            return loot
+
+        rarity = self.roll_rarity()
+
         conn = self.connect()
         cur = conn.cursor()
 
-        for _ in range(random.randint(0, 2)):  # Up to 2 items per monster
-            rarity = self.roll_rarity()
+        # Simple query: Get one random item from the general equipment table
+        # that matches the rolled rarity and is at or below the monster's level.
+        cur.execute(
+            """
+            SELECT id, name, rarity, slot, 'equipment' AS source
+            FROM equipment
+            WHERE rarity = ? AND min_level <= ?
+            ORDER BY RANDOM()
+            LIMIT 1;
+        """,
+            (rarity, level),
+        )
 
-            # Search ALL equipment tables
-            cur.execute(
-                """
-                SELECT id, name, rarity, slot, min_level, 'equipment' AS source
-                FROM equipment
-                WHERE rarity = ? AND min_level <= ?
-                UNION ALL
-                SELECT id, name, rarity, slot, min_level, 'class_equipment' AS source
-                FROM class_equipment
-                WHERE rarity = ? AND min_level <= ?
-                LIMIT 1;
-            """,
-                (rarity, level, rarity, level),
-            )
-
-            row = cur.fetchone()
-            if row:
-                loot.append(dict(row))
+        row = cur.fetchone()
+        if row:
+            loot.append(dict(row))
 
         conn.close()
         return loot
+
+    # --- END REWRITE ---
 
     # --------------------------------------------------------------------
     #     SEARCH & UTILITY

@@ -80,12 +80,11 @@ class EldoriaBot(commands.Bot):
             print("No 'cogs' directory found. I've created one for you.")
 
         for filename in os.listdir(cogs_dir):
-            # --- THIS IS THE FIX ---
-            # We load files that end in .py, NOT start with _, AND are NOT 'ui_helpers.py'
+            # This logic automatically finds and loads your new cogs
             if (
                 filename.endswith(".py")
                 and not filename.startswith("_")
-                and filename != "ui_helpers.py"  # <-- ADD THIS CONDITION
+                and filename != "ui_helpers.py"
             ):
                 cog_name = f"cogs.{filename[:-3]}"
                 try:

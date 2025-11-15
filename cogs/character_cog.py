@@ -270,6 +270,42 @@ class CharacterProfileView(View):
         """
         await back_to_guild_hall_callback(interaction)
 
+    # --- THIS IS THE NEW BUTTON (Row 3) ---
+    @discord.ui.button(
+        label="Status Update",
+        style=discord.ButtonStyle.success,
+        custom_id="profile_status_update",
+        emoji="⬆️",
+        row=2,
+    )
+    async def status_update_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the Status Update UI.
+        """
+        await interaction.response.defer()
+
+        # Import the new cog's view
+        from .status_update_cog import StatusUpdateView
+
+        # Get all player data
+        player_data = self.db.get_player(self.interaction_user.id)
+        stats_json = self.db.get_player_stats_json(self.interaction_user.id)
+        player_stats = PlayerStats.from_dict(stats_json)
+
+        # Build the embed using the static method from the view
+        # --- THIS IS THE FIX ---
+        embed = StatusUpdateView.build_status_embed(player_data, player_stats)
+        # --- END OF FIX ---
+
+        view = StatusUpdateView(
+            self.db, self.interaction_user, player_data, player_stats
+        )
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # --- END OF NEW BUTTON ---
+
 
 # ======================================================================
 # INVENTORY & SKILLS VIEWS

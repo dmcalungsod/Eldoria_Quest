@@ -41,7 +41,13 @@ def create_tables():
         gender TEXT,
         level INTEGER DEFAULT 1,
         experience INTEGER DEFAULT 0,
-        exp_to_next INTEGER DEFAULT 100,
+        
+        -- --- CHANGE 1: Set new default ---
+        exp_to_next INTEGER DEFAULT 1000,
+        
+        -- --- CHANGE 2: Add new Vestige pool ---
+        vestige_pool INTEGER DEFAULT 0,
+
         aurum INTEGER DEFAULT 0,
         current_hp INTEGER DEFAULT 100,
         current_mp INTEGER DEFAULT 20,
@@ -194,7 +200,7 @@ def create_tables():
         item_key TEXT NOT NULL,
         item_name TEXT NOT NULL,
         item_type TEXT NOT NULL,
-        rarity TEXT DEFAULT 'Common', -- <-- THIS IS THE FIX
+        rarity TEXT DEFAULT 'Common',
         slot TEXT,
         item_source_table TEXT,
         count INTEGER DEFAULT 1,

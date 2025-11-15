@@ -19,7 +19,8 @@ QUESTS_F_TIER = [
         "Willowcreek Outskirts",
         "Slimes are devouring crops and farm tools.",
         "Moisture from the Broken Veil has thickened the forest air, spawning an abnormal number of Forest Slimes. Farmer Tallen’s fields have become a slow-moving tide of gelatinous pests. He seeks someone willing to drive them back before planting season is ruined.",
-        json.dumps({"defeat": {"Forest Slime": 10}, "collect": {"Residual Core": 3}}),
+        # --- FIX: Changed "Forest Slime" to "Verdant Slime" and "Glimmer Slime" ---
+        json.dumps({"defeat": {"Verdant Slime": 5, "Glimmer Slime": 5}}),
         json.dumps({"exp": 45, "aurum": 20, "item": "Minor Healing Draught"}),
     ),
     (
@@ -52,7 +53,8 @@ QUESTS_F_TIER = [
         "Forest Edge",
         "Giant forest rats are tearing into supply crates.",
         "Doran’s shipments have been gnawed open by oversized rodents infused with Veil-sickness. Their boldness grows daily, and his livelihood is at risk. Clear them out before he loses another week’s worth of grain and cloth.",
-        json.dumps({"defeat": {"Forest Rat": 8}}),
+        # --- FIX: Changed "Forest Rat" to "Goblin Grunt" (since rats don't exist) ---
+        json.dumps({"defeat": {"Goblin Grunt": 8}}),
         json.dumps({"exp": 35, "aurum": 18}),
     ),
     (
@@ -74,7 +76,8 @@ QUESTS_F_TIER = [
         "Eastwood Camp",
         "Clear goblins from a campsite Rima wants to use.",
         "Rima, an overly enthusiastic explorer, set up camp deep in goblin-infested brush. Before she can proceed with her “grand expedition,” she needs the area cleared of lurking scavenger goblins.",
-        json.dumps({"defeat": {"Scavenger Goblin": 5}}),
+        # --- FIX: Changed "Scavenger Goblin" to "Goblin Grunt" ---
+        json.dumps({"defeat": {"Goblin Grunt": 5}}),
         json.dumps({"exp": 45, "aurum": 14}),
     ),
     (
@@ -135,9 +138,8 @@ QUESTS_E_TIER = [
         "Eastern Forest",
         "Goblins are organizing raids.",
         "For the first time in seasons, goblins have formed war skirmishes. Their scouts have been spotted mapping forest paths—an alarming sign of future raids. Rhea needs swift action before these pests grow bold enough to strike Willowcreek.",
-        json.dumps(
-            {"defeat": {"Goblin Skirmisher": 7}, "retrieve": {"Map Fragment": 1}}
-        ),
+        # --- FIX: Changed "Goblin Skirmisher" to "Goblin Scout" ---
+        json.dumps({"defeat": {"Goblin Scout": 7}, "retrieve": {"Map Fragment": 1}}),
         json.dumps({"exp": 60, "aurum": 25}),
     ),
     (
@@ -159,7 +161,8 @@ QUESTS_E_TIER = [
         "Hollowtree Den",
         "Investigate eerie whispers from a rotten tree cavern.",
         "Travelers claim that the Hollowtree whispers names, luring wanderers closer. Sorin suspects a Veil-born sprite nesting inside. He needs someone who won’t be fooled by its illusions.",
-        json.dumps({"investigate": "Hollowtree", "defeat": {"Mischief Sprite": 1}}),
+        # --- FIX: Changed "Mischief Sprite" to "Burbling Sprite" ---
+        json.dumps({"investigate": "Hollowtree", "defeat": {"Burbling Sprite": 1}}),
         json.dumps({"exp": 70, "aurum": 22}),
     ),
     (
@@ -170,7 +173,8 @@ QUESTS_E_TIER = [
         "Birchfall Path",
         "Eliminate a territorial Treeling.",
         "A sentient sap-creature—the Treeling—has claimed Birchfall Path, harassing workers and smashing tools. Bran asks for aid before the creature’s roots choke out the entire path.",
-        json.dumps({"defeat": {"Treeling": 1}}),
+        # --- FIX: Changed "Treeling" to "Vineling" ---
+        json.dumps({"defeat": {"Vineling": 1}}),
         json.dumps({"exp": 90, "aurum": 28, "item": "Bark-Stitched Gloves"}),
     ),
     (
@@ -181,7 +185,8 @@ QUESTS_E_TIER = [
         "Moonwater Shore",
         "Water spirits are disturbing fishermen.",
         "Moonwater’s surface shimmers even without sun, revealing restless Naiads that drag nets underwater. Amon fears someone will be taken next. He needs protection.",
-        json.dumps({"defeat": {"Moonwater Naiad": 3}}),
+        # --- FIX: Changed "Moonwater Naiad" to "Fen Wisp" ---
+        json.dumps({"defeat": {"Fen Wisp": 3}}),
         json.dumps({"exp": 65, "aurum": 20}),
     ),
     (
@@ -203,7 +208,8 @@ QUESTS_E_TIER = [
         "Ranger Outpost",
         "Practice combat against agile forest beasts.",
         "Alyss trains new recruits by sending them after Swift-tail Hares—nimble creatures infused with faint forest magic. Catching them tests reflex and precision.",
-        json.dumps({"defeat": {"Swift-tail Hare": 5}}),
+        # --- FIX: Changed "Swift-tail Hare" to "Gloam Hare" ---
+        json.dumps({"defeat": {"Gloam Hare": 5}}),
         json.dumps({"exp": 50, "aurum": 12, "item": "Wooden Ranger Pendant"}),
     ),
     (
@@ -225,7 +231,8 @@ QUESTS_E_TIER = [
         "Webwood",
         "Destroy a growing spider nest.",
         "The Webwood’s population of brood spiders has ballooned, stringing webs across traveler roads. Their venom weakens limbs, making escape impossible. Rhea requires an adventurer to thin their numbers.",
-        json.dumps({"defeat": {"Brood Spider": 6}}),
+        # --- FIX: Changed "Brood Spider" to "Thicket Spider" ---
+        json.dumps({"defeat": {"Thicket Spider": 6}}),
         json.dumps({"exp": 85, "aurum": 32, "item": "Venom Sac"}),
     ),
     (
@@ -236,7 +243,8 @@ QUESTS_E_TIER = [
         "Sporebrush Patch",
         "Defeat aggressive fungus creatures.",
         "Sporeshrooms have sprouted beyond their usual cycle, animated by warped forest mana. Pim’s harvesting routes are blocked unless these lumbering fungi are cleared.",
-        json.dumps({"defeat": {"Sporeshroom": 4}}),
+        # --- FIX: Changed "Sporeshroom" to "Sporeling" ---
+        json.dumps({"defeat": {"Sporeling": 4}}),
         json.dumps({"exp": 80, "aurum": 30}),
     ),
 ]
@@ -253,7 +261,8 @@ QUESTS_D_TIER = [
         "Ruined Camp",
         "Take down a goblin commander.",
         "A cunning goblin lieutenant has unified several scattered tribes. His camp rings with stolen steel and crude banners. If left unchecked, an organized horde might rise.",
-        json.dumps({"defeat": {"Goblin Lieutenant Krag": 1}}),
+        # --- FIX: Changed "Goblin Lieutenant Krag" to "Bramble Goblin" (a tougher goblin) ---
+        json.dumps({"defeat": {"Bramble Goblin": 1}}),
         json.dumps({"exp": 120, "aurum": 55, "item": "Krag’s Insignia"}),
     ),
     (
@@ -264,7 +273,8 @@ QUESTS_D_TIER = [
         "Heartwood Glade",
         "Aid a wounded forest spirit.",
         "A Heartwood Sprite has been corrupted by a splinter of Veil energy lodged in its body. Leira believes an adventurer with a steady hand can help remove it—if they can survive its thrashing.",
-        json.dumps({"subdue": "Sprite", "remove": "Veil Splinter"}),
+        # --- FIX: Changed "Sprite" to "Wisp-Sentinel" ---
+        json.dumps({"subdue": "Wisp-Sentinel", "remove": "Veil Splinter"}),
         json.dumps({"exp": 110, "aurum": 40, "item": "Blessing of Vital Sap"}),
     ),
     (
@@ -275,7 +285,8 @@ QUESTS_D_TIER = [
         "Moonfang Den",
         "Hunt a powerful forest wolf touched by moonlight.",
         "The Moonfang Wolf is a silver-coated predator that leads lesser wolves with eerie discipline. Yorin fears it will turn its pack upon the village unless someone challenges it.",
-        json.dumps({"defeat": {"Moonfang Wolf": 1}}),
+        # --- FIX: Changed "Moonfang Wolf" to "Ridge Wolf" ---
+        json.dumps({"defeat": {"Ridge Wolf": 1}}),
         json.dumps({"exp": 150, "aurum": 60, "item": "Moonfang Pelt"}),
     ),
     (
@@ -286,7 +297,8 @@ QUESTS_D_TIER = [
         "Rootcoil Valley",
         "Destroy corrupted root-beasts.",
         "Tanglesap Creatures—animated roots—have begun striking at loggers. Their claws are formed of hardened bark and their bodies pulse with sickly green glow.",
-        json.dumps({"defeat": {"Tanglesap Creature": 3}}),
+        # --- FIX: Changed "Tanglesap Creature" to "Young Treant" ---
+        json.dumps({"defeat": {"Young Treant": 3}}),
         json.dumps({"exp": 100, "aurum": 30}),
     ),
     (
@@ -319,7 +331,8 @@ QUESTS_D_TIER = [
         "Moonshadow Shrine",
         "Purify a shrine corrupted by Veil energy.",
         "The Moonshadow Shrine’s white stones have turned black-veined, its pool reflecting horrors instead of moonlight. Mara needs an adventurer to drive off the wraithlings haunting it.",
-        json.dumps({"defeat": {"Wraithling": 5}, "use": "Purification Amulet"}),
+        # --- FIX: Changed "Wraithling" to "Rookwood Shade" ---
+        json.dumps({"defeat": {"Rookwood Shade": 5}, "use": "Purification Amulet"}),
         json.dumps({"exp": 130, "aurum": 45, "item": "Blessed Talisman"}),
     ),
     (
@@ -330,7 +343,8 @@ QUESTS_D_TIER = [
         "Webwood Nest",
         "Hunt the matriarch of the spider colony.",
         "The brood spiders answer to a single massive mother whose venom sacs can rot bark. Her growing brood threatens to spread beyond Webwood entirely.",
-        json.dumps({"defeat": {"Spider Matron Vesska": 1}}),
+        # --- FIX: Changed "Spider Matron Vesska" to "Thicket Spider" (just more of them) ---
+        json.dumps({"defeat": {"Thicket Spider": 10}}),
         json.dumps({"exp": 160, "aurum": 70, "item": "Vesska’s Venom"}),
     ),
     (
@@ -352,7 +366,8 @@ QUESTS_D_TIER = [
         "Whispering Oak Circle",
         "Investigate a sacred tree murmuring with corrupted voices.",
         "The Whispering Oak, ancient guardian of the forest, has begun muttering in tones unlike any druidic language. Leira suspects an unseen parasite clinging to its bark—one born of the Veil.",
-        json.dumps({"inspect": "Oak", "defeat": {"Oak Parasite": 1}}),
+        # --- FIX: Changed "Oak Parasite" to "Pine Wight" ---
+        json.dumps({"inspect": "Oak", "defeat": {"Pine Wight": 1}}),
         json.dumps({"exp": 140, "aurum": 50, "item": "Oakwood Charm"}),
     ),
 ]

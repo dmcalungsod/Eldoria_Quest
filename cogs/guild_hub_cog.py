@@ -159,6 +159,42 @@ class GuildCardView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     # --- (Row 2 buttons) ---
+
+    # --- THIS IS THE NEW BUTTON ---
+    @discord.ui.button(
+        label="Guild Shop",
+        style=discord.ButtonStyle.secondary,
+        custom_id="guild_shop",
+        emoji="🪙",  # Using a standard emoji as E.AURUM is custom
+        row=1,
+    )
+    async def guild_shop_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the new Guild Shop UI.
+        """
+        await interaction.response.defer()
+
+        # Import the new cog's view
+        from .shop_cog import ShopView
+
+        # Get player's current aurum
+        player_data = self.db.get_player(interaction.user.id)
+        current_aurum = player_data["aurum"] if player_data else 0
+
+        embed = discord.Embed(
+            title=f"Guild Shop",
+            description=f"Welcome to the Guild's public shop. Spend your hard-earned Aurum.\n\nYou have: {current_aurum} {E.AURUM}",
+            color=discord.Color.green(),
+        )
+        embed.set_footer(text="Items you can't afford are not shown in the dropdown.")
+
+        view = ShopView(self.db, self.interaction_user, current_aurum)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # --- END OF NEW BUTTON ---
+
     @discord.ui.button(
         label="Check Rank",
         style=discord.ButtonStyle.secondary,

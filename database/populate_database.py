@@ -22,7 +22,7 @@ try:
     from game_systems.data import monsters
     from game_systems.data import quest_items
     from game_systems.data import consumables
-    from game_systems.data import equipments
+    from game_systems.data import equipments  # <-- This will now import the dictionary
     from game_systems.data import class_equipments
     from game_systems.data import materials
     from game_systems.data import quest_data
@@ -130,10 +130,13 @@ def insert_consumables(conn):
     conn.commit()
 
 
+# --- THIS FUNCTION IS REWRITTEN ---
 def insert_equipments(conn):
     cur = conn.cursor()
     print("Inserting general equipments...")
-    for key, e in equipments.EQUIPMENTS.items():
+
+    # Iterate over the new dictionary's VALUES
+    for e in equipments.EQUIPMENT_DATA.values():
         stats = e.get("stats_bonus", {})
         cur.execute(
             """
@@ -157,6 +160,9 @@ def insert_equipments(conn):
             ),
         )
     conn.commit()
+
+
+# --- END OF REWRITE ---
 
 
 def insert_class_equipments(conn):

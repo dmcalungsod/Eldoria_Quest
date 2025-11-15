@@ -77,7 +77,10 @@ class DatabaseManager:
             INSERT INTO players (discord_id, name, class_id, race, gender, 
                                  level, experience, exp_to_next, 
                                  current_hp, current_mp)
-            VALUES (?, ?, ?, ?, ?, 1, 0, 100, ?, ?)
+            
+            -- --- THIS IS THE CHANGE ---
+            VALUES (?, ?, ?, ?, ?, 1, 0, 1000, ?, ?)
+            -- --- END OF CHANGE ---
         """,
             (discord_id, name, class_id, race, gender, initial_hp, initial_mp),
         )

@@ -8,11 +8,54 @@ Defines:
 
 from dataclasses import dataclass
 from typing import Dict, List, Any
+import math  # <-- IMPORT MATH
 
 
-# ---------------------------------------------
-# StatBlock
-# ---------------------------------------------
+# --- NEW HELPER FUNCTION ---
+def calculate_tiered_bonus(stat_value, base_effect_per_point):
+    """
+    Calculates a stat's total effect based on a tiered scaling
+    where each 100-point milestone adds +25% to the base multiplier.
+
+    Tier 1 (1-100 pts): 1.00x
+    Tier 2 (101-200 pts): 1.25x
+    Tier 3 (201-300 pts): 1.50x
+    ...
+    Tier 10 (901-999 pts): 3.25x
+
+    Example: 250 END (10 HP per point)
+    - 100 points @ 1.00x = 100 * 10 * 1.00 = 1000
+    - 100 points @ 1.25x = 100 * 10 * 1.25 = 1250
+    - 50 points  @ 1.50x =  50 * 10 * 1.50 =  750
+    - Total = 3000 HP
+    """
+    total_effect = 0
+    remaining_points = stat_value
+    current_tier = 0
+
+    while remaining_points > 0:
+        # Determine points to calculate for this tier
+        points_in_this_tier = min(remaining_points, 100)
+
+        # Calculate the additive multiplier
+        # Tier 0 (1-100) = 1.0 + (0 * 0.25) = 1.0x
+        # Tier 1 (101-200) = 1.0 + (1 * 0.25) = 1.25x
+        # Tier 2 (201-300) = 1.0 + (2 * 0.25) = 1.50x
+        multiplier = 1.0 + (current_tier * 0.25)
+
+        # Add to the total effect
+        total_effect += points_in_this_tier * base_effect_per_point * multiplier
+
+        # Decrement points and move to the next tier
+        remaining_points -= points_in_this_tier
+        current_tier += 1
+
+    return math.floor(total_effect)
+
+
+# --- END NEW HELPER FUNCTION ---
+
+
 @dataclass
 class StatBlock:
     """Stores the base and bonus values of a stat."""
@@ -31,14 +74,7 @@ class StatBlock:
 class PlayerStats:
     """
     Manages all stats for a player character.
-
-    Core Stats:
-        STR (Strength), END (Endurance), DEX (Dexterity),
-        AGI (Agility), MAG (Magic), LCK (Luck)
-
-    Derived Stats:
-        HP = 50 + END * 10
-        MP = 20 + MAG * 5
+    ...
     """
 
     def __init__(
@@ -79,16 +115,20 @@ class PlayerStats:
     def luck(self):
         return self._stats["LCK"].total
 
-    # --- Derived stats ---
+    # --- Derived stats (MODIFIED) ---
     @property
     def max_hp(self) -> int:
-        # Formula uses Endurance
-        return 50 + (self.endurance * 10)
+        # Formula was: 50 + (self.endurance * 10)
+        # NEW Formula: 50 + Tiered Bonus from END (10 HP per point)
+        hp_bonus = calculate_tiered_bonus(self.endurance, 10)
+        return 50 + hp_bonus
 
     @property
     def max_mp(self) -> int:
-        # Formula uses Magic
-        return 20 + (self.magic * 5)
+        # Formula was: 20 + (self.magic * 5)
+        # NEW Formula: 20 + Tiered Bonus from MAG (5 MP per point)
+        mp_bonus = calculate_tiered_bonus(self.magic, 5)
+        return 20 + mp_bonus
 
     # --- Stat modification ---
     def set_base_stat(self, stat_name, value):
