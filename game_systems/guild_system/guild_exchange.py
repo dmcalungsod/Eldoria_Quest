@@ -3,7 +3,6 @@ guild_exchange.py
 
 Handles the logic for exchanging monster materials (Magic Stones, Drop Items)
 for Aurum (currency) at the Guild Hall.
-This is the core economic loop inspired by Danmachi.
 """
 
 from database.database_manager import DatabaseManager
@@ -48,7 +47,7 @@ class GuildExchange:
         """
         Sells all materials in the player's inventory.
         1. Calculates total value.
-        2. Adds gold (Aurum) to player.
+        2. Adds Aurum to player.
         3. Deletes materials from inventory.
         Returns (total_earned, list_of_sold_items).
         """
@@ -60,9 +59,10 @@ class GuildExchange:
         conn = self.db.connect()
         cur = conn.cursor()
 
-        # 1. Add gold to player
+        # --- THIS IS THE FIX ---
+        # 1. Add gold (Aurum) to player
         cur.execute(
-            "UPDATE players SET gold = gold + ? WHERE discord_id = ?",
+            "UPDATE players SET aurum = aurum + ? WHERE discord_id = ?",
             (total_value, discord_id),
         )
 

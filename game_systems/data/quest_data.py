@@ -20,7 +20,7 @@ QUESTS_F_TIER = [
         "Slimes are devouring crops and farm tools.",
         "Moisture from the Broken Veil has thickened the forest air, spawning an abnormal number of Forest Slimes. Farmer Tallen’s fields have become a slow-moving tide of gelatinous pests. He seeks someone willing to drive them back before planting season is ruined.",
         json.dumps({"defeat": {"Forest Slime": 10}, "collect": {"Residual Core": 3}}),
-        json.dumps({"exp": 45, "gold": 20, "item": "Minor Healing Draught"}),
+        json.dumps({"exp": 45, "aurum": 20, "item": "Minor Healing Draught"}),
     ),
     (
         2,
@@ -31,7 +31,7 @@ QUESTS_F_TIER = [
         "The local healer needs fresh medicinal plants.",
         "The Whispering Thicket grows herbs found nowhere else, especially Moonleaf—gleaming silver leaves used to treat fevers. With monsters stirring, Mirra can’t safely gather them herself. She requests an adventurer to harvest the plants before night-dew poisons their potency.",
         json.dumps({"gather": {"Moonleaf Herb": 5}}),
-        json.dumps({"exp": 25, "gold": 10, "item": "Herbal Salve"}),
+        json.dumps({"exp": 25, "aurum": 10, "item": "Herbal Salve"}),
     ),
     (
         3,
@@ -42,7 +42,7 @@ QUESTS_F_TIER = [
         "A villager’s child wandered into the forest.",
         "A young girl, Lina, chased her pet sprite into the treeline and never returned. The local guard is stretched thin and needs someone swift to search the nearby clearings. Time is short—nightfall brings predators hungrier than wolves.",
         json.dumps({"locate": "Lina", "escort": "Lina"}),
-        json.dumps({"exp": 40, "gold": 15}),
+        json.dumps({"exp": 40, "aurum": 15}),
     ),
     (
         4,
@@ -53,7 +53,7 @@ QUESTS_F_TIER = [
         "Giant forest rats are tearing into supply crates.",
         "Doran’s shipments have been gnawed open by oversized rodents infused with Veil-sickness. Their boldness grows daily, and his livelihood is at risk. Clear them out before he loses another week’s worth of grain and cloth.",
         json.dumps({"defeat": {"Forest Rat": 8}}),
-        json.dumps({"exp": 35, "gold": 18}),
+        json.dumps({"exp": 35, "aurum": 18}),
     ),
     (
         5,
@@ -64,7 +64,7 @@ QUESTS_F_TIER = [
         "Deliver chopped timber to Willowcreek.",
         "Travelers fear the woodland paths at dusk, forcing Elwin’s workers to abandon their supply of freshly cut lumber. The carpenter needs someone resilient enough to haul the materials before thieves or creatures steal them away.",
         json.dumps({"transport": {"Timber Bundle": 1}}),
-        json.dumps({"exp": 20, "gold": 12}),
+        json.dumps({"exp": 20, "aurum": 12}),
     ),
     (
         6,
@@ -75,7 +75,7 @@ QUESTS_F_TIER = [
         "Clear goblins from a campsite Rima wants to use.",
         "Rima, an overly enthusiastic explorer, set up camp deep in goblin-infested brush. Before she can proceed with her “grand expedition,” she needs the area cleared of lurking scavenger goblins.",
         json.dumps({"defeat": {"Scavenger Goblin": 5}}),
-        json.dumps({"exp": 45, "gold": 14}),
+        json.dumps({"exp": 45, "aurum": 14}),
     ),
     (
         7,
@@ -86,7 +86,7 @@ QUESTS_F_TIER = [
         "Investigate unusual beast tracks near town.",
         "Claw marks and hoofprints twisted by corruption have appeared near the northern trail. Yorin suspects a malformed creature but needs confirmation from someone willing to venture deeper.",
         json.dumps({"examine": {"Track Sites": 3}, "report_to": "Hunter Yorin"}),
-        json.dumps({"exp": 30, "gold": 10}),
+        json.dumps({"exp": 30, "aurum": 10}),
     ),
     (
         8,
@@ -97,7 +97,7 @@ QUESTS_F_TIER = [
         "Deliver lanterns to patrolling guards.",
         "With fog thickening earlier each day, sentries require new lanterns to maintain visibility. Highwaymen have grown bold at dusk, so the guards depend on timely supply delivery.",
         json.dumps({"deliver": {"Lanterns": 3}}),
-        json.dumps({"exp": 20, "gold": 8}),
+        json.dumps({"exp": 20, "aurum": 8}),
     ),
     (
         9,
@@ -108,7 +108,7 @@ QUESTS_F_TIER = [
         "Gather ingredients for travel rations.",
         "Vero’s inn prepares provisions for those venturing into the forest. He needs fresh mushroom caps and forest berries, both of which grow near shallow cave mouths—often watched by lurking slimes.",
         json.dumps({"collect": {"Cavecap Mushroom": 4, "Wild Berry": 3}}),
-        json.dumps({"exp": 30, "gold": 10, "item": "Small Stamina Snack"}),
+        json.dumps({"exp": 30, "aurum": 10, "item": "Small Stamina Snack"}),
     ),
     (
         10,
@@ -119,7 +119,7 @@ QUESTS_F_TIER = [
         "Retrieve parts from damaged animal traps.",
         "Dane’s metal snares were shattered, bent by something far stronger than wolves. He wishes to salvage what remains before it rusts or is stolen by goblins.",
         json.dumps({"retrieve": {"Trap Springs": 3}}),
-        json.dumps({"exp": 25, "gold": 10}),
+        json.dumps({"exp": 25, "aurum": 10}),
     ),
 ]
 
@@ -138,7 +138,7 @@ QUESTS_E_TIER = [
         json.dumps(
             {"defeat": {"Goblin Skirmisher": 7}, "retrieve": {"Map Fragment": 1}}
         ),
-        json.dumps({"exp": 60, "gold": 25}),
+        json.dumps({"exp": 60, "aurum": 25}),
     ),
     (
         12,
@@ -149,7 +149,7 @@ QUESTS_E_TIER = [
         "Collect venom samples from poisonous snakes.",
         "Strange serpents have slithered into the grove, their fangs dripping an iridescent toxin unseen since before the Sundering. Lune hopes to refine an antidote—but only if someone brings her samples.",
         json.dumps({"collect": {"Serpent Venom": 3}}),
-        json.dumps({"exp": 55, "gold": 24, "item": "Antidote Flask"}),
+        json.dumps({"exp": 55, "aurum": 24, "item": "Antidote Flask"}),
     ),
     (
         13,
@@ -160,7 +160,7 @@ QUESTS_E_TIER = [
         "Investigate eerie whispers from a rotten tree cavern.",
         "Travelers claim that the Hollowtree whispers names, luring wanderers closer. Sorin suspects a Veil-born sprite nesting inside. He needs someone who won’t be fooled by its illusions.",
         json.dumps({"investigate": "Hollowtree", "defeat": {"Mischief Sprite": 1}}),
-        json.dumps({"exp": 70, "gold": 22}),
+        json.dumps({"exp": 70, "aurum": 22}),
     ),
     (
         14,
@@ -171,7 +171,7 @@ QUESTS_E_TIER = [
         "Eliminate a territorial Treeling.",
         "A sentient sap-creature—the Treeling—has claimed Birchfall Path, harassing workers and smashing tools. Bran asks for aid before the creature’s roots choke out the entire path.",
         json.dumps({"defeat": {"Treeling": 1}}),
-        json.dumps({"exp": 90, "gold": 28, "item": "Bark-Stitched Gloves"}),
+        json.dumps({"exp": 90, "aurum": 28, "item": "Bark-Stitched Gloves"}),
     ),
     (
         15,
@@ -182,7 +182,7 @@ QUESTS_E_TIER = [
         "Water spirits are disturbing fishermen.",
         "Moonwater’s surface shimmers even without sun, revealing restless Naiads that drag nets underwater. Amon fears someone will be taken next. He needs protection.",
         json.dumps({"defeat": {"Moonwater Naiad": 3}}),
-        json.dumps({"exp": 65, "gold": 20}),
+        json.dumps({"exp": 65, "aurum": 20}),
     ),
     (
         16,
@@ -193,7 +193,7 @@ QUESTS_E_TIER = [
         "Recover fragments of an ancient forest idol.",
         "Goblins shattered a woodland idol to steal its gemstones. Firren wishes to reassemble the relic before its latent magic spills into the wild.",
         json.dumps({"retrieve": {"Idol Fragments": 4}}),
-        json.dumps({"exp": 55, "gold": 30}),
+        json.dumps({"exp": 55, "aurum": 30}),
     ),
     (
         17,
@@ -204,7 +204,7 @@ QUESTS_E_TIER = [
         "Practice combat against agile forest beasts.",
         "Alyss trains new recruits by sending them after Swift-tail Hares—nimble creatures infused with faint forest magic. Catching them tests reflex and precision.",
         json.dumps({"defeat": {"Swift-tail Hare": 5}}),
-        json.dumps({"exp": 50, "gold": 12, "item": "Wooden Ranger Pendant"}),
+        json.dumps({"exp": 50, "aurum": 12, "item": "Wooden Ranger Pendant"}),
     ),
     (
         18,
@@ -215,7 +215,7 @@ QUESTS_E_TIER = [
         "Find a courier who vanished en route to Willowcreek.",
         "A forest courier carrying urgent correspondence never arrived. Tracks suggest he was chased off-road by beasts. His satchel holds valuable village contracts.",
         json.dumps({"find": "Courier", "retrieve": "Mail Satchel"}),
-        json.dumps({"exp": 70, "gold": 26}),
+        json.dumps({"exp": 70, "aurum": 26}),
     ),
     (
         19,
@@ -226,7 +226,7 @@ QUESTS_E_TIER = [
         "Destroy a growing spider nest.",
         "The Webwood’s population of brood spiders has ballooned, stringing webs across traveler roads. Their venom weakens limbs, making escape impossible. Rhea requires an adventurer to thin their numbers.",
         json.dumps({"defeat": {"Brood Spider": 6}}),
-        json.dumps({"exp": 85, "gold": 32, "item": "Venom Sac"}),
+        json.dumps({"exp": 85, "aurum": 32, "item": "Venom Sac"}),
     ),
     (
         20,
@@ -237,7 +237,7 @@ QUESTS_E_TIER = [
         "Defeat aggressive fungus creatures.",
         "Sporeshrooms have sprouted beyond their usual cycle, animated by warped forest mana. Pim’s harvesting routes are blocked unless these lumbering fungi are cleared.",
         json.dumps({"defeat": {"Sporeshroom": 4}}),
-        json.dumps({"exp": 80, "gold": 30}),
+        json.dumps({"exp": 80, "aurum": 30}),
     ),
 ]
 
@@ -254,7 +254,7 @@ QUESTS_D_TIER = [
         "Take down a goblin commander.",
         "A cunning goblin lieutenant has unified several scattered tribes. His camp rings with stolen steel and crude banners. If left unchecked, an organized horde might rise.",
         json.dumps({"defeat": {"Goblin Lieutenant Krag": 1}}),
-        json.dumps({"exp": 120, "gold": 55, "item": "Krag’s Insignia"}),
+        json.dumps({"exp": 120, "aurum": 55, "item": "Krag’s Insignia"}),
     ),
     (
         22,
@@ -265,7 +265,7 @@ QUESTS_D_TIER = [
         "Aid a wounded forest spirit.",
         "A Heartwood Sprite has been corrupted by a splinter of Veil energy lodged in its body. Leira believes an adventurer with a steady hand can help remove it—if they can survive its thrashing.",
         json.dumps({"subdue": "Sprite", "remove": "Veil Splinter"}),
-        json.dumps({"exp": 110, "gold": 40, "item": "Blessing of Vital Sap"}),
+        json.dumps({"exp": 110, "aurum": 40, "item": "Blessing of Vital Sap"}),
     ),
     (
         23,
@@ -276,7 +276,7 @@ QUESTS_D_TIER = [
         "Hunt a powerful forest wolf touched by moonlight.",
         "The Moonfang Wolf is a silver-coated predator that leads lesser wolves with eerie discipline. Yorin fears it will turn its pack upon the village unless someone challenges it.",
         json.dumps({"defeat": {"Moonfang Wolf": 1}}),
-        json.dumps({"exp": 150, "gold": 60, "item": "Moonfang Pelt"}),
+        json.dumps({"exp": 150, "aurum": 60, "item": "Moonfang Pelt"}),
     ),
     (
         24,
@@ -287,7 +287,7 @@ QUESTS_D_TIER = [
         "Destroy corrupted root-beasts.",
         "Tanglesap Creatures—animated roots—have begun striking at loggers. Their claws are formed of hardened bark and their bodies pulse with sickly green glow.",
         json.dumps({"defeat": {"Tanglesap Creature": 3}}),
-        json.dumps({"exp": 100, "gold": 30}),
+        json.dumps({"exp": 100, "aurum": 30}),
     ),
     (
         25,
@@ -298,7 +298,7 @@ QUESTS_D_TIER = [
         "Scout territory of the Thornhide Bear.",
         "Massive claw marks and uprooted trees mark the hunting grounds of Thornhide—the first of the forest’s three boss creatures. Before a slaying party mobilizes, Rhea needs precise scouting intel.",
         json.dumps({"survey": {"Bear Signs": 3}, "report_to": "Guard Captain Rhea"}),
-        json.dumps({"exp": 90, "gold": 25}),
+        json.dumps({"exp": 90, "aurum": 25}),
     ),
     (
         26,
@@ -309,7 +309,7 @@ QUESTS_D_TIER = [
         "Recover stolen trade goods.",
         "Bandit-goblins ambushed Salvi and fled into the thicket with his fabrics and spices. The merchant begs someone to reclaim the goods before the creatures burn or eat them.",
         json.dumps({"recover": {"Trade Crates": 5}}),
-        json.dumps({"exp": 100, "gold": 35, "item": "Salvi’s Trade Token"}),
+        json.dumps({"exp": 100, "aurum": 35, "item": "Salvi’s Trade Token"}),
     ),
     (
         27,
@@ -320,7 +320,7 @@ QUESTS_D_TIER = [
         "Purify a shrine corrupted by Veil energy.",
         "The Moonshadow Shrine’s white stones have turned black-veined, its pool reflecting horrors instead of moonlight. Mara needs an adventurer to drive off the wraithlings haunting it.",
         json.dumps({"defeat": {"Wraithling": 5}, "use": "Purification Amulet"}),
-        json.dumps({"exp": 130, "gold": 45, "item": "Blessed Talisman"}),
+        json.dumps({"exp": 130, "aurum": 45, "item": "Blessed Talisman"}),
     ),
     (
         28,
@@ -331,7 +331,7 @@ QUESTS_D_TIER = [
         "Hunt the matriarch of the spider colony.",
         "The brood spiders answer to a single massive mother whose venom sacs can rot bark. Her growing brood threatens to spread beyond Webwood entirely.",
         json.dumps({"defeat": {"Spider Matron Vesska": 1}}),
-        json.dumps({"exp": 160, "gold": 70, "item": "Vesska’s Venom"}),
+        json.dumps({"exp": 160, "aurum": 70, "item": "Vesska’s Venom"}),
     ),
     (
         29,
@@ -342,7 +342,7 @@ QUESTS_D_TIER = [
         "Prepare the town for coming threats.",
         "The council fears an impending surge of monsters, driven outward by the forest bosses awakening. They require supplies gathered and warnings spread to outlying homes.",
         json.dumps({"deliver": {"Warning Notices": 3}, "bring": {"Supply Sacks": 2}}),
-        json.dumps({"exp": 85, "gold": 30}),
+        json.dumps({"exp": 85, "aurum": 30}),
     ),
     (
         30,
@@ -353,7 +353,7 @@ QUESTS_D_TIER = [
         "Investigate a sacred tree murmuring with corrupted voices.",
         "The Whispering Oak, ancient guardian of the forest, has begun muttering in tones unlike any druidic language. Leira suspects an unseen parasite clinging to its bark—one born of the Veil.",
         json.dumps({"inspect": "Oak", "defeat": {"Oak Parasite": 1}}),
-        json.dumps({"exp": 140, "gold": 50, "item": "Oakwood Charm"}),
+        json.dumps({"exp": 140, "aurum": 50, "item": "Oakwood Charm"}),
     ),
 ]
 

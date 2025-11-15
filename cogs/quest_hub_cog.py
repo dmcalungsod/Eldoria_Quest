@@ -34,12 +34,12 @@ class QuestLogView(View):
         self,
         db_manager: DatabaseManager,
         active_quests: list,
-        discord_id: int,
+        interaction_user: discord.User,
     ):
         super().__init__(timeout=None)
         self.db = db_manager
         self.active_quests = active_quests
-        self.discord_id = discord_id
+        self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
 
         # --- Button 1: Back to Profile (Default) ---
@@ -80,6 +80,14 @@ class QuestLogView(View):
         self.quest_select.callback = self.complete_quest_callback
         self.add_item(self.quest_select)
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
+
     def set_back_button(self, callback_function, label="Back"):
         """
         Allows the Guild Hall to change the back button to point
@@ -91,13 +99,15 @@ class QuestLogView(View):
     async def complete_quest_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         quest_id = int(self.quest_select.values[0])
-        success, message = self.quest_system.complete_quest(self.discord_id, quest_id)
+        success, message = self.quest_system.complete_quest(
+            interaction.user.id, quest_id
+        )
 
         # Send ephemeral confirmation
         await interaction.followup.send(message, ephemeral=True)
 
         # --- Refresh the View In-Place ---
-        new_active_quests = self.quest_system.get_player_quests(self.discord_id)
+        new_active_quests = self.quest_system.get_player_quests(interaction.user.id)
         embed = interaction.message.embeds[0]  # Get the current embed
         embed.clear_fields()  # Clear old quest fields
 
@@ -122,7 +132,7 @@ class QuestLogView(View):
                 )
 
         # Re-build the view with the new quest list
-        new_view = QuestLogView(self.db, new_active_quests, self.discord_id)
+        new_view = QuestLogView(self.db, new_active_quests, self.interaction_user)
         # Preserve the original back button
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
@@ -139,10 +149,13 @@ class QuestBoardView(View):
     Displays the list of available quests using a dropdown.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quests: list):
+    def __init__(
+        self, db_manager: DatabaseManager, quests: list, interaction_user: discord.User
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quests = quests
+        self.interaction_user = interaction_user
 
         self.quest_select = Select(
             placeholder="Select a quest contract...", min_values=1, max_values=1
@@ -171,6 +184,14 @@ class QuestBoardView(View):
         )
         back_button.callback = back_to_guild_hall_callback
         self.add_item(back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
     async def view_quest_details_callback(self, interaction: discord.Interaction):
         quest_id = int(self.quest_select.values[0])
@@ -201,13 +222,15 @@ class QuestBoardView(View):
         rewards_text = ""
         if "rewards" in quest_details and quest_details["rewards"]:
             for reward, value in quest_details["rewards"].items():
-                display_reward = "Aurum" if reward == "gold" else reward.title()
+                display_reward = "Aurum" if reward == "aurum" else reward.title()
                 rewards_text += f"• **{display_reward}:** {value}\n"
         rewards_text = rewards_text or "No rewards listed."
         embed.add_field(name="Rewards", value=rewards_text, inline=False)
         embed.set_footer(text=f"Quest ID: {quest_id} | Tier: {quest_details['tier']}")
 
-        view = QuestDetailView(self.db, quest_id, self.quests)  # Pass quest list
+        view = QuestDetailView(
+            self.db, quest_id, self.quests, self.interaction_user
+        )  # Pass user
         await interaction.response.edit_message(embed=embed, view=view)
 
 
@@ -216,11 +239,18 @@ class QuestDetailView(View):
     Displays the details of a single quest and allows the player to accept it.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quest_id: int, quests_list: list):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        quest_id: int,
+        quests_list: list,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quest_id = quest_id
         self.quests_list = quests_list  # To rebuild the QuestBoardView
+        self.interaction_user = interaction_user
 
         accept_button = Button(
             label="Accept Quest",
@@ -237,6 +267,14 @@ class QuestDetailView(View):
         )
         back_button.callback = self.back_to_quest_board_callback
         self.add_item(back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
     async def accept_quest_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
@@ -275,7 +313,7 @@ class QuestDetailView(View):
             name="Available Contracts",
             value="Select an available quest from the dropdown menu.",
         )
-        view = QuestBoardView(db, available_quests)
+        view = QuestBoardView(db, available_quests, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
 

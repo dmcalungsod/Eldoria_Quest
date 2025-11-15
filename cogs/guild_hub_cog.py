@@ -40,59 +40,32 @@ class CharacterProfileView(View):
     Buttons: Inventory, Skills, Quest Log, Start Adventure, Guild
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.inventory_manager = InventoryManager(self.db)
+        self.interaction_user = interaction_user
 
-        # --- Row 1: Character ---
-        inventory_button = Button(
-            label="Inventory",
-            style=discord.ButtonStyle.secondary,
-            custom_id="profile_inventory",
-            emoji=E.BACKPACK,
-        )
-        inventory_button.callback = self.inventory_callback
-        self.add_item(inventory_button)
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
-        skills_button = Button(
-            label="Skills",
-            style=discord.ButtonStyle.secondary,
-            custom_id="profile_skills",
-            emoji="✨",
-        )
-        skills_button.callback = self.skills_callback
-        self.add_item(skills_button)
+    # --- (Row 1 buttons) ---
 
-        quest_log_button = Button(
-            label="Quest Log",
-            style=discord.ButtonStyle.primary,
-            custom_id="profile_quest_log",
-            emoji=E.QUEST_SCROLL,
-        )
-        quest_log_button.callback = self.quest_log_callback
-        self.add_item(quest_log_button)
-
-        # --- Row 2: Actions ---
-        start_adventure_button = Button(
-            label="Start Adventure",
-            style=discord.ButtonStyle.success,
-            custom_id="profile_start_adventure",
-            emoji=E.MAP,
-        )
-        start_adventure_button.callback = self.start_adventure_callback
-        self.add_item(start_adventure_button)
-
-        guild_button = Button(
-            label="Guild Hall",
-            style=discord.ButtonStyle.primary,
-            custom_id="profile_guild_hall",
-            emoji="🛡️",
-        )
-        guild_button.callback = self.guild_hall_callback
-        self.add_item(guild_button)
-
-    async def inventory_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Inventory",
+        style=discord.ButtonStyle.secondary,
+        custom_id="profile_inventory",
+        emoji=E.BACKPACK,
+        row=0,
+    )
+    async def inventory_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Inventory UI.
         """
@@ -116,10 +89,17 @@ class CharacterProfileView(View):
             for category, item_list in categories.items():
                 embed.add_field(name=category, value="\n".join(item_list), inline=False)
 
-        view = InventoryView(self.db)
+        view = InventoryView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def skills_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Skills",
+        style=discord.ButtonStyle.secondary,
+        custom_id="profile_skills",
+        emoji="✨",
+        row=0,
+    )
+    async def skills_callback(self, interaction: discord.Interaction, button: Button):
         """
         Edits the message to show the Skills UI.
         """
@@ -142,10 +122,19 @@ class CharacterProfileView(View):
             color=discord.Color.purple(),
         )
 
-        view = SkillsView(self.db)
+        view = SkillsView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def quest_log_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Quest Log",
+        style=discord.ButtonStyle.primary,
+        custom_id="profile_quest_log",
+        emoji=E.QUEST_SCROLL,
+        row=0,
+    )
+    async def quest_log_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Quest Log UI.
         """
@@ -181,12 +170,22 @@ class CharacterProfileView(View):
                     inline=False,
                 )
 
-        view = QuestLogView(self.db, active_quests, interaction.user.id)
-        # Default back button on this view goes to Profile
+        view = QuestLogView(self.db, active_quests, self.interaction_user)
         view.set_back_button(back_to_profile_callback, "Back to Profile")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def start_adventure_callback(self, interaction: discord.Interaction):
+    # --- (Row 2 buttons) ---
+
+    @discord.ui.button(
+        label="Start Adventure",
+        style=discord.ButtonStyle.success,
+        custom_id="profile_start_adventure",
+        emoji=E.MAP,
+        row=1,
+    )
+    async def start_adventure_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Adventure Setup (location picker) UI.
         """
@@ -197,15 +196,30 @@ class CharacterProfileView(View):
             )
             return
 
+        if adventure_cog.manager.get_active_session(interaction.user.id):
+            await interaction.response.send_message(
+                f"{E.WARNING} You are already on an adventure.", ephemeral=True
+            )
+            return
+
         embed = discord.Embed(
             title=f"{E.MAP} Prepare for Expedition",
             description="You stand before the city gates, the Guild's clearance seal in your hand. The wilderness beyond the walls of Ashgrave awaits.\n\nSelect a destination.",
             color=discord.Color.dark_green(),
         )
-        view = AdventureSetupView(self.db, adventure_cog.manager)
+        view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user)
         await interaction.response.edit_message(embed=embed, view=view)
 
-    async def guild_hall_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Guild Hall",
+        style=discord.ButtonStyle.primary,
+        custom_id="profile_guild_hall",
+        emoji="🛡️",
+        row=1,
+    )
+    async def guild_hall_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Guild Hall (sub-menu) UI.
         """
@@ -220,12 +234,12 @@ class CharacterProfileView(View):
 class InventoryView(View):
     """
     A simple view that just shows the "Back to Profile" button.
-    The embed itself contains all the inventory info.
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
 
         back_button = Button(
             label="Back to Profile",
@@ -234,17 +248,25 @@ class InventoryView(View):
         )
         back_button.callback = back_to_profile_callback
         self.add_item(back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
 
 class SkillsView(View):
     """
     A simple view that just shows the "Back to Profile" button.
-    The embed itself contains all the skills info.
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
 
         back_button = Button(
             label="Back to Profile",
@@ -253,6 +275,14 @@ class SkillsView(View):
         )
         back_button.callback = back_to_profile_callback
         self.add_item(back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
 
 # ======================================================================
@@ -266,59 +296,31 @@ class GuildCardView(View):
     Buttons: Quest Board, Guild Exchange, Quest Turn In, Guild Rank, Back
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.rank_system = RankSystem(self.db)
+        self.interaction_user = interaction_user
 
-        # --- Row 1: Guild Services ---
-        quests_button = Button(
-            label="Quest Board",
-            style=discord.ButtonStyle.primary,
-            custom_id="guild_quests",
-            emoji=E.HERB,
-        )
-        quests_button.callback = self.view_quests_callback
-        self.add_item(quests_button)
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
-        exchange_button = Button(
-            label="Guild Exchange",
-            style=discord.ButtonStyle.primary,
-            custom_id="guild_exchange",
-            emoji=E.EXCHANGE,
-        )
-        exchange_button.callback = self.guild_exchange_callback
-        self.add_item(exchange_button)
-
-        turn_in_button = Button(
-            label="Quest Turn-In",
-            style=discord.ButtonStyle.primary,
-            custom_id="guild_turn_in",
-            emoji=E.QUEST_SCROLL,
-        )
-        turn_in_button.callback = self.quest_turn_in_callback
-        self.add_item(turn_in_button)
-
-        # --- Row 2: Administration ---
-        check_rank_button = Button(
-            label="Check Rank",
-            style=discord.ButtonStyle.secondary,
-            custom_id="guild_rank",
-            emoji=E.MEDAL,
-        )
-        check_rank_button.callback = self.check_rank_callback
-        self.add_item(check_rank_button)
-
-        back_button = Button(
-            label="Back to Profile",
-            style=discord.ButtonStyle.grey,
-            custom_id="guild_back_profile",
-            emoji="⬅️",
-        )
-        back_button.callback = back_to_profile_callback
-        self.add_item(back_button)
-
-    async def view_quests_callback(self, interaction: discord.Interaction):
+    # --- (Row 1 buttons) ---
+    @discord.ui.button(
+        label="Quest Board",
+        style=discord.ButtonStyle.primary,
+        custom_id="guild_quests",
+        emoji=E.HERB,
+        row=0,
+    )
+    async def view_quests_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Quest Board UI.
         """
@@ -337,36 +339,19 @@ class GuildCardView(View):
             name="Available Contracts",
             value="Select an available quest from the dropdown menu.",
         )
-        view = QuestBoardView(self.db, available_quests)
+        view = QuestBoardView(self.db, available_quests, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def quest_turn_in_callback(self, interaction: discord.Interaction):
-        """
-        Edits the message to show the Quest Log / Turn-In UI.
-        """
-        await interaction.response.defer()
-        from game_systems.guild_system.quest_system import QuestSystem
-
-        quest_system = QuestSystem(self.db)
-        active_quests = quest_system.get_player_quests(interaction.user.id)
-
-        embed = discord.Embed(
-            title=f"{E.QUEST_SCROLL} Quest Turn-In",
-            description="Report on your completed assignments to the Guild.",
-            color=discord.Color.from_rgb(139, 69, 19),
-        )
-        if not active_quests:
-            embed.add_field(
-                name="No Active Quests",
-                value="Visit the Quest Board to accept a task.",
-            )
-
-        view = QuestLogView(self.db, active_quests, interaction.user.id)
-        # We pass a flag to the QuestLogView to change its "Back" button
-        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Hall")
-        await interaction.edit_original_response(embed=embed, view=view)
-
-    async def guild_exchange_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Guild Exchange",
+        style=discord.ButtonStyle.primary,
+        custom_id="guild_exchange",
+        emoji=E.EXCHANGE,
+        row=0,
+    )
+    async def guild_exchange_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Guild Exchange UI.
         """
@@ -394,10 +379,53 @@ class GuildCardView(View):
                 inline=False,
             )
 
-        view = GuildExchangeView(self.db, total_value > 0)
+        view = GuildExchangeView(self.db, total_value > 0, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def check_rank_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Quest Turn-In",
+        style=discord.ButtonStyle.primary,
+        custom_id="guild_turn_in",
+        emoji=E.QUEST_SCROLL,
+        row=0,
+    )
+    async def quest_turn_in_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the Quest Log / Turn-In UI.
+        """
+        await interaction.response.defer()
+        from game_systems.guild_system.quest_system import QuestSystem
+
+        quest_system = QuestSystem(self.db)
+        active_quests = quest_system.get_player_quests(interaction.user.id)
+
+        embed = discord.Embed(
+            title=f"{E.QUEST_SCROLL} Quest Turn-In",
+            description="Report on your completed assignments to the Guild.",
+            color=discord.Color.from_rgb(139, 69, 19),
+        )
+        if not active_quests:
+            embed.add_field(
+                name="No Active Quests", value="Visit the Quest Board to accept a task."
+            )
+
+        view = QuestLogView(self.db, active_quests, self.interaction_user)
+        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Hall")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # --- (Row 2 buttons) ---
+    @discord.ui.button(
+        label="Check Rank",
+        style=discord.ButtonStyle.secondary,
+        custom_id="guild_rank",
+        emoji=E.MEDAL,
+        row=1,
+    )
+    async def check_rank_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
         """
         Edits the message to show the Rank Progress UI.
         """
@@ -413,7 +441,9 @@ class GuildCardView(View):
                 description="You have reached the highest rank.",
                 color=discord.Color.gold(),
             )
-            view = RankProgressView(self.db, eligible=False)
+            view = RankProgressView(
+                self.db, eligible=False, interaction_user=self.interaction_user
+            )
             await interaction.edit_original_response(embed=embed, view=view)
             return
 
@@ -438,8 +468,20 @@ class GuildCardView(View):
         else:
             embed.set_footer(text="Continue your efforts, adventurer.")
 
-        view = RankProgressView(self.db, eligible=eligible)
+        view = RankProgressView(
+            self.db, eligible=eligible, interaction_user=self.interaction_user
+        )
         await interaction.edit_original_response(embed=embed, view=view)
+
+    @discord.ui.button(
+        label="Back to Profile",
+        style=discord.ButtonStyle.grey,
+        custom_id="guild_back_profile",
+        emoji="⬅️",
+        row=1,
+    )
+    async def back_to_profile(self, interaction: discord.Interaction, button: Button):
+        await back_to_profile_callback(interaction)
 
 
 # ======================================================================
@@ -452,9 +494,15 @@ class RankProgressView(View):
     Shows promotion eligibility and the "Promote" button.
     """
 
-    def __init__(self, db_manager: DatabaseManager, eligible: bool):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        eligible: bool,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
 
         promote_button = Button(
             label="Request Promotion",
@@ -472,6 +520,14 @@ class RankProgressView(View):
         )
         back_button.callback = back_to_guild_hall_callback
         self.add_item(back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
     async def promote_callback(self, interaction: discord.Interaction):
         discord_id = interaction.user.id
@@ -495,9 +551,15 @@ class GuildExchangeView(View):
     Handles the UI for selling materials.
     """
 
-    def __init__(self, db_manager: DatabaseManager, can_sell: bool):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        can_sell: bool,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
 
         sell_button = Button(
             label="Sell All Materials",
@@ -517,6 +579,14 @@ class GuildExchangeView(View):
         back_button.callback = back_to_guild_hall_callback
         self.add_item(back_button)
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
+
     async def sell_materials_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         exchange = GuildExchange(self.db)
@@ -534,8 +604,9 @@ class GuildExchangeView(View):
         )
         receipt_embed.add_field(name="Sold Materials", value="\n".join(sold_list))
 
-        # Go back to the Guild Hall, showing the receipt ephemerally
-        await back_to_guild_hall_callback(interaction, embed_to_show=receipt_embed)
+        # Send ephemeral receipt, then go back
+        await interaction.followup.send(embed=receipt_embed, ephemeral=True)
+        await back_to_guild_hall_callback(interaction)
 
 
 # ======================================================================

@@ -13,11 +13,13 @@ import game_systems.data.emojis as E
 
 
 async def back_to_profile_callback(
-    interaction: discord.Interaction, embed_to_show: discord.Embed = None
+    interaction: discord.Interaction, is_new_message: bool = False
 ):
     """
     A shared callback to return to the MAIN Character Profile menu.
     This is the new "home" screen.
+    If is_new_message=True, it sends a new message.
+    Otherwise, it edits the existing one.
     """
     # We import here, inside the function, to prevent circular imports
     from .guild_hub_cog import CharacterProfileView
@@ -25,17 +27,15 @@ async def back_to_profile_callback(
     if not interaction.response.is_done():
         await interaction.response.defer()
 
-    if embed_to_show:
-        await interaction.followup.send(embed=embed_to_show, ephemeral=True)
-
     discord_id = interaction.user.id
     db = DatabaseManager()
 
     # --- Build the Profile Embed ---
     player = db.get_player(discord_id)
     if not player:
-        await interaction.edit_original_response(
-            content="Error: Could not find player.", embed=None, view=None
+        # This error should only happen if called on a non-existent player
+        await interaction.followup.send(
+            "Error: Could not find player data.", ephemeral=True
         )
         return
 
@@ -72,25 +72,27 @@ async def back_to_profile_callback(
     embed.add_field(name="Basic Abilities", value=stat_block, inline=False)
 
     # --- Create the View ---
-    view = CharacterProfileView(db)
+    view = CharacterProfileView(db, interaction.user)
 
-    await interaction.edit_original_response(content=None, embed=embed, view=view)
+    # --- FIX: This is the new logic ---
+    if is_new_message:
+        # Used by /start (when player exists) to create a new UI
+        await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+    else:
+        # Used by all "Back" buttons to edit the existing UI
+        await interaction.edit_original_response(content=None, embed=embed, view=view)
 
 
-async def back_to_guild_hall_callback(
-    interaction: discord.Interaction, embed_to_show: discord.Embed = None
-):
+async def back_to_guild_hall_callback(interaction: discord.Interaction):
     """
     A shared callback to return to the Guild Hall SUB-MENU.
+    This always edits the message.
     """
     # We import here, inside the function, to prevent circular imports
     from .guild_hub_cog import GuildCardView
 
     if not interaction.response.is_done():
         await interaction.response.defer()
-
-    if embed_to_show:
-        await interaction.followup.send(embed=embed_to_show, ephemeral=True)
 
     discord_id = interaction.user.id
     db = DatabaseManager()
@@ -122,5 +124,5 @@ async def back_to_guild_hall_callback(
     embed.set_footer(text=f"Joined: {card_data['join_date']}")
 
     # --- Create the View ---
-    view = GuildCardView(db)
+    view = GuildCardView(db, interaction.user)
     await interaction.edit_original_response(content=None, embed=embed, view=view)

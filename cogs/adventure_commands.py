@@ -38,37 +38,27 @@ class AdventureSetupView(View):
     This view is shown when "Start Adventure" is clicked on the profile.
     """
 
-    def __init__(self, db, manager):
+    def __init__(self, db, manager, interaction_user: discord.User):
         super().__init__()
         self.db = db
         self.manager = manager
+        self.interaction_user = interaction_user
 
-        self.location_select = Select(placeholder="Choose a Zone...")
-        for key, loc in LOCATIONS.items():
-            self.location_select.add_option(
-                label=loc["name"],
-                value=key,
-                description=f"Lv. {loc['level_req']} | {loc['min_rank']}-Rank",
-                emoji=loc.get("emoji"),
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
             )
-        self.location_select.callback = self.location_callback
-        self.add_item(self.location_select)
+            return False
+        return True
 
-        # Add a back button to return to profile
-        back_button = Button(
-            label="Back to Profile",
-            style=discord.ButtonStyle.grey,
-            custom_id="back_to_profile",
-        )
-        back_button.callback = back_to_profile_callback
-        self.add_item(back_button)
-
-    async def location_callback(self, interaction: discord.Interaction):
+    @discord.ui.select(placeholder="Choose a Zone...")
+    async def location_callback(self, interaction: discord.Interaction, select: Select):
         """
         Callback for when a location is selected.
         This edits the message to show the main ExplorationView.
         """
-        loc_id = self.location_select.values[0]
+        loc_id = select.values[0]
         loc_data = LOCATIONS[loc_id]
 
         # 1. Start the "session" in the database (duration -1 = active)
@@ -86,10 +76,21 @@ class AdventureSetupView(View):
         )
 
         adventure_cog = self.manager.bot.get_cog("AdventureCommands")
-        view = ExplorationView(self.db, self.manager, loc_id, initial_log)
+        view = ExplorationView(
+            self.db, self.manager, loc_id, initial_log, self.interaction_user
+        )
 
         # 3. Edit the original message to show the new UI
         await interaction.response.edit_message(embed=embed, view=view)
+
+    @discord.ui.button(
+        label="Back to Profile",
+        style=discord.ButtonStyle.grey,
+        custom_id="back_to_profile",
+        row=1,
+    )
+    async def back_to_profile(self, interaction: discord.Interaction, button: Button):
+        await back_to_profile_callback(interaction)
 
 
 class ExplorationView(View):
@@ -99,34 +100,32 @@ class ExplorationView(View):
     The embed on this message is the "Exploration Log".
     """
 
-    def __init__(self, db, manager, location_id, log: list):
+    def __init__(
+        self, db, manager, location_id, log: list, interaction_user: discord.User
+    ):
         super().__init__(timeout=None)
         self.db = db
         self.manager = manager
         self.location_id = location_id
         self.log = log
         self.log_limit = 10  # Max number of lines to show
+        self.interaction_user = interaction_user
 
-        # --- The New Buttons ---
-        explore_button = Button(
-            label="Explore",
-            style=discord.ButtonStyle.success,
-            custom_id="explore_step",
-            emoji="🧭",
-        )
-        explore_button.callback = self.explore_callback
-        self.add_item(explore_button)
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
-        leave_button = Button(
-            label="Return to City",
-            style=discord.ButtonStyle.danger,
-            custom_id="explore_leave",
-            emoji="🛡️",
-        )
-        leave_button.callback = self.leave_callback
-        self.add_item(leave_button)
-
-    async def explore_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Explore",
+        style=discord.ButtonStyle.success,
+        custom_id="explore_step",
+        emoji="🧭",
+    )
+    async def explore_callback(self, interaction: discord.Interaction, button: Button):
         """
         The player takes a step forward in the dungeon.
         This is the new "tick" of progression.
@@ -161,30 +160,33 @@ class ExplorationView(View):
             for item in self.children:
                 item.disabled = True
 
-            # Edit the message to show death and disable buttons
             await interaction.edit_original_response(embed=embed, view=self)
 
-            # Send a followup and then go home
             return_embed = discord.Embed(
-                title="Returned to Guild",
-                description="You were defeated and recovered by the Guild. Your adventure is over.",
+                title=f"{E.DEFEAT} Defeated!",
+                description="You were recovered by the Guild. Your adventure is over.",
                 color=discord.Color.dark_red(),
             )
-            # Use the helper to go back to the profile
-            await back_to_profile_callback(interaction, embed_to_show=return_embed)
+            await interaction.followup.send(embed=return_embed, ephemeral=True)
+            await back_to_profile_callback(interaction)
 
         else:
             # Just edit the message with the new log
             await interaction.edit_original_response(embed=embed, view=self)
 
-    async def leave_callback(self, interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Return to City",
+        style=discord.ButtonStyle.danger,
+        custom_id="explore_leave",
+        emoji="🛡️",
+    )
+    async def leave_callback(self, interaction: discord.Interaction, button: Button):
         """
         The player decides to leave the adventure and return to the Guild Hall.
         """
         # 1. Mark the adventure as inactive and grant rewards
         self.manager.end_adventure(interaction.user.id)
 
-        # 2. Go back to the main Profile
         await interaction.response.defer()
 
         embed = discord.Embed(
@@ -193,7 +195,9 @@ class ExplorationView(View):
             color=discord.Color.blue(),
         )
 
-        await back_to_profile_callback(interaction, embed_to_show=embed)
+        # Send ephemeral notification, then edit the main UI
+        await interaction.followup.send(embed=embed, ephemeral=True)
+        await back_to_profile_callback(interaction)
 
 
 async def setup(bot):

@@ -21,7 +21,6 @@ from game_systems.data.stat_descriptions import STAT_DESCRIPTIONS
 import game_systems.data.emojis as E
 
 # --- Handoff Import ---
-# We now import the HELPER, not the view
 from .ui_helpers import back_to_profile_callback
 
 
@@ -35,10 +34,19 @@ class StartMenuView(View):
     The main menu view for the /start command.
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
         self.create_class_buttons()
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
     def create_class_buttons(self):
         conn = self.db.connect()
@@ -89,7 +97,7 @@ class StartMenuView(View):
             color=0x00B0F4,
             timestamp=datetime.now(),
         )
-        view = ClassDetailView(self.db, class_id)
+        view = ClassDetailView(self.db, class_id, self.interaction_user)
         await interaction.response.edit_message(embed=embed, view=view)
 
 
@@ -98,10 +106,14 @@ class ClassDetailView(View):
     The view that shows the details of a specific class.
     """
 
-    def __init__(self, db_manager: DatabaseManager, class_id: int):
+    def __init__(
+        self, db_manager: DatabaseManager, class_id: int, interaction_user: discord.User
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
         self.class_id = class_id
+        self.interaction_user = interaction_user
+
         create_button = Button(
             label="Create",
             style=discord.ButtonStyle.success,
@@ -116,6 +128,14 @@ class ClassDetailView(View):
         )
         back_button.callback = self.back_button_callback
         self.add_item(back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
     async def create_button_callback(self, interaction: discord.Interaction):
         creator = PlayerCreator(self.db)
@@ -136,7 +156,7 @@ class ClassDetailView(View):
                 color=discord.Color.dark_gold(),
             )
             embed.set_footer(text="Your journey begins now. Tread boldly.")
-            view = CharacterMenuView(self.db)
+            view = CharacterMenuView(self.db, self.interaction_user)
             await interaction.response.edit_message(embed=embed, view=view)
         else:
             await interaction.response.send_message(
@@ -150,7 +170,7 @@ class ClassDetailView(View):
         embed.set_footer(
             text="Once you have chosen a class, you can create your character."
         )
-        view = StartMenuView(self.db)
+        view = StartMenuView(self.db, self.interaction_user)
         await interaction.response.edit_message(embed=embed, view=view)
 
 
@@ -159,9 +179,11 @@ class CharacterMenuView(View):
     The view displayed after a character has been created, prompting for guild registration.
     """
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
+
         register_button = Button(
             label="Register with the Adventurer's Guild",
             style=discord.ButtonStyle.success,
@@ -169,6 +191,14 @@ class CharacterMenuView(View):
         )
         register_button.callback = self.register_button_callback
         self.add_item(register_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
 
     async def register_button_callback(self, interaction: discord.Interaction):
         discord_id = interaction.user.id
@@ -195,7 +225,7 @@ class CharacterMenuView(View):
             conn.close()
 
             # --- HANDOFF ---
-            # We now call the global helper to build the new main menu
+            # Send an ephemeral confirmation, THEN edit the main UI to the profile.
             embed = discord.Embed(
                 title=f"{E.CHECK} Registration Complete!",
                 description=(
@@ -205,8 +235,10 @@ class CharacterMenuView(View):
                 ),
                 color=discord.Color.green(),
             )
-            # This sends the ephemeral welcome message, then loads the main profile UI
-            await back_to_profile_callback(interaction, embed_to_show=embed)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+
+            # This call will edit the *original* message (which is non-ephemeral)
+            await back_to_profile_callback(interaction, is_new_message=False)
 
         except Exception as e:
             print(f"Error during guild registration: {e}")
@@ -230,14 +262,14 @@ class OnboardingCog(commands.Cog):
         """
         The main entry point for new players.
         """
-        # --- NEW: Check if player already exists ---
         if self.db.player_exists(interaction.user.id):
+            # --- FIX: Load profile in a NEW message ---
             await interaction.response.send_message(
-                f"{E.WARNING} You are already an adventurer. Your profile is being loaded.",
+                f"{E.WARNING} You are already an adventurer. Loading your profile...",
                 ephemeral=True,
             )
-            # Load their existing profile
-            await back_to_profile_callback(interaction)
+            # This creates a new, persistent "ONE UI" message
+            await back_to_profile_callback(interaction, is_new_message=True)
             return
 
         embed = discord.Embed(
@@ -246,10 +278,12 @@ class OnboardingCog(commands.Cog):
         embed.set_footer(
             text="Once you have chosen a class, you can create your character."
         )
-        view = StartMenuView(self.db)
-        await interaction.response.send_message(
-            embed=embed, view=view, ephemeral=True
-        )  # Send the first message ephemerally
+
+        # --- THE FIX ---
+        # Send the first message as non-ephemeral.
+        # This becomes the "ONE UI" that everything else edits.
+        view = StartMenuView(self.db, interaction.user)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=False)
 
 
 async def setup(bot: commands.Bot):
