@@ -7,9 +7,13 @@ Orchestrates combat and returns a result dictionary.
 
 from .damage_formula import DamageFormula
 from ..rewards.exp_calculator import ExpCalculator
+
 # GoldRewards import is REMOVED
 from ..monsters.monster_actions import MonsterAI
 from .combat_phrases import CombatPhrases
+
+# --- NEW IMPORT ---
+import game_systems.data.emojis as E
 
 
 class CombatEngine:
@@ -51,7 +55,8 @@ class CombatEngine:
         # Use player's current combat HP
         while self.player.hp_current > 0 and self.mon_hp > 0:
 
-            log.append(f"\n--- Turn {turn} ---")
+            # --- EMOJI ADDED ---
+            log.append(f"\n--- {E.COMBAT} Turn {turn} ---")
 
             # ---------------------------
             # PLAYER ATTACK

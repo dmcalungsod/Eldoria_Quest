@@ -211,10 +211,11 @@ class CharacterMenuView(View):
                 "SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)
             )
             if cur.fetchone():
-                await interaction.response.send_message(
-                    "You are already registered.", ephemeral=True
-                )
+                # This check is good, but the button shouldn't be visible
+                # if the player is already registered.
+                # For now, we'll just hand off to the profile.
                 conn.close()
+                await back_to_profile_callback(interaction, is_new_message=False)
                 return
 
             cur.execute(
@@ -224,27 +225,29 @@ class CharacterMenuView(View):
             conn.commit()
             conn.close()
 
-            # --- HANDOFF ---
-            # Send an ephemeral confirmation, THEN edit the main UI to the profile.
-            embed = discord.Embed(
-                title=f"{E.CHECK} Registration Complete!",
-                description=(
-                    "Your name has been inked into the Guild's ledger. "
-                    "Welcome to the Adventurer's Guild, rookie.\n\n"
-                    "Your profile is now active. Don't die."
-                ),
-                color=discord.Color.green(),
-            )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            # --- THIS IS THE FIX ---
+            #
+            # We no longer send an ephemeral message.
+            # We call the back_to_profile_callback directly.
+            # That helper function will defer the interaction and then
+            # edit the original message, which is the correct
+            # "ONE UI" behavior.
+            #
+            # [REMOVED] embed = discord.Embed(...)
+            # [REMOVED] await interaction.response.send_message(embed=embed, ephemeral=True)
+            #
+            # --- END OF FIX ---
 
-            # This call will edit the *original* message (which is non-ephemeral)
+            # This call will now handle the response, defer, and edit.
             await back_to_profile_callback(interaction, is_new_message=False)
 
         except Exception as e:
             print(f"Error during guild registration: {e}")
-            await interaction.response.send_message(
-                f"{E.ERROR} An error occurred.", ephemeral=True
-            )
+            # We still need to respond to the interaction on failure
+            if not interaction.response.is_done():
+                await interaction.response.send_message(
+                    f"{E.ERROR} An error occurred during registration.", ephemeral=True
+                )
 
 
 # ======================================================================

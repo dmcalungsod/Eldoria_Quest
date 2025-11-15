@@ -180,7 +180,7 @@ class CharacterProfileView(View):
         label="Start Adventure",
         style=discord.ButtonStyle.success,
         custom_id="profile_start_adventure",
-        emoji=E.MAP,
+        # emoji=E.MAP,  <-- EMOJI REMOVED
         row=1,
     )
     async def start_adventure_callback(
@@ -214,7 +214,7 @@ class CharacterProfileView(View):
         label="Guild Hall",
         style=discord.ButtonStyle.primary,
         custom_id="profile_guild_hall",
-        emoji="🛡️",
+        # emoji="🛡️",  <-- EMOJI REMOVED
         row=1,
     )
     async def guild_hall_callback(

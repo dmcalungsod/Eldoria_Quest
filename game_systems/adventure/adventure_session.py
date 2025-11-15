@@ -18,6 +18,8 @@ from game_systems.player.level_up import LevelUpSystem
 from game_systems.guild_system.quest_system import QuestSystem
 import game_systems.data.emojis as E
 
+from game_systems.data.materials import MATERIALS
+
 
 class AdventureSession:
     def __init__(
@@ -122,10 +124,14 @@ class AdventureSession:
             for drop_key, chance in result["drops"]:
                 if random.randint(1, 100) <= chance:
                     self.add_loot(drop_key, 1)
-                    loot_text.append(f"`{drop_key}`")
+
+                    mat_data = MATERIALS.get(drop_key)
+                    item_name = mat_data["name"] if mat_data else drop_key
+                    loot_text.append(f"`{item_name}`")
 
             if loot_text:
-                combat_log.append(f"{E.ITEM_BOX} **Loot:** {', '.join(loot_text)}")
+                # --- NEWLINE ADDED FOR SPACING ---
+                combat_log.append(f"\n{E.ITEM_BOX} **Loot:** {', '.join(loot_text)}")
 
             # --- Update Quest Progress ---
             quest_updates = self._update_quests(
