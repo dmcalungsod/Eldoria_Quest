@@ -1,8 +1,3 @@
-Thanks — I see what you mean. The previous README had inconsistent indentation and a malformed project-structure block. I corrected that and ensured the **Project Structure** is a clean, properly formatted code block (no stray characters). Paste the exact text below into your `README.md`.
-
----
-
-```markdown
 # 🌑 **Eldoria Quest**
 
 ### _A Dark High-Fantasy Idle RPG Discord Bot_
@@ -79,6 +74,7 @@ The game blends:
 ---
 
 # 🗂️ Project Structure
+
 ```
 
 eldoria-bot/
@@ -140,6 +136,7 @@ eldoria-bot/
 ```
 
 > **Notes:**
+>
 > - `cogs/` modules **must not** import each other. They only import from `ui/`, `game_systems/`, and `database/`.
 > - Keep UI code in `ui/` to avoid circular imports. Import views lazily in callbacks if needed.
 > - Business logic lives under `game_systems/` and never imports from `cogs/` or `ui/`.
@@ -151,4 +148,7 @@ eldoria-bot/
 This repository is **private intellectual property**. All source code, lore, mechanics, and documentation belong solely to the project owner.
 
 **Not open-source. Not licensed for redistribution or reuse.**
+
+```
+
 ```
