@@ -11,11 +11,12 @@ from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
 
-# --- THIS IS THE FIX ---
-# Import the helper function from its new central location
-from game_systems.data.emojis import get_rarity_ansi
+# --- NEW IMPORT ---
+from game_systems.items.item_manager import item_manager
 
-# --- END OF FIX ---
+# --- END NEW ---
+
+from game_systems.data.emojis import get_rarity_ansi
 
 
 # ======================================================================
@@ -28,7 +29,7 @@ def build_inventory_embed(items: list) -> discord.Embed:
     Builds the standard embed for the player's inventory,
     separating items by type and equipped status.
 
-    --- NOW WITH ANSI COLORS ---
+    --- NOW WITH ANSI COLORS & STATS ---
     """
     embed = discord.Embed(
         title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange()
@@ -50,13 +51,29 @@ def build_inventory_embed(items: list) -> discord.Embed:
         text = ""  # This will be the text we color
 
         if item_type == "Equipment":
+
+            # --- THIS IS THE FIX ---
+            # 1. Fetch the stats
+            stats_dict = item_manager.get_equipment_stats(
+                item["item_key"], item["item_source_table"]
+            )
+
+            # 2. Format the stats into a string
+            stats_str = ""
+            if stats_dict:
+                stats_str = ", ".join(
+                    f"{stat}: +{val}" for stat, val in stats_dict.items()
+                )
+                stats_str = f" ({stats_str})"
+            # --- END OF FIX ---
+
             if item["equipped"] == 1:
-                # Build string WITHOUT markdown
-                text = f"• {item['item_name']} ({rarity}) (Slot: {item['slot']})"
-                # Add the color-wrapped string to the list
+                # Build string WITHOUT markdown, WITH stats
+                text = f"• {item['item_name']} ({rarity}) (Slot: {item['slot']}){stats_str}"
                 categories["Equipped"].append(get_rarity_ansi(rarity, text))
             else:
-                text = f"• {item['item_name']} ({rarity}) (x{item['count']})"
+                # Build string WITHOUT markdown, WITH stats
+                text = f"• {item['item_name']} ({rarity}) (x{item['count']}){stats_str}"
                 categories["Equipment"].append(get_rarity_ansi(rarity, text))
 
         elif item_type in categories:
@@ -115,8 +132,10 @@ async def back_to_profile_callback(
     guild_data = cur.fetchone()
     conn.close()
 
+    # This stats object contains the TOTAL (Base + Bonus) stats
     stats_json = db.get_player_stats_json(discord_id)
     stats = PlayerStats.from_dict(stats_json)
+
     class_row = db.get_class(player["class_id"])
     class_name = class_row["name"] if class_row else "Unknown"
 
@@ -146,6 +165,7 @@ async def back_to_profile_callback(
         inline=True,
     )
 
+    # This stat_block correctly displays the TOTAL stats.
     stat_block = (
         f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
         f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"

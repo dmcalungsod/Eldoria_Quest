@@ -17,8 +17,21 @@ Also handles:
 import sqlite3
 import random
 import json
+from typing import Dict
 
 DB_NAME = "EQ_Game.db"
+
+# --- NEW: Added stat map and valid tables ---
+STAT_MAP = {
+    "str_bonus": "STR",
+    "end_bonus": "END",
+    "dex_bonus": "DEX",
+    "agi_bonus": "AGI",
+    "mag_bonus": "MAG",
+    "lck_bonus": "LCK",
+}
+VALID_EQUIP_TABLES = ["equipment", "class_equipment"]
+# --- END NEW ---
 
 
 class ItemManager:
@@ -29,6 +42,33 @@ class ItemManager:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
+
+    # --- NEW FUNCTION ---
+    def get_equipment_stats(self, item_key: str, source_table: str) -> Dict:
+        """
+        Fetches the stat bonuses for a single item from its source table.
+        """
+        if source_table not in VALID_EQUIP_TABLES:
+            return {}
+
+        conn = self.connect()
+        cur = conn.cursor()
+
+        # f-string is safe here due to the valid_tables check
+        cur.execute(f"SELECT * FROM {source_table} WHERE id = ?", (item_key,))
+        item_row = cur.fetchone()
+        conn.close()
+
+        if not item_row:
+            return {}
+
+        bonuses = {}
+        for key, stat in STAT_MAP.items():
+            if key in item_row.keys() and item_row[key] != 0:
+                bonuses[stat] = item_row[key]
+        return bonuses
+
+    # --- END NEW ---
 
     # --------------------------------------------------------------------
     #     GENERIC ITEM LOOKUP
@@ -44,7 +84,7 @@ class ItemManager:
     def get_equipment_by_name(self, name: str):
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM equipment WHERE name LIKE ?", ('%' + name + '%',))
+        cur.execute("SELECT * FROM equipment WHERE name LIKE ?", ("%" + name + "%",))
         item = cur.fetchone()
         conn.close()
         return item
@@ -52,7 +92,7 @@ class ItemManager:
     def get_consumable(self, name: str):
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM consumables WHERE name LIKE ?", ('%' + name + '%',))
+        cur.execute("SELECT * FROM consumables WHERE name LIKE ?", ("%" + name + "%",))
         item = cur.fetchone()
         conn.close()
         return item
@@ -60,7 +100,7 @@ class ItemManager:
     def get_quest_item(self, name: str):
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM quest_items WHERE name LIKE ?", ('%' + name + '%',))
+        cur.execute("SELECT * FROM quest_items WHERE name LIKE ?", ("%" + name + "%",))
         item = cur.fetchone()
         conn.close()
         return item
@@ -74,11 +114,14 @@ class ItemManager:
         """
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT * FROM class_equipment
             WHERE class_id = ?
               AND min_level <= ?
-        """, (class_id, level))
+        """,
+            (class_id, level),
+        )
         results = cur.fetchall()
         conn.close()
         return results
@@ -116,7 +159,9 @@ class ItemManager:
     def get_monster(self, monster_name: str):
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM monsters WHERE name LIKE ?", ('%' + monster_name + '%',))
+        cur.execute(
+            "SELECT * FROM monsters WHERE name LIKE ?", ("%" + monster_name + "%",)
+        )
         monster = cur.fetchone()
         conn.close()
         return monster
@@ -136,7 +181,8 @@ class ItemManager:
             rarity = self.roll_rarity()
 
             # Search ALL equipment tables
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT id, name, rarity, slot, min_level, 'equipment' AS source
                 FROM equipment
                 WHERE rarity = ? AND min_level <= ?
@@ -145,7 +191,9 @@ class ItemManager:
                 FROM class_equipment
                 WHERE rarity = ? AND min_level <= ?
                 LIMIT 1;
-            """, (rarity, level, rarity, level))
+            """,
+                (rarity, level, rarity, level),
+            )
 
             row = cur.fetchone()
             if row:
@@ -161,7 +209,8 @@ class ItemManager:
         conn = self.connect()
         cur = conn.cursor()
 
-        cur.execute("""
+        cur.execute(
+            """
             SELECT id, name, rarity, slot, 'equipment' AS table_name
             FROM equipment
             WHERE name LIKE ?
@@ -177,7 +226,9 @@ class ItemManager:
             SELECT id, name, rarity, NULL AS slot, 'quest_items'
             FROM quest_items
             WHERE name LIKE ?;
-        """, (f"%{text}%", f"%{text}%", f"%{text}%", f"%{text}%"))
+        """,
+            (f"%{text}%", f"%{text}%", f"%{text}%", f"%{text}%"),
+        )
 
         results = cur.fetchall()
         conn.close()
