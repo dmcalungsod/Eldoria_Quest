@@ -1,27 +1,43 @@
 """
 Database Manager for Eldoria Quest
 ----------------------------------
-... (rest of the file)
+Optimized with context managers for better performance and resource management.
 """
 
 import sqlite3
 import json
 from typing import Optional, Dict, Any, List
+from contextlib import contextmanager
 
 
 DATABASE_NAME = "EQ_Game.db"
 
 
 class DatabaseManager:
-    """Handles all database operations for Eldoria Quest."""
+    """Handles all database operations for Eldoria Quest with optimized connection handling."""
 
     def __init__(self):
         self.db_name = DATABASE_NAME
 
     # ------------------------------------------------------------
-    # INTERNAL CONNECTION HANDLER
+    # INTERNAL CONNECTION HANDLER (OPTIMIZED)
     # ------------------------------------------------------------
+    @contextmanager
+    def get_connection(self):
+        """Context manager for database connections - ensures proper cleanup."""
+        conn = sqlite3.connect(self.db_name, timeout=10.0)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
     def connect(self):
+        """Legacy method for backward compatibility."""
         conn = sqlite3.connect(self.db_name)
         conn.row_factory = sqlite3.Row
         return conn
@@ -48,10 +64,10 @@ class DatabaseManager:
         name: str,
         class_id: int,
         stats_data: Dict[str, Any],
-        initial_hp: int,  # <-- NEW
-        initial_mp: int,  # <-- NEW
-        race: str = None,
-        gender: str = None,
+        initial_hp: int,
+        initial_mp: int,
+        race: Optional[str] = None,
+        gender: Optional[str] = None,
     ):
         conn = self.connect()
         cur = conn.cursor()
