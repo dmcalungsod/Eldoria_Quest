@@ -17,16 +17,17 @@ from game_systems.guild_system.quest_system import QuestSystem
 import game_systems.data.emojis as E
 
 # --- Local Imports ---
-from .ui_helpers import back_to_guild_card_callback
+from .ui_helpers import back_to_profile_callback, back_to_guild_hall_callback
 
 # ======================================================================
-# QUEST LOG VIEW (NOW WITH COMPLETION LOGIC)
+# QUEST LOG & TURN-IN VIEW
 # ======================================================================
 
 
 class QuestLogView(View):
     """
     Displays the player's currently accepted quests and allows completion.
+    This is accessed from both the Profile and Guild Hall.
     """
 
     def __init__(
@@ -41,27 +42,22 @@ class QuestLogView(View):
         self.discord_id = discord_id
         self.quest_system = QuestSystem(self.db)
 
-        # --- Button 1: Back to Guild Card ---
-        back_button = Button(
-            label="Back to Guild Card",
+        # --- Button 1: Back to Profile (Default) ---
+        self.back_button = Button(
+            label="Back to Profile",
             style=discord.ButtonStyle.secondary,
-            custom_id="back_to_guild_card",
-            row=1,  # Place it on the second row
+            custom_id="back_to_profile",
+            row=1,
         )
-        back_button.callback = back_to_guild_card_callback
-        self.add_item(back_button)
+        self.back_button.callback = back_to_profile_callback
+        self.add_item(self.back_button)
 
         # --- Dropdown 1: Complete Quest ---
         self.quest_select = Select(
-            placeholder="Report a completed quest...",
-            min_values=1,
-            max_values=1,
-            row=0,
+            placeholder="Report a completed quest...", min_values=1, max_values=1, row=0
         )
-
         completable_quests = []
         for quest in self.active_quests:
-            # Check if all objectives for this quest are met
             is_complete = self.quest_system.check_completion(
                 quest["progress"], quest["objectives"]
             )
@@ -70,9 +66,7 @@ class QuestLogView(View):
 
         if not completable_quests:
             self.quest_select.add_option(
-                label="No quests are ready to turn in.",
-                value="disabled",
-                emoji=E.ERROR,
+                label="No quests are ready to turn in.", value="disabled", emoji=E.ERROR
             )
             self.quest_select.disabled = True
         else:
@@ -86,60 +80,52 @@ class QuestLogView(View):
         self.quest_select.callback = self.complete_quest_callback
         self.add_item(self.quest_select)
 
+    def set_back_button(self, callback_function, label="Back"):
+        """
+        Allows the Guild Hall to change the back button to point
+        back to the Guild Hall instead of the Profile.
+        """
+        self.back_button.label = label
+        self.back_button.callback = callback_function
+
     async def complete_quest_callback(self, interaction: discord.Interaction):
-        """
-        Callback for the 'Complete Quest' dropdown.
-        """
         await interaction.response.defer()
         quest_id = int(self.quest_select.values[0])
-
-        # Attempt to complete the quest
         success, message = self.quest_system.complete_quest(self.discord_id, quest_id)
 
-        # Send the result message (success or fail) as a private followup
+        # Send ephemeral confirmation
         await interaction.followup.send(message, ephemeral=True)
 
-        # --- Refresh the View ---
-        # Re-fetch the quest data
+        # --- Refresh the View In-Place ---
         new_active_quests = self.quest_system.get_player_quests(self.discord_id)
-
-        # Re-build the embed
-        embed = discord.Embed(
-            title=f"{E.QUEST_SCROLL} Adventurer's Log",
-            description="A review of your currently accepted assignments from the Guild.",
-            color=discord.Color.from_rgb(139, 69, 19),  # Brown
-        )
+        embed = interaction.message.embeds[0]  # Get the current embed
+        embed.clear_fields()  # Clear old quest fields
 
         if not new_active_quests:
             embed.add_field(
-                name="No Active Quests",
-                value="You have no assignments. Please visit the Quest Board to accept a new task.",
+                name="No Active Quests", value="Visit the Quest Board to accept a task."
             )
         else:
             for quest in new_active_quests:
                 progress_text = []
                 objectives = quest.get("objectives", {})
                 progress = quest.get("progress", {})
-
                 for obj_type, tasks in objectives.items():
                     if isinstance(tasks, dict):
                         for task, required in tasks.items():
                             current = progress.get(obj_type, {}).get(task, 0)
                             progress_text.append(f"• {task}: {current} / {required}")
-                    else:
-                        current = progress.get(obj_type, {}).get(tasks, 0)
-                        progress_text.append(f"• {tasks}: {current} / 1")
-
                 embed.add_field(
                     name=f"{quest['title']} (ID: {quest['id']})",
-                    value="\n".join(progress_text) if progress_text else "No objectives.",
+                    value="\n".join(progress_text) or "No objectives.",
                     inline=False,
                 )
 
         # Re-build the view with the new quest list
         new_view = QuestLogView(self.db, new_active_quests, self.discord_id)
+        # Preserve the original back button
+        new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
-        # Edit the original message to show the updated log
         await interaction.edit_original_response(embed=embed, view=new_view)
 
 
@@ -150,7 +136,7 @@ class QuestLogView(View):
 
 class QuestBoardView(View):
     """
-    Displays the list of available quests using a dropdown (Select) menu.
+    Displays the list of available quests using a dropdown.
     """
 
     def __init__(self, db_manager: DatabaseManager, quests: list):
@@ -158,59 +144,41 @@ class QuestBoardView(View):
         self.db = db_manager
         self.quests = quests
 
-        # --- NEW: Create the Select Menu ---
         self.quest_select = Select(
-            placeholder="Select a quest contract from the board...",
-            min_values=1,
-            max_values=1,
+            placeholder="Select a quest contract...", min_values=1, max_values=1
         )
-
-        # Populate the dropdown with quests
         if not self.quests:
             self.quest_select.add_option(
-                label="No quests available",
-                description="Check back later or rank up.",
-                value="disabled",
-                emoji=E.ERROR,
+                label="No quests available", value="disabled", emoji=E.ERROR
             )
             self.quest_select.disabled = True
         else:
-            # Discord Select Menus have a 25 option limit
             for quest in self.quests[:25]:
                 self.quest_select.add_option(
                     label=f"[{quest['tier']}-Rank] {quest['title']}",
-                    # Descriptions have a 100-char limit
                     description=quest["summary"][:100],
-                    value=str(quest["id"]),  # Value must be a string
+                    value=str(quest["id"]),
                     emoji=E.HERB,
                 )
-
         self.quest_select.callback = self.view_quest_details_callback
         self.add_item(self.quest_select)
 
-        # --- Add the Back Button ---
+        # --- Back button now points to Guild Hall ---
         back_button = Button(
-            label="Back to Guild Card",
+            label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
-            custom_id="back_to_guild_card",
+            custom_id="back_to_guild_hall",
         )
-        back_button.callback = back_to_guild_card_callback  # Use the global helper
+        back_button.callback = back_to_guild_hall_callback
         self.add_item(back_button)
 
     async def view_quest_details_callback(self, interaction: discord.Interaction):
-        """
-        This is the callback for the *Select menu*.
-        It fires when a user chooses a quest from the dropdown.
-        """
-        # Get the quest ID from the select menu's values
         quest_id = int(self.quest_select.values[0])
-
         quest_system = QuestSystem(self.db)
         quest_details = quest_system.get_quest_details(quest_id)
-
         if not quest_details:
             await interaction.response.send_message(
-                f"{E.ERROR} Could not find details for this quest.", ephemeral=True
+                f"{E.ERROR} Could not find quest details.", ephemeral=True
             )
             return
 
@@ -219,7 +187,6 @@ class QuestBoardView(View):
             description=quest_details["description"],
             color=discord.Color.dark_teal(),
         )
-
         objectives_text = ""
         if "objectives" in quest_details and quest_details["objectives"]:
             for obj_type, tasks in quest_details["objectives"].items():
@@ -228,27 +195,19 @@ class QuestBoardView(View):
                         objectives_text += (
                             f"• **{obj_type.title()}:** {task} ({value})\n"
                         )
-                else:
-                    objectives_text += f"• **{obj_type.title()}:** {tasks}\n"
-        else:
-            objectives_text = "No objectives listed."
-
+        objectives_text = objectives_text or "No objectives listed."
         embed.add_field(name="Objectives", value=objectives_text, inline=False)
 
         rewards_text = ""
         if "rewards" in quest_details and quest_details["rewards"]:
             for reward, value in quest_details["rewards"].items():
-                # Display "Gold" from quests as "Aurum"
                 display_reward = "Aurum" if reward == "gold" else reward.title()
                 rewards_text += f"• **{display_reward}:** {value}\n"
-        else:
-            rewards_text = "No rewards listed."
-
+        rewards_text = rewards_text or "No rewards listed."
         embed.add_field(name="Rewards", value=rewards_text, inline=False)
         embed.set_footer(text=f"Quest ID: {quest_id} | Tier: {quest_details['tier']}")
 
-        view = QuestDetailView(self.db, quest_id)
-        # Edit the message to show the Quest Detail screen
+        view = QuestDetailView(self.db, quest_id, self.quests)  # Pass quest list
         await interaction.response.edit_message(embed=embed, view=view)
 
 
@@ -257,10 +216,11 @@ class QuestDetailView(View):
     Displays the details of a single quest and allows the player to accept it.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quest_id: int):
+    def __init__(self, db_manager: DatabaseManager, quest_id: int, quests_list: list):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quest_id = quest_id
+        self.quests_list = quests_list  # To rebuild the QuestBoardView
 
         accept_button = Button(
             label="Accept Quest",
@@ -279,68 +239,43 @@ class QuestDetailView(View):
         self.add_item(back_button)
 
     async def accept_quest_callback(self, interaction: discord.Interaction):
-        """
-        Callback for the 'Accept Quest' button.
-        On success, automatically navigates back to the quest board.
-        On failure, sends an ephemeral error.
-        """
-        # Acknowledge the click instantly so the UI doesn't hang.
         await interaction.response.defer()
-
         quest_system = QuestSystem(self.db)
         success = quest_system.accept_quest(interaction.user.id, self.quest_id)
 
         if success:
-            # Send a private confirmation message to the user.
             await interaction.followup.send(
-                f"{E.CHECK} Quest accepted! The details have been added to your log.",
-                ephemeral=True,
+                f"{E.CHECK} Quest accepted! Added to your log.", ephemeral=True
             )
-
-            # Now, go back to the quest board by editing the original message
+            # --- Go back to the quest board ---
             await self.back_to_quest_board_callback(interaction)
         else:
-            # Because we deferred, we must use followup.send for any new messages.
             await interaction.followup.send(
-                f"{E.WARNING} You have already accepted this quest or an error occurred.",
-                ephemeral=True,
+                f"{E.WARNING} You have already accepted this quest.", ephemeral=True
             )
 
     async def back_to_quest_board_callback(self, interaction: discord.Interaction):
         """
         Returns to the quest board view.
         """
-        # This check is important. If called from "Accept", is_done() will be True.
-        # If called from "Back", is_done() will be False.
         if not interaction.response.is_done():
             await interaction.response.defer()
 
-        db = DatabaseManager()  # Need a fresh instance for the new view
+        # Re-fetch the available quests list, as we may have just accepted one
+        db = DatabaseManager()
         quest_system = QuestSystem(db)
         available_quests = quest_system.get_available_quests(interaction.user.id)
 
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
-            description="The board is cluttered with parchment sheets—some crisp and new, others curled and water-stained. The scent of pine resin clings to them.",
+            description="The board is cluttered with parchment sheets...",
             color=discord.Color.dark_green(),
         )
-
-        # This embed description is now the primary way to see quests
-        # The dropdown will contain the selectable list.
-        if not available_quests:
-            embed.add_field(
-                name="No Quests Available",
-                value="There are currently no quests available for your rank. Check back later, adventurer.",
-            )
-        else:
-            embed.add_field(
-                name="Available Contracts",
-                value="Select an available quest from the dropdown menu to review its details.",
-            )
-
+        embed.add_field(
+            name="Available Contracts",
+            value="Select an available quest from the dropdown menu.",
+        )
         view = QuestBoardView(db, available_quests)
-        # We use edit_original_response here, which is correct for both
-        # a deferred interaction and a new button click (if we defer first).
         await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -350,11 +285,6 @@ class QuestDetailView(View):
 
 
 class QuestHubCog(commands.Cog):
-    """
-    A cog for housing all Guild-related Quest Views.
-    This cog has no commands, it just makes the Views loadable.
-    """
-
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db = DatabaseManager()
