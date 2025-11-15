@@ -57,7 +57,7 @@ def create_tables():
         level INTEGER DEFAULT 1,
         experience INTEGER DEFAULT 0,
         exp_to_next INTEGER DEFAULT 100,
-        gold INTEGER DEFAULT 0,
+        aurum INTEGER DEFAULT 0,
         last_action_time TEXT,
         
         FOREIGN KEY(class_id) REFERENCES classes(id)

@@ -30,7 +30,7 @@ class RewardSystem:
         rewards_data = json.loads(row["rewards"])
 
         exp_reward = rewards_data.get("exp", 0)
-        gold_reward = rewards_data.get("gold", 0)
+        aurum_reward = rewards_data.get("aurum", 0)
         merit_reward = rewards_data.get("merit", 5)
         item_reward = rewards_data.get("item", None)
 
@@ -59,10 +59,10 @@ class RewardSystem:
         )
         self.db.update_player_stats(discord_id, level_system.stats.to_dict())
 
-        # Update Gold (internal name)
+        # Update Aurum
         cur.execute(
-            "UPDATE players SET gold = gold + ? WHERE discord_id = ?",
-            (gold_reward, discord_id),
+            "UPDATE players SET aurum = aurum + ? WHERE discord_id = ?",
+            (aurum_reward, discord_id),
         )
 
         # Update Merit
@@ -85,7 +85,7 @@ class RewardSystem:
             "Your achievements have been recorded in the annals of the\n"
             "**Eldorian Adventurer’s Consortium.**\n\n"
             f"{E.EXP} **EXP Gained:** `+{exp_reward}`\n"
-            f"{E.AURUM} **Aurum Earned:** `+{gold_reward}`\n"
+            f"{E.AURUM} **Aurum Earned:** `+{aurum_reward}`\n"
             f"{E.GUILD_MERIT} **Guild Merit:** `+{merit_reward}`"
         )
 
