@@ -48,6 +48,8 @@ class DatabaseManager:
         name: str,
         class_id: int,
         stats_data: Dict[str, Any],
+        initial_hp: int,  # <-- NEW
+        initial_mp: int,  # <-- NEW
         race: str = None,
         gender: str = None,
     ):
@@ -56,10 +58,12 @@ class DatabaseManager:
 
         cur.execute(
             """
-            INSERT INTO players (discord_id, name, class_id, race, gender, level, experience, exp_to_next)
-            VALUES (?, ?, ?, ?, ?, 1, 0, 100)
+            INSERT INTO players (discord_id, name, class_id, race, gender, 
+                                 level, experience, exp_to_next, 
+                                 current_hp, current_mp)
+            VALUES (?, ?, ?, ?, ?, 1, 0, 100, ?, ?)
         """,
-            (discord_id, name, class_id, race, gender),
+            (discord_id, name, class_id, race, gender, initial_hp, initial_mp),
         )
 
         cur.execute(
@@ -117,6 +121,37 @@ class DatabaseManager:
         return json.loads(row["stats_json"])
 
     # --- NEW FUNCTION ---
+    # ------------------------------------------------------------
+    # PLAYER VITALS (HP/MP)
+    # ------------------------------------------------------------
+    def get_player_vitals(self, discord_id: int) -> Optional[sqlite3.Row]:
+        """
+        Fetches the player's current HP and MP.
+        """
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT current_hp, current_mp FROM players WHERE discord_id = ?",
+            (discord_id,),
+        )
+        row = cur.fetchone()
+        conn.close()
+        return row
+
+    # --- NEW FUNCTION ---
+    def set_player_vitals(self, discord_id: int, hp: int, mp: int):
+        """
+        Updates the player's current HP and MP.
+        """
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE players SET current_hp = ?, current_mp = ? WHERE discord_id = ?",
+            (hp, mp, discord_id),
+        )
+        conn.commit()
+        conn.close()
+
     # ------------------------------------------------------------
     # PLAYER SKILLS
     # ------------------------------------------------------------

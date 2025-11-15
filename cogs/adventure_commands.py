@@ -20,7 +20,11 @@ from game_systems.items.inventory_manager import InventoryManager
 import game_systems.data.emojis as E
 
 # --- Local Imports ---
-from .ui_helpers import back_to_profile_callback
+from .ui_helpers import back_to_profile_callback, build_inventory_embed
+
+# --- View Imports ---
+# --- UPDATED: We now need InventoryView from character_cog ---
+from .character_cog import InventoryView
 
 
 class AdventureCommands(commands.Cog):
@@ -139,6 +143,25 @@ class ExplorationView(View):
         self.log_limit = 10  # Max number of lines to show
         self.interaction_user = interaction_user
 
+        # --- NEW ---
+        self.inv_manager = InventoryManager(self.db)
+
+        # --- Add the inventory button ---
+        inventory_button = Button(
+            label="Inventory",
+            style=discord.ButtonStyle.secondary,
+            custom_id="explore_inventory",
+            emoji=E.BACKPACK,
+            row=0,  # Put it next to the Explore button
+        )
+        inventory_button.callback = self.inventory_callback
+        # We need to add it *after* the explore button but *before* the leave button
+        # self.children[0] is Explore
+        # self.children[1] is Return to City
+        # We insert at index 1
+        self.insert_item(1, inventory_button)
+        # --- END NEW ---
+
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
             await interaction.response.send_message(
@@ -151,7 +174,7 @@ class ExplorationView(View):
         label="Explore",
         style=discord.ButtonStyle.success,
         custom_id="explore_step",
-        # emoji="🧭",  <-- EMOJI REMOVED
+        row=0,  # Ensure it's on row 0
     )
     async def explore_callback(self, interaction: discord.Interaction, button: Button):
         """
@@ -162,10 +185,8 @@ class ExplorationView(View):
 
         # --- COMBAT LOOP START ---
         # Disable buttons during the action
-        explore_button = self.children[0]
-        leave_button = self.children[1]
-        explore_button.disabled = True
-        leave_button.disabled = True
+        for item in self.children:
+            item.disabled = True
         await interaction.edit_original_response(view=self)
 
         # This one function does all the backend work
@@ -178,15 +199,13 @@ class ExplorationView(View):
         # "Play back" the log entries one by one
         for entry in log_entries:
             self.log.append(entry)
-            # Trim the log if it's too long
             if len(self.log) > self.log_limit:
                 self.log = self.log[-self.log_limit :]
 
-            # Update the embed description with the new log
             new_description = "\n".join(self.log)
             embed.description = new_description
             await interaction.edit_original_response(embed=embed)
-            await asyncio.sleep(1.5)  # <-- The 1.5-second delay
+            await asyncio.sleep(1.5)
 
         # --- COMBAT LOOP END ---
 
@@ -194,10 +213,7 @@ class ExplorationView(View):
             embed.color = discord.Color.red()
             embed.set_footer(text="You have been defeated! Your adventure is over.")
 
-            # View is already in a disabled state from the start of the callback
-            # We just need to ensure the view object state is updated
-            for item in self.children:
-                item.disabled = True
+            # All buttons are already disabled
             await interaction.edit_original_response(embed=embed, view=self)
 
             return_embed = discord.Embed(
@@ -206,19 +222,57 @@ class ExplorationView(View):
                 color=discord.Color.dark_red(),
             )
             await interaction.followup.send(embed=return_embed, ephemeral=True)
-            # We do NOT return to profile, player is stuck on death screen
 
         else:
             # Re-enable buttons
-            explore_button.disabled = False
-            leave_button.disabled = False
+            for item in self.children:
+                item.disabled = False
             await interaction.edit_original_response(embed=embed, view=self)
+
+    # --- NEW CALLBACK ---
+    async def inventory_callback(self, interaction: discord.Interaction):
+        """
+        Opens the inventory UI from the exploration view.
+        """
+        await interaction.response.defer()
+        items = self.inv_manager.get_inventory(interaction.user.id)
+
+        embed = build_inventory_embed(items)
+
+        # Pass the 'back_to_exploration' callback
+        view = InventoryView(
+            db_manager=self.db,
+            interaction_user=self.interaction_user,
+            previous_view_callback=self.back_to_exploration_callback,
+            previous_view_label="Back to Adventure",
+        )
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def back_to_exploration_callback(self, interaction: discord.Interaction):
+        """
+        A custom callback function that returns to *this* exploration view.
+        """
+        await interaction.response.defer()
+
+        # Re-build the embed
+        embed = discord.Embed(
+            title=f"{LOCATIONS[self.location_id].get('emoji', E.MAP)} Exploring: {LOCATIONS[self.location_id]['name']}",
+            description="\n".join(self.log),
+            color=discord.Color.green(),
+        )
+
+        # Re-create the view to ensure buttons are enabled
+        new_view = ExplorationView(
+            self.db, self.manager, self.location_id, self.log, self.interaction_user
+        )
+
+        await interaction.edit_original_response(embed=embed, view=new_view)
 
     @discord.ui.button(
         label="Return to City",
         style=discord.ButtonStyle.danger,
         custom_id="explore_leave",
-        # emoji="🛡️",  <-- EMOJI REMOVED
+        row=1,  # Move to row 1 to make space for inventory
     )
     async def leave_callback(self, interaction: discord.Interaction, button: Button):
         """

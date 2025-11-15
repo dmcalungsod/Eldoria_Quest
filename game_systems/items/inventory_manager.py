@@ -13,24 +13,36 @@ class InventoryManager:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
 
-    def add_item(self, discord_id: int, item_key: str, item_name: str, item_type: str, amount: int = 1):
+    def add_item(
+        self,
+        discord_id: int,
+        item_key: str,
+        item_name: str,
+        item_type: str,
+        amount: int = 1,
+        slot: str = None,  # <-- NEW PARAMETER
+    ):
         """
         Adds an item to the player's inventory using its item_key.
-        Stacks if it already exists.
+        Stacks if it already exists (and is not equipment).
         """
         conn = self.db.connect()
         cur = conn.cursor()
 
-        # Check if item exists in inventory by key
-        cur.execute(
-            """
-            SELECT count FROM inventory 
-            WHERE discord_id = ? AND item_key = ? AND item_type = ?
-        """,
-            (discord_id, item_key, item_type),
-        )
-
-        row = cur.fetchone()
+        # Equipment should not stack, but materials/consumables should
+        if item_type != "equipment":
+            # Check if stackable item exists in inventory by key
+            cur.execute(
+                """
+                SELECT count FROM inventory 
+                WHERE discord_id = ? AND item_key = ? AND item_type = ?
+            """,
+                (discord_id, item_key, item_type),
+            )
+            row = cur.fetchone()
+        else:
+            # Equipment never stacks
+            row = None
 
         if row:
             # Stack it
@@ -45,10 +57,10 @@ class InventoryManager:
             # Create new entry
             cur.execute(
                 """
-                INSERT INTO inventory (discord_id, item_key, item_name, item_type, count)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO inventory (discord_id, item_key, item_name, item_type, slot, count)
+                VALUES (?, ?, ?, ?, ?, ?)
             """,
-                (discord_id, item_key, item_name, item_type, amount),
+                (discord_id, item_key, item_name, item_type, slot, amount),
             )
 
         conn.commit()
@@ -62,7 +74,7 @@ class InventoryManager:
         cur = conn.cursor()
 
         cur.execute(
-            "SELECT count FROM inventory WHERE discord_id = ? AND item_key = ?",
+            "SELECT id, count FROM inventory WHERE discord_id = ? AND item_key = ? LIMIT 1",
             (discord_id, item_key),
         )
         row = cur.fetchone()
@@ -73,14 +85,16 @@ class InventoryManager:
 
         new_count = row["count"] - amount
         if new_count <= 0:
+            # If it's the last one, delete it (works for equipment and stackables)
             cur.execute(
-                "DELETE FROM inventory WHERE discord_id = ? AND item_key = ?",
-                (discord_id, item_key),
+                "DELETE FROM inventory WHERE id = ?",
+                (row["id"],),
             )
         else:
+            # This branch will only run for stackable items
             cur.execute(
-                "UPDATE inventory SET count = ? WHERE discord_id = ? AND item_key = ?",
-                (new_count, discord_id, item_key),
+                "UPDATE inventory SET count = ? WHERE id = ?",
+                (new_count, row["id"]),
             )
 
         conn.commit()
@@ -96,7 +110,7 @@ class InventoryManager:
 
         cur.execute(
             """
-            SELECT item_key, item_name, item_type, count, equipped 
+            SELECT id, item_key, item_name, item_type, slot, count, equipped 
             FROM inventory 
             WHERE discord_id = ? 
             ORDER BY item_type, item_name

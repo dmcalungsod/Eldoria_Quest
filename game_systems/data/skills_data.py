@@ -13,6 +13,8 @@ SKILLS = {
         "description": "A basic incantation that hurls a sphere of fire.",
         "type": "Active",
         "class_id": 2,  # Mage
+        "mp_cost": 5,
+        "power_multiplier": 1.2,
     },
     "explosion": {
         "key_id": "explosion",
@@ -20,6 +22,8 @@ SKILLS = {
         "description": "The ultimate offensive magic. Annihilates the target with a devastating blast.",
         "type": "Active",
         "class_id": 2,  # Mage
+        "mp_cost": 25,
+        "power_multiplier": 2.5,
     },
     # Warrior Skills
     "power_strike": {
@@ -28,14 +32,17 @@ SKILLS = {
         "description": "A heavy, focused blow that aims to break an enemy's guard.",
         "type": "Active",
         "class_id": 1,  # Warrior
+        "mp_cost": 5,
+        "power_multiplier": 1.5,  # We'll make this STR-based in damage_formula
     },
     # Rogue Skills
     "stealth": {
         "key_id": "stealth",
         "name": "Stealth",
         "description": "Fade into the shadows, becoming harder to detect.",
-        "type": "Active",
+        "type": "Passive",  # Passive for now, no MP cost
         "class_id": 3,  # Rogue
+        "mp_cost": 0,
     },
     # Cleric Skills
     "heal": {
@@ -44,6 +51,8 @@ SKILLS = {
         "description": "A gentle prayer that mends minor wounds.",
         "type": "Active",
         "class_id": 4,  # Cleric
+        "mp_cost": 10,
+        "heal_power": 30,  # Base heal
     },
     # Ranger Skills
     "true_shot": {
@@ -52,5 +61,7 @@ SKILLS = {
         "description": "A focused arrow shot that pierces vital points.",
         "type": "Active",
         "class_id": 5,  # Ranger
+        "mp_cost": 8,
+        "power_multiplier": 1.4,  # We'll make this DEX-based
     },
 }

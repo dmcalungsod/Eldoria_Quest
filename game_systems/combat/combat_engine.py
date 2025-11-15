@@ -1,129 +1,164 @@
 """
 Combat Engine for Eldoria Quest
 
-Orchestrates combat and returns a result dictionary.
-(Refactored for material-based economy)
+Refactored to handle a single turn of auto-combat, including
+player auto-skill usage.
 """
 
+import random
 from .damage_formula import DamageFormula
 from ..rewards.exp_calculator import ExpCalculator
-
-# GoldRewards import is REMOVED
 from ..monsters.monster_actions import MonsterAI
 from .combat_phrases import CombatPhrases
-
-# --- NEW IMPORT ---
 import game_systems.data.emojis as E
 
 
 class CombatEngine:
-    def __init__(self, player, monster):
+
+    # --- Player AI Settings ---
+    PLAYER_SKILL_CHANCE = 40  # 40% chance to use a skill if possible
+
+    def __init__(self, player, monster: dict, player_skills: list, player_mp: int):
         """
-        player → LevelUpSystem wrapper (with stats + HP)
-        monster → Dict containing monster stats
+        player → LevelUpSystem wrapper (with stats + current HP)
+        monster → DICT containing monster's CURRENT state (including current HP)
+        player_skills → List of dicts of skills from DB
+        player_mp → Player's current MP
         """
         self.player = player
         self.monster = monster
+        self.player_skills = player_skills
 
-        # Cache monster stats from template
-        self.mon_hp = monster.get("HP", 1)
-        self.mon_mp = monster.get("MP", 0)
-
-        # Cache player's current HP from their stats object
-        # We need a way to track HP during combat
-        if not hasattr(self.player, "hp_current"):
-            self.player.hp_current = self.player.stats.max_hp
+        # Cache vitals
+        self.player_hp = player.hp_current
+        self.player_mp = player_mp
+        self.monster_hp = monster.get("HP", 1)
 
     # ------------------------------------------------------------
-    # MAIN COMBAT LOOP
+    # MAIN COMBAT TURN
     # ------------------------------------------------------------
-    def begin_combat(self):
+    def run_combat_turn(self):
         """
-        Runs combat automatically until someone dies.
-        Returns a dictionary with:
-        {
-            "winner": "player" or "monster",
-            "exp": int,
-            "drops": list,  <-- NEW
-            "phrases": list
-        }
+        Runs ONE turn of combat (Player -> Monster).
+        Returns a full dictionary with the results.
         """
         log = []
-        log.append(CombatPhrases.opening(self.monster))
+        log.append(f"\n--- {E.COMBAT} Turn ---")
 
-        turn = 1
-        # Use player's current combat HP
-        while self.player.hp_current > 0 and self.mon_hp > 0:
+        # --- 1. PLAYER'S TURN ---
 
-            # --- EMOJI ADDED ---
-            log.append(f"\n--- {E.COMBAT} Turn {turn} ---")
+        # Decide action: Skill or Attack?
+        use_skill = self._decide_player_skill()
 
-            # ---------------------------
-            # PLAYER ATTACK
-            # ---------------------------
+        if use_skill:
+            # --- Player uses a Skill ---
+            skill = use_skill  # Get the skill data
+            mp_cost = skill.get("mp_cost", 0)
+            self.player_mp -= mp_cost
+
+            if skill.get("heal_power", 0) > 0:
+                # --- It's a HEAL skill ---
+                heal, new_hp = DamageFormula.player_heal(
+                    self.player.stats, self.player_hp, skill
+                )
+                self.player_hp = new_hp
+                log.append(CombatPhrases.player_heal(self.player, skill, heal))
+            else:
+                # --- It's an ATTACK skill ---
+                dmg, crit = DamageFormula.player_skill(
+                    self.player.stats, self.monster, skill
+                )
+                self.monster_hp -= dmg
+                log.append(
+                    CombatPhrases.player_skill(
+                        self.player, self.monster, skill, dmg, crit
+                    )
+                )
+
+        else:
+            # --- Player uses a Basic Attack ---
             dmg, crit = DamageFormula.player_attack(self.player.stats, self.monster)
-            self.mon_hp -= dmg
+            self.monster_hp -= dmg
             log.append(
                 CombatPhrases.player_attack(self.player, self.monster, dmg, crit)
             )
 
-            if self.mon_hp <= 0:
-                # Pass the combat log to the victory handler
-                return self._player_victory(log)
+        # --- Check for Player Victory ---
+        if self.monster_hp <= 0:
+            return self._player_victory(log)
 
-            # ---------------------------
-            # MONSTER ATTACK
-            # ---------------------------
-            action = MonsterAI.choose_action(self.monster, self.mon_hp, self.mon_mp)
+        # --- 2. MONSTER'S TURN ---
+        action = MonsterAI.choose_action(
+            self.monster, self.monster_hp, self.monster.get("MP", 0)
+        )
 
-            if action["type"] == "attack":
-                dmg, crit = DamageFormula.monster_attack(
-                    self.monster, self.player.stats
-                )
-                self.player.hp_current -= dmg
-                log.append(
-                    CombatPhrases.monster_attack(self.monster, self.player, dmg, crit)
-                )
+        if action["type"] == "attack":
+            dmg, crit = DamageFormula.monster_attack(self.monster, self.player.stats)
+            self.player_hp -= dmg
+            log.append(
+                CombatPhrases.monster_attack(self.monster, self.player, dmg, crit)
+            )
 
-            elif action["type"] == "skill":
-                skill = action["skill"]
-                # Check MP
-                if self.mon_mp >= skill.get("mp_cost", 0):
-                    self.mon_mp -= skill.get("mp_cost", 0)
-                    dmg, crit = DamageFormula.monster_skill(
-                        self.monster, self.player.stats, skill
-                    )
-                    self.player.hp_current -= dmg
-                    log.append(
-                        CombatPhrases.monster_skill(
-                            self.monster, self.player, skill, dmg, crit
-                        )
-                    )
-                else:
-                    # Not enough MP, default to normal attack
-                    dmg, crit = DamageFormula.monster_attack(
-                        self.monster, self.player.stats
-                    )
-                    self.player.hp_current -= dmg
-                    log.append(
-                        CombatPhrases.monster_attack(
-                            self.monster, self.player, dmg, crit
-                        )
-                    )
+        elif action["type"] == "skill":
+            skill = action["skill"]
+            # (Monster MP logic would go here if we tracked it)
+            dmg, crit = DamageFormula.monster_skill(
+                self.monster, self.player.stats, skill
+            )
+            self.player_hp -= dmg
+            log.append(
+                CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit)
+            )
 
-            elif action["type"] == "buff":
-                buff = action["buff"]
-                MonsterAI.apply_buff(self.monster, buff)
-                log.append(CombatPhrases.monster_buff(self.monster, buff))
+        elif action["type"] == "buff":
+            buff = action["buff"]
+            MonsterAI.apply_buff(self.monster, buff)
+            log.append(CombatPhrases.monster_buff(self.monster, buff))
 
-            # Check if player died
-            if self.player.hp_current <= 0:
-                return self._monster_victory(log)
+        # --- Check for Monster Victory ---
+        if self.player_hp <= 0:
+            return self._monster_victory(log)
 
-            turn += 1
+        # --- 3. Turn End: No winner yet ---
+        return {
+            "winner": None,
+            "phrases": log,
+            "hp_current": self.player_hp,
+            "mp_current": self.player_mp,
+            "monster_hp": self.monster_hp,
+        }
 
-        # Fallback (should not happen)
-        return {"winner": "unknown", "exp": 0, "drops": [], "phrases": log}
+    def _decide_player_skill(self) -> dict | None:
+        """
+        Player AI logic.
+        Decides if the player should use a skill.
+        Returns the skill dictionary if yes, None if no.
+        """
+        # 1. Check if we should even try
+        if not self.player_skills or random.randint(1, 100) > self.PLAYER_SKILL_CHANCE:
+            return None
+
+        # 2. Find a skill we can afford
+        usable_skills = [
+            s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp
+        ]
+
+        # --- Special Case: Cleric Heal Logic ---
+        # If HP is low, prioritize healing
+        if self.player_hp < (self.player.stats.max_hp * 0.5):
+            heal_skill = next(
+                (s for s in usable_skills if s.get("heal_power", 0) > 0), None
+            )
+            if heal_skill:
+                return heal_skill  # Use heal!
+
+        # 3. Use a random offensive skill
+        offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0]
+        if offensive_skills:
+            return random.choice(offensive_skills)
+
+        # 4. Can't afford any skills or have no offensive ones
+        return None
 
     # ------------------------------------------------------------
     # RESULT HANDLERS
@@ -131,22 +166,22 @@ class CombatEngine:
     def _player_victory(self, log):
         """Handles rewarding EXP and passing up monster drops."""
         exp = ExpCalculator.calculate_exp(self.player.level, self.monster)
-
-        # Gold is NO LONGER calculated here.
-        # We just get the monster's drop list.
         drops = self.monster.get("drops", [])
+        leveled_up = self.player.add_exp(
+            exp
+        )  # This just updates the wrapper for the log
 
-        # Apply EXP to the player wrapper
-        leveled_up = self.player.add_exp(exp)
-
-        # We pass gold=0 because the phrase handler expects it, but it won't be used
         log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up))
 
         return {
             "winner": "player",
-            "exp": exp,
-            "drops": drops,  # Pass the raw drops list
             "phrases": log,
+            "hp_current": self.player_hp,
+            "mp_current": self.player_mp,
+            "monster_hp": 0,
+            "exp": exp,
+            "drops": drops,
+            "monster_data": self.monster,  # Pass back the original template
         }
 
     def _monster_victory(self, log):
@@ -155,7 +190,8 @@ class CombatEngine:
 
         return {
             "winner": "monster",
-            "exp": 0,
-            "drops": [],
             "phrases": log,
+            "hp_current": 0,
+            "mp_current": self.player_mp,
+            "monster_hp": self.monster_hp,
         }

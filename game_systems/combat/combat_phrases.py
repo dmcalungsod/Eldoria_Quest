@@ -131,10 +131,8 @@ class CombatPhrases:
             f"A decisive blow hits the {m_name}, dealing `{damage}` damage!{crit_text}",
         ]
 
-        # --- THIS IS THE FIX ---
         if m >= s and m >= d_a:
             pool = mage
-        # --- END OF FIX ---
         elif s > m and s > d_a:
             pool = warrior
         elif d_a > s and d_a > m:
@@ -143,6 +141,40 @@ class CombatPhrases:
             pool = hybrid
 
         return random.choice(pool)
+
+    # --- NEW METHOD ---
+    @staticmethod
+    def player_skill(
+        player: LevelUpSystem, monster: dict, skill: dict, damage: int, is_crit: bool
+    ) -> str:
+        """
+        Called when the player uses an offensive skill.
+        """
+        m_name = monster.get("name", "the enemy")
+        skill_name = skill.get("name", "a skill")
+        crit_text = " **(CRITICAL!)**" if is_crit else ""
+
+        phrases = [
+            f"You unleash **{skill_name}**! It slams into the {m_name} for `{damage}` damage!{crit_text}",
+            f"Focusing your power, you cast **{skill_name}**, dealing `{damage}` damage to the {m_name}.{crit_text}",
+            f"A brilliant flash erupts as **{skill_name}** strikes the {m_name} for `{damage}` damage!{crit_text}",
+        ]
+        return f"{random.choice(phrases)}"
+
+    # --- NEW METHOD ---
+    @staticmethod
+    def player_heal(player: LevelUpSystem, skill: dict, heal_amount: int) -> str:
+        """
+        Called when the player uses a healing skill.
+        """
+        skill_name = skill.get("name", "a healing spell")
+
+        phrases = [
+            f"You invoke **{skill_name}**! A warm light washes over you, restoring `{heal_amount}` HP.",
+            f"A gentle prayer... **{skill_name}** mends your wounds for `{heal_amount}` HP.",
+            f"Calling upon **{skill_name}**, you feel vitality return, healing `{heal_amount}` HP.",
+        ]
+        return f"{random.choice(phrases)}"
 
     @staticmethod
     def monster_attack(
@@ -201,7 +233,6 @@ class CombatPhrases:
             f"Pain lances through you as the {m_name} finds a gap in your defense for `{damage}` damage!{crit_text}",
         ]
 
-        # Logic to choose the correct pool
         if "Goblin" in m_name:
             pool = goblin
         elif "Slime" in m_name:

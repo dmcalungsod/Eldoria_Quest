@@ -19,6 +19,8 @@ from game_systems.guild_system.quest_system import QuestSystem
 import game_systems.data.emojis as E
 
 from game_systems.data.materials import MATERIALS
+from game_systems.items.inventory_manager import InventoryManager
+from game_systems.items.item_manager import item_manager
 
 
 class AdventureSession:
@@ -26,11 +28,13 @@ class AdventureSession:
         self,
         db_manager: DatabaseManager,
         quest_system: QuestSystem,
+        inventory_manager: InventoryManager,
         discord_id: int,
         row_data=None,
     ):
         self.db = db_manager
-        self.quest_system = quest_system  # For updating progress
+        self.quest_system = quest_system
+        self.inventory_manager = inventory_manager
         self.discord_id = discord_id
 
         if row_data:
@@ -39,8 +43,15 @@ class AdventureSession:
             self.logs = json.loads(row_data["logs"])
             self.loot = json.loads(row_data["loot_collected"])
             self.active = bool(row_data["active"])
+            # --- NEW: Load monster if one is active ---
+            self.active_monster = (
+                json.loads(row_data["active_monster_json"])
+                if row_data["active_monster_json"]
+                else None
+            )
         else:
-            self.active = False  # Should be initialized by manager
+            self.active = False
+            self.active_monster = None
 
     def simulate_step(self) -> dict:
         """
@@ -52,24 +63,106 @@ class AdventureSession:
         if not location:
             return {"log": ["Error: Location data missing."], "dead": True}
 
-        # --- 1. Decide what happens ---
-        # 60% chance of combat, 40% chance of nothing
+        # --- NEW: Check if already in combat ---
+        if self.active_monster:
+            # If we are in combat, the "Explore" button means "Attack"
+            return self._resolve_combat_turn()
+
+        # --- Not in combat, so explore ---
         if random.randint(1, 100) > 40:
-            # --- 2. COMBAT ENCOUNTER ---
-            return self._resolve_combat(location)
+            # 60% chance of combat
+            return self._initiate_combat(location)
         else:
-            # --- 3. NO ENCOUNTER ---
-            log_entry = f"{E.FOREST} You search the area but find nothing of interest."
+            # 40% chance of "Catching Your Breath" (Regen)
+            return self._perform_regeneration()
+
+    # --- NEW METHOD: Regeneration ---
+    def _perform_regeneration(self) -> dict:
+        """
+        Player finds no monster and regenerates HP/MP.
+        """
+        stats_json = self.db.get_player_stats_json(self.discord_id)
+        stats = PlayerStats.from_dict(stats_json)
+        vitals = self.db.get_player_vitals(self.discord_id)
+
+        current_hp = vitals["current_hp"]
+        current_mp = vitals["current_mp"]
+        max_hp = stats.max_hp
+        max_mp = stats.max_mp
+
+        if current_hp >= max_hp and current_mp >= max_mp:
+            log_entry = f"{E.FOREST} You search the area but find nothing. You are at full strength."
             self.logs.append(log_entry)
             return {"log": [log_entry], "dead": False}
 
-    def _resolve_combat(self, location: dict) -> dict:
+        # Regen Formula: 5% of max + 1 (based on END and MAG)
+        hp_regen = 1 + int(stats.endurance * 0.5)
+        mp_regen = 1 + int(stats.magic * 0.5)
+
+        new_hp = min(current_hp + hp_regen, max_hp)
+        new_mp = min(current_mp + mp_regen, max_mp)
+
+        hp_gained = new_hp - current_hp
+        mp_gained = new_mp - current_mp
+
+        self.db.set_player_vitals(self.discord_id, new_hp, new_mp)
+
+        log_lines = [f"{E.FOREST} You pause to catch your breath..."]
+        if hp_gained > 0:
+            log_lines.append(f"You regenerated `{hp_gained}` HP.")
+        if mp_gained > 0:
+            log_lines.append(f"You regenerated `{mp_gained}` MP.")
+
+        self.logs.extend(log_lines)
+        return {"log": log_lines, "dead": False}
+
+    # --- RENAMED & UPDATED: This starts combat ---
+    def _initiate_combat(self, location: dict) -> dict:
         """
-        Handles a single combat encounter and returns the result.
+        Finds a new monster and begins combat.
+        """
+        # 1. Pick a Monster
+        monster_pool = location["monsters"]
+        choices, weights = zip(*monster_pool)
+        monster_key = random.choices(choices, weights=weights, k=1)[0]
+        monster_template = MONSTERS.get(monster_key)
+        if not monster_template:
+            return {"log": ["Error: Monster data missing."], "dead": False}
+
+        # 2. Store monster data in session
+        self.active_monster = {
+            "name": monster_template["name"],
+            "level": monster_template["level"],
+            "tier": monster_template["tier"],
+            "HP": monster_template["hp"],  # This will be the "current HP"
+            "max_hp": monster_template["hp"],  # Store this for reference
+            "MP": 10,
+            "ATK": monster_template["atk"],
+            "DEF": monster_template["def"],
+            "xp": monster_template["xp"],
+            "drops": monster_template.get("drops", []),
+        }
+
+        # 3. Save to DB
+        self.save_state()
+
+        # 4. Return the opening phrase
+        log_entry = CombatPhrases.opening(self.active_monster)
+        self.logs.append(log_entry)
+        return {"log": [log_entry], "dead": False}
+
+    # --- REFACTORED: This is now just one turn ---
+    def _resolve_combat_turn(self) -> dict:
+        """
+        Resolves ONE turn of combat against self.active_monster.
         """
         # 1. Fetch Player
         stats_json = self.db.get_player_stats_json(self.discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
+
+        vitals = self.db.get_player_vitals(self.discord_id)
+        current_hp = vitals["current_hp"]
+        current_mp = vitals["current_mp"]
 
         conn = self.db.connect()
         cur = conn.cursor()
@@ -78,7 +171,22 @@ class AdventureSession:
             (self.discord_id,),
         )
         p_row = cur.fetchone()
+
+        # --- NEW: Get player skills ---
+        cur.execute(
+            """
+            SELECT s.key_id, s.name, s.type, ps.skill_level,
+                   s.mp_cost, s.power_multiplier, s.heal_power
+            FROM player_skills ps
+            JOIN skills s ON ps.skill_key = s.key_id
+            WHERE ps.discord_id = ? AND s.type = 'Active'
+        """,
+            (self.discord_id,),
+        )
+        player_skills_raw = cur.fetchall()
         conn.close()
+
+        player_skills = [dict(row) for row in player_skills_raw]
 
         player_wrapper = LevelUpSystem(
             stats=player_stats,
@@ -86,79 +194,88 @@ class AdventureSession:
             exp=p_row["experience"],
             exp_to_next=p_row["exp_to_next"],
         )
-        player_wrapper.hp_current = player_stats.max_hp
+        player_wrapper.hp_current = current_hp
 
-        # 2. Pick a Monster
-        monster_pool = location["monsters"]
-        choices, weights = zip(*monster_pool)
-        monster_key = random.choices(choices, weights=weights, k=1)[0]
-        monster_template = MONSTERS.get(monster_key)
-        if not monster_template:
-            return {"log": ["Error: Monster data missing."], "dead": False}
+        # 2. Pass to Combat Engine
+        engine = CombatEngine(
+            player=player_wrapper,
+            monster=self.active_monster,
+            player_skills=player_skills,
+            player_mp=current_mp,
+        )
 
-        monster_instance = {
-            "name": monster_template["name"],
-            "level": monster_template["level"],
-            "tier": monster_template["tier"],
-            "HP": monster_template["hp"],
-            "MP": 10,
-            "ATK": monster_template["atk"],
-            "DEF": monster_template["def"],
-            "xp": monster_template["xp"],
-            "drops": monster_template.get("drops", []),
-        }
+        # --- UPDATED: begin_combat now just runs ONE turn ---
+        # and returns the full result of that turn
+        result = engine.run_combat_turn()
 
-        # 3. Resolve Combat
-        engine = CombatEngine(player_wrapper, monster_instance)
-        result = engine.begin_combat()  # This is the automated combat
+        # 3. Update vitals from result
+        self.db.set_player_vitals(
+            self.discord_id, result["hp_current"], result["mp_current"]
+        )
 
-        # 4. Process Results
-        combat_log = result["phrases"]  # Get the descriptive log
+        # 4. Update monster HP
+        self.active_monster["HP"] = result["monster_hp"]
+
         is_dead = False
+        combat_log = result["phrases"]
 
+        # 5. Process Combat End
         if result["winner"] == "player":
+            self.active_monster = None  # Combat is over
             loot_text = []
             self.add_loot("exp", result["exp"])
             loot_text.append(f"`{result['exp']} EXP`")
 
+            # Materials
             for drop_key, chance in result["drops"]:
                 if random.randint(1, 100) <= chance:
                     self.add_loot(drop_key, 1)
-
                     mat_data = MATERIALS.get(drop_key)
                     item_name = mat_data["name"] if mat_data else drop_key
                     loot_text.append(f"`{item_name}`")
 
+            # Equipment
+            equipment_drops = item_manager.generate_monster_loot(result["monster_data"])
+            for item in equipment_drops:
+                self.inventory_manager.add_item(
+                    discord_id=self.discord_id,
+                    item_key=str(item["id"]),
+                    item_name=item["name"],
+                    item_type="equipment",
+                    amount=1,
+                    slot=item["slot"],
+                    item_source_table=item["source"],
+                )
+                loot_text.append(f"`{item['name']}`")
+
             if loot_text:
-                # --- NEWLINE ADDED FOR SPACING ---
                 combat_log.append(f"\n{E.ITEM_BOX} **Loot:** {', '.join(loot_text)}")
 
-            # --- Update Quest Progress ---
+            # Quests
             quest_updates = self._update_quests(
-                monster_instance["name"], result["drops"]
+                result["monster_data"]["name"], result["drops"]
             )
             if quest_updates:
                 combat_log.append(
                     f"{E.QUEST_SCROLL} *Quest Updated: {', '.join(quest_updates)}*"
                 )
 
-        else:
-            # Player Died
+        elif result["winner"] == "monster":
             is_dead = True
-            self.active = False  # End session immediately
+            self.active = False
+            self.active_monster = None  # Combat is over
 
-        # 5. Save Log
+        # 6. Save Log & Session State
         self.logs.extend(combat_log)
+        self.save_state()
         return {"log": combat_log, "dead": is_dead}
 
     def _update_quests(self, monster_name: str, drops: list) -> list:
-        """Checks and updates all active quests for this event."""
         updated_quests = []
         active_quests = self.quest_system.get_player_quests(self.discord_id)
 
         for quest in active_quests:
             updated = False
-            # A. Check for monster kill objectives
             if (
                 "defeat" in quest["objectives"]
                 and monster_name in quest["objectives"]["defeat"]
@@ -168,7 +285,6 @@ class AdventureSession:
                 )
                 updated = True
 
-            # B. Check for item collection objectives
             if "collect" in quest["objectives"]:
                 for drop_key, _ in drops:
                     if drop_key in quest["objectives"]["collect"]:
@@ -183,7 +299,6 @@ class AdventureSession:
         return updated_quests
 
     def add_loot(self, key, amount):
-        """Adds loot to the session's temporary loot pool."""
         if key in self.loot:
             self.loot[key] += amount
         else:
@@ -193,16 +308,20 @@ class AdventureSession:
         """Saves the session's current state to the database."""
         conn = self.db.connect()
         cur = conn.cursor()
+
+        monster_json = json.dumps(self.active_monster) if self.active_monster else None
+
         cur.execute(
             """
             UPDATE adventure_sessions 
-            SET logs = ?, loot_collected = ?, active = ?
+            SET logs = ?, loot_collected = ?, active = ?, active_monster_json = ?
             WHERE discord_id = ? AND active = 1
         """,
             (
                 json.dumps(self.logs),
                 json.dumps(self.loot),
                 1 if self.active else 0,
+                monster_json,
                 self.discord_id,
             ),
         )

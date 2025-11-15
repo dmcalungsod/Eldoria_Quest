@@ -12,6 +12,60 @@ from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
 
 
+# ======================================================================
+# EMBED BUILDER
+# ======================================================================
+
+
+def build_inventory_embed(items: list) -> discord.Embed:
+    """
+    Builds the standard embed for the player's inventory,
+    separating items by type and equipped status.
+    """
+    embed = discord.Embed(title=f"{E.BACKPACK} Backpack", color=discord.Color.brown())
+
+    categories = {
+        "Equipped": [],
+        "Equipment": [],
+        "Consumable": [],
+        "Material": [],
+    }
+
+    for item in items:
+        item_type = item["item_type"].title()
+        if item_type == "Equipment":
+            if item["equipped"] == 1:
+                categories["Equipped"].append(
+                    f"• **{item['item_name']}** (Slot: *{item['slot']}*)"
+                )
+            else:
+                categories["Equipment"].append(
+                    f"• {item['item_name']} (x{item['count']})"
+                )
+        elif item_type in categories:
+            categories[item_type].append(f"• {item['item_name']} (x{item['count']})")
+
+    if not any(categories.values()):
+        embed.description = "Your backpack is empty."
+        return embed
+
+    if categories["Equipped"]:
+        embed.add_field(
+            name="Equipped Gear", value="\n".join(categories["Equipped"]), inline=False
+        )
+
+    for category, item_list in categories.items():
+        if category != "Equipped" and item_list:
+            embed.add_field(name=category, value="\n".join(item_list), inline=False)
+
+    return embed
+
+
+# ======================================================================
+# VIEW CALLBACKS
+# ======================================================================
+
+
 async def back_to_profile_callback(
     interaction: discord.Interaction, is_new_message: bool = False
 ):
@@ -21,8 +75,7 @@ async def back_to_profile_callback(
     If is_new_message=True, it sends a new message.
     Otherwise, it edits the existing one.
     """
-    # We import here, inside the function, to prevent circular imports
-    from .guild_hub_cog import CharacterProfileView
+    from .character_cog import CharacterProfileView
 
     if not interaction.response.is_done():
         await interaction.response.defer()
@@ -33,7 +86,6 @@ async def back_to_profile_callback(
     # --- Build the Profile Embed ---
     player = db.get_player(discord_id)
     if not player:
-        # This error should only happen if called on a non-existent player
         await interaction.followup.send(
             "Error: Could not find player data.", ephemeral=True
         )
@@ -60,26 +112,29 @@ async def back_to_profile_callback(
         value=f"**Lv.** {player['level']}\n**Rank:** {guild_data['rank']}",
         inline=True,
     )
+
+    # --- UPDATED TO SHOW CURRENT VITALS ---
     embed.add_field(
         name="Vitals",
-        value=f"{E.HP} **HP:** {stats.max_hp}\n{E.MP} **MP:** {stats.max_mp}",
+        value=(
+            f"{E.HP} **HP:** {player['current_hp']} / {stats.max_hp}\n"
+            f"{E.MP} **MP:** {player['current_mp']} / {stats.max_mp}"
+        ),
         inline=True,
     )
+    # --- END OF UPDATE ---
+
     stat_block = (
         f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
         f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
     )
     embed.add_field(name="Basic Abilities", value=stat_block, inline=False)
 
-    # --- Create the View ---
     view = CharacterProfileView(db, interaction.user)
 
-    # --- FIX: This is the new logic ---
     if is_new_message:
-        # Used by /start (when player exists) to create a new UI
         await interaction.followup.send(embed=embed, view=view, ephemeral=False)
     else:
-        # Used by all "Back" buttons to edit the existing UI
         await interaction.edit_original_response(content=None, embed=embed, view=view)
 
 
@@ -88,7 +143,6 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     A shared callback to return to the Guild Hall SUB-MENU.
     This always edits the message.
     """
-    # We import here, inside the function, to prevent circular imports
     from .guild_hub_cog import GuildCardView
 
     if not interaction.response.is_done():
@@ -97,7 +151,6 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     discord_id = interaction.user.id
     db = DatabaseManager()
 
-    # --- Build the Guild Card Embed ---
     conn = db.connect()
     cur = conn.cursor()
     cur.execute(
@@ -123,6 +176,5 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     embed.add_field(name="Rank", value=card_data["rank"], inline=True)
     embed.set_footer(text=f"Joined: {card_data['join_date']}")
 
-    # --- Create the View ---
     view = GuildCardView(db, interaction.user)
     await interaction.edit_original_response(content=None, embed=embed, view=view)

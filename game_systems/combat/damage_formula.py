@@ -16,31 +16,22 @@ class DamageFormula:
         Calculates damage dealt by the player to a monster.
         Returns: (damage_dealt: int, is_critical: bool)
         """
-        # 1. Calculate Player Attack Power
-        # Formula: (STR * 2) + DEX
-        # Check if stats is a PlayerStats object or a dictionary
         if hasattr(player_stats, "strength"):
             str_val = player_stats.strength
             dex_val = player_stats.dexterity
             luck_val = player_stats.luck
         else:
-            # Fallback for dictionary access
             str_val = player_stats.get("STR", 0)
             dex_val = player_stats.get("DEX", 0)
             luck_val = player_stats.get("LCK", 0)
 
         attack_power = (str_val * 2) + dex_val
-
-        # 2. Calculate Monster Defense
         monster_def = monster.get("DEF", 0)
 
-        # 3. Damage Calculation
-        # Damage = (Atk - Def/2) * Random Variance
         base_damage = max(1, attack_power - (monster_def / 2))
         variance = random.uniform(0.9, 1.1)
         damage = int(base_damage * variance)
 
-        # 4. Critical Hit Check (Base 5% + Luck mod)
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
 
@@ -50,29 +41,83 @@ class DamageFormula:
         return max(1, damage), is_crit
 
     @staticmethod
+    def player_skill(player_stats, monster, skill_data):
+        """
+        Calculates damage dealt by a player's skill.
+        Now routes to different stats based on skill key.
+        Returns: (damage_dealt: int, is_critical: bool)
+        """
+        skill_key = skill_data.get("key_id", "")
+
+        # --- STAT-BASED DAMAGE ROUTING ---
+        if skill_key in ["fireball", "explosion"]:
+            # Magic-based
+            base_stat = player_stats.magic
+            stat_multiplier = 3.0
+        elif skill_key == "power_strike":
+            # Strength-based
+            base_stat = player_stats.strength
+            stat_multiplier = 2.5  # Slightly better than basic attack
+        elif skill_key == "true_shot":
+            # Dexterity-based
+            base_stat = player_stats.dexterity
+            stat_multiplier = 2.8  # Strong single shot
+        else:
+            # Default fallback
+            base_stat = player_stats.magic
+            stat_multiplier = 1.0
+
+        luck_val = player_stats.luck
+
+        attack_power = base_stat * stat_multiplier
+        attack_power *= skill_data.get("power_multiplier", 1.0)
+
+        monster_def = monster.get("DEF", 0)
+        base_damage = max(1, attack_power - (monster_def / 2))
+        variance = random.uniform(0.9, 1.1)
+        damage = int(base_damage * variance)
+
+        crit_chance = 0.05 + (luck_val * 0.005)
+        is_crit = random.random() < crit_chance
+
+        if is_crit:
+            damage = int(damage * 1.5)
+
+        return max(1, damage), is_crit
+
+    # --- NEW METHOD ---
+    @staticmethod
+    def player_heal(player_stats, current_hp: int, skill_data: dict) -> Tuple[int, int]:
+        """
+        Calculates healing from a player's skill.
+        Returns: (amount_healed: int, new_hp: int)
+        """
+        base_heal = skill_data.get("heal_power", 0)
+        mag_val = player_stats.magic
+        max_hp = player_stats.max_hp
+
+        # Formula: Base Heal + (Magic * 2)
+        total_heal = base_heal + (mag_val * 2)
+        variance = random.uniform(0.9, 1.1)
+        heal_amount = int(total_heal * variance)
+
+        new_hp = min(current_hp + heal_amount, max_hp)
+        actual_healed = new_hp - current_hp
+
+        return actual_healed, new_hp
+
+    @staticmethod
     def monster_attack(monster, player_stats):
         """
         Calculates damage dealt by a monster to the player.
-        Returns: (damage_dealt: int, is_critical: bool)
         """
-        # 1. Monster Attack
         attack_power = monster.get("ATK", 10)
+        defense = player_stats.endurance * 1.5
 
-        # 2. Player Defense
-        # Formula: (END * 1.5)
-        if hasattr(player_stats, "endurance"):
-            end_val = player_stats.endurance
-        else:
-            end_val = player_stats.get("END", 0)
-
-        defense = end_val * 1.5
-
-        # 3. Damage Calculation
         base_damage = max(1, attack_power - (defense / 2))
         variance = random.uniform(0.9, 1.1)
         damage = int(base_damage * variance)
 
-        # 4. Crit (Monsters have fixed 5% chance usually)
         is_crit = random.random() < 0.05
         if is_crit:
             damage = int(damage * 1.5)
@@ -84,10 +129,7 @@ class DamageFormula:
         """
         Calculates damage for a monster's special skill.
         """
-        # Calculate normal attack first
         damage, is_crit = DamageFormula.monster_attack(monster, player_stats)
-
-        # Apply skill multiplier
         multiplier = skill_data.get("power", 1.5)
         damage = int(damage * multiplier)
 

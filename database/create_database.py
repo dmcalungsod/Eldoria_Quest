@@ -62,6 +62,8 @@ def create_tables():
         experience INTEGER DEFAULT 0,
         exp_to_next INTEGER DEFAULT 100,
         aurum INTEGER DEFAULT 0,
+        current_hp INTEGER DEFAULT 100,
+        current_mp INTEGER DEFAULT 20,
         last_action_time TEXT,
         
         FOREIGN KEY(class_id) REFERENCES classes(id)
@@ -210,9 +212,10 @@ def create_tables():
         discord_id INTEGER NOT NULL,
         item_key TEXT NOT NULL,
         item_name TEXT NOT NULL,
-        item_type TEXT NOT NULL,
+        item_type TEXT NOT NULL,  -- 'material', 'consumable', 'equipment'
+        slot TEXT,
         count INTEGER DEFAULT 1,
-        equipped INTEGER DEFAULT 0,
+        equipped INTEGER DEFAULT 0, -- 0 = False, 1 = True
         
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     );
@@ -226,7 +229,8 @@ def create_tables():
         duration_minutes INTEGER NOT NULL,
         active INTEGER DEFAULT 1,
         logs TEXT DEFAULT '[]',
-        loot_collected TEXT DEFAULT '{}'
+        loot_collected TEXT DEFAULT '{}',
+        active_monster_json TEXT DEFAULT NULL -- <-- NEW
     );
     
     -- 16. Skill Definitions (NEW)
@@ -256,7 +260,9 @@ def create_tables():
 
     conn.commit()
     conn.close()
-    print("✔ Eldoria Quest database created successfully! (Added Skills)")
+    print(
+        "✔ Eldoria Quest database created successfully! (Added Skills and inventory.slot)"
+    )
 
 
 if __name__ == "__main__":

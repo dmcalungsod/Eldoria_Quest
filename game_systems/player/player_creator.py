@@ -41,8 +41,7 @@ class PlayerCreator:
 
         class_data = CLASS_DEFINITIONS[class_name]
 
-        # --- THIS IS THE FIX ---
-        # Updated to use the new 6-stat system from class_data
+        # Create a stats object to calculate initial HP/MP
         stats = PlayerStats(
             str_base=class_data["stats"]["STR"],
             end_base=class_data["stats"]["END"],
@@ -52,8 +51,11 @@ class PlayerCreator:
             lck_base=class_data["stats"]["LCK"],
         )
 
+        # Get initial max HP and MP from the new stats object
+        initial_hp = stats.max_hp
+        initial_mp = stats.max_mp
+
         # Save to database
-        # We now pass all fields, including the new optional ones
         self.db.create_player(
             discord_id=discord_id,
             name=username,
@@ -61,6 +63,8 @@ class PlayerCreator:
             race=race,
             gender=gender,
             stats_data=stats.to_dict(),
+            initial_hp=initial_hp,  # <-- NEW
+            initial_mp=initial_mp,  # <-- NEW
         )
 
         return True, f"Welcome **{username}**, you are now a **{class_name}**!"
