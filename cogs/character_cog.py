@@ -180,10 +180,14 @@ class CharacterProfileView(View):
         self, interaction: discord.Interaction, button: Button
     ):
         """
-        Edits the message to show the Adventure Setup (location picker) UI.
+        Edits the message to show the Adventure Setup (location picker) UI
+        OR resumes a stuck adventure if one is found.
         """
-        # --- FIX: Import locally ---
-        from .adventure_commands import AdventureSetupView
+        # --- Import locally ---
+        from .adventure_commands import AdventureSetupView, ExplorationView
+        from game_systems.data.adventure_locations import LOCATIONS
+        import game_systems.data.emojis as E
+        import json
 
         adventure_cog = interaction.client.get_cog("AdventureCommands")
         if not adventure_cog:
@@ -192,19 +196,65 @@ class CharacterProfileView(View):
             )
             return
 
-        if adventure_cog.manager.get_active_session(interaction.user.id):
-            await interaction.response.send_message(
-                f"{E.WARNING} You are already on an adventure.", ephemeral=True
+        active_session_row = adventure_cog.manager.get_active_session(
+            interaction.user.id
+        )
+
+        if active_session_row:
+            # --- User is STUCK. Let's RESUME their session ---
+            if not interaction.response.is_done():
+                await interaction.response.defer()  # Defer to be safe
+
+            loc_id = active_session_row["location_id"]
+            loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone", "emoji": E.MAP})
+
+            try:
+                log_data = active_session_row["logs"]
+                log = json.loads(log_data if log_data else "[]")
+            except json.JSONDecodeError:
+                log = ["Your adventure log was corrupted, but you can continue."]
+
+            if not isinstance(log, list):
+                log = ["Adventure log corrupted. Resuming."]
+
+            # Get last 10 lines for the view's internal log
+            log = log[-10:]
+
+            # --- THIS IS THE FIX ---
+            # Instead of showing the old log, show a clean resume message.
+            # The 'log' variable is still passed to the view to maintain history.
+            resume_description = (
+                "Your previous session has been recovered. You can continue "
+                "exploring or return to the city."
             )
+            # --- END OF FIX ---
+
+            embed = discord.Embed(
+                title=f"{loc_data.get('emoji', E.MAP)} Resuming Adventure: {loc_data['name']}",
+                description=resume_description,  # <-- Use the new clean message
+                color=discord.Color.green(),
+            )
+            embed.set_footer(text="Your previous session was recovered.")
+
+            view = ExplorationView(
+                self.db,
+                adventure_cog.manager,
+                loc_id,
+                log,  # <-- Pass the old log history to the view
+                self.interaction_user,
+            )
+            await interaction.edit_original_response(embed=embed, view=view)
             return
 
+        # --- Original logic: No active session, show setup ---
+        await interaction.response.defer()  # Defer for the setup view
         embed = discord.Embed(
             title=f"{E.MAP} Prepare for Expedition",
             description="You stand before the city gates, the Guild's clearance seal in your hand. The wilderness beyond the walls of Ashgrave awaits.\n\nSelect a destination.",
             color=discord.Color.dark_green(),
         )
         view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user)
-        await interaction.response.edit_message(embed=embed, view=view)
+        await interaction.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(
         label="Guild Hall",

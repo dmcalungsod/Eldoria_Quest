@@ -224,6 +224,11 @@ def create_tables():
         type TEXT DEFAULT 'Active',
         class_id INTEGER,
         
+        -- FIX: ADDED MISSING COLUMNS --
+        mp_cost INTEGER DEFAULT 0,
+        power_multiplier REAL DEFAULT 1.0,
+        heal_power INTEGER DEFAULT 0,
+        
         FOREIGN KEY(class_id) REFERENCES classes(id)
     );
     

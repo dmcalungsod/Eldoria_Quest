@@ -11,6 +11,7 @@ import random
 import datetime
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
+from game_systems.combat.combat_phrases import CombatPhrases  # <-- THIS IS THE FIX
 from game_systems.data.monsters import MONSTERS
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
