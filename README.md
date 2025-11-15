@@ -1,272 +1,154 @@
+Thanks — I see what you mean. The previous README had inconsistent indentation and a malformed project-structure block. I corrected that and ensured the **Project Structure** is a clean, properly formatted code block (no stray characters). Paste the exact text below into your `README.md`.
+
+---
+
+```markdown
 # 🌑 **Eldoria Quest**
 
 ### _A Dark High-Fantasy Idle RPG Discord Bot_
 
-Inspired by guild-based progression, grounded survival themes, and atmospheric literary fantasy
+Inspired by:
+
+- **Danmachi** — guild ranks, dungeon progression, structured growth
+- **Grimgar of Fantasy and Ash** — grounded survival, emotional weight, realism
+- **Classic literary fantasy** — atmospheric, book-like narration
 
 ---
 
-\<p align="center"\>
-\<img src="[https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge](https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge)"/\>
-\<img src="[https://img.shields.io/badge/built_for-personal_use-blue?style=for-the-badge](https://img.shields.io/badge/built_for-personal_use-blue?style=for-the-badge)"/\>
-\<img src="[https://img.shields.io/badge/not_open_source-grey?style=for-the-badge](https://img.shields.io/badge/not_open_source-grey?style=for-the-badge)"/\>
-\</p\>
+<p align="center">
+  <img src="https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/not_open_source-grey?style=for-the-badge"/>
+</p>
 
 ---
 
-# 🜁 **The Theme of Eldoria Quest**
+# 🜁 **World & Theme**
 
-**Eldoria Quest** is a private, personal RPG system built as a fully immersive **Dark High-Fantasy Idle RPG**.
+**Eldoria Quest** is a private, personal RPG system set in a fractured world reshaped by **The Sundering**—a magical catastrophe that shattered the Veil and unleashed horrors across the realm.
 
-The world is shaped by **The Sundering**—a cataclysm that shattered the Veil “like weathered glass,” unleashing nightmares upon the fractured lands of Eldoria. Civilization now clings to fortified enclaves, and the **Adventurer's Guild** stands as humanity’s last defense.
+Civilization survives only within fortified enclaves like **Astraeon**, the capital city where the **Eldorian Adventurer’s Consortium** operates. Adventurers fight not for glory, but survival.
 
-The experience blends:
+The game blends:
 
-- **Guild Progression** — adventurer ranks and a structured advancement system
-- **Grounded Survival** — a focus on tone, emotional weight, and realism
-- **Classic literary fantasy** — atmospheric narration, slow-burn storytelling
-
-This is not a typical power fantasy—its tone is gritty, grounded, and unforgiving.
+- **Guild-Driven Progression** (Danmachi)
+- **Material-Based Economy & Harsh Survival** (Grimgar)
+- **Literary, atmospheric narration** for every action
 
 ---
 
-# ⭐ **Design Philosophy**
+# ⭐ Design Philosophy
 
-### **Grounded Adventuring**
+### 🜄 Loot-Driven Economy (Danmachi-Style)
 
-- Early-game danger reflects a realistic survival tone
-- Monsters hit hard
-- Supplies and stamina matter
-- Death ends the adventure and shapes the story
+- Monsters do **not** drop coins.
+- They drop **Magic Stones** and **Monster Materials** (fangs, claws, hides).
+- All currency (**Aurum**) comes from selling materials at the **Guild Exchange**.
+- Every adventure becomes a calculated risk for better loot.
 
-### **Emotional, Earned Progression**
+### 🜃 Immersive UI & Narrative (Grimgar-Style)
 
-- No magical coin drops—only scavenged monster parts
-- All currency (Aurum) is earned through Guild Exchange
-- Each stat point feels meaningful
-- Growth is slow, narratively grounded
-
-### **Literary, Atmospheric Narration**
-
-Every message is styled like a fantasy novel:
-
-> _“You steady your breathing as the mist thins before you.
-> The boundary stone hums faintly, a reminder that one misstep can end a novice’s life.”_
+- A single persistent **“ONE UI”** message — minimal slash commands.
+- Combat plays out automatically with suspenseful timed narration.
+- Narration is both **class-aware** and **monster-aware**.
+- Player HP/MP persists until healed.
 
 ---
 
-# 🜂 **Core Gameplay Loop**
+# 🜂 Core Gameplay Loop
 
-### **1. Player Registration**
-
-Players register with the **Adventurer's Guild**
-and receive their **Guild Card**—their identity and lifeline.
-
----
-
-### **2. Choosing a Quest**
-
-The Quest Board presents simple but dangerous tasks:
-
-- Slime extermination
-- Gathering beast pelts
-- Scouting ruined outskirts
-- Boundary patrols
-
-These are low-tier but deadly—reflecting the struggles of a new adventurer.
+1. **Register** — Use `/start` to create your character and receive your **Guild Card**.
+2. **Explore** — From the profile UI, choose a location and press **Explore**.
+3. **Survive** — Each exploration triggers combat, rest, or a story event; combat logs post every 5 minutes.
+4. **Manage** — Use Inventory to equip gear or consume potions during or after runs.
+5. **Return** — End the adventure to receive EXP and materials; heal and rest at the Guild Hall.
+6. **Progress** — Sell materials at the **Guild Exchange** for Aurum, turn in quests, and rank up (F → SSS).
 
 ---
 
-### **3. Idle Adventure**
+# 🧩 Major Features
 
-Players select:
-
-- A zone
-- An adventure duration (minutes → hours)
-
-The bot simulates encounters **every 5 minutes**, outputting combat logs in a slow, atmospheric rhythm.
-
----
-
-### **4. Loot-Only Economy**
-
-Enemies drop:
-
-- Monster hides
-- Fangs, claws, bones
-- Magic stones
-- Corrupted essences
-- Shards & fragments
-
-Materials must be **sold manually** at the **Guild Exchange**
-—a core part of the realistic economy.
+- Persistent **ONE UI** system (no constant slash commands)
+- Idle adventure simulation with 5-minute log cadence
+- Auto-skill combat AI and class/monster-aware narration
+- Loot-only economy; materials sold at Guild Exchange for Aurum
+- Full equipment & consumable systems with persistent HP/MP
+- Quest system with automatic objective tracking
+- Rank progression (F → SSS) and Guild Merit mechanics
 
 ---
 
-### **5. Survival & Consequences**
-
-Death:
-
-- Ends an adventure early
-- Generates a harsh but narratively immersive summary
-- Carries real tension and weight
-
----
-
-# 6\. Slow Progression
-
-Players level up over time through:
-
-- Incremental stat gains
-- Skill unlocks
-- Attribute growth
-- Guild Merit increases
-
-The pace is deliberate—not a power fantasy.
-
----
-
-# 🧩 **Major Features**
-
-### ✔️ Detailed guild ranking system
-
-### ✔️ Scavenging-based economy
-
-### ✔️ Idle auto-adventure system
-
-### ✔️ Real-time interval combat (every 5 minutes)
-
-### ✔️ Material drops instead of currency
-
-### ✔️ Sell items for Aurum at the Guild Exchange
-
-### ✔️ Detailed level & stat tracking
-
-### ✔️ Atmospheric narration for every event
-
-### ✔️ Robust modular system architecture
-
----
-
-# 🗂️ **Project Structure (Private Layout)**
-
-```
-/game_systems
-    /adventure_system
-        adventure_manager.py
-        adventure_session.py
-    /combat_system
-        combat_engine.py
-        monster_data.py
-    /guild_system
-        reward_system.py
-        rank_system.py
-    /quest_system
-        quest_system.py
-    /inventory_system
-        inventory_manager.py
-
-/database
-    database_manager.py
-    schema.sql
-
-/ui
-    guild_card_ui.py
-    menu_buttons.py
-
-config/
-    config.py
-    constants.py
-
-bot.py
-README.md
+# 🗂️ Project Structure
 ```
 
-_(Only a structural overview — this repository is private and not intended for external use.)_
+eldoria-bot/
+├─ main.py # Bot entry point
+├─ config.py # Global configuration / constants
+├─ README.md
+├─ requirements.txt
+│
+├─ cogs/
+│ ├─ onboarding_cog.py # /start, character creation
+│ ├─ character_cog.py # Profile, Inventory, Skills UI
+│ ├─ guild_hub_cog.py # Guild Hall, Rank Up, Exchange UI
+│ ├─ quest_hub_cog.py # Quest Board, Quest Log UI
+│ ├─ adventure_commands.py # Explore, adventure session UI
+│ └─ ui_helpers.py # Shared navigation utilities (no cross-cog imports)
+│
+├─ ui/
+│ ├─ guild_card_view.py # Views/buttons for main player card
+│ ├─ quest_board_view.py # Quest board dropdowns & pages
+│ ├─ quest_log_view.py # Quest progress views
+│ └─ navigation.py # back_to_guild_card callbacks (safe imports)
+│
+├─ database/
+│ ├─ database_manager.py # DB interface
+│ ├─ create_database.py # Schema creation script
+│ └─ populate_database.py # Seed data insertion
+│
+├─ game_systems/
+│ ├─ adventure/
+│ │ ├─ adventure_manager.py
+│ │ └─ adventure_session.py
+│ ├─ combat/
+│ │ ├─ combat_engine.py
+│ │ ├─ combat_phrases.py
+│ │ └─ damage_formula.py
+│ ├─ data/
+│ │ ├─ class_data.py
+│ │ ├─ monster_data.py
+│ │ ├─ materials.py
+│ │ ├─ consumables.py
+│ │ └─ skills_data.py
+│ └─ guild_system/
+│ ├─ guild_exchange.py
+│ ├─ quest_system.py
+│ ├─ rank_system.py
+│ └─ reward_system.py
+│
+├─ items/
+│ ├─ item_manager.py
+│ ├─ inventory_manager.py
+│ ├─ equipment_manager.py
+│ └─ consumable_manager.py
+│
+└─ player/
+├─ player_creator.py
+├─ player_stats.py
+└─ level_up.py
+
+```
+
+> **Notes:**
+> - `cogs/` modules **must not** import each other. They only import from `ui/`, `game_systems/`, and `database/`.
+> - Keep UI code in `ui/` to avoid circular imports. Import views lazily in callbacks if needed.
+> - Business logic lives under `game_systems/` and never imports from `cogs/` or `ui/`.
 
 ---
 
-# ⚙️ **Setup (Private Use Only)**
+# 🛡️ License & Ownership
 
-Because this is a personal, closed-source project, setup instructions are intentionally minimal.
+This repository is **private intellectual property**. All source code, lore, mechanics, and documentation belong solely to the project owner.
 
-### **1. Install Required Libraries**
-
-Python 3.10+ recommended.
-
+**Not open-source. Not licensed for redistribution or reuse.**
 ```
-pip install -r requirements.txt
-```
-
-### **2. Configure Environment Variables**
-
-In `.env`:
-
-```
-DISCORD_TOKEN=your_private_token_here
-```
-
-### **3. Initialize Local Database**
-
-Run:
-
-```
-python database/setup_database.py
-```
-
-### **4. Launch the Bot**
-
-```
-python bot.py
-```
-
----
-
-# ✨ **Core Bot Commands**
-
-### Adventurer Commands
-
-- `/start` — Register as an adventurer
-- `/status` — View detailed adventurer status
-- `/profile` — Open Guild Card UI
-
-### Progression & Tasks
-
-- `/questboard` — Browse quests
-- `/adventure` — Begin idle exploration
-- `/inventory` — View collected materials
-- `/exchange` — Trade materials for Aurum
-
----
-
-# 🔮 **Future Enhancements (Internal Roadmap)**
-
-- Multi-party dungeon expeditions
-- Personality-driven AI party members
-- Dynamic events based on zone corruption levels
-- Crafting and forging systems
-- Skill trees & specializations
-- S-Rank boss hunts
-- Seasonal events
-- Procedural story arcs
-
----
-
-# 🛡️ **License & Ownership**
-
-This repository is **private intellectual property**.
-All code, design, mechanics, lore, and documentation belong exclusively to the project owner.
-
-**Not open-source.
-Not licensed for public distribution or reuse.**
-
----
-
-# 🜸 **Final Notes**
-
-Eldoria Quest is a personal passion project built for immersion, mood, and grounded fantasy storytelling.
-It blends:
-
-- A structured guild system
-- Grounded, realistic progression
-- Literary dark-fantasy prose
