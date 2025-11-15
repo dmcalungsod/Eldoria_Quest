@@ -3,81 +3,95 @@ adventure_session.py
 
 Represents a single active adventure session.
 Handles the simulation of combat steps and log generation.
+(Refactored for material-based economy)
 """
 
 import json
 import random
 import datetime
+from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.data.monsters import MONSTERS
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
 from game_systems.player.level_up import LevelUpSystem
+from game_systems.guild_system.quest_system import QuestSystem
 import game_systems.data.emojis as E
 
+
 class AdventureSession:
-    def __init__(self, db_manager, discord_id, row_data=None):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        quest_system: QuestSystem,
+        discord_id: int,
+        row_data=None,
+    ):
         self.db = db_manager
+        self.quest_system = quest_system  # For updating progress
         self.discord_id = discord_id
-        
+
         if row_data:
-            self.location_id = row_data['location_id']
-            self.end_time = datetime.datetime.fromisoformat(row_data['end_time'])
-            self.logs = json.loads(row_data['logs'])
-            self.loot = json.loads(row_data['loot_collected'])
-            self.active = bool(row_data['active'])
+            self.location_id = row_data["location_id"]
+            self.end_time = datetime.datetime.fromisoformat(row_data["end_time"])
+            self.logs = json.loads(row_data["logs"])
+            self.loot = json.loads(row_data["loot_collected"])
+            self.active = bool(row_data["active"])
         else:
-            # Initialize new (handled by manager mostly)
-            self.active = False
+            self.active = False  # Should be initialized by manager
 
     async def simulate_step(self):
         """
         Simulates one 'step' (e.g., 5 minutes interval).
-        Determines if a fight happens, resolves it, and updates logs.
+        Resolves combat, logs results, and updates quest progress.
         """
         location = LOCATIONS.get(self.location_id)
         if not location:
             return
 
-        # 1. Fetch Player Stats
+        # 1. Fetch Player
         stats_json = self.db.get_player_stats_json(self.discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
-        
-        # Load basic player info for level scaling reference
+
         conn = self.db.connect()
         cur = conn.cursor()
-        cur.execute("SELECT level, experience, exp_to_next, gold FROM players WHERE discord_id = ?", (self.discord_id,))
+        cur.execute(
+            "SELECT level, experience, exp_to_next FROM players WHERE discord_id = ?",
+            (self.discord_id,),
+        )
         p_row = cur.fetchone()
         conn.close()
 
-        # Wrapper for CombatEngine
-        player_wrapper = LevelUpSystem(player_stats, p_row['level'], p_row['experience'], p_row['exp_to_next'])
+        # Create a fresh player wrapper for this combat
+        player_wrapper = LevelUpSystem(
+            stats=player_stats,
+            level=p_row["level"],
+            exp=p_row["experience"],
+            exp_to_next=p_row["exp_to_next"],
+        )
+        # Set current HP for this fight
+        player_wrapper.hp_current = player_stats.max_hp
 
         # 2. Pick a Monster
-        monster_pool = location['monsters']
-        # Weighted random choice
+        monster_pool = location["monsters"]
         choices, weights = zip(*monster_pool)
         monster_key = random.choices(choices, weights=weights, k=1)[0]
-        
-        # Lookup monster data (Clone it so we don't modify the template)
+
         monster_template = MONSTERS.get(monster_key)
         if not monster_template:
-            return 
-        
-        # Create a combat-ready monster dict (renaming keys for CombatEngine compatibility if needed)
+            return True  # Failed to find monster, but session continues
+
+        # Create a combat-ready monster instance
         monster_instance = {
             "name": monster_template["name"],
             "level": monster_template["level"],
+            "tier": monster_template["tier"],
             "HP": monster_template["hp"],
-            "MP": 10, # Default MP for simple mobs
-            "ATK": monster_instance_atk(monster_template),
+            "MP": 10,  # Default MP
+            "ATK": monster_template["atk"],
             "DEF": monster_template["def"],
-            "CON": monster_template["hp"] // 5, # Approx
-            "DEX": monster_template["level"], 
-            "INT": 1,
             "xp": monster_template["xp"],
-            "gold_drop": monster_template["level"] * 2, # Basic calculation
-            "drops": monster_template.get("drops", [])
+            "drops": monster_template.get("drops", []),
         }
 
         # 3. Resolve Combat
@@ -86,38 +100,48 @@ class AdventureSession:
 
         # 4. Process Results
         timestamp = datetime.datetime.now().strftime("%H:%M")
-        
-        if result['winner'] == 'player':
-            # Add Loot
+
+        if result["winner"] == "player":
+            # --- This is the new loot logic ---
             loot_text = []
-            # Gold
-            self.add_loot("gold", result['gold'])
-            loot_text.append(f"{result['gold']} Gold")
-            
-            # EXP (Note: Actual EXP apply happens at END of adventure to prevent leveling mid-dungeon)
-            self.add_loot("exp", result['exp'])
+
+            # Add EXP
+            self.add_loot("exp", result["exp"])
             loot_text.append(f"{result['exp']} EXP")
 
-            # Monster Drops
-            for drop_name, chance in monster_instance['drops']:
+            # Roll for Monster Drops
+            for drop_key, chance in result["drops"]:
                 if random.randint(1, 100) <= chance:
-                    # Map drop keys to readable names if needed, for now use keys
-                    self.add_loot(drop_name, 1)
-                    loot_text.append(f"{drop_name}")
+                    self.add_loot(drop_key, 1)  # Add the material key
+                    loot_text.append(f"{drop_key}")
 
             log_entry = (
-                f"`[{timestamp}]` ⚔️ **Encounter:** {monster_instance['name']}\n"
-                f"> Defeated! Gained: {', '.join(loot_text)}.\n"
-                f"> *HP remaining: {player_stats.max_hp}* (Auto-heal)" # For idle, we often auto-heal or track persistent HP. 
-                # Note: For simple Idle, we assume full heal between fights unless we add persistent HP tracking.
+                f"`[{timestamp}]` {E.COMBAT} Encountered: **{monster_instance['name']}**\n"
+                f"> {E.VICTORY} Defeated! Gained: {', '.join(loot_text)}.\n"
+                f"> *HP remaining: {player_wrapper.hp_current} / {player_stats.max_hp}* (Recovers)"
             )
+
+            # --- CRITICAL: Update Quest Progress ---
+            # We get all active quests
+            active_quests = self.quest_system.get_player_quests(self.discord_id)
+            for quest in active_quests:
+                # Check if this monster is an objective
+                if (
+                    "defeat" in quest["objectives"]
+                    and monster_instance["name"] in quest["objectives"]["defeat"]
+                ):
+                    self.quest_system.update_progress(
+                        self.discord_id, quest["id"], "defeat", monster_instance["name"]
+                    )
+                    log_entry += f"\n> *Quest Updated: {quest['title']}*"
+
         else:
             # Player Died
             log_entry = (
-                f"`[{timestamp}]` 💀 **Defeat:** Overwhelmed by {monster_instance['name']}.\n"
+                f"`[{timestamp}]` {E.DEFEAT} **Defeat:** Overwhelmed by {monster_instance['name']}.\n"
                 f"> The Guild sends a rescue party. Adventure ends early."
             )
-            self.active = False # End session immediately
+            self.active = False  # End session immediately
 
         # 5. Save Log
         self.logs.append(log_entry)
@@ -133,14 +157,18 @@ class AdventureSession:
     def save_state(self):
         conn = self.db.connect()
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             UPDATE adventure_sessions 
             SET logs = ?, loot_collected = ?, active = ?
             WHERE discord_id = ?
-        """, (json.dumps(self.logs), json.dumps(self.loot), 1 if self.active else 0, self.discord_id))
+        """,
+            (
+                json.dumps(self.logs),
+                json.dumps(self.loot),
+                1 if self.active else 0,
+                self.discord_id,
+            ),
+        )
         conn.commit()
         conn.close()
-
-def monster_instance_atk(template):
-    # Helper to extract attack from template
-    return template.get("atk", 10)

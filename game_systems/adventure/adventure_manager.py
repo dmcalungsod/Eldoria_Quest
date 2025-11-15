@@ -2,23 +2,30 @@
 adventure_manager.py
 
 Orchestrates all active adventures.
-- Starts new sessions
-- Checks for completion
-- Triggers the 5-minute update steps
+(Refactored for material-based economy)
 """
 
 import sqlite3
 import json
 import datetime
 from discord.ext import tasks
+from database.database_manager import DatabaseManager
+from game_systems.items.inventory_manager import InventoryManager
+from game_systems.guild_system.quest_system import QuestSystem
 from .adventure_session import AdventureSession
-from game_systems.guild_system.reward_system import RewardSystem # To finalize rewards
 from game_systems.data.materials import MATERIALS
+import game_systems.data.emojis as E
+
 
 class AdventureManager:
-    def __init__(self, db_manager, bot):
+    def __init__(self, db_manager: DatabaseManager, bot):
         self.db = db_manager
         self.bot = bot
+
+        # Create instances of systems we need
+        self.inventory_manager = InventoryManager(self.db)
+        self.quest_system = QuestSystem(self.db)
+
         # Start the background loop
         self.update_loop.start()
 
@@ -28,19 +35,31 @@ class AdventureManager:
         """
         start_time = datetime.datetime.now()
         end_time = start_time + datetime.timedelta(minutes=duration_minutes)
-        
+
         conn = self.db.connect()
         cur = conn.cursor()
-        
-        # Clear old sessions
-        cur.execute("DELETE FROM adventure_sessions WHERE discord_id = ?", (discord_id,))
-        
-        cur.execute("""
+
+        # Clear old/finished sessions
+        cur.execute(
+            "DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0",
+            (discord_id,),
+        )
+
+        cur.execute(
+            """
             INSERT INTO adventure_sessions 
             (discord_id, location_id, start_time, end_time, duration_minutes, active, logs, loot_collected)
             VALUES (?, ?, ?, ?, ?, 1, '[]', '{}')
-        """, (discord_id, location_id, start_time.isoformat(), end_time.isoformat(), duration_minutes))
-        
+        """,
+            (
+                discord_id,
+                location_id,
+                start_time.isoformat(),
+                end_time.isoformat(),
+                duration_minutes,
+            ),
+        )
+
         conn.commit()
         conn.close()
         return True
@@ -48,7 +67,10 @@ class AdventureManager:
     def get_active_session(self, discord_id):
         conn = self.db.connect()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM adventure_sessions WHERE discord_id = ?", (discord_id,))
+        cur.execute(
+            "SELECT * FROM adventure_sessions WHERE discord_id = ? AND active = 1",
+            (discord_id,),
+        )
         row = cur.fetchone()
         conn.close()
         return row
@@ -61,26 +83,29 @@ class AdventureManager:
         2. Triggers a simulation step (fight).
         3. Checks if time is up.
         """
-        # In a production bot, we wouldn't fetch ALL, but batch them. 
-        # For now, fetching all is fine.
+        await self.bot.wait_until_ready()
+
         conn = self.db.connect()
         cur = conn.cursor()
         cur.execute("SELECT * FROM adventure_sessions WHERE active = 1")
         active_rows = cur.fetchall()
         conn.close()
 
-        for row in active_rows:
-            session = AdventureSession(self.db, row['discord_id'], row)
-            
-            # check if time expired
+        for row_data in active_rows:
+            # Pass the QuestSystem to the session
+            session = AdventureSession(
+                self.db, self.quest_system, row_data["discord_id"], row_data
+            )
+
+            # Check if time expired
             now = datetime.datetime.now()
             if now >= session.end_time:
                 await self.complete_adventure(session)
                 continue
 
-            # Simulate step
+            # Simulate one 5-minute step
             is_alive = await session.simulate_step()
-            
+
             if not is_alive:
                 # Player died in combat
                 await self.fail_adventure(session)
@@ -89,65 +114,99 @@ class AdventureManager:
         """
         Finalizes the adventure, grants rewards, and notifies the user.
         """
-        # 1. Calculate Totals
-        total_gold = session.loot.pop("gold", 0)
+        # 1. Pop EXP, leaving only materials in the loot dict
         total_exp = session.loot.pop("exp", 0)
-        
+
         # 2. Grant Rewards to DB
         conn = self.db.connect()
         cur = conn.cursor()
-        
-        # Gold
-        cur.execute("UPDATE players SET gold = gold + ? WHERE discord_id = ?", (total_gold, session.discord_id))
-        
-        # EXP (Using simple SQL update here, ideally use LevelUpSystem if we want level up checks)
-        # For simplicity in the loop:
-        cur.execute("UPDATE players SET experience = experience + ? WHERE discord_id = ?", (total_exp, session.discord_id))
-        
-        # Items (Materials)
-        # We need to map drop keys (e.g. 'goblin_ear') to Inventory
+
+        # --- Apply EXP ---
+        # We must use the LevelUpSystem to handle level-ups correctly
+        cur.execute("SELECT * FROM players WHERE discord_id = ?", (session.discord_id,))
+        player_row = cur.fetchone()
+        stats_json = self.db.get_player_stats_json(session.discord_id)
+        player_stats = PlayerStats.from_dict(stats_json)
+
+        level_system = LevelUpSystem(
+            stats=player_stats,
+            level=player_row["level"],
+            exp=player_row["experience"],
+            exp_to_next=player_row["exp_to_next"],
+        )
+        leveled_up = level_system.add_exp(total_exp)
+
+        # Save updated player data
+        self.db.update_player_level_data(
+            session.discord_id,
+            level_system.level,
+            level_system.exp,
+            level_system.exp_to_next,
+        )
+        self.db.update_player_stats(session.discord_id, level_system.stats.to_dict())
+
+        # --- Add Items to Inventory ---
+        loot_summary_list = []
         for item_key, count in session.loot.items():
-            # Look up display name in MATERIALS
+            # Get the item's real name from the materials file
             mat_data = MATERIALS.get(item_key)
-            item_name = mat_data['name'] if mat_data else item_key
-            item_type = "material"
-            
-            # Add to inventory table
-            # Check existence
-            cur.execute("SELECT count FROM inventory WHERE discord_id=? AND item_name=?", (session.discord_id, item_name))
-            inv_row = cur.fetchone()
-            if inv_row:
-                cur.execute("UPDATE inventory SET count = count + ? WHERE discord_id=? AND item_name=?", (count, session.discord_id, item_name))
-            else:
-                cur.execute("INSERT INTO inventory (discord_id, item_name, item_type, count) VALUES (?, ?, ?, ?)", (session.discord_id, item_name, item_type, count))
+            item_name = mat_data["name"] if mat_data else item_key
+
+            # Use InventoryManager to add to DB
+            self.inventory_manager.add_item(
+                session.discord_id, item_name, "material", count
+            )
+            loot_summary_list.append(f"{item_name} x{count}")
 
         # Mark session inactive
-        cur.execute("UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?", (session.discord_id,))
+        cur.execute(
+            "UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?",
+            (session.discord_id,),
+        )
         conn.commit()
         conn.close()
 
-        # 3. Notify User (DM or specific channel)
+        # 3. Notify User (DM)
         user = self.bot.get_user(session.discord_id)
         if user:
-            summary = f"🌲 **Adventure Complete!**\nDuration: {session.logs[-1] if session.logs else 'Unknown'}\n"
-            summary += f"💰 +{total_gold} Gold\n✨ +{total_exp} EXP\n📦 Items: {', '.join(f'{k} x{v}' for k,v in session.loot.items())}"
+            loot_str = ", ".join(loot_summary_list) if loot_summary_list else "nothing"
+
+            summary = (
+                f"{E.VICTORY} **Adventure Complete!**\n"
+                f"You have returned from the wilds, weary but successful.\n\n"
+                f"{E.EXP} **EXP Gained:** `+{total_exp}`\n"
+                f"{E.ITEM_BOX} **Materials Hauled:** {loot_str}\n\n"
+                f"*(Take your materials to the Guild Exchange to sell them for Valis!)*"
+            )
+            if leveled_up:
+                summary += (
+                    f"\n\n{E.LEVEL_UP} **You are now Level {level_system.level}!**"
+                )
+
             try:
                 await user.send(summary)
             except:
-                pass # Can't DM
+                pass  # Can't DM
 
     async def fail_adventure(self, session: AdventureSession):
-        # Handle death (partial rewards or zero rewards)
+        # Handle death (No EXP, No Loot)
         conn = self.db.connect()
         cur = conn.cursor()
-        cur.execute("UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?", (session.discord_id,))
+        cur.execute(
+            "UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?",
+            (session.discord_id,),
+        )
         conn.commit()
         conn.close()
-        
+
         user = self.bot.get_user(session.discord_id)
         if user:
             try:
-                await user.send("💀 **Adventure Failed**\nYou were defeated in the wilds. The Guild rescue team has brought you back.")
+                await user.send(
+                    f"{E.DEFEAT} **Adventure Failed**\n"
+                    "You were defeated in the wilds. The Guild rescue team "
+                    "retrieved your body, but your haul was lost..."
+                )
             except:
                 pass
 

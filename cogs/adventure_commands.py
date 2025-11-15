@@ -56,7 +56,7 @@ class AdventureCommands(commands.Cog):
             
             # Show Location Select Menu
             view = AdventureSetupView(self.db, self.manager)
-            await interaction.response.send_message("🗺️ **Select a Destination:**", view=view, ephemeral=True)
+            await interaction.response.send_message(f"{E.MAP} **Select a Destination:**", view=view, ephemeral=True)
 
         elif action == "cancel":
             # Implement cancel logic (mark active=0, maybe give partial rewards)
@@ -71,11 +71,12 @@ class AdventureSetupView(View):
         # Location Select
         self.location_select = Select(placeholder="Choose a Zone...")
         for key, loc in LOCATIONS.items():
+            # Use the emoji from the location data file
             self.location_select.add_option(
                 label=loc['name'], 
                 value=key, 
                 description=f"Lv. {loc['level_req']} | {loc['min_rank']}-Rank",
-                emoji=loc['emoji']
+                emoji=loc.get('emoji') # Use .get() for safety
             )
         self.location_select.callback = self.location_callback
         self.add_item(self.location_select)
@@ -92,7 +93,10 @@ class AdventureSetupView(View):
             btn.callback = self.duration_callback
             self.add_item(btn)
             
-        await interaction.response.edit_message(content=f"🌲 **Destination:** {loc_data['name']}\nSelect Duration:", view=self)
+        await interaction.response.edit_message(
+            content=f"{loc_data.get('emoji', E.MAP)} **Destination:** {loc_data['name']}\nSelect Duration:", 
+            view=self
+        )
 
     async def duration_callback(self, interaction: discord.Interaction):
         # custom_id format: dur_locationID_minutes
@@ -101,8 +105,12 @@ class AdventureSetupView(View):
         duration = int(parts[-1])
         
         self.manager.start_adventure(interaction.user.id, loc_id, duration)
-        await interaction.response.edit_message(content=f"✅ **Adventure Started!**\nYou have set off for **{LOCATIONS[loc_id]['name']}** for {duration} minutes.\nCheck back with `/adventure status`.", view=None)
+        await interaction.response.edit_message(
+            content=f"{E.CHECK} **Adventure Started!**\n"
+                    f"You have set off for **{LOCATIONS[loc_id]['name']}** for {duration} minutes.\n"
+                    f"Check back with `/adventure status`.", 
+            view=None
+        )
 
-# --- THIS WAS MISSING ---
 async def setup(bot):
     await bot.add_cog(AdventureCommands(bot))

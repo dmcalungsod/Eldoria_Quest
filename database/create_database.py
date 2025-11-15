@@ -2,18 +2,7 @@
 create_database.py
 
 Creates the full Eldoria Quest database schema from scratch.
-If EQ_Game.db already exists, it will overwrite the existing tables.
-
-Tables created:
-- classes
-- players
-- stats
-- monsters
-- quest_items
-- consumables
-- equipment
-- class_equipment
-- item_sets (optional, for future set bonuses)
+(Refactored to remove 'gold_drop' from monsters table)
 """
 
 import sqlite3
@@ -26,9 +15,10 @@ def create_tables():
     cursor = conn.cursor()
 
     # -------------------------
-    # DROP OLD TABLES (optional)
+    # DROP OLD TABLES
     # -------------------------
-    cursor.executescript("""
+    cursor.executescript(
+        """
     DROP TABLE IF EXISTS classes;
     DROP TABLE IF EXISTS players;
     DROP TABLE IF EXISTS stats;
@@ -41,12 +31,17 @@ def create_tables():
     DROP TABLE IF EXISTS guild_members;
     DROP TABLE IF EXISTS quests;
     DROP TABLE IF EXISTS player_quests;
-    """)
+    DROP TABLE IF EXISTS materials;
+    DROP TABLE IF EXISTS inventory;
+    DROP TABLE IF EXISTS adventure_sessions;
+    """
+    )
 
     # -------------------------
     # CREATE TABLES
     # -------------------------
-    cursor.executescript("""
+    cursor.executescript(
+        """
     -- 1. Class Definitions
     CREATE TABLE classes (
         id INTEGER PRIMARY KEY,
@@ -76,21 +71,20 @@ def create_tables():
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     );
 
-    -- 4. Monsters
+    -- 4. Monsters (NO gold_drop column)
     CREATE TABLE monsters (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
-        tier TEXT NOT NULL,            -- Normal / Elite / Boss
+        tier TEXT NOT NULL,
         level INTEGER NOT NULL,
         hp INTEGER NOT NULL,
         attack INTEGER NOT NULL,
         defense INTEGER NOT NULL,
         dexterity INTEGER NOT NULL,
         magic INTEGER NOT NULL,
-        gold_drop INTEGER NOT NULL,
         exp_drop INTEGER NOT NULL,
-        biome TEXT NOT NULL            -- "Forest"
+        biome TEXT NOT NULL
     );
 
     -- 5. Quest Items
@@ -98,7 +92,7 @@ def create_tables():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
-        rarity TEXT NOT NULL,          -- Common → Mythical
+        rarity TEXT NOT NULL,
         quest_id INTEGER,
         value INTEGER DEFAULT 0
     );
@@ -119,7 +113,7 @@ def create_tables():
         name TEXT NOT NULL,
         description TEXT,
         rarity TEXT NOT NULL,
-        slot TEXT NOT NULL,            -- weapon / chest / boots / ring / amulet
+        slot TEXT NOT NULL,
         str_bonus INTEGER DEFAULT 0,
         dex_bonus INTEGER DEFAULT 0,
         con_bonus INTEGER DEFAULT 0,
@@ -133,7 +127,7 @@ def create_tables():
     -- 8. Class-Specific Equipment
     CREATE TABLE class_equipment (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        class_id INTEGER NOT NULL,     -- 1 Warrior / 2 Mage / 3 Rogue / 4 Cleric / 5 Ranger
+        class_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
         rarity TEXT NOT NULL,
@@ -145,13 +139,13 @@ def create_tables():
         wis_bonus INTEGER DEFAULT 0,
         cha_bonus INTEGER DEFAULT 0,
         lck_bonus INTEGER DEFAULT 0,
-        set_name TEXT,                 -- Beginner Set Name
+        set_name TEXT,
         min_level INTEGER DEFAULT 1,
 
         FOREIGN KEY(class_id) REFERENCES classes(id)
     );
 
-    -- 9. Item Sets (Optional for future expansions)
+    -- 9. Item Sets
     CREATE TABLE item_sets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         set_name TEXT NOT NULL,
@@ -197,11 +191,47 @@ def create_tables():
         FOREIGN KEY(discord_id) REFERENCES players(discord_id),
         FOREIGN KEY(quest_id) REFERENCES quests(id)
     );
-    """)
+    
+    -- 13. Materials (Loot Definitions)
+    CREATE TABLE IF NOT EXISTS materials (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key_id TEXT UNIQUE,
+        name TEXT NOT NULL,
+        description TEXT,
+        rarity TEXT DEFAULT 'Common',
+        value INTEGER DEFAULT 0
+    );
+
+    -- 14. Inventory (Player Backpack)
+    CREATE TABLE IF NOT EXISTS inventory (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        discord_id INTEGER NOT NULL,
+        item_key TEXT NOT NULL,
+        item_name TEXT NOT NULL,
+        item_type TEXT NOT NULL,
+        count INTEGER DEFAULT 1,
+        equipped INTEGER DEFAULT 0,
+        
+        FOREIGN KEY(discord_id) REFERENCES players(discord_id)
+    );
+    
+    -- 15. Adventure Sessions
+    CREATE TABLE IF NOT EXISTS adventure_sessions (
+        discord_id INTEGER PRIMARY KEY,
+        location_id TEXT NOT NULL,
+        start_time TEXT NOT NULL,
+        end_time TEXT NOT NULL,
+        duration_minutes INTEGER NOT NULL,
+        active INTEGER DEFAULT 1,
+        logs TEXT DEFAULT '[]',
+        loot_collected TEXT DEFAULT '{}'
+    );
+    """
+    )
 
     conn.commit()
     conn.close()
-    print("✔ Eldoria Quest database created successfully!")
+    print("✔ Eldoria Quest database created successfully! (Economy: Materials-Only)")
 
 
 if __name__ == "__main__":

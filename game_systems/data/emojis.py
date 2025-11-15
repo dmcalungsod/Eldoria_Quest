@@ -11,9 +11,9 @@ GOLD = "<:gold_coin:1194437266903404596>"
 GUILD_MERIT = "<:guild_prestige:1194437270363701338>"
 
 # --- Standard Unicode Emojis ---
+
 # UI Icons
 EXP = "✨"
-QUEST_SCROLL = "📜"
 LEVEL_UP = "🌟"
 ITEM_BOX = "📦"
 ERROR = "❌"
@@ -22,6 +22,18 @@ CHECK = "✅"
 WARNING = "⚠️"
 BACKPACK = "🎒"
 SCROLL = "📜"
+QUEST_SCROLL = "📜"  # Alias for SCROLL
+MAP = "🗺️"
+EXCHANGE = "🔄"  # <-- ADDED
+
+# Combat
+COMBAT = "⚔️"
+PLAYER_ATTACK = "🗡️"
+MONSTER_ATTACK = "💥"
+MONSTER_SKILL = "🔥"
+BUFF = "✨"  # Alias for EXP
+VICTORY = "🏆"
+DEFEAT = "💀"
 
 # Stats
 STR = "💪"
@@ -35,3 +47,9 @@ LCK = "🍀"
 # Resources
 HP = "❤️"
 MP = "💧"
+
+# Misc World
+FOREST = "🌲"
+THICKET = "🍃"
+CAVE = "🍄"
+HERB = "🌿"
