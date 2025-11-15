@@ -13,27 +13,24 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
 # --- Setup Logging ---
-# This provides much better debugging than print() statements
-logs_dir = os.path.join(ROOT_DIR, 'logs')
+logs_dir = os.path.join(ROOT_DIR, "logs")
 if not os.path.exists(logs_dir):
     os.makedirs(logs_dir)
 
-logger = logging.getLogger('discord')
-logger.setLevel(logging.INFO) # Set to INFO or DEBUG for more details
-handler = logging.FileHandler(filename=os.path.join(logs_dir, 'eldoria.log'), encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger = logging.getLogger("discord")
+logger.setLevel(logging.INFO)  # Set to INFO or DEBUG for more details
+handler = logging.FileHandler(
+    filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w"
+)
+handler.setFormatter(
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+)
 logger.addHandler(handler)
-
-# --- Path Configuration ---
-# This ensures that the bot can find your 'core' modules (like stats.py)
-# It adds the parent directory of 'main.py' to the Python path.
-# Now you can safely use imports like `from core.player_info.stats import PlayerStats`
-# inside your cogs.
 
 # --- Load Token & Guild ID ---
 load_dotenv()
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-GUILD_ID = os.getenv('GUILD_ID')
+TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+GUILD_ID = os.getenv("GUILD_ID")
 
 if TOKEN is None:
     print("CRITICAL ERROR: DISCORD_BOT_TOKEN not found in .env file.")
@@ -41,25 +38,31 @@ if TOKEN is None:
     exit()
 
 if GUILD_ID is None:
-    print("Warning: GUILD_ID not found in .env file. Slash commands will be registered globally, which can take up to an hour to update.")
-    logger.warning("GUILD_ID not found in .env file. Slash commands will be registered globally.")
+    print(
+        "Warning: GUILD_ID not found in .env file. Slash commands will be registered globally, which can take up to an hour to update."
+    )
+    logger.warning(
+        "GUILD_ID not found in .env file. Slash commands will be registered globally."
+    )
+
 
 # --- Bot Class ---
 class EldoriaBot(commands.Bot):
     """
     Main Bot class for Eldoria Quest.
     """
+
     def __init__(self):
         # Define the intents your bot needs
         intents = discord.Intents.default()
-        intents.message_content = True # Required for reading !commands
-        intents.members = True         # Optional: for greeting new members
+        intents.message_content = True  # Required for reading !commands
+        intents.members = True  # Optional: for greeting new members
 
         super().__init__(
-            command_prefix='!', 
-            intents=intents, 
+            command_prefix="!",
+            intents=intents,
             activity=discord.Game(name="Eldoria | /start"),
-            help_command=None # We will build a custom one
+            help_command=None,  # We will build a custom one
         )
 
     async def setup_hook(self):
@@ -69,17 +72,19 @@ class EldoriaBot(commands.Bot):
         """
         print("--- Loading Cogs ---")
         logger.info("Loading Cogs...")
-        
-        # Make sure you have a 'cogs' folder in the same directory as main.py
-        cogs_dir = os.path.join(ROOT_DIR, 'cogs')
+
+        cogs_dir = os.path.join(ROOT_DIR, "cogs")
         if not os.path.exists(cogs_dir):
             os.makedirs(cogs_dir)
             logger.warning("No 'cogs' directory found. Created one.")
             print("No 'cogs' directory found. I've created one for you.")
 
         for filename in os.listdir(cogs_dir):
-            if filename.endswith('.py') and not filename.startswith('__'):
-                cog_name = f'cogs.{filename[:-3]}'
+            # --- THIS IS THE FIX ---
+            # We only load files that end in .py AND do NOT start with an underscore.
+            # This correctly skips __init__.py and any _helper.py files.
+            if filename.endswith(".py") and not filename.startswith("_"):
+                cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)
                     print(f"  [+] Loaded: {cog_name}")
@@ -89,7 +94,7 @@ class EldoriaBot(commands.Bot):
                     print(f"  [!] FAILED to load: {cog_name}")
                     logger.error(f"Failed to load extension {cog_name}.", exc_info=True)
                     traceback.print_exc()
-        
+
         print("--- Cog loading complete ---")
 
         # Sync slash commands to the specific guild for instant updates
@@ -110,11 +115,12 @@ class EldoriaBot(commands.Bot):
         Called when the bot is fully connected and ready.
         """
         print("-------------------------------------------------")
-        print(f'Logged in as: {self.user.name} (ID: {self.user.id})')
-        print(f'Discord.py Version: {discord.__version__}')
+        print(f"Logged in as: {self.user.name} (ID: {self.user.id})")
+        print(f"Discord.py Version: {discord.__version__}")
         print("Eldoria is online and ready for adventure!")
         print("-------------------------------------------------")
         logger.info(f"Bot '{self.user.name}' is online and ready.")
+
 
 from database.create_database import create_tables
 from database.populate_database import main as populate_db
@@ -128,10 +134,10 @@ if __name__ == "__main__":
     print("--- Database Initialized and Populated ---")
 
     bot = EldoriaBot()
-    
+
     try:
         # This starts the bot
-        bot.run(TOKEN, log_handler=handler) 
+        bot.run(TOKEN, log_handler=handler)
     except discord.errors.LoginFailure:
         logger.critical("Improper token passed. Bot cannot log in.")
         print("\nError: Improper token passed. Please check your .env file.")

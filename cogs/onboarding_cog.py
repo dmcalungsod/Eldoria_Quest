@@ -23,7 +23,8 @@ import game_systems.data.emojis as E
 # --- Handoff Import ---
 # We import the GuildCardView from the *other* cog.
 # This is the handoff from onboarding to the main guild menu.
-from .guild_cog import GuildCardView
+# --- CORRECTED IMPORT ---
+from .guild_hub_cog import GuildCardView 
 
 
 # ======================================================================
@@ -252,7 +253,6 @@ class CharacterMenuView(View):
             # Create the Guild Card embed
             embed = discord.Embed(
                 title=f"{E.SCROLL} Guild Card",
-                # --- TYPO FIX ---
                 description=f"This card certifies that **{card_data['name']}** is a registered member of The Eldorian Adventurer’s Consortium.",
                 color=discord.Color.dark_gold(),
             )

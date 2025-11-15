@@ -1,5 +1,5 @@
 """
-ui_helpers.py
+_ui_helpers.py
 
 Contains shared helper functions for the UI, primarily the
 global "back" button callback to prevent circular imports.
