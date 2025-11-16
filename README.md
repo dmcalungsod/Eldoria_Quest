@@ -1,144 +1,122 @@
 # 🌑 **Eldoria Quest**
 
-### _A Dark High-Fantasy Idle RPG Discord Bot_
+### _A Dark High-Fantasy Survival RPG Discord Bot_
 
 Inspired by:
 
-- **Danmachi** — guild ranks, dungeon progression, structured growth
-- **Grimgar of Fantasy and Ash** — grounded survival, emotional weight, realism
-- **Classic literary fantasy** — atmospheric, book-like narration
+- **Danmachi** — guild ranks, dungeon structure, steady progression
+- **Grimgar of Fantasy and Ash** — grounded danger, fragile mortality, material-driven survival
+- **Literary fantasy** — atmospheric narration, immersive tone, worldbuilding through text
 
 ---
 
-<p align="center">
-  <img src="https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/not_open_source-grey?style=for-the-badge"/>
-</p>
+\<p align="center"\>
+  \<img src="[https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge](https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge)"/\>
+  \<img src="[https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge](https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge)"/\>
+  \<img src="[https://img.shields.io/badge/not_open_source-grey?style=for-the-badge](https://img.shields.io/badge/not_open_source-grey?style=for-the-badge)"/\>
+\</p\>
 
 ---
 
 # 🜁 **World & Theme**
 
-**Eldoria Quest** is a private, personal RPG system set in a fractured world reshaped by **The Sundering**—a magical catastrophe that shattered the Veil and unleashed horrors across the realm.
+**Eldoria Quest** unfolds in a world shattered by **The Sundering**, a cataclysm that tore apart the Veil and unleashed horrors across the realm.
 
-Civilization survives only within fortified enclaves like **Astraeon**, the capital city where the **Adventurer’s Guild** operates. Adventurers fight not for glory, but survival.
+Civilization survives only inside fortified enclaves such as **Astraeon**, home of the **Adventurer’s Guild**—an institution born from necessity rather than prestige. Adventurers are not heroes; they are workers who risk their lives so the city may endure.
+
+Your character serves the Guild with the official occupation of **Adventurer**, tasked with reclaiming the wilds one dangerous step at a time.
 
 The game blends:
 
-- **Guild-Driven Progression** (Danmachi-Style)
-- **Material-Based Economy & Harsh Survival** (Grimgar-Style)
-- **Literary, atmospheric narration** for every action
+- **Guild-driven structure** (Danmachi)
+- **Material-based survival realism** (Grimgar)
+- **Literary, atmospheric narration** across all actions
 
 ---
 
-# ⭐ Design Philosophy
+# ⭐ **Design Philosophy**
 
-### 🜄 Loot-Driven Economy (Danmachi-Style)
+### 🜄 Material-Driven Survival (Danmachi-Style Economics)
 
-- Monsters do **not** drop coins.
-- They drop **Magic Stones** and **Monster Materials** (fangs, claws, hides).
-- All currency (**Aurum**) comes from selling materials at the **Guild Exchange**.
-- Every adventure becomes a calculated risk for better loot.
+- Monsters drop **Magic Stones** and **Monster Materials**, not currency.
+- All Aurum is earned by selling materials at the **Guild Exchange**.
+- Every expedition is a calculated risk with uncertain profit.
 
-### 🜃 Immersive UI & Narrative (Grimgar-Style)
+### 🜃 Story-Focused Immersion (Grimgar-Style)
 
-- A single persistent **“ONE UI”** message — minimal slash commands.
-- Combat plays out automatically with suspenseful **1.5-second turn delays**.
-- Narration is both **class-aware** (Mages cast spells, Warriors cleave) and **monster-aware**.
-- Player **HP/MP persists** between actions and must be healed manually or by resting.
-
----
-
-# 🜂 Core Gameplay Loop
-
-1.  **Register** — Use `/start` to create your character, choose a class, and receive your **Guild Card**.
-2.  **Explore** — From the profile UI, choose a location and press **"Explore"**.
-3.  **Survive** — Each press of "Explore" triggers one of two events:
-    - **Combat (60%):** You encounter a monster. The battle plays out automatically, with your character using skills and attacks via an "Auto-Skill AI".
-    - **Rest (40%):** You find nothing, "catch your breath," and regenerate a small amount of HP and MP based on your stats.
-4.  **Manage** — During the adventure, you can press **"Inventory"** to pause and use a potion or equip a newly looted item.
-5.  **Return** — Click **"Return to City"** to end your adventure. This banks your EXP and fully restores your HP and MP. If you die, you are forcibly returned with 1 HP.
-6.  **Progress** — Back at the **Guild Hall**, you can sell materials at the **Guild Exchange**, turn in quests, and request promotion to the next Guild Rank (F → SSS).
+- Almost the entire game runs through a single persistent **ONE UI** message.
+- Exploration is **manual**, turn-based, and intentionally slow-paced.
+- Every action is narrated with book-like atmosphere and class awareness.
+- HP/MP persist between actions — healing is precious.
 
 ---
 
-# 🧩 Major Features
+# 🜂 **Core Gameplay Loop**
 
-- Persistent **"ONE UI" System** (No slash commands needed after `/start`)
-- **Manual Exploration** (button-driven, not timed)
-- **Turn-by-Turn Combat Playback** (1.5s delay for suspense)
-- **Auto-Skill Combat AI** (Mages cast spells, Clerics heal, Warriors strike)
-- **"Explore-to-Regen"** HP/MP System
-- **Loot-Only Economy** (Materials must be sold at the Guild)
-- **Full Equipment System** (Equip/Unequip from inventory, stats auto-recalculate)
-- **Full Consumable System** (Use potions to heal persistent HP)
-- **Persistent Player Vitals** (HP/MP are saved to the database)
-- **Detailed Guild Rank System** (F to SSS) with promotion checks
-- **Quest System** with automatic "defeat" and "collect" objective tracking
+1.  **Begin** — Use `/start` to join the Adventurer’s Guild and receive your Guild Card.
+2.  **Prepare** — Manage your equipment and view your character’s Ledger.
+3.  **Press Forward** — Choose a location and advance through it step by step:
+
+- **Combat (60%)** — Auto-resolved battles narrated turn-by-turn.
+   - **Regeneration (40%)** — You pause to breathe and recover HP/MP.
+
+4.  **Field Pack** — Access inventory mid-adventure to equip items or use potions.
+5.  **Withdraw to Astraeon City** — Return to the city to restore fully and finalize gains.
+6.  **Advance** — Sell materials, complete quests, and rise through Guild Ranks (F → SSS).
 
 ---
 
-# 🗂️ Project Structure
+# 🧩 **Major Features**
+
+- Persistent **ONE UI** interface
+- Manual, button-driven exploration
+- Turn-by-turn combat playback (1.5s suspense delay)
+- Auto-skill combat AI (class-aware decision making)
+- Real HP/MP persistence with no auto-healing
+- Material-based economy (no monster gold drops)
+- Complete equipment + consumable system
+- Inventory access during expeditions
+- Guild Ranks with promotion requirements
+- Quest Board + passive quest progression
+
+---
+
+# 🗂️ **Project Structure**
 
 ```
-
 eldoria-bot/
-├─ main.py \# Bot entry point
+├─ main.py                     # Bot entry point
 ├─ README.md
 ├─ requirements.txt
 │
 ├─ cogs/
-│ ├─ onboarding_cog.py \# /start, character creation
-│ ├─ character_cog.py \# Profile, Inventory, Skills UI
-│ ├─ guild_hub_cog.py \# Guild Hall, Rank Up, Exchange UI
-│ ├─ quest_hub_cog.py \# Quest Board and Quest Log UI
-│ ├─ adventure_commands.py \# The main "Explore" adventure UI
-│ └─ ui_helpers.py \# Shared navigation functions (back_to_profile...)
+│ ├─ onboarding_cog.py         # /start, character creation
+│ ├─ character_cog.py          # Profile, Ledger, Inventory, Skills UI
+│ ├─ guild_hub_cog.py          # Guild Hall, Rank Up, Exchange
+│ ├─ quest_hub_cog.py          # Quest Board + Quest Log UI
+│ ├─ adventure_commands.py     # Main exploration and adventure UI
+│ └─ ui_helpers.py             # Shared navigation functions
 │
 ├─ database/
-│ ├─ database_manager.py \# DB interface (CRUD operations)
-│ ├─ create_database.py \# The master schema
-│ └─ populate_database.py \# Fills DB with items, monsters, quests
+│ ├─ database_manager.py
+│ ├─ create_database.py
+│ └─ populate_database.py
 │
 ├─ game_systems/
-├─ adventure/
-│ ├─ adventure_manager.py
-│ └─ adventure_session.py
-├─ combat/
-│ ├─ combat_engine.py
-│ ├─ combat_phrases.py
-│ └─ damage_formula.py
-├─ data/
-│ ├─ class_data.py
-│ ├─ monsters.py
-│ ├─ materials.py
-│ ├─ consumables.py
-│ ├─ skills_data.py
-│ └─ ... (etc)
-├─ guild_system/
-│ ├─ guild_exchange.py
-│ ├─ quest_system.py
-│ ├─ rank_system.py
-│ └─ reward_system.py
-├─ items/
-│ ├─ item_manager.py
-│ ├─ inventory_manager.py
-│ ├─ equipment_manager.py
-│ └─ consumable_manager.py
-├─ monsters/
-│ └─ monster_actions.py
-├─ player/
-├─ player_creator.py
-├─ player_stats.py
-└─ level_up.py
-
+│ ├─ adventure/                # Exploration + session logic
+│ ├─ combat/                   # Combat engine, phrases, math
+│ ├─ data/                     # Classes, monsters, items, skills
+│ ├─ guild_system/             # Exchange, ranks, quests, rewards
+│ ├─ items/                    # Equipment & inventory managers
+│ ├─ monsters/                 # Monster AI logic
+│ └─ player/                   # Player stats + leveling
 ```
 
 ---
 
-# 🛡️ License & Ownership
+# 🛡️ **License & Ownership**
 
-This repository is **private intellectual property**. All source code, lore, mechanics, and documentation belong solely to the project owner.
+This project is **private intellectual property**.
+All code, assets, systems, and lore belong solely to the creator.
 
-**Not open-source. Not licensed for redistribution or reuse.**
+**Not open-source. Not licensed for reuse or redistribution.**
