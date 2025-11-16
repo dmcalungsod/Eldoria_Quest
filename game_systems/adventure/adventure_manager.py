@@ -98,7 +98,21 @@ class AdventureManager:
 
         if result_dict.get("dead", False):
             # Player is dead, grant 0 EXP but process loot
-            self._grant_rewards(session, 0)
+            stats_json = self.db.get_player_stats_json(discord_id)
+            player_stats = PlayerStats.from_dict(stats_json)
+            items_to_add = []
+            with self.db.get_connection() as conn:
+                items_to_add = self._grant_rewards(session, 0, conn, player_stats)
+            
+            for item in items_to_add:
+                self.inventory_manager.add_item(
+                    discord_id=discord_id,
+                    item_key=item["key"],
+                    item_name=item["name"],
+                    item_type=item["type"],
+                    rarity=item["rarity"],
+                    amount=item["amount"],
+                )
 
         return result_dict
 
@@ -107,7 +121,12 @@ class AdventureManager:
         Manually ends an adventure (e.g., "Return to City").
         Grants all collected EXP and loot.
         """
-        # --- MODIFIED: Use context manager ---
+        
+        stats_json = self.db.get_player_stats_json(discord_id)
+        player_stats = PlayerStats.from_dict(stats_json)
+
+        items_to_add = [] 
+
         with self.db.get_connection() as conn:
             cur = conn.cursor()
             cur.execute(
@@ -127,32 +146,43 @@ class AdventureManager:
 
                 total_exp = session.loot.pop("exp", 0)
 
-                # --- THIS IS THE FIX ---
-                # Pass the connection to _grant_rewards
-                self._grant_rewards(session, total_exp, conn)
-                # --- END OF FIX ---
+                items_to_add = self._grant_rewards(
+                    session, total_exp, conn, player_stats
+                )
 
                 cur.execute(
                     "UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?",
                     (discord_id,),
                 )
-        # --- Connection is automatically committed and closed here ---
+        
+        for item in items_to_add:
+            self.inventory_manager.add_item(
+                discord_id=discord_id,
+                item_key=item["key"],
+                item_name=item["name"],
+                item_type=item["type"],
+                rarity=item["rarity"],
+                amount=item["amount"],
+            )
 
-    # --- THIS FUNCTION IS REWRITTEN ---
+
     def _grant_rewards(
-        self, session: AdventureSession, total_exp: int, conn: sqlite3.Connection
-    ):
+        self,
+        session: AdventureSession,
+        total_exp: int,
+        conn: sqlite3.Connection,
+        player_stats: PlayerStats, 
+    ) -> list: 
         """
         (Internal) Grants EXP and Items to the player's main profile.
         Uses the connection passed in from end_adventure to prevent db locks.
+        Returns a list of items to be added to inventory.
+        
+        --- THIS VERSION ONLY HEALS MP, NOT HP ---
         """
         cur = conn.cursor()
         cur.execute("SELECT * FROM players WHERE discord_id = ?", (session.discord_id,))
         player_row = cur.fetchone()
-
-        # We need a separate connection to read stats, this is fine
-        stats_json = self.db.get_player_stats_json(session.discord_id)
-        player_stats = PlayerStats.from_dict(stats_json)
 
         level_system = LevelUpSystem(
             stats=player_stats,
@@ -162,10 +192,8 @@ class AdventureManager:
         )
 
         if total_exp > 0:
-            # Add EXP to the level-up bar
             level_system.add_exp(total_exp)
 
-            # Update the player's level, exp, and exp_to_next
             cur.execute(
                 """
                 UPDATE players
@@ -180,31 +208,30 @@ class AdventureManager:
                 ),
             )
 
-            # Add the same EXP to the spendable "Vestige" pool
             cur.execute(
                 "UPDATE players SET vestige_pool = vestige_pool + ? WHERE discord_id = ?",
                 (total_exp, session.discord_id),
             )
 
-        # --- Restore Vitals ---
-        new_max_hp = level_system.stats.max_hp
-        new_max_mp = level_system.stats.max_mp
+        # --- Restore Vitals (THE FIX IS HERE) ---
+        new_max_mp = level_system.stats.max_mp # We only care about MP
+        
+        # Get the HP the player ended the adventure with
+        current_hp_from_db = player_row['current_hp']
+        
+        # If they died, set HP to 1. Otherwise, it stays as-is.
+        hp_to_save = 1 if current_hp_from_db <= 0 else current_hp_from_db
+        
+        # Always restore MP
+        mp_to_save = new_max_mp  
 
-        hp_to_save = 1
-        mp_to_save = new_max_mp  # Always restore MP
-
-        if total_exp > 0:
-            # Player returned manually, full heal
-            hp_to_save = new_max_hp
-
-        # If total_exp == 0, player died. hp_to_save remains 1.
         cur.execute(
             "UPDATE players SET current_hp = ?, current_mp = ? WHERE discord_id = ?",
             (hp_to_save, mp_to_save, session.discord_id),
         )
+        # --- END OF FIX ---
 
         # Add Materials to Inventory
-        # This function opens its own connection, so we'll do it outside the lock
         items_to_add = []
         for item_key, count in session.loot.items():
             mat_data = MATERIALS.get(item_key)
@@ -225,20 +252,8 @@ class AdventureManager:
                     "amount": count,
                 }
             )
-
-        # Now that the connection from end_adventure is closed (or will be),
-        # we can safely call the inventory manager.
-        for item in items_to_add:
-            self.inventory_manager.add_item(
-                discord_id=session.discord_id,
-                item_key=item["key"],
-                item_name=item["name"],
-                item_type=item["type"],
-                rarity=item["rarity"],
-                amount=item["amount"],
-            )
-
-    # --- END OF REWRITE ---
+            
+        return items_to_add
 
     async def fail_adventure(self, session: AdventureSession):
         """

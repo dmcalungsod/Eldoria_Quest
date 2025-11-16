@@ -242,6 +242,27 @@ class CharacterProfileView(View):
                 description=resume_description,
                 color=discord.Color.green(),
             )
+            
+            # --- THIS IS THE FIX ---
+            # We must fetch player_stats and vitals to add the "Vitals" field
+            stats_json = await asyncio.to_thread(
+                self.db.get_player_stats_json, self.interaction_user.id
+            )
+            player_stats = PlayerStats.from_dict(stats_json)
+            vitals = await asyncio.to_thread(
+                self.db.get_player_vitals, self.interaction_user.id
+            )
+
+            embed.add_field(
+                name="Vitals",
+                value=(
+                    f"> {E.HP} **HP:** {vitals['current_hp']} / {player_stats.max_hp}\n"
+                    f"> {E.MP} **MP:** {vitals['current_mp']} / {player_stats.max_mp}"
+                ),
+                inline=True
+            )
+            # --- END OF FIX ---
+            
             embed.set_footer(text="Your previous session was recovered.")
 
             view = ExplorationView(
@@ -250,6 +271,7 @@ class CharacterProfileView(View):
                 loc_id,
                 log,
                 self.interaction_user,
+                player_stats  # <-- And pass stats to the view
             )
             await interaction.edit_original_response(embed=embed, view=view)
             return

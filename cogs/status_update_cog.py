@@ -140,7 +140,7 @@ class StatusUpdateView(View):
         lck_button.callback = self.stat_button_callback
         self.add_item(lck_button)
 
-    # --- NEW HELPER FOR ASYNC ---
+    # --- THIS FUNCTION CONTAINS THE FIX ---
     def _execute_stat_increase(self, stat_to_increase: str, cost: int) -> Tuple[bool, str, int]:
         """Returns (success, error_message, new_vestige)"""
         with self.db.get_connection() as conn:
@@ -153,14 +153,29 @@ class StatusUpdateView(View):
             if current_vestige < cost:
                 return (False, "You do not have enough Vestige for this.", 0)
 
-            new_vestige_pool = current_vestige - cost
+            # --- START OF FIX ---
+            # 1. Apply the stat change *in memory* first
             self.player_stats.add_base_stat(stat_to_increase, 1)
+            
+            # 2. Get the NEW max vitals from the updated stats object
+            new_max_hp = self.player_stats.max_hp
+            new_max_mp = self.player_stats.max_mp
+            # --- END OF FIX ---
 
-            # Update Vestige pool
+            new_vestige_pool = current_vestige - cost
+
+            # Update Vestige pool AND set current HP/MP to their new max
             cur.execute(
-                "UPDATE players SET vestige_pool = ? WHERE discord_id = ?",
-                (new_vestige_pool, self.interaction_user.id),
+                """
+                UPDATE players 
+                SET vestige_pool = ?,
+                    current_hp = ?,
+                    current_mp = ?
+                WHERE discord_id = ?
+                """,
+                (new_vestige_pool, new_max_hp, new_max_mp, self.interaction_user.id),
             )
+            
             # Update base stats in the stats table
             cur.execute(
                 "UPDATE stats SET stats_json = ? WHERE discord_id = ?",
@@ -200,7 +215,7 @@ class StatusUpdateView(View):
 
         await interaction.edit_original_response(embed=new_embed, view=new_view)
         await interaction.followup.send(
-            f"{E.CHECK} Your **{stat_to_increase}** has increased!", ephemeral=True
+            f"{E.CHECK} Your **{stat_to_increase}** has increased! Your vitals have been refreshed.", ephemeral=True
         )
 
     @staticmethod

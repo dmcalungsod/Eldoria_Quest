@@ -99,6 +99,7 @@ class QuestLogView(View):
         self.back_button.label = label
         self.back_button.callback = callback_function
 
+    # --- THIS FUNCTION IS MODIFIED ---
     async def complete_quest_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         quest_id = int(self.quest_select.values[0])
@@ -109,17 +110,30 @@ class QuestLogView(View):
         )
         # --- END FIX ---
 
-        await interaction.followup.send(message, ephemeral=True)
+        # --- THIS IS THE FIX ---
+        # We no longer send an ephemeral followup.
+        # We will set the embed description to the message.
+        if not success:
+            # If it failed, send the error message as an ephemeral followup
+            await interaction.followup.send(message, ephemeral=True)
+            return
+        
+        # On success, 'message' contains the reward text.
+        # We will use this as the new embed description.
+        # --- END OF FIX ---
 
         # --- Refresh the View In-Place ---
-        # --- ASYNC FIX ---
         new_active_quests = await asyncio.to_thread(
             self.quest_system.get_player_quests, self.interaction_user.id
         )
-        # --- END FIX ---
         
         embed = interaction.message.embeds[0]
+        
+        # --- THIS IS THE FIX ---
+        # Set the embed description to the success message
+        embed.description = message
         embed.clear_fields()
+        # --- END OF FIX ---
 
         if not new_active_quests:
             embed.add_field(
@@ -145,6 +159,7 @@ class QuestLogView(View):
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=new_view)
+    # --- END OF MODIFICATION ---
 
 
 # ======================================================================

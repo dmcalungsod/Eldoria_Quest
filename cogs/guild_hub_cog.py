@@ -268,13 +268,43 @@ class GuildCardView(View):
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
-    # --- THIS IS THE NEW BUTTON ---
+    # --- THIS IS THE NEW BUTTON (ROW 2) ---
+    @discord.ui.button(
+        label="Infirmary",
+        style=discord.ButtonStyle.secondary,
+        custom_id="guild_infirmary",
+        emoji="❤️‍🩹",
+        row=2,
+    )
+    async def infirmary_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the new Guild Infirmary UI.
+        """
+        await interaction.response.defer()
+        
+        from .infirmary_cog import InfirmaryView
+        from game_systems.player.player_stats import PlayerStats
+        
+        # We need both player data (for aurum/current_hp) and stats (for max_hp)
+        player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+        
+        player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
+        player_stats = PlayerStats.from_dict(stats_json)
+        
+        embed = InfirmaryView.build_infirmary_embed(player_data, player_stats)
+        view = InfirmaryView(self.db, self.interaction_user, player_data, player_stats)
+        await interaction.edit_original_response(embed=embed, view=view)
+    # --- END OF NEW BUTTON ---
+
     @discord.ui.button(
         label="Skill Trainer",
         style=discord.ButtonStyle.secondary,
         custom_id="skill_trainer",
         emoji="🧠",
-        row=2, # New row
+        row=3, # Moved to row 3
     )
     async def skill_trainer_callback(
         self, interaction: discord.Interaction, button: Button
@@ -293,7 +323,6 @@ class GuildCardView(View):
         embed = SkillTrainerView.build_skill_embed(player_data)
         view = SkillTrainerView(self.db, self.interaction_user, player_data)
         await interaction.edit_original_response(embed=embed, view=view)
-    # --- END OF NEW BUTTON ---
 
 
     @discord.ui.button(
@@ -301,7 +330,7 @@ class GuildCardView(View):
         style=discord.ButtonStyle.grey,
         custom_id="guild_back_profile",
         emoji="⬅️",
-        row=2, # New row
+        row=3, # Moved to row 3
     )
     async def back_to_profile(self, interaction: discord.Interaction, button: Button):
         # This function is already async!

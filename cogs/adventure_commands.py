@@ -11,6 +11,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Select, Button
+import sqlite3 # <-- Added for type hinting
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
@@ -42,21 +43,17 @@ class AdventureSetupView(View):
     This view is shown when "Start Adventure" is clicked on the profile.
     """
 
-    # --- MODIFIED __init__ ---
     def __init__(self, db, manager, interaction_user: discord.User, player_rank: str):
         super().__init__(timeout=None)
         self.db = db
         self.manager = manager
         self.interaction_user = interaction_user
-        # --- END MODIFICATION ---
 
         self.location_select = Select(
             placeholder="Choose a Zone...", min_values=1, max_values=1, row=0
         )
 
-        # --- REMOVED DB CALL, WE NOW USE THE PASSED-IN player_rank ---
         for loc_id, loc_data in LOCATIONS.items():
-            # This logic to check rank is not yet implemented, but the var is ready
             self.location_select.add_option(
                 label=loc_data["name"],
                 value=loc_id,
@@ -83,17 +80,21 @@ class AdventureSetupView(View):
         loc_id = self.location_select.values[0]
         loc_data = LOCATIONS[loc_id]
 
-        # --- ASYNC FIX ---
-        # Run the DB write in a thread
         await asyncio.to_thread(
             self.manager.start_adventure,
             interaction.user.id,
             loc_id,
             duration_minutes=-1
         )
-        # --- END FIX ---
 
-        # 2. Create the new Exploration View
+        stats_json = await asyncio.to_thread(
+            self.db.get_player_stats_json, interaction.user.id
+        )
+        player_stats = PlayerStats.from_dict(stats_json)
+        vitals = await asyncio.to_thread(
+            self.db.get_player_vitals, interaction.user.id
+        )
+
         initial_log = [
             f"You step past the threshold into the {loc_data['name']}. The air feels different."
         ]
@@ -104,11 +105,25 @@ class AdventureSetupView(View):
             color=discord.Color.green(),
         )
 
-        view = ExplorationView(
-            self.db, self.manager, loc_id, initial_log, self.interaction_user
+        # Add the Vitals field (with user's formatting)
+        embed.add_field(
+            name="Vitals",
+            value=(
+                f"> {E.HP} **HP:** {vitals['current_hp']} / {player_stats.max_hp}\n"
+                f"> {E.MP} **MP:** {vitals['current_mp']} / {player_stats.max_mp}"
+            ),
+            inline=True
         )
 
-        # 3. Edit the original message to show the new UI
+        view = ExplorationView(
+            self.db,
+            self.manager,
+            loc_id,
+            initial_log,
+            self.interaction_user,
+            player_stats
+        )
+
         await interaction.response.edit_message(embed=embed, view=view)
 
     @discord.ui.button(
@@ -118,7 +133,6 @@ class AdventureSetupView(View):
         row=1,
     )
     async def back_to_profile(self, interaction: discord.Interaction, button: Button):
-        # This function is already async!
         await back_to_profile_callback(interaction, is_new_message=False)
 
 
@@ -128,21 +142,45 @@ class ExplorationView(View):
     """
 
     def __init__(
-        self, db, manager, location_id, log: list, interaction_user: discord.User
+        self,
+        db,
+        manager,
+        location_id,
+        log: list,
+        interaction_user: discord.User,
+        player_stats: PlayerStats
     ):
         super().__init__(timeout=None)
         self.db = db
         self.manager = manager
         self.location_id = location_id
         self.log = log
-        self.log_limit = 10  # Max number of lines to show
+        self.log_limit = 10
         self.interaction_user = interaction_user
         self.inv_manager = InventoryManager(self.db)
+        self.player_stats = player_stats
 
-        # ... (button definitions are unchanged) ...
-        self.explore_button = Button(...)
-        self.inventory_button = Button(...)
-        self.leave_button = Button(...)
+        self.explore_button = Button(
+            label="Explore",
+            style=discord.ButtonStyle.success,
+            custom_id="adv_explore",
+            emoji="⚔️",
+            row=0,
+        )
+        self.inventory_button = Button(
+            label="Inventory",
+            style=discord.ButtonStyle.secondary,
+            custom_id="adv_inventory",
+            emoji=E.BACKPACK,
+            row=0,
+        )
+        self.leave_button = Button(
+            label="Return to City",
+            style=discord.ButtonStyle.danger,
+            custom_id="adv_leave",
+            emoji="⬅️",
+            row=0,
+        )
         
         self.explore_button.callback = self.explore_callback
         self.add_item(self.explore_button)
@@ -150,7 +188,6 @@ class ExplorationView(View):
         self.add_item(self.inventory_button)
         self.leave_button.callback = self.leave_callback
         self.add_item(self.leave_button)
-
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -160,58 +197,179 @@ class ExplorationView(View):
             return False
         return True
 
+    # --- NEW HELPER FUNCTION ---
+    def _update_embed_fields(
+        self,
+        embed: discord.Embed,
+        vitals: sqlite3.Row,
+        session_row: sqlite3.Row
+    ):
+        """Clears and redraws the embed fields for Vitals and Monster Vitals."""
+        embed.clear_fields()
+        
+        # 1. Add Player Vitals
+        embed.add_field(
+            name="Vitals",
+            value=(
+                f"> {E.HP} **HP:** {vitals['current_hp']} / {self.player_stats.max_hp}\n"
+                f"> {E.MP} **MP:** {vitals['current_mp']} / {self.player_stats.max_mp}"
+            ),
+            inline=True
+        )
+
+        # 2. Add Monster Vitals (if one is active)
+        active_monster = None
+        if session_row and session_row["active_monster_json"]:
+            try:
+                active_monster = json.loads(session_row["active_monster_json"])
+            except json.JSONDecodeError:
+                active_monster = None
+
+        if active_monster:
+            embed.add_field(
+                name="Monster Vitals",
+                value=(
+                    f"> 👹 **HP:** {active_monster['HP']} / {active_monster['max_hp']}"
+                ),
+                inline=True
+            )
+    # --- END HELPER FUNCTION ---
+
     async def explore_callback(self, interaction: discord.Interaction):
         """
-        The player takes a step forward in the dungeon.
+        The player takes an action (step) in the dungeon.
+
+        Behavior implemented:
+        - Show step log entries one-by-one for pacing.
+        - Vitals (player HP/MP and monster HP) are updated ONLY AFTER the step completes,
+          and only if they actually changed compared to the snapshot taken before the step.
         """
         await interaction.response.defer()
 
+        # Disable buttons while action is processed
         self.explore_button.disabled = True
         self.inventory_button.disabled = True
         self.leave_button.disabled = True
         await interaction.edit_original_response(view=self)
 
-        # --- ASYNC FIX ---
-        # This is the most important one!
-        # simulate_adventure_step runs the *entire* combat loop
-        result = await asyncio.to_thread(
-            self.manager.simulate_adventure_step, interaction.user.id
+        # --- Snapshot vitals and session BEFORE the step ---
+        prev_vitals, prev_session = await asyncio.gather(
+            asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
+            asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
         )
-        # --- END FIX ---
+
+        # Extract previous monster HP if present
+        prev_mon_hp = None
+        if prev_session and prev_session.get("active_monster_json"):
+            try:
+                prev_mon_hp = json.loads(prev_session["active_monster_json"]).get("HP")
+            except Exception:
+                prev_mon_hp = None
+
+        # --- Run the step (this may produce multiple log lines) ---
+        result = await asyncio.to_thread(
+            self.manager.simulate_adventure_step,
+            interaction.user.id
+        )
 
         log_entries = result.get("log", ["An unknown error occurred."])
         is_dead = result.get("dead", False)
-        embed = interaction.message.embeds[0]
 
+        # We'll need the original embed to copy its static fields while we stream logs
+        original_embed = interaction.message.embeds[0]
+        original_fields = list(original_embed.fields)  # copy so we can re-add them each update
+
+        # --- Stream log entries (pacing) but DO NOT change vitals yet ---
         for entry in log_entries:
             self.log.append(entry)
             if len(self.log) > self.log_limit:
-                self.log = self.log[-self.log_limit :]
+                self.log = self.log[-self.log_limit:]
 
-            new_description = "\n".join(self.log)
-            embed.description = new_description
+            # Rebuild a fresh embed for reliability and to avoid caching quirks
+            embed = discord.Embed(
+                title=original_embed.title,
+                description="\n".join(self.log),
+                color=original_embed.color
+            )
+
+            # Re-add original fields (these still show the previous vitals until we update them below)
+            for f in original_fields:
+                # Use the field's attributes to re-add (name, value, inline)
+                embed.add_field(name=f.name, value=f.value, inline=f.inline)
+
+            # Push this log update
             await interaction.edit_original_response(embed=embed)
+            await asyncio.sleep(1.2)  # pacing for readability
 
-            await asyncio.sleep(1.5) # This is already non-blocking, so it's fine
+        # --- After the entire step finishes, fetch final vitals & session once ---
+        final_vitals, final_session = await asyncio.gather(
+            asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
+            asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
+        )
 
+        # Extract final monster HP if present
+        final_mon_hp = None
+        if final_session and final_session.get("active_monster_json"):
+            try:
+                final_mon_hp = json.loads(final_session["active_monster_json"]).get("HP")
+            except Exception:
+                final_mon_hp = None
+
+        # Compare snapshots to determine whether to update vitals fields
+        player_hp_changed = final_vitals["current_hp"] != prev_vitals["current_hp"]
+        player_mp_changed = final_vitals["current_mp"] != prev_vitals["current_mp"]
+        monster_hp_changed = final_mon_hp != prev_mon_hp
+
+        # Only rebuild fields if there's a change (Option C)
+        embed = discord.Embed(
+            title=original_embed.title,
+            description="\n".join(self.log),
+            color=original_embed.color
+        )
+
+        if player_hp_changed or player_mp_changed or monster_hp_changed:
+            # Refresh player_stats in case max_hp/max_mp changed during the step
+            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
+            try:
+                self.player_stats = PlayerStats.from_dict(stats_json)
+            except Exception:
+                # keep existing if parse fails
+                pass
+
+            # Update the fields to reflect final vitals & monster
+            self._update_embed_fields(embed, final_vitals, final_session)
+        else:
+            # No vitals changed — re-add the original fields as-is
+            for f in original_fields:
+                embed.add_field(name=f.name, value=f.value, inline=f.inline)
+
+        # --- End of step — if dead, handle defeat specially ---
         if is_dead:
             embed.color = discord.Color.red()
             embed.set_footer(text="You have been defeated! Your adventure is over.")
 
+            self.explore_button.disabled = True
+            self.inventory_button.disabled = True
+            self.leave_button.disabled = False  # allow leaving
+
             await interaction.edit_original_response(embed=embed, view=self)
 
-            return_embed = discord.Embed(
+            death_embed = discord.Embed(
                 title=f"{E.DEFEAT} Defeated!",
                 description="You were recovered by the Guild. Your adventure is over.",
                 color=discord.Color.dark_red(),
             )
-            await interaction.followup.send(embed=return_embed, ephemeral=True)
+            # Send non-ephemeral death message so the user notices
+            await interaction.followup.send(embed=death_embed, ephemeral=False)
+            return
 
-        else:
-            self.explore_button.disabled = False
-            self.inventory_button.disabled = False
-            self.leave_button.disabled = False
-            await interaction.edit_original_response(embed=embed, view=self)
+        # --- If not dead, re-enable buttons and persist final display ---
+        self.explore_button.disabled = False
+        self.inventory_button.disabled = False
+        self.leave_button.disabled = False
+        await interaction.edit_original_response(embed=embed, view=self)
+
+    # --- END OF explore_callback ---
 
     async def inventory_callback(self, interaction: discord.Interaction):
         """
@@ -221,12 +379,10 @@ class ExplorationView(View):
 
         await interaction.response.defer()
         
-        # --- ASYNC FIX ---
         items = await asyncio.to_thread(
             self.inv_manager.get_inventory, interaction.user.id
         )
         embed = await asyncio.to_thread(build_inventory_embed, items)
-        # --- END FIX ---
 
         view = InventoryView(
             db_manager=self.db,
@@ -242,14 +398,31 @@ class ExplorationView(View):
         """
         await interaction.response.defer()
 
+        # --- MODIFIED: Must fetch all data to rebuild embed correctly ---
+        vitals_task = asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+        session_row_task = asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
+        
+        vitals, session_row = await asyncio.gather(vitals_task, session_row_task)
+        # --- END MODIFIED ---
+
         embed = discord.Embed(
             title=f"{LOCATIONS[self.location_id].get('emoji', E.MAP)} Exploring: {LOCATIONS[self.location_id]['name']}",
             description="\n".join(self.log),
             color=discord.Color.green(),
         )
 
+        # --- NEW: Rebuild fields using the helper ---
+        # We can re-use self.player_stats as it's stored on the view
+        self._update_embed_fields(embed, vitals, session_row)
+        # --- END NEW ---
+
         new_view = ExplorationView(
-            self.db, self.manager, self.location_id, self.log, self.interaction_user
+            self.db,
+            self.manager,
+            self.location_id,
+            self.log,
+            self.interaction_user,
+            self.player_stats
         )
 
         await interaction.edit_original_response(embed=embed, view=new_view)
@@ -258,12 +431,9 @@ class ExplorationView(View):
         """
         The player decides to leave the adventure and return to the Guild Hall.
         """
-        await interaction.response.defer() # Defer *before* the blocking call
+        await interaction.response.defer()
 
-        # --- ASYNC FIX ---
-        # end_adventure is a heavy blocking call
-        await asyncio.to_thread(self.manager.end_adventure, interaction.user.id)
-        # --- END FIX ---
+        await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
 
         embed = discord.Embed(
             title="Returned to City",
@@ -273,7 +443,6 @@ class ExplorationView(View):
 
         await interaction.followup.send(embed=embed, ephemeral=True)
         
-        # This callback is now fully async, so we can await it
         await back_to_profile_callback(interaction, is_new_message=False)
 
 

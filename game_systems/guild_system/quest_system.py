@@ -310,4 +310,7 @@ class QuestSystem:
         conn.commit()
         conn.close()
 
-        return True, f"{E.QUEST_SCROLL} **Quest Completed!**\n\n{reward_msg}"
+        # --- THIS IS THE FIX ---
+        # Return only the reward message, not extra text
+        return True, reward_msg
+        # --- END OF FIX ---
