@@ -85,6 +85,7 @@ class RewardSystem:
             "Your achievements have been recorded in the annals of the\n"
             "**Adventurer's Guild**.\n\n"
             f"{E.EXP} **EXP Gained:** `+{exp_reward}`\n"
+            f"{E.VESTIGE} **Vestige Gained:** `+{exp_reward}`\n" # FIX: Added Vestige reward line with new emoji
             f"{E.AURUM} **Aurum Earned:** `+{aurum_reward}`\n"
             f"{E.GUILD_MERIT} **Guild Merit:** `+{merit_reward}`"
         )

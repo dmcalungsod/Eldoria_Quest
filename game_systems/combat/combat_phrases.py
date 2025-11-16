@@ -197,6 +197,39 @@ class CombatPhrases:
             f"Calling upon **{skill_name}**, you feel vitality return, healing `{heal_amount}` HP.",
         ]
         return f"{random.choice(phrases)}"
+    
+    # FIX: Add player_buff method for utility skills like Mana Shield/Endure
+    @staticmethod
+    def player_buff(player: LevelUpSystem, skill: dict) -> str:
+        """
+        Called when the player uses a buff/utility skill (like Mana Shield).
+        """
+        skill_name = skill.get("name", "a buff spell")
+
+        if skill.get("key_id") == "mana_shield":
+             phrases = [
+                f"You focus, creating the **Mana Shield**! Damage will now drain MP for a time.",
+                f"Arcane will hardens, forming the **Mana Shield** around you.",
+                f"Energy flows outward— **Mana Shield** activated.",
+            ]
+        elif skill.get("key_id") == "endure":
+            phrases = [
+                f"You brace, invoking **Endure** to shrug off the next blows.",
+                f"Your resolve firms; **Endure** makes you an unmoving fortress.",
+            ]
+        elif skill.get("key_id") == "blessing":
+            phrases = [
+                f"A divine light settles over you— **Blessing** of the Ancients granted!",
+                f"You utter a sacred word; **Blessing** enhances your abilities.",
+            ]
+        else:
+            phrases = [
+                f"You cast **{skill_name}**! The unseen energies protect you.",
+                f"A brief moment of concentration; **{skill_name}** affects your state.",
+            ]
+
+        return f"{E.BUFF} {random.choice(phrases)}"
+    # END FIX
 
     @staticmethod
     def monster_attack(

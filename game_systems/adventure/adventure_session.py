@@ -248,10 +248,11 @@ class AdventureSession:
 
         player_class_id = p_row["class_id"] if p_row else 0
 
+        # FIX: Added s.buff_data to the skill fetch query
         cur.execute(
             """
             SELECT s.key_id, s.name, s.type, ps.skill_level,
-                   s.mp_cost, s.power_multiplier, s.heal_power
+                   s.mp_cost, s.power_multiplier, s.heal_power, s.buff_data
             FROM player_skills ps
             JOIN skills s ON ps.skill_key = s.key_id
             WHERE ps.discord_id = ? AND s.type = 'Active'
@@ -262,6 +263,15 @@ class AdventureSession:
         conn.close()
 
         player_skills = [dict(row) for row in player_skills_raw]
+
+        # FIX: Deserialize buff_data for combat engine
+        for skill in player_skills:
+            if skill["buff_data"]:
+                try:
+                    skill["buff_data"] = json.loads(skill["buff_data"])
+                except json.JSONDecodeError:
+                    skill["buff_data"] = {}
+        # END FIX
 
         player_wrapper = LevelUpSystem(
             stats=player_stats,

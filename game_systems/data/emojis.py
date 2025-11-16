@@ -9,6 +9,7 @@ Exports constants for both custom (ID-based) and standard unicode emojis.
 # Format: <:name:id>
 AURUM = "<:gold_coin:1194437266903404596>"
 GUILD_MERIT = "<:guild_prestige:1194437270363701338>"
+VESTIGE = "<:vestige:1439467043467427850>"
 
 # --- Standard Unicode Emojis ---
 
@@ -57,15 +58,15 @@ HERB = "🌿"
 
 # --- NEW: ANSI Color Definitions ---
 RARITY_COLORS = {
-    "Common": "[0;37m",  # Grey/White
-    "Uncommon": "[0;32m",  # Green
-    "Rare": "[0;34m",  # Blue
-    "Epic": "[0;35m",  # Purple
-    "Legendary": "[0;33m",  # Yellow/Gold
-    "Mythical": "[0;31m",  # Red
-    "DEFAULT": "[0;37m",  # Default to grey
+    "Common": " [0;37m",  # Grey/White
+    "Uncommon": " [0;32m",  # Green
+    "Rare": " [0;34m",  # Blue
+    "Epic": " [0;35m",  # Purple
+    "Legendary": " [0;33m",  # Yellow/Gold
+    "Mythical": " [0;31m",  # Red
+    "DEFAULT": " [0;37m",  # Default to grey
 }
-ANSI_RESET = "[0m"
+ANSI_RESET = " [0m"
 
 
 def get_rarity_ansi(rarity_name: str, text: str) -> str:

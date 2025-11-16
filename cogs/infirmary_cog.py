@@ -52,8 +52,8 @@ class InfirmaryView(View):
 
         # --- Add the Heal Button ---
         heal_button = Button(
-            # --- FIX: Removed E.AURUM from label ---
-            label=f"Heal Wounds ({self.heal_cost} Aurum)",
+            # FIX: Re-added E.AURUM to button label to ensure display
+            label=f"Heal Wounds ({self.heal_cost} {E.AURUM})",
             style=discord.ButtonStyle.success,
             custom_id="infirmary_heal",
             emoji="❤️‍🩹",
@@ -64,8 +64,8 @@ class InfirmaryView(View):
             heal_button.label = "You are already at full health."
             heal_button.disabled = True
         elif self.current_aurum < self.heal_cost:
-            # --- FIX: Removed E.AURUM from label ---
-            heal_button.label = f"Not enough Aurum ({self.heal_cost})"
+            # FIX: Re-added E.AURUM to button label for the disabled state
+            heal_button.label = f"Not enough Aurum ({self.heal_cost} {E.AURUM})"
             heal_button.disabled = True
         
         heal_button.callback = self.heal_callback

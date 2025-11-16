@@ -11,7 +11,7 @@ from discord.ext import commands
 import json
 import sqlite3
 import math
-import asyncio # <-- IMPORT ASYNCIO
+import asyncio
 from typing import Tuple
 
 from database.database_manager import DatabaseManager
@@ -22,19 +22,20 @@ import game_systems.data.emojis as E
 from .ui_helpers import back_to_guild_hall_callback
 
 
+# --------------------------------------
 # Helper function for cost calculation
+# --------------------------------------
 def get_upgrade_cost(base_cost: int, current_level: int) -> int:
     """Calculates the Vestige cost to upgrade a skill."""
-    # Formula: BaseCost * (CurrentLevel ^ 1.8)
     cost = base_cost * math.pow(current_level, 1.8)
     return math.ceil(cost)
 
 
+# --------------------------------------
+# Skill Trainer View
+# --------------------------------------
 class SkillTrainerView(View):
-    """
-    The main UI for the Skill Trainer.
-    Allows learning new skills and upgrading existing ones.
-    """
+    """UI view for the skill trainer."""
 
     def __init__(
         self,
@@ -49,14 +50,14 @@ class SkillTrainerView(View):
         self.vestige_pool = player_data["vestige_pool"]
         self.player_class_id = player_data["class_id"]
 
-        # This is a blocking call, but it's in __init__
+        # Fetch player skills
         self.player_skills = self.get_player_skills()
 
-        # 2. Build the UI components
+        # Build UI components
         self.add_item(self.build_learn_select())
         self.add_item(self.build_upgrade_select())
 
-        # 3. Add the back button
+        # Back button
         back_button = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
@@ -75,7 +76,6 @@ class SkillTrainerView(View):
         return True
 
     def get_player_skills(self) -> dict:
-        """Fetches a dict of skills the player knows, keyed by skill_key."""
         conn = self.db.connect()
         cur = conn.cursor()
         cur.execute(
@@ -86,8 +86,10 @@ class SkillTrainerView(View):
         conn.close()
         return skills
 
+    # ------------------------------------------------
+    # Build Learn Select
+    # ------------------------------------------------
     def build_learn_select(self) -> Select:
-        """Builds the dropdown for skills the player can learn."""
         learn_select = Select(
             placeholder="Learn a new skill...", min_values=1, max_values=1, row=0
         )
@@ -109,20 +111,22 @@ class SkillTrainerView(View):
         for skill in learnable_skills:
             cost = skill["learn_cost"]
             learn_select.add_option(
-                label=f"{skill['name']} ({cost} Vestige)",
+                label=f"{skill['name']} ({cost} {E.VESTIGE})",
                 value=f"{skill['key_id']}:{cost}",
                 description=skill["description"][:100],
                 emoji="📖",
             )
-        
+
         if self.vestige_pool == 0:
             learn_select.placeholder = "You have no Vestige to learn skills."
 
         learn_select.callback = self.learn_skill_callback
         return learn_select
 
+    # ------------------------------------------------
+    # Build Upgrade Select
+    # ------------------------------------------------
     def build_upgrade_select(self) -> Select:
-        """Builds the dropdown for skills the player can upgrade."""
         upgrade_select = Select(
             placeholder="Upgrade an existing skill...",
             min_values=1,
@@ -148,9 +152,9 @@ class SkillTrainerView(View):
             upgrade_cost = get_upgrade_cost(base_cost, current_level)
 
             upgrade_select.add_option(
-                label=f"{skill_data['name']} (Lvl {current_level} -> {current_level + 1})",
+                label=f"{skill_data['name']} (Lvl {current_level} → {current_level + 1})",
                 value=f"{skill_key}:{upgrade_cost}:{current_level}",
-                description=f"Cost: {upgrade_cost} Vestige",
+                description=f"Cost: {upgrade_cost} {E.VESTIGE}",
                 emoji="✨",
             )
 
@@ -163,43 +167,46 @@ class SkillTrainerView(View):
         upgrade_select.callback = self.upgrade_skill_callback
         return upgrade_select
 
-    # --- NEW HELPER FOR ASYNC ---
+    # ------------------------------------------------
+    # Learning Skill (async thread wrapper)
+    # ------------------------------------------------
     def _execute_learn_skill(self, skill_key: str, cost: int) -> Tuple[bool, str, int]:
-        """Returns (success, error_message, new_vestige)"""
         with self.db.get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+            cur.execute(
+                "SELECT vestige_pool FROM players WHERE discord_id = ?",
+                (self.interaction_user.id,),
+            )
             player_data = cur.fetchone()
-            
+
             if player_data["vestige_pool"] < cost:
                 return (False, "You do not have enough Vestige.", 0)
 
             new_vestige = player_data["vestige_pool"] - cost
-            
-            # Debit Vestige
+
+            # Update player Vestige
             cur.execute(
                 "UPDATE players SET vestige_pool = ? WHERE discord_id = ?",
                 (new_vestige, self.interaction_user.id),
             )
-            # Add new skill
+
+            # Add skill
             cur.execute(
                 "INSERT INTO player_skills (discord_id, skill_key, skill_level) VALUES (?, ?, 1)",
                 (self.interaction_user.id, skill_key),
             )
+
             return (True, "", new_vestige)
-    
+
     async def learn_skill_callback(self, interaction: discord.Interaction):
-        """Handles the logic for learning a new skill."""
         await interaction.response.defer()
 
         skill_key, cost_str = interaction.data["values"][0].split(":")
         cost = int(cost_str)
 
-        # --- ASYNC FIX ---
         success, error_msg, new_vestige = await asyncio.to_thread(
             self._execute_learn_skill, skill_key, cost
         )
-        # --- END FIX ---
 
         if not success:
             await interaction.followup.send(f"{E.ERROR} {error_msg}", ephemeral=True)
@@ -210,41 +217,49 @@ class SkillTrainerView(View):
             f"{E.LEVEL_UP} You have learned **{skill_name}**!", ephemeral=True
         )
 
-        # Refresh the UI
-        refreshed_player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        new_embed = self.build_skill_embed(refreshed_player_data)
-        new_view = SkillTrainerView(
-            self.db, self.interaction_user, refreshed_player_data
+        # Refresh UI
+        refreshed_player_data = await asyncio.to_thread(
+            self.db.get_player, self.interaction_user.id
         )
+        new_embed = self.build_skill_embed(refreshed_player_data)
+        new_view = SkillTrainerView(self.db, self.interaction_user, refreshed_player_data)
         await interaction.edit_original_response(embed=new_embed, view=new_view)
 
-    # --- NEW HELPER FOR ASYNC ---
-    def _execute_upgrade_skill(self, skill_key: str, cost: int, new_level: int) -> Tuple[bool, str, int]:
-        """Returns (success, error_message, new_vestige)"""
+    # ------------------------------------------------
+    # Upgrade Skill (async wrapper)
+    # ------------------------------------------------
+    def _execute_upgrade_skill(
+        self, skill_key: str, cost: int, new_level: int
+    ) -> Tuple[bool, str, int]:
+
         with self.db.get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+            cur.execute(
+                "SELECT vestige_pool FROM players WHERE discord_id = ?",
+                (self.interaction_user.id,),
+            )
             player_data = cur.fetchone()
 
             if player_data["vestige_pool"] < cost:
                 return (False, "You do not have enough Vestige.", 0)
 
             new_vestige = player_data["vestige_pool"] - cost
-            
+
             # Debit Vestige
             cur.execute(
                 "UPDATE players SET vestige_pool = ? WHERE discord_id = ?",
                 (new_vestige, self.interaction_user.id),
             )
+
             # Upgrade skill
             cur.execute(
                 "UPDATE player_skills SET skill_level = ? WHERE discord_id = ? AND skill_key = ?",
                 (new_level, self.interaction_user.id, skill_key),
             )
+
             return (True, "", new_vestige)
 
     async def upgrade_skill_callback(self, interaction: discord.Interaction):
-        """Handles the logic for upgrading a skill."""
         await interaction.response.defer()
 
         skill_key, cost_str, level_str = interaction.data["values"][0].split(":")
@@ -252,12 +267,10 @@ class SkillTrainerView(View):
         current_level = int(level_str)
         new_level = current_level + 1
 
-        # --- ASYNC FIX ---
         success, error_msg, new_vestige = await asyncio.to_thread(
             self._execute_upgrade_skill, skill_key, cost, new_level
         )
-        # --- END FIX ---
-        
+
         if not success:
             await interaction.followup.send(f"{E.ERROR} {error_msg}", ephemeral=True)
             return
@@ -268,37 +281,55 @@ class SkillTrainerView(View):
             ephemeral=True,
         )
 
-        # Refresh the UI
-        refreshed_player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        new_embed = self.build_skill_embed(refreshed_player_data)
-        new_view = SkillTrainerView(
-            self.db, self.interaction_user, refreshed_player_data
+        refreshed_player_data = await asyncio.to_thread(
+            self.db.get_player, self.interaction_user.id
         )
+        new_embed = self.build_skill_embed(refreshed_player_data)
+        new_view = SkillTrainerView(self.db, self.interaction_user, refreshed_player_data)
         await interaction.edit_original_response(embed=new_embed, view=new_view)
 
+    # ------------------------------------------------
+    # Embed
+    # ------------------------------------------------
     @staticmethod
     def build_skill_embed(player_data):
-        """Builds the main embed for the Skill Trainer."""
         embed = discord.Embed(
             title="Skill Trainer",
-            description=f"Here you can spend Vestige to acquire new skills or strengthen those you already know.\n\n"
-            f"You have: **{player_data['vestige_pool']} Vestige**",
+            description=(
+                f"Here you can spend Vestige to acquire new skills or strengthen those you already know.\n\n"
+                f"You have: **{player_data['vestige_pool']} {E.VESTIGE} Vestige**"
+            ),
             color=discord.Color.blue(),
         )
         embed.set_footer(text="Skills you cannot afford are disabled in the dropdown.")
         return embed
 
 
-# ======================================================================
-# COG LOADER
-# ======================================================================
-
-
+# --------------------------------------
+# Cog Wrapper (Required for Extension)
+# --------------------------------------
 class SkillTrainerCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot):
         self.bot = bot
-        self.db = DatabaseManager()
+
+    # Slash command to open trainer (you already have this in your bot?)
+    @commands.command(name="skilltrainer")
+    async def open_skill_trainer(self, ctx):
+        """Manual command for testing."""
+        db = DatabaseManager()
+        player = db.get_player(ctx.author.id)
+
+        if not player:
+            await ctx.send("No player found.")
+            return
+
+        embed = SkillTrainerView.build_skill_embed(player)
+        view = SkillTrainerView(db, ctx.author, player)
+        await ctx.send(embed=embed, view=view)
 
 
-async def setup(bot: commands.Bot):
+# --------------------------------------
+# REQUIRED SETUP FUNCTION
+# --------------------------------------
+async def setup(bot):
     await bot.add_cog(SkillTrainerCog(bot))

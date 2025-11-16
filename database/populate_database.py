@@ -253,16 +253,21 @@ def insert_materials(conn):
     print(f"✔ Populated {count} material definitions.")
 
 
+# FIX: Update insert_skills to include buff_data
 def insert_skills(conn):
     cur = conn.cursor()
     print("Inserting skills...")
     count = 0
     for key, data in skills_data.SKILLS.items():
+        # Combine buff and debuff data and serialize it
+        buff_data = data.get("buff") or data.get("debuff")
+        buff_data_json = json.dumps(buff_data) if buff_data else None
+
         cur.execute(
             """
             INSERT OR IGNORE INTO skills (key_id, name, description, type, class_id,
-                                          mp_cost, power_multiplier, heal_power)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                          mp_cost, power_multiplier, heal_power, buff_data)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 data["key_id"],
@@ -273,6 +278,7 @@ def insert_skills(conn):
                 data.get("mp_cost", 0),
                 data.get("power_multiplier", 1.0),
                 data.get("heal_power", 0),
+                buff_data_json,  # <-- NEW: Insert JSON string of buff/debuff
             ),
         )
         count += 1

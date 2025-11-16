@@ -219,7 +219,8 @@ class ExplorationView(View):
 
         # 2. Add Monster Vitals (if one is active)
         active_monster = None
-        if session_row and session_row["active_monster_json"]:
+        # FIX: Use indexing ['active_monster_json'] instead of .get()
+        if session_row and session_row["active_monster_json"]: 
             try:
                 active_monster = json.loads(session_row["active_monster_json"])
             except json.JSONDecodeError:
@@ -238,11 +239,6 @@ class ExplorationView(View):
     async def explore_callback(self, interaction: discord.Interaction):
         """
         The player takes an action (step) in the dungeon.
-
-        Behavior implemented:
-        - Show step log entries one-by-one for pacing.
-        - Vitals (player HP/MP and monster HP) are updated ONLY AFTER the step completes,
-          and only if they actually changed compared to the snapshot taken before the step.
         """
         await interaction.response.defer()
 
@@ -260,7 +256,8 @@ class ExplorationView(View):
 
         # Extract previous monster HP if present
         prev_mon_hp = None
-        if prev_session and prev_session.get("active_monster_json"):
+        # FIX: Use indexing ['active_monster_json'] instead of .get()
+        if prev_session and prev_session["active_monster_json"]: 
             try:
                 prev_mon_hp = json.loads(prev_session["active_monster_json"]).get("HP")
             except Exception:
@@ -309,7 +306,8 @@ class ExplorationView(View):
 
         # Extract final monster HP if present
         final_mon_hp = None
-        if final_session and final_session.get("active_monster_json"):
+        # FIX: Use indexing ['active_monster_json'] instead of .get()
+        if final_session and final_session["active_monster_json"]: 
             try:
                 final_mon_hp = json.loads(final_session["active_monster_json"]).get("HP")
             except Exception:
@@ -405,8 +403,10 @@ class ExplorationView(View):
         vitals, session_row = await asyncio.gather(vitals_task, session_row_task)
         # --- END MODIFIED ---
 
+        loc_data = LOCATIONS[self.location_id]
+        
         embed = discord.Embed(
-            title=f"{LOCATIONS[self.location_id].get('emoji', E.MAP)} Exploring: {LOCATIONS[self.location_id]['name']}",
+            title=f"{loc_data.get('emoji', E.MAP)} Exploring: {loc_data['name']}",
             description="\n".join(self.log),
             color=discord.Color.green(),
         )

@@ -78,7 +78,12 @@ class CombatEngine:
                 )
                 self.player_hp = new_hp
                 log.append(CombatPhrases.player_heal(self.player, skill, heal))
+            elif skill.get("buff_data"): # FIX: New check for utility/buff skills
+                # This is a buff/utility skill (like Mana Shield or Endure)
+                log.append(CombatPhrases.player_buff(self.player, skill))
+                logger.info(f"Combat Player Buff: {skill['name']} applied buff/utility.")
             else:
+                # Offensive skill
                 # --- MODIFIED: Pass skill_level ---
                 dmg, crit = DamageFormula.player_skill(
                     self.player.stats, self.monster, skill, skill_level
@@ -172,6 +177,7 @@ class CombatEngine:
         if not usable_skills:
             return {"skill": None, "reason": "Not enough MP for any skill."}
 
+        # Priority 1: Healing (if below 50% HP)
         hp_threshold = self.player.stats.max_hp * 0.5
         if self.player_hp < hp_threshold:
             heal_skill = next(
@@ -182,8 +188,18 @@ class CombatEngine:
                     "skill": heal_skill,
                     "reason": f"HP < {hp_threshold}, using Heal.",
                 }
+        
+        # Priority 2: Buffs (simple check: if Mana Shield or Endure is available)
+        utility_skills = [s for s in usable_skills if s.get("buff_data")]
+        if utility_skills and random.randint(1, 100) > 50: # 50% chance to use buff if one is available
+             chosen_skill = random.choice(utility_skills)
+             return {
+                "skill": chosen_skill,
+                "reason": f"Rolled {roll}, prioritizing utility skill `{chosen_skill['name']}`.",
+            }
 
-        offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0]
+        # Priority 3: Offensive Skills
+        offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0 and not s.get("buff_data")]
         if offensive_skills:
             chosen_skill = random.choice(offensive_skills)
             return {

@@ -234,6 +234,7 @@ def create_tables():
         mp_cost INTEGER DEFAULT 0,
         power_multiplier REAL DEFAULT 1.0,
         heal_power INTEGER DEFAULT 0,
+        buff_data TEXT, 
         
         FOREIGN KEY(class_id) REFERENCES classes(id)
     );
@@ -250,6 +251,16 @@ def create_tables():
     );
     """
     )
+    
+    # FIX: Add ALTER TABLE command for schema migration robustness
+    try:
+        cursor.execute("ALTER TABLE skills ADD COLUMN buff_data TEXT;")
+        print("✔ Column 'buff_data' added to 'skills' table.")
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" in str(e):
+            print("✔ Column 'buff_data' already exists in 'skills' table. Skipping ALTER.")
+        else:
+            raise # Reraise if it's a different error
 
     conn.commit()
     conn.close()
