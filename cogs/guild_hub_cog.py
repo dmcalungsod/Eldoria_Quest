@@ -1,12 +1,16 @@
 """
-guild_hub_cog.py
+cogs/guild_hub_cog.py
 
-Handles the main UI hubs for the game.
-- GuildLobbyView (The new main Guild menu)
+Rewritten, thematic, and consistent Guild Hub for Eldoria Quest.
+
+- GuildLobbyView (Main Guild menu)
 - QuestsMenuView (Quest sub-menu)
 - GuildServicesView (Services sub-menu)
 - RankProgressView
 - GuildExchangeView
+
+All embeds and button labels use the Adventurer's Guild tone (grim, pragmatic, survivalist).
+Database calls are executed off the event loop where appropriate.
 """
 
 import json
@@ -14,32 +18,29 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
-import asyncio 
+import asyncio
+from typing import Optional
 
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.guild_exchange import GuildExchange
 import game_systems.data.emojis as E
 
-# --- Local Imports ---
+# Local helpers
 from .ui_helpers import back_to_profile_callback, back_to_guild_hall_callback
 
-# --- View Imports ---
-from .quest_hub_cog import QuestBoardView, QuestLogView
-
-# Note: CharacterProfileView, InventoryView, and SkillsView have been
-# moved to character_cog.py
+# View imports (imported at runtime in callbacks to avoid circular imports)
+# from .quest_hub_cog import QuestBoardView, QuestLogView  (imported inside functions)
 
 
 # ======================================================================
-# GUILD LOBBY (THE NEW MAIN MENU)
+# GUILD LOBBY (MAIN MENU)
 # ======================================================================
 
 class GuildLobbyView(View):
     """
-    The new main view for the Guild Lobby.
-    This replaces the old GuildCardView.
-    Buttons: Quests, Guild Services, Back to Profile
+    Main view for the Adventurer's Guild Lobby.
+    Presents the player with gateway options: Quests, Services, Profile.
     """
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
@@ -47,100 +48,94 @@ class GuildLobbyView(View):
         self.db = db_manager
         self.interaction_user = interaction_user
 
-        # --- Row 1: Main Menu Buttons ---
-        self.add_item(Button(
+        # --- Buttons (added as Items so they can be assigned callbacks) ---
+        self.quests_btn = Button(
             label="Quests",
             style=discord.ButtonStyle.success,
             custom_id="lobby_quests",
             emoji="📜",
-            row=0
-        ))
-        self.add_item(Button(
+            row=0,
+        )
+        self.quests_btn.callback = self._quests_btn_callback
+        self.add_item(self.quests_btn)
+
+        self.services_btn = Button(
             label="Guild Services",
             style=discord.ButtonStyle.primary,
             custom_id="lobby_services",
             emoji="🏦",
-            row=0
-        ))
-        
-        # --- Row 2: Navigation ---
-        back_btn = Button(
-            label="Back to Profile",
+            row=0,
+        )
+        self.services_btn.callback = self._services_btn_callback
+        self.add_item(self.services_btn)
+
+        self.back_btn = Button(
+            label="Return — Character",
             style=discord.ButtonStyle.grey,
             custom_id="lobby_back_profile",
             emoji="⬅️",
-            row=1
+            row=1,
         )
-        back_btn.callback = back_to_profile_callback
-        self.add_item(back_btn)
-
+        self.back_btn.callback = back_to_profile_callback
+        self.add_item(self.back_btn)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
-        
-        # --- Handle button routing ---
-        custom_id = interaction.data.get("custom_id")
-        
-        if custom_id == "lobby_quests":
-            await self.quests_menu_callback(interaction)
-            return False # Stop further processing
-            
-        if custom_id == "lobby_services":
-            await self.guild_services_menu_callback(interaction)
-            return False # Stop further processing
-
-        # Allow interaction to proceed (for back_to_profile_callback)
         return True
+
+    # --- Button callbacks delegate to async helpers ---
+
+    async def _quests_btn_callback(self, interaction: discord.Interaction):
+        await self.quests_menu_callback(interaction)
+
+    async def _services_btn_callback(self, interaction: discord.Interaction):
+        await self.guild_services_menu_callback(interaction)
+
+    # --- Menu builders ---
 
     async def quests_menu_callback(self, interaction: discord.Interaction):
         """
-        Edits the message to show the Quest sub-menu.
+        Show the Quests sub-menu.
         """
         await interaction.response.defer()
-        # THIS IS YOUR NEW THEMATIC EMBED
+
         embed = discord.Embed(
             title=f"{E.SCROLL} Quests & Assignments",
             description=(
-                "*You unfold the Guild’s mission ledger. Inked seals, stamped parchments, and "
-                "weathered entries detail the labors of countless adventurers before you.*\n\n"
-                "From here, you may review your duties, track your progress, or pursue new "
-                "assignments sanctioned by the Guild."
+                "*You unfold the Guild’s mission ledger. Inked seals and stamped parchments mark the tasks entrusted to you.*\n\n"
+                "From here you may inspect the Quest Board, turn in completed contracts, or review promotion requirements."
             ),
-            color=discord.Color.dark_green()
+            color=discord.Color.dark_green(),
         )
 
+        from .guild_hub_cog import QuestsMenuView as LocalQuestsMenuView  # type: ignore
         view = QuestsMenuView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def guild_services_menu_callback(self, interaction: discord.Interaction):
         """
-        Edits the message to show the Guild Services sub-menu.
+        Show the Guild Services sub-menu.
         """
         await interaction.response.defer()
-        # THIS IS YOUR NEW THEMATIC EMBED
+
         embed = discord.Embed(
             title="🏦 Guild Services",
             description=(
-                "*You step into the Guild’s service hall, where lanternlight dances across "
-                "stone walls and clerks work in quiet precision.*\n"
-                "*Ledgers, sigils, and sealed documents fill the counters—this is the heart of "
-                "the Guild’s economy and infrastructure.*\n\n"
+                "*Lanternlight slides across service counters and ledgers. The Guild maintains many practical services — "
+                "each intended to keep you alive for the next contract.*\n\n"
                 "**Available Services:**\n"
-                "• **Guild Exchange** — Trade materials, relics, and rare findings.\n"
-                "• **Guild Shop** — Acquire sanctioned gear and adventuring supplies.\n"
-                "• **Infirmary** — Receive medical care and restore your strength.\n"
-                "• **Skill Trainer** — Refine your abilities and advance your craft."
+                "• **Guild Exchange** — Trade gathered materials for Aurum.\n"
+                "• **Guild Supply** — Purchase provisions and curatives.\n"
+                "• **Infirmary** — Receive medical treatment.\n"
+                "• **Skill Trainer** — Refine techniques and learn new arts."
             ),
-            color=discord.Color.dark_blue()
+            color=discord.Color.dark_blue(),
         )
 
         view = GuildServicesView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
-
 
 
 # ======================================================================
@@ -149,154 +144,154 @@ class GuildLobbyView(View):
 
 class QuestsMenuView(View):
     """
-    The sub-menu for all quest-related activities.
-    Buttons: Quest Board, Quest Turn-In, Check Rank
+    Sub-menu for the Guild's quest systems.
+    Buttons: Quest Board, Quest Turn-In, Check Rank, Back.
     """
+
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.rank_system = RankSystem(self.db)
         self.interaction_user = interaction_user
-        
-        # --- Add Back Button ---
-        back_btn = Button(
+
+        # Buttons
+        self.quest_board_btn = Button(
+            label="Quest Board",
+            style=discord.ButtonStyle.primary,
+            custom_id="guild_quest_board",
+            emoji=E.SCROLL,
+            row=0,
+        )
+        self.quest_board_btn.callback = self.view_quests_callback
+        self.add_item(self.quest_board_btn)
+
+        self.turn_in_btn = Button(
+            label="Quest Turn-In",
+            style=discord.ButtonStyle.primary,
+            custom_id="guild_turn_in",
+            emoji=E.QUEST_SCROLL,
+            row=0,
+        )
+        self.turn_in_btn.callback = self.quest_turn_in_callback
+        self.add_item(self.turn_in_btn)
+
+        self.check_rank_btn = Button(
+            label="Check Rank",
+            style=discord.ButtonStyle.secondary,
+            custom_id="guild_check_rank",
+            emoji=E.MEDAL,
+            row=0,
+        )
+        self.check_rank_btn.callback = self.check_rank_callback
+        self.add_item(self.check_rank_btn)
+
+        self.back_btn = Button(
             label="Back to Guild Lobby",
             style=discord.ButtonStyle.grey,
-            custom_id="back_to_guild_hall",
-            row=1
+            custom_id="back_to_guild_lobby",
+            row=1,
         )
-        back_btn.callback = back_to_guild_hall_callback
-        self.add_item(back_btn)
+        self.back_btn.callback = back_to_guild_hall_callback
+        self.add_item(self.back_btn)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
-    @discord.ui.button(
-        label="Quest Board",
-        style=discord.ButtonStyle.primary,
-        custom_id="guild_quests",
-        emoji=E.HERB,
-        row=0,
-    )
-    async def view_quests_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the Quest Board UI.
-        """
+    # -------------------------
+    # Quest Board
+    # -------------------------
+    async def view_quests_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
+        from .quest_hub_cog import QuestBoardView  # imported here to avoid circular import
         from game_systems.guild_system.quest_system import QuestSystem
 
         quest_system = QuestSystem(self.db)
-        
-        available_quests = await asyncio.to_thread(
-            quest_system.get_available_quests, self.interaction_user.id
-        )
+        available_quests = await asyncio.to_thread(quest_system.get_available_quests, self.interaction_user.id)
 
-        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
             description=(
-                "*A vast wooden board dominates the hall, crowded with torn parchments, "
-                "fresh postings, and blood-stamped contracts. Candlelight flickers across "
-                "the edges of each sheet, casting shifting shadows over the quests awaiting "
-                "a willing adventurer.*\n\n"
-                "New assignments, bounties, and Guild-sanctioned contracts are posted here."
+                "*A battered board hangs within the hall, pinned with contracts and bounty slips. Each posting carries risk and reward.*\n\n"
+                "Select a contract from the dropdown to inspect its details."
             ),
             color=discord.Color.dark_green(),
         )
 
-        embed.add_field(
-            name="Available Contracts",
-            value="Choose a quest from the dropdown to inspect its details.",
-            inline=False,
-        )
+        embed.add_field(name="Available Contracts", value="Choose a quest from the dropdown to inspect it.", inline=False)
 
         view = QuestBoardView(self.db, available_quests, self.interaction_user)
+        # Make sure QuestBoardView's back returns to this menu if supported
+        try:
+            view.set_back_button(self.back_to_this_menu, "Back to Quests")
+        except Exception:
+            # ignore if the child view doesn't support set_back_button
+            pass
+
         await interaction.edit_original_response(embed=embed, view=view)
 
-
-    @discord.ui.button(
-        label="Quest Turn-In",
-        style=discord.ButtonStyle.primary,
-        custom_id="guild_turn_in",
-        emoji=E.QUEST_SCROLL,
-        row=0,
-    )
-    async def quest_turn_in_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the Quest Log / Turn-In UI.
-        """
+    # -------------------------
+    # Quest Turn-In
+    # -------------------------
+    async def quest_turn_in_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
         from game_systems.guild_system.quest_system import QuestSystem
+        from .quest_hub_cog import QuestLogView
 
         quest_system = QuestSystem(self.db)
-        
-        active_quests = await asyncio.to_thread(
-            quest_system.get_player_quests, self.interaction_user.id
-        )
+        active_quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
 
         embed = discord.Embed(
             title=f"{E.QUEST_SCROLL} Quest Turn-In",
-            description="Report on your completed assignments to the Guild.",
+            description="Report completed contracts and receive your due Aurum and reputation.",
             color=discord.Color.from_rgb(139, 69, 19),
         )
         if not active_quests:
-            embed.add_field(
-                name="No Active Quests", value="Visit the Quest Board to accept a task."
-            )
+            embed.add_field(name="No Active Contracts", value="You have no completed contracts to turn in.", inline=False)
 
         view = QuestLogView(self.db, active_quests, self.interaction_user)
-        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Lobby")
+        # ensure child view's back returns to this menu
+        try:
+            view.set_back_button(self.back_to_this_menu, "Back to Quests")
+        except Exception:
+            pass
+
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="Check Rank",
-        style=discord.ButtonStyle.secondary,
-        custom_id="guild_rank",
-        emoji=E.MEDAL,
-        row=0,
-    )
-    async def check_rank_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the Rank Progress UI.
-        """
+    # -------------------------
+    # Rank Check
+    # -------------------------
+    async def check_rank_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
         discord_id = interaction.user.id
-        
+
         player_data = await asyncio.to_thread(self.rank_system.get_rank_info, discord_id)
-        
-        current_rank = player_data["rank"]
+        current_rank = player_data.get("rank", "F")
         next_rank_key = self.rank_system.RANKS.get(current_rank, {}).get("next_rank")
 
         if not next_rank_key:
             embed = discord.Embed(
                 title=f"{E.MEDAL} Rank Status: {current_rank}",
-                description="You have reached the highest rank.",
+                description="You have reached the highest rank the Guild currently confers.",
                 color=discord.Color.gold(),
             )
-            view = RankProgressView(
-                self.db, eligible=False, interaction_user=self.interaction_user
-            )
+            view = RankProgressView(self.db, eligible=False, interaction_user=self.interaction_user)
+            # set back to this menu
+            view.set_back_button(self.back_to_this_menu, "Back to Quests")
             await interaction.edit_original_response(embed=embed, view=view)
             return
 
         requirements = self.rank_system.RANKS[current_rank].get("requirements", {})
         next_rank_title = self.rank_system.RANKS[next_rank_key]["title"]
+
         embed = discord.Embed(
             title=f"{E.MEDAL} Promotion Evaluation: {current_rank} → {next_rank_key}",
-            description=f"Your progress towards the rank of **{next_rank_title}**.",
+            description=f"Progress toward the title **{next_rank_title}**.",
             color=discord.Color.blue(),
         )
+
         progress_text = ""
         eligible = True
         for req, required_value in requirements.items():
@@ -304,17 +299,32 @@ class QuestsMenuView(View):
             progress_text += f"• **{req.replace('_', ' ').title()}:** {current_value} / {required_value}\n"
             if current_value < required_value:
                 eligible = False
-        embed.add_field(name="Current Progress", value=progress_text, inline=False)
+
+        embed.add_field(name="Current Progress", value=progress_text or "No tracked progress.", inline=False)
+        embed.set_footer(text="If eligible, request promotion to advance your standing.")
+
         if eligible:
             embed.color = discord.Color.green()
-            embed.set_footer(text="You are eligible for promotion!")
-        else:
-            embed.set_footer(text="Continue your efforts, adventurer.")
+            embed.set_footer(text="You meet the requirements. Request promotion when ready.")
 
-        view = RankProgressView(
-            self.db, eligible=eligible, interaction_user=self.interaction_user
+        view = RankProgressView(self.db, eligible=eligible, interaction_user=self.interaction_user)
+        view.set_back_button(self.back_to_this_menu, "Back to Quests")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # -------------------------
+    # Helper: return to this menu
+    # -------------------------
+    async def back_to_this_menu(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        embed = discord.Embed(
+            title=f"{E.SCROLL} Quests & Assignments",
+            description=(
+                "*You unfold the Guild’s mission ledger. Inked seals and stamped parchments mark the tasks entrusted to you.*\n\n"
+                "From here you may inspect the Quest Board, turn in completed contracts, or review promotion requirements."
+            ),
+            color=discord.Color.dark_green(),
         )
-        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Lobby") # Set back button
+        view = QuestsMenuView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -324,160 +334,180 @@ class QuestsMenuView(View):
 
 class GuildServicesView(View):
     """
-    The sub-menu for all guild facilities and economy.
-    Buttons: Exchange, Shop, Infirmary, Skill Trainer
+    Sub-menu for Guild facilities: Exchange, Shop, Infirmary, Skill Trainer.
     """
+
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.interaction_user = interaction_user
-        
-        # --- Add Back Button ---
-        back_btn = Button(
+
+        # Service buttons
+        self.exchange_btn = Button(
+            label="Guild Exchange",
+            style=discord.ButtonStyle.primary,
+            custom_id="guild_exchange",
+            emoji=E.EXCHANGE,
+            row=0,
+        )
+        self.exchange_btn.callback = self.guild_exchange_callback
+        self.add_item(self.exchange_btn)
+
+        self.shop_btn = Button(
+            label="Guild Supply",
+            style=discord.ButtonStyle.primary,
+            custom_id="guild_shop",
+            emoji="🪙",
+            row=0,
+        )
+        self.shop_btn.callback = self.guild_shop_callback
+        self.add_item(self.shop_btn)
+
+        self.infirmary_btn = Button(
+            label="Infirmary",
+            style=discord.ButtonStyle.secondary,
+            custom_id="guild_infirmary",
+            emoji="❤️‍🩹",
+            row=1,
+        )
+        self.infirmary_btn.callback = self.infirmary_callback
+        self.add_item(self.infirmary_btn)
+
+        self.trainer_btn = Button(
+            label="Skill Trainer",
+            style=discord.ButtonStyle.secondary,
+            custom_id="skill_trainer",
+            emoji="🧠",
+            row=1,
+        )
+        self.trainer_btn.callback = self.skill_trainer_callback
+        self.add_item(self.trainer_btn)
+
+        # Back
+        self.back_btn = Button(
             label="Back to Guild Lobby",
             style=discord.ButtonStyle.grey,
-            custom_id="back_to_guild_hall",
-            row=2 # Place below the other 4 buttons
+            custom_id="back_to_guild_lobby",
+            row=2,
         )
-        back_btn.callback = back_to_guild_hall_callback
-        self.add_item(back_btn)
+        self.back_btn.callback = back_to_guild_hall_callback
+        self.add_item(self.back_btn)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
-    @discord.ui.button(
-        label="Guild Exchange",
-        style=discord.ButtonStyle.primary,
-        custom_id="guild_exchange",
-        emoji=E.EXCHANGE,
-        row=0,
-    )
-    async def guild_exchange_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the Guild Exchange UI.
-        """
+    # -------------------------
+    # Guild Exchange
+    # -------------------------
+    async def guild_exchange_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
         exchange = GuildExchange(self.db)
-        
-        total_value, materials = await asyncio.to_thread(
-            exchange.calculate_exchange_value, self.interaction_user.id
-        )
+
+        total_value, materials = await asyncio.to_thread(exchange.calculate_exchange_value, self.interaction_user.id)
 
         embed = discord.Embed(
             title=f"{E.EXCHANGE} Guild Exchange",
-            description=f'A guild receptionist looks up from her ledger. "Here to exchange your haul for Aurum?"',
+            description='A clerk raises their eyes from a ledger. "Exchange your gathered materials for Aurum."',
             color=discord.Color.blue(),
         )
-        if total_value == 0:
-            embed.add_field(
-                name="Materials on Hand", value="You have no materials to exchange."
-            )
-        else:
-            mat_list = [f"• {item['item_name']} x{item['count']}" for item in materials]
-            embed.add_field(
-                name="Materials on Hand", value="\n".join(mat_list), inline=False
-            )
-            embed.add_field(
-                name="Total Value",
-                value=f"{E.AURUM} **{total_value} Aurum**",
-                inline=False,
-            )
 
+        if total_value == 0:
+            embed.add_field(name="Materials on Hand", value="You have no materials to exchange.", inline=False)
+        else:
+            mat_list = [f"• {m['item_name']} x{m['count']}" for m in materials]
+            embed.add_field(name="Materials on Hand", value="\n".join(mat_list), inline=False)
+            embed.add_field(name="Total Value", value=f"{E.AURUM} **{total_value} Aurum**", inline=False)
+
+        from .guild_hub_cog import GuildExchangeView as LocalExchangeView  # type: ignore
         view = GuildExchangeView(self.db, total_value > 0, self.interaction_user)
-        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Lobby") # Set back button
+        # ensure Back goes to Services menu
+        view.set_back_button(self.back_to_services_menu, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="Guild Shop",
-        style=discord.ButtonStyle.primary,
-        custom_id="guild_shop",
-        emoji="🪙",
-        row=0,
-    )
-    async def guild_shop_callback(self, interaction: discord.Interaction, button: Button):
-        """
-        Edits the message to show the new Guild Shop UI.
-        """
+    # -------------------------
+    # Guild Shop
+    # -------------------------
+    async def guild_shop_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
-        
         from .shop_cog import ShopView
-        
+
         player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        
-        current_aurum = player_data['aurum'] if player_data else 0
+        current_aurum = player_data.get("aurum", 0) if player_data else 0
 
         embed = discord.Embed(
-            title=f"Guild Shop",
-            description=f"Welcome to the Guild's public shop. Spend your hard-earned Aurum.\n\nYou have: {current_aurum} {E.AURUM}",
-            color=discord.Color.green()
+            title="🛒 Guild Supply Depot",
+            description=(
+                "A modest counter stocked with provisions and curatives. Purchase what you need and return to the field.\n\n"
+                f"You hold **{current_aurum} {E.AURUM}**."
+            ),
+            color=discord.Color.green(),
         )
-        embed.set_footer(text="Items you can't afford are not shown in the dropdown.")
-        
+        embed.set_footer(text="Items you cannot afford are hidden from the list.")
+
         view = ShopView(self.db, self.interaction_user, current_aurum)
-        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Lobby") # Set back button
+        view.set_back_button(self.back_to_services_menu, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="Infirmary",
-        style=discord.ButtonStyle.secondary,
-        custom_id="guild_infirmary",
-        emoji="❤️‍🩹",
-        row=1,
-    )
-    async def infirmary_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the new Guild Infirmary UI.
-        """
+    # -------------------------
+    # Infirmary
+    # -------------------------
+    async def infirmary_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
-        
         from .infirmary_cog import InfirmaryView
         from game_systems.player.player_stats import PlayerStats
-        
+
         player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
-        
         player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
         player_stats = PlayerStats.from_dict(stats_json)
-        
+
         embed = InfirmaryView.build_infirmary_embed(player_data, player_stats)
         view = InfirmaryView(self.db, self.interaction_user, player_data, player_stats)
-        view.set_back_button(back_to_guild_hall_callback, "Back to Guild Lobby") # Set back button
+        view.set_back_button(self.back_to_services_menu, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="Skill Trainer",
-        style=discord.ButtonStyle.secondary,
-        custom_id="skill_trainer",
-        emoji="🧠",
-        row=1,
-    )
-    async def skill_trainer_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the new Skill Trainer UI.
-        """
+    # -------------------------
+    # Skill Trainer
+    # -------------------------
+    async def skill_trainer_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
-        
         from .skill_trainer_cog import SkillTrainerView
-        
+
         player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        
+
         embed = SkillTrainerView.build_skill_embed(player_data)
         view = SkillTrainerView(self.db, self.interaction_user, player_data)
-        
-        # Set the back button to point to the Guild Lobby
-        view.back_button.callback = back_to_guild_hall_callback
-        view.back_button.label = "Back to Guild Lobby"
+        # Make sure back returns here
+        try:
+            view.back_button.callback = self.back_to_services_menu
+            view.back_button.label = "Back to Services"
+        except Exception:
+            pass
+
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # -------------------------
+    # Helper: return to services menu
+    # -------------------------
+    async def back_to_services_menu(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        embed = discord.Embed(
+            title="🏦 Guild Services",
+            description=(
+                "*Lanternlight slides across service counters and ledgers. The Guild maintains many practical services — "
+                "each intended to keep you alive for the next contract.*\n\n"
+                "**Available Services:**\n"
+                "• **Guild Exchange** — Trade gathered materials for Aurum.\n"
+                "• **Guild Supply** — Purchase provisions and curatives.\n"
+                "• **Infirmary** — Receive medical treatment.\n"
+                "• **Skill Trainer** — Refine techniques and learn new arts."
+            ),
+            color=discord.Color.dark_blue(),
+        )
+        view = GuildServicesView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -485,154 +515,145 @@ class GuildServicesView(View):
 # RANK PROGRESS VIEW
 # ======================================================================
 
-
 class RankProgressView(View):
     """
-    Shows promotion eligibility and the "Promote" button.
+    Shows promotion eligibility and contains the 'Request Promotion' button.
     """
 
-    def __init__(
-        self,
-        db_manager: DatabaseManager,
-        eligible: bool,
-        interaction_user: discord.User,
-    ):
+    def __init__(self, db_manager: DatabaseManager, eligible: bool, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.interaction_user = interaction_user
 
-        promote_button = Button(
+        self.promote_btn = Button(
             label="Request Promotion",
             style=discord.ButtonStyle.success,
-            custom_id="promote",
+            custom_id="request_promotion",
             disabled=not eligible,
+            row=0,
         )
-        promote_button.callback = self.promote_callback
-        self.add_item(promote_button)
+        self.promote_btn.callback = self.promote_callback
+        self.add_item(self.promote_btn)
 
-        self.back_button = Button(
+        self.back_btn = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_hall",
+            row=1,
         )
-        self.back_button.callback = back_to_guild_hall_callback
-        self.add_item(self.back_button)
+        self.back_btn.callback = back_to_guild_hall_callback
+        self.add_item(self.back_btn)
 
-    # New helper to allow parent view to change the back button
     def set_back_button(self, callback_function, label="Back"):
-        self.back_button.label = label
-        self.back_button.callback = callback_function
+        self.back_btn.label = label
+        self.back_btn.callback = callback_function
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
-    async def promote_callback(self, interaction: discord.Interaction):
+    async def promote_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         discord_id = interaction.user.id
         rank_system = RankSystem(self.db)
-        
+
         await interaction.response.defer()
-        
-        success, message = await asyncio.to_thread(
-            rank_system.promote_player, discord_id
-        )
+        success, message = await asyncio.to_thread(rank_system.promote_player, discord_id)
 
         await interaction.followup.send(message, ephemeral=True)
 
         if success:
-            await back_to_guild_hall_callback(interaction)  # Refresh the guild hall
+            # If parent overwrote back button, call it to navigate back
+            try:
+                await self.back_btn.callback(interaction)
+            except Exception:
+                # fallback: go to guild lobby
+                await back_to_guild_hall_callback(interaction)
 
 
 # ======================================================================
 # GUILD EXCHANGE VIEW
 # ======================================================================
 
-
 class GuildExchangeView(View):
     """
-    Handles the UI for selling materials.
+    View that handles exchanging materials for Aurum.
     """
 
-    def __init__(
-        self,
-        db_manager: DatabaseManager,
-        can_sell: bool,
-        interaction_user: discord.User,
-    ):
+    def __init__(self, db_manager: DatabaseManager, can_sell: bool, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.interaction_user = interaction_user
-        self.exchange = GuildExchange(self.db) # Create instance
+        self.exchange = GuildExchange(self.db)
 
-        sell_button = Button(
+        self.sell_btn = Button(
             label="Sell All Materials",
             style=discord.ButtonStyle.success,
-            custom_id="sell_mats",
+            custom_id="sell_materials",
             disabled=not can_sell,
             emoji=E.AURUM,
+            row=0,
         )
-        sell_button.callback = self.sell_materials_callback
-        self.add_item(sell_button)
+        self.sell_btn.callback = self.sell_materials_callback
+        self.add_item(self.sell_btn)
 
-        self.back_button = Button(
+        self.back_btn = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_hall",
+            row=1,
         )
-        self.back_button.callback = back_to_guild_hall_callback
-        self.add_item(self.back_button)
-        
-    # New helper to allow parent view to change the back button
+        self.back_btn.callback = back_to_guild_hall_callback
+        self.add_item(self.back_btn)
+
     def set_back_button(self, callback_function, label="Back"):
-        self.back_button.label = label
-        self.back_button.callback = callback_function
+        self.back_btn.label = label
+        self.back_btn.callback = callback_function
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
-    async def sell_materials_callback(self, interaction: discord.Interaction):
+    async def sell_materials_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
-        
-        total_earned, sold_items = await asyncio.to_thread(
-            self.exchange.exchange_all_materials, self.interaction_user.id
-        )
+
+        total_earned, sold_items = await asyncio.to_thread(self.exchange.exchange_all_materials, self.interaction_user.id)
 
         if total_earned == 0:
             await interaction.followup.send("You have nothing to sell.", ephemeral=True)
             return
 
-        sold_list = [f"• {item['item_name']} x{item['count']}" for item in sold_items]
-        receipt_embed = discord.Embed(
+        sold_list = [f"• {i['item_name']} x{i['count']}" for i in sold_items]
+        receipt = discord.Embed(
             title=f"{E.EXCHANGE} Exchange Complete",
-            description=f'The receptionist stamps your ledger. "A fine haul... your payment has been processed."\n\n**Total Earned: {E.AURUM} {total_earned} Aurum**',
+            description=(
+                'The clerk stamps your ledger. "Payment processed."\n\n'
+                f"**Total Earned:** {E.AURUM} **{total_earned}**"
+            ),
             color=discord.Color.green(),
         )
-        receipt_embed.add_field(name="Sold Materials", value="\n".join(sold_list))
+        receipt.add_field(name="Sold Materials", value="\n".join(sold_list), inline=False)
 
-        # Send ephemeral receipt, then go back
-        await interaction.followup.send(embed=receipt_embed, ephemeral=True)
-        await back_to_guild_hall_callback(interaction)
+        await interaction.followup.send(embed=receipt, ephemeral=True)
+
+        # attempt to return to parent menu via back btn callback
+        try:
+            await self.back_btn.callback(interaction)
+        except Exception:
+            await back_to_guild_hall_callback(interaction)
 
 
 # ======================================================================
 # COG LOADER
 # ======================================================================
 
-
 class GuildHubCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db = DatabaseManager()
-
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(GuildHubCog(bot))

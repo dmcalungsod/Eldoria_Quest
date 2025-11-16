@@ -1,16 +1,18 @@
 """
-shop_cog.py
+cogs/shop_cog.py
 
-Handles the Guild Shop UI:
-- Lists consumables for sale
-- Handles the purchase transaction (Aurum debit, item credit)
+Guild Shop Interface for Eldoria Quest.
+Astraeon's Adventurer’s Guild maintains a modest supply depot where
+survivalists purchase field provisions, curatives, and rare tonics.
+Every purchase reflects the Guild's harsh economy—Aurum is hard-earned,
+and nothing in Eldoria comes without cost.
 """
 
 import discord
 from discord.ui import View, Button, Select
 from discord.ext import commands
-import asyncio # <-- IMPORT ASYNCIO
-from typing import Tuple, Dict, Any # For type hinting
+import asyncio
+from typing import Tuple, Dict, Any
 
 from database.database_manager import DatabaseManager
 from game_systems.items.inventory_manager import InventoryManager
@@ -20,26 +22,30 @@ import game_systems.data.emojis as E
 # --- Local Imports ---
 from .ui_helpers import back_to_guild_hall_callback
 
-# --- Shop Price List ---
-# We define the prices here. (item_key: price)
-# You can adjust these prices as you see fit.
+# ----------------------------------------------------------------------
+# SHOP PRICE LIST
+# ----------------------------------------------------------------------
 SHOP_INVENTORY = {
-    "hp_potion_1": 15,  # Dewfall Tonic
-    "mp_potion_1": 15,  # Scholar's Draught
-    "antidote_basic": 25,  # Thicket Antidote
-    "smoke_pellet": 30,  # Whisper-Cloud Pellet
-    "food_ration": 10,  # Trailman's Ration
-    "hp_potion_2": 50,  # Glade Salve Vial
-    "mp_potion_2": 50,  # Lunaris Tonic
-    "strength_brew": 75,  # Captains' Ale
-    "dex_elixir": 75,  # Starlit Tincture
+    "hp_potion_1": 15,      # Dewfall Tonic
+    "mp_potion_1": 15,      # Scholar's Draught
+    "antidote_basic": 25,   # Thicket Antidote
+    "smoke_pellet": 30,     # Whisper-Cloud Pellet
+    "food_ration": 10,      # Trailman's Ration
+    "hp_potion_2": 50,      # Glade Salve Vial
+    "mp_potion_2": 50,      # Lunaris Tonic
+    "strength_brew": 75,    # Captains' Ale
+    "dex_elixir": 75,       # Starlit Tincture
 }
 
 
+# ======================================================================
+# SHOP VIEW
+# ======================================================================
+
 class ShopView(View):
     """
-    The main UI for the Guild Shop.
-    Displays current Aurum and a dropdown of items to buy.
+    Main UI for the Adventurer’s Guild Supply Depot.
+    Displays the player's Aurum and allows purchasing provisions.
     """
 
     def __init__(
@@ -54,31 +60,40 @@ class ShopView(View):
         self.current_aurum = current_aurum
         self.inv_manager = InventoryManager(self.db)
 
-        # Build the dropdown
+        # Dropdown
         self.add_item(self.build_item_select())
 
-        # Add the back button
-        back_button = Button(
-            label="Back to Guild Hall",
+        # Back button
+        self.back_button = Button(
+            label="Return to Guild Hall",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_hall",
             row=1,
         )
-        back_button.callback = back_to_guild_hall_callback
-        self.add_item(back_button)
+        self.back_button.callback = back_to_guild_hall_callback
+        self.add_item(self.back_button)
+
+    # Allow parent view to adjust the back button
+    def set_back_button(self, callback_function, label="Back"):
+        self.back_button.label = label
+        self.back_button.callback = callback_function
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
             await interaction.response.send_message(
-                "This is not your shop.", ephemeral=True
+                "These provisions are reserved for another adventurer.", ephemeral=True
             )
             return False
         return True
 
+    # ------------------------------------------------------------------
+    # BUILD DROPDOWN
+    # ------------------------------------------------------------------
     def build_item_select(self) -> Select:
         """Creates the Select dropdown for shop items."""
+
         item_select = Select(
-            placeholder="Choose an item to purchase...",
+            placeholder="Select an item to requisition...",
             min_values=1,
             max_values=1,
             row=0,
@@ -86,12 +101,15 @@ class ShopView(View):
 
         if not SHOP_INVENTORY:
             item_select.add_option(
-                label="The shop is currently empty.", value="disabled", emoji=E.ERROR
+                label="Supply shelves are empty.",
+                value="disabled",
+                emoji=E.ERROR
             )
             item_select.disabled = True
             return item_select
 
         can_afford_any = False
+
         for item_key, price in SHOP_INVENTORY.items():
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
@@ -99,82 +117,83 @@ class ShopView(View):
 
             if self.current_aurum >= price:
                 can_afford_any = True
-            
+
             item_select.add_option(
-                # FIX: Remove custom emoji E.AURUM from label
-                label=f"{item_data['name']} ({price} Aurum)",
-                value=f"{item_key}:{price}",  # Pass both key and price
+                label=f"{item_data['name']}  —  {price} Aurum",
+                value=f"{item_key}:{price}",
                 description=item_data["description"][:100],
-                # FIX: Use a Unicode proxy emoji (a standard coin)
-                emoji="🪙", 
+                emoji="🪙",
             )
 
         if not can_afford_any and self.current_aurum > 0:
-            item_select.placeholder = "You cannot afford any items."
+            item_select.placeholder = "You lack the Aurum for any provisions."
         elif self.current_aurum == 0:
-            item_select.placeholder = "You have no Aurum to spend."
+            item_select.placeholder = "You carry no Aurum."
             item_select.disabled = True
 
         item_select.callback = self.purchase_item_callback
         return item_select
 
-    # --- NEW HELPER FUNCTION FOR ASYNC ---
+    # ------------------------------------------------------------------
+    # DATABASE PURCHASE EXECUTION (threaded)
+    # ------------------------------------------------------------------
     def _execute_purchase(self, item_key: str, price: int) -> Tuple[bool, Any, int]:
         """
-        Runs the blocking DB transaction.
-        Returns (success, item_data, new_aurum)
+        Handles the blocking DB transaction (in a thread).
+        Returns: (success, item_data_or_error, new_aurum)
         """
         item_data = CONSUMABLES.get(item_key)
         if not item_data:
-            return (False, "Item data not found.", 0)
+            return (False, "The item could not be located.", 0)
 
-        # 1. Transaction Check
         with self.db.get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT aurum FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+
+            cur.execute(
+                "SELECT aurum FROM players WHERE discord_id = ?",
+                (self.interaction_user.id,)
+            )
             player_data = cur.fetchone()
 
             if not player_data or player_data["aurum"] < price:
-                return (False, f"You do not have enough {E.AURUM} for this item.", 0)
+                return (
+                    False,
+                    f"You lack the required {E.AURUM} to secure this provision.",
+                    0
+                )
 
-            # 2. Debit Aurum
+            # Deduct Aurum
             new_aurum = player_data["aurum"] - price
             cur.execute(
                 "UPDATE players SET aurum = ? WHERE discord_id = ?",
-                (new_aurum, self.interaction_user.id),
+                (new_aurum, self.interaction_user.id)
             )
-            
-            # 3. Credit Item (run in a separate thread later)
-        
-        return (True, item_data, new_aurum)
-    # --- END HELPER ---
 
+        return (True, item_data, new_aurum)
+
+    # ------------------------------------------------------------------
+    # PURCHASE CALLBACK
+    # ------------------------------------------------------------------
     async def purchase_item_callback(self, interaction: discord.Interaction):
-        """
-        Handles the logic for purchasing a single item.
-        """
         await interaction.response.defer()
 
         item_key, price_str = interaction.data["values"][0].split(":")
         price = int(price_str)
-        
-        # --- ASYNC FIX ---
-        # Run the DB transaction in a thread
+
+        # Process purchase
         success, result, new_aurum = await asyncio.to_thread(
             self._execute_purchase, item_key, price
         )
-        # --- END FIX ---
 
         if not success:
-            # 'result' contains the error message
-            await interaction.followup.send(f"{E.ERROR} {result}", ephemeral=True)
+            await interaction.followup.send(
+                f"{E.ERROR} {result}", ephemeral=True
+            )
             return
-        
-        # 'result' contains the item_data
+
         item_data = result
-        
-        # --- ASYNC FIX ---
-        # Run the inventory write in a separate thread
+
+        # Add the item to inventory
         await asyncio.to_thread(
             self.inv_manager.add_item,
             self.interaction_user.id,
@@ -182,36 +201,48 @@ class ShopView(View):
             item_data["name"],
             "consumable",
             item_data["rarity"],
-            1
+            1,
         )
-        # --- END FIX ---
 
         await interaction.followup.send(
-            f"{E.CHECK} You purchased 1x {item_data['name']} for {price} {E.AURUM}.",
+            (
+                f"{E.CHECK} Your requisition is complete.\n"
+                f"You obtained **1× {item_data['name']}** "
+                f"for **{price} {E.AURUM}**."
+            ),
             ephemeral=True,
         )
 
-        # Re-build the embed and view with new Aurum total
-        new_embed = discord.Embed(
-            title=f"Guild Shop",
-            # FIX: Embeds can render custom emojis, so this is correct
-            description=f"Welcome to the Guild's public shop. Spend your hard-earned Aurum.\n\nYou have: {new_aurum} {E.AURUM}",
+        # ------------------------------------------------------------------
+        # Rebuild embed + view with updated Aurum
+        # ------------------------------------------------------------------
+        embed = discord.Embed(
+            title="🛒 Guild Supply Depot",
+            description=(
+                "Astraeon’s Adventurer’s Guild maintains this austere supply counter, "
+                "where every tincture and ration carries the weight of survival.\n\n"
+                f"You currently hold **{new_aurum} {E.AURUM}**."
+            ),
             color=discord.Color.green(),
         )
+
         new_view = ShopView(self.db, self.interaction_user, new_aurum)
-        await interaction.edit_original_response(embed=new_embed, view=new_view)
+
+        # Preserve back button callback
+        new_view.back_button.callback = self.back_button.callback
+        new_view.back_button.label = self.back_button.label
+
+        await interaction.edit_original_response(embed=embed, view=new_view)
 
 
 # ======================================================================
 # COG LOADER
 # ======================================================================
 
-
 class ShopCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db = DatabaseManager()
-
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ShopCog(bot))
