@@ -61,14 +61,14 @@ class StatusUpdateView(View):
         self.add_stat_buttons()
 
         # Back button
-        back_button = Button(
+        self.back_button = Button(
             label="Back to Profile",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_profile",
             row=2,
         )
-        back_button.callback = back_to_profile_callback
-        self.add_item(back_button)
+        self.back_button.callback = back_to_profile_callback
+        self.add_item(self.back_button)
 
     # -------------------------------
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -84,11 +84,13 @@ class StatusUpdateView(View):
         """Create one button per stat."""
 
         def make_btn(stat: str, row: int):
+            # FIX: Use the standard Unicode E.VESTIGE (🧬) inside the label
             return Button(
                 label=f"+1 {stat} ({STAT_COSTS[stat]} {E.VESTIGE})",
                 style=discord.ButtonStyle.secondary,
                 custom_id=f"increase_stat_{stat}",
                 disabled=self.vestige_pool < STAT_COSTS[stat],
+                emoji=None, # No longer needed
                 row=row,
             )
 
@@ -175,8 +177,12 @@ class StatusUpdateView(View):
         new_view = StatusUpdateView(
             self.db, self.interaction_user, self.player_data, self.player_stats
         )
+        
+        # Manually re-assign the callback to the new view's button
+        new_view.back_button.callback = self.back_button.callback
+        new_view.back_button.label = self.back_button.label
 
-        await interaction.edit_original_response(embed=new_embed, view=new_view)
+        await interaction.edit_original_response(embed=embed, view=new_view)
         await interaction.followup.send(
             f"{E.CHECK} **{stat}** increased! Your vitality has been restored.",
             ephemeral=True,
@@ -188,24 +194,31 @@ class StatusUpdateView(View):
     @staticmethod
     def build_status_embed(player_data, player_stats):
         embed = discord.Embed(
-            title="Status Update",
+            title="🜁 Attribute Awakening",
             description=(
-                f"Channel your inner Falna.\n"
-                f"Spend **{player_data['vestige_pool']} {E.VESTIGE} Vestige** to strengthen your attributes."
+                "*You stand before an ancient monolith etched with runes that pulse faintly "
+                "at your presence. Each glyph resonates with the essence of your growing power.*\n\n"
+                "Here, you may channel Vestige to refine the core attributes that shape your fate.\n\n"
+                f"**Current Vestige:** {player_data['vestige_pool']} {E.VESTIGE}"
             ),
             color=discord.Color.purple(),
         )
 
         stats = player_stats.get_base_stats_dict()
+
         formatted_stats = (
             f"`STR: {stats['STR']:<4}` `END: {stats['END']:<4}` `DEX: {stats['DEX']:<4}`\n"
             f"`AGI: {stats['AGI']:<4}` `MAG: {stats['MAG']:<4}` `LCK: {stats['LCK']:<4}`"
         )
 
-        embed.add_field(name="Base Abilities", value=formatted_stats, inline=False)
-        embed.set_footer(text="Return to your profile to view updated stats.")
-        return embed
+        embed.add_field(
+            name="Current Attributes",
+            value=formatted_stats,
+            inline=False
+        )
 
+        embed.set_footer(text="Each attribute point reshapes the spirit. Choose wisely.")
+        return embed
 
 # ==========================================================
 # COG LOADER

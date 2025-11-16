@@ -9,13 +9,15 @@ Exports constants for both custom (ID-based) and standard unicode emojis.
 # Format: <:name:id>
 AURUM = "<:gold_coin:1194437266903404596>"
 GUILD_MERIT = "<:guild_prestige:1194437270363701338>"
-VESTIGE = "<:vestige:1439467043467427850>"
+# VESTIGE = "<:vestige:1439461714541150310>" # No longer a custom emoji
 
 # --- Standard Unicode Emojis ---
 
 # UI Icons
 EXP = "✨"
 LEVEL_UP = "🌟"
+# FIX: Vestige is now the standard DNA emoji
+VESTIGE = "🧬" 
 ITEM_BOX = "📦"
 ERROR = "❌"
 MEDAL = "🏅"

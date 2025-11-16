@@ -52,11 +52,11 @@ class InfirmaryView(View):
 
         # --- Add the Heal Button ---
         heal_button = Button(
-            # FIX: Re-added E.AURUM to button label to ensure display
-            label=f"Heal Wounds ({self.heal_cost} {E.AURUM})",
+            # FIX: Move E.AURUM from 'label' to 'emoji'
+            label=f"Heal Wounds ({self.heal_cost})",
             style=discord.ButtonStyle.success,
             custom_id="infirmary_heal",
-            emoji="❤️‍🩹",
+            emoji=discord.PartialEmoji.from_str(E.AURUM), # Use PartialEmoji
             row=0
         )
 
@@ -64,8 +64,8 @@ class InfirmaryView(View):
             heal_button.label = "You are already at full health."
             heal_button.disabled = True
         elif self.current_aurum < self.heal_cost:
-            # FIX: Re-added E.AURUM to button label for the disabled state
-            heal_button.label = f"Not enough Aurum ({self.heal_cost} {E.AURUM})"
+            # FIX: Remove emoji from disabled label
+            heal_button.label = f"Not enough Aurum ({self.heal_cost})"
             heal_button.disabled = True
         
         heal_button.callback = self.heal_callback
@@ -171,11 +171,11 @@ class InfirmaryView(View):
             f"**Your Condition:**\n"
             f"> {E.HP} **HP:** {current_hp} / {max_hp}\n\n"
             f"**Your Funds:**\n"
+            # FIX: Embeds can render custom emojis, so this is correct.
             f"> {E.AURUM} **Aurum:** {current_aurum}\n\n"
         )
         
         if hp_to_heal > 0:
-            # --- FIX: Changed E.EXP (✨) to E.AURUM (coin) ---
             description += f"A full recovery will cost **{heal_cost} {E.AURUM}**."
         else:
             description += "You are in perfect health."

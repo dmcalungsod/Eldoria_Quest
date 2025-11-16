@@ -115,7 +115,8 @@ async def back_to_profile_callback(
     This is the new "home" screen.
     This function is now ASYNCHRONOUS to prevent blocking the bot.
     """
-    from .character_cog import CharacterProfileView
+    # FIX: Import the new CharacterTabView
+    from .character_cog import CharacterTabView
 
     if not interaction.response.is_done():
         await interaction.response.defer()
@@ -200,7 +201,8 @@ async def back_to_profile_callback(
 
     embed.add_field(name="Acquired Skills", value=skills_str, inline=False)
 
-    view = CharacterProfileView(db, interaction.user)
+    # FIX: Attach the new CharacterTabView
+    view = CharacterTabView(db, interaction.user)
 
     if is_new_message:
         await interaction.followup.send(embed=embed, view=view, ephemeral=False)
@@ -213,7 +215,8 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     A shared callback to return to the Guild Hall SUB-MENU.
     This always edits the message.
     """
-    from .guild_hub_cog import GuildCardView
+    # FIX: Import GuildLobbyView instead of GuildCardView
+    from .guild_hub_cog import GuildLobbyView
 
     if not interaction.response.is_done():
         await interaction.response.defer()
@@ -221,9 +224,7 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     discord_id = interaction.user.id
     db = DatabaseManager()
 
-    # --- 3. APPLY THE SAME FIX HERE ---
     card_data = await asyncio.to_thread(db.get_guild_card_data, discord_id)
-    # --- END FIX ---
 
     if not card_data:
         await interaction.edit_original_response(
@@ -231,13 +232,39 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
         )
         return
 
+    # --- REWRITTEN GUILD LOBBY EMBED ---
     embed = discord.Embed(
-        title=f"{E.SCROLL} Guild Card",
-        description=f"This card certifies that **{card_data['name']}** is a registered member of the **Adventurer's Guild** (Ashgrave City branch).",
+        title="🏰 Adventurer’s Guild Lobby",
+        description=(
+            "*The receptionist inspects your guild card and bows politely.*\n\n"
+            f"**{card_data['name']} — Rank {card_data['rank']}**\n"
+            "“How may the Guild assist you today?”"
+        ),
         color=discord.Color.dark_gold(),
     )
-    embed.add_field(name="Rank", value=card_data["rank"], inline=True)
-    embed.set_footer(text=f"Joined: {card_data['join_date']}")
 
-    view = GuildCardView(db, interaction.user)
+    embed.add_field(
+        name="📜 Quest Board",
+        value=(
+            "• **Available Quests** — View open missions\n"
+            "• **Current Progress** — Track ongoing assignments\n"
+            "• **Rank Trials** — Attempt promotion exams"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="⚙️ Guild Services",
+        value=(
+            "• **Guild Shop** — Buy supplies and equipment\n"
+            "• **Item Exchange** — Trade materials and rare items\n"
+            "• **Facilities** — Training grounds & workshops"
+        ),
+        inline=False
+    )
+    embed.set_footer(text="Select an option below.")
+
+
+    # FIX: Attach the new GuildLobbyView
+    view = GuildLobbyView(db, interaction.user)
     await interaction.edit_original_response(content=None, embed=embed, view=view)

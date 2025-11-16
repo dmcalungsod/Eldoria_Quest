@@ -58,14 +58,14 @@ class SkillTrainerView(View):
         self.add_item(self.build_upgrade_select())
 
         # Back button
-        back_button = Button(
+        self.back_button = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_hall",
             row=2,
         )
-        back_button.callback = back_to_guild_hall_callback
-        self.add_item(back_button)
+        self.back_button.callback = back_to_guild_hall_callback
+        self.add_item(self.back_button)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -111,10 +111,11 @@ class SkillTrainerView(View):
         for skill in learnable_skills:
             cost = skill["learn_cost"]
             learn_select.add_option(
+                # FIX: Use the standard Unicode E.VESTIGE (🧬) in the label
                 label=f"{skill['name']} ({cost} {E.VESTIGE})",
                 value=f"{skill['key_id']}:{cost}",
                 description=skill["description"][:100],
-                emoji="📖",
+                emoji="📖", # Keep the book emoji
             )
 
         if self.vestige_pool == 0:
@@ -152,10 +153,11 @@ class SkillTrainerView(View):
             upgrade_cost = get_upgrade_cost(base_cost, current_level)
 
             upgrade_select.add_option(
-                label=f"{skill_data['name']} (Lvl {current_level} → {current_level + 1})",
+                label=f"{skill_data['name']} (Lvl {current_level} -> {current_level + 1})",
                 value=f"{skill_key}:{upgrade_cost}:{current_level}",
+                # FIX: Use the standard Unicode E.VESTIGE (🧬) in the description
                 description=f"Cost: {upgrade_cost} {E.VESTIGE}",
-                emoji="✨",
+                emoji=E.LEVEL_UP, # Keep the level up emoji
             )
 
         if not has_upgradable_skill:
@@ -223,6 +225,9 @@ class SkillTrainerView(View):
         )
         new_embed = self.build_skill_embed(refreshed_player_data)
         new_view = SkillTrainerView(self.db, self.interaction_user, refreshed_player_data)
+        # Manually re-assign the callback to the new view's button
+        new_view.back_button.callback = self.back_button.callback
+        new_view.back_button.label = self.back_button.label
         await interaction.edit_original_response(embed=new_embed, view=new_view)
 
     # ------------------------------------------------
@@ -286,7 +291,10 @@ class SkillTrainerView(View):
         )
         new_embed = self.build_skill_embed(refreshed_player_data)
         new_view = SkillTrainerView(self.db, self.interaction_user, refreshed_player_data)
-        await interaction.edit_original_response(embed=new_embed, view=new_view)
+        # Manually re-assign the callback to the new view's button
+        new_view.back_button.callback = self.back_button.callback
+        new_view.back_button.label = self.back_button.label
+        await interaction.edit_original_response(embed=embed, view=new_view)
 
     # ------------------------------------------------
     # Embed
@@ -294,16 +302,20 @@ class SkillTrainerView(View):
     @staticmethod
     def build_skill_embed(player_data):
         embed = discord.Embed(
-            title="Skill Trainer",
+            title="🧬 Skill Trainer",
             description=(
-                f"Here you can spend Vestige to acquire new skills or strengthen those you already know.\n\n"
-                f"You have: **{player_data['vestige_pool']} {E.VESTIGE} Vestige**"
+                "*You enter a quiet chamber lined with spell sigils, training dummies, and "
+                "weathered tomes. A mentor regards you with a measured, expectant gaze.*\n\n"
+                "Here, you may learn new techniques or refine the skills you already wield.\n\n"
+                f"**Current Vestige:** {player_data['vestige_pool']} {E.VESTIGE}"
             ),
-            color=discord.Color.blue(),
+            color=discord.Color.dark_blue(),
         )
-        embed.set_footer(text="Skills you cannot afford are disabled in the dropdown.")
-        return embed
 
+        embed.set_footer(
+            text="Skills you cannot afford are disabled in the dropdown."
+        )
+        return embed
 
 # --------------------------------------
 # Cog Wrapper (Required for Extension)
@@ -311,21 +323,7 @@ class SkillTrainerView(View):
 class SkillTrainerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    # Slash command to open trainer (you already have this in your bot?)
-    @commands.command(name="skilltrainer")
-    async def open_skill_trainer(self, ctx):
-        """Manual command for testing."""
-        db = DatabaseManager()
-        player = db.get_player(ctx.author.id)
-
-        if not player:
-            await ctx.send("No player found.")
-            return
-
-        embed = SkillTrainerView.build_skill_embed(player)
-        view = SkillTrainerView(db, ctx.author, player)
-        await ctx.send(embed=embed, view=view)
+        self.db = DatabaseManager()
 
 
 # --------------------------------------

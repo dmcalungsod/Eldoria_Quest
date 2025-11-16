@@ -101,11 +101,12 @@ class ShopView(View):
                 can_afford_any = True
             
             item_select.add_option(
-                label=f"{item_data['name']} ({price} {E.AURUM})",
+                # FIX: Remove custom emoji E.AURUM from label
+                label=f"{item_data['name']} ({price} Aurum)",
                 value=f"{item_key}:{price}",  # Pass both key and price
                 description=item_data["description"][:100],
-                emoji="🧪",
-                # Don't disable the option, check on callback
+                # FIX: Use a Unicode proxy emoji (a standard coin)
+                emoji="🪙", 
             )
 
         if not can_afford_any and self.current_aurum > 0:
@@ -193,6 +194,7 @@ class ShopView(View):
         # Re-build the embed and view with new Aurum total
         new_embed = discord.Embed(
             title=f"Guild Shop",
+            # FIX: Embeds can render custom emojis, so this is correct
             description=f"Welcome to the Guild's public shop. Spend your hard-earned Aurum.\n\nYou have: {new_aurum} {E.AURUM}",
             color=discord.Color.green(),
         )

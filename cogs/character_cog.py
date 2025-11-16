@@ -2,16 +2,16 @@
 character_cog.py
 
 Handles the main character UI hubs for the game:
-- CharacterProfileView (The main "home" screen)
-- InventoryView (Interactive inventory)
-- SkillsView
+- CharacterTabView (The main "CHARACTER" tab)
+- AbilitiesView (Sub-menu for inventory and skills)
+- AdventureView (Sub-menu for quests and travel)
 """
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
-import asyncio # <-- IMPORT ASYNCIO
+import asyncio 
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -28,25 +28,151 @@ from .ui_helpers import (
 )
 
 # --- View Imports ---
-from .quest_hub_cog import QuestLogView
+# (Imported inside functions to prevent circular dependencies)
+
 
 # ======================================================================
-# CHARACTER PROFILE (THE NEW MAIN MENU)
+# "CHARACTER" TAB (The Main Menu)
 # ======================================================================
 
-
-class CharacterProfileView(View):
+class CharacterTabView(View):
     """
     The main character profile screen. This is the new "home" UI.
-    Buttons: Inventory, Skills, Quest Log, Start Adventure, Guild
+    Shows core stats and buttons to navigate to Abilities & Adventure.
     """
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
+        self.interaction_user = interaction_user
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        # This view only routes to other views or callbacks
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
+
+    @discord.ui.button(
+        label="Arcana & Arms",
+        style=discord.ButtonStyle.primary,
+        custom_id="profile_abilities",
+        emoji="✨",
+        row=0,
+    )
+    async def abilities_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the Abilities (Inventory/Skills) sub-menu.
+        """
+        await interaction.response.defer()
+        embed = discord.Embed(
+            title="📜 Arcane Ledger of Abilities",
+            description=(
+                "*A leather-bound tome hums with dormant power as you open it. "
+                "Every page reflects the skills you’ve mastered, the tools you carry, "
+                "and the relics woven into your fate.*\n\n"
+                "**Manage the following:**\n"
+                "• **Inventory** — Items, materials, and consumables.\n"
+                "• **Equipment** — Weapons and armor currently worn.\n"
+                "• **Skills** — Techniques and abilities you've unlocked."
+            ),
+            color=discord.Color.purple(),
+        )
+
+        view = AbilitiesView(self.db, self.interaction_user)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+
+    @discord.ui.button(
+        label="Adventure",
+        style=discord.ButtonStyle.success,
+        custom_id="profile_adventure",
+        emoji="🗺️",
+        row=0,
+    )
+    async def adventure_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the Adventure (Quests/Travel) sub-menu.
+        """
+        await interaction.response.defer()
+        embed = discord.Embed(
+            title="🗺️ The Road Ahead",
+            description=(
+                "*Shadows creep along the edges of the world, awaiting your next move.*\n\n"
+                "**Your choices:**\n"
+                "• **Quest Log** — Recall the tasks that bind your fate.\n"
+                "• **Guild Hall** — Seek aid, rest, or guidance.\n"
+                "• **Journey Forth** — Step into dangers untold."
+            ),
+            color=discord.Color.dark_teal(),
+        )
+
+        view = AdventureView(self.db, self.interaction_user)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+
+    @discord.ui.button(
+        label="Status Update",
+        style=discord.ButtonStyle.secondary,
+        custom_id="profile_status_update",
+        # FIX: Use the new standard Unicode E.VESTIGE
+        emoji=E.VESTIGE, # Was: E.LEVEL_UP
+        row=1, 
+    )
+    async def status_update_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the Status Update UI.
+        """
+        await interaction.response.defer()
+        
+        from .status_update_cog import StatusUpdateView
+        
+        player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+        
+        player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
+        
+        player_stats = PlayerStats.from_dict(stats_json)
+
+        embed = StatusUpdateView.build_status_embed(player_data, player_stats)
+        
+        view = StatusUpdateView(self.db, self.interaction_user, player_data, player_stats)
+        # Manually set the back button to point to the main profile
+        view.back_button.callback = back_to_profile_callback
+        await interaction.edit_original_response(embed=embed, view=view)
+
+
+# ======================================================================
+# "ABILITIES" TAB (Sub-Menu)
+# ======================================================================
+
+class AbilitiesView(View):
+    """
+    Sub-menu for Inventory, Skills, and Skill Trainer.
+    """
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
+        super().__init__(timeout=None)
+        self.db = db_manager
         self.inventory_manager = InventoryManager(self.db)
         self.interaction_user = interaction_user
-        self.equipment_manager = EquipmentManager(self.db)
+
+        # --- Back Button ---
+        back_btn = Button(
+            label="Back to Character",
+            style=discord.ButtonStyle.grey,
+            custom_id="back_to_profile",
+            row=1
+        )
+        back_btn.callback = back_to_profile_callback
+        self.add_item(back_btn)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -55,8 +181,6 @@ class CharacterProfileView(View):
             )
             return False
         return True
-
-    # --- (Row 1 buttons) ---
 
     @discord.ui.button(
         label="Inventory",
@@ -73,18 +197,17 @@ class CharacterProfileView(View):
         """
         await interaction.response.defer()
         
-        # --- ASYNC FIX ---
         items = await asyncio.to_thread(
             self.inventory_manager.get_inventory, self.interaction_user.id
         )
         embed = await asyncio.to_thread(build_inventory_embed, items)
-        # --- END FIX ---
 
         view = InventoryView(
             db_manager=self.db,
             interaction_user=self.interaction_user,
+            # Set the back button to go all the way to the main profile
             previous_view_callback=back_to_profile_callback,
-            previous_view_label="Back to Profile",
+            previous_view_label="Back to Character",
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -101,11 +224,9 @@ class CharacterProfileView(View):
         """
         await interaction.response.defer()
         
-        # --- ASYNC FIX ---
         player_skills = await asyncio.to_thread(
             self.db.get_player_skills, self.interaction_user.id
         )
-        # --- END FIX ---
 
         if not player_skills:
             skills_str = "You have not learned any skills."
@@ -124,69 +245,48 @@ class CharacterProfileView(View):
         )
 
         view = SkillsView(self.db, self.interaction_user)
+        # Set the back button to go all the way to the main profile
+        view.back_button.callback = back_to_profile_callback
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="Quest Log",
-        style=discord.ButtonStyle.primary,
-        custom_id="profile_quest_log",
-        emoji=E.QUEST_SCROLL,
-        row=0,
-    )
-    async def quest_log_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the Quest Log UI.
-        """
-        await interaction.response.defer()
-        from game_systems.guild_system.quest_system import QuestSystem
 
-        quest_system = QuestSystem(self.db)
+# ======================================================================
+# "ADVENTURE" TAB (Sub-Menu)
+# ======================================================================
+
+class AdventureView(View):
+    """
+    Sub-menu for Quest Log, Guild Hall, and Starting Adventures.
+    """
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
+        super().__init__(timeout=None)
+        self.db = db_manager
+        self.interaction_user = interaction_user
         
-        # --- ASYNC FIX ---
-        active_quests = await asyncio.to_thread(
-            quest_system.get_player_quests, self.interaction_user.id
+        # --- Back Button ---
+        back_btn = Button(
+            label="Back to Character",
+            style=discord.ButtonStyle.grey,
+            custom_id="back_to_profile",
+            row=2
         )
-        # --- END FIX ---
+        back_btn.callback = back_to_profile_callback
+        self.add_item(back_btn)
 
-        embed = discord.Embed(
-            title=f"{E.QUEST_SCROLL} Adventurer's Log",
-            description="A review of your currently accepted assignments.",
-            color=discord.Color.from_rgb(139, 69, 19),
-        )
-        if not active_quests:
-            embed.add_field(
-                name="No Active Quests",
-                value="Visit the Guild Hall Quest Board to accept a task.",
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
             )
-        else:
-            for quest in active_quests:
-                progress_text = []
-                objectives = quest.get("objectives", {})
-                progress = quest.get("progress", {})
-                for obj_type, tasks in objectives.items():
-                    if isinstance(tasks, dict):
-                        for task, required in tasks.items():
-                            current = progress.get(obj_type, {}).get(task, 0)
-                            progress_text.append(f"• {task}: {current} / {required}")
-                embed.add_field(
-                    name=f"{quest['title']} (ID: {quest['id']})",
-                    value="\n".join(progress_text) or "No objectives.",
-                    inline=False,
-                )
-
-        view = QuestLogView(self.db, active_quests, self.interaction_user)
-        view.set_back_button(back_to_profile_callback, "Back to Profile")
-        await interaction.edit_original_response(embed=embed, view=view)
-
-    # --- (Row 2 buttons) ---
+            return False
+        return True
 
     @discord.ui.button(
         label="Start Adventure",
         style=discord.ButtonStyle.success,
         custom_id="profile_start_adventure",
-        row=1,
+        emoji="⚔️",
+        row=0,
     )
     async def start_adventure_callback(
         self, interaction: discord.Interaction, button: Button
@@ -195,7 +295,6 @@ class CharacterProfileView(View):
         Edits the message to show the Adventure Setup (location picker) UI
         OR resumes a stuck adventure if one is found.
         """
-        # --- Import locally ---
         from .adventure_commands import AdventureSetupView, ExplorationView
         from game_systems.data.adventure_locations import LOCATIONS
         import game_systems.data.emojis as E
@@ -208,13 +307,12 @@ class CharacterProfileView(View):
             )
             return
 
-        # --- ASYNC FIX ---
         active_session_row = await asyncio.to_thread(
             adventure_cog.manager.get_active_session, self.interaction_user.id
         )
-        # --- END FIX ---
 
         if active_session_row:
+            # ... (Resuming adventure logic - unchanged) ...
             if not interaction.response.is_done():
                 await interaction.response.defer() 
 
@@ -243,8 +341,6 @@ class CharacterProfileView(View):
                 color=discord.Color.green(),
             )
             
-            # --- THIS IS THE FIX ---
-            # We must fetch player_stats and vitals to add the "Vitals" field
             stats_json = await asyncio.to_thread(
                 self.db.get_player_stats_json, self.interaction_user.id
             )
@@ -261,7 +357,6 @@ class CharacterProfileView(View):
                 ),
                 inline=True
             )
-            # --- END OF FIX ---
             
             embed.set_footer(text="Your previous session was recovered.")
 
@@ -271,19 +366,18 @@ class CharacterProfileView(View):
                 loc_id,
                 log,
                 self.interaction_user,
-                player_stats  # <-- And pass stats to the view
+                player_stats
             )
+            # Make the "Return to City" button go to the main profile
+            view.leave_button.callback = back_to_profile_callback
             await interaction.edit_original_response(embed=embed, view=view)
             return
 
         # --- Original logic: No active session, show setup ---
         await interaction.response.defer()
         
-        # --- ASYNC FIX ---
-        # Get rank data for the location selector
         guild_member = await asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id)
         player_rank = guild_member['rank'] if guild_member else 'F'
-        # --- END FIX ---
         
         embed = discord.Embed(
             title=f"{E.MAP} Prepare for Expedition",
@@ -291,14 +385,71 @@ class CharacterProfileView(View):
             color=discord.Color.dark_green(),
         )
         
-        # Pass the pre-fetched rank to the view
         view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, player_rank)
+        # Make the view's back button go to the main profile
+        view.back_button.callback = back_to_profile_callback
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    @discord.ui.button(
+        label="Quest Log",
+        style=discord.ButtonStyle.primary,
+        custom_id="profile_quest_log",
+        emoji=E.QUEST_SCROLL,
+        row=1,
+    )
+    async def quest_log_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the Quest Log UI.
+        """
+        await interaction.response.defer()
+        from game_systems.guild_system.quest_system import QuestSystem
+        from .quest_hub_cog import QuestLogView
+
+        quest_system = QuestSystem(self.db)
+        
+        active_quests = await asyncio.to_thread(
+            quest_system.get_player_quests, self.interaction_user.id
+        )
+
+        embed = discord.Embed(
+            title=f"{E.QUEST_SCROLL} Adventurer's Log",
+            description="A review of your currently accepted assignments.",
+            color=discord.Color.from_rgb(139, 69, 19),
+        )
+        if not active_quests:
+            embed.add_field(
+                name="No Active Quests",
+                value="Visit the Guild Hall Quest Board to accept a task.",
+            )
+        else:
+            # ... (logic to add quest fields - unchanged) ...
+            for quest in active_quests:
+                progress_text = []
+                objectives = quest.get("objectives", {})
+                progress = quest.get("progress", {})
+                for obj_type, tasks in objectives.items():
+                    if isinstance(tasks, dict):
+                        for task, required in tasks.items():
+                            current = progress.get(obj_type, {}).get(task, 0)
+                            progress_text.append(f"• {task}: {current} / {required}")
+                embed.add_field(
+                    name=f"{quest['title']} (ID: {quest['id']})",
+                    value="\n".join(progress_text) or "No objectives.",
+                    inline=False,
+                )
+
+        view = QuestLogView(self.db, active_quests, self.interaction_user)
+        # Set the back button to go all the way to the main profile
+        view.set_back_button(back_to_profile_callback, "Back to Character")
         await interaction.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(
         label="Guild Hall",
         style=discord.ButtonStyle.primary,
         custom_id="profile_guild_hall",
+        emoji="🏦",
         row=1,
     )
     async def guild_hall_callback(
@@ -310,41 +461,9 @@ class CharacterProfileView(View):
         # This function is already async!
         await back_to_guild_hall_callback(interaction)
 
-    @discord.ui.button(
-        label="Status Update",
-        style=discord.ButtonStyle.success,
-        custom_id="profile_status_update",
-        emoji="⬆️",
-        row=2, 
-    )
-    async def status_update_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
-        """
-        Edits the message to show the Status Update UI.
-        """
-        await interaction.response.defer()
-        
-        from .status_update_cog import StatusUpdateView
-        
-        # --- ASYNC FIX ---
-        # Run DB calls in parallel
-        player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
-        
-        player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
-        # --- END FIX ---
-        
-        player_stats = PlayerStats.from_dict(stats_json)
-
-        embed = StatusUpdateView.build_status_embed(player_data, player_stats)
-        
-        view = StatusUpdateView(self.db, self.interaction_user, player_data, player_stats)
-        await interaction.edit_original_response(embed=embed, view=view)
-
 
 # ======================================================================
-# INVENTORY & SKILLS VIEWS
+# INVENTORY & SKILLS (CHILD VIEWS)
 # ======================================================================
 
 
@@ -386,8 +505,6 @@ class InventoryView(View):
             row=3,
         )
         
-        # Note: _populate_selects is NOT async because it's in __init__
-        # This is a small, acceptable performance hit.
         self._populate_selects()
 
         self.equip_select.callback = self.equip_callback
@@ -402,8 +519,6 @@ class InventoryView(View):
 
     def _populate_selects(self):
         """Fetches inventory and populates the dropdowns."""
-        # This is a blocking call, but it's in __init__ which is not async
-        # This is the trade-off for dynamic dropdowns.
         items = self.inv_manager.get_inventory(self.interaction_user.id)
 
         self.equip_select.options.clear()
@@ -468,11 +583,9 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.equip_select.values[0])
 
-        # --- ASYNC FIX ---
         success, message = await asyncio.to_thread(
             self.eq_manager.equip_item, self.interaction_user.id, inv_db_id
         )
-        # --- END FIX ---
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -481,11 +594,9 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.unequip_select.values[0])
 
-        # --- ASYNC FIX ---
         success, message = await asyncio.to_thread(
             self.eq_manager.unequip_item, self.interaction_user.id, inv_db_id
         )
-        # --- END FIX ---
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -494,11 +605,9 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.use_select.values[0])
 
-        # --- ASYNC FIX ---
         success, message = await asyncio.to_thread(
             self.con_manager.use_item, self.interaction_user.id, inv_db_id
         )
-        # --- END FIX ---
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -506,12 +615,10 @@ class InventoryView(View):
     async def _refresh_view(self, interaction: discord.Interaction):
         """Re-builds the embed and view to show changes."""
 
-        # --- ASYNC FIX ---
         items = await asyncio.to_thread(
             self.inv_manager.get_inventory, self.interaction_user.id
         )
         embed = await asyncio.to_thread(build_inventory_embed, items)
-        # --- END FIX ---
 
         new_view = InventoryView(
             db_manager=self.db,
@@ -525,7 +632,8 @@ class InventoryView(View):
 
 class SkillsView(View):
     """
-    A simple view that just shows the "Back to Profile" button.
+    A simple view that just shows the "Back" button.
+    The callback is set by the parent view.
     """
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
@@ -533,13 +641,12 @@ class SkillsView(View):
         self.db = db_manager
         self.interaction_user = interaction_user
 
-        back_button = Button(
-            label="Back to Profile",
+        self.back_button = Button(
+            label="Back to Character",
             style=discord.ButtonStyle.grey,
             custom_id="back_to_profile",
         )
-        back_button.callback = back_to_profile_callback
-        self.add_item(back_button)
+        self.add_item(self.back_button)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
