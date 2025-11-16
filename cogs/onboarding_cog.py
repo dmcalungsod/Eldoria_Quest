@@ -155,7 +155,7 @@ class ClassDetailView(View):
         
         if success:
             welcome_title = (
-                f"Welcome, {interaction.user.display_name}, to Ashgrave City."
+                f"Welcome, {interaction.user.display_name}, to Astraeon City."
             )
             welcome_description = (
                 "Your name is known, but your deeds are not. The path ahead is fraught with peril... \n\n"

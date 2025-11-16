@@ -14,7 +14,7 @@ grim, pragmatic, survivalist — literary but UI-friendly.
 Button label theme replacements applied:
 - Explore -> Press Forward
 - Inventory -> Field Pack
-- Return to City -> Withdraw to Ashgrave
+- Return to City -> Withdraw to Astraeon
 - Back to Profile -> Return to Ledger
 - Back to Adventure -> Return to the Wilds
 """
@@ -154,7 +154,7 @@ class ExplorationView(View):
     Buttons:
       - Press Forward (advance/explore)
       - Field Pack (open inventory)
-      - Withdraw to Ashgrave (end expedition and return)
+      - Withdraw to Astraeon (end expedition and return)
     """
 
     def __init__(
@@ -192,7 +192,7 @@ class ExplorationView(View):
             row=0,
         )
         self.withdraw_btn = Button(
-            label="Withdraw to Ashgrave",
+            label="Withdraw to Astraeon",
             style=discord.ButtonStyle.danger,
             custom_id="adv_withdraw",
             emoji="⬅️",
@@ -425,7 +425,7 @@ class ExplorationView(View):
         await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
 
         embed = discord.Embed(
-            title="Returned to Ashgrave",
+            title="Returned to Astraeon",
             description="You withdraw to the city and the Guild's relative safety. Prepare for the next contract.",
             color=discord.Color.blue(),
         )

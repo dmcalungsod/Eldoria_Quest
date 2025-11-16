@@ -73,8 +73,14 @@ class PlayerCreator:
             conn = self.db.connect()
             cur = conn.cursor()
 
-            # 1. Find all default skills for this class_id
-            cur.execute("SELECT key_id FROM skills WHERE class_id = ?", (class_id,))
+            # 1. Find all default skills (learn_cost = 0) for this class_id
+            # --- MODIFIED QUERY ---
+            cur.execute(
+                "SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0", 
+                (class_id,)
+            )
+            # --- END OF MODIFICATION ---
+            
             default_skills = cur.fetchall()
 
             # 2. Add them to the player_skills table
