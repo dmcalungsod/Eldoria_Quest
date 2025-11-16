@@ -27,7 +27,7 @@ class CombatEngine:
         player_skills: list,
         player_mp: int,
         player_class_id: int,
-        active_boosts: list = None, # <-- Receives a LIST now
+        active_boosts: dict = None, # <-- Receives a DICT now
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -35,7 +35,7 @@ class CombatEngine:
         player_skills → List of dicts of skills from DB (INCLUDES skill_level)
         player_mp → Player's current MP
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
-        active_boosts → List of active global boost dicts
+        active_boosts → Dict of active global boosts, e.g., {"exp_boost": 2.0}
         """
         self.player = player
         self.monster = monster
@@ -47,17 +47,12 @@ class CombatEngine:
         self.monster_hp = monster.get("HP", 1)
 
         # --- THIS IS THE FIX ---
-        # Store the raw list
-        self.active_boosts_list = active_boosts or []
+        # Store the raw dict
+        self.active_boosts_dict = active_boosts or {}
         
-        # Process the list into simple multipliers
-        self.exp_boost = 1.0
-        self.loot_boost = 1.0
-        for boost in self.active_boosts_list:
-            if boost.get("boost_key") == "exp_boost":
-                self.exp_boost = boost.get("multiplier", 1.0)
-            elif boost.get("boost_key") == "loot_boost":
-                self.loot_boost = boost.get("multiplier", 1.0)
+        # Process the dict into simple multipliers
+        self.exp_boost = self.active_boosts_dict.get("exp_boost", 1.0)
+        self.loot_boost = self.active_boosts_dict.get("loot_boost", 1.0)
         # --- END OF FIX ---
 
     def run_combat_turn(self):
@@ -210,7 +205,7 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
             "turn_report": turn_report, 
-            "active_boosts": self.active_boosts_list, # <-- Pass the list back
+            "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
         }
 
     def _decide_player_skill(self) -> dict:
@@ -288,7 +283,7 @@ class CombatEngine:
             "drops": drops,
             "monster_data": self.monster,
             "turn_report": turn_report,
-            "active_boosts": self.active_boosts_list, # <-- Pass the list back
+            "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
         }
 
     def _monster_victory(self, log, turn_report):
@@ -303,5 +298,5 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
             "turn_report": turn_report,
-            "active_boosts": self.active_boosts_list, # <-- Pass the list back
+            "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
         }
