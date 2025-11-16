@@ -15,7 +15,11 @@ class ExpCalculator:
     }
 
     @staticmethod
-    def calculate_exp(player_level: int, monster_data: dict) -> int:
+    # --- MODIFIED FUNCTION SIGNATURE ---
+    def calculate_exp(
+        player_level: int, monster_data: dict, exp_boost_mult: float = 1.0
+    ) -> int:
+    # --- END MODIFIED SIGNATURE ---
         """
         Calculates XP reward for a single player.
         """
@@ -26,7 +30,10 @@ class ExpCalculator:
 
         # Apply Tier Multiplier
         tier_mult = ExpCalculator.TIER_MULTIPLIER.get(tier, 1.0)
-        raw_xp = base_xp * tier_mult
+        
+        # --- MODIFIED LINE ---
+        raw_xp = base_xp * tier_mult * exp_boost_mult
+        # --- END MODIFIED LINE ---
 
         # Level Difference Penalty
         # If player is 5+ levels higher, reduce XP

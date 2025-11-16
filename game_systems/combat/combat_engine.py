@@ -27,6 +27,7 @@ class CombatEngine:
         player_skills: list,
         player_mp: int,
         player_class_id: int,
+        active_boosts: list = None, # <-- Receives a LIST now
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -34,6 +35,7 @@ class CombatEngine:
         player_skills → List of dicts of skills from DB (INCLUDES skill_level)
         player_mp → Player's current MP
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
+        active_boosts → List of active global boost dicts
         """
         self.player = player
         self.monster = monster
@@ -44,6 +46,20 @@ class CombatEngine:
         self.player_mp = player_mp
         self.monster_hp = monster.get("HP", 1)
 
+        # --- THIS IS THE FIX ---
+        # Store the raw list
+        self.active_boosts_list = active_boosts or []
+        
+        # Process the list into simple multipliers
+        self.exp_boost = 1.0
+        self.loot_boost = 1.0
+        for boost in self.active_boosts_list:
+            if boost.get("boost_key") == "exp_boost":
+                self.exp_boost = boost.get("multiplier", 1.0)
+            elif boost.get("boost_key") == "loot_boost":
+                self.loot_boost = boost.get("multiplier", 1.0)
+        # --- END OF FIX ---
+
     def run_combat_turn(self):
         """
         Runs ONE turn of combat (Player -> Monster).
@@ -52,17 +68,16 @@ class CombatEngine:
         log = []
         log.append(f"\n--- {E.COMBAT} Turn ---")
         
-        # --- THIS IS THE FIX: More specific counters ---
         turn_report = {
-            "str_hits": 0,         # For STR exp
-            "dex_hits": 0,         # For DEX exp
-            "mag_hits": 0,         # For MAG exp
-            "player_crit": 0,      # For DEX exp (bonus)
-            "player_dodge": 0,     # For AGI exp
-            "damage_taken": 0,     # For END exp
-            "skills_used": 0,      # (Retained for LCK or other logic)
+            "str_hits": 0,
+            "dex_hits": 0,
+            "mag_hits": 0,
+            "player_crit": 0,
+            "player_dodge": 0,
+            "damage_taken": 0,
+            "skills_used": 0,
+            "skill_key_used": None,
         }
-        # --- END OF FIX ---
 
         logger.info(
             f"Combat Turn Start: Player Vitals: {self.player_hp} HP, {self.player_mp} MP"
@@ -78,16 +93,16 @@ class CombatEngine:
             skill = use_skill
             mp_cost = skill.get("mp_cost", 0)
             skill_level = skill.get("skill_level", 1)
+            skill_key = skill.get("key_id", "")
+            
             self.player_mp -= mp_cost
             turn_report["skills_used"] = 1
+            turn_report["skill_key_used"] = skill_key
             
             if skill.get("heal_power", 0) > 0:
                 # --- Healing Skill ---
                 heal, new_hp, event_type = DamageFormula.player_heal(
                     self.player.stats, self.player_hp, skill, skill_level
-                )
-                logger.info(
-                    f"Combat Player Heal: {skill['name']} | Base: {skill.get('heal_power', 0)} | Total: {heal}"
                 )
                 self.player_hp = new_hp
                 log.append(CombatPhrases.player_heal(self.player, skill, heal))
@@ -95,7 +110,6 @@ class CombatEngine:
             elif skill.get("buff_data"):
                 # --- Buff/Utility Skill ---
                 log.append(CombatPhrases.player_buff(self.player, skill))
-                logger.info(f"Combat Player Buff: {skill['name']} applied buff/utility.")
                 
             else:
                 # --- Offensive Skill ---
@@ -103,25 +117,16 @@ class CombatEngine:
                     self.player.stats, self.monster, skill, skill_level
                 )
                 
-                # --- THIS IS THE FIX (per user suggestion) ---
-                skill_key = skill.get("key_id", "")
-                
-                # Crits are counted as a bonus
                 if event_type == "crit":
                     turn_report["player_crit"] = 1
                 
-                # Grant base stat EXP regardless of crit
                 if skill_key in ["fireball", "explosion", "ice_lance", "smite"]:
                     turn_report["mag_hits"] = 1
                 elif skill_key in ["true_shot", "multi_shot", "double_strike", "toxic_blade"]:
                     turn_report["dex_hits"] = 1
                 elif skill_key in ["power_strike", "cleave"]:
                     turn_report["str_hits"] = 1
-                # --- END OF FIX ---
                 
-                logger.info(
-                    f"Combat Player Skill: {skill['name']} | Dmg: {dmg} | Crit: {crit}"
-                )
                 self.monster_hp -= dmg
                 log.append(
                     CombatPhrases.player_skill(
@@ -132,25 +137,19 @@ class CombatEngine:
             # --- Basic Attack ---
             dmg, crit, event_type = DamageFormula.player_attack(self.player.stats, self.monster)
             
-            # --- THIS IS THE FIX (per user suggestion) ---
-            # Grant crit as a bonus, not a replacement
             if event_type == "crit":
                 turn_report["player_crit"] = 1
             
-            # Grant class-appropriate base stat EXP regardless of crit
-            if self.player_class_id in [1, 4]: # Warrior, Cleric
+            if self.player_class_id in [1, 4]:
                 turn_report["str_hits"] = 1
-            elif self.player_class_id in [3, 5]: # Rogue, Ranger
+            elif self.player_class_id in [3, 5]:
                 turn_report["dex_hits"] = 1
-            elif self.player_class_id == 2: # Mage
+            elif self.player_class_id == 2:
                 turn_report["mag_hits"] = 1
-            else: # Fallback
+            else:
                 turn_report["str_hits"] = 1
-            # --- END OF FIX ---
             
-            logger.info(f"Combat Player Atk: Basic | Dmg: {dmg} | Crit: {crit}")
             self.monster_hp -= dmg
-
             log.append(
                 CombatPhrases.player_attack(
                     self.player, self.monster, dmg, crit, self.player_class_id
@@ -175,7 +174,6 @@ class CombatEngine:
             else:
                 turn_report["damage_taken"] = dmg
 
-            logger.info(f"Combat Monster Atk: Basic | Dmg: {dmg} | Crit: {crit}")
             self.player_hp -= dmg
             log.append(
                 CombatPhrases.monster_attack(self.monster, self.player, dmg, crit)
@@ -191,9 +189,6 @@ class CombatEngine:
             else:
                 turn_report["damage_taken"] = dmg
             
-            logger.info(
-                f"Combat Monster Skill: {skill['name']} | Dmg: {dmg} | Crit: {crit}"
-            )
             self.player_hp -= dmg
             log.append(
                 CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit)
@@ -215,6 +210,7 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
             "turn_report": turn_report, 
+            "active_boosts": self.active_boosts_list, # <-- Pass the list back
         }
 
     def _decide_player_skill(self) -> dict:
@@ -273,16 +269,14 @@ class CombatEngine:
 
     def _player_victory(self, log, turn_report):
         """Handles rewarding EXP and passing up monster drops."""
-        exp = ExpCalculator.calculate_exp(self.player.level, self.monster)
+        
+        exp = ExpCalculator.calculate_exp(self.player.level, self.monster, self.exp_boost)
         drops = self.monster.get("drops", [])
         leveled_up = self.player.add_exp(exp)
 
         logger.info(f"Combat Player Victory. EXP: {exp} | Leveled Up: {leveled_up}")
         
-        # --- THIS IS THE FIX ---
-        # We now pass the new level to the phrasing function
         log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up, self.player.level))
-        # --- END OF FIX ---
 
         return {
             "winner": "player",
@@ -294,6 +288,7 @@ class CombatEngine:
             "drops": drops,
             "monster_data": self.monster,
             "turn_report": turn_report,
+            "active_boosts": self.active_boosts_list, # <-- Pass the list back
         }
 
     def _monster_victory(self, log, turn_report):
@@ -308,4 +303,5 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
             "turn_report": turn_report,
+            "active_boosts": self.active_boosts_list, # <-- Pass the list back
         }

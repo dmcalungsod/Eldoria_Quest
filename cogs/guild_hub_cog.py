@@ -734,7 +734,12 @@ class GuildExchangeView(View):
 
         # 3. Rebuild the view to show the disabled button
         new_view = GuildExchangeView(self.db, can_sell=False, interaction_user=self.interaction_user)
-        new_view.set_back_button(self.back_button.callback, self.back_button.label)
+        
+        # --- THIS IS THE BUG FIX ---
+        # Was: self.back_button (AttributeError)
+        # Now: self.back_btn
+        new_view.set_back_button(self.back_btn.callback, self.back_btn.label)
+        # --- END OF BUG FIX ---
         
         # 4. Edit the original message
         await interaction.edit_original_response(embed=embed, view=new_view)

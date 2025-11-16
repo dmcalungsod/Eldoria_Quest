@@ -37,6 +37,11 @@ HIGH_RARITY_TIERS = ["Epic", "Legendary", "Mythical"]
 STAT_EXP_THRESHOLD = 100
 # --- END NEW ---
 
+# --- NEW: SKILL EXP CONSTANTS ---
+SKILL_EXP_THRESHOLD = 100  # How much EXP to level up a skill
+SKILL_EXP_PER_USE = 2.5    # How much EXP is gained per use
+# --- END NEW ---
+
 # Get the logger
 logger = logging.getLogger("discord")
 
@@ -108,11 +113,14 @@ class AdventureSession:
                 "player_dodge": 0,
                 "damage_taken": 0,
                 "skills_used": 0,
+                "skill_key_used": None, # <-- NEW
             }
             # --- END NEW ---
 
             # 2. Run the battle loop until there is a winner
             is_dead = False
+            battle_reports_list = [] # <-- NEW: Store all turn reports
+            
             while self.active_monster and not is_dead:
                 logger.info("Simulate Step: Running combat turn...")
                 
@@ -123,8 +131,11 @@ class AdventureSession:
 
                 # --- NEW: Aggregate turn report into battle report ---
                 turn_report = combat_result.get("turn_report", {})
+                battle_reports_list.append(turn_report) # <-- NEW
+                
                 for key in battle_report:
-                    battle_report[key] += turn_report.get(key, 0)
+                    if key != "skill_key_used": # Don't sum skill_key_used
+                        battle_report[key] += turn_report.get(key, 0)
                 # --- END NEW ---
 
                 if combat_result.get("winner") == "monster":
@@ -136,6 +147,11 @@ class AdventureSession:
                 # --- THIS IS THE FIX ---
                 # We pass the main `log_entries` list to be appended to
                 self._process_stat_exp(battle_report, log_entries)
+                
+                # --- NEW: Process SKILL exp ---
+                self._process_skill_exp(battle_reports_list, log_entries)
+                # --- END NEW ---
+                
                 # --- END OF FIX ---
                 
                 # Increment the kill counter for Guild Rank
@@ -214,11 +230,9 @@ class AdventureSession:
             for obj_type in event_types:
                 if obj_type in objectives:
                     
-                    # --- THIS IS THE FIX ---
-                    tasks = objectives[obj_type] # Get the objective data
+                    tasks = objectives[obj_type]
                 
                     if isinstance(tasks, dict):
-                        # This handles {"defeat": {"Goblin": 5}}
                         for task, required in tasks.items():
                             current = progress.get(obj_type, {}).get(task, 0)
                             if current < required:
@@ -231,7 +245,6 @@ class AdventureSession:
                                 )
                                 return {"log": [log_entry, quest_update], "dead": False}
                     else:
-                        # This handles {"locate": "Lina"}
                         task = tasks
                         required = 1
                         current = progress.get(obj_type, {}).get(task, 0)
@@ -244,7 +257,6 @@ class AdventureSession:
                                 f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"
                             )
                             return {"log": [log_entry, quest_update], "dead": False}
-                    # --- END OF FIX ---
 
         log_entry = AdventureEvents.no_event_found()
         return {"log": [log_entry], "dead": False}
@@ -307,7 +319,6 @@ class AdventureSession:
 
         player_class_id = p_row["class_id"] if p_row else 0
 
-        # FIX: Added s.buff_data to the skill fetch query
         cur.execute(
             """
             SELECT s.key_id, s.name, s.type, ps.skill_level,
@@ -321,16 +332,17 @@ class AdventureSession:
         player_skills_raw = cur.fetchall()
         conn.close()
 
+        # --- Fetch active boosts (uses its own connection) ---
+        active_boosts = self.db.get_active_boosts()
+
         player_skills = [dict(row) for row in player_skills_raw]
 
-        # FIX: Deserialize buff_data for combat engine
         for skill in player_skills:
             if skill["buff_data"]:
                 try:
                     skill["buff_data"] = json.loads(skill["buff_data"])
                 except json.JSONDecodeError:
                     skill["buff_data"] = {}
-        # END FIX
 
         player_wrapper = LevelUpSystem(
             stats=player_stats,
@@ -346,6 +358,7 @@ class AdventureSession:
             player_skills=player_skills,
             player_mp=current_mp,
             player_class_id=player_class_id,
+            active_boosts=active_boosts, # <-- PASS BOOSTS TO ENGINE
         )
 
         result = engine.run_combat_turn()
@@ -363,41 +376,42 @@ class AdventureSession:
 
             colored_loot_lines = []
             self.add_loot("exp", result["exp"])
-            # Add EXP to the list, formatted with "Common" color
             colored_loot_lines.append(
                 get_rarity_ansi("Common", f"• {result['exp']} EXP")
             )
 
-            # --- 2. LUCK CALCULATION (NEW FORMULA) ---
             player_luck = player_wrapper.stats.luck
-            # Formula: Scales to +50% at 999 LCK
-            # (player_luck / 999) gives a 0-1 multiplier
             luck_bonus = (player_luck / 999) * 50.0
-            # --- END OF NEW FORMULA ---
+            
+            # --- THIS IS THE FIX ---
+            # Get loot boost from the combat result (which is a list)
+            loot_boost_mult = 1.0
+            active_boosts_list = result.get("active_boosts", [])
+            for boost in active_boosts_list:
+                if boost.get("boost_key") == "loot_boost":
+                    loot_boost_mult = boost.get("multiplier", 1.0)
+                    break # Found it
+            # --- END OF FIX ---
 
             # 1. Handle Material Drops
             for drop_key, chance in result["drops"]:
-
-                # --- 3. APPLY LUCK BONUS CONDITIONALLY (NEW LOGIC) ---
-                final_chance = chance
+                
+                # Apply loot boost
+                final_chance = chance * loot_boost_mult
+                
                 mat_data = MATERIALS.get(drop_key)
 
-                item_rarity = "Common"  # Default rarity
+                item_rarity = "Common"
                 if mat_data:
                     item_rarity = mat_data.get("rarity", "Common")
-                    # Apply bonus only if the item rarity is Epic or higher
                     if item_rarity in HIGH_RARITY_TIERS:
                         final_chance += luck_bonus
 
                 if random.randint(1, 100) <= final_chance:
                     self.add_loot(drop_key, 1)
                     item_name = mat_data.get("name", drop_key) if mat_data else drop_key
-
-                    # --- THIS IS THE FIX ---
-                    # Removed rarity text from the log
                     text = f"• {item_name}"
                     colored_loot_lines.append(get_rarity_ansi(item_rarity, text))
-                # --- END OF NEW LOGIC ---
 
             # 2. Handle Equipment Drops
             equipment_drops = item_manager.generate_monster_loot(result["monster_data"])
@@ -412,14 +426,10 @@ class AdventureSession:
                     slot=item["slot"],
                     item_source_table=item["source"],
                 )
-
-                # --- THIS IS THE FIX ---
-                # Removed rarity text from the log
                 text = f"• {item['name']}"
                 colored_loot_lines.append(get_rarity_ansi(item["rarity"], text))
 
             if colored_loot_lines:
-                # Build the final ANSI block
                 loot_block = "\n".join(colored_loot_lines)
                 combat_log.append(
                     f"\n{E.ITEM_BOX} **Loot**\n```ansi\n{loot_block}\n```"
@@ -434,14 +444,13 @@ class AdventureSession:
                 )
 
         elif result.get("winner") == "monster":
-            self.active = False  # Player is dead, end session
+            self.active = False
             self.active_monster = None
 
         self.logs.extend(combat_log)
-        self.save_state()  # Save the result of this turn
+        self.save_state()
         return result
 
-    # --- NEW FUNCTION: _process_stat_exp ---
     def _process_stat_exp(self, battle_report: dict, log_entries: list):
         """
         Processes the aggregated battle report, grants stat exp,
@@ -449,18 +458,15 @@ class AdventureSession:
         Appends messages to the log_entries list.
         """
         
-        # --- THIS IS THE FIX: Updated formulas ---
         gains = {
             "str_exp": battle_report.get("str_hits", 0) * 0.5,
             "dex_exp": (battle_report.get("dex_hits", 0) * 0.5) + (battle_report.get("player_crit", 0) * 2.0),
             "agi_exp": battle_report.get("player_dodge", 0) * 1.5,
             "end_exp": battle_report.get("damage_taken", 0) * 0.2,
             "mag_exp": battle_report.get("mag_hits", 0) * 1.0,
-            "lck_exp": 0.5,  # Flat 0.5 LCK exp for *surviving* a battle
+            "lck_exp": 0.5,
         }
-        # --- END OF FIX ---
 
-        # 2. Get current stats and stat_exp from DB
         with self.db.get_connection() as conn:
             cur = conn.cursor()
             cur.execute(
@@ -485,21 +491,16 @@ class AdventureSession:
 
             stat_up_messages = []
 
-            # 3. Calculate new totals and check for level-ups
             for key, gain in gains.items():
                 if gain > 0:
-                    stat_name = key.split("_")[0].upper() # e.g., "STR"
+                    stat_name = key.split("_")[0].upper()
                     
-                    # Add gain to current exp
                     current_exp[key] += gain
                     
-                    # --- THIS IS THE FIX: Use a WHILE loop for multi-level-ups ---
                     while current_exp[key] >= STAT_EXP_THRESHOLD:
-                    # --- END OF FIX ---
-                        current_exp[key] -= STAT_EXP_THRESHOLD # Subtract threshold
-                        base_stats[stat_name] += 1 # Increase base stat
+                        current_exp[key] -= STAT_EXP_THRESHOLD
+                        base_stats[stat_name] += 1
                         
-                        # Add a thematic message
                         if stat_name == "STR":
                             stat_up_messages.append(f"{E.STR} Your arm feels stronger after the struggle. (STR +1)")
                         elif stat_name == "END":
@@ -513,14 +514,10 @@ class AdventureSession:
                         elif stat_name == "LCK":
                             stat_up_messages.append(f"{E.LCK} The world seems to bend slightly to your will. (LCK +1)")
 
-            # 4. Save everything back to the DB
-            
-            # Update the stats_json with new base stats
             for stat, base_val in base_stats.items():
                 if stat in stats_data:
                     stats_data[stat]["base"] = base_val
             
-            # Update the stats table with new EXP and new stats_json
             cur.execute(
                 """
                 UPDATE stats
@@ -546,20 +543,83 @@ class AdventureSession:
                 )
             )
             
-            # 5. Add messages to the log
             if stat_up_messages:
                 log_entries.append("\n" + "\n".join(stat_up_messages))
 
+    
+    # --- NEW FUNCTION: _process_skill_exp ---
+    def _process_skill_exp(self, battle_reports_list: list, log_entries: list):
+        """
+        Processes the list of turn reports, grants skill exp,
+        and handles automatic skill level-ups.
+        """
+        
+        # 1. Tally up all skill uses from the battle
+        skill_uses = {}
+        for report in battle_reports_list:
+            skill_key = report.get("skill_key_used")
+            if skill_key:
+                skill_uses[skill_key] = skill_uses.get(skill_key, 0) + 1
+        
+        if not skill_uses:
+            return # No skills were used
+            
+        skill_up_messages = []
+
+        # 2. Process gains in a single DB transaction
+        try:
+            with self.db.get_connection() as conn:
+                cur = conn.cursor()
+                
+                for skill_key, times_used in skill_uses.items():
+                    exp_gain = times_used * SKILL_EXP_PER_USE
+                    
+                    # Get the skill's current state
+                    cur.execute(
+                        "SELECT skill_level, skill_exp, s.name FROM player_skills ps JOIN skills s ON ps.skill_key = s.key_id WHERE ps.discord_id = ? AND ps.skill_key = ?",
+                        (self.discord_id, skill_key)
+                    )
+                    skill_row = cur.fetchone()
+                    
+                    if not skill_row:
+                        continue # Player doesn't have this skill?
+                    
+                    current_level = skill_row["skill_level"]
+                    current_exp = skill_row["skill_exp"]
+                    skill_name = skill_row["name"]
+                    
+                    # Add new exp
+                    current_exp += exp_gain
+                    
+                    # Check for level up (can happen multiple times)
+                    while current_exp >= SKILL_EXP_THRESHOLD:
+                        current_exp -= SKILL_EXP_THRESHOLD
+                        current_level += 1
+                        skill_up_messages.append(
+                            f"{E.LEVEL_UP} Your **{skill_name}** has reached **Level {new_level}**!"
+                        )
+                    
+                    # Save the new state
+                    cur.execute(
+                        "UPDATE player_skills SET skill_level = ?, skill_exp = ? WHERE discord_id = ? AND skill_key = ?",
+                        (current_level, current_exp, self.discord_id, skill_key)
+                    )
+            
+            # 3. Add messages to the log
+            if skill_up_messages:
+                log_entries.append("\n" + "\n".join(skill_up_messages))
+                
+        except Exception as e:
+            logger.error(f"Failed to process skill exp for {self.discord_id}: {e}")
+
     # --- END NEW FUNCTION ---
     
-    # --- NEW FUNCTION: _increment_kill_counter ---
     def _increment_kill_counter(self, monster_tier: str):
         """
         Increments the correct kill counter in the guild_members table
         based on the monster's tier.
         """
         
-        # Determine which column to update
         if monster_tier == "Normal":
             column_to_update = "normal_kills"
         elif monster_tier == "Elite":
@@ -567,12 +627,11 @@ class AdventureSession:
         elif monster_tier == "Boss":
             column_to_update = "boss_kills"
         else:
-            return # Don't update for unknown tiers
+            return
 
         try:
             with self.db.get_connection() as conn:
                 cur = conn.cursor()
-                # Use f-string safely here because we've controlled the input
                 cur.execute(
                     f"""
                     UPDATE guild_members
@@ -583,7 +642,6 @@ class AdventureSession:
                 )
         except Exception as e:
             logger.error(f"Failed to increment kill counter for {self.discord_id}: {e}")
-    # --- END NEW FUNCTION ---
 
     def _update_quests(self, monster_name: str, drops: list) -> list:
         """

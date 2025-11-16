@@ -8,6 +8,7 @@ import sqlite3
 import json
 from typing import Optional, Dict, Any, List
 from contextlib import contextmanager
+import datetime
 
 
 DATABASE_NAME = "EQ_Game.db"
@@ -249,6 +250,31 @@ class DatabaseManager:
 
         conn.commit()
         conn.close()
+
+    # --- THIS FUNCTION IS MODIFIED ---
+    def get_active_boosts(self) -> List[Dict[str, Any]]:
+        """
+        Fetches all active (non-expired) global boosts.
+        Returns a list of dictionaries, 
+        e.g., [{"boost_key": "exp_boost", "multiplier": 2.0, "end_time": "..."}]
+        """
+        boosts = []
+        now = datetime.datetime.now().isoformat()
+        
+        try:
+            with self.get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?",
+                    (now,)
+                )
+                for row in cur.fetchall():
+                    boosts.append(dict(row))
+        except Exception as e:
+            print(f"Error fetching active boosts: {e}")
+            
+        return boosts
+    # --- END OF MODIFICATION ---
 
     # --- NEW HELPER FUNCTIONS FOR ASYNC ---
 

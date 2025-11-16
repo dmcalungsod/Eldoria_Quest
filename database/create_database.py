@@ -258,6 +258,13 @@ def create_tables():
         FOREIGN KEY(discord_id) REFERENCES players(discord_id),
         FOREIGN KEY(skill_key) REFERENCES skills(key_id)
     );
+
+    -- 18. Global Boosts (for Devs)
+    CREATE TABLE IF NOT EXISTS global_boosts (
+        boost_key TEXT PRIMARY KEY,
+        multiplier REAL DEFAULT 1.0,
+        end_time TEXT NOT NULL
+    );
     """
     )
     
@@ -293,7 +300,17 @@ def create_tables():
             print("✔ Column 'buff_data' already exists in 'skills' table. Skipping.")
         else:
             raise # Reraise if it's a different error
-    # --- End of Migration ---
+            
+    # --- NEW MIGRATION FOR SKILL EXP ---
+    try:
+        cursor.execute("ALTER TABLE player_skills ADD COLUMN skill_exp REAL DEFAULT 0;")
+        print("✔ Column 'skill_exp' added to 'player_skills' table.")
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" in str(e):
+            print("✔ Column 'skill_exp' already exists in 'player_skills' table. Skipping.")
+        else:
+            raise # Reraise if it's a different error
+    # --- END OF NEW MIGRATION ---
 
     conn.commit()
     conn.close()
