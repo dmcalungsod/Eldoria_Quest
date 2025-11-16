@@ -101,6 +101,7 @@ class GuildLobbyView(View):
         Edits the message to show the Quest sub-menu.
         """
         await interaction.response.defer()
+        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title=f"{E.SCROLL} Quests & Assignments",
             description=(
@@ -120,6 +121,7 @@ class GuildLobbyView(View):
         Edits the message to show the Guild Services sub-menu.
         """
         await interaction.response.defer()
+        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title="🏦 Guild Services",
             description=(
@@ -196,6 +198,7 @@ class QuestsMenuView(View):
             quest_system.get_available_quests, self.interaction_user.id
         )
 
+        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
             description=(
@@ -450,7 +453,6 @@ class GuildServicesView(View):
         view.set_back_button(back_to_guild_hall_callback, "Back to Guild Lobby") # Set back button
         await interaction.edit_original_response(embed=embed, view=view)
 
-    # FIX: Add the "Skill Trainer" button back to this view
     @discord.ui.button(
         label="Skill Trainer",
         style=discord.ButtonStyle.secondary,

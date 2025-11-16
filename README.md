@@ -22,7 +22,7 @@ Inspired by:
 
 **Eldoria Quest** is a private, personal RPG system set in a fractured world reshaped by **The Sundering**—a magical catastrophe that shattered the Veil and unleashed horrors across the realm.
 
-Civilization survives only within fortified enclaves like **Astraeon**, the capital city where the **Eldorian Adventurer’s Consortium** operates. Adventurers fight not for glory, but survival.
+Civilization survives only within fortified enclaves like **Astraeon**, the capital city where the **Adventurer’s Guild** operates. Adventurers fight not for glory, but survival.
 
 The game blends:
 

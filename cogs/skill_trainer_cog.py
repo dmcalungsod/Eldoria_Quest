@@ -301,8 +301,9 @@ class SkillTrainerView(View):
     # ------------------------------------------------
     @staticmethod
     def build_skill_embed(player_data):
+        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
-            title="🧬 Skill Trainer",
+            title="🧠 Skill Trainer",
             description=(
                 "*You enter a quiet chamber lined with spell sigils, training dummies, and "
                 "weathered tomes. A mentor regards you with a measured, expectant gaze.*\n\n"

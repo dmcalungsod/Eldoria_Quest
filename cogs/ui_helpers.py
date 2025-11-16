@@ -150,8 +150,8 @@ async def back_to_profile_callback(
     class_name = class_row["name"] if class_row else "Unknown"
 
     embed = discord.Embed(
-        title=f"{E.SCROLL} Adventurer Status — {player['name']}",
-        description=f"**Guild:** Adventurer's Guild\n**Class:** {class_name}",
+        title=f"{E.SCROLL} {player['name']}'s Character Status",
+        description=f"**Occupation:** Adventurer\n**Class:** {class_name}",
         color=discord.Color.dark_red(),
     )
 
@@ -232,7 +232,7 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
         )
         return
 
-    # --- REWRITTEN GUILD LOBBY EMBED ---
+    # --- THIS IS YOUR NEW THEMATIC EMBED ---
     embed = discord.Embed(
         title="🏰 Adventurer’s Guild Lobby",
         description=(
@@ -262,8 +262,9 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
         ),
         inline=False
     )
+    
     embed.set_footer(text="Select an option below.")
-
+    # --- END OF EMBED ---
 
     # FIX: Attach the new GuildLobbyView
     view = GuildLobbyView(db, interaction.user)

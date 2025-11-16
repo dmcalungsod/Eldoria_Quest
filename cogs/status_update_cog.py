@@ -182,7 +182,7 @@ class StatusUpdateView(View):
         new_view.back_button.callback = self.back_button.callback
         new_view.back_button.label = self.back_button.label
 
-        await interaction.edit_original_response(embed=embed, view=new_view)
+        await interaction.edit_original_response(embed=new_embed, view=new_view)
         await interaction.followup.send(
             f"{E.CHECK} **{stat}** increased! Your vitality has been restored.",
             ephemeral=True,
@@ -193,6 +193,7 @@ class StatusUpdateView(View):
     # ==========================================================
     @staticmethod
     def build_status_embed(player_data, player_stats):
+        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title="🜁 Attribute Awakening",
             description=(
