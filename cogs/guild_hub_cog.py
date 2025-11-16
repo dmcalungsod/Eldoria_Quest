@@ -435,7 +435,11 @@ class GuildServicesView(View):
         from .shop_cog import ShopView
 
         player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        current_aurum = player_data.get("aurum", 0) if player_data else 0
+        
+        # --- THIS IS THE FIX ---
+        # Changed .get("aurum", 0) to ["aurum"]
+        current_aurum = player_data["aurum"] if player_data else 0
+        # --- END OF FIX ---
 
         embed = discord.Embed(
             title="🛒 Guild Supply Depot",

@@ -61,6 +61,15 @@ def create_tables():
         discord_id INTEGER PRIMARY KEY,
         stats_json TEXT,
 
+        -- --- NEW: Columns for Practice-Based Stat EXP ---
+        str_exp REAL DEFAULT 0,
+        end_exp REAL DEFAULT 0,
+        dex_exp REAL DEFAULT 0,
+        agi_exp REAL DEFAULT 0,
+        mag_exp REAL DEFAULT 0,
+        lck_exp REAL DEFAULT 0,
+        -- --- END OF NEW ---
+
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     );
 
@@ -252,15 +261,39 @@ def create_tables():
     """
     )
     
-    # FIX: Add ALTER TABLE command for schema migration robustness
+    # --- Robust Schema Migration ---
+    # List of new columns to add to the 'stats' table
+    stat_exp_columns = [
+        "str_exp REAL DEFAULT 0",
+        "end_exp REAL DEFAULT 0",
+        "dex_exp REAL DEFAULT 0",
+        "agi_exp REAL DEFAULT 0",
+        "mag_exp REAL DEFAULT 0",
+        "lck_exp REAL DEFAULT 0",
+    ]
+
+    # Add columns to 'stats' table
+    for column_def in stat_exp_columns:
+        col_name = column_def.split(" ")[0]
+        try:
+            cursor.execute(f"ALTER TABLE stats ADD COLUMN {column_def};")
+            print(f"✔ Column '{col_name}' added to 'stats' table.")
+        except sqlite3.OperationalError as e:
+            if "duplicate column name" in str(e):
+                print(f"✔ Column '{col_name}' already exists in 'stats' table. Skipping.")
+            else:
+                raise # Reraise if it's a different error
+    
+    # Add column to 'skills' table
     try:
         cursor.execute("ALTER TABLE skills ADD COLUMN buff_data TEXT;")
         print("✔ Column 'buff_data' added to 'skills' table.")
     except sqlite3.OperationalError as e:
         if "duplicate column name" in str(e):
-            print("✔ Column 'buff_data' already exists in 'skills' table. Skipping ALTER.")
+            print("✔ Column 'buff_data' already exists in 'skills' table. Skipping.")
         else:
             raise # Reraise if it's a different error
+    # --- End of Migration ---
 
     conn.commit()
     conn.close()

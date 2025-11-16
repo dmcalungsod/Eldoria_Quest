@@ -191,45 +191,48 @@ class AdventureManager:
             exp_to_next=player_row["exp_to_next"],
         )
 
+        # --- THIS IS THE FIX: All DB logic is now combined ---
+        
+        # 1. Process EXP and Leveling in memory
         if total_exp > 0:
             level_system.add_exp(total_exp)
 
-            cur.execute(
-                """
-                UPDATE players
-                SET level = ?, experience = ?, exp_to_next = ?
-                WHERE discord_id = ?
-            """,
-                (
-                    level_system.level,
-                    level_system.exp,
-                    level_system.exp_to_next,
-                    session.discord_id,
-                ),
-            )
-
-            cur.execute(
-                "UPDATE players SET vestige_pool = vestige_pool + ? WHERE discord_id = ?",
-                (total_exp, session.discord_id),
-            )
-
-        # --- Restore Vitals (THE FIX IS HERE) ---
-        new_max_mp = level_system.stats.max_mp # We only care about MP
+        # 2. Determine final HP/MP state
+        # Get the HP the player ended the adventure with (from the last combat turn)
+        current_hp_from_db = player_row['current_hp'] 
         
-        # Get the HP the player ended the adventure with
-        current_hp_from_db = player_row['current_hp']
-        
-        # If they died, set HP to 1. Otherwise, it stays as-is.
+        # If they died (total_exp == 0), set HP to 1. Otherwise, it stays as-is.
+        # This enforces the "Grimgar" design: returning to town doesn't heal you.
         hp_to_save = 1 if current_hp_from_db <= 0 else current_hp_from_db
         
-        # Always restore MP
-        mp_to_save = new_max_mp  
+        # Always restore MP upon returning to town
+        mp_to_save = level_system.stats.max_mp  
 
+        # 3. Run ONE combined UPDATE statement
         cur.execute(
-            "UPDATE players SET current_hp = ?, current_mp = ? WHERE discord_id = ?",
-            (hp_to_save, mp_to_save, session.discord_id),
+            """
+            UPDATE players
+            SET 
+                level = ?, 
+                experience = ?, 
+                exp_to_next = ?,
+                vestige_pool = vestige_pool + ?,
+                current_hp = ?,
+                current_mp = ?
+            WHERE discord_id = ?
+            """,
+            (
+                level_system.level,
+                level_system.exp,
+                level_system.exp_to_next,
+                total_exp,  # This adds the earned EXP to Vestige
+                hp_to_save,
+                mp_to_save,
+                session.discord_id
+            )
         )
         # --- END OF FIX ---
+
 
         # Add Materials to Inventory
         items_to_add = []

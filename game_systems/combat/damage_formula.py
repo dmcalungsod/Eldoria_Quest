@@ -18,7 +18,7 @@ class DamageFormula:
     def player_attack(player_stats, monster):
         """
         Calculates damage dealt by the player to a monster.
-        Returns: (damage_dealt: int, is_critical: bool)
+        Returns: (damage_dealt: int, is_critical: bool, event_type: str)
         """
         if hasattr(player_stats, "strength"):
             str_val = player_stats.strength
@@ -45,11 +45,14 @@ class DamageFormula:
         # Crit formula is unchanged as per your request
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
+        
+        event_type = "hit" # Default event
 
         if is_crit:
             damage = int(damage * 1.5)
+            event_type = "crit" # --- NEW: Set event type
 
-        return max(1, damage), is_crit
+        return max(1, damage), is_crit, event_type
 
     # --- THIS METHOD IS MODIFIED ---
     @staticmethod
@@ -57,7 +60,7 @@ class DamageFormula:
         """
         Calculates damage dealt by a player's skill.
         Now routes to different stats based on skill key.
-        Returns: (damage_dealt: int, is_critical: bool)
+        Returns: (damage_dealt: int, is_critical: bool, event_type: str)
         """
         skill_key = skill_data.get("key_id", "")
 
@@ -104,20 +107,23 @@ class DamageFormula:
         # Crit formula is unchanged
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
+        
+        event_type = "hit" # Default event
 
         if is_crit:
             damage = int(damage * 1.5)
+            event_type = "crit" # --- NEW: Set event type
 
-        return max(1, damage), is_crit
+        return max(1, damage), is_crit, event_type
 
     # --- THIS METHOD IS MODIFIED ---
     @staticmethod
     def player_heal(
         player_stats, current_hp: int, skill_data: dict, skill_level: int
-    ) -> Tuple[int, int]:
+    ) -> Tuple[int, int, str]:
         """
         Calculates healing from a player's skill.
-        Returns: (amount_healed: int, new_hp: int)
+        Returns: (amount_healed: int, new_hp: int, event_type: str)
         """
         base_heal = skill_data.get("heal_power", 0)
         mag_val = player_stats.magic
@@ -141,18 +147,19 @@ class DamageFormula:
         new_hp = min(current_hp + heal_amount, max_hp)
         actual_healed = new_hp - current_hp
 
-        return actual_healed, new_hp
+        return actual_healed, new_hp, "heal"
 
     @staticmethod
     def monster_attack(monster, player_stats):
         """
         Calculates damage dealt by a monster to the player.
+        Returns: (damage_dealt: int, is_critical: bool, event_type: str)
         """
 
         # AGI/Dodge formula is unchanged as per your request
         dodge_chance = player_stats.agility * 0.001
         if random.random() < dodge_chance:
-            return 0, False  # 0 damage, not a crit (DODGED)
+            return 0, False, "dodge"  # 0 damage, not a crit (DODGED)
 
         attack_power = monster.get("ATK", 10)
 
@@ -165,26 +172,33 @@ class DamageFormula:
         damage = int(base_damage * variance)
 
         is_crit = random.random() < 0.05
+        event_type = "hit" # Default event
+        
         if is_crit:
             damage = int(damage * 1.5)
+            event_type = "crit" # --- NEW: Set event type
 
-        return max(1, damage), is_crit
+        return max(1, damage), is_crit, event_type
 
     @staticmethod
     def monster_skill(monster, player_stats, skill_data):
         """
         Calculates damage for a monster's special skill.
+        Returns: (damage_dealt: int, is_critical: bool, event_type: str)
         """
 
         # AGI/Dodge formula is unchanged as per your request
         dodge_chance = player_stats.agility * 0.001
         if random.random() < dodge_chance:
-            return 0, False  # 0 damage, not a crit (DODGED)
+            return 0, False, "dodge"  # 0 damage, not a crit (DODGED)
 
-        # This correctly uses the new tiered defense
-        # by calling the modified monster_attack
-        damage, is_crit = DamageFormula.monster_attack(monster, player_stats)
+        # --- THIS IS THE FIX ---
+        # We must capture all 3 values from monster_attack now
+        damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats)
+        # --- END OF FIX ---
+        
         multiplier = skill_data.get("power", 1.5)
         damage = int(damage * multiplier)
 
-        return damage, is_crit
+        # The event_type ("hit" or "crit") is passed through from monster_attack
+        return damage, is_crit, event_type

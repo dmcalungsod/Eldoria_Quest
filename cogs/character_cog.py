@@ -348,9 +348,9 @@ class AdventureView(View):
                 player_stats,
             )
             
-            # --- THIS IS THE FIX ---
-            # The button on ExplorationView is named 'withdraw_btn'
-            view.withdraw_btn.callback = back_to_profile_callback
+            # --- THIS IS THE BUG FIX ---
+            # We are REMOVING the line that overwrote the correct callback.
+            # view.withdraw_btn.callback = back_to_profile_callback  <-- THIS LINE IS NOW GONE
             # --- END OF FIX ---
             
             await interaction.edit_original_response(embed=embed, view=view)
@@ -374,10 +374,8 @@ class AdventureView(View):
 
         view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, player_rank)
         
-        # --- THIS IS THE FIRST FIX (which you already applied) ---
-        # The button on AdventureSetupView is named 'back_to_profile'
+        # This was the previous bug, which is already fixed:
         view.back_to_profile.callback = back_to_profile_callback
-        # --- END OF FIX ---
         
         await interaction.edit_original_response(embed=embed, view=view)
 

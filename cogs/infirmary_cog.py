@@ -58,7 +58,10 @@ class InfirmaryView(View):
         # derived values
         self.current_hp = player_data["current_hp"]
         self.max_hp = player_stats.max_hp
-        self.current_aurum = player_data.get("aurum", 0)
+        
+        # --- THIS IS THE FIRST FIX ---
+        self.current_aurum = player_data["aurum"]
+        # --- END OF FIX ---
 
         self.missing_hp = max(0, self.max_hp - self.current_hp)
         self.heal_cost = infirmary_cost(self.missing_hp)
@@ -182,7 +185,7 @@ class InfirmaryView(View):
         new_view.back_button.callback = self.back_button.callback
         new_view.back_button.label = self.back_button.label
 
-        await interaction.edit_original_response(embed=new_embed, view=new_view)
+        await interaction.edit_original_response(embed=embed, view=new_view)
 
     # -----------------------------------------------------------------
     # Embed builder
@@ -192,7 +195,10 @@ class InfirmaryView(View):
         """Builds the embed for the Adventurer's Guild Infirmary."""
         current_hp = player_data["current_hp"]
         max_hp = player_stats.max_hp
-        current_aurum = player_data.get("aurum", 0)
+        
+        # --- THIS IS THE SECOND FIX ---
+        current_aurum = player_data["aurum"]
+        # --- END OF FIX ---
 
         missing_hp = max(0, max_hp - current_hp)
         cost = infirmary_cost(missing_hp)

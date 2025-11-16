@@ -10,6 +10,7 @@ import json
 import random
 import datetime
 import logging
+import math # <-- NEW: IMPORTED MATH
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.combat_phrases import CombatPhrases
@@ -31,6 +32,10 @@ from game_systems.data.emojis import get_rarity_ansi
 # --- 1. DEFINE HIGH-TIER RARITIES (NEW) ---
 HIGH_RARITY_TIERS = ["Epic", "Legendary", "Mythical"]
 # --- END OF NEW CODE ---
+
+# --- NEW: STAT EXP THRESHOLD ---
+STAT_EXP_THRESHOLD = 100
+# --- END NEW ---
 
 # Get the logger
 logger = logging.getLogger("discord")
@@ -94,16 +99,41 @@ class AdventureSession:
                 self.save_state()  # Save error log
                 return {"log": log_entries, "dead": False}
 
+            # --- NEW: Initialize aggregated battle report ---
+            battle_report = {
+                "player_hit": 0,
+                "player_crit": 0,
+                "player_dodge": 0,
+                "damage_taken": 0,
+                "skills_used": 0,
+                "mag_skills_used": 0,
+            }
+            # --- END NEW ---
+
             # 2. Run the battle loop until there is a winner
             is_dead = False
             while self.active_monster and not is_dead:
                 logger.info("Simulate Step: Running combat turn...")
-                combat_result = self._resolve_combat_turn()  # This runs one turn
+                
+                # --- MODIFIED: Pass the battle_report to be updated ---
+                combat_result = self._resolve_combat_turn(battle_report)  # This runs one turn
 
                 log_entries.extend(combat_result["phrases"])
 
+                # --- NEW: Aggregate turn report into battle report ---
+                turn_report = combat_result.get("turn_report", {})
+                for key in battle_report:
+                    battle_report[key] += turn_report.get(key, 0)
+                # --- END NEW ---
+
                 if combat_result.get("winner") == "monster":
                     is_dead = True
+            
+            # --- NEW: If player won, process stat exp ---
+            if not is_dead and combat_result.get("winner") == "player":
+                # We pass the final combat_result log to append stat-up messages
+                self._process_stat_exp(battle_report, combat_result["phrases"])
+            # --- END NEW ---
 
             logger.info(f"Simulate Step: Combat finished. Dead: {is_dead}")
             return {"log": log_entries, "dead": is_dead}
@@ -226,7 +256,7 @@ class AdventureSession:
 
         return [log_entry]
 
-    def _resolve_combat_turn(self) -> dict:
+    def _resolve_combat_turn(self, battle_report: dict) -> dict:
         """
         Resolves ONE turn of combat and saves the new state.
         """
@@ -381,6 +411,115 @@ class AdventureSession:
         self.logs.extend(combat_log)
         self.save_state()  # Save the result of this turn
         return result
+
+    # --- NEW FUNCTION: _process_stat_exp ---
+    def _process_stat_exp(self, battle_report: dict, log_entries: list):
+        """
+        Processes the aggregated battle report, grants stat exp,
+        and handles automatic stat level-ups.
+        Appends messages to the log_entries list.
+        """
+        
+        # 1. Define gain rates (as discussed)
+        gains = {
+            "str_exp": battle_report.get("player_hit", 0) * 0.5,
+            "dex_exp": battle_report.get("player_crit", 0) * 2.0,
+            "agi_exp": battle_report.get("player_dodge", 0) * 1.5,
+            "end_exp": battle_report.get("damage_taken", 0) * 0.2,
+            "mag_exp": battle_report.get("mag_skills_used", 0) * 1.0,
+            "lck_exp": 0.5,  # Flat 0.5 LCK exp for *surviving* a battle
+        }
+
+        # 2. Get current stats and stat_exp from DB
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT stats_json, str_exp, end_exp, dex_exp, agi_exp, mag_exp, lck_exp FROM stats WHERE discord_id = ?", 
+                (self.discord_id,)
+            )
+            row = cur.fetchone()
+            if not row:
+                return
+
+            stats_data = json.loads(row["stats_json"])
+            base_stats = {k: v.get("base", 1) for k, v in stats_data.items()}
+            
+            current_exp = {
+                "str_exp": row["str_exp"],
+                "end_exp": row["end_exp"],
+                "dex_exp": row["dex_exp"],
+                "agi_exp": row["agi_exp"],
+                "mag_exp": row["mag_exp"],
+                "lck_exp": row["lck_exp"],
+            }
+
+            stat_up_messages = []
+
+            # 3. Calculate new totals and check for level-ups
+            for key, gain in gains.items():
+                if gain > 0:
+                    stat_name = key.split("_")[0].upper() # e.g., "STR"
+                    
+                    # Add gain to current exp
+                    current_exp[key] += gain
+                    
+                    # Check for stat level up
+                    if current_exp[key] >= STAT_EXP_THRESHOLD:
+                        current_exp[key] -= STAT_EXP_THRESHOLD # Subtract threshold
+                        base_stats[stat_name] += 1 # Increase base stat
+                        
+                        # Add a thematic message
+                        if stat_name == "STR":
+                            stat_up_messages.append(f"{E.STR} Your arm feels stronger after the struggle. (STR +1)")
+                        elif stat_name == "END":
+                            stat_up_messages.append(f"{E.CON} You feel more resilient, having weathered the blows. (END +1)")
+                        elif stat_name == "DEX":
+                            stat_up_messages.append(f"{E.DEX} Your focus sharpens, finding new openings. (DEX +1)")
+                        elif stat_name == "AGI":
+                            stat_up_messages.append(f"{E.AGI} Your body feels lighter, more attuned to the flow of battle. (AGI +1)")
+                        elif stat_name == "MAG":
+                            stat_up_messages.append(f"{E.INT} Your understanding of the arcane deepens. (MAG +1)")
+                        elif stat_name == "LCK":
+                            stat_up_messages.append(f"{E.LCK} The world seems to bend slightly to your will. (LCK +1)")
+
+            # 4. Save everything back to the DB
+            
+            # Update the stats_json with new base stats
+            for stat, base_val in base_stats.items():
+                if stat in stats_data:
+                    stats_data[stat]["base"] = base_val
+            
+            # Update the stats table with new EXP and new stats_json
+            cur.execute(
+                """
+                UPDATE stats
+                SET 
+                    stats_json = ?,
+                    str_exp = ?,
+                    end_exp = ?,
+                    dex_exp = ?,
+                    agi_exp = ?,
+                    mag_exp = ?,
+                    lck_exp = ?
+                WHERE discord_id = ?
+                """,
+                (
+                    json.dumps(stats_data),
+                    current_exp["str_exp"],
+                    current_exp["end_exp"],
+                    current_exp["dex_exp"],
+                    current_exp["agi_exp"],
+                    current_exp["mag_exp"],
+                    current_exp["lck_exp"],
+                    self.discord_id
+                )
+            )
+            
+            # 5. Add messages to the log
+            if stat_up_messages:
+                log_entries.append("\n" + "\n".join(stat_up_messages))
+
+    # --- END NEW FUNCTION ---
 
     def _update_quests(self, monster_name: str, drops: list) -> list:
         """

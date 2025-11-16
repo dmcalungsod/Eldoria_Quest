@@ -51,6 +51,17 @@ class CombatEngine:
         """
         log = []
         log.append(f"\n--- {E.COMBAT} Turn ---")
+        
+        # --- NEW: Initialize a report for THIS turn's events ---
+        turn_report = {
+            "player_hit": 0,
+            "player_crit": 0,
+            "player_dodge": 0,
+            "damage_taken": 0,
+            "skills_used": 0,
+            "mag_skills_used": 0, # For MAG exp
+        }
+        # --- END NEW ---
 
         logger.info(
             f"Combat Turn Start: Player Vitals: {self.player_hp} HP, {self.player_mp} MP"
@@ -67,10 +78,21 @@ class CombatEngine:
             mp_cost = skill.get("mp_cost", 0)
             skill_level = skill.get("skill_level", 1)  # <-- GET SKILL LEVEL
             self.player_mp -= mp_cost
+            
+            # --- NEW: Track skill usage ---
+            turn_report["skills_used"] = 1
+            
+            # --- THIS IS THE FIX ---
+            # Only grant MAG exp for offensive magic
+            if skill.get("key_id") in ["fireball", "explosion", "ice_lance", "smite"]:
+                 turn_report["mag_skills_used"] = 1
+            # --- END OF FIX ---
+            
+            # --- END NEW ---
 
             if skill.get("heal_power", 0) > 0:
                 # --- MODIFIED: Pass skill_level ---
-                heal, new_hp = DamageFormula.player_heal(
+                heal, new_hp, event_type = DamageFormula.player_heal(
                     self.player.stats, self.player_hp, skill, skill_level
                 )
                 logger.info(
@@ -84,10 +106,18 @@ class CombatEngine:
                 logger.info(f"Combat Player Buff: {skill['name']} applied buff/utility.")
             else:
                 # Offensive skill
-                # --- MODIFIED: Pass skill_level ---
-                dmg, crit = DamageFormula.player_skill(
+                # --- MODIFIED: Pass skill_level and capture event_type ---
+                dmg, crit, event_type = DamageFormula.player_skill(
                     self.player.stats, self.monster, skill, skill_level
                 )
+                
+                # --- NEW: Update report ---
+                if event_type == "crit":
+                    turn_report["player_crit"] = 1
+                else:
+                    turn_report["player_hit"] = 1
+                # --- END NEW ---
+                
                 logger.info(
                     f"Combat Player Skill: {skill['name']} | Dmg: {dmg} | Crit: {crit}"
                 )
@@ -98,7 +128,16 @@ class CombatEngine:
                     )
                 )
         else:
-            dmg, crit = DamageFormula.player_attack(self.player.stats, self.monster)
+            # --- MODIFIED: Capture event_type ---
+            dmg, crit, event_type = DamageFormula.player_attack(self.player.stats, self.monster)
+            
+            # --- NEW: Update report ---
+            if event_type == "crit":
+                turn_report["player_crit"] = 1
+            else:
+                turn_report["player_hit"] = 1
+            # --- END NEW ---
+            
             logger.info(f"Combat Player Atk: Basic | Dmg: {dmg} | Crit: {crit}")
             self.monster_hp -= dmg
 
@@ -110,7 +149,8 @@ class CombatEngine:
 
         if self.monster_hp <= 0:
             logger.info(f"Combat End: Monster HP {self.monster_hp} <= 0. Player wins.")
-            return self._player_victory(log)
+            # --- MODIFIED: Pass turn_report to victory function ---
+            return self._player_victory(log, turn_report)
 
         # --- 2. MONSTER'S TURN ---
         action = MonsterAI.choose_action(
@@ -119,7 +159,16 @@ class CombatEngine:
         logger.info(f"Combat Monster AI: Selected {action['type']}")
 
         if action["type"] == "attack":
-            dmg, crit = DamageFormula.monster_attack(self.monster, self.player.stats)
+            # --- MODIFIED: Capture event_type ---
+            dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.player.stats)
+            
+            # --- NEW: Update report ---
+            if event_type == "dodge":
+                turn_report["player_dodge"] = 1
+            else:
+                turn_report["damage_taken"] = dmg
+            # --- END NEW ---
+
             logger.info(f"Combat Monster Atk: Basic | Dmg: {dmg} | Crit: {crit}")
             self.player_hp -= dmg
             log.append(
@@ -127,9 +176,18 @@ class CombatEngine:
             )
         elif action["type"] == "skill":
             skill = action["skill"]
-            dmg, crit = DamageFormula.monster_skill(
+            # --- MODIFIED: Capture event_type ---
+            dmg, crit, event_type = DamageFormula.monster_skill(
                 self.monster, self.player.stats, skill
             )
+
+            # --- NEW: Update report ---
+            if event_type == "dodge":
+                turn_report["player_dodge"] = 1
+            else:
+                turn_report["damage_taken"] = dmg
+            # --- END NEW ---
+            
             logger.info(
                 f"Combat Monster Skill: {skill['name']} | Dmg: {dmg} | Crit: {crit}"
             )
@@ -144,15 +202,18 @@ class CombatEngine:
 
         if self.player_hp <= 0:
             logger.info(f"Combat End: Player HP {self.player_hp} <= 0. Monster wins.")
-            return self._monster_victory(log)
+            # --- MODIFIED: Pass turn_report to monster victory function ---
+            return self._monster_victory(log, turn_report)
 
         logger.info("Combat Turn End: No winner.")
+        # --- MODIFIED: Return the turn_report ---
         return {
             "winner": None,
             "phrases": log,
             "hp_current": self.player_hp,
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
+            "turn_report": turn_report, 
         }
 
     def _decide_player_skill(self) -> dict:
@@ -209,7 +270,7 @@ class CombatEngine:
 
         return {"skill": None, "reason": "No offensive skills usable or affordable."}
 
-    def _player_victory(self, log):
+    def _player_victory(self, log, turn_report):
         """Handles rewarding EXP and passing up monster drops."""
         exp = ExpCalculator.calculate_exp(self.player.level, self.monster)
         drops = self.monster.get("drops", [])
@@ -218,6 +279,7 @@ class CombatEngine:
         logger.info(f"Combat Player Victory. EXP: {exp} | Leveled Up: {leveled_up}")
         log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up))
 
+        # --- MODIFIED: Return the final turn's report ---
         return {
             "winner": "player",
             "phrases": log,
@@ -227,17 +289,20 @@ class CombatEngine:
             "exp": exp,
             "drops": drops,
             "monster_data": self.monster,
+            "turn_report": turn_report,
         }
 
-    def _monster_victory(self, log):
+    def _monster_victory(self, log, turn_report):
         """Handles death phrase."""
         logger.info("Combat Monster Victory.")
         log.append(CombatPhrases.player_defeated(self.monster))
 
+        # --- MODIFIED: Return the final turn's report ---
         return {
             "winner": "monster",
             "phrases": log,
             "hp_current": 0,
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
+            "turn_report": turn_report,
         }
