@@ -15,6 +15,7 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
 import asyncio
+import json # <-- NEW IMPORT
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -112,9 +113,8 @@ class CharacterTabView(View):
             description=(
                 "*Beyond the enclave, the world is fractured. Each path is a test of wit, grit, and survival.*\n\n"
                 "**Your choices:**\n"
-                "• **Quest Log** — Review duties assigned by the Guild.\n"
-                "• **Guild Hall** — Return for supplies, contracts, and counsel.\n"
-                "• **Begin Expedition** — Step beyond the walls and into the wild." 
+                "• **Begin Expedition** — Step beyond the walls and into the wild.\n"
+                "• **Guild Hall** — Return for supplies, contracts, and counsel."
             ),
             color=discord.Color.dark_teal(),
         )
@@ -137,14 +137,22 @@ class CharacterTabView(View):
 
         from .status_update_cog import StatusUpdateView
 
+        # --- THIS IS THE FIX ---
+        # We now fetch the 'players' row and the full 'stats' row
         player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+        # Use our new function to get the row with all the _exp columns
+        stats_row_task = asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id)
 
-        player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
-        player_stats = PlayerStats.from_dict(stats_json)
+        player_data, stats_row = await asyncio.gather(player_data_task, stats_row_task)
+        
+        # We can now create the PlayerStats object from the stats_row
+        player_stats = PlayerStats.from_dict(json.loads(stats_row["stats_json"]))
 
-        embed = StatusUpdateView.build_status_embed(player_data, player_stats)
-        view = StatusUpdateView(self.db, self.interaction_user, player_data, player_stats)
+        # We pass the full stats_row to the embed builder and the view
+        embed = StatusUpdateView.build_status_embed(player_data, player_stats, stats_row)
+        view = StatusUpdateView(self.db, self.interaction_user, player_data, player_stats, stats_row)
+        # --- END OF FIX ---
+        
         view.back_button.callback = back_to_profile_callback
 
         await interaction.edit_original_response(embed=embed, view=view)
@@ -348,10 +356,9 @@ class AdventureView(View):
                 player_stats,
             )
             
-            # --- THIS IS THE BUG FIX ---
-            # We are REMOVING the line that overwrote the correct callback.
-            # view.withdraw_btn.callback = back_to_profile_callback  <-- THIS LINE IS NOW GONE
-            # --- END OF FIX ---
+            # This was the bug fix from before, leaving it in
+            # The button on ExplorationView is named 'withdraw_btn'
+            # view.withdraw_btn.callback = back_to_profile_callback # This line is now gone
             
             await interaction.edit_original_response(embed=embed, view=view)
             return
@@ -374,69 +381,29 @@ class AdventureView(View):
 
         view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, player_rank)
         
-        # This was the previous bug, which is already fixed:
+        # This was the other bug fix from before
         view.back_to_profile.callback = back_to_profile_callback
         
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="Quest Ledger",
-        style=discord.ButtonStyle.primary,
-        custom_id="profile_quest_log",
-        emoji=E.QUEST_SCROLL,
-        row=1,
-    )
-    async def quest_log_callback(self, interaction: discord.Interaction, button: Button):
-        """
-        Show the Quest Log UI.
-        """
-        await interaction.response.defer()
-        from game_systems.guild_system.quest_system import QuestSystem
-        from .quest_hub_cog import QuestLogView
-
-        quest_system = QuestSystem(self.db)
-        active_quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
-
-        embed = discord.Embed(
-            title=f"{E.QUEST_SCROLL} Adventurer's Ledger",
-            description=(
-                "*You unfurl the ledger entries that bind you to the Guild's tasks.*\n\n"
-                "A review of your currently accepted assignments."
-            ),
-            color=discord.Color.from_rgb(139, 69, 19),
-        )
-
-        if not active_quests:
-            embed.add_field(
-                name="No Active Contracts",
-                value="Visit the Guild Hall Quest Board to accept a task.",
-            )
-        else:
-            for quest in active_quests:
-                progress_text = []
-                objectives = quest.get("objectives", {})
-                progress = quest.get("progress", {})
-                for obj_type, tasks in objectives.items():
-                    if isinstance(tasks, dict):
-                        for task, required in tasks.items():
-                            current = progress.get(obj_type, {}).get(task, 0)
-                            progress_text.append(f"• {task}: {current} / {required}")
-                embed.add_field(
-                    name=f"{quest['title']} (ID: {quest['id']})",
-                    value="\n".join(progress_text) or "No objectives.",
-                    inline=False,
-                )
-
-        view = QuestLogView(self.db, active_quests, self.interaction_user)
-        view.set_back_button(back_to_profile_callback, "Return — Character")
-        await interaction.edit_original_response(embed=embed, view=view)
+    # --- THIS BUTTON IS NOW REMOVED ---
+    # @discord.ui.button(
+    #     label="Quest Ledger",
+    #     style=discord.ButtonStyle.primary,
+    #     custom_id="profile_quest_log",
+    #     emoji=E.QUEST_SCROLL,
+    #     row=1,
+    # )
+    # async def quest_log_callback(self, interaction: discord.Interaction, button: Button):
+    #     ...
+    # --- END OF REMOVAL ---
 
     @discord.ui.button(
         label="Guild Hall",
         style=discord.ButtonStyle.primary,
         custom_id="profile_guild_hall",
         emoji="🏦",
-        row=1,
+        row=1, # <-- MOVED TO ROW 1
     )
     async def guild_hall_callback(self, interaction: discord.Interaction, button: Button):
         """

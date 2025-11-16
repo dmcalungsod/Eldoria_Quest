@@ -101,12 +101,13 @@ class AdventureSession:
 
             # --- NEW: Initialize aggregated battle report ---
             battle_report = {
-                "player_hit": 0,
+                "str_hits": 0,
+                "dex_hits": 0,
+                "mag_hits": 0,
                 "player_crit": 0,
                 "player_dodge": 0,
                 "damage_taken": 0,
                 "skills_used": 0,
-                "mag_skills_used": 0,
             }
             # --- END NEW ---
 
@@ -133,6 +134,12 @@ class AdventureSession:
             if not is_dead and combat_result.get("winner") == "player":
                 # We pass the final combat_result log to append stat-up messages
                 self._process_stat_exp(battle_report, combat_result["phrases"])
+                
+                # --- THIS IS THE FIX ---
+                # Increment the kill counter for Guild Rank
+                self._increment_kill_counter(combat_result["monster_data"]["tier"])
+                # --- END OF FIX ---
+                
             # --- END NEW ---
 
             logger.info(f"Simulate Step: Combat finished. Dead: {is_dead}")
@@ -420,15 +427,16 @@ class AdventureSession:
         Appends messages to the log_entries list.
         """
         
-        # 1. Define gain rates (as discussed)
+        # --- THIS IS THE FIX: Updated formulas ---
         gains = {
-            "str_exp": battle_report.get("player_hit", 0) * 0.5,
-            "dex_exp": battle_report.get("player_crit", 0) * 2.0,
+            "str_exp": battle_report.get("str_hits", 0) * 0.5,
+            "dex_exp": (battle_report.get("dex_hits", 0) * 0.5) + (battle_report.get("player_crit", 0) * 2.0),
             "agi_exp": battle_report.get("player_dodge", 0) * 1.5,
             "end_exp": battle_report.get("damage_taken", 0) * 0.2,
-            "mag_exp": battle_report.get("mag_skills_used", 0) * 1.0,
+            "mag_exp": battle_report.get("mag_hits", 0) * 1.0,
             "lck_exp": 0.5,  # Flat 0.5 LCK exp for *surviving* a battle
         }
+        # --- END OF FIX ---
 
         # 2. Get current stats and stat_exp from DB
         with self.db.get_connection() as conn:
@@ -519,6 +527,39 @@ class AdventureSession:
             if stat_up_messages:
                 log_entries.append("\n" + "\n".join(stat_up_messages))
 
+    # --- END NEW FUNCTION ---
+    
+    # --- NEW FUNCTION: _increment_kill_counter ---
+    def _increment_kill_counter(self, monster_tier: str):
+        """
+        Increments the correct kill counter in the guild_members table
+        based on the monster's tier.
+        """
+        
+        # Determine which column to update
+        if monster_tier == "Normal":
+            column_to_update = "normal_kills"
+        elif monster_tier == "Elite":
+            column_to_update = "elite_kills"
+        elif monster_tier == "Boss":
+            column_to_update = "boss_kills"
+        else:
+            return # Don't update for unknown tiers
+
+        try:
+            with self.db.get_connection() as conn:
+                cur = conn.cursor()
+                # Use f-string safely here because we've controlled the input
+                cur.execute(
+                    f"""
+                    UPDATE guild_members
+                    SET {column_to_update} = {column_to_update} + 1
+                    WHERE discord_id = ?
+                    """,
+                    (self.discord_id,)
+                )
+        except Exception as e:
+            logger.error(f"Failed to increment kill counter for {self.discord_id}: {e}")
     # --- END NEW FUNCTION ---
 
     def _update_quests(self, monster_name: str, drops: list) -> list:

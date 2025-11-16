@@ -165,13 +165,15 @@ class QuestsMenuView(View):
         self.quest_board_btn.callback = self.view_quests_callback
         self.add_item(self.quest_board_btn)
 
+        # --- THIS IS THE FIX ---
         self.turn_in_btn = Button(
-            label="Quest Turn-In",
+            label="Quest Ledger", # Renamed from "Quest Turn-In"
             style=discord.ButtonStyle.primary,
             custom_id="guild_turn_in",
             emoji=E.QUEST_SCROLL,
             row=0,
         )
+        # --- END OF FIX ---
         self.turn_in_btn.callback = self.quest_turn_in_callback
         self.add_item(self.turn_in_btn)
 
@@ -233,7 +235,7 @@ class QuestsMenuView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     # -------------------------
-    # Quest Turn-In
+    # Quest Turn-In (now Quest Ledger)
     # -------------------------
     async def quest_turn_in_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
@@ -243,13 +245,16 @@ class QuestsMenuView(View):
         quest_system = QuestSystem(self.db)
         active_quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
 
+        # --- THIS IS THE FIX ---
         embed = discord.Embed(
-            title=f"{E.QUEST_SCROLL} Quest Turn-In",
-            description="Report completed contracts and receive your due Aurum and reputation.",
+            title=f"{E.QUEST_SCROLL} Quest Ledger",
+            description="A review of your active contracts. Select a completed quest from the dropdown to report its resolution.",
             color=discord.Color.from_rgb(139, 69, 19),
         )
+        # --- END OF FIX ---
+        
         if not active_quests:
-            embed.add_field(name="No Active Contracts", value="You have no completed contracts to turn in.", inline=False)
+            embed.add_field(name="No Active Contracts", value="You have no active contracts.", inline=False)
 
         view = QuestLogView(self.db, active_quests, self.interaction_user)
         # ensure child view's back returns to this menu

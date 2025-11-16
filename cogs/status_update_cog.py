@@ -13,6 +13,7 @@ import json
 import sqlite3
 import asyncio
 from typing import Tuple
+import math # <-- NEW IMPORT
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -31,6 +32,20 @@ STAT_COSTS = {
     "LCK": 20,
 }
 
+# --- NEW: STAT EXP THRESHOLD ---
+STAT_EXP_THRESHOLD = 100
+# --- END NEW ---
+
+# --- NEW HELPER FUNCTION ---
+def _make_progress_bar(current: float, max_val: int, bar_length: int = 10) -> str:
+    """Generates a text-based progress bar."""
+    current = min(current, max_val) # Cap at max
+    percentage = current / max_val
+    filled_length = int(percentage * bar_length)
+    bar = '█' * filled_length + '─' * (bar_length - filled_length)
+    return f"[{bar}] {math.floor(current)}/{max_val}"
+# --- END NEW HELPER FUNCTION ---
+
 
 # ==========================================================
 # STATUS UPDATE VIEW
@@ -47,6 +62,7 @@ class StatusUpdateView(View):
         interaction_user: discord.User,
         player_data: sqlite3.Row,
         player_stats: PlayerStats,
+        stats_row: sqlite3.Row, # <-- NEW: Receive the full stats row
     ):
         super().__init__(timeout=None)
         self.db = db_manager
@@ -55,6 +71,7 @@ class StatusUpdateView(View):
         # Convert sqlite Row → dict so we can safely mutate values
         self.player_data = dict(player_data)
         self.player_stats = player_stats
+        self.stats_row = stats_row # <-- NEW: Store the stats row
         self.vestige_pool = self.player_data["vestige_pool"]
 
         # Add stat buttons
@@ -171,11 +188,19 @@ class StatusUpdateView(View):
 
         # Update local Vestige pool
         self.player_data["vestige_pool"] = new_vestige
+        
+        # --- THIS IS THE FIX ---
+        # We must re-fetch the stats_row to get the updated stats_json
+        # (which now has the new base stat)
+        new_stats_row = await asyncio.to_thread(
+            self.db.get_player_stats_row, self.interaction_user.id
+        )
+        # --- END OF FIX ---
 
         # Rebuild UI
-        new_embed = self.build_status_embed(self.player_data, self.player_stats)
+        new_embed = self.build_status_embed(self.player_data, self.player_stats, new_stats_row)
         new_view = StatusUpdateView(
-            self.db, self.interaction_user, self.player_data, self.player_stats
+            self.db, self.interaction_user, self.player_data, self.player_stats, new_stats_row
         )
         
         # Manually re-assign the callback to the new view's button
@@ -192,7 +217,7 @@ class StatusUpdateView(View):
     # EMBED
     # ==========================================================
     @staticmethod
-    def build_status_embed(player_data, player_stats):
+    def build_status_embed(player_data, player_stats, stats_row):
         # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title="🜁 Attribute Awakening",
@@ -217,6 +242,23 @@ class StatusUpdateView(View):
             value=formatted_stats,
             inline=False
         )
+        
+        # --- NEW: Show Practice EXP Bars ---
+        practice_bars = (
+            f"`STR:` {_make_progress_bar(stats_row['str_exp'], STAT_EXP_THRESHOLD)}\n"
+            f"`END:` {_make_progress_bar(stats_row['end_exp'], STAT_EXP_THRESHOLD)}\n"
+            f"`DEX:` {_make_progress_bar(stats_row['dex_exp'], STAT_EXP_THRESHOLD)}\n"
+            f"`AGI:` {_make_progress_bar(stats_row['agi_exp'], STAT_EXP_THRESHOLD)}\n"
+            f"`MAG:` {_make_progress_bar(stats_row['mag_exp'], STAT_EXP_THRESHOLD)}\n"
+            f"`LCK:` {_make_progress_bar(stats_row['lck_exp'], STAT_EXP_THRESHOLD)}"
+        )
+        
+        embed.add_field(
+            name="Attribute Practice",
+            value=practice_bars,
+            inline=False
+        )
+        # --- END NEW ---
 
         embed.set_footer(text="Each attribute point reshapes the spirit. Choose wisely.")
         return embed

@@ -138,6 +138,22 @@ class DatabaseManager:
             return {}
 
         return json.loads(row["stats_json"])
+    
+    # --- NEW FUNCTION ---
+    def get_player_stats_row(self, discord_id: int) -> Optional[sqlite3.Row]:
+        """
+        Fetches the entire row from the 'stats' table, including
+        stats_json and all stat_exp columns.
+        """
+        conn = self.connect()
+        cur = conn.cursor()
+
+        cur.execute("SELECT * FROM stats WHERE discord_id = ?", (discord_id,))
+        row = cur.fetchone()
+
+        conn.close()
+        return row
+    # --- END NEW FUNCTION ---
 
     # ------------------------------------------------------------
     # PLAYER VITALS (HP/MP)

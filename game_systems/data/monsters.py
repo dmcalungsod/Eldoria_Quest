@@ -68,9 +68,12 @@ for idx in range(1, 51):
     hp = 30 + level * (8 if tier == "Normal" else 14 if tier == "Elite" else 40)
     atk = 3 + level // (1 if tier == "Normal" else 1 if tier == "Elite" else 1)
     defense = 1 + (level // (2 if tier == "Normal" else 1))
+    
+    # --- THIS IS THE FIX: Changed 'level * 10' to 'level * 15' ---
     xp = int(
-        (level * 8) * (1.0 if tier == "Normal" else 2.5 if tier == "Elite" else 10.0)
+        (level * 15) * (1.0 if tier == "Normal" else 2.5 if tier == "Elite" else 10.0)
     )
+    # --- END OF FIX ---
 
     # --- New Thematic Drop Logic ---
     drops = []
