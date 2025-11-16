@@ -347,7 +347,12 @@ class AdventureView(View):
                 self.interaction_user,
                 player_stats,
             )
-            view.leave_button.callback = back_to_profile_callback
+            
+            # --- THIS IS THE FIX ---
+            # The button on ExplorationView is named 'withdraw_btn'
+            view.withdraw_btn.callback = back_to_profile_callback
+            # --- END OF FIX ---
+            
             await interaction.edit_original_response(embed=embed, view=view)
             return
 
@@ -368,7 +373,12 @@ class AdventureView(View):
         )
 
         view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, player_rank)
-        view.back_button.callback = back_to_profile_callback
+        
+        # --- THIS IS THE FIRST FIX (which you already applied) ---
+        # The button on AdventureSetupView is named 'back_to_profile'
+        view.back_to_profile.callback = back_to_profile_callback
+        # --- END OF FIX ---
+        
         await interaction.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(
@@ -498,7 +508,7 @@ class InventoryView(View):
             value = str(item["id"])
 
             if item_type == "equipment":
-                label = f"{item['item_name']} (Slot: {item['slot']})"
+                label = f"{item['item_name']} ({item['slot']})"
                 if item.get("equipped") == 1:
                     unequip_options.append(discord.SelectOption(label=label, value=value, emoji="🛡️"))
                 else:

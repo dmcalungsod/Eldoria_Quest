@@ -59,16 +59,18 @@ HERB = "🌿"
 
 
 # --- NEW: ANSI Color Definitions ---
+# --- THIS IS THE FIX: Replaced " [0;37m" with "\u001b[0;37m" ---
 RARITY_COLORS = {
-    "Common": " [0;37m",  # Grey/White
-    "Uncommon": " [0;32m",  # Green
-    "Rare": " [0;34m",  # Blue
-    "Epic": " [0;35m",  # Purple
-    "Legendary": " [0;33m",  # Yellow/Gold
-    "Mythical": " [0;31m",  # Red
-    "DEFAULT": " [0;37m",  # Default to grey
+    "Common": "\u001b[0;37m",  # Grey/White
+    "Uncommon": "\u001b[0;32m",  # Green
+    "Rare": "\u001b[0;34m",  # Blue
+    "Epic": "\u001b[0;35m",  # Purple
+    "Legendary": "\u001b[0;33m",  # Yellow/Gold
+    "Mythical": "\u001b[0;31m",  # Red
+    "DEFAULT": "\u001b[0;37m",  # Default to grey
 }
-ANSI_RESET = " [0m"
+ANSI_RESET = "\u001b[0m"
+# --- END OF FIX ---
 
 
 def get_rarity_ansi(rarity_name: str, text: str) -> str:

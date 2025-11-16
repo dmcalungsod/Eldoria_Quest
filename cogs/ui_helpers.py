@@ -31,7 +31,7 @@ def build_inventory_embed(items: list) -> discord.Embed:
     Builds the standard embed for the player's inventory,
     separating items by type and equipped status.
 
-    --- NOW WITH ANSI COLORS & STATS ---
+    --- NOW WITH ANSI COLORS & SIMPLIFIED FORMAT ---
     """
     embed = discord.Embed(
         title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange()
@@ -54,34 +54,28 @@ def build_inventory_embed(items: list) -> discord.Embed:
 
         if item_type == "Equipment":
 
-            # --- THIS IS THE FIX ---
-            # 1. Fetch the stats
-            stats_dict = item_manager.get_equipment_stats(
-                item["item_key"], item["item_source_table"]
-            )
-
-            # 2. Format the stats into a string
-            stats_str = ""
-            if stats_dict:
-                stats_str = ", ".join(
-                    f"{stat}: +{val}" for stat, val in stats_dict.items()
-                )
-                stats_str = f" ({stats_str})"
-            # --- END OF FIX ---
+            # --- THIS IS THE FIX (User request to simplify format) ---
+            # We no longer fetch or display individual stats in the list.
+            
+            # 1. Get the slot, capitalize it if it exists
+            slot_name = item.get('slot', 'Unknown')
+            if slot_name:
+                # Turns 'heavy_armor' into 'Heavy Armor'
+                slot_name = slot_name.replace('_', ' ').title()
 
             if item["equipped"] == 1:
-                # Build string WITHOUT markdown, WITH stats
-                # --- MODIFIED: Removed ({rarity}) ---
-                text = f"• {item['item_name']} (Slot: {item['slot']}){stats_str}"
+                # New format: [E] Item Name (Slot)
+                text = f"[E] {item['item_name']} ({slot_name})"
                 categories["Equipped"].append(get_rarity_ansi(rarity, text))
             else:
-                # Build string WITHOUT markdown, WITH stats
-                # --- MODIFIED: Removed ({rarity}) ---
-                text = f"• {item['item_name']} (x{item['count']}){stats_str}"
+                # New format: • Item Name (xCount)
+                # (Slot/stats are hidden for unequipped items to reduce clutter)
+                text = f"• {item['item_name']} (x{item['count']})"
                 categories["Equipment"].append(get_rarity_ansi(rarity, text))
+            # --- END OF FIX ---
 
         elif item_type in categories:
-            # --- MODIFIED: Removed ({rarity}) ---
+            # Format for Materials/Consumables
             text = f"• {item['item_name']} (x{item['count']})"
             categories[item_type].append(get_rarity_ansi(rarity, text))
 

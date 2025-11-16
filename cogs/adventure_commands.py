@@ -232,7 +232,11 @@ class ExplorationView(View):
 
         # Monster vitals if active monster present
         active_monster = None
-        if session_row and session_row.get("active_monster_json"):
+        
+        # --- THIS IS THE FIRST FIX ---
+        # Changed .get("active_monster_json") to key access
+        if session_row and "active_monster_json" in session_row.keys() and session_row["active_monster_json"]:
+        # --- END OF FIX ---
             try:
                 active_monster = json.loads(session_row["active_monster_json"])
             except Exception:
@@ -264,7 +268,11 @@ class ExplorationView(View):
         )
 
         prev_mon_hp = None
-        if prev_session and prev_session.get("active_monster_json"):
+        
+        # --- THIS IS THE SECOND FIX ---
+        # Changed .get("active_monster_json") to key access
+        if prev_session and "active_monster_json" in prev_session.keys() and prev_session["active_monster_json"]:
+        # --- END OF FIX ---
             try:
                 prev_mon_hp = json.loads(prev_session["active_monster_json"]).get("HP")
             except Exception:
@@ -307,7 +315,11 @@ class ExplorationView(View):
         )
 
         final_mon_hp = None
-        if final_session and final_session.get("active_monster_json"):
+        
+        # --- THIS IS THE THIRD FIX ---
+        # Changed .get("active_monster_json") to key access
+        if final_session and "active_monster_json" in final_session.keys() and final_session["active_monster_json"]:
+        # --- END OF FIX ---
             try:
                 final_mon_hp = json.loads(final_session["active_monster_json"]).get("HP")
             except Exception:
