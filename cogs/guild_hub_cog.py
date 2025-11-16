@@ -154,7 +154,9 @@ class QuestsMenuView(View):
         self.rank_system = RankSystem(self.db)
         self.interaction_user = interaction_user
 
-        # Buttons
+        # --- THIS IS THE FIX ---
+
+        # Button 1: Quest Board
         self.quest_board_btn = Button(
             label="Quest Board",
             style=discord.ButtonStyle.primary,
@@ -165,28 +167,40 @@ class QuestsMenuView(View):
         self.quest_board_btn.callback = self.view_quests_callback
         self.add_item(self.quest_board_btn)
 
-        # --- THIS IS THE FIX ---
-        self.turn_in_btn = Button(
-            label="Quest Ledger", # Renamed from "Quest Turn-In"
+        # Button 2: Quest Ledger (View Only)
+        self.quest_ledger_btn = Button(
+            label="Quest Ledger",
             style=discord.ButtonStyle.primary,
-            custom_id="guild_turn_in",
+            custom_id="guild_quest_ledger",
             emoji=E.QUEST_SCROLL,
             row=0,
         )
-        # --- END OF FIX ---
+        self.quest_ledger_btn.callback = self.view_quest_ledger_callback
+        self.add_item(self.quest_ledger_btn)
+
+        # Button 3: Quest Turn-In
+        self.turn_in_btn = Button(
+            label="Quest Turn-In",
+            style=discord.ButtonStyle.success, # Changed style
+            custom_id="guild_turn_in",
+            emoji=E.MEDAL, # Changed emoji
+            row=0,
+        )
         self.turn_in_btn.callback = self.quest_turn_in_callback
         self.add_item(self.turn_in_btn)
 
+        # Button 4: Check Rank
         self.check_rank_btn = Button(
             label="Check Rank",
             style=discord.ButtonStyle.secondary,
             custom_id="guild_check_rank",
-            emoji=E.MEDAL,
-            row=0,
+            emoji="🏅",
+            row=1, # Moved to row 1
         )
         self.check_rank_btn.callback = self.check_rank_callback
         self.add_item(self.check_rank_btn)
 
+        # Button 5: Back
         self.back_btn = Button(
             label="Back to Guild Lobby",
             style=discord.ButtonStyle.grey,
@@ -195,6 +209,8 @@ class QuestsMenuView(View):
         )
         self.back_btn.callback = back_to_guild_hall_callback
         self.add_item(self.back_btn)
+        
+        # --- END OF FIX ---
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -235,7 +251,62 @@ class QuestsMenuView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     # -------------------------
-    # Quest Turn-In (now Quest Ledger)
+    # Quest Ledger (NEW CALLBACK)
+    # -------------------------
+    async def view_quest_ledger_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
+        await interaction.response.defer()
+        from game_systems.guild_system.quest_system import QuestSystem
+        from .quest_hub_cog import QuestLedgerView # Import our new view
+
+        quest_system = QuestSystem(self.db)
+        active_quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
+
+        embed = discord.Embed(
+            title=f"{E.QUEST_SCROLL} Quest Ledger",
+            description="A review of your currently accepted contracts and their progress.",
+            color=discord.Color.from_rgb(139, 69, 19), # Brown color
+        )
+
+        if not active_quests:
+            embed.add_field(
+                name="No Active Contracts",
+                value="Visit the Quest Board to accept a task.",
+            )
+        else:
+            for quest in active_quests:
+                progress_text = []
+                objectives = quest.get("objectives", {})
+                progress = quest.get("progress", {})
+                
+                # --- THIS IS THE FIX ---
+                for obj_type, tasks in objectives.items():
+                    if isinstance(tasks, dict):
+                        # This handles {"defeat": {"Goblin": 5}}
+                        for task, required in tasks.items():
+                            current = progress.get(obj_type, {}).get(task, 0)
+                            progress_text.append(f"• {task}: {current} / {required}")
+                    else:
+                        # This handles {"locate": "Lina"}
+                        task = tasks  # task is "Lina"
+                        required = 1  # required is 1
+                        current = progress.get(obj_type, {}).get(task, 0)
+                        # --- THIS IS THE LINE TO FIX ---
+                        progress_text.append(f"• {obj_type.title()} {task.title()}: {current} / {required}")
+                        # --- END OF LINE TO FIX ---
+                # --- END OF FIX ---
+                        
+                embed.add_field(
+                    name=f"{quest['title']} (ID: {quest['id']})",
+                    value="\n".join(progress_text) or "No objectives.",
+                    inline=False,
+                )
+        
+        view = QuestLedgerView(self.db, active_quests, self.interaction_user)
+        view.set_back_button(self.back_to_this_menu, "Back to Quests")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # -------------------------
+    # Quest Turn-In
     # -------------------------
     async def quest_turn_in_callback(self, interaction: discord.Interaction, button: Optional[Button] = None):
         await interaction.response.defer()
@@ -245,16 +316,25 @@ class QuestsMenuView(View):
         quest_system = QuestSystem(self.db)
         active_quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
 
-        # --- THIS IS THE FIX ---
         embed = discord.Embed(
-            title=f"{E.QUEST_SCROLL} Quest Ledger",
-            description="A review of your active contracts. Select a completed quest from the dropdown to report its resolution.",
-            color=discord.Color.from_rgb(139, 69, 19),
+            title=f"{E.MEDAL} Quest Turn-In",
+            description="Report completed contracts and receive your due Aurum and reputation. Select a quest from the dropdown to report.",
+            color=discord.Color.gold(), # Gold color for rewards
         )
-        # --- END OF FIX ---
         
+        # We still build the list of *all* active quests for the QuestLogView
         if not active_quests:
-            embed.add_field(name="No Active Contracts", value="You have no active contracts.", inline=False)
+            embed.add_field(name="No Active Contracts", value="You have no contracts to turn in.", inline=False)
+        else:
+            # This list is for the *dropdown*, which only shows completable quests
+            completable_quests = 0
+            for quest in active_quests:
+                 if quest_system.check_completion(quest["progress"], quest["objectives"]):
+                     completable_quests += 1
+            
+            if completable_quests == 0:
+                 embed.add_field(name="No Completed Quests", value="None of your active contracts are ready to turn in.", inline=False)
+
 
         view = QuestLogView(self.db, active_quests, self.interaction_user)
         # ensure child view's back returns to this menu

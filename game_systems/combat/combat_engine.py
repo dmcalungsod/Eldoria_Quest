@@ -278,7 +278,11 @@ class CombatEngine:
         leveled_up = self.player.add_exp(exp)
 
         logger.info(f"Combat Player Victory. EXP: {exp} | Leveled Up: {leveled_up}")
-        log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up))
+        
+        # --- THIS IS THE FIX ---
+        # We now pass the new level to the phrasing function
+        log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up, self.player.level))
+        # --- END OF FIX ---
 
         return {
             "winner": "player",

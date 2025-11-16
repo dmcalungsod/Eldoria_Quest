@@ -21,6 +21,49 @@ import game_systems.data.emojis as E
 from .ui_helpers import back_to_profile_callback, back_to_guild_hall_callback
 
 # ======================================================================
+# QUEST LEDGER VIEW (NEW)
+# ======================================================================
+
+class QuestLedgerView(View):
+    """
+    Displays the player's currently accepted quests (read-only).
+    This is just for viewing, not completing.
+    """
+
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        active_quests: list,
+        interaction_user: discord.User,
+    ):
+        super().__init__(timeout=None)
+        self.db = db_manager
+        self.active_quests = active_quests
+        self.interaction_user = interaction_user
+
+        # --- Back Button ---
+        self.back_button = Button(
+            label="Back to Quests Menu",
+            style=discord.ButtonStyle.secondary,
+            custom_id="back_to_guild_quests_menu", # This will be set by the parent
+            row=1,
+        )
+        self.add_item(self.back_button)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
+            return False
+        return True
+
+    def set_back_button(self, callback_function, label="Back"):
+        self.back_button.label = label
+        self.back_button.callback = callback_function
+
+
+# ======================================================================
 # QUEST LOG & TURN-IN VIEW
 # ======================================================================
 
@@ -144,11 +187,24 @@ class QuestLogView(View):
                 progress_text = []
                 objectives = quest.get("objectives", {})
                 progress = quest.get("progress", {})
+                
+                # --- THIS IS THE FIX ---
                 for obj_type, tasks in objectives.items():
                     if isinstance(tasks, dict):
+                        # This handles {"defeat": {"Goblin": 5}}
                         for task, required in tasks.items():
                             current = progress.get(obj_type, {}).get(task, 0)
                             progress_text.append(f"• {task}: {current} / {required}")
+                    else:
+                        # This handles {"locate": "Lina"}
+                        task = tasks  # task is "Lina"
+                        required = 1  # required is 1
+                        current = progress.get(obj_type, {}).get(task, 0)
+                        # --- THIS IS THE LINE TO FIX ---
+                        progress_text.append(f"• {obj_type.title()} {task.title()}: {current} / {required}")
+                        # --- END OF LINE TO FIX ---
+                # --- END OF FIX ---
+                        
                 embed.add_field(
                     name=f"{quest['title']} (ID: {quest['id']})",
                     value="\n".join(progress_text) or "No objectives.",

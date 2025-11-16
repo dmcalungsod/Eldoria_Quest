@@ -21,7 +21,8 @@ QUESTS_F_TIER = [
         "Moisture from the Broken Veil has thickened the forest air, spawning an abnormal number of Forest Slimes. Farmer Tallen’s fields have become a slow-moving tide of gelatinous pests. He seeks someone willing to drive them back before planting season is ruined.",
         # --- FIX: Changed "Forest Slime" to "Verdant Slime" and "Glimmer Slime" ---
         json.dumps({"defeat": {"Verdant Slime": 5, "Glimmer Slime": 5}}),
-        json.dumps({"exp": 45, "aurum": 20, "item": "Minor Healing Draught"}),
+        # --- FIX: Changed item name to match consumables.py ---
+        json.dumps({"exp": 45, "aurum": 20, "item": "Dewfall Tonic"}),
     ),
     (
         2,
@@ -32,7 +33,8 @@ QUESTS_F_TIER = [
         "The local healer needs fresh medicinal plants.",
         "The Whispering Thicket grows herbs found nowhere else, especially Moonleaf—gleaming silver leaves used to treat fevers. With monsters stirring, Mirra can’t safely gather them herself. She requests an adventurer to harvest the plants before night-dew poisons their potency.",
         json.dumps({"gather": {"Moonleaf Herb": 5}}),
-        json.dumps({"exp": 25, "aurum": 10, "item": "Herbal Salve"}),
+        # --- FIX: Changed item name to match consumables.py ---
+        json.dumps({"exp": 25, "aurum": 10, "item": "Thicket Antidote"}),
     ),
     (
         3,
@@ -111,7 +113,8 @@ QUESTS_F_TIER = [
         "Gather ingredients for travel rations.",
         "Vero’s inn prepares provisions for those venturing into the forest. He needs fresh mushroom caps and forest berries, both of which grow near shallow cave mouths—often watched by lurking slimes.",
         json.dumps({"collect": {"Cavecap Mushroom": 4, "Wild Berry": 3}}),
-        json.dumps({"exp": 30, "aurum": 10, "item": "Small Stamina Snack"}),
+        # --- FIX: Changed item name to match consumables.py ---
+        json.dumps({"exp": 30, "aurum": 10, "item": "Trailman's Ration"}),
     ),
     (
         10,
@@ -151,7 +154,8 @@ QUESTS_E_TIER = [
         "Collect venom samples from poisonous snakes.",
         "Strange serpents have slithered into the grove, their fangs dripping an iridescent toxin unseen since before the Sundering. Lune hopes to refine an antidote—but only if someone brings her samples.",
         json.dumps({"collect": {"Serpent Venom": 3}}),
-        json.dumps({"exp": 55, "aurum": 24, "item": "Antidote Flask"}),
+        # --- FIX: Changed item name to match consumables.py ---
+        json.dumps({"exp": 55, "aurum": 24, "item": "Thicket Antidote"}),
     ),
     (
         13,
@@ -175,7 +179,8 @@ QUESTS_E_TIER = [
         "A sentient sap-creature—the Treeling—has claimed Birchfall Path, harassing workers and smashing tools. Bran asks for aid before the creature’s roots choke out the entire path.",
         # --- FIX: Changed "Treeling" to "Vineling" ---
         json.dumps({"defeat": {"Vineling": 1}}),
-        json.dumps({"exp": 90, "aurum": 28, "item": "Bark-Stitched Gloves"}),
+        # --- FIX: Changed equipment to a high-value consumable ---
+        json.dumps({"exp": 90, "aurum": 28, "item": "Elixir of Verdant Heart"}),
     ),
     (
         15,
@@ -210,7 +215,8 @@ QUESTS_E_TIER = [
         "Alyss trains new recruits by sending them after Swift-tail Hares—nimble creatures infused with faint forest magic. Catching them tests reflex and precision.",
         # --- FIX: Changed "Swift-tail Hare" to "Gloam Hare" ---
         json.dumps({"defeat": {"Gloam Hare": 5}}),
-        json.dumps({"exp": 50, "aurum": 12, "item": "Wooden Ranger Pendant"}),
+        # --- FIX: Changed equipment to a consumable ---
+        json.dumps({"exp": 50, "aurum": 12, "item": "Runner's Cordial"}),
     ),
     (
         18,
@@ -233,7 +239,8 @@ QUESTS_E_TIER = [
         "The Webwood’s population of brood spiders has ballooned, stringing webs across traveler roads. Their venom weakens limbs, making escape impossible. Rhea requires an adventurer to thin their numbers.",
         # --- FIX: Changed "Brood Spider" to "Thicket Spider" ---
         json.dumps({"defeat": {"Thicket Spider": 6}}),
-        json.dumps({"exp": 85, "aurum": 32, "item": "Venom Sac"}),
+        # --- FIX: Changed material to a consumable ---
+        json.dumps({"exp": 85, "aurum": 32, "item": "Panacea Root Paste"}),
     ),
     (
         20,
@@ -263,7 +270,7 @@ QUESTS_D_TIER = [
         "A cunning goblin lieutenant has unified several scattered tribes. His camp rings with stolen steel and crude banners. If left unchecked, an organized horde might rise.",
         # --- FIX: Changed "Goblin Lieutenant Krag" to "Bramble Goblin" (a tougher goblin) ---
         json.dumps({"defeat": {"Bramble Goblin": 1}}),
-        json.dumps({"exp": 120, "aurum": 55, "item": "Krag’s Insignia"}),
+        json.dumps({"exp": 120, "aurum": 55, "item": "Captains' Ale (Embolden)"}), # Fixed item
     ),
     (
         22,
@@ -275,7 +282,7 @@ QUESTS_D_TIER = [
         "A Heartwood Sprite has been corrupted by a splinter of Veil energy lodged in its body. Leira believes an adventurer with a steady hand can help remove it—if they can survive its thrashing.",
         # --- FIX: Changed "Sprite" to "Wisp-Sentinel" ---
         json.dumps({"subdue": "Wisp-Sentinel", "remove": "Veil Splinter"}),
-        json.dumps({"exp": 110, "aurum": 40, "item": "Blessing of Vital Sap"}),
+        json.dumps({"exp": 110, "aurum": 40, "item": "Sap of Renewal"}), # Fixed item
     ),
     (
         23,
@@ -287,7 +294,7 @@ QUESTS_D_TIER = [
         "The Moonfang Wolf is a silver-coated predator that leads lesser wolves with eerie discipline. Yorin fears it will turn its pack upon the village unless someone challenges it.",
         # --- FIX: Changed "Moonfang Wolf" to "Ridge Wolf" ---
         json.dumps({"defeat": {"Ridge Wolf": 1}}),
-        json.dumps({"exp": 150, "aurum": 60, "item": "Moonfang Pelt"}),
+        json.dumps({"exp": 150, "aurum": 60, "item": "Glade Salve Vial"}), # Fixed item
     ),
     (
         24,
@@ -321,7 +328,7 @@ QUESTS_D_TIER = [
         "Recover stolen trade goods.",
         "Bandit-goblins ambushed Salvi and fled into the thicket with his fabrics and spices. The merchant begs someone to reclaim the goods before the creatures burn or eat them.",
         json.dumps({"recover": {"Trade Crates": 5}}),
-        json.dumps({"exp": 100, "aurum": 35, "item": "Salvi’s Trade Token"}),
+        json.dumps({"exp": 100, "aurum": 35, "item": "Lunaris Tonic"}), # Fixed item
     ),
     (
         27,
@@ -333,7 +340,7 @@ QUESTS_D_TIER = [
         "The Moonshadow Shrine’s white stones have turned black-veined, its pool reflecting horrors instead of moonlight. Mara needs an adventurer to drive off the wraithlings haunting it.",
         # --- FIX: Changed "Wraithling" to "Rookwood Shade" ---
         json.dumps({"defeat": {"Rookwood Shade": 5}, "use": "Purification Amulet"}),
-        json.dumps({"exp": 130, "aurum": 45, "item": "Blessed Talisman"}),
+        json.dumps({"exp": 130, "aurum": 45, "item": "Wardkeeper's Vial"}), # Fixed item
     ),
     (
         28,
@@ -345,7 +352,7 @@ QUESTS_D_TIER = [
         "The brood spiders answer to a single massive mother whose venom sacs can rot bark. Her growing brood threatens to spread beyond Webwood entirely.",
         # --- FIX: Changed "Spider Matron Vesska" to "Thicket Spider" (just more of them) ---
         json.dumps({"defeat": {"Thicket Spider": 10}}),
-        json.dumps({"exp": 160, "aurum": 70, "item": "Vesska’s Venom"}),
+        json.dumps({"exp": 160, "aurum": 70, "item": "Panacea Root Paste"}), # Fixed item
     ),
     (
         29,
@@ -368,7 +375,7 @@ QUESTS_D_TIER = [
         "The Whispering Oak, ancient guardian of the forest, has begun muttering in tones unlike any druidic language. Leira suspects an unseen parasite clinging to its bark—one born of the Veil.",
         # --- FIX: Changed "Oak Parasite" to "Pine Wight" ---
         json.dumps({"inspect": "Oak", "defeat": {"Pine Wight": 1}}),
-        json.dumps({"exp": 140, "aurum": 50, "item": "Oakwood Charm"}),
+        json.dumps({"exp": 140, "aurum": 50, "item": "Luck-Blessed Cordial"}), # Fixed item
     ),
 ]
 

@@ -132,13 +132,14 @@ class AdventureSession:
             
             # --- NEW: If player won, process stat exp ---
             if not is_dead and combat_result.get("winner") == "player":
-                # We pass the final combat_result log to append stat-up messages
-                self._process_stat_exp(battle_report, combat_result["phrases"])
                 
                 # --- THIS IS THE FIX ---
+                # We pass the main `log_entries` list to be appended to
+                self._process_stat_exp(battle_report, log_entries)
+                # --- END OF FIX ---
+                
                 # Increment the kill counter for Guild Rank
                 self._increment_kill_counter(combat_result["monster_data"]["tier"])
-                # --- END OF FIX ---
                 
             # --- END NEW ---
 
@@ -204,7 +205,7 @@ class AdventureSession:
         Finds a non-combat quest objective (gather, locate, etc.)
         """
         active_quests = self.quest_system.get_player_quests(self.discord_id)
-        event_types = ["gather", "locate", "examine", "survey"]
+        event_types = ["gather", "locate", "examine", "survey", "escort", "retrieve", "deliver"]
 
         for quest in active_quests:
             objectives = quest.get("objectives", {})
@@ -212,7 +213,27 @@ class AdventureSession:
 
             for obj_type in event_types:
                 if obj_type in objectives:
-                    for task, required in objectives[obj_type].items():
+                    
+                    # --- THIS IS THE FIX ---
+                    tasks = objectives[obj_type] # Get the objective data
+                
+                    if isinstance(tasks, dict):
+                        # This handles {"defeat": {"Goblin": 5}}
+                        for task, required in tasks.items():
+                            current = progress.get(obj_type, {}).get(task, 0)
+                            if current < required:
+                                self.quest_system.update_progress(
+                                    self.discord_id, quest["id"], obj_type, task, 1
+                                )
+                                log_entry = AdventureEvents.quest_event(obj_type, task)
+                                quest_update = (
+                                    f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"
+                                )
+                                return {"log": [log_entry, quest_update], "dead": False}
+                    else:
+                        # This handles {"locate": "Lina"}
+                        task = tasks
+                        required = 1
                         current = progress.get(obj_type, {}).get(task, 0)
                         if current < required:
                             self.quest_system.update_progress(
@@ -223,6 +244,7 @@ class AdventureSession:
                                 f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"
                             )
                             return {"log": [log_entry, quest_update], "dead": False}
+                    # --- END OF FIX ---
 
         log_entry = AdventureEvents.no_event_found()
         return {"log": [log_entry], "dead": False}
@@ -471,8 +493,9 @@ class AdventureSession:
                     # Add gain to current exp
                     current_exp[key] += gain
                     
-                    # Check for stat level up
-                    if current_exp[key] >= STAT_EXP_THRESHOLD:
+                    # --- THIS IS THE FIX: Use a WHILE loop for multi-level-ups ---
+                    while current_exp[key] >= STAT_EXP_THRESHOLD:
+                    # --- END OF FIX ---
                         current_exp[key] -= STAT_EXP_THRESHOLD # Subtract threshold
                         base_stats[stat_name] += 1 # Increase base stat
                         
