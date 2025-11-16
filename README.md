@@ -4,65 +4,69 @@
 
 Inspired by:
 
-- **Danmachi** — guild ranks, dungeon structure, steady progression
+- **Danmachi** — guild hierarchy, dungeon progression, steady advancement
 - **Grimgar of Fantasy and Ash** — grounded danger, fragile mortality, material-driven survival
-- **Literary fantasy** — atmospheric narration, immersive tone, worldbuilding through text
+- **Literary fantasy** — atmospheric narration, immersive prose, worldbuilding through text
 
 ---
 
-\<p align="center"\>
-  \<img src="[https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge](https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge)"/\>
-  \<img src="[https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge](https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge)"/\>
-  \<img src="[https://img.shields.io/badge/not_open_source-grey?style=for-the-badge](https://img.shields.io/badge/not_open_source-grey?style=for-the-badge)"/\>
-\</p\>
+<p align="center">
+  <img src="https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/not_open_source-grey?style=for-the-badge"/>
+</p>
 
 ---
 
 # 🜁 **World & Theme**
 
-**Eldoria Quest** unfolds in a world shattered by **The Sundering**, a cataclysm that tore apart the Veil and unleashed horrors across the realm.
+**Eldoria Quest** unfolds in a world fractured by **The Sundering** — a magical catastrophe that tore open the Veil and unleashed horrors across the realm.
 
-Civilization survives only inside fortified enclaves such as **Astraeon**, home of the **Adventurer’s Guild**—an institution born from necessity rather than prestige. Adventurers are not heroes; they are workers who risk their lives so the city may endure.
+Civilization clings to survival within fortified cities such as **Astraeon**, home to the **Adventurer’s Guild** — an institution forged out of necessity rather than glory. Adventurers are not celebrated heroes; they are laborers who brave the wilds so that Astraeon may endure.
 
-Your character serves the Guild with the official occupation of **Adventurer**, tasked with reclaiming the wilds one dangerous step at a time.
+Your character is officially registered with the Guild under the occupation of **Adventurer**, tasked with reclaiming the world one perilous step at a time.
 
 The game blends:
 
 - **Guild-driven structure** (Danmachi)
 - **Material-based survival realism** (Grimgar)
-- **Literary, atmospheric narration** across all actions
+- **Atmospheric, literary narration** woven into every action
 
 ---
 
 # ⭐ **Design Philosophy**
 
-### 🜄 Material-Driven Survival (Danmachi-Style Economics)
+### 🜄 Material-Driven Survival
 
-- Monsters drop **Magic Stones** and **Monster Materials**, not currency.
-- All Aurum is earned by selling materials at the **Guild Exchange**.
-- Every expedition is a calculated risk with uncertain profit.
+- Monsters drop **Magic Stones** and **Monster Materials**, not gold.
+- All Aurum is earned by selling these resources at the **Guild Exchange**.
+- Every expedition is a risk; profit is never guaranteed.
 
-### 🜃 Story-Focused Immersion (Grimgar-Style)
+### 🜃 Narrative-Focused Immersion
 
-- Almost the entire game runs through a single persistent **ONE UI** message.
-- Exploration is **manual**, turn-based, and intentionally slow-paced.
-- Every action is narrated with book-like atmosphere and class awareness.
-- HP/MP persist between actions — healing is precious.
+- Nearly the entire game unfolds within a single persistent **ONE UI** interface.
+- Exploration is **manual**, deliberate, and turn-based.
+- Every action is narrated with thematic, class-aware writing.
+- HP/MP persist between encounters — recovery is scarce and meaningful.
 
 ---
 
 # 🜂 **Core Gameplay Loop**
 
-1.  **Begin** — Use `/start` to join the Adventurer’s Guild and receive your Guild Card.
-2.  **Prepare** — Manage your equipment and view your character’s Ledger.
-3.  **Press Forward** — Choose a location and advance through it step by step:
+1. **Begin** — Use `/start` to join the Adventurer’s Guild and receive your Guild Card.
 
-- **Combat (60%)** — Auto-resolved battles narrated turn-by-turn.
-   - **Regeneration (40%)** — You pause to breathe and recover HP/MP.
+2. **Prepare** — Manage equipment, inspect your Ledger, and ready yourself.
 
-4.  **Field Pack** — Access inventory mid-adventure to equip items or use potions.
-5.  **Withdraw to Astraeon City** — Return to the city to restore fully and finalize gains.
-6.  **Advance** — Sell materials, complete quests, and rise through Guild Ranks (F → SSS).
+3. **Press Forward** — Choose a location and advance through it step by step:
+
+   - **Combat (60%)** — Auto-resolved encounters narrated turn-by-turn.
+   - **Regeneration (40%)** — Short rests where you recover HP/MP.
+
+4. **Field Pack** — Access inventory mid-expedition to equip items or use consumables.
+
+5. **Return to Astraeon** — Recover fully, sell materials, and tally your gains.
+
+6. **Advance** — Earn Aurum, complete quests, and rise through Guild Ranks (F → SSS).
 
 ---
 
@@ -70,13 +74,12 @@ The game blends:
 
 - Persistent **ONE UI** interface
 - Manual, button-driven exploration
-- Turn-by-turn combat playback (1.5s suspense delay)
-- Auto-skill combat AI (class-aware decision making)
-- Real HP/MP persistence with no auto-healing
-- Material-based economy (no monster gold drops)
-- Complete equipment + consumable system
+- Turn-by-turn combat playback with suspense timing
+- Auto-skill combat AI (class-aware)
+- Real HP/MP persistence (no natural regeneration)
+- Full equipment + consumable system
 - Inventory access during expeditions
-- Guild Ranks with promotion requirements
+- Guild Ranks with structured promotion
 - Quest Board + passive quest progression
 
 ---
@@ -85,17 +88,17 @@ The game blends:
 
 ```
 eldoria-bot/
-├─ main.py                     # Bot entry point
+├─ main.py                     # Bot entry point
 ├─ README.md
 ├─ requirements.txt
 │
 ├─ cogs/
-│ ├─ onboarding_cog.py         # /start, character creation
-│ ├─ character_cog.py          # Profile, Ledger, Inventory, Skills UI
-│ ├─ guild_hub_cog.py          # Guild Hall, Rank Up, Exchange
-│ ├─ quest_hub_cog.py          # Quest Board + Quest Log UI
-│ ├─ adventure_commands.py     # Main exploration and adventure UI
-│ └─ ui_helpers.py             # Shared navigation functions
+│ ├─ onboarding_cog.py         # /start, character creation
+│ ├─ character_cog.py          # Profile, Ledger, Inventory, Skills UI
+│ ├─ guild_hub_cog.py          # Guild Hall, Rank Up, Exchange
+│ ├─ quest_hub_cog.py          # Quest Board + Quest Log UI
+│ ├─ adventure_commands.py     # Main exploration & adventure UI
+│ └─ ui_helpers.py             # Shared navigation utilities
 │
 ├─ database/
 │ ├─ database_manager.py
@@ -103,13 +106,13 @@ eldoria-bot/
 │ └─ populate_database.py
 │
 ├─ game_systems/
-│ ├─ adventure/                # Exploration + session logic
-│ ├─ combat/                   # Combat engine, phrases, math
-│ ├─ data/                     # Classes, monsters, items, skills
-│ ├─ guild_system/             # Exchange, ranks, quests, rewards
-│ ├─ items/                    # Equipment & inventory managers
-│ ├─ monsters/                 # Monster AI logic
-│ └─ player/                   # Player stats + leveling
+│ ├─ adventure/                # Exploration logic + session state
+│ ├─ combat/                   # Combat engine, math, narration
+│ ├─ data/                     # Classes, monsters, items, skills
+│ ├─ guild_system/             # Exchange, ranks, quests, rewards
+│ ├─ items/                    # Equipment and inventory logic
+│ ├─ monsters/                 # Monster behavior + AI
+│ └─ player/                   # Player stats, progression, occupation
 ```
 
 ---
