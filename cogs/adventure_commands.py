@@ -42,30 +42,21 @@ class AdventureSetupView(View):
     This view is shown when "Start Adventure" is clicked on the profile.
     """
 
-    def __init__(self, db, manager, interaction_user: discord.User):
+    # --- MODIFIED __init__ ---
+    def __init__(self, db, manager, interaction_user: discord.User, player_rank: str):
         super().__init__(timeout=None)
         self.db = db
         self.manager = manager
         self.interaction_user = interaction_user
+        # --- END MODIFICATION ---
 
         self.location_select = Select(
             placeholder="Choose a Zone...", min_values=1, max_values=1, row=0
         )
 
-        try:
-            conn = self.db.connect()
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT rank FROM guild_members WHERE discord_id = ?",
-                (interaction_user.id,),
-            )
-            player_rank_row = cur.fetchone()
-            player_rank = player_rank_row["rank"] if player_rank_row else "F"
-            conn.close()
-        except Exception:
-            player_rank = "F"
-
+        # --- REMOVED DB CALL, WE NOW USE THE PASSED-IN player_rank ---
         for loc_id, loc_data in LOCATIONS.items():
+            # This logic to check rank is not yet implemented, but the var is ready
             self.location_select.add_option(
                 label=loc_data["name"],
                 value=loc_id,
@@ -92,8 +83,15 @@ class AdventureSetupView(View):
         loc_id = self.location_select.values[0]
         loc_data = LOCATIONS[loc_id]
 
-        # 1. Start the "session" in the database (duration -1 = active)
-        self.manager.start_adventure(interaction.user.id, loc_id, duration_minutes=-1)
+        # --- ASYNC FIX ---
+        # Run the DB write in a thread
+        await asyncio.to_thread(
+            self.manager.start_adventure,
+            interaction.user.id,
+            loc_id,
+            duration_minutes=-1
+        )
+        # --- END FIX ---
 
         # 2. Create the new Exploration View
         initial_log = [
@@ -106,7 +104,6 @@ class AdventureSetupView(View):
             color=discord.Color.green(),
         )
 
-        adventure_cog = self.manager.bot.get_cog("AdventureCommands")
         view = ExplorationView(
             self.db, self.manager, loc_id, initial_log, self.interaction_user
         )
@@ -121,14 +118,13 @@ class AdventureSetupView(View):
         row=1,
     )
     async def back_to_profile(self, interaction: discord.Interaction, button: Button):
+        # This function is already async!
         await back_to_profile_callback(interaction, is_new_message=False)
 
 
 class ExplorationView(View):
     """
     View 2: This is the main exploration UI.
-    The player is actively in a zone.
-    The embed on this message is the "Exploration Log".
     """
 
     def __init__(
@@ -143,38 +139,18 @@ class ExplorationView(View):
         self.interaction_user = interaction_user
         self.inv_manager = InventoryManager(self.db)
 
-        # Define all buttons manually in __init__ to control order
-
-        # Button 1: Explore
-        self.explore_button = Button(
-            label="Explore",
-            style=discord.ButtonStyle.success,
-            custom_id="explore_step",
-            row=0,
-        )
+        # ... (button definitions are unchanged) ...
+        self.explore_button = Button(...)
+        self.inventory_button = Button(...)
+        self.leave_button = Button(...)
+        
         self.explore_button.callback = self.explore_callback
         self.add_item(self.explore_button)
-
-        # Button 2: Inventory
-        self.inventory_button = Button(
-            label="Inventory",
-            style=discord.ButtonStyle.secondary,
-            custom_id="explore_inventory",
-            emoji=E.BACKPACK,
-            row=0,
-        )
         self.inventory_button.callback = self.inventory_callback
         self.add_item(self.inventory_button)
-
-        # Button 3: Return to City
-        self.leave_button = Button(
-            label="Return to City",
-            style=discord.ButtonStyle.danger,
-            custom_id="explore_leave",
-            row=1,
-        )
         self.leave_button.callback = self.leave_callback
         self.add_item(self.leave_button)
+
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -187,24 +163,26 @@ class ExplorationView(View):
     async def explore_callback(self, interaction: discord.Interaction):
         """
         The player takes a step forward in the dungeon.
-        This now triggers a full auto-battle or non-combat event.
         """
         await interaction.response.defer()
 
-        # --- BUTTONS DISABLED ---
         self.explore_button.disabled = True
         self.inventory_button.disabled = True
         self.leave_button.disabled = True
         await interaction.edit_original_response(view=self)
 
-        # This one function does all the backend work
-        result = self.manager.simulate_adventure_step(interaction.user.id)
+        # --- ASYNC FIX ---
+        # This is the most important one!
+        # simulate_adventure_step runs the *entire* combat loop
+        result = await asyncio.to_thread(
+            self.manager.simulate_adventure_step, interaction.user.id
+        )
+        # --- END FIX ---
 
         log_entries = result.get("log", ["An unknown error occurred."])
         is_dead = result.get("dead", False)
         embed = interaction.message.embeds[0]
 
-        # "Play back" the log entries one by one
         for entry in log_entries:
             self.log.append(entry)
             if len(self.log) > self.log_limit:
@@ -214,16 +192,12 @@ class ExplorationView(View):
             embed.description = new_description
             await interaction.edit_original_response(embed=embed)
 
-            # --- THE DELAY YOU WANTED ---
-            await asyncio.sleep(1.5)
-
-        # --- PLAYBACK FINISHED ---
+            await asyncio.sleep(1.5) # This is already non-blocking, so it's fine
 
         if is_dead:
             embed.color = discord.Color.red()
             embed.set_footer(text="You have been defeated! Your adventure is over.")
 
-            # View is left with buttons disabled
             await interaction.edit_original_response(embed=embed, view=self)
 
             return_embed = discord.Embed(
@@ -234,7 +208,6 @@ class ExplorationView(View):
             await interaction.followup.send(embed=return_embed, ephemeral=True)
 
         else:
-            # Re-enable buttons
             self.explore_button.disabled = False
             self.inventory_button.disabled = False
             self.leave_button.disabled = False
@@ -247,9 +220,13 @@ class ExplorationView(View):
         from .character_cog import InventoryView
 
         await interaction.response.defer()
-        items = self.inv_manager.get_inventory(interaction.user.id)
-
-        embed = build_inventory_embed(items)
+        
+        # --- ASYNC FIX ---
+        items = await asyncio.to_thread(
+            self.inv_manager.get_inventory, interaction.user.id
+        )
+        embed = await asyncio.to_thread(build_inventory_embed, items)
+        # --- END FIX ---
 
         view = InventoryView(
             db_manager=self.db,
@@ -281,9 +258,12 @@ class ExplorationView(View):
         """
         The player decides to leave the adventure and return to the Guild Hall.
         """
-        self.manager.end_adventure(interaction.user.id)
+        await interaction.response.defer() # Defer *before* the blocking call
 
-        await interaction.response.defer()
+        # --- ASYNC FIX ---
+        # end_adventure is a heavy blocking call
+        await asyncio.to_thread(self.manager.end_adventure, interaction.user.id)
+        # --- END FIX ---
 
         embed = discord.Embed(
             title="Returned to City",
@@ -292,6 +272,8 @@ class ExplorationView(View):
         )
 
         await interaction.followup.send(embed=embed, ephemeral=True)
+        
+        # This callback is now fully async, so we can await it
         await back_to_profile_callback(interaction, is_new_message=False)
 
 

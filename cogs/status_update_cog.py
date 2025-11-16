@@ -10,7 +10,9 @@ import discord
 from discord.ui import View, Button, Select
 from discord.ext import commands
 import json
-import sqlite3  # <-- FIX 1: ADDED THIS IMPORT
+import sqlite3
+import asyncio # <-- IMPORT ASYNCIO
+from typing import Tuple
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -42,7 +44,7 @@ class StatusUpdateView(View):
         self,
         db_manager: DatabaseManager,
         interaction_user: discord.User,
-        player_data: sqlite3.Row,  # <-- FIX 2: CHANGED THE TYPE HINT
+        player_data: sqlite3.Row,
         player_stats: PlayerStats,
     ):
         super().__init__(timeout=None)
@@ -58,7 +60,7 @@ class StatusUpdateView(View):
         # Add the back button
         back_button = Button(
             label="Back to Profile",
-            style=discord.ButtonStyle.grey,
+            style=discord.ButtonStyle.secondary,
             custom_id="back_to_profile",
             row=2,  # Place it on the third row
         )
@@ -138,33 +140,22 @@ class StatusUpdateView(View):
         lck_button.callback = self.stat_button_callback
         self.add_item(lck_button)
 
-    async def stat_button_callback(self, interaction: discord.Interaction):
-        """
-        Handles the logic for purchasing a single stat point.
-        """
-        await interaction.response.defer()
+    # --- NEW HELPER FOR ASYNC ---
+    def _execute_stat_increase(self, stat_to_increase: str, cost: int) -> Tuple[bool, str, int]:
+        """Returns (success, error_message, new_vestige)"""
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+            player_data = cur.fetchone()
+            
+            current_vestige = player_data["vestige_pool"]
 
-        stat_to_increase = interaction.data["custom_id"].split("_")[-1]  # e.g., "STR"
-        cost = STAT_COSTS[stat_to_increase]
+            if current_vestige < cost:
+                return (False, "You do not have enough Vestige for this.", 0)
 
-        # --- 1. Transaction Check ---
-        # Re-fetch the pool to be safe
-        player_data = self.db.get_player(self.interaction_user.id)
-        current_vestige = player_data["vestige_pool"]
+            new_vestige_pool = current_vestige - cost
+            self.player_stats.add_base_stat(stat_to_increase, 1)
 
-        if current_vestige < cost:
-            await interaction.followup.send(
-                f"{E.ERROR} You do not have enough Vestige for this.", ephemeral=True
-            )
-            return
-
-        # --- 2. Debit Vestige & Update Stat ---
-        new_vestige_pool = current_vestige - cost
-        self.player_stats.add_base_stat(stat_to_increase, 1)
-
-        conn = self.db.connect()
-        cur = conn.cursor()
-        try:
             # Update Vestige pool
             cur.execute(
                 "UPDATE players SET vestige_pool = ? WHERE discord_id = ?",
@@ -175,25 +166,36 @@ class StatusUpdateView(View):
                 "UPDATE stats SET stats_json = ? WHERE discord_id = ?",
                 (json.dumps(self.player_stats.to_dict()), self.interaction_user.id),
             )
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            await interaction.followup.send(
-                f"{E.ERROR} A database error occurred during the update.",
-                ephemeral=True,
-            )
-            print(f"Status Update error: {e}")
+            return (True, "", new_vestige_pool)
+    # --- END HELPER ---
+
+    async def stat_button_callback(self, interaction: discord.Interaction):
+        """
+        Handles the logic for purchasing a single stat point.
+        """
+        await interaction.response.defer()
+
+        stat_to_increase = interaction.data["custom_id"].split("_")[-1]  # e.g., "STR"
+        cost = STAT_COSTS[stat_to_increase]
+
+        # --- ASYNC FIX ---
+        success, error_msg, new_vestige = await asyncio.to_thread(
+            self._execute_stat_increase, stat_to_increase, cost
+        )
+        # --- END FIX ---
+
+        if not success:
+            await interaction.followup.send(f"{E.ERROR} {error_msg}", ephemeral=True)
             return
-        finally:
-            conn.close()
 
-        # --- 3. Refresh the UI ---
-        # We need the full player data again for the embed
-        refreshed_player_data = self.db.get_player(self.interaction_user.id)
-
-        new_embed = self.build_status_embed(refreshed_player_data, self.player_stats)
+        # Refresh the UI
+        # We can just update the player_data dict with the new vestige pool
+        # This is safe because it's only used for display
+        self.player_data['vestige_pool'] = new_vestige 
+        
+        new_embed = self.build_status_embed(self.player_data, self.player_stats)
         new_view = StatusUpdateView(
-            self.db, self.interaction_user, refreshed_player_data, self.player_stats
+            self.db, self.interaction_user, self.player_data, self.player_stats
         )
 
         await interaction.edit_original_response(embed=new_embed, view=new_view)
@@ -201,7 +203,6 @@ class StatusUpdateView(View):
             f"{E.CHECK} Your **{stat_to_increase}** has increased!", ephemeral=True
         )
 
-    # --- FIX 3: MADE THIS A STATIC METHOD ---
     @staticmethod
     def build_status_embed(player_data, player_stats):
         """Builds the main embed for the Status Update."""

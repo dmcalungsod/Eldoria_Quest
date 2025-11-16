@@ -12,6 +12,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
+import asyncio # <-- IMPORT ASYNCIO
 
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.rank_system import RankSystem
@@ -71,7 +72,12 @@ class GuildCardView(View):
         from game_systems.guild_system.quest_system import QuestSystem
 
         quest_system = QuestSystem(self.db)
-        available_quests = quest_system.get_available_quests(interaction.user.id)
+        
+        # --- ASYNC FIX ---
+        available_quests = await asyncio.to_thread(
+            quest_system.get_available_quests, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
@@ -100,7 +106,12 @@ class GuildCardView(View):
         """
         await interaction.response.defer()
         exchange = GuildExchange(self.db)
-        total_value, materials = exchange.calculate_exchange_value(interaction.user.id)
+        
+        # --- ASYNC FIX ---
+        total_value, materials = await asyncio.to_thread(
+            exchange.calculate_exchange_value, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         embed = discord.Embed(
             title=f"{E.EXCHANGE} Guild Exchange",
@@ -142,7 +153,12 @@ class GuildCardView(View):
         from game_systems.guild_system.quest_system import QuestSystem
 
         quest_system = QuestSystem(self.db)
-        active_quests = quest_system.get_player_quests(interaction.user.id)
+        
+        # --- ASYNC FIX ---
+        active_quests = await asyncio.to_thread(
+            quest_system.get_player_quests, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         embed = discord.Embed(
             title=f"{E.QUEST_SCROLL} Quest Turn-In",
@@ -159,7 +175,7 @@ class GuildCardView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     # --- (Row 2 buttons) ---
-
+    
     @discord.ui.button(
         label="Guild Shop",
         style=discord.ButtonStyle.secondary,
@@ -167,26 +183,27 @@ class GuildCardView(View):
         emoji="🪙",
         row=1,
     )
-    async def guild_shop_callback(
-        self, interaction: discord.Interaction, button: Button
-    ):
+    async def guild_shop_callback(self, interaction: discord.Interaction, button: Button):
         """
         Edits the message to show the new Guild Shop UI.
         """
         await interaction.response.defer()
-
+        
         from .shop_cog import ShopView
-
-        player_data = self.db.get_player(interaction.user.id)
-        current_aurum = player_data["aurum"] if player_data else 0
+        
+        # --- ASYNC FIX ---
+        player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        # --- END FIX ---
+        
+        current_aurum = player_data['aurum'] if player_data else 0
 
         embed = discord.Embed(
             title=f"Guild Shop",
             description=f"Welcome to the Guild's public shop. Spend your hard-earned Aurum.\n\nYou have: {current_aurum} {E.AURUM}",
-            color=discord.Color.green(),
+            color=discord.Color.green()
         )
         embed.set_footer(text="Items you can't afford are not shown in the dropdown.")
-
+        
         view = ShopView(self.db, self.interaction_user, current_aurum)
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -205,7 +222,11 @@ class GuildCardView(View):
         """
         await interaction.response.defer()
         discord_id = interaction.user.id
-        player_data = self.rank_system.get_rank_info(discord_id)
+        
+        # --- ASYNC FIX ---
+        player_data = await asyncio.to_thread(self.rank_system.get_rank_info, discord_id)
+        # --- END FIX ---
+        
         current_rank = player_data["rank"]
         next_rank_key = self.rank_system.RANKS.get(current_rank, {}).get("next_rank")
 
@@ -253,7 +274,7 @@ class GuildCardView(View):
         style=discord.ButtonStyle.secondary,
         custom_id="skill_trainer",
         emoji="🧠",
-        row=2,  # New row
+        row=2, # New row
     )
     async def skill_trainer_callback(
         self, interaction: discord.Interaction, button: Button
@@ -262,26 +283,28 @@ class GuildCardView(View):
         Edits the message to show the new Skill Trainer UI.
         """
         await interaction.response.defer()
-
-        # Import the new cog's view
-        from .skill_trainer_cog import SkillTrainerView, build_skill_embed
-
-        player_data = self.db.get_player(self.interaction_user.id)
-
-        embed = build_skill_embed(player_data)
+        
+        from .skill_trainer_cog import SkillTrainerView
+        
+        # --- ASYNC FIX ---
+        player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        # --- END FIX ---
+        
+        embed = SkillTrainerView.build_skill_embed(player_data)
         view = SkillTrainerView(self.db, self.interaction_user, player_data)
         await interaction.edit_original_response(embed=embed, view=view)
-
     # --- END OF NEW BUTTON ---
+
 
     @discord.ui.button(
         label="Back to Profile",
         style=discord.ButtonStyle.grey,
         custom_id="guild_back_profile",
         emoji="⬅️",
-        row=2,  # New row
+        row=2, # New row
     )
     async def back_to_profile(self, interaction: discord.Interaction, button: Button):
+        # This function is already async!
         await back_to_profile_callback(interaction)
 
 
@@ -333,9 +356,15 @@ class RankProgressView(View):
     async def promote_callback(self, interaction: discord.Interaction):
         discord_id = interaction.user.id
         rank_system = RankSystem(self.db)
-        success, message = rank_system.promote_player(discord_id)
-
+        
         await interaction.response.defer()
+        
+        # --- ASYNC FIX ---
+        success, message = await asyncio.to_thread(
+            rank_system.promote_player, discord_id
+        )
+        # --- END FIX ---
+
         await interaction.followup.send(message, ephemeral=True)
 
         if success:
@@ -361,6 +390,7 @@ class GuildExchangeView(View):
         super().__init__(timeout=None)
         self.db = db_manager
         self.interaction_user = interaction_user
+        self.exchange = GuildExchange(self.db) # Create instance
 
         sell_button = Button(
             label="Sell All Materials",
@@ -390,8 +420,12 @@ class GuildExchangeView(View):
 
     async def sell_materials_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        exchange = GuildExchange(self.db)
-        total_earned, sold_items = exchange.exchange_all_materials(interaction.user.id)
+        
+        # --- ASYNC FIX ---
+        total_earned, sold_items = await asyncio.to_thread(
+            self.exchange.exchange_all_materials, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         if total_earned == 0:
             await interaction.followup.send("You have nothing to sell.", ephemeral=True)

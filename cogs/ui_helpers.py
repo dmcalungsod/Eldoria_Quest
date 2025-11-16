@@ -10,6 +10,7 @@ import discord
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
+import asyncio  # <-- 1. IMPORT ASYNCIO
 
 # --- NEW IMPORT ---
 from game_systems.items.item_manager import item_manager
@@ -24,6 +25,7 @@ from game_systems.data.emojis import get_rarity_ansi
 # ======================================================================
 
 
+# ... (build_inventory_embed function is unchanged) ...
 def build_inventory_embed(items: list) -> discord.Embed:
     """
     Builds the standard embed for the player's inventory,
@@ -104,14 +106,14 @@ def build_inventory_embed(items: list) -> discord.Embed:
 # ======================================================================
 
 
+# --- 2. THIS ENTIRE FUNCTION IS REWRITTEN ---
 async def back_to_profile_callback(
     interaction: discord.Interaction, is_new_message: bool = False
 ):
     """
     A shared callback to return to the MAIN Character Profile menu.
     This is the new "home" screen.
-    If is_new_message=True, it sends a new message.
-    Otherwise, it edits the existing one.
+    This function is now ASYNCHRONOUS to prevent blocking the bot.
     """
     from .character_cog import CharacterProfileView
 
@@ -122,27 +124,29 @@ async def back_to_profile_callback(
     db = DatabaseManager()
 
     # --- Build the Profile Embed ---
-    player = db.get_player(discord_id)
+
+    # Run all blocking database calls in separate threads
+    player = await asyncio.to_thread(db.get_player, discord_id)
     if not player:
         await interaction.followup.send(
             "Error: Could not find player data.", ephemeral=True
         )
         return
 
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,))
-    guild_data = cur.fetchone()
-    conn.close()
+    # Run these calls in parallel
+    guild_data_task = asyncio.to_thread(db.get_guild_member_data, discord_id)
+    stats_json_task = asyncio.to_thread(db.get_player_stats_json, discord_id)
+    class_row_task = asyncio.to_thread(db.get_class, player["class_id"])
+    player_skills_task = asyncio.to_thread(db.get_player_skills, discord_id)
 
-    # This stats object contains the TOTAL (Base + Bonus) stats
-    stats_json = db.get_player_stats_json(discord_id)
+    # Wait for all of them to finish
+    guild_data, stats_json, class_row, player_skills = await asyncio.gather(
+        guild_data_task, stats_json_task, class_row_task, player_skills_task
+    )
+
+    # Now that all data is loaded, we can build the embed
     stats = PlayerStats.from_dict(stats_json)
-
-    class_row = db.get_class(player["class_id"])
     class_name = class_row["name"] if class_row else "Unknown"
-
-    player_skills = db.get_player_skills(discord_id)
 
     embed = discord.Embed(
         title=f"{E.SCROLL} Adventurer Status — {player['name']}",
@@ -155,7 +159,7 @@ async def back_to_profile_callback(
 
     embed.add_field(
         name="Condition",
-        value=f"**Lv.** {player['level']}\n**Rank:** {guild_data['rank']}",
+        value=f"**Lv.** {player['level']}\n**Rank:** {guild_data['rank'] if guild_data else 'N/A'}",
         inline=True,
     )
 
@@ -168,7 +172,6 @@ async def back_to_profile_callback(
         inline=True,
     )
 
-    # This stat_block correctly displays the TOTAL stats.
     stat_block = (
         f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
         f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
@@ -218,16 +221,9 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     discord_id = interaction.user.id
     db = DatabaseManager()
 
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT p.name, gm.rank, gm.join_date FROM players p "
-        "JOIN guild_members gm ON p.discord_id = gm.discord_id "
-        "WHERE p.discord_id = ?",
-        (discord_id,),
-    )
-    card_data = cur.fetchone()
-    conn.close()
+    # --- 3. APPLY THE SAME FIX HERE ---
+    card_data = await asyncio.to_thread(db.get_guild_card_data, discord_id)
+    # --- END FIX ---
 
     if not card_data:
         await interaction.edit_original_response(

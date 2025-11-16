@@ -12,6 +12,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button
+import asyncio # <-- IMPORT ASYNCIO
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_creator import PlayerCreator
@@ -38,6 +39,7 @@ class StartMenuView(View):
         super().__init__(timeout=None)
         self.db = db_manager
         self.interaction_user = interaction_user
+        # This is a blocking call, but it's in __init__
         self.create_class_buttons()
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -60,6 +62,7 @@ class StartMenuView(View):
             self.add_item(button)
 
     async def class_button_callback(self, interaction: discord.Interaction):
+        # This callback is fine, it reads from a static dict (CLASS_DEFINITIONS)
         class_id = int(interaction.data["custom_id"].split("_")[1])
         class_name = None
         for name, data in CLASS_DEFINITIONS.items():
@@ -113,6 +116,7 @@ class ClassDetailView(View):
         self.db = db_manager
         self.class_id = class_id
         self.interaction_user = interaction_user
+        self.creator = PlayerCreator(self.db) # Create instance
 
         create_button = Button(
             label="Create",
@@ -138,10 +142,17 @@ class ClassDetailView(View):
         return True
 
     async def create_button_callback(self, interaction: discord.Interaction):
-        creator = PlayerCreator(self.db)
-        success, message = creator.create_player(
-            interaction.user.id, interaction.user.display_name, self.class_id
+        await interaction.response.defer() # Defer immediately
+        
+        # --- ASYNC FIX ---
+        success, message = await asyncio.to_thread(
+            self.creator.create_player,
+            interaction.user.id, 
+            interaction.user.display_name, 
+            self.class_id
         )
+        # --- END FIX ---
+        
         if success:
             welcome_title = (
                 f"Welcome, {interaction.user.display_name}, to Ashgrave City."
@@ -157,9 +168,10 @@ class ClassDetailView(View):
             )
             embed.set_footer(text="Your journey begins now. Tread boldly.")
             view = CharacterMenuView(self.db, self.interaction_user)
-            await interaction.response.edit_message(embed=embed, view=view)
+            await interaction.edit_original_response(embed=embed, view=view)
         else:
-            await interaction.response.send_message(
+            # Use followup for the error message
+            await interaction.followup.send(
                 f"{E.WARNING} {message}", ephemeral=True
             )
 
@@ -200,36 +212,42 @@ class CharacterMenuView(View):
             return False
         return True
 
+    # --- NEW HELPER FOR ASYNC ---
+    def _execute_guild_registration(self, discord_id: int, join_date: str) -> bool:
+        """Returns True if registration is new, False if player already exists."""
+        try:
+            with self.db.get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)
+                )
+                if cur.fetchone():
+                    return False # Already registered
+
+                cur.execute(
+                    "INSERT INTO guild_members (discord_id, join_date) VALUES (?, ?)",
+                    (discord_id, join_date),
+                )
+            return True # New registration
+        except Exception as e:
+            print(f"Error during guild registration: {e}")
+            return False
+    # --- END HELPER ---
+
     async def register_button_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer() # Defer immediately
+        
         discord_id = interaction.user.id
         join_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        try:
-            conn = self.db.connect()
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)
-            )
-            if cur.fetchone():
-                conn.close()
-                await back_to_profile_callback(interaction, is_new_message=False)
-                return
-
-            cur.execute(
-                "INSERT INTO guild_members (discord_id, join_date) VALUES (?, ?)",
-                (discord_id, join_date),
-            )
-            conn.commit()
-            conn.close()
-
-            await back_to_profile_callback(interaction, is_new_message=False)
-
-        except Exception as e:
-            print(f"Error during guild registration: {e}")
-            if not interaction.response.is_done():
-                await interaction.response.send_message(
-                    f"{E.ERROR} An error occurred during registration.", ephemeral=True
-                )
+        # --- ASYNC FIX ---
+        success = await asyncio.to_thread(
+            self._execute_guild_registration, discord_id, join_date
+        )
+        # --- END FIX ---
+        
+        # This callback is async, so we can await it
+        await back_to_profile_callback(interaction, is_new_message=False)
 
 
 # ======================================================================
@@ -247,15 +265,13 @@ class OnboardingCog(commands.Cog):
         """
         The main entry point for new players.
         """
-        if self.db.player_exists(interaction.user.id):
-
-            # --- THIS IS THE FIX ---
-            # Defer publicly. This will show a "Eldoria is thinking..."
-            # message that is visible to everyone, and is NOT ephemeral.
+        
+        # --- ASYNC FIX ---
+        player_exists = await asyncio.to_thread(self.db.player_exists, interaction.user.id)
+        # --- END FIX ---
+        
+        if player_exists:
             await interaction.response.defer()
-            # --- END OF FIX ---
-
-            # This will now use followup.send() to post the new UI panel
             await back_to_profile_callback(interaction, is_new_message=True)
             return
 

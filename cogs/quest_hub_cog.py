@@ -11,6 +11,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
+import asyncio # <-- IMPORT ASYNCIO
 
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.quest_system import QuestSystem
@@ -56,6 +57,8 @@ class QuestLogView(View):
         self.quest_select = Select(
             placeholder="Report a completed quest...", min_values=1, max_values=1, row=0
         )
+        
+        # This is a blocking call, but it's in __init__
         completable_quests = []
         for quest in self.active_quests:
             is_complete = self.quest_system.check_completion(
@@ -99,17 +102,24 @@ class QuestLogView(View):
     async def complete_quest_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         quest_id = int(self.quest_select.values[0])
-        success, message = self.quest_system.complete_quest(
-            interaction.user.id, quest_id
+        
+        # --- ASYNC FIX ---
+        success, message = await asyncio.to_thread(
+            self.quest_system.complete_quest, self.interaction_user.id, quest_id
         )
+        # --- END FIX ---
 
-        # Send ephemeral confirmation
         await interaction.followup.send(message, ephemeral=True)
 
         # --- Refresh the View In-Place ---
-        new_active_quests = self.quest_system.get_player_quests(interaction.user.id)
-        embed = interaction.message.embeds[0]  # Get the current embed
-        embed.clear_fields()  # Clear old quest fields
+        # --- ASYNC FIX ---
+        new_active_quests = await asyncio.to_thread(
+            self.quest_system.get_player_quests, self.interaction_user.id
+        )
+        # --- END FIX ---
+        
+        embed = interaction.message.embeds[0]
+        embed.clear_fields()
 
         if not new_active_quests:
             embed.add_field(
@@ -131,9 +141,7 @@ class QuestLogView(View):
                     inline=False,
                 )
 
-        # Re-build the view with the new quest list
         new_view = QuestLogView(self.db, new_active_quests, self.interaction_user)
-        # Preserve the original back button
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=new_view)
@@ -156,6 +164,7 @@ class QuestBoardView(View):
         self.db = db_manager
         self.quests = quests
         self.interaction_user = interaction_user
+        self.quest_system = QuestSystem(self.db) # Create instance
 
         self.quest_select = Select(
             placeholder="Select a quest contract...", min_values=1, max_values=1
@@ -176,7 +185,6 @@ class QuestBoardView(View):
         self.quest_select.callback = self.view_quest_details_callback
         self.add_item(self.quest_select)
 
-        # --- Back button now points to Guild Hall ---
         back_button = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
@@ -194,11 +202,18 @@ class QuestBoardView(View):
         return True
 
     async def view_quest_details_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer() # Defer immediately
+        
         quest_id = int(self.quest_select.values[0])
-        quest_system = QuestSystem(self.db)
-        quest_details = quest_system.get_quest_details(quest_id)
+        
+        # --- ASYNC FIX ---
+        quest_details = await asyncio.to_thread(
+            self.quest_system.get_quest_details, quest_id
+        )
+        # --- END FIX ---
+        
         if not quest_details:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"{E.ERROR} Could not find quest details.", ephemeral=True
             )
             return
@@ -230,8 +245,8 @@ class QuestBoardView(View):
 
         view = QuestDetailView(
             self.db, quest_id, self.quests, self.interaction_user
-        )  # Pass user
-        await interaction.response.edit_message(embed=embed, view=view)
+        )
+        await interaction.edit_original_response(embed=embed, view=view)
 
 
 class QuestDetailView(View):
@@ -249,8 +264,9 @@ class QuestDetailView(View):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quest_id = quest_id
-        self.quests_list = quests_list  # To rebuild the QuestBoardView
+        self.quests_list = quests_list
         self.interaction_user = interaction_user
+        self.quest_system = QuestSystem(self.db) # Create instance
 
         accept_button = Button(
             label="Accept Quest",
@@ -278,31 +294,36 @@ class QuestDetailView(View):
 
     async def accept_quest_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        quest_system = QuestSystem(self.db)
-        success = quest_system.accept_quest(interaction.user.id, self.quest_id)
+        
+        # --- ASYNC FIX ---
+        success = await asyncio.to_thread(
+            self.quest_system.accept_quest, self.interaction_user.id, self.quest_id
+        )
+        # --- END FIX ---
 
         if success:
             await interaction.followup.send(
                 f"{E.CHECK} Quest accepted! Added to your log.", ephemeral=True
             )
             # --- Go back to the quest board ---
-            await self.back_to_quest_board_callback(interaction)
+            await self.back_to_quest_board_callback(interaction, deferred=True)
         else:
             await interaction.followup.send(
                 f"{E.WARNING} You have already accepted this quest.", ephemeral=True
             )
 
-    async def back_to_quest_board_callback(self, interaction: discord.Interaction):
+    async def back_to_quest_board_callback(self, interaction: discord.Interaction, deferred: bool = False):
         """
         Returns to the quest board view.
         """
-        if not interaction.response.is_done():
+        if not deferred and not interaction.response.is_done():
             await interaction.response.defer()
 
-        # Re-fetch the available quests list, as we may have just accepted one
-        db = DatabaseManager()
-        quest_system = QuestSystem(db)
-        available_quests = quest_system.get_available_quests(interaction.user.id)
+        # --- ASYNC FIX ---
+        available_quests = await asyncio.to_thread(
+            self.quest_system.get_available_quests, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
@@ -313,7 +334,7 @@ class QuestDetailView(View):
             name="Available Contracts",
             value="Select an available quest from the dropdown menu.",
         )
-        view = QuestBoardView(db, available_quests, self.interaction_user)
+        view = QuestBoardView(self.db, available_quests, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
 
 

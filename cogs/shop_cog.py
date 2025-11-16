@@ -9,6 +9,8 @@ Handles the Guild Shop UI:
 import discord
 from discord.ui import View, Button, Select
 from discord.ext import commands
+import asyncio # <-- IMPORT ASYNCIO
+from typing import Tuple, Dict, Any # For type hinting
 
 from database.database_manager import DatabaseManager
 from game_systems.items.inventory_manager import InventoryManager
@@ -89,28 +91,62 @@ class ShopView(View):
             item_select.disabled = True
             return item_select
 
+        can_afford_any = False
         for item_key, price in SHOP_INVENTORY.items():
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 continue
 
-            # Check if player can afford this item
-            can_afford = self.current_aurum >= price
-
+            if self.current_aurum >= price:
+                can_afford_any = True
+            
             item_select.add_option(
                 label=f"{item_data['name']} ({price} {E.AURUM})",
                 value=f"{item_key}:{price}",  # Pass both key and price
                 description=item_data["description"][:100],
                 emoji="🧪",
-                default=False,
+                # Don't disable the option, check on callback
             )
 
-        if self.current_aurum == 0:
+        if not can_afford_any and self.current_aurum > 0:
+            item_select.placeholder = "You cannot afford any items."
+        elif self.current_aurum == 0:
             item_select.placeholder = "You have no Aurum to spend."
             item_select.disabled = True
 
         item_select.callback = self.purchase_item_callback
         return item_select
+
+    # --- NEW HELPER FUNCTION FOR ASYNC ---
+    def _execute_purchase(self, item_key: str, price: int) -> Tuple[bool, Any, int]:
+        """
+        Runs the blocking DB transaction.
+        Returns (success, item_data, new_aurum)
+        """
+        item_data = CONSUMABLES.get(item_key)
+        if not item_data:
+            return (False, "Item data not found.", 0)
+
+        # 1. Transaction Check
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT aurum FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+            player_data = cur.fetchone()
+
+            if not player_data or player_data["aurum"] < price:
+                return (False, f"You do not have enough {E.AURUM} for this item.", 0)
+
+            # 2. Debit Aurum
+            new_aurum = player_data["aurum"] - price
+            cur.execute(
+                "UPDATE players SET aurum = ? WHERE discord_id = ?",
+                (new_aurum, self.interaction_user.id),
+            )
+            
+            # 3. Credit Item (run in a separate thread later)
+        
+        return (True, item_data, new_aurum)
+    # --- END HELPER ---
 
     async def purchase_item_callback(self, interaction: discord.Interaction):
         """
@@ -118,60 +154,37 @@ class ShopView(View):
         """
         await interaction.response.defer()
 
-        # Parse the selected value
         item_key, price_str = interaction.data["values"][0].split(":")
         price = int(price_str)
-
-        item_data = CONSUMABLES.get(item_key)
-        if not item_data:
-            await interaction.followup.send(
-                f"{E.ERROR} This item (key: {item_key}) does not exist in the data files.",
-                ephemeral=True,
-            )
-            return
-
-        # --- 1. Transaction Check ---
-        # Re-fetch player data to prevent buying with stale info
-        player_data = self.db.get_player(self.interaction_user.id)
-        if not player_data or player_data["aurum"] < price:
-            await interaction.followup.send(
-                f"{E.ERROR} You do not have enough {E.AURUM} for this item.",
-                ephemeral=True,
-            )
-            return
-
-        # --- 2. Debit Aurum (The Transaction) ---
-        new_aurum = player_data["aurum"] - price
-        conn = self.db.connect()
-        cur = conn.cursor()
-        try:
-            cur.execute(
-                "UPDATE players SET aurum = ? WHERE discord_id = ?",
-                (new_aurum, self.interaction_user.id),
-            )
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            await interaction.followup.send(
-                f"{E.ERROR} A database error occurred during the transaction.",
-                ephemeral=True,
-            )
-            print(f"Shop purchase error: {e}")
-            return
-        finally:
-            conn.close()
-
-        # --- 3. Credit Item ---
-        self.inv_manager.add_item(
-            discord_id=self.interaction_user.id,
-            item_key=item_key,
-            item_name=item_data["name"],
-            item_type="consumable",
-            rarity=item_data["rarity"],
-            amount=1,
+        
+        # --- ASYNC FIX ---
+        # Run the DB transaction in a thread
+        success, result, new_aurum = await asyncio.to_thread(
+            self._execute_purchase, item_key, price
         )
+        # --- END FIX ---
 
-        # --- 4. Refresh the UI ---
+        if not success:
+            # 'result' contains the error message
+            await interaction.followup.send(f"{E.ERROR} {result}", ephemeral=True)
+            return
+        
+        # 'result' contains the item_data
+        item_data = result
+        
+        # --- ASYNC FIX ---
+        # Run the inventory write in a separate thread
+        await asyncio.to_thread(
+            self.inv_manager.add_item,
+            self.interaction_user.id,
+            item_key,
+            item_data["name"],
+            "consumable",
+            item_data["rarity"],
+            1
+        )
+        # --- END FIX ---
+
         await interaction.followup.send(
             f"{E.CHECK} You purchased 1x {item_data['name']} for {price} {E.AURUM}.",
             ephemeral=True,

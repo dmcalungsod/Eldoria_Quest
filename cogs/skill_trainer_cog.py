@@ -11,6 +11,8 @@ from discord.ext import commands
 import json
 import sqlite3
 import math
+import asyncio # <-- IMPORT ASYNCIO
+from typing import Tuple
 
 from database.database_manager import DatabaseManager
 from game_systems.data.skills_data import SKILLS
@@ -47,7 +49,7 @@ class SkillTrainerView(View):
         self.vestige_pool = player_data["vestige_pool"]
         self.player_class_id = player_data["class_id"]
 
-        # 1. Get skills the player already has
+        # This is a blocking call, but it's in __init__
         self.player_skills = self.get_player_skills()
 
         # 2. Build the UI components
@@ -92,16 +94,11 @@ class SkillTrainerView(View):
 
         learnable_skills = []
         for key, skill_data in SKILLS.items():
-            # Check if:
-            # 1. It matches the player's class
-            # 2. It's not a default skill (learn_cost > 0)
-            # 3. The player does not already know it
             if (
                 skill_data.get("class_id") == self.player_class_id
                 and skill_data.get("learn_cost", 0) > 0
                 and key not in self.player_skills
             ):
-
                 learnable_skills.append(skill_data)
 
         if not learnable_skills:
@@ -116,8 +113,10 @@ class SkillTrainerView(View):
                 value=f"{skill['key_id']}:{cost}",
                 description=skill["description"][:100],
                 emoji="📖",
-                disabled=(self.vestige_pool < cost),
             )
+        
+        if self.vestige_pool == 0:
+            learn_select.placeholder = "You have no Vestige to learn skills."
 
         learn_select.callback = self.learn_skill_callback
         return learn_select
@@ -138,11 +137,13 @@ class SkillTrainerView(View):
             upgrade_select.disabled = True
             return upgrade_select
 
+        has_upgradable_skill = False
         for skill_key, current_level in self.player_skills.items():
             skill_data = SKILLS.get(skill_key)
             if not skill_data or skill_data.get("upgrade_cost", 0) == 0:
-                continue  # Skip passives or un-upgradeable skills
+                continue
 
+            has_upgradable_skill = True
             base_cost = skill_data["upgrade_cost"]
             upgrade_cost = get_upgrade_cost(base_cost, current_level)
 
@@ -151,10 +152,9 @@ class SkillTrainerView(View):
                 value=f"{skill_key}:{upgrade_cost}:{current_level}",
                 description=f"Cost: {upgrade_cost} Vestige",
                 emoji="✨",
-                disabled=(self.vestige_pool < upgrade_cost),
             )
 
-        if not upgrade_select.options:
+        if not has_upgradable_skill:
             upgrade_select.add_option(
                 label="You have no skills to upgrade.", value="disabled"
             )
@@ -163,27 +163,19 @@ class SkillTrainerView(View):
         upgrade_select.callback = self.upgrade_skill_callback
         return upgrade_select
 
-    async def learn_skill_callback(self, interaction: discord.Interaction):
-        """Handles the logic for learning a new skill."""
-        await interaction.response.defer()
+    # --- NEW HELPER FOR ASYNC ---
+    def _execute_learn_skill(self, skill_key: str, cost: int) -> Tuple[bool, str, int]:
+        """Returns (success, error_message, new_vestige)"""
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+            player_data = cur.fetchone()
+            
+            if player_data["vestige_pool"] < cost:
+                return (False, "You do not have enough Vestige.", 0)
 
-        skill_key, cost_str = interaction.data["values"][0].split(":")
-        cost = int(cost_str)
-
-        # Re-check funds
-        player_data = self.db.get_player(self.interaction_user.id)
-        if player_data["vestige_pool"] < cost:
-            await interaction.followup.send(
-                f"{E.ERROR} You do not have enough Vestige.", ephemeral=True
-            )
-            return
-
-        new_vestige = player_data["vestige_pool"] - cost
-        skill_name = SKILLS.get(skill_key, {}).get("name", "Unknown Skill")
-
-        conn = self.db.connect()
-        cur = conn.cursor()
-        try:
+            new_vestige = player_data["vestige_pool"] - cost
+            
             # Debit Vestige
             cur.execute(
                 "UPDATE players SET vestige_pool = ? WHERE discord_id = ?",
@@ -194,52 +186,51 @@ class SkillTrainerView(View):
                 "INSERT INTO player_skills (discord_id, skill_key, skill_level) VALUES (?, ?, 1)",
                 (self.interaction_user.id, skill_key),
             )
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            await interaction.followup.send(
-                f"{E.ERROR} Database error while learning skill.", ephemeral=True
-            )
-            print(f"Skill learn error: {e}")
-            return
-        finally:
-            conn.close()
+            return (True, "", new_vestige)
+    
+    async def learn_skill_callback(self, interaction: discord.Interaction):
+        """Handles the logic for learning a new skill."""
+        await interaction.response.defer()
 
+        skill_key, cost_str = interaction.data["values"][0].split(":")
+        cost = int(cost_str)
+
+        # --- ASYNC FIX ---
+        success, error_msg, new_vestige = await asyncio.to_thread(
+            self._execute_learn_skill, skill_key, cost
+        )
+        # --- END FIX ---
+
+        if not success:
+            await interaction.followup.send(f"{E.ERROR} {error_msg}", ephemeral=True)
+            return
+
+        skill_name = SKILLS.get(skill_key, {}).get("name", "Unknown Skill")
         await interaction.followup.send(
             f"{E.LEVEL_UP} You have learned **{skill_name}**!", ephemeral=True
         )
 
         # Refresh the UI
-        refreshed_player_data = self.db.get_player(self.interaction_user.id)
+        refreshed_player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         new_embed = self.build_skill_embed(refreshed_player_data)
         new_view = SkillTrainerView(
             self.db, self.interaction_user, refreshed_player_data
         )
         await interaction.edit_original_response(embed=new_embed, view=new_view)
 
-    async def upgrade_skill_callback(self, interaction: discord.Interaction):
-        """Handles the logic for upgrading a skill."""
-        await interaction.response.defer()
+    # --- NEW HELPER FOR ASYNC ---
+    def _execute_upgrade_skill(self, skill_key: str, cost: int, new_level: int) -> Tuple[bool, str, int]:
+        """Returns (success, error_message, new_vestige)"""
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,))
+            player_data = cur.fetchone()
 
-        skill_key, cost_str, level_str = interaction.data["values"][0].split(":")
-        cost = int(cost_str)
-        current_level = int(level_str)
-        new_level = current_level + 1
+            if player_data["vestige_pool"] < cost:
+                return (False, "You do not have enough Vestige.", 0)
 
-        # Re-check funds
-        player_data = self.db.get_player(self.interaction_user.id)
-        if player_data["vestige_pool"] < cost:
-            await interaction.followup.send(
-                f"{E.ERROR} You do not have enough Vestige.", ephemeral=True
-            )
-            return
-
-        new_vestige = player_data["vestige_pool"] - cost
-        skill_name = SKILLS.get(skill_key, {}).get("name", "Unknown Skill")
-
-        conn = self.db.connect()
-        cur = conn.cursor()
-        try:
+            new_vestige = player_data["vestige_pool"] - cost
+            
             # Debit Vestige
             cur.execute(
                 "UPDATE players SET vestige_pool = ? WHERE discord_id = ?",
@@ -250,24 +241,35 @@ class SkillTrainerView(View):
                 "UPDATE player_skills SET skill_level = ? WHERE discord_id = ? AND skill_key = ?",
                 (new_level, self.interaction_user.id, skill_key),
             )
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            await interaction.followup.send(
-                f"{E.ERROR} Database error while upgrading skill.", ephemeral=True
-            )
-            print(f"Skill upgrade error: {e}")
-            return
-        finally:
-            conn.close()
+            return (True, "", new_vestige)
 
+    async def upgrade_skill_callback(self, interaction: discord.Interaction):
+        """Handles the logic for upgrading a skill."""
+        await interaction.response.defer()
+
+        skill_key, cost_str, level_str = interaction.data["values"][0].split(":")
+        cost = int(cost_str)
+        current_level = int(level_str)
+        new_level = current_level + 1
+
+        # --- ASYNC FIX ---
+        success, error_msg, new_vestige = await asyncio.to_thread(
+            self._execute_upgrade_skill, skill_key, cost, new_level
+        )
+        # --- END FIX ---
+        
+        if not success:
+            await interaction.followup.send(f"{E.ERROR} {error_msg}", ephemeral=True)
+            return
+
+        skill_name = SKILLS.get(skill_key, {}).get("name", "Unknown Skill")
         await interaction.followup.send(
             f"{E.LEVEL_UP} Your **{skill_name}** is now **Level {new_level}**!",
             ephemeral=True,
         )
 
         # Refresh the UI
-        refreshed_player_data = self.db.get_player(self.interaction_user.id)
+        refreshed_player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         new_embed = self.build_skill_embed(refreshed_player_data)
         new_view = SkillTrainerView(
             self.db, self.interaction_user, refreshed_player_data
@@ -283,7 +285,7 @@ class SkillTrainerView(View):
             f"You have: **{player_data['vestige_pool']} Vestige**",
             color=discord.Color.blue(),
         )
-        embed.set_footer(text="Skills you cannot afford are disabled.")
+        embed.set_footer(text="Skills you cannot afford are disabled in the dropdown.")
         return embed
 
 

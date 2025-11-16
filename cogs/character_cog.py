@@ -11,6 +11,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
+import asyncio # <-- IMPORT ASYNCIO
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -28,9 +29,6 @@ from .ui_helpers import (
 
 # --- View Imports ---
 from .quest_hub_cog import QuestLogView
-
-# --- FIX: REMOVED IMPORT from .adventure_commands ---
-
 
 # ======================================================================
 # CHARACTER PROFILE (THE NEW MAIN MENU)
@@ -74,9 +72,13 @@ class CharacterProfileView(View):
         Edits the message to show the Inventory UI.
         """
         await interaction.response.defer()
-        items = self.inventory_manager.get_inventory(interaction.user.id)
-
-        embed = build_inventory_embed(items)
+        
+        # --- ASYNC FIX ---
+        items = await asyncio.to_thread(
+            self.inventory_manager.get_inventory, self.interaction_user.id
+        )
+        embed = await asyncio.to_thread(build_inventory_embed, items)
+        # --- END FIX ---
 
         view = InventoryView(
             db_manager=self.db,
@@ -98,7 +100,12 @@ class CharacterProfileView(View):
         Edits the message to show the Skills UI.
         """
         await interaction.response.defer()
-        player_skills = self.db.get_player_skills(interaction.user.id)
+        
+        # --- ASYNC FIX ---
+        player_skills = await asyncio.to_thread(
+            self.db.get_player_skills, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         if not player_skills:
             skills_str = "You have not learned any skills."
@@ -136,7 +143,12 @@ class CharacterProfileView(View):
         from game_systems.guild_system.quest_system import QuestSystem
 
         quest_system = QuestSystem(self.db)
-        active_quests = quest_system.get_player_quests(interaction.user.id)
+        
+        # --- ASYNC FIX ---
+        active_quests = await asyncio.to_thread(
+            quest_system.get_player_quests, self.interaction_user.id
+        )
+        # --- END FIX ---
 
         embed = discord.Embed(
             title=f"{E.QUEST_SCROLL} Adventurer's Log",
@@ -196,14 +208,15 @@ class CharacterProfileView(View):
             )
             return
 
-        active_session_row = adventure_cog.manager.get_active_session(
-            interaction.user.id
+        # --- ASYNC FIX ---
+        active_session_row = await asyncio.to_thread(
+            adventure_cog.manager.get_active_session, self.interaction_user.id
         )
+        # --- END FIX ---
 
         if active_session_row:
-            # --- User is STUCK. Let's RESUME their session ---
             if not interaction.response.is_done():
-                await interaction.response.defer()  # Defer to be safe
+                await interaction.response.defer() 
 
             loc_id = active_session_row["location_id"]
             loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone", "emoji": E.MAP})
@@ -217,21 +230,16 @@ class CharacterProfileView(View):
             if not isinstance(log, list):
                 log = ["Adventure log corrupted. Resuming."]
 
-            # Get last 10 lines for the view's internal log
             log = log[-10:]
 
-            # --- THIS IS THE FIX ---
-            # Instead of showing the old log, show a clean resume message.
-            # The 'log' variable is still passed to the view to maintain history.
             resume_description = (
                 "Your previous session has been recovered. You can continue "
                 "exploring or return to the city."
             )
-            # --- END OF FIX ---
 
             embed = discord.Embed(
                 title=f"{loc_data.get('emoji', E.MAP)} Resuming Adventure: {loc_data['name']}",
-                description=resume_description,  # <-- Use the new clean message
+                description=resume_description,
                 color=discord.Color.green(),
             )
             embed.set_footer(text="Your previous session was recovered.")
@@ -240,20 +248,29 @@ class CharacterProfileView(View):
                 self.db,
                 adventure_cog.manager,
                 loc_id,
-                log,  # <-- Pass the old log history to the view
+                log,
                 self.interaction_user,
             )
             await interaction.edit_original_response(embed=embed, view=view)
             return
 
         # --- Original logic: No active session, show setup ---
-        await interaction.response.defer()  # Defer for the setup view
+        await interaction.response.defer()
+        
+        # --- ASYNC FIX ---
+        # Get rank data for the location selector
+        guild_member = await asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id)
+        player_rank = guild_member['rank'] if guild_member else 'F'
+        # --- END FIX ---
+        
         embed = discord.Embed(
             title=f"{E.MAP} Prepare for Expedition",
             description="You stand before the city gates, the Guild's clearance seal in your hand. The wilderness beyond the walls of Ashgrave awaits.\n\nSelect a destination.",
             color=discord.Color.dark_green(),
         )
-        view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user)
+        
+        # Pass the pre-fetched rank to the view
+        view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, player_rank)
         await interaction.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(
@@ -268,15 +285,15 @@ class CharacterProfileView(View):
         """
         Edits the message to show the Guild Hall (sub-menu) UI.
         """
+        # This function is already async!
         await back_to_guild_hall_callback(interaction)
 
-    # --- THIS IS THE NEW BUTTON (Row 3) ---
     @discord.ui.button(
         label="Status Update",
         style=discord.ButtonStyle.success,
         custom_id="profile_status_update",
         emoji="⬆️",
-        row=2,
+        row=2, 
     )
     async def status_update_callback(
         self, interaction: discord.Interaction, button: Button
@@ -285,26 +302,23 @@ class CharacterProfileView(View):
         Edits the message to show the Status Update UI.
         """
         await interaction.response.defer()
-
-        # Import the new cog's view
+        
         from .status_update_cog import StatusUpdateView
-
-        # Get all player data
-        player_data = self.db.get_player(self.interaction_user.id)
-        stats_json = self.db.get_player_stats_json(self.interaction_user.id)
+        
+        # --- ASYNC FIX ---
+        # Run DB calls in parallel
+        player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+        
+        player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
+        # --- END FIX ---
+        
         player_stats = PlayerStats.from_dict(stats_json)
 
-        # Build the embed using the static method from the view
-        # --- THIS IS THE FIX ---
         embed = StatusUpdateView.build_status_embed(player_data, player_stats)
-        # --- END OF FIX ---
-
-        view = StatusUpdateView(
-            self.db, self.interaction_user, player_data, player_stats
-        )
+        
+        view = StatusUpdateView(self.db, self.interaction_user, player_data, player_stats)
         await interaction.edit_original_response(embed=embed, view=view)
-
-    # --- END OF NEW BUTTON ---
 
 
 # ======================================================================
@@ -349,7 +363,9 @@ class InventoryView(View):
             style=discord.ButtonStyle.secondary,
             row=3,
         )
-
+        
+        # Note: _populate_selects is NOT async because it's in __init__
+        # This is a small, acceptable performance hit.
         self._populate_selects()
 
         self.equip_select.callback = self.equip_callback
@@ -364,6 +380,8 @@ class InventoryView(View):
 
     def _populate_selects(self):
         """Fetches inventory and populates the dropdowns."""
+        # This is a blocking call, but it's in __init__ which is not async
+        # This is the trade-off for dynamic dropdowns.
         items = self.inv_manager.get_inventory(self.interaction_user.id)
 
         self.equip_select.options.clear()
@@ -428,9 +446,11 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.equip_select.values[0])
 
-        success, message = self.eq_manager.equip_item(
-            self.interaction_user.id, inv_db_id
+        # --- ASYNC FIX ---
+        success, message = await asyncio.to_thread(
+            self.eq_manager.equip_item, self.interaction_user.id, inv_db_id
         )
+        # --- END FIX ---
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -439,9 +459,11 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.unequip_select.values[0])
 
-        success, message = self.eq_manager.unequip_item(
-            self.interaction_user.id, inv_db_id
+        # --- ASYNC FIX ---
+        success, message = await asyncio.to_thread(
+            self.eq_manager.unequip_item, self.interaction_user.id, inv_db_id
         )
+        # --- END FIX ---
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -450,9 +472,11 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.use_select.values[0])
 
-        success, message = self.con_manager.use_item(
-            self.interaction_user.id, inv_db_id
+        # --- ASYNC FIX ---
+        success, message = await asyncio.to_thread(
+            self.con_manager.use_item, self.interaction_user.id, inv_db_id
         )
+        # --- END FIX ---
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -460,8 +484,12 @@ class InventoryView(View):
     async def _refresh_view(self, interaction: discord.Interaction):
         """Re-builds the embed and view to show changes."""
 
-        items = self.inv_manager.get_inventory(self.interaction_user.id)
-        embed = build_inventory_embed(items)
+        # --- ASYNC FIX ---
+        items = await asyncio.to_thread(
+            self.inv_manager.get_inventory, self.interaction_user.id
+        )
+        embed = await asyncio.to_thread(build_inventory_embed, items)
+        # --- END FIX ---
 
         new_view = InventoryView(
             db_manager=self.db,

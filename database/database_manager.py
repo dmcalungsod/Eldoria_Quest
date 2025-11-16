@@ -139,7 +139,6 @@ class DatabaseManager:
 
         return json.loads(row["stats_json"])
 
-    # --- NEW FUNCTION ---
     # ------------------------------------------------------------
     # PLAYER VITALS (HP/MP)
     # ------------------------------------------------------------
@@ -157,7 +156,6 @@ class DatabaseManager:
         conn.close()
         return row
 
-    # --- NEW FUNCTION ---
     def set_player_vitals(self, discord_id: int, hp: int, mp: int):
         """
         Updates the player's current HP and MP.
@@ -235,3 +233,30 @@ class DatabaseManager:
 
         conn.commit()
         conn.close()
+
+    # --- NEW HELPER FUNCTIONS FOR ASYNC ---
+
+    def get_guild_member_data(self, discord_id: int) -> Optional[sqlite3.Row]:
+        """Fetches guild member rank."""
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,)
+        )
+        row = cur.fetchone()
+        conn.close()
+        return row
+
+    def get_guild_card_data(self, discord_id: int) -> Optional[sqlite3.Row]:
+        """Fetches data needed for the guild card."""
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT p.name, gm.rank, gm.join_date FROM players p "
+            "JOIN guild_members gm ON p.discord_id = gm.discord_id "
+            "WHERE p.discord_id = ?",
+            (discord_id,),
+        )
+        row = cur.fetchone()
+        conn.close()
+        return row
