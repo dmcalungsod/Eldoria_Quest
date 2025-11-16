@@ -51,8 +51,9 @@ class DamageFormula:
 
         return max(1, damage), is_crit
 
+    # --- THIS METHOD IS MODIFIED ---
     @staticmethod
-    def player_skill(player_stats, monster, skill_data):
+    def player_skill(player_stats, monster, skill_data, skill_level: int):
         """
         Calculates damage dealt by a player's skill.
         Now routes to different stats based on skill key.
@@ -61,15 +62,20 @@ class DamageFormula:
         skill_key = skill_data.get("key_id", "")
 
         # --- MODIFIED STAT-BASED DAMAGE ROUTING ---
-        if skill_key in ["fireball", "explosion"]:
+        if skill_key in ["fireball", "explosion", "ice_lance", "smite"]:
             # Magic-based
             base_stat_value = player_stats.magic
             base_effect_per_point = 3.0
-        elif skill_key == "power_strike":
+        elif skill_key == "power_strike" or skill_key == "cleave":
             # Strength-based
             base_stat_value = player_stats.strength
             base_effect_per_point = 2.5
-        elif skill_key == "true_shot":
+        elif (
+            skill_key == "true_shot"
+            or skill_key == "multi_shot"
+            or skill_key == "double_strike"
+            or skill_key == "toxic_blade"
+        ):
             # Dexterity-based
             base_stat_value = player_stats.dexterity
             base_effect_per_point = 2.8
@@ -78,12 +84,17 @@ class DamageFormula:
             base_stat_value = player_stats.magic
             base_effect_per_point = 1.0
 
-        # Old Formula: attack_power = base_stat * stat_multiplier
         attack_power = calculate_tiered_bonus(base_stat_value, base_effect_per_point)
         # --- END OF MODIFICATION ---
 
         luck_val = player_stats.luck
-        attack_power *= skill_data.get("power_multiplier", 1.0)
+
+        # --- NEW SKILL LEVEL SCALING ---
+        base_multiplier = skill_data.get("power_multiplier", 1.0)
+        # Formula: FinalMultiplier = BaseMultiplier + (10% * (SkillLevel - 1))
+        final_multiplier = base_multiplier + (0.1 * (skill_level - 1))
+        attack_power *= final_multiplier
+        # --- END NEW SKILL LEVEL SCALING ---
 
         monster_def = monster.get("DEF", 0)
         base_damage = max(1, attack_power - (monster_def / 2))
@@ -99,9 +110,11 @@ class DamageFormula:
 
         return max(1, damage), is_crit
 
-    # --- NEW METHOD ---
+    # --- THIS METHOD IS MODIFIED ---
     @staticmethod
-    def player_heal(player_stats, current_hp: int, skill_data: dict) -> Tuple[int, int]:
+    def player_heal(
+        player_stats, current_hp: int, skill_data: dict, skill_level: int
+    ) -> Tuple[int, int]:
         """
         Calculates healing from a player's skill.
         Returns: (amount_healed: int, new_hp: int)
@@ -111,9 +124,15 @@ class DamageFormula:
         max_hp = player_stats.max_hp
 
         # --- MODIFIED HEAL CALCULATION ---
-        # Old Formula: total_heal = base_heal + (mag_val * 2)
         magic_bonus = calculate_tiered_bonus(mag_val, 2)  # 2 Heal per MAG
-        total_heal = base_heal + magic_bonus
+
+        # --- NEW SKILL LEVEL SCALING ---
+        # Formula: FinalHeal = BaseHeal * (1 + (20% * (SkillLevel - 1)))
+        level_multiplier = 1.0 + (0.2 * (skill_level - 1))
+        final_base_heal = base_heal * level_multiplier
+        # --- END NEW SKILL LEVEL SCALING ---
+
+        total_heal = final_base_heal + magic_bonus
         # --- END OF MODIFICATION ---
 
         variance = random.uniform(0.9, 1.1)
@@ -138,7 +157,6 @@ class DamageFormula:
         attack_power = monster.get("ATK", 10)
 
         # --- MODIFIED DEFENSE CALCULATION ---
-        # Old Formula: defense = player_stats.endurance * 1.5
         defense = calculate_tiered_bonus(player_stats.endurance, 1.5)  # 1.5 Def per END
         # --- END OF MODIFICATION ---
 

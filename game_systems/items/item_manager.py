@@ -21,7 +21,6 @@ from typing import Dict, List
 
 DB_NAME = "EQ_Game.db"
 
-# --- NEW: Added stat map and valid tables ---
 STAT_MAP = {
     "str_bonus": "STR",
     "end_bonus": "END",
@@ -31,7 +30,6 @@ STAT_MAP = {
     "lck_bonus": "LCK",
 }
 VALID_EQUIP_TABLES = ["equipment", "class_equipment"]
-# --- END NEW ---
 
 
 class ItemManager:
@@ -43,7 +41,6 @@ class ItemManager:
         conn.row_factory = sqlite3.Row
         return conn
 
-    # --- NEW FUNCTION ---
     def get_equipment_stats(self, item_key: str, source_table: str) -> Dict:
         """
         Fetches the stat bonuses for a single item from its source table.
@@ -68,8 +65,6 @@ class ItemManager:
             if key in item_row.keys() and item_row[key] != 0:
                 bonuses[stat] = item_row[key]
         return bonuses
-
-    # --- END NEW ---
 
     # --------------------------------------------------------------------
     #     GENERIC ITEM LOOKUP

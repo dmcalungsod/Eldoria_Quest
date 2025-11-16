@@ -11,6 +11,11 @@ from typing import Dict, Tuple
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 
+# --- NEW IMPORT ---
+from game_systems.data.class_data import CLASSES
+
+# --- END IMPORT ---
+
 
 class EquipmentManager:
     def __init__(self, db_manager: DatabaseManager):
@@ -33,6 +38,29 @@ class EquipmentManager:
         }
         self.valid_tables = ["equipment", "class_equipment"]
 
+    # --- NEW HELPER FUNCTION ---
+    def _get_player_allowed_slots(self, discord_id: int) -> list:
+        """Fetches the player's class and returns their allowed slots."""
+        player_row = self.db.get_player(discord_id)
+        if not player_row:
+            return []
+
+        player_class_id = player_row["class_id"]
+
+        # Find the class name from the ID
+        class_name = None
+        for name, data in CLASSES.items():
+            if data["id"] == player_class_id:
+                class_name = name
+                break
+
+        if class_name:
+            return CLASSES[class_name].get("allowed_slots", [])
+
+        return []
+
+    # --- END HELPER ---
+
     def _get_item_bonuses(self, item_key: str, source_table: str) -> Dict:
         """
         Safely fetches the stat bonuses for a single item from its source table.
@@ -45,7 +73,8 @@ class EquipmentManager:
         cur = conn.cursor()
 
         # f-string is safe here due to the valid_tables check
-        cur.execute(f"SELECT * FROM {source_table} WHERE id = ?", (item_key,))
+        query_table = "equipment" if source_table == "equipment" else "class_equipment"
+        cur.execute(f"SELECT * FROM {query_table} WHERE id = ?", (item_key,))
         item_row = cur.fetchone()
         conn.close()
 
@@ -58,7 +87,7 @@ class EquipmentManager:
                 bonuses[stat] = item_row[key]
         return bonuses
 
-    def recalculate_player_stats(self, discord_id: int):
+    def recalculate_player_stats(self, discord_id: int) -> PlayerStats:
         """
         Recalculates a player's total stats based on equipped items.
         1. Fetches base stats.
@@ -66,11 +95,14 @@ class EquipmentManager:
         3. Fetches all equipped items.
         4. Gets bonuses for each item and applies them.
         5. Saves the new stats_json back to the database.
+
+        Returns the updated PlayerStats object.
         """
         base_stats_json = self.db.get_player_stats_json(discord_id)
         if not base_stats_json:
             print(f"Error: Could not find base stats for {discord_id}")
-            return
+            # Return an empty stats object to prevent crashes
+            return PlayerStats()
 
         # 1. Create PlayerStats object from BASE stats
         stats = PlayerStats.from_dict(base_stats_json)
@@ -98,6 +130,10 @@ class EquipmentManager:
 
         # 4. Save the new stats (base + bonus) back to the DB
         self.db.update_player_stats(discord_id, stats.to_dict())
+
+        # --- NEW: Return the recalculated stats object ---
+        return stats
+        # --- END NEW ---
 
     def equip_item(self, discord_id: int, inventory_db_id: int) -> Tuple[bool, str]:
         """
@@ -127,7 +163,14 @@ class EquipmentManager:
 
         slot_to_equip = item_stack["slot"]
 
-        # Unequip any item currently in that slot (this is unchanged)
+        # --- NEW CLASS RESTRICTION ---
+        allowed_slots = self._get_player_allowed_slots(discord_id)
+        if slot_to_equip not in allowed_slots:
+            conn.close()
+            return False, f"Your class cannot equip this item type ({slot_to_equip})."
+        # --- END NEW RESTRICTION ---
+
+        # Unequip any item currently in that slot
         cur.execute(
             """
             SELECT id FROM inventory 
@@ -149,7 +192,6 @@ class EquipmentManager:
         cur = conn.cursor()
 
         # Re-fetch the item_stack in case it was modified by the unequip
-        # (e.g., if you equip the same item you unequipped)
         cur.execute(
             "SELECT * FROM inventory WHERE id = ? AND discord_id = ?",
             (inventory_db_id, discord_id),

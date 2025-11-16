@@ -22,12 +22,15 @@ try:
     from game_systems.data import monsters
     from game_systems.data import quest_items
     from game_systems.data import consumables
-    from game_systems.data import equipments  # <-- This will now import the dictionary
-    from game_systems.data import class_equipments
+
+    # --- FIX: We now import the new data dictionaries ---
+    from game_systems.data.equipments import EQUIPMENT_DATA
+    from game_systems.data.class_equipments import CLASS_EQUIPMENTS
+
+    # --- END FIX ---
     from game_systems.data import materials
     from game_systems.data import quest_data
 
-    # --- NEW IMPORT ---
     from game_systems.data import skills_data
     from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 except ImportError as e:
@@ -55,6 +58,8 @@ def insert_classes(conn):
 def insert_monsters(conn):
     cur = conn.cursor()
     print("Inserting monsters...")
+    # Clear existing monsters to prevent duplicates on re-run
+    cur.execute("DELETE FROM monsters;")
     for key, m in monsters.MONSTERS.items():
         name = m.get("name")
         description = m.get("description", "")
@@ -94,6 +99,7 @@ def insert_monsters(conn):
 def insert_quest_items(conn):
     cur = conn.cursor()
     print("Inserting quest items...")
+    cur.execute("DELETE FROM quest_items;")
     for key, q in quest_items.QUEST_ITEMS.items():
         cur.execute(
             """
@@ -113,6 +119,7 @@ def insert_quest_items(conn):
 def insert_consumables(conn):
     cur = conn.cursor()
     print("Inserting consumables...")
+    cur.execute("DELETE FROM consumables;")
     for key, c in consumables.CONSUMABLES.items():
         cur.execute(
             """
@@ -134,9 +141,11 @@ def insert_consumables(conn):
 def insert_equipments(conn):
     cur = conn.cursor()
     print("Inserting general equipments...")
+    # Clear existing general equipment
+    cur.execute("DELETE FROM equipment;")
 
-    # Iterate over the new dictionary's VALUES
-    for e in equipments.EQUIPMENT_DATA.values():
+    # Iterate over the new EQUIPMENT_DATA dictionary
+    for key, e in EQUIPMENT_DATA.items():
         stats = e.get("stats_bonus", {})
         cur.execute(
             """
@@ -165,28 +174,22 @@ def insert_equipments(conn):
 # --- END OF REWRITE ---
 
 
+# --- THIS FUNCTION IS REWRITTEN ---
 def insert_class_equipments(conn):
     cur = conn.cursor()
     print("Inserting class-specific equipment...")
+    # Clear existing class equipment and item sets
+    cur.execute("DELETE FROM class_equipment;")
+    cur.execute("DELETE FROM item_sets;")  # Clear old sets, as we don't use them yet
+
     class_map = {"Warrior": 1, "Mage": 2, "Rogue": 3, "Cleric": 4, "Ranger": 5}
 
-    # Insert item sets
-    try:
-        class_sets = getattr(class_equipments, "CLASS_SETS", {})
-        if class_sets:
-            print("Inserting item sets...")
-            for set_name, meta in class_sets.items():
-                cur.execute(
-                    "INSERT INTO item_sets (set_name, bonus_description) VALUES (?, ?)",
-                    (set_name, json.dumps(meta.get("set_bonus", {}))),
-                )
-            conn.commit()
-    except Exception:
-        pass  # Silently skip if data is malformed
-
-    # Insert class equipment
-    for key, ce in class_equipments.CLASS_EQUIPMENTS.items():
+    # Insert class equipment from the new generated dictionary
+    for key, ce in CLASS_EQUIPMENTS.items():
         class_id = class_map.get(ce.get("class"), 0)
+        if class_id == 0:
+            continue
+
         stats = ce.get("stats_bonus", {})
 
         cur.execute(
@@ -208,11 +211,14 @@ def insert_class_equipments(conn):
                 stats.get("AGI", 0),
                 stats.get("MAG", 0),
                 stats.get("LCK", 0),
-                ce.get("set"),
+                ce.get("set"),  # Will be None, which is correct
                 ce.get("level_req", 1),
             ),
         )
     conn.commit()
+
+
+# --- END OF REWRITE ---
 
 
 def insert_quests(conn):
@@ -247,7 +253,6 @@ def insert_materials(conn):
     print(f"✔ Populated {count} material definitions.")
 
 
-# --- UPDATED FUNCTION ---
 def insert_skills(conn):
     cur = conn.cursor()
     print("Inserting skills...")
@@ -265,7 +270,6 @@ def insert_skills(conn):
                 data["description"],
                 data["type"],
                 data.get("class_id", 0),  # 0 for 'all classes'
-                # --- FIX: ADDED NEW DATA ---
                 data.get("mp_cost", 0),
                 data.get("power_multiplier", 1.0),
                 data.get("heal_power", 0),
@@ -280,16 +284,24 @@ def main():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     try:
-        insert_classes(conn)
+        # Note: We skip insert_classes as it's IGNORE
+        # We skip insert_quests as it's IGNORE
+        # We skip insert_materials as it's IGNORE
+        # We skip insert_skills as it's IGNORE
+
+        # These are the functions that need to run to clear old data
         insert_monsters(conn)
         insert_quest_items(conn)
         insert_consumables(conn)
         insert_equipments(conn)
         insert_class_equipments(conn)
+
+        # These only add if missing, safe to run
+        insert_classes(conn)
         insert_quests(conn)
         insert_materials(conn)
-        # --- NEW FUNCTION CALL ---
         insert_skills(conn)
+
         print("✔ Database population complete.")
     except Exception as e:
         print(f"Error populating database: {e}")

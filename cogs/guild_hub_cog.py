@@ -160,12 +160,11 @@ class GuildCardView(View):
 
     # --- (Row 2 buttons) ---
 
-    # --- THIS IS THE NEW BUTTON ---
     @discord.ui.button(
         label="Guild Shop",
         style=discord.ButtonStyle.secondary,
         custom_id="guild_shop",
-        emoji="🪙",  # Using a standard emoji as E.AURUM is custom
+        emoji="🪙",
         row=1,
     )
     async def guild_shop_callback(
@@ -176,10 +175,8 @@ class GuildCardView(View):
         """
         await interaction.response.defer()
 
-        # Import the new cog's view
         from .shop_cog import ShopView
 
-        # Get player's current aurum
         player_data = self.db.get_player(interaction.user.id)
         current_aurum = player_data["aurum"] if player_data else 0
 
@@ -192,8 +189,6 @@ class GuildCardView(View):
 
         view = ShopView(self.db, self.interaction_user, current_aurum)
         await interaction.edit_original_response(embed=embed, view=view)
-
-    # --- END OF NEW BUTTON ---
 
     @discord.ui.button(
         label="Check Rank",
@@ -252,12 +247,39 @@ class GuildCardView(View):
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
+    # --- THIS IS THE NEW BUTTON ---
+    @discord.ui.button(
+        label="Skill Trainer",
+        style=discord.ButtonStyle.secondary,
+        custom_id="skill_trainer",
+        emoji="🧠",
+        row=2,  # New row
+    )
+    async def skill_trainer_callback(
+        self, interaction: discord.Interaction, button: Button
+    ):
+        """
+        Edits the message to show the new Skill Trainer UI.
+        """
+        await interaction.response.defer()
+
+        # Import the new cog's view
+        from .skill_trainer_cog import SkillTrainerView, build_skill_embed
+
+        player_data = self.db.get_player(self.interaction_user.id)
+
+        embed = build_skill_embed(player_data)
+        view = SkillTrainerView(self.db, self.interaction_user, player_data)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    # --- END OF NEW BUTTON ---
+
     @discord.ui.button(
         label="Back to Profile",
         style=discord.ButtonStyle.grey,
         custom_id="guild_back_profile",
         emoji="⬅️",
-        row=1,
+        row=2,  # New row
     )
     async def back_to_profile(self, interaction: discord.Interaction, button: Button):
         await back_to_profile_callback(interaction)

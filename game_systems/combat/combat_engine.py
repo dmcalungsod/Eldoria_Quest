@@ -20,7 +20,6 @@ class CombatEngine:
 
     PLAYER_SKILL_CHANCE = 40  # 40% chance to use a skill if possible
 
-    # --- THIS IS THE FIX (Part 1) ---
     def __init__(
         self,
         player,
@@ -32,15 +31,14 @@ class CombatEngine:
         """
         player → LevelUpSystem wrapper (with stats + current HP)
         monster → DICT containing monster's CURRENT state (including current HP)
-        player_skills → List of dicts of skills from DB
+        player_skills → List of dicts of skills from DB (INCLUDES skill_level)
         player_mp → Player's current MP
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
         """
         self.player = player
         self.monster = monster
         self.player_skills = player_skills
-        self.player_class_id = player_class_id  # <-- Store the Class ID
-        # --- END OF FIX ---
+        self.player_class_id = player_class_id
 
         self.player_hp = player.hp_current
         self.player_mp = player_mp
@@ -67,11 +65,13 @@ class CombatEngine:
         if use_skill:
             skill = use_skill
             mp_cost = skill.get("mp_cost", 0)
+            skill_level = skill.get("skill_level", 1)  # <-- GET SKILL LEVEL
             self.player_mp -= mp_cost
 
             if skill.get("heal_power", 0) > 0:
+                # --- MODIFIED: Pass skill_level ---
                 heal, new_hp = DamageFormula.player_heal(
-                    self.player.stats, self.player_hp, skill
+                    self.player.stats, self.player_hp, skill, skill_level
                 )
                 logger.info(
                     f"Combat Player Heal: {skill['name']} | Base: {skill.get('heal_power', 0)} | Total: {heal}"
@@ -79,8 +79,9 @@ class CombatEngine:
                 self.player_hp = new_hp
                 log.append(CombatPhrases.player_heal(self.player, skill, heal))
             else:
+                # --- MODIFIED: Pass skill_level ---
                 dmg, crit = DamageFormula.player_skill(
-                    self.player.stats, self.monster, skill
+                    self.player.stats, self.monster, skill, skill_level
                 )
                 logger.info(
                     f"Combat Player Skill: {skill['name']} | Dmg: {dmg} | Crit: {crit}"
@@ -96,13 +97,11 @@ class CombatEngine:
             logger.info(f"Combat Player Atk: Basic | Dmg: {dmg} | Crit: {crit}")
             self.monster_hp -= dmg
 
-            # --- THIS IS THE FIX (Part 2) ---
             log.append(
                 CombatPhrases.player_attack(
                     self.player, self.monster, dmg, crit, self.player_class_id
                 )
             )
-            # --- END OF FIX ---
 
         if self.monster_hp <= 0:
             logger.info(f"Combat End: Monster HP {self.monster_hp} <= 0. Player wins.")
