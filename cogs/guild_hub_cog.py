@@ -716,23 +716,30 @@ class GuildExchangeView(View):
             return
 
         sold_list = [f"• {i['item_name']} x{i['count']}" for i in sold_items]
-        receipt = discord.Embed(
-            title=f"{E.EXCHANGE} Exchange Complete",
-            description=(
-                'The clerk stamps your ledger. "Payment processed."\n\n'
-                f"**Total Earned:** {E.AURUM} **{total_earned}**"
-            ),
-            color=discord.Color.green(),
+        
+        # --- THIS IS THE FIX ---
+        
+        # 1. Get the current embed
+        embed = interaction.message.embeds[0]
+        
+        # 2. Update the embed with receipt info
+        embed.title = f"{E.EXCHANGE} Exchange Complete"
+        embed.description = (
+            'The clerk stamps your ledger. "Payment processed."\n\n'
+            f"**Total Earned:** {E.AURUM} **{total_earned}**"
         )
-        receipt.add_field(name="Sold Materials", value="\n".join(sold_list), inline=False)
+        embed.clear_fields()
+        embed.add_field(name="Sold Materials", value="\n".join(sold_list), inline=False)
+        embed.color = discord.Color.green()
 
-        await interaction.followup.send(embed=receipt, ephemeral=True)
-
-        # attempt to return to parent menu via back btn callback
-        try:
-            await self.back_btn.callback(interaction)
-        except Exception:
-            await back_to_guild_hall_callback(interaction)
+        # 3. Rebuild the view to show the disabled button
+        new_view = GuildExchangeView(self.db, can_sell=False, interaction_user=self.interaction_user)
+        new_view.set_back_button(self.back_button.callback, self.back_button.label)
+        
+        # 4. Edit the original message
+        await interaction.edit_original_response(embed=embed, view=new_view)
+        
+        # --- END OF FIX ---
 
 
 # ======================================================================

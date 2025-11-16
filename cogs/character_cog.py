@@ -96,7 +96,7 @@ class CharacterTabView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(
-        label="The Road Ahead",
+        label="Adventure",
         style=discord.ButtonStyle.success,
         custom_id="profile_adventure",
         emoji="🗺️",
@@ -109,7 +109,7 @@ class CharacterTabView(View):
         await interaction.response.defer()
 
         embed = discord.Embed(
-            title="🗺️ The Road Ahead",
+            title="🗺️ Adventure",
             description=(
                 "*Beyond the enclave, the world is fractured. Each path is a test of wit, grit, and survival.*\n\n"
                 "**Your choices:**\n"
