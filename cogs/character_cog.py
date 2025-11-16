@@ -81,7 +81,7 @@ class CharacterTabView(View):
         embed = discord.Embed(
             title="📜 Arcane Ledger of Abilities",
             description=(
-                "*You open the Consortium’s ledger — a heavy tome ringed with wax seals. "
+                "*You open the ledger — a heavy tome ringed with wax seals. "
                 "Each entry details what an adventurer carries and what arts they command.*\n\n"
                 "**Manage the following:**\n"
                 "• **Inventory** — Items, materials, and consumables.\n"
@@ -112,7 +112,7 @@ class CharacterTabView(View):
             description=(
                 "*Beyond the enclave, the world is fractured. Each path is a test of wit, grit, and survival.*\n\n"
                 "**Your choices:**\n"
-                "• **Quest Log** — Review duties assigned by the Consortium.\n"
+                "• **Quest Log** — Review duties assigned by the Guild.\n"
                 "• **Guild Hall** — Return for supplies, contracts, and counsel.\n"
                 "• **Begin Expedition** — Step beyond the walls and into the wild." 
             ),
@@ -314,7 +314,7 @@ class AdventureView(View):
             log = log[-10:]
 
             resume_description = (
-                "*Your last expedition was recovered from the Consortium's archives. "
+                "*Your last expedition was recovered from the Guild's archives. "
                 "You may continue where you left or return to the enclave.*"
             )
 
@@ -392,7 +392,7 @@ class AdventureView(View):
         embed = discord.Embed(
             title=f"{E.QUEST_SCROLL} Adventurer's Ledger",
             description=(
-                "*You unfurl the ledger entries that bind you to the Consortium's tasks.*\n\n"
+                "*You unfurl the ledger entries that bind you to the Guild's tasks.*\n\n"
                 "A review of your currently accepted assignments."
             ),
             color=discord.Color.from_rgb(139, 69, 19),
