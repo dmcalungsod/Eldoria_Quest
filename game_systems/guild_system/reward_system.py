@@ -76,6 +76,15 @@ class RewardSystem:
             (merit_reward, discord_id),
         )
 
+        # --- THIS IS THE FIX ---
+        # Grant Vestige equal to the EXP reward
+        if exp_reward > 0:
+            cur.execute(
+                "UPDATE players SET vestige_pool = vestige_pool + ? WHERE discord_id = ?",
+                (exp_reward, discord_id),
+            )
+        # --- END OF FIX ---
+
         conn.commit()
         conn.close()
 
