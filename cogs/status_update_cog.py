@@ -208,10 +208,13 @@ class StatusUpdateView(View):
         new_view.back_button.label = self.back_button.label
 
         await interaction.edit_original_response(embed=new_embed, view=new_view)
-        await interaction.followup.send(
-            f"{E.CHECK} **{stat}** increased! Your vitality has been restored.",
-            ephemeral=True,
-        )
+        
+        # --- THIS IS THE LINE THAT WAS REMOVED ---
+        # await interaction.followup.send(
+        #     f"{E.CHECK} **{stat}** increased! Your vitality has been restored.",
+        #     ephemeral=True,
+        # )
+        # --- END OF REMOVAL ---
 
     # ==========================================================
     # EMBED

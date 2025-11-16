@@ -333,7 +333,14 @@ class AdventureSession:
         conn.close()
 
         # --- Fetch active boosts (uses its own connection) ---
-        active_boosts = self.db.get_active_boosts()
+        active_boosts_list = self.db.get_active_boosts()
+
+        # --- THIS IS THE FIX ---
+        # Process the list into a dict for the combat engine
+        active_boosts_dict = {}
+        for boost in active_boosts_list:
+            active_boosts_dict[boost["boost_key"]] = boost["multiplier"]
+        # --- END OF FIX ---
 
         player_skills = [dict(row) for row in player_skills_raw]
 
@@ -358,7 +365,7 @@ class AdventureSession:
             player_skills=player_skills,
             player_mp=current_mp,
             player_class_id=player_class_id,
-            active_boosts=active_boosts, # <-- PASS BOOSTS TO ENGINE
+            active_boosts=active_boosts_dict, # <-- Pass the DICT
         )
 
         result = engine.run_combat_turn()
@@ -384,19 +391,13 @@ class AdventureSession:
             luck_bonus = (player_luck / 999) * 50.0
             
             # --- THIS IS THE FIX ---
-            # Get loot boost from the combat result (which is a list)
-            loot_boost_mult = 1.0
-            active_boosts_list = result.get("active_boosts", [])
-            for boost in active_boosts_list:
-                if boost.get("boost_key") == "loot_boost":
-                    loot_boost_mult = boost.get("multiplier", 1.0)
-                    break # Found it
+            # Get loot boost from the combat result (which is a dict)
+            loot_boost_mult = result.get("active_boosts", {}).get("loot_boost", 1.0)
             # --- END OF FIX ---
 
             # 1. Handle Material Drops
             for drop_key, chance in result["drops"]:
                 
-                # Apply loot boost
                 final_chance = chance * loot_boost_mult
                 
                 mat_data = MATERIALS.get(drop_key)
@@ -595,9 +596,12 @@ class AdventureSession:
                     while current_exp >= SKILL_EXP_THRESHOLD:
                         current_exp -= SKILL_EXP_THRESHOLD
                         current_level += 1
+                        
+                        # --- THIS IS THE BUG FIX ---
                         skill_up_messages.append(
-                            f"{E.LEVEL_UP} Your **{skill_name}** has reached **Level {new_level}**!"
+                            f"{E.LEVEL_UP} Your **{skill_name}** has reached **Level {current_level}**!"
                         )
+                        # --- END OF BUG FIX ---
                     
                     # Save the new state
                     cur.execute(
