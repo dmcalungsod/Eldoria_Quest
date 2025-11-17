@@ -6,8 +6,8 @@ Exports constants for both custom (ID-based) and standard unicode emojis.
 """
 
 # --- Custom Emojis (Update these IDs if you re-upload emojis) ---
-# Format: <:name:id>
-AURUM = "<:gold_coin:1194437266903404596>"
+# Format: <:name:id> or standard unicode
+AURUM = "🪙"
 GUILD_MERIT = "<:guild_prestige:1194437270363701338>"
 
 # --- Standard Unicode Emojis ---
