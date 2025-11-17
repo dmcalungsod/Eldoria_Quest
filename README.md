@@ -1,3 +1,6 @@
+Here is the updated `README.md`. I have added the **ONE UI Policy** section under Design Philosophy and updated the **Project Structure** tree to reflect your recent modularization (showing the new `adventure` and `guild_system` organization).
+
+```markdown
 # 🌑 **Eldoria Quest**
 
 ### _A Dark High-Fantasy Survival RPG Discord Bot_
@@ -42,9 +45,14 @@ The game blends:
 - All Aurum is earned by selling these resources at the **Guild Exchange**.
 - Every expedition is a risk; profit is never guaranteed.
 
+### 🖥️ ONE UI Policy (Strict)
+
+- **Single Persistent Interface:** The game operates entirely within a single message per session.
+- **Non-Ephemeral:** No hidden/ephemeral messages. All state changes are visible and persistent.
+- **Non-Branching:** The bot **never** sends a new message to reply to a button click. All interactions **edit the existing message** to update the UI state.
+
 ### 🜃 Narrative-Focused Immersion
 
-- Nearly the entire game unfolds within a single persistent **ONE UI** interface.
 - Exploration is **manual**, deliberate, and turn-based.
 - Every action is narrated with thematic, class-aware writing.
 - HP/MP persist between encounters — recovery is scarce and meaningful.
@@ -72,7 +80,7 @@ The game blends:
 
 # 🧩 **Major Features**
 
-- Persistent **ONE UI** interface
+- **Strict ONE UI Architecture:** No chat spam; seamless message editing.
 - Manual, button-driven exploration
 - Turn-by-turn combat playback with suspense timing
 - Auto-skill combat AI (class-aware)
@@ -87,32 +95,45 @@ The game blends:
 # 🗂️ **Project Structure**
 
 ```
+
 eldoria-bot/
-├─ main.py                     # Bot entry point
+├─ main.py                     \# Bot entry point
 ├─ README.md
 ├─ requirements.txt
 │
 ├─ cogs/
-│ ├─ onboarding_cog.py         # /start, character creation
-│ ├─ character_cog.py          # Profile, Ledger, Inventory, Skills UI
-│ ├─ guild_hub_cog.py          # Guild Hall, Rank Up, Exchange
-│ ├─ quest_hub_cog.py          # Quest Board + Quest Log UI
-│ ├─ adventure_commands.py     # Main exploration & adventure UI
-│ └─ ui_helpers.py             # Shared navigation utilities
+│ ├─ onboarding\_cog.py         \# /start, character creation
+│ ├─ character\_cog.py          \# Profile, Ledger, Inventory, Skills UI
+│ ├─ adventure\_cog.py          \# Main adventure controller
+│ ├─ guild\_hub\_cog.py          \# Guild Hall, Rank Up, Exchange
+│ ├─ quest\_hub\_cog.py          \# Quest Board + Quest Log UI
+│ ├─ shop\_cog.py               \# Guild Shop UI
+│ ├─ skill\_trainer\_cog.py      \# Skill learning UI
+│ ├─ status\_update\_cog.py      \# Stat allocation UI
+│ ├─ infirmary\_cog.py          \# Healing UI
+│ └─ ui\_helpers.py             \# Shared navigation utilities
 │
 ├─ database/
-│ ├─ database_manager.py
-│ ├─ create_database.py
-│ └─ populate_database.py
+│ ├─ database\_manager.py
+│ ├─ create\_database.py
+│ └─ populate\_database.py
 │
-├─ game_systems/
-│ ├─ adventure/                # Exploration logic + session state
-│ ├─ combat/                   # Combat engine, math, narration
-│ ├─ data/                     # Classes, monsters, items, skills
-│ ├─ guild_system/             # Exchange, ranks, quests, rewards
-│ ├─ items/                    # Equipment and inventory logic
-│ ├─ monsters/                 # Monster behavior + AI
-│ └─ player/                   # Player stats, progression, occupation
+├─ game\_systems/
+│ ├─ adventure/                \# Exploration logic
+│ │ ├─ ui/                     \# Adventure UI Views
+│ │ ├─ adventure\_manager.py
+│ │ ├─ adventure\_session.py
+│ │ ├─ adventure\_rewards.py
+│ │ ├─ combat\_handler.py
+│ │ └─ event\_handler.py
+│ ├─ combat/                   \# Combat engine
+│ ├─ data/                     \# Static data (Monsters, Items, etc.)
+│ ├─ guild\_system/             \# Guild logic
+│ │ └─ ui/                     \# Guild UI Views
+│ ├─ items/                    \# Inventory logic
+│ ├─ monsters/                 \# Monster logic
+│ └─ player/                   \# Player logic
+
 ```
 
 ---
@@ -123,3 +144,4 @@ This project is **private intellectual property**.
 All code, assets, systems, and lore belong solely to the creator.
 
 **Not open-source. Not licensed for reuse or redistribution.**
+```
