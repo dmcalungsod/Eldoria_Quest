@@ -73,7 +73,14 @@ class AdventureSession:
                 self.logs.append(phrase)
                 self.save_state()
                 return {"log": [phrase], "dead": False}
-            return {"log": ["Error starting combat."], "dead": False}
+            
+            # --- FIX: Handle "No Monster" case gracefully (e.g. Empty Arena) ---
+            # Uses the phrase returned by combat handler ("The area is silent...")
+            message = phrase if phrase else "The path is clear for now."
+            self.logs.append(message)
+            self.save_state()
+            return {"log": [message], "dead": False}
+            # --- END FIX ---
 
         # 3. NON-COMBAT EVENT
         else:

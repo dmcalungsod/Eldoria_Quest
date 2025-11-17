@@ -11,7 +11,7 @@ from math import ceil
 
 CLASSES = ["Warrior", "Mage", "Rogue", "Cleric", "Ranger"]
 
-# 1. DEFINE SLOTS (from our previous change)
+# 1. DEFINE SLOTS (Updated for Rogue Armor)
 SLOTS = {
     "Warrior": [
         "sword",
@@ -42,7 +42,7 @@ SLOTS = {
         "offhand_dagger",
         "bow",
         "leather_hood",
-        "medium_armor",
+        "rogue_armor", # <--- CHANGED
         "medium_gloves",
         "medium_legs",
         "medium_boots",
@@ -102,6 +102,7 @@ STAT_BUDGETS = {
     # -- Armor --
     "heavy_armor": {"END": 0.8, "STR": 0.2},
     "medium_armor": {"END": 0.5, "AGI": 0.5},
+    "rogue_armor": {"AGI": 0.6, "END": 0.4}, # <--- ADDED: Rogue Armor budget (High Agility)
     "robe": {"END": 0.5, "MAG": 0.5},
     "vestments": {"END": 0.6, "MAG": 0.4},
     # -- Helmets --

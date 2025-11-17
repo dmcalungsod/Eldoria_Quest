@@ -34,6 +34,14 @@ EQUIPMENT_DATA = {
         "stats_bonus": {"END": 1, "AGI": 1},  # (1 * 1.0) * 2 = 2
         "description": "Moth-eaten and stained, but it's another layer between you and the world.",
     },
+    "gen_rogue_armor_001": {
+        "name": "Worn Leather Vest",
+        "slot": "rogue_armor",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {"AGI": 2}, 
+        "description": "Supple leather, worn thin by use, but allows freedom of movement.",
+    },
     "gen_accessory_001": {
         "name": "Twine Bracelet",
         "slot": "accessory",

@@ -32,7 +32,13 @@ class CombatHandler:
         Selects a monster and returns (monster_dict, opening_phrase).
         """
         try:
-            monster_pool = location["monsters"]
+            monster_pool = location.get("monsters", [])
+            
+            # --- FIX: Handle empty monster pool (e.g., Guild Arena after boss death) ---
+            if not monster_pool:
+                return None, "The area is eerily silent. No further threats present themselves."
+            # --- END FIX ---
+
             choices, weights = zip(*monster_pool)
             monster_key = random.choices(choices, weights=weights, k=1)[0]
 

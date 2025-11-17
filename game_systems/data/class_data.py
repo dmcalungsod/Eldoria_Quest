@@ -69,7 +69,7 @@ CLASSES = {
             "offhand_dagger",
             "bow",  # Weapons
             "leather_hood",
-            "medium_armor",
+            "rogue_armor",  # <--- CHANGED: Specific slot for Rogue
             "medium_gloves",
             "medium_boots",
             "medium_legs",  # Armor
