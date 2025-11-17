@@ -1,6 +1,7 @@
 """
 cogs/character_cog.py
 Controller for the Character UI system.
+No slash commands here; pure UI logic.
 """
 
 import discord

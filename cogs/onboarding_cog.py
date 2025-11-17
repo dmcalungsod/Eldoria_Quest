@@ -1,10 +1,7 @@
 """
 onboarding_cog.py
 
-Handles the /start command and the new player onboarding flow:
-- Class Selection (StartMenuView, ClassDetailView)
-- Character Creation (ClassDetailView)
-- Guild Registration (CharacterMenuView)
+Handles the /start command and the new player onboarding flow.
 """
 
 from datetime import datetime
@@ -12,7 +9,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button
-import asyncio # <-- IMPORT ASYNCIO
+import asyncio
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_creator import PlayerCreator

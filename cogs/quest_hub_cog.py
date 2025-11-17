@@ -7,11 +7,10 @@ Handles all UI Views related to the Questing System:
 - Quest Log (turn-in)
 - Quest Detail (viewing and accepting)
 
-Refactored to strictly adhere to ONE UI Policy.
+Refactored to strictly adhere to ONE UI Policy and fix navigation crashes.
 """
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 from discord.ui import View, Button, Select
 import asyncio
@@ -40,13 +39,14 @@ class QuestLedgerView(View):
         self.active_quests = active_quests
         self.interaction_user = interaction_user
 
-        # Back Button (parent view will overwrite callback)
+        # Back Button
         self.back_button = Button(
-            label="Back to Quests Menu",
+            label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
-            custom_id="back_to_guild_quests_menu",
+            custom_id="back_to_guild_hall",
             row=1,
         )
+        self.back_button.callback = back_to_guild_hall_callback
         self.add_item(self.back_button)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -56,6 +56,7 @@ class QuestLedgerView(View):
         return True
 
     def set_back_button(self, callback_function, label="Back"):
+        """Allows parent menus to override the back button destination."""
         self.back_button.label = label
         self.back_button.callback = callback_function
 
@@ -67,7 +68,6 @@ class QuestLedgerView(View):
 class QuestLogView(View):
     """
     Displays accepted quests and allows the player to turn in completed ones.
-    Accessed from both the Profile and Guild Hall.
     """
 
     def __init__(self, db_manager: DatabaseManager, active_quests: list, interaction_user: discord.User):
@@ -77,7 +77,7 @@ class QuestLogView(View):
         self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
 
-        # Back Button (default: return to Profile)
+        # Back Button
         self.back_button = Button(
             label="Back to Profile",
             style=discord.ButtonStyle.secondary,
@@ -95,7 +95,7 @@ class QuestLogView(View):
             row=0,
         )
 
-        # Determine completable quests synchronously (safe)
+        # Determine completable quests synchronously
         completable_quests = []
         for quest in self.active_quests:
             if self.quest_system.check_completion(quest["progress"], quest["objectives"]):
@@ -134,23 +134,19 @@ class QuestLogView(View):
 
         quest_id = int(self.quest_select.values[0])
 
-        # Perform turn-in asynchronously
         success, message = await asyncio.to_thread(
             self.quest_system.complete_quest,
             self.interaction_user.id,
             quest_id,
         )
         
-        # We now update the embed directly regardless of success/failure
-        # Instead of sending an ephemeral message.
-
         # Refresh quest list
         new_active_quests = await asyncio.to_thread(
             self.quest_system.get_player_quests, self.interaction_user.id
         )
 
         embed = interaction.message.embeds[0]
-        embed.description = message # Replace description with the result (Error or Success)
+        embed.description = message 
         embed.clear_fields()
 
         if not new_active_quests:
@@ -177,14 +173,12 @@ class QuestLogView(View):
                     inline=False,
                 )
         
-        # Color code the result
         if not success:
             embed.color = discord.Color.red()
             embed.title = f"{E.ERROR} Turn-In Rejected"
         else:
             embed.color = discord.Color.gold()
 
-        # Rebuild the view with updated quest list
         new_view = QuestLogView(self.db, new_active_quests, self.interaction_user)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
@@ -200,14 +194,18 @@ class QuestBoardView(View):
     Displays all available quests in a dropdown list.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quests: list, interaction_user: discord.User, status_message: str = None):
+    def __init__(self, db_manager: DatabaseManager, quests: list, interaction_user: discord.User, status_message: str = None, parent_back_data: tuple = None):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quests = quests
         self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
-        self.status_message = status_message # Optional status to display in embed
+        self.status_message = status_message
+        
+        # Store navigation context (Callback, Label)
+        self.parent_back_data = parent_back_data 
 
+        # --- Quest Select ---
         self.quest_select = Select(
             placeholder="Select a guild contract...",
             min_values=1,
@@ -222,7 +220,7 @@ class QuestBoardView(View):
             )
             self.quest_select.disabled = True
         else:
-            for quest in self.quests[:25]:  # Discord limit
+            for quest in self.quests[:25]:
                 self.quest_select.add_option(
                     label=f"[{quest['tier']}-Rank] {quest['title']}",
                     description=quest["summary"][:100],
@@ -233,13 +231,30 @@ class QuestBoardView(View):
         self.quest_select.callback = self.view_quest_details_callback
         self.add_item(self.quest_select)
 
-        back_button = Button(
+        # --- Back Button (FIXED) ---
+        # Must be an instance attribute to be modifiable
+        self.back_button = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_hall",
         )
-        back_button.callback = back_to_guild_hall_callback
-        self.add_item(back_button)
+        
+        # Apply parent context if it exists (persisting navigation)
+        if self.parent_back_data:
+            self.back_button.callback = self.parent_back_data[0]
+            self.back_button.label = self.parent_back_data[1]
+        else:
+            self.back_button.callback = back_to_guild_hall_callback
+            
+        self.add_item(self.back_button)
+
+    # --- FIX: Added Method ---
+    def set_back_button(self, callback_function, label="Back"):
+        """Allows external callers to change where the back button goes."""
+        self.back_button.label = label
+        self.back_button.callback = callback_function
+        # Save this so we can pass it to child views
+        self.parent_back_data = (callback_function, label)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -251,14 +266,9 @@ class QuestBoardView(View):
         await interaction.response.defer()
 
         quest_id = int(self.quest_select.values[0])
-
-        quest_details = await asyncio.to_thread(
-            self.quest_system.get_quest_details,
-            quest_id,
-        )
+        quest_details = await asyncio.to_thread(self.quest_system.get_quest_details, quest_id)
 
         if not quest_details:
-            # Convert this to persistent error on the board
             await self.refresh_board(interaction, f"{E.ERROR} Could not retrieve quest details.")
             return
 
@@ -292,15 +302,17 @@ class QuestBoardView(View):
             value="\n".join(reward_lines) or "No rewards listed.",
             inline=False,
         )
-
         embed.set_footer(text=f"Quest ID: {quest_id} | Tier: {quest_details['tier']}")
 
-        view = QuestDetailView(self.db, quest_id, self.quests, self.interaction_user)
+        # Pass navigation context to Detail View
+        view = QuestDetailView(
+            self.db, quest_id, self.quests, self.interaction_user, 
+            parent_back_data=self.parent_back_data
+        )
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def refresh_board(self, interaction: discord.Interaction, status_msg: str = None):
         """Helper to reload the board with a status message."""
-        # Re-fetch quests just in case
         quests = await asyncio.to_thread(self.quest_system.get_available_quests, self.interaction_user.id)
         
         embed = discord.Embed(
@@ -314,7 +326,8 @@ class QuestBoardView(View):
              
         embed.add_field(name="Available Contracts", value="Select a quest from the dropdown.")
         
-        view = QuestBoardView(self.db, quests, self.interaction_user, status_message=status_msg)
+        # Pass navigation context back
+        view = QuestBoardView(self.db, quests, self.interaction_user, status_message=status_msg, parent_back_data=self.parent_back_data)
         await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -327,13 +340,16 @@ class QuestDetailView(View):
     Displays full details for a specific quest and allows acceptance.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quest_id: int, quests_list: list, interaction_user: discord.User):
+    def __init__(self, db_manager: DatabaseManager, quest_id: int, quests_list: list, interaction_user: discord.User, parent_back_data: tuple = None):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quest_id = quest_id
         self.quests_list = quests_list
         self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
+        
+        # Store navigation to return to the correct board state
+        self.parent_back_data = parent_back_data
 
         accept_button = Button(
             label="Accept Quest",
@@ -372,7 +388,6 @@ class QuestDetailView(View):
         else:
             status_msg = f"{E.WARNING} You have already sworn to undertake this task."
 
-        # Return to board with the status message
         await self.back_to_quest_board_callback(interaction, deferred=True, status_message=status_msg)
 
     async def back_to_quest_board_callback(self, interaction: discord.Interaction, deferred: bool = False, status_message: str = None):
@@ -398,7 +413,12 @@ class QuestDetailView(View):
             value="Select a quest from the dropdown.",
         )
 
-        view = QuestBoardView(self.db, available_quests, self.interaction_user, status_message=status_message)
+        # Restore the Board View with the original navigation context
+        view = QuestBoardView(
+            self.db, available_quests, self.interaction_user, 
+            status_message=status_message, 
+            parent_back_data=self.parent_back_data
+        )
         await interaction.edit_original_response(embed=embed, view=view)
 
 
