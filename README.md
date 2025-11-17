@@ -1,6 +1,3 @@
-Here is the updated `README.md`. I have added the **ONE UI Policy** section under Design Philosophy and updated the **Project Structure** tree to reflect your recent modularization (showing the new `adventure` and `guild_system` organization).
-
-```markdown
 # 🌑 **Eldoria Quest**
 
 ### _A Dark High-Fantasy Survival RPG Discord Bot_
@@ -144,4 +141,3 @@ This project is **private intellectual property**.
 All code, assets, systems, and lore belong solely to the creator.
 
 **Not open-source. Not licensed for reuse or redistribution.**
-```
