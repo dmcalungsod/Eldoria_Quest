@@ -210,7 +210,7 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     This always edits the message.
     """
     # FIX: Import GuildLobbyView instead of GuildCardView
-    from .guild_hub_cog import GuildLobbyView
+    from game_systems.guild_system.ui.lobby_view import GuildLobbyView
 
     if not interaction.response.is_done():
         await interaction.response.defer()

@@ -1,0 +1,85 @@
+"""
+game_systems/guild_system/ui/services_menu.py
+"""
+import discord
+import asyncio
+from discord.ui import View, Button
+from database.database_manager import DatabaseManager
+import game_systems.data.emojis as E
+
+from .components import ViewFactory, GuildViewMixin, EmbedBuilder, SystemCache
+from cogs.ui_helpers import back_to_guild_hall_callback
+
+class GuildServicesView(View, GuildViewMixin):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
+        super().__init__(timeout=None)
+        self.db = db_manager
+        self.interaction_user = interaction_user
+        
+        self.add_item(ViewFactory.create_button("Guild Exchange", discord.ButtonStyle.primary, "g_exchange", E.EXCHANGE, 0, callback=self.exchange_callback))
+        self.add_item(ViewFactory.create_button("Guild Supply", discord.ButtonStyle.primary, "g_shop", "🪙", 0, callback=self.shop_callback))
+        self.add_item(ViewFactory.create_button("Infirmary", discord.ButtonStyle.secondary, "g_infirmary", "❤️‍🩹", 1, callback=self.infirmary_callback))
+        self.add_item(ViewFactory.create_button("Skill Trainer", discord.ButtonStyle.secondary, "g_trainer", "🧠", 1, callback=self.trainer_callback))
+        
+        self.back_btn = ViewFactory.create_button("Back to Guild Lobby", discord.ButtonStyle.grey, "back_lobby", row=2, callback=back_to_guild_hall_callback)
+        self.add_item(self.back_btn)
+
+    async def exchange_callback(self, interaction: discord.Interaction, button: Button = None):
+        from .exchange_view import GuildExchangeView
+        await interaction.response.defer()
+        exchange = SystemCache.get_guild_exchange(self.db)
+        val, mats = await asyncio.to_thread(exchange.calculate_exchange_value, self.interaction_user.id)
+        
+        embed = EmbedBuilder.guild_exchange()
+        if val == 0:
+            embed.add_field(name="Materials", value="None.")
+        else:
+            rows = [f"• {m['item_name']} x{m['count']}" for m in mats]
+            embed.add_field(name="Materials", value="\n".join(rows), inline=False)
+            embed.add_field(name="Value", value=f"{val} Aurum", inline=False)
+
+        view = GuildExchangeView(self.db, val > 0, self.interaction_user)
+        view.set_back_button(self.back_to_services, "Back to Services")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def shop_callback(self, interaction: discord.Interaction, button: Button = None):
+        from cogs.shop_cog import ShopView
+        await interaction.response.defer()
+        p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        aurum = p_data['aurum']
+        
+        embed = discord.Embed(title="Guild Supply", description=f"Funds: {aurum} Aurum", color=discord.Color.green())
+        view = ShopView(self.db, self.interaction_user, aurum)
+        view.set_back_button(self.back_to_services, "Back to Services")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def infirmary_callback(self, interaction: discord.Interaction, button: Button = None):
+        from cogs.infirmary_cog import InfirmaryView
+        from game_systems.player.player_stats import PlayerStats
+        await interaction.response.defer()
+        
+        p_data, s_json = await asyncio.gather(
+            asyncio.to_thread(self.db.get_player, self.interaction_user.id),
+            asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+        )
+        stats = PlayerStats.from_dict(s_json)
+        
+        embed = InfirmaryView.build_infirmary_embed(p_data, stats)
+        view = InfirmaryView(self.db, self.interaction_user, p_data, stats)
+        view.set_back_button(self.back_to_services, "Back to Services")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def trainer_callback(self, interaction: discord.Interaction, button: Button = None):
+        from cogs.skill_trainer_cog import SkillTrainerView
+        await interaction.response.defer()
+        p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        
+        embed = SkillTrainerView.build_skill_embed(p_data)
+        view = SkillTrainerView(self.db, self.interaction_user, p_data)
+        view.set_back_button(self.back_to_services, "Back to Services")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def back_to_services(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        view = GuildServicesView(self.db, self.interaction_user)
+        await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
