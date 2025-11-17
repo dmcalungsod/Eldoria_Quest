@@ -63,9 +63,10 @@ class QuestsMenuView(View, GuildViewMixin):
             quest_system.get_available_quests, self.interaction_user.id
         )
         
+        # --- Narrative Update ---
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
-            description="Browse available guild contracts.",
+            description="The board is pinned with desperate pleas and official warrants. Choose your burden.",
             color=discord.Color.dark_green()
         )
         embed.add_field(
@@ -91,16 +92,17 @@ class QuestsMenuView(View, GuildViewMixin):
             quest_system.get_player_quests, self.interaction_user.id
         )
         
+        # --- Narrative Update ---
         embed = discord.Embed(
             title=f"{E.QUEST_SCROLL} Quest Ledger",
-            description="Your active guild contracts.",
+            description="The oaths you have sworn to the Guild. Leave none unfulfilled.",
             color=discord.Color.from_rgb(139, 69, 19)
         )
         
         if not quests:
             embed.add_field(
                 name="No Active Contracts",
-                value="Visit the Quest Board to take on new work.",
+                value="Your ledger is empty. The Guild has need of you—consult the board.",
             )
         else:
             for q in quests:
@@ -128,16 +130,17 @@ class QuestsMenuView(View, GuildViewMixin):
             quest_system.get_player_quests, self.interaction_user.id
         )
         
+        # --- Narrative Update ---
         embed = discord.Embed(
             title=f"{E.MEDAL} Quest Turn-In",
-            description="Submit completed contracts for Guild approval.",
+            description="Present your findings to the Guildmaster. Only success is rewarded here.",
             color=discord.Color.gold()
         )
         
         if not quests:
             embed.add_field(
                 name="No Active Contracts",
-                value="You have nothing to report.",
+                value="You have no completed contracts to report. Return when the work is done.",
             )
 
         view = QuestLogView(self.db, quests, self.interaction_user)
@@ -160,9 +163,10 @@ class QuestsMenuView(View, GuildViewMixin):
 
         # Max Rank
         if not next_rank:
+            # --- Narrative Update ---
             embed = discord.Embed(
                 title="Rank Evaluation",
-                description="You have attained the highest recognized Guild rank.",
+                description="You stand at the zenith of the Guild's hierarchy. There are no titles left to grant you.",
                 color=discord.Color.gold()
             )
             view = RankProgressView(self.db, False, self.interaction_user)

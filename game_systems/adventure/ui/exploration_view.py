@@ -27,11 +27,6 @@ import game_systems.data.emojis as E
 class ExplorationView(View):
     """
     The core exploration UI for traversing Eldoria’s wilderness.
-
-    Players can:
-    - Press Forward (advance deeper into danger)
-    - Access Field Pack (inventory)
-    - Withdraw (return to the safety of Astraeon)
     """
 
     def __init__(
@@ -150,13 +145,11 @@ class ExplorationView(View):
             embed.color = discord.Color.dark_grey()
             embed.set_footer(text="You collapse. The Adventurer’s Guild dispatches a rescue team.")
 
+            # Update main message
             await interaction.edit_original_response(embed=embed, view=self)
-
-            await interaction.followup.send(
-                f"{E.DEFEAT} **Defeated.**\nYou retain your gear, "
-                f"but your Vestige is lost to the wilds.",
-                ephemeral=True
-            )
+            
+            # We purposefully avoid an ephemeral message here, as the embed
+            # state ("You collapse") is sufficient and persistent.
             return
 
         await interaction.edit_original_response(embed=embed, view=self)
@@ -210,7 +203,7 @@ class ExplorationView(View):
 
     async def leave_callback(self, interaction: discord.Interaction):
         """
-        Ends the adventure session and returns the player to Astraeon.
+        Ends the adventure session and transitions to a persistent summary view.
         """
         await interaction.response.defer()
 
@@ -219,12 +212,22 @@ class ExplorationView(View):
         embed = discord.Embed(
             title="Returned to Astraeon",
             description=(
-                "You withdraw from the field, returning to the relative safety "
-                "of the Adventurer’s Guild. Rest, resupply, and prepare for the next contract."
+                "The heavy iron gates of Astraeon close behind you, shutting out the wilds. "
+                "You breathe the stale, comforting air of the city once more.\n\n"
+                "**You have survived.**"
             ),
             color=discord.Color.blue()
         )
+        
+        # Create a temporary, minimal view just to get back to the profile
+        # This replaces the ephemeral message.
+        view = View()
+        btn = Button(label="Return to Profile", style=discord.ButtonStyle.primary)
+        
+        async def return_callback(inter: discord.Interaction):
+            await back_to_profile_callback(inter, is_new_message=False)
+            
+        btn.callback = return_callback
+        view.add_item(btn)
 
-        await interaction.followup.send(embed=embed, ephemeral=True)
-
-        await back_to_profile_callback(interaction, is_new_message=False)
+        await interaction.edit_original_response(embed=embed, view=view)

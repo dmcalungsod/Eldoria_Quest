@@ -6,6 +6,8 @@ Handles all UI Views related to the Questing System:
 - Quest Ledger (active quests, read-only)
 - Quest Log (turn-in)
 - Quest Detail (viewing and accepting)
+
+Refactored to strictly adhere to ONE UI Policy.
 """
 
 import discord
@@ -138,10 +140,9 @@ class QuestLogView(View):
             self.interaction_user.id,
             quest_id,
         )
-
-        if not success:
-            await interaction.followup.send(message, ephemeral=True)
-            return
+        
+        # We now update the embed directly regardless of success/failure
+        # Instead of sending an ephemeral message.
 
         # Refresh quest list
         new_active_quests = await asyncio.to_thread(
@@ -149,7 +150,7 @@ class QuestLogView(View):
         )
 
         embed = interaction.message.embeds[0]
-        embed.description = message
+        embed.description = message # Replace description with the result (Error or Success)
         embed.clear_fields()
 
         if not new_active_quests:
@@ -175,6 +176,13 @@ class QuestLogView(View):
                     value="\n".join(progress_lines) or "No objectives.",
                     inline=False,
                 )
+        
+        # Color code the result
+        if not success:
+            embed.color = discord.Color.red()
+            embed.title = f"{E.ERROR} Turn-In Rejected"
+        else:
+            embed.color = discord.Color.gold()
 
         # Rebuild the view with updated quest list
         new_view = QuestLogView(self.db, new_active_quests, self.interaction_user)
@@ -192,12 +200,13 @@ class QuestBoardView(View):
     Displays all available quests in a dropdown list.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quests: list, interaction_user: discord.User):
+    def __init__(self, db_manager: DatabaseManager, quests: list, interaction_user: discord.User, status_message: str = None):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quests = quests
         self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
+        self.status_message = status_message # Optional status to display in embed
 
         self.quest_select = Select(
             placeholder="Select a guild contract...",
@@ -249,7 +258,8 @@ class QuestBoardView(View):
         )
 
         if not quest_details:
-            await interaction.followup.send(f"{E.ERROR} Could not retrieve quest details.", ephemeral=True)
+            # Convert this to persistent error on the board
+            await self.refresh_board(interaction, f"{E.ERROR} Could not retrieve quest details.")
             return
 
         embed = discord.Embed(
@@ -286,6 +296,25 @@ class QuestBoardView(View):
         embed.set_footer(text=f"Quest ID: {quest_id} | Tier: {quest_details['tier']}")
 
         view = QuestDetailView(self.db, quest_id, self.quests, self.interaction_user)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def refresh_board(self, interaction: discord.Interaction, status_msg: str = None):
+        """Helper to reload the board with a status message."""
+        # Re-fetch quests just in case
+        quests = await asyncio.to_thread(self.quest_system.get_available_quests, self.interaction_user.id)
+        
+        embed = discord.Embed(
+            title=f"{E.SCROLL} Quest Board",
+            description="The board is cluttered with parchment requests and sealed contracts.",
+            color=discord.Color.dark_green(),
+        )
+        
+        if status_msg:
+             embed.add_field(name="Update", value=status_msg, inline=False)
+             
+        embed.add_field(name="Available Contracts", value="Select a quest from the dropdown.")
+        
+        view = QuestBoardView(self.db, quests, self.interaction_user, status_message=status_msg)
         await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -337,13 +366,16 @@ class QuestDetailView(View):
             self.quest_id,
         )
 
+        status_msg = ""
         if success:
-            await interaction.followup.send(f"{E.CHECK} Quest accepted! Added to your log.", ephemeral=True)
-            await self.back_to_quest_board_callback(interaction, deferred=True)
+            status_msg = f"{E.CHECK} Contract sealed. The details are recorded in your ledger."
         else:
-            await interaction.followup.send(f"{E.WARNING} You have already accepted this quest.", ephemeral=True)
+            status_msg = f"{E.WARNING} You have already sworn to undertake this task."
 
-    async def back_to_quest_board_callback(self, interaction: discord.Interaction, deferred: bool = False):
+        # Return to board with the status message
+        await self.back_to_quest_board_callback(interaction, deferred=True, status_message=status_msg)
+
+    async def back_to_quest_board_callback(self, interaction: discord.Interaction, deferred: bool = False, status_message: str = None):
         if not deferred and not interaction.response.is_done():
             await interaction.response.defer()
 
@@ -357,12 +389,16 @@ class QuestDetailView(View):
             description="The board is cluttered with parchment requests and sealed contracts.",
             color=discord.Color.dark_green(),
         )
+        
+        if status_message:
+            embed.add_field(name="Update", value=status_message, inline=False)
+
         embed.add_field(
             name="Available Contracts",
             value="Select a quest from the dropdown.",
         )
 
-        view = QuestBoardView(self.db, available_quests, self.interaction_user)
+        view = QuestBoardView(self.db, available_quests, self.interaction_user, status_message=status_message)
         await interaction.edit_original_response(embed=embed, view=view)
 
 
