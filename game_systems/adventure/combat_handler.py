@@ -30,15 +30,33 @@ class CombatHandler:
     def initiate_combat(self, location: Dict[str, Any]) -> Tuple[Dict[str, Any], str]:
         """
         Selects a monster and returns (monster_dict, opening_phrase).
+        Now supports conditional spawns based on player level.
         """
         try:
-            monster_pool = location.get("monsters", [])
+            # 1. Start with the base pool
+            monster_pool = list(location.get("monsters", []))
+
+            # 2. Check for Conditional Monsters (Level-based spawns)
+            conditionals = location.get("conditional_monsters", [])
             
-            # --- FIX: Handle empty monster pool (e.g., Guild Arena after boss death) ---
+            if conditionals:
+                # Fetch player level to determine eligibility
+                with self.db.get_connection() as conn:
+                    cur = conn.cursor()
+                    cur.execute("SELECT level FROM players WHERE discord_id = ?", (self.discord_id,))
+                    row = cur.fetchone()
+                    player_level = row["level"] if row else 1
+
+                # Inject stronger monsters if the player qualifies
+                for cond in conditionals:
+                    if player_level >= cond.get("min_level", 1):
+                        monster_pool.append((cond["monster_key"], cond["weight"]))
+
+            # 3. Handle empty pool case
             if not monster_pool:
                 return None, "The area is eerily silent. No further threats present themselves."
-            # --- END FIX ---
 
+            # 4. Select Monster
             choices, weights = zip(*monster_pool)
             monster_key = random.choices(choices, weights=weights, k=1)[0]
 

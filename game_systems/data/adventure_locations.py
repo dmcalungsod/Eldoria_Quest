@@ -17,6 +17,14 @@ LOCATIONS = {
             ("monster_002", 40),  # Glimmer Slime
             ("monster_003", 20),  # Goblin Grunt
         ],
+        # --- NEW: High level spawn for stronger players ---
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_007", # Hollow Spiderling (Lvl 5 Elite)
+                "weight": 10,                 # ~10% spawn chance if added
+                "min_level": 3                # Only appears for Level 3+
+            }
+        ],
         "description": "The safe edge of the forest. Slimes and weak goblins lurk here."
     },
     "whispering_thicket": {
@@ -47,7 +55,6 @@ LOCATIONS = {
         ],
         "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot."
     },
-    # --- NEW SPECIAL LOCATION ---
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",
