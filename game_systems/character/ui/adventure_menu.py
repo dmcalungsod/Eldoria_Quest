@@ -115,6 +115,15 @@ class AdventureView(View):
                 logs = json.loads(session["logs"])
             except Exception:
                 logs = []
+            
+            # --- FIX: Parse active monster to update button state ---
+            active_monster = None
+            if session["active_monster_json"]:
+                try:
+                    active_monster = json.loads(session["active_monster_json"])
+                except:
+                    pass
+            # --- END FIX ---
 
             # Fetch stats and vitals
             stats_json = await asyncio.to_thread(
@@ -139,6 +148,7 @@ class AdventureView(View):
                 logs,
                 self.interaction_user,
                 stats,
+                active_monster=active_monster # <-- Pass active monster
             )
 
             await interaction.edit_original_response(embed=embed, view=view)

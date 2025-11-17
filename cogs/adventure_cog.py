@@ -50,6 +50,15 @@ class AdventureCommands(commands.Cog):
                 log = json.loads(active_session["logs"])
             except:
                 log = []
+
+            # --- FIX: Parse active monster ---
+            active_monster = None
+            if active_session["active_monster_json"]:
+                try:
+                    active_monster = json.loads(active_session["active_monster_json"])
+                except:
+                    pass
+            # --- END FIX ---
             
             # Fetch current state
             stats_json = await asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
@@ -63,7 +72,8 @@ class AdventureCommands(commands.Cog):
             
             # Launch View
             view = ExplorationView(
-                self.db, self.manager, loc_id, log, interaction.user, player_stats
+                self.db, self.manager, loc_id, log, interaction.user, player_stats,
+                active_monster=active_monster # <-- Pass monster
             )
             await interaction.followup.send(embed=embed, view=view)
             return

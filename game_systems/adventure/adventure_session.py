@@ -2,17 +2,15 @@
 adventure_session.py
 
 The Coordinator for adventure logic.
-It delegates heavy lifting to:
-- CombatHandler (Fighting)
-- EventHandler (Regen/Quests)
-- AdventureRewards (XP/Loot)
+Refactored to support "Dramatic Timing" by returning sequences of events
+rather than a flat log list.
 """
 
 import json
 import random
 import datetime
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
@@ -54,9 +52,14 @@ class AdventureSession:
             self.loot = {}
 
     def simulate_step(self) -> Dict[str, Any]:
-        """Main Step Logic: Hybrid Combat or Exploration."""
+        """
+        Main Step Logic.
+        Returns a dict containing 'sequence': List[List[str]].
+        UI will print each inner list as a separate update with a delay.
+        """
         location = LOCATIONS.get(self.location_id)
-        if not location: return {"log": ["Error: Location missing."], "dead": True}
+        if not location: 
+            return {"sequence": [["Error: Location missing."]], "dead": True}
 
         # 1. CONTINUE COMBAT
         if self.active_monster:
@@ -72,22 +75,22 @@ class AdventureSession:
                 self.active_monster = monster
                 self.logs.append(phrase)
                 self.save_state()
-                return {"log": [phrase], "dead": False}
+                # Return as single sequence (instant print)
+                return {"sequence": [[phrase]], "dead": False}
             
-            # --- FIX: Handle "No Monster" case gracefully (e.g. Empty Arena) ---
-            # Uses the phrase returned by combat handler ("The area is silent...")
+            # Handle Empty Arena / No Monster
             message = phrase if phrase else "The path is clear for now."
             self.logs.append(message)
             self.save_state()
-            return {"log": [message], "dead": False}
-            # --- END FIX ---
+            return {"sequence": [[message]], "dead": False}
 
-        # 3. NON-COMBAT EVENT
+        # 3. NON-COMBAT EVENT (Regen / Quest)
         else:
             result = self.events.resolve_non_combat(70)
             self.logs.extend(result["log"])
             self.save_state()
-            return result
+            # Wrap the log in a list of lists so it prints instantly as one block
+            return {"sequence": [result["log"]], "dead": False}
 
     def _should_auto(self) -> bool:
         if not self.active_monster: return False
@@ -98,20 +101,33 @@ class AdventureSession:
         return (vitals["current_hp"] / max(stats.max_hp, 1)) >= 0.30
 
     def _resolve_auto_combat(self) -> Dict[str, Any]:
-        """Auto-Combat Loop."""
+        """
+        Auto-Combat Loop with DRAMA.
+        Returns a sequence of turns so the UI can animate them.
+        """
         report = self.combat.create_empty_battle_report()
         report_list = []
-        logs = []
+        
+        # This will hold List[str], where each inner list is one "frame" of animation
+        sequence = [] 
+        
         is_dead, player_won = False, False
 
         for _ in range(8): # Max 8 turns
+            # Run one turn
             result = self.combat.resolve_turn(self.active_monster, report)
             report_list.append(result["turn_report"])
             
+            # Add this turn's logs as a distinct block in the sequence
+            # We add a newline at the start of the block for spacing
+            turn_logs = result["phrases"]
+            if turn_logs:
+                sequence.append(turn_logs)
+
             # Check Safety
             stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
             if result["hp_current"] / stats.max_hp < 0.30:
-                logs.append("⚠️ **Combat paused:** Health critical. Manual mode engaged.")
+                sequence.append(["\n⚠️ **Combat paused:** Health critical. Manual mode engaged."])
                 break
 
             if result.get("winner") == "monster":
@@ -119,36 +135,56 @@ class AdventureSession:
             if result.get("winner") == "player":
                 player_won = True; self.active_monster = None; break
 
+        # Handle End of Battle (Victory/Defeat)
+        final_block = []
         if player_won:
-            logs.extend(self.rewards.process_victory(
+            final_block.append(f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(report_list)} rounds.")
+            # Calculate rewards
+            reward_logs = self.rewards.process_victory(
                 report, report_list, result, self.quest_system, self.inventory_manager, self.loot
-            ))
-            logs.append(f"⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(report_list)} rounds.")
+            )
+            final_block.extend(reward_logs)
+            
         elif is_dead:
-            logs.append("💀 You have been defeated.")
+            final_block.append("\n💀 **You have been defeated.**")
 
-        self.logs.extend(logs)
+        # Append final results as the last "frame"
+        if final_block:
+            sequence.append(final_block)
+
+        # Update master log with everything that happened
+        for block in sequence:
+            self.logs.extend(block)
+            
         self.save_state()
-        return {"log": logs, "dead": is_dead}
+        return {"sequence": sequence, "dead": is_dead}
 
     def _process_combat_turn(self) -> Dict[str, Any]:
-        """Manual Turn."""
+        """Manual Turn (Single Step)."""
         report = self.combat.create_empty_battle_report()
         result = self.combat.resolve_turn(self.active_monster, report)
-        logs = result["phrases"]
+        
+        turn_logs = result["phrases"]
         is_dead = False
-
+        
+        # Check results immediately
         if result.get("winner") == "monster":
             is_dead = True; self.active = False; self.active_monster = None
+            turn_logs.append("\n💀 **You have been defeated.**")
+            
         elif result.get("winner") == "player":
-            logs.extend(self.rewards.process_victory(
+            turn_logs.append(f"\n⚔️ **Victory!**")
+            reward_logs = self.rewards.process_victory(
                 report, [report], result, self.quest_system, self.inventory_manager, self.loot
-            ))
+            )
+            turn_logs.extend(reward_logs)
             self.active_monster = None
 
-        self.logs.extend(logs)
+        self.logs.extend(turn_logs)
         self.save_state()
-        return {"log": logs, "dead": is_dead}
+        
+        # Return as a single sequence block (no delay needed for manual clicks)
+        return {"sequence": [turn_logs], "dead": is_dead}
 
     def save_state(self):
         m_json = json.dumps(self.active_monster) if self.active_monster else None

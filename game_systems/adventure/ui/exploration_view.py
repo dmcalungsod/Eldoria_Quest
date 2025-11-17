@@ -2,11 +2,8 @@
 game_systems/adventure/ui/exploration_view.py
 
 Primary gameplay interface for field exploration.
-
-Buttons:
-- Press Forward
-- Field Pack
-- Withdraw
+Refactored to support "Dramatic Timing", dynamic "Start Battle" button state,
+and "In Battle" disabled state for ALL buttons during animation.
 """
 
 import discord
@@ -37,6 +34,7 @@ class ExplorationView(View):
         log: list,
         interaction_user: discord.User,
         player_stats: PlayerStats,
+        active_monster: dict = None,
     ):
         super().__init__(timeout=None)
         self.db = db
@@ -45,18 +43,20 @@ class ExplorationView(View):
         self.log = log or []
         self.interaction_user = interaction_user
         self.player_stats = player_stats
-
         self.inv_manager = InventoryManager(self.db)
+        self.active_monster = active_monster
 
         # -------------------------------------------------------------
         # BUTTONS
         # -------------------------------------------------------------
 
-        # Advance deeper into the region
+        # Initialize button state based on active_monster
+        label, style, emoji = self._get_button_state(self.active_monster)
+
         self.forward_btn = Button(
-            label="Press Forward",
-            style=discord.ButtonStyle.success,
-            emoji="⚔️",
+            label=label,
+            style=style,
+            emoji=emoji,
             row=0
         )
         self.forward_btn.callback = self.explore_callback
@@ -83,6 +83,22 @@ class ExplorationView(View):
         self.add_item(self.withdraw_btn)
 
     # -------------------------------------------------------------
+    # HELPER: Button State
+    # -------------------------------------------------------------
+    def _get_button_state(self, active_monster):
+        if active_monster:
+            return "Start Battle", discord.ButtonStyle.danger, "⚔️"
+        else:
+            return "Press Forward", discord.ButtonStyle.success, "🥾"
+
+    def _update_forward_button(self, active_monster):
+        label, style, emoji = self._get_button_state(active_monster)
+        self.forward_btn.label = label
+        self.forward_btn.style = style
+        self.forward_btn.emoji = emoji
+        self.forward_btn.disabled = False
+
+    # -------------------------------------------------------------
     # ACCESS VALIDATION
     # -------------------------------------------------------------
 
@@ -101,7 +117,7 @@ class ExplorationView(View):
     async def explore_callback(self, interaction: discord.Interaction):
         """
         The core step of exploration.
-        Simulates one advancement into the wilderness (encounters, events, etc.).
+        Simulates advancement and plays back the result with dramatic timing.
         """
         await interaction.response.defer()
 
@@ -109,60 +125,90 @@ class ExplorationView(View):
         result = await asyncio.to_thread(
             self.manager.simulate_adventure_step, interaction.user.id
         )
+        
+        sequence = result.get("sequence", [])
+        is_dead = result.get("dead", False)
+        
+        # Animate if multiple frames (combat)
+        animate = len(sequence) > 1
 
-        # 2. Append new log lines
-        new_lines = result.get("log", [])
-        self.log.extend(new_lines)
-        self.log = self.log[-15:]  # Keep log concise but contextual
+        # 2. Playback Loop
+        for index, block in enumerate(sequence):
+            
+            # Append to log
+            self.log.extend(block)
+            self.log = self.log[-15:]
 
-        # 3. Refresh all vital data
-        vitals_task = asyncio.to_thread(self.db.get_player_vitals, interaction.user.id)
-        session_task = asyncio.to_thread(self.manager.get_active_session, interaction.user.id)
-        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
+            # 3. Refresh Data
+            vitals_task = asyncio.to_thread(self.db.get_player_vitals, interaction.user.id)
+            session_task = asyncio.to_thread(self.manager.get_active_session, interaction.user.id)
+            stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
 
-        vitals, session_row, stats_json = await asyncio.gather(
-            vitals_task, session_task, stats_json_task
-        )
-        self.player_stats = PlayerStats.from_dict(stats_json)
+            vitals, session_row, stats_json = await asyncio.gather(
+                vitals_task, session_task, stats_json_task
+            )
+            self.player_stats = PlayerStats.from_dict(stats_json)
+            
+            # Parse active monster for button state
+            current_monster = None
+            if session_row and session_row["active_monster_json"]:
+                try:
+                    current_monster = json.loads(session_row["active_monster_json"])
+                except:
+                    pass
+            
+            # --- BUTTON STATE LOGIC ---
+            is_last_frame = (index == len(sequence) - 1)
 
-        # 4. Rebuild the exploration embed
-        embed = AdventureEmbeds.build_exploration_embed(
-            self.location_id,
-            self.log,
-            self.player_stats,
-            vitals,
-            session_row
-        )
+            if is_dead and is_last_frame:
+                # Dead on the last frame
+                self.forward_btn.disabled = True
+                self.inventory_btn.disabled = True
+                self.withdraw_btn.disabled = False 
+            elif animate and not is_last_frame:
+                # Mid-Battle: Disable ALL buttons
+                self.forward_btn.label = "In Battle"
+                self.forward_btn.style = discord.ButtonStyle.secondary
+                self.forward_btn.emoji = "⚔️"
+                self.forward_btn.disabled = True
+                
+                # Disable Field Pack and Withdraw during combat animation
+                self.inventory_btn.disabled = True
+                self.withdraw_btn.disabled = True
+            else:
+                # End of sequence: Restore proper state
+                self._update_forward_button(current_monster)
+                # Re-enable other buttons
+                self.inventory_btn.disabled = False
+                self.withdraw_btn.disabled = False
 
-        # ---------------------------------------------------------
-        # Handle Death
-        # ---------------------------------------------------------
-        if result.get("dead", False):
-            self.forward_btn.disabled = True
-            self.inventory_btn.disabled = True
-            self.withdraw_btn.disabled = False  # Still allow retreat
+            # 4. Rebuild Embed
+            embed = AdventureEmbeds.build_exploration_embed(
+                self.location_id,
+                self.log,
+                self.player_stats,
+                vitals,
+                session_row
+            )
 
-            embed.color = discord.Color.dark_grey()
-            embed.set_footer(text="You collapse. The Adventurer’s Guild dispatches a rescue team.")
+            if is_dead and is_last_frame:
+                embed.color = discord.Color.dark_grey()
+                embed.set_footer(text="You collapse. The Adventurer’s Guild dispatches a rescue team.")
 
-            # Update main message
+            # Update Message
             await interaction.edit_original_response(embed=embed, view=self)
             
-            # We purposefully avoid an ephemeral message here, as the embed
-            # state ("You collapse") is sufficient and persistent.
-            return
-
-        await interaction.edit_original_response(embed=embed, view=self)
+            # Dramatic Pause
+            if animate and not is_last_frame:
+                await asyncio.sleep(1.5)
 
     # -------------------------------------------------------------
     # INVENTORY
     # -------------------------------------------------------------
 
     async def inventory_callback(self, interaction: discord.Interaction):
-        """
-        Opens the Field Pack (Inventory View).
-        """
-        from cogs.character_cog import InventoryView  # avoid circular import
+        """Opens the Field Pack."""
+        from cogs.character_cog import InventoryView 
 
         await interaction.response.defer()
 
@@ -179,13 +225,25 @@ class ExplorationView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def return_from_inventory(self, interaction: discord.Interaction):
-        """
-        Restores the exploration view after closing the inventory.
-        """
+        """Restores the exploration view."""
         await interaction.response.defer()
 
         vitals = await asyncio.to_thread(self.db.get_player_vitals, interaction.user.id)
         session_row = await asyncio.to_thread(self.manager.get_active_session, interaction.user.id)
+
+        # Parse monster to restore button state
+        current_monster = None
+        if session_row and session_row["active_monster_json"]:
+            try:
+                current_monster = json.loads(session_row["active_monster_json"])
+            except:
+                pass
+        
+        self._update_forward_button(current_monster)
+        
+        # Ensure other buttons are enabled when returning
+        self.inventory_btn.disabled = False
+        self.withdraw_btn.disabled = False
 
         embed = AdventureEmbeds.build_exploration_embed(
             self.location_id,
@@ -202,9 +260,7 @@ class ExplorationView(View):
     # -------------------------------------------------------------
 
     async def leave_callback(self, interaction: discord.Interaction):
-        """
-        Ends the adventure session and transitions to a persistent summary view.
-        """
+        """Ends the adventure."""
         await interaction.response.defer()
 
         await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
@@ -219,8 +275,6 @@ class ExplorationView(View):
             color=discord.Color.blue()
         )
         
-        # Create a temporary, minimal view just to get back to the profile
-        # This replaces the ephemeral message.
         view = View()
         btn = Button(label="Return to Profile", style=discord.ButtonStyle.primary)
         

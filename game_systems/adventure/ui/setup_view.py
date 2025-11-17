@@ -100,8 +100,10 @@ class AdventureSetupView(View):
         )
 
         # 5. Transition to Exploration View
+        # active_monster defaults to None for new adventures
         view = ExplorationView(
             self.db, self.manager, loc_id, initial_log, 
-            self.interaction_user, player_stats
+            self.interaction_user, player_stats,
+            active_monster=None 
         )
         await interaction.edit_original_response(embed=embed, view=view)
