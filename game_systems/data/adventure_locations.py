@@ -3,19 +3,6 @@ adventure_locations.py
 
 Defines the exploration zones available to adventurers.
 Each location dictates the monster pool, difficulty, and rewards.
-
-Structure:
-{
-    "zone_id": {
-        "name": str,
-        "emoji": str,
-        "min_rank": str,  # F, E, D...
-        "level_req": int,
-        "duration_options": [int], # Minutes
-        "monsters": [("monster_key", weight)],
-        "description": str
-    }
-}
 """
 
 LOCATIONS = {
@@ -59,5 +46,15 @@ LOCATIONS = {
             ("monster_020", 20),  # Ravaged Boar
         ],
         "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot."
+    },
+    # --- NEW SPECIAL LOCATION ---
+    "guild_arena": {
+        "name": "Guild Proving Grounds",
+        "emoji": "🏟️",
+        "min_rank": "F",
+        "level_req": 1,
+        "duration_options": [],
+        "monsters": [], # Boss is custom-spawned
+        "description": "The dedicated arena for Adventurer rank examinations."
     }
 }

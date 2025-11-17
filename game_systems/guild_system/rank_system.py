@@ -1,18 +1,20 @@
 """
 rank_system.py
 
-Handles adventurer rank promotions based on the detailed requirements
-from the Guild Rank System documentation.
+Handles adventurer rank progression and promotions based on the formal
+Guild Rank System requirements.
 """
 
 from database.database_manager import DatabaseManager
 from typing import Dict, Optional, Tuple
 
+
 class RankSystem:
     """
-    Manages the adventurer ranking system based on quests, kills, and other achievements.
+    Manages the guild's adventurer ranking system, including requirement
+    checks, eligibility validation, and promotion processing.
     """
-    
+
     RANKS = {
         "F": {
             "title": "Initiate",
@@ -27,7 +29,7 @@ class RankSystem:
         "D": {
             "title": "Apprentice",
             "next_rank": "C",
-            "requirements": {"quests_completed": 40, "elite_kills": 3, "boss_kills": 0} # Boss survival is not tracked yet
+            "requirements": {"quests_completed": 40, "elite_kills": 3, "boss_kills": 0}
         },
         "C": {
             "title": "Adept",
@@ -44,74 +46,90 @@ class RankSystem:
             "next_rank": "S",
             "requirements": {"quests_completed": 300, "boss_kills": 10}
         },
-        "S": {"title": "Elite", "next_rank": "SS", "requirements": {}}, # Further ranks require manual implementation
+        "S":  {"title": "Elite",   "next_rank": "SS",  "requirements": {}},
         "SS": {"title": "Paragon", "next_rank": "SSS", "requirements": {}},
-        "SSS": {"title": "Mythic", "next_rank": None, "requirements": {}}
+        "SSS": {"title": "Mythic", "next_rank": None,  "requirements": {}}
     }
 
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
 
+    # -----------------------------------------------------
+    # Data Retrieval
+    # -----------------------------------------------------
+
     def get_rank_info(self, discord_id: int) -> Optional[Dict]:
-        """
-        Retrieves a player's full progression data from the guild_members table.
-        """
+        """Fetches a player's rank and progression statistics."""
         conn = self.db.connect()
         cur = conn.cursor()
         cur.execute("SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,))
         data = cur.fetchone()
         conn.close()
-        
-        if data:
-            return dict(data)
-        return None
+
+        return dict(data) if data else None
+
+    # -----------------------------------------------------
+    # Rank Eligibility Logic
+    # -----------------------------------------------------
 
     def check_promotion_eligibility(self, discord_id: int) -> bool:
-        """
-        Checks if a player has met the detailed requirements for the next rank.
-        """
+        """Returns True if the player meets the requirements for their next rank."""
         player_data = self.get_rank_info(discord_id)
         if not player_data:
             return False
 
-        current_rank = player_data['rank']
+        current_rank = player_data["rank"]
         next_rank_key = self.RANKS.get(current_rank, {}).get("next_rank")
-        
         if not next_rank_key:
-            return False  # Already at max rank or rank not in simple progression
+            return False  # Already at max rank
 
-        requirements = self.RANKS[current_rank].get("requirements", {})
-        
-        for req, value in requirements.items():
-            if player_data.get(req, 0) < value:
+        required_stats = self.RANKS[current_rank].get("requirements", {})
+
+        for req_name, req_value in required_stats.items():
+            if player_data.get(req_name, 0) < req_value:
                 return False
-        
+
         return True
+
+    def get_next_rank(self, current_rank: str) -> Optional[str]:
+        """Returns the key for the next rank, if any."""
+        return self.RANKS.get(current_rank, {}).get("next_rank")
+
+    # -----------------------------------------------------
+    # Promotion Handling
+    # -----------------------------------------------------
 
     def promote_player(self, discord_id: int) -> Tuple[bool, str]:
         """
-        Promotes a player to the next rank if they are eligible.
-        Returns a tuple of (success, message).
+        Legacy/utility function.
+        Standard rank-ups are now done via Guild Trial boss battles.
         """
         if not self.check_promotion_eligibility(discord_id):
             return False, "You have not yet met the requirements for a promotion."
 
-        player_data = self.get_rank_info(discord_id)
-        current_rank = player_data['rank']
-        next_rank_key = self.RANKS[current_rank]["next_rank"]
+        return (
+            False,
+            "Promotion requires completing a Guild Trial. Open 'Check Rank' to begin the trial."
+        )
 
-        if not next_rank_key:
-            return False, "You have already reached the highest rank in the simple progression."
-
+    def finalize_promotion(self, discord_id: int, new_rank: str) -> Tuple[bool, str]:
+        """
+        Applies a new rank after the player successfully completes their Promotion Trial.
+        Called exclusively by the reward system after a Promotion Boss is defeated.
+        """
         try:
             conn = self.db.connect()
             cur = conn.cursor()
-            cur.execute("UPDATE guild_members SET rank = ? WHERE discord_id = ?", (next_rank_key, discord_id))
+            cur.execute(
+                "UPDATE guild_members SET rank = ? WHERE discord_id = ?",
+                (new_rank, discord_id),
+            )
             conn.commit()
             conn.close()
-            
-            next_rank_title = self.RANKS[next_rank_key]['title']
-            return True, f"Congratulations! You have been promoted to Rank {next_rank_key} – {next_rank_title}."
+
+            rank_title = self.RANKS.get(new_rank, {}).get("title", "Unknown")
+            return True, f"Congratulations! You have been promoted to Rank {new_rank} — {rank_title}."
+
         except Exception as e:
-            print(f"Error during rank promotion: {e}")
-            return False, "An error occurred while processing your promotion."
+            print(f"[RankSystem] Error during rank promotion: {e}")
+            return False, "An unexpected error occurred while processing your promotion."

@@ -1,14 +1,14 @@
 """
 adventure_manager.py
 
-Orchestrates all active adventures.
-Compatible with the improved MANUAL + AUTO hybrid AdventureSession.
+Coordinates all active adventures across Eldoria.
+Handles creation, progression, boss trials, and reward distribution.
+Compatible with the improved MANUAL + AUTO hybrid AdventureSession system.
 """
 
 import sqlite3
 import json
 import datetime
-from discord.ext import tasks
 from database.database_manager import DatabaseManager
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.guild_system.quest_system import QuestSystem
@@ -19,48 +19,118 @@ from game_systems.data.materials import MATERIALS
 import game_systems.data.emojis as E
 
 
-# =====================================================================
-# ADVENTURE MANAGER
-# =====================================================================
-
 class AdventureManager:
+    """
+    Oversees all adventure sessions:
+    • Normal expeditions
+    • Timed adventures
+    • Rank Promotion Trials
+    • Reward and level-up handling
+    """
+
     def __init__(self, db_manager: DatabaseManager, bot):
         self.db = db_manager
         self.bot = bot
-
         self.inventory_manager = InventoryManager(self.db)
         self.quest_system = QuestSystem(self.db)
 
-    # =================================================================
-    # START ADVENTURE
-    # =================================================================
+    # --------------------------------------------------
+    # Normal Adventure Start
+    # --------------------------------------------------
 
     def start_adventure(self, discord_id: int, location_id: str, duration_minutes: int):
         """
-        Begins a new adventure session in the DB.
+        Starts a new adventure session.
+        Duration -1 means “long expedition” (up to 90 days).
         """
+        start_time = datetime.datetime.now()
+        end_time = (
+            start_time + datetime.timedelta(days=90)
+            if duration_minutes == -1
+            else start_time + datetime.timedelta(minutes=duration_minutes)
+        )
+
+        self._create_session(discord_id, location_id, start_time, end_time, duration_minutes)
+        return True
+
+    # --------------------------------------------------
+    # Rank Promotion Trial
+    # --------------------------------------------------
+
+    def start_promotion_trial(self, discord_id: int, next_rank: str):
+        """
+        Initializes a special Promotion Trial.
+        The player faces a scaling, boss-tier Examiner within the Guild Arena.
+        """
+        stats_json = self.db.get_player_stats_json(discord_id)
+        p_stats = PlayerStats.from_dict(stats_json)
+
+        # --- Examiner Scaling ---
+        boss_hp = int(p_stats.max_hp * 2.5)
+        boss_atk = int(p_stats.endurance * 1.5 + (p_stats.max_hp / 10))
+        boss_def = int(p_stats.strength * 0.8)
+
+        active_monster = {
+            "name": f"Rank {next_rank} Examiner",
+            "level": 99,               # Cosmetic
+            "tier": "Boss",            # Forces manual combat
+            "HP": boss_hp,
+            "max_hp": boss_hp,
+            "MP": 100,
+            "ATK": boss_atk,
+            "DEF": boss_def,
+            "xp": 500,
+            "drops": [],               # No material drops for trials
+            "promotion_target": next_rank
+        }
 
         start_time = datetime.datetime.now()
-
-        if duration_minutes == -1:
-            # Effectively infinite until manually ended
-            end_time = start_time + datetime.timedelta(days=90)
-        else:
-            end_time = start_time + datetime.timedelta(minutes=duration_minutes)
+        end_time = start_time + datetime.timedelta(hours=1)
 
         with self.db.get_connection() as conn:
             cur = conn.cursor()
 
-            # Cleanup inactive sessions
+            # Clean old inactive sessions
+            cur.execute(
+                "DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0",
+                (discord_id,)
+            )
+
+            # Insert new arena session
+            cur.execute(
+                """
+                INSERT OR REPLACE INTO adventure_sessions
+                (discord_id, location_id, start_time, end_time, duration_minutes, active, logs, loot_collected, active_monster_json)
+                VALUES (?, ?, ?, ?, ?, 1, ?, '{}', ?)
+                """,
+                (
+                    discord_id,
+                    "guild_arena",
+                    start_time.isoformat(),
+                    end_time.isoformat(),
+                    -1,
+                    json.dumps([f"{E.COMBAT} **PROMOTION TRIAL COMMENCED**\nThe Examiner steps forward."]),
+                    json.dumps(active_monster),
+                ),
+            )
+
+        return True
+
+    # --------------------------------------------------
+    # Helper — Session Creation
+    # --------------------------------------------------
+
+    def _create_session(self, discord_id, location_id, start_time, end_time, duration):
+        """Internal method: Inserts a new adventure session."""
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
             cur.execute(
                 "DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0",
                 (discord_id,),
             )
-
-            # Create new session
             cur.execute(
                 """
-                INSERT OR REPLACE INTO adventure_sessions 
+                INSERT OR REPLACE INTO adventure_sessions
                 (discord_id, location_id, start_time, end_time, duration_minutes, active, logs, loot_collected)
                 VALUES (?, ?, ?, ?, ?, 1, '[]', '{}')
                 """,
@@ -69,15 +139,13 @@ class AdventureManager:
                     location_id,
                     start_time.isoformat(),
                     end_time.isoformat(),
-                    duration_minutes,
+                    duration,
                 ),
             )
 
-        return True
-
-    # =================================================================
-    # LOAD AN ACTIVE SESSION
-    # =================================================================
+    # --------------------------------------------------
+    # Fetch / Simulate
+    # --------------------------------------------------
 
     def get_active_session(self, discord_id):
         conn = self.db.connect()
@@ -90,21 +158,14 @@ class AdventureManager:
         conn.close()
         return row
 
-    # =================================================================
-    # SIMULATE A SINGLE STEP
-    # =================================================================
-
     def simulate_adventure_step(self, discord_id: int) -> dict:
         """
-        Loads the session, simulates one step, updates DB, and returns result.
+        Runs a single step in AUTO adventure mode.
+        Returns logs + state flags.
         """
-
         session_row = self.get_active_session(discord_id)
         if not session_row:
-            return {
-                "log": ["Error: Could not find your active adventure session."],
-                "dead": True,
-            }
+            return {"log": ["Error: No active session."], "dead": True}
 
         session = AdventureSession(
             self.db,
@@ -116,12 +177,11 @@ class AdventureManager:
 
         result_dict = session.simulate_step()
 
-        # If the player died in this step:
+        # If the player dies during AUTO mode, grant minimal rewards
         if result_dict.get("dead", False):
             stats_json = self.db.get_player_stats_json(discord_id)
             player_stats = PlayerStats.from_dict(stats_json)
 
-            # Even if dead, loot is preserved. EXP = 0.
             with self.db.get_connection() as conn:
                 items_awarded = self._grant_rewards(
                     session=session,
@@ -130,103 +190,78 @@ class AdventureManager:
                     player_stats=player_stats,
                 )
 
-            # Add materials to inventory
             for item in items_awarded:
                 self.inventory_manager.add_item(
-                    discord_id=discord_id,
-                    item_key=item["key"],
-                    item_name=item["name"],
-                    item_type=item["type"],
-                    rarity=item["rarity"],
-                    amount=item["amount"],
+                    discord_id,
+                    item["key"],
+                    item["name"],
+                    item["type"],
+                    item["rarity"],
+                    item["amount"],
                 )
 
         return result_dict
 
-    # =================================================================
-    # MANUAL END (Return to city)
-    # =================================================================
+    # --------------------------------------------------
+    # Adventure End
+    # --------------------------------------------------
 
     def end_adventure(self, discord_id: int):
         """
-        Manually ends an adventure.
-        Grants collected EXP + items.
-        DOES NOT HEAL HP — except MP restore at end.
+        Finalizes an adventure:
+        • Grants EXP + Materials
+        • Levels up player
+        • Saves Vitals
         """
-
         stats_json = self.db.get_player_stats_json(discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
 
-        items_to_add = []
-
         with self.db.get_connection() as conn:
             cur = conn.cursor()
-
             cur.execute(
                 "SELECT * FROM adventure_sessions WHERE discord_id = ? AND active = 1",
                 (discord_id,),
             )
             session_row = cur.fetchone()
 
-            if session_row:
-                session = AdventureSession(
-                    self.db,
-                    self.quest_system,
-                    self.inventory_manager,
-                    discord_id,
-                    session_row,
-                )
+            if not session_row:
+                return
 
-                total_exp = session.loot.pop("exp", 0)
+            session = AdventureSession(
+                self.db, self.quest_system, self.inventory_manager, discord_id, session_row
+            )
+            total_exp = session.loot.pop("exp", 0)
 
-                items_to_add = self._grant_rewards(
-                    session=session,
-                    total_exp=total_exp,
-                    conn=conn,
-                    player_stats=player_stats,
-                )
+            items_to_add = self._grant_rewards(session, total_exp, conn, player_stats)
 
-                # End session
-                cur.execute(
-                    "UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?",
-                    (discord_id,),
-                )
-
-        # Add material rewards
-        for item in items_to_add:
-            self.inventory_manager.add_item(
-                discord_id=discord_id,
-                item_key=item["key"],
-                item_name=item["name"],
-                item_type=item["type"],
-                rarity=item["rarity"],
-                amount=item["amount"],
+            cur.execute(
+                "UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?",
+                (discord_id,),
             )
 
-    # =================================================================
-    # INTERNAL: REWARD GRANTING
-    # =================================================================
+        for item in items_to_add:
+            self.inventory_manager.add_item(
+                discord_id,
+                item["key"],
+                item["name"],
+                item["type"],
+                item["rarity"],
+                item["amount"],
+            )
 
-    def _grant_rewards(
-        self,
-        session: AdventureSession,
-        total_exp: int,
-        conn: sqlite3.Connection,
-        player_stats: PlayerStats,
-    ) -> list:
-        """
-        Unified EXP + loot reward handler.
-        HP does NOT heal.
-        MP is always restored.
-        """
+    # --------------------------------------------------
+    # Rewards / Level Up
+    # --------------------------------------------------
 
+    def _grant_rewards(self, session, total_exp, conn, player_stats) -> list:
+        """
+        Grants EXP, performs Level Ups, and converts collected materials
+        into proper inventory items.
+        """
         cur = conn.cursor()
-
-        # Load player core stats
         cur.execute("SELECT * FROM players WHERE discord_id = ?", (session.discord_id,))
         p_row = cur.fetchone()
 
-        # Level handler
         level_sys = LevelUpSystem(
             stats=player_stats,
             level=p_row["level"],
@@ -234,31 +269,19 @@ class AdventureManager:
             exp_to_next=p_row["exp_to_next"],
         )
 
-        # -------- EXP + LEVEL --------
+        # Experience Gain
         if total_exp > 0:
             level_sys.add_exp(total_exp)
 
-        # -------- VITALS --------
-
-        # Current HP from database (after last combat)
+        # HP/MP Save Rules
         current_hp = p_row["current_hp"]
-
-        # If they died, revive with 1 HP.
-        hp_save = 1 if current_hp <= 0 else current_hp
-
-        # MP always restored on return to city
-        mp_save = level_sys.stats.max_mp
+        saved_hp = 1 if current_hp <= 0 else current_hp
+        saved_mp = level_sys.stats.max_mp
 
         cur.execute(
             """
             UPDATE players
-            SET 
-                level = ?, 
-                experience = ?, 
-                exp_to_next = ?,
-                vestige_pool = vestige_pool + ?,
-                current_hp = ?,
-                current_mp = ?
+            SET level = ?, experience = ?, exp_to_next = ?, vestige_pool = vestige_pool + ?, current_hp = ?, current_mp = ?
             WHERE discord_id = ?
             """,
             (
@@ -266,24 +289,18 @@ class AdventureManager:
                 level_sys.exp,
                 level_sys.exp_to_next,
                 total_exp,
-                hp_save,
-                mp_save,
+                saved_hp,
+                saved_mp,
                 session.discord_id,
             ),
         )
 
-        # -------- MATERIAL LOOT --------
-
+        # Convert session loot into final inventory items
         items_awarded = []
         for item_key, count in session.loot.items():
-            mat = MATERIALS.get(item_key, None)
-
-            if mat:
-                name = mat["name"]
-                rarity = mat.get("rarity", "Common")
-            else:
-                name = item_key
-                rarity = "Common"
+            mat = MATERIALS.get(item_key)
+            name = mat["name"] if mat else item_key
+            rarity = mat.get("rarity", "Common") if mat else "Common"
 
             items_awarded.append(
                 {
@@ -296,22 +313,3 @@ class AdventureManager:
             )
 
         return items_awarded
-
-    # =================================================================
-    # NOT CURRENTLY USED (Future death handling)
-    # =================================================================
-
-    async def fail_adventure(self, session: AdventureSession):
-        """
-        Optional future feature — handles death notifications.
-        """
-        user = self.bot.get_user(session.discord_id)
-        if user:
-            try:
-                await user.send(
-                    f"{E.DEFEAT} **You have been defeated!**\n"
-                    "A Guild rescue team recovered you, but your Vestige was lost.\n"
-                    "Materials gathered remain in your inventory."
-                )
-            except:
-                pass

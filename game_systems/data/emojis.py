@@ -9,14 +9,12 @@ Exports constants for both custom (ID-based) and standard unicode emojis.
 # Format: <:name:id>
 AURUM = "<:gold_coin:1194437266903404596>"
 GUILD_MERIT = "<:guild_prestige:1194437270363701338>"
-# VESTIGE = "<:vestige:1439461714541150310>" # No longer a custom emoji
 
 # --- Standard Unicode Emojis ---
 
 # UI Icons
 EXP = "✨"
 LEVEL_UP = "🌟"
-# FIX: Vestige is now the standard DNA emoji
 VESTIGE = "🧬" 
 ITEM_BOX = "📦"
 ERROR = "❌"
@@ -38,14 +36,19 @@ BUFF = "✨"  # Alias for EXP
 VICTORY = "🏆"
 DEFEAT = "💀"
 
-# Stats
-STR = "💪"
-DEX = "🏹"
-CON = "🛡️"
-INT = "🔮"
+# Stats (Eldoria System)
+STR = "💪"  # Strength
+END = "🛡️"  # Endurance
+DEX = "🏹"  # Dexterity
+AGI = "⚡"  # Agility
+MAG = "🔮"  # Magic
+LCK = "🍀"  # Luck
+
+# Legacy Mappings (Safety for old code referencing D&D terms)
+CON = END
+INT = MAG
 WIS = "📖"
 CHA = "🗣️"
-LCK = "🍀"
 
 # Resources
 HP = "❤️"
@@ -56,10 +59,10 @@ FOREST = "🌲"
 THICKET = "🍃"
 CAVE = "🍄"
 HERB = "🌿"
+SWORDS = "⚔️" 
+SKULL = "💀"
 
-
-# --- NEW: ANSI Color Definitions ---
-# --- THIS IS THE FIX: Replaced " [0;37m" with "\u001b[0;37m" ---
+# --- ANSI Color Definitions ---
 RARITY_COLORS = {
     "Common": "\u001b[0;37m",  # Grey/White
     "Uncommon": "\u001b[0;32m",  # Green
@@ -70,8 +73,6 @@ RARITY_COLORS = {
     "DEFAULT": "\u001b[0;37m",  # Default to grey
 }
 ANSI_RESET = "\u001b[0m"
-# --- END OF FIX ---
-
 
 def get_rarity_ansi(rarity_name: str, text: str) -> str:
     """Wraps text in ANSI color codes for a given rarity."""
@@ -83,6 +84,3 @@ def get_rarity_ansi(rarity_name: str, text: str) -> str:
 
     # Return the formatted string
     return f"{color}{text}{ANSI_RESET}"
-
-
-# --- END NEW ---

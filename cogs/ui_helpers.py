@@ -110,7 +110,7 @@ async def back_to_profile_callback(
     This function is now ASYNCHRONOUS to prevent blocking the bot.
     """
     # FIX: Import the new CharacterTabView
-    from .character_cog import CharacterTabView
+    from game_systems.character.ui.profile_view import CharacterTabView
 
     if not interaction.response.is_done():
         await interaction.response.defer()
