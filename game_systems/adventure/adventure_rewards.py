@@ -193,7 +193,7 @@ class AdventureRewards:
         
         sorted_loot = sorted(
             loot_bundle.items(), 
-            key=lambda x: (rarity_order.get(x[0][1], 0), x[0][0])
+            key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1])
         )
 
         for (name, rarity), count in sorted_loot:
@@ -205,8 +205,8 @@ class AdventureRewards:
 
         if loot_lines:
             block = "\n".join(loot_lines)
-            logs.append(f"\n{E.ITEM_BOX} **Loot Acquired**```ansi\n{block}\n```")
-
+            # FIX: Removed the extra \n before {E.ITEM_BOX} to fix double spacing
+            logs.append(f"{E.ITEM_BOX} **Loot Acquired**\n```ansi\n{block}\n```")
 
         # QUEST UPDATES
         self._update_quests(
