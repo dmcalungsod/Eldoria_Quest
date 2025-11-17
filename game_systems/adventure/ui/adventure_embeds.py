@@ -47,9 +47,25 @@ class AdventureEmbeds:
             title = f"{loc_data.get('emoji', E.MAP)} Exploring: {loc_data['name']}"
             color = discord.Color.dark_green()
 
-        # 3. Create Embed
-        # Show last 12 lines for context
-        log_text = "\n".join(log[-12:]) if log else "The journey begins..."
+        # 3. Create Embed with FIXED HEIGHT LOG
+        # We want exactly 12 lines of content to prevent UI jitter
+        max_lines = 12
+        
+        # Get the last N lines
+        current_lines = log[-max_lines:] if log else ["The journey begins..."]
+        
+        # Calculate padding needed
+        padding_needed = max_lines - len(current_lines)
+        
+        # Add invisible characters for padding to maintain height
+        if padding_needed > 0:
+            padding = ["\u200b"] * padding_needed
+            final_log = current_lines + padding
+        else:
+            final_log = current_lines
+
+        log_text = "\n".join(final_log)
+
         embed = discord.Embed(
             title=title,
             description=log_text,

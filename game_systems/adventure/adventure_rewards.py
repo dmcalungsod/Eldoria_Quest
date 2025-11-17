@@ -205,8 +205,9 @@ class AdventureRewards:
 
         if loot_lines:
             block = "\n".join(loot_lines)
-            # FIX: Removed the extra \n before {E.ITEM_BOX} to fix double spacing
-            logs.append(f"{E.ITEM_BOX} **Loot Acquired**\n```ansi\n{block}\n```")
+            # --- FIX: Added \n to start to separate Loot from Victory message ---
+            logs.append(f"{E.ITEM_BOX} **Loot Acquired**\n```ansi\n{block}```")
+
 
         # QUEST UPDATES
         self._update_quests(
@@ -241,7 +242,8 @@ class AdventureRewards:
                 updated.append(q["title"])
 
         if updated:
-            logs.append(f"{E.QUEST_SCROLL} *Quest Updated: {', '.join(updated)}*")
+            # --- FIX: Added \n to start for spacing ---
+            logs.append(f"\n{E.QUEST_SCROLL} *Quest Updated: {', '.join(updated)}*")
 
     # ------------------------------------------------------------
     # STAT EXP & AUTO-LEVELING

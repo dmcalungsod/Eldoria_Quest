@@ -53,7 +53,7 @@ class EventHandler:
         if new_hp > vitals["current_hp"]: 
             logs.append(f"You regenerated `{new_hp - vitals['current_hp']}` HP.")
         if new_mp > vitals["current_mp"]: 
-            logs.append(f"You regenerated `{new_mp - vitals['current_mp']}` MP.")
+            logs.append(f"You regenerated `{new_mp - vitals['current_mp']}` MP.\n")
             
         return {"log": logs, "dead": False}
 

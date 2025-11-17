@@ -119,7 +119,7 @@ class AdventureSession:
             return {"sequence": [[msg]], "dead": False}
 
         # --- 3. Non-Combat Event ---
-        result = self.events.resolve_non_combat(chance_regen=70)
+        result = self.events.resolve_non_combat(regen_chance=70)
         self.logs.extend(result["log"])
         self.save_state()
 
@@ -174,7 +174,8 @@ class AdventureSession:
             # Safety: Drop to manual if HP is too low
             stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
             if result["hp_current"] / stats.max_hp < 0.30:
-                sequence.append(["⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                # --- FIX: Added spacing ---
+                sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
                 break
 
             if result.get("winner") == "monster":
@@ -190,23 +191,26 @@ class AdventureSession:
         # Final Results Block
         final_block = []
         if player_won:
+            # --- FIX: Added spacing ---
             final_block.append(
-                f"⚔️ **Victory:** Defeated {result['monster_data']['name']} "
+                f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} "
                 f"in {len(turn_reports)} rounds."
             )
 
+            # --- FIX: Corrected argument names to match adventure_rewards.py ---
             reward_texts = self.rewards.process_victory(
-                report=report,
+                battle_report=report,
                 report_list=turn_reports,
-                result=result,
+                combat_result=result,
                 quest_system=self.quest_system,
                 inventory_manager=self.inventory_manager,
-                loot=self.loot,
+                session_loot=self.loot,
             )
             final_block.extend(reward_texts)
 
         elif is_dead:
-            final_block.append("💀 **You have been defeated.**")
+            # --- FIX: Added spacing ---
+            final_block.append("\n💀 **You have been defeated.**")
 
         if final_block:
             sequence.append(final_block)
@@ -237,19 +241,22 @@ class AdventureSession:
         if result.get("winner") == "monster":
             is_dead = True
             self.active_monster = None
-            turn_logs.append("💀 **You have been defeated.**")
+            # --- FIX: Added spacing ---
+            turn_logs.append("\n💀 **You have been defeated.**")
 
         elif result.get("winner") == "player":
             self.active_monster = None
-            turn_logs.append("⚔️ **Victory!**")
+            # --- FIX: Added spacing ---
+            turn_logs.append("\n⚔️ **Victory!**")
 
+            # --- FIX: Corrected argument names to match adventure_rewards.py ---
             reward_texts = self.rewards.process_victory(
-                report=report,
+                battle_report=report,
                 report_list=[report],
-                result=result,
+                combat_result=result,
                 quest_system=self.quest_system,
                 inventory_manager=self.inventory_manager,
-                loot=self.loot,
+                session_loot=self.loot,
             )
             turn_logs.extend(reward_texts)
 

@@ -2,11 +2,12 @@
 cogs/infirmary_cog.py
 
 Handles the Adventurer's Guild Infirmary UI where adventurers
-spend Aurum to restore HP.
+spend Aurum to restore HP and MP.
 
 Healing rate:
     • 0.5 Aurum per missing HP (rounded up)
     • Minimum cost: 1 Aurum if any HP is missing
+    • MP restoration is included in the treatment cost (currently free bonus)
 
 Refactored to follow the one-UI policy (no ephemeral messages).
 """
@@ -42,7 +43,7 @@ def infirmary_cost(missing_hp: int) -> int:
 class InfirmaryView(View):
     """
     The Adventurer’s Guild Infirmary interface.
-    Displays HP, treatment cost, and offers paid healing.
+    Displays HP, MP, treatment cost, and offers paid healing.
     """
 
     def __init__(
@@ -61,21 +62,28 @@ class InfirmaryView(View):
 
         # Derived state
         self.current_hp = player_data["current_hp"]
+        self.current_mp = player_data["current_mp"]  # Added MP
         self.max_hp = player_stats.max_hp
+        self.max_mp = player_stats.max_mp            # Added Max MP
         self.current_aurum = player_data["aurum"]
 
         self.missing_hp = max(0, self.max_hp - self.current_hp)
+        self.missing_mp = max(0, self.max_mp - self.current_mp) # Calculate missing MP
+        
+        # Cost is based on HP loss, but healing restores both
         self.heal_cost = infirmary_cost(self.missing_hp)
 
         # --------------------------------------------------------------
         # Treatment Button
         # --------------------------------------------------------------
-        if self.missing_hp <= 0:
-            heal_label = "You are already in full health."
+        # Enable healing if either HP or MP is missing
+        if self.missing_hp <= 0 and self.missing_mp <= 0:
+            heal_label = "You are already in full condition."
             heal_disabled = True
             heal_style = discord.ButtonStyle.secondary
         else:
-            heal_label = f"Receive Treatment ({self.heal_cost} {E.AURUM})"
+            # --- FIX: Removed {E.AURUM} from label, replaced with text ---
+            heal_label = f"Receive Treatment ({self.heal_cost} Aurum)"
             heal_disabled = self.current_aurum < self.heal_cost
             heal_style = discord.ButtonStyle.primary
 
@@ -130,7 +138,7 @@ class InfirmaryView(View):
 
             # Reload authoritative record
             cur.execute(
-                "SELECT current_hp, aurum FROM players WHERE discord_id = ?",
+                "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id = ?",
                 (self.interaction_user.id,)
             )
             row = cur.fetchone()
@@ -138,34 +146,39 @@ class InfirmaryView(View):
                 return False, "Adventurer record could not be located."
 
             current_hp = row["current_hp"]
+            current_mp = row["current_mp"] # Fetch current MP
             aurum = row["aurum"]
 
-            # Load fresh stats for true max HP
+            # Load fresh stats for true max HP/MP
             stats_json = self.db.get_player_stats_json(self.interaction_user.id)
             player_stats = PlayerStats.from_dict(stats_json)
             max_hp = player_stats.max_hp
+            max_mp = player_stats.max_mp # Fetch max MP
 
             missing_hp = max(0, max_hp - current_hp)
+            missing_mp = max(0, max_mp - current_mp)
+            
             cost = infirmary_cost(missing_hp)
 
-            if missing_hp <= 0:
+            if missing_hp <= 0 and missing_mp <= 0:
                 return False, "You are already fully restored."
             if aurum < cost:
                 return False, f"Insufficient Aurum. Treatment requires {cost} {E.AURUM}."
 
-            # Apply healing
+            # Apply healing (Restore both HP and MP)
             new_hp = max_hp
+            new_mp = max_mp
             new_aurum = aurum - cost
 
             cur.execute(
-                "UPDATE players SET current_hp = ?, aurum = ? WHERE discord_id = ?",
-                (new_hp, new_aurum, self.interaction_user.id),
+                "UPDATE players SET current_hp = ?, current_mp = ?, aurum = ? WHERE discord_id = ?",
+                (new_hp, new_mp, new_aurum, self.interaction_user.id),
             )
             conn.commit()
 
             return True, (
                 f"You paid {cost} {E.AURUM}. "
-                f"Your wounds have been treated — HP restored to {new_hp}."
+                f"Your condition has been treated — HP & MP fully restored."
             )
 
     # -----------------------------------------------------------------
@@ -210,10 +223,14 @@ class InfirmaryView(View):
     ) -> discord.Embed:
 
         current_hp = player_data["current_hp"]
+        current_mp = player_data["current_mp"] # Added MP
         max_hp = player_stats.max_hp
+        max_mp = player_stats.max_mp # Added Max MP
         current_aurum = player_data["aurum"]
 
         missing_hp = max(0, max_hp - current_hp)
+        missing_mp = max(0, max_mp - current_mp) # Calculate missing MP
+        
         cost = infirmary_cost(missing_hp)
 
         description = (
@@ -221,12 +238,13 @@ class InfirmaryView(View):
             "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
             "but genuine.\n\n"
             "**Condition**\n"
-            f"> {E.HP} **HP:** {current_hp} / {max_hp}\n\n"
+            f"> {E.HP} **HP:** {current_hp} / {max_hp}\n"
+            f"> {E.MP} **MP:** {current_mp} / {max_mp}\n\n"
             "**Purse**\n"
             f"> {E.AURUM} **Aurum:** {current_aurum}\n\n"
         )
 
-        if missing_hp > 0:
+        if missing_hp > 0 or missing_mp > 0:
             description += (
                 f"A full course of treatment will cost **{cost} {E.AURUM}** "
                 f"(0.5 Aurum per missing HP, rounded up)."
@@ -246,7 +264,7 @@ class InfirmaryView(View):
             embed.add_field(name=field_title, value=f"{icon} {status_message}", inline=False)
             embed.color = discord.Color.green() if success else discord.Color.red()
 
-        embed.set_footer(text="Select 'Receive Treatment' to spend Aurum and restore HP.")
+        embed.set_footer(text="Select 'Receive Treatment' to spend Aurum and restore HP & MP.")
 
         return embed
 
