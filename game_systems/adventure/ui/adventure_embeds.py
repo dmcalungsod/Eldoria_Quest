@@ -1,0 +1,96 @@
+"""
+game_systems/adventure/ui/adventure_embeds.py
+
+Handles the creation of Discord embeds for the adventure system.
+Dynamically adjusts layout based on Combat vs. Exploration state.
+"""
+
+import discord
+import json
+import sqlite3
+from game_systems.player.player_stats import PlayerStats
+import game_systems.data.emojis as E
+from game_systems.data.adventure_locations import LOCATIONS
+
+class AdventureEmbeds:
+
+    @staticmethod
+    def build_exploration_embed(
+        location_id: str,
+        log: list,
+        player_stats: PlayerStats,
+        vitals: sqlite3.Row,
+        session_row: sqlite3.Row
+    ) -> discord.Embed:
+        """
+        Generates the main game interface embed.
+        Adapts based on whether a monster is currently active (Manual Mode) or not.
+        """
+
+        loc_data = LOCATIONS.get(location_id, {"name": "Unknown Zone", "emoji": E.MAP})
+
+        # 1. Determine State (Combat vs Exploration)
+        active_monster = None
+        if session_row and session_row["active_monster_json"]:
+            try:
+                active_monster = json.loads(session_row["active_monster_json"])
+            except Exception:
+                pass
+
+        # 2. Base Embed Styling
+        if active_monster:
+            # Manual Combat Mode (Boss/Elite) -> Red Theme
+            title = f"{E.COMBAT} Encounter: {active_monster['name']}"
+            color = discord.Color.dark_red()
+        else:
+            # Exploration / Auto-Combat Result -> Green Theme
+            title = f"{loc_data.get('emoji', E.MAP)} Exploring: {loc_data['name']}"
+            color = discord.Color.dark_green()
+
+        # 3. Create Embed
+        # Show last 12 lines for context
+        log_text = "\n".join(log[-12:]) if log else "The journey begins..."
+        embed = discord.Embed(
+            title=title,
+            description=log_text,
+            color=color,
+        )
+
+        # 4. Player Vitals Field
+        # Using emojis for clean layout
+        hp_percent = vitals['current_hp'] / max(player_stats.max_hp, 1)
+        mp_percent = vitals['current_mp'] / max(player_stats.max_mp, 1)
+        
+        # Simple status indicator
+        status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
+        
+        embed.add_field(
+            name=f"Adventurer Status {status_icon}",
+            value=(
+                f"{E.HP} **HP:** {vitals['current_hp']} / {player_stats.max_hp}\n"
+                f"{E.MP} **MP:** {vitals['current_mp']} / {player_stats.max_mp}"
+            ),
+            inline=True,
+        )
+
+        # 5. Monster Vitals Field (Only in Manual Mode)
+        if active_monster:
+            m_hp = active_monster.get('HP', 0)
+            m_max = active_monster.get('max_hp', m_hp) # Fallback
+
+            # Visual Health Bar
+            percent = max(0, min(1, m_hp / m_max)) if m_max > 0 else 0
+            bar_len = 12
+            filled = int(percent * bar_len)
+            bar = "█" * filled + "░" * (bar_len - filled)
+
+            embed.add_field(
+                name=f"VS. {active_monster['name']}",
+                value=f"**HP:** `{bar}` {m_hp}/{m_max}",
+                inline=True,
+            )
+
+        # 6. Footer
+        embed.set_footer(text="Press Forward to continue • Field Pack to manage items")
+
+        return embed
