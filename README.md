@@ -94,42 +94,53 @@ The game blends:
 ```
 
 eldoria-bot/
-├─ main.py                     \# Bot entry point
+├─ main.py                          # Bot entry point
 ├─ README.md
 ├─ requirements.txt
 │
 ├─ cogs/
-│ ├─ onboarding\_cog.py         \# /start, character creation
-│ ├─ character\_cog.py          \# Profile, Ledger, Inventory, Skills UI
-│ ├─ adventure\_cog.py          \# Main adventure controller
-│ ├─ guild\_hub\_cog.py          \# Guild Hall, Rank Up, Exchange
-│ ├─ quest\_hub\_cog.py          \# Quest Board + Quest Log UI
-│ ├─ shop\_cog.py               \# Guild Shop UI
-│ ├─ skill\_trainer\_cog.py      \# Skill learning UI
-│ ├─ status\_update\_cog.py      \# Stat allocation UI
-│ ├─ infirmary\_cog.py          \# Healing UI
-│ └─ ui\_helpers.py             \# Shared navigation utilities
+│   ├─ onboarding_cog.py            # /start, character creation
+│   ├─ character_cog.py             # Profile, Ledger, Inventory, Skills UI
+│   ├─ adventure_cog.py             # Main adventure controller
+│   ├─ guild_hub_cog.py             # Guild Hall, Rank Up, Exchange
+│   ├─ quest_hub_cog.py             # Quest Board & Quest Log UI
+│   ├─ shop_cog.py                  # Guild Shop UI
+│   ├─ skill_trainer_cog.py         # Skill learning UI
+│   ├─ status_update_cog.py         # Stat allocation UI
+│   ├─ infirmary_cog.py             # Healing UI
+│   └─ ui_helpers.py                # Shared navigation utilities
 │
 ├─ database/
-│ ├─ database\_manager.py
-│ ├─ create\_database.py
-│ └─ populate\_database.py
+│   ├─ database_manager.py
+│   ├─ create_database.py
+│   └─ populate_database.py
 │
-├─ game\_systems/
-│ ├─ adventure/                \# Exploration logic
-│ │ ├─ ui/                     \# Adventure UI Views
-│ │ ├─ adventure\_manager.py
-│ │ ├─ adventure\_session.py
-│ │ ├─ adventure\_rewards.py
-│ │ ├─ combat\_handler.py
-│ │ └─ event\_handler.py
-│ ├─ combat/                   \# Combat engine
-│ ├─ data/                     \# Static data (Monsters, Items, etc.)
-│ ├─ guild\_system/             \# Guild logic
-│ │ └─ ui/                     \# Guild UI Views
-│ ├─ items/                    \# Inventory logic
-│ ├─ monsters/                 \# Monster logic
-│ └─ player/                   \# Player logic
+├─ game_systems/
+│   ├─ adventure/                   # Exploration system
+│   │   ├─ ui/                      # Adventure UI views
+│   │   ├─ adventure_manager.py
+│   │   ├─ adventure_session.py
+│   │   ├─ adventure_rewards.py
+│   │   ├─ combat_handler.py
+│   │   └─ event_handler.py
+│   │
+│   ├─ combat/                      # Combat engine core
+│   │   └─ (combat modules...)
+│   │
+│   ├─ data/                        # Static data (monsters, items, etc.)
+│   │   └─ (JSON, YAML, or Python dicts)
+│   │
+│   ├─ guild_system/                # Guild mechanics & logic
+│   │   └─ ui/                      # Guild UI views
+│   │
+│   ├─ items/                       # Inventory & item logic
+│   │   └─ (item modules...)
+│   │
+│   ├─ monsters/                    # Monster definitions & AI
+│   │   └─ (monster modules...)
+│   │
+│   └─ player/                      # Player stats, leveling, skills, etc.
+│       └─ (player modules...)
 
 ```
 
