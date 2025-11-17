@@ -1,22 +1,23 @@
 """
 ui_helpers.py
 
-Contains shared helper functions for the UI, primarily the
-global "back" button callbacks for the main UI hubs.
-This is the core of the "single-UI" navigation.
+Shared helper utilities for the UI system, including global
+'navigation' callbacks used by the core single-UI layout.
+
+Ensures consistent transitions between menus such as:
+- Character Profile
+- Guild Hall
+- Inventory & Equipment
+- Skill Management
 """
 
 import discord
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 import game_systems.data.emojis as E
-import asyncio  # <-- 1. IMPORT ASYNCIO
+import asyncio
 
-# --- NEW IMPORT ---
 from game_systems.items.item_manager import item_manager
-
-# --- END NEW ---
-
 from game_systems.data.emojis import get_rarity_ansi
 
 
@@ -24,92 +25,103 @@ from game_systems.data.emojis import get_rarity_ansi
 # EMBED BUILDER
 # ======================================================================
 
-
-# ... (build_inventory_embed function is unchanged) ...
 def build_inventory_embed(items: list) -> discord.Embed:
     """
-    Builds the standard embed for the player's inventory,
-    separating items by type and equipped status.
+    Construct the standardized inventory embed.
 
-    --- NOW WITH ANSI COLORS & SIMPLIFIED FORMAT ---
+    Features:
+    - Separates equipped gear from backpack contents.
+    - Aggregates identical unequipped items (type + name + rarity).
+    - Uses ANSI rarity coloring for clean visual distinction.
+    - Sorted output for a consistent UX across all inventory views.
     """
     embed = discord.Embed(
-        title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange()
+        title=f"{E.BACKPACK} Backpack",
+        color=discord.Color.dark_orange(),
     )
 
+    equipped_list = []
+
+    # (item_type, item_name, rarity) → total_count
+    unequipped_aggregation = {}
+
+    for item in items:
+        item_type = item["item_type"].title()
+        rarity = item.get("rarity") or "Common"
+        name = item["item_name"]
+        count = item["count"]
+
+        # Equipped equipment (always displayed individually)
+        if item.get("equipped") == 1 and item_type == "Equipment":
+            slot_name = item.get("slot", "Unknown").replace("_", " ").title()
+            text = f"[E] {name} ({slot_name})"
+            equipped_list.append(get_rarity_ansi(rarity, text))
+            continue
+
+        # Aggregate unequipped items
+        key = (item_type, name, rarity)
+        unequipped_aggregation[key] = unequipped_aggregation.get(key, 0) + count
+
     categories = {
-        "Equipped": [],
+        "Equipped": equipped_list,
         "Equipment": [],
         "Consumable": [],
         "Material": [],
     }
 
-    for item in items:
-        item_type = item["item_type"].title()
-        rarity = (
-            item.get("rarity") or "Common"
-        )  # Default to Common if rarity is None or empty
+    # Sort by type → name for clean ordering
+    sorted_items = sorted(
+        unequipped_aggregation.items(),
+        key=lambda x: (x[0][0], x[0][1]),
+    )
 
-        text = ""  # This will be the text we color
+    for (itype, name, rarity), total_count in sorted_items:
+        text = f"• {name} (x{total_count})"
+        colored_text = get_rarity_ansi(rarity, text)
 
-        if item_type == "Equipment":
+        if itype in categories:
+            categories[itype].append(colored_text)
+        else:
+            categories.setdefault("Misc", []).append(colored_text)
 
-            # --- THIS IS THE FIX (User request to simplify format) ---
-            # We no longer fetch or display individual stats in the list.
-            
-            # 1. Get the slot, capitalize it if it exists
-            slot_name = item.get('slot', 'Unknown')
-            if slot_name:
-                # Turns 'heavy_armor' into 'Heavy Armor'
-                slot_name = slot_name.replace('_', ' ').title()
-
-            if item["equipped"] == 1:
-                # New format: [E] Item Name (Slot)
-                text = f"[E] {item['item_name']} ({slot_name})"
-                categories["Equipped"].append(get_rarity_ansi(rarity, text))
-            else:
-                # New format: • Item Name (xCount)
-                # (Slot/stats are hidden for unequipped items to reduce clutter)
-                text = f"• {item['item_name']} (x{item['count']})"
-                categories["Equipment"].append(get_rarity_ansi(rarity, text))
-            # --- END OF FIX ---
-
-        elif item_type in categories:
-            # Format for Materials/Consumables
-            text = f"• {item['item_name']} (x{item['count']})"
-            categories[item_type].append(get_rarity_ansi(rarity, text))
-
+    # If no items
     if not any(categories.values()):
-        embed.description = "Your backpack is empty."
+        embed.description = "Your backpack contains nothing of note."
         return embed
 
+    # Equipped Gear
     if categories["Equipped"]:
-        value = "```ansi\n" + "\n".join(categories["Equipped"]) + "\n```"
-        embed.add_field(name="Equipped Gear", value=value, inline=False)
+        embed.add_field(
+            name="Equipped Gear",
+            value="```ansi\n" + "\n".join(categories["Equipped"]) + "\n```",
+            inline=False,
+        )
 
-    for category, item_list in categories.items():
-        if category != "Equipped" and item_list:
-            value = "```ansi\n" + "\n".join(item_list) + "\n```"
-            embed.add_field(name=category, value=value, inline=False)
+    # Render other categories following standard Eldoria UX ordering
+    for cat in ["Equipment", "Consumable", "Material", "Misc"]:
+        if cat in categories and categories[cat]:
+            embed.add_field(
+                name=cat,
+                value="```ansi\n" + "\n".join(categories[cat]) + "\n```",
+                inline=False,
+            )
 
     return embed
 
 
 # ======================================================================
-# VIEW CALLBACKS
+# NAVIGATION CALLBACKS
 # ======================================================================
 
-
-# --- 2. THIS ENTIRE FUNCTION IS REWRITTEN ---
 async def back_to_profile_callback(
     interaction: discord.Interaction, is_new_message: bool = False
 ):
     """
-    A shared callback to return to the MAIN Character Profile menu.
-    This is the new "home" screen.
-    This function is now ASYNCHRONOUS to prevent blocking the bot.
+    Return to the Character Status screen — the adventurer's
+    personal profile recognized by the Guild.
+
+    This serves as the 'home' of the player UI.
     """
-    # FIX: Import the new CharacterTabView
     from game_systems.character.ui.profile_view import CharacterTabView
 
     if not interaction.response.is_done():
@@ -118,34 +130,35 @@ async def back_to_profile_callback(
     discord_id = interaction.user.id
     db = DatabaseManager()
 
-    # --- Build the Profile Embed ---
-
-    # Run all blocking database calls in separate threads
     player = await asyncio.to_thread(db.get_player, discord_id)
     if not player:
         await interaction.followup.send(
-            "Error: Could not find player data.", ephemeral=True
+            "Error: No character data found.", ephemeral=True
         )
         return
 
-    # Run these calls in parallel
+    # Fetch all dependent data in parallel for max responsiveness
     guild_data_task = asyncio.to_thread(db.get_guild_member_data, discord_id)
     stats_json_task = asyncio.to_thread(db.get_player_stats_json, discord_id)
     class_row_task = asyncio.to_thread(db.get_class, player["class_id"])
     player_skills_task = asyncio.to_thread(db.get_player_skills, discord_id)
 
-    # Wait for all of them to finish
     guild_data, stats_json, class_row, player_skills = await asyncio.gather(
-        guild_data_task, stats_json_task, class_row_task, player_skills_task
+        guild_data_task,
+        stats_json_task,
+        class_row_task,
+        player_skills_task,
     )
 
-    # Now that all data is loaded, we can build the embed
     stats = PlayerStats.from_dict(stats_json)
     class_name = class_row["name"] if class_row else "Unknown"
 
     embed = discord.Embed(
         title=f"{E.SCROLL} {player['name']}'s Character Status",
-        description=f"**Occupation:** Adventurer\n**Class:** {class_name}",
+        description=(
+            f"**Occupation:** Adventurer\n"
+            f"**Class:** {class_name}"
+        ),
         color=discord.Color.dark_red(),
     )
 
@@ -154,7 +167,10 @@ async def back_to_profile_callback(
 
     embed.add_field(
         name="Condition",
-        value=f"**Lv.** {player['level']}\n**Rank:** {guild_data['rank'] if guild_data else 'N/A'}",
+        value=(
+            f"**Lv.** {player['level']}\n"
+            f"**Guild Rank:** {guild_data['rank'] if guild_data else 'Unregistered'}"
+        ),
         inline=True,
     )
 
@@ -173,43 +189,40 @@ async def back_to_profile_callback(
     )
     embed.add_field(name="Overall Abilities", value=stat_block, inline=False)
 
+    # Skills
     if not player_skills:
-        skills_str = "No skills learned."
+        skills_str = "No skills acquired."
     else:
         active_skills = []
         passive_skills = []
+
         for s in player_skills:
-            skill_line = f"• **{s['name']}** (Lv. {s['skill_level']})"
-            if s["type"] == "Active":
-                active_skills.append(skill_line)
-            else:
-                passive_skills.append(skill_line)
+            line = f"• **{s['name']}** (Lv. {s['skill_level']})"
+            (active_skills if s["type"] == "Active" else passive_skills).append(line)
 
-        skills_parts = []
+        combined = []
         if active_skills:
-            skills_parts.append(f"**Active**\n" + "\n".join(active_skills))
+            combined.append("**Active Skills**\n" + "\n".join(active_skills))
         if passive_skills:
-            skills_parts.append(f"**Passive**\n" + "\n".join(passive_skills))
+            combined.append("**Passive Skills**\n" + "\n".join(passive_skills))
 
-        skills_str = "\n".join(skills_parts)
+        skills_str = "\n\n".join(combined)
 
     embed.add_field(name="Acquired Skills", value=skills_str, inline=False)
 
-    # FIX: Attach the new CharacterTabView
     view = CharacterTabView(db, interaction.user)
 
     if is_new_message:
-        await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+        await interaction.followup.send(embed=embed, view=view)
     else:
-        await interaction.edit_original_response(content=None, embed=embed, view=view)
+        await interaction.edit_original_response(embed=embed, view=view)
 
 
 async def back_to_guild_hall_callback(interaction: discord.Interaction):
     """
-    A shared callback to return to the Guild Hall SUB-MENU.
-    This always edits the message.
+    Return to the Adventurer's Guild Hall — the primary hub for quests,
+    services, and advancement.
     """
-    # FIX: Import GuildLobbyView instead of GuildCardView
     from game_systems.guild_system.ui.lobby_view import GuildLobbyView
 
     if not interaction.response.is_done():
@@ -219,18 +232,18 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     db = DatabaseManager()
 
     card_data = await asyncio.to_thread(db.get_guild_card_data, discord_id)
-
     if not card_data:
         await interaction.edit_original_response(
-            content="Error: Could not find guild data.", embed=None, view=None
+            content="Error: Guild data not found.",
+            embed=None,
+            view=None,
         )
         return
 
-    # --- THIS IS YOUR NEW THEMATIC EMBED ---
     embed = discord.Embed(
-        title="🏰 Adventurer’s Guild Lobby",
+        title="🏰 Adventurer’s Guild Hall",
         description=(
-            "*The receptionist inspects your guild card and bows politely.*\n\n"
+            "*The receptionist inspects your guild card, offering a polite bow.*\n\n"
             f"**{card_data['name']} — Rank {card_data['rank']}**\n"
             "“How may the Guild assist you today?”"
         ),
@@ -240,26 +253,24 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
     embed.add_field(
         name="📜 Quest Board",
         value=(
-            "• **Available Quests** — View open missions\n"
-            "• **Current Progress** — Track ongoing assignments\n"
-            "• **Rank Trials** — Attempt promotion exams"
+            "• **Available Quests** — Browse open missions\n"
+            "• **Current Progress** — Track your active assignments\n"
+            "• **Rank Trials** — Attempt advancement challenges"
         ),
-        inline=False
+        inline=False,
     )
 
     embed.add_field(
         name="⚙️ Guild Services",
         value=(
-            "• **Guild Shop** — Buy supplies and equipment\n"
-            "• **Item Exchange** — Trade materials and rare items\n"
-            "• **Facilities** — Training grounds & workshops"
+            "• **Guild Shop** — Purchase arms, supplies, and essentials\n"
+            "• **Item Exchange** — Trade materials and rare loot\n"
+            "• **Facilities** — Access training grounds and workshops"
         ),
-        inline=False
+        inline=False,
     )
-    
-    embed.set_footer(text="Select an option below.")
-    # --- END OF EMBED ---
 
-    # FIX: Attach the new GuildLobbyView
+    embed.set_footer(text="Select an option below.")
+
     view = GuildLobbyView(db, interaction.user)
-    await interaction.edit_original_response(content=None, embed=embed, view=view)
+    await interaction.edit_original_response(embed=embed, view=view)

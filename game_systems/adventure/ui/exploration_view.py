@@ -208,7 +208,8 @@ class ExplorationView(View):
 
     async def inventory_callback(self, interaction: discord.Interaction):
         """Opens the Field Pack."""
-        from cogs.character_cog import InventoryView 
+        # FIX: Import from the correct game_systems path, not the cog
+        from game_systems.character.ui.inventory_view import InventoryView 
 
         await interaction.response.defer()
 

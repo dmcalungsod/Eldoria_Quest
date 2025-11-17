@@ -79,6 +79,14 @@ class SkillTrainerView(View):
             )
             return False
         return True
+        
+    # --------------------------------------------------------
+    # Navigation Helper (FIX ADDED HERE)
+    # --------------------------------------------------------
+    def set_back_button(self, callback_function, label="Back"):
+        """Allows parent menus to override the back button destination."""
+        self.back_button.label = label
+        self.back_button.callback = callback_function
 
     # --------------------------------------------------------
     # Load player's skill dict

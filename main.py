@@ -99,24 +99,23 @@ class EldoriaBot(commands.Bot):
 
         print("--- Cog loading complete ---")
 
-        # --- SYNC COMMANDS ---
-        # This logic is critical for removing old/deleted commands
+        # --- COMMAND SYNC ---
         if GUILD_ID:
             guild = discord.Object(id=GUILD_ID)
             
-            # 1. Clear existing commands on the guild (optional but safer)
-            # self.tree.clear_commands(guild=guild) 
+            # 1. FORCE CLEAR: This removes all cached commands for this guild
+            self.tree.clear_commands(guild=guild)
             
-            # 2. Copy global commands to the guild
+            # 2. COPY GLOBAL: Move the commands loaded from cogs (start, ping, devpanel) to the guild
             self.tree.copy_global_to(guild=guild)
             
-            # 3. Sync! This overwrites the guild's command list with the new one
+            # 3. SYNC: Push the clean list to Discord
             await self.tree.sync(guild=guild)
             
-            print(f"--- Synced slash commands to Guild ID: {GUILD_ID} ---")
-            logger.info(f"Synced slash commands to Guild ID: {GUILD_ID}")
+            print(f"--- Cleared and Synced commands to Guild ID: {GUILD_ID} ---")
+            logger.info(f"Cleared and Synced commands to Guild ID: {GUILD_ID}")
         else:
-            # If no guild ID, sync globally (slower)
+            # If no guild ID, sync globally (slower propagation)
             await self.tree.sync()
             print("--- Synced slash commands globally ---")
             logger.info("Synced slash commands globally.")

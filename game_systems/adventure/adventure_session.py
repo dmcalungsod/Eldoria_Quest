@@ -71,22 +71,27 @@ class AdventureSession:
         # 2. NEW ENCOUNTER
         if random.randint(1, 100) > self.REGEN_CHANCE:
             monster, phrase = self.combat.initiate_combat(location)
+            
+            # --- FIX: Add spacing to new encounter/empty message ---
             if monster:
                 self.active_monster = monster
+                phrase = f"\n{phrase}" # Add newline
                 self.logs.append(phrase)
                 self.save_state()
                 # Return as single sequence (instant print)
                 return {"sequence": [[phrase]], "dead": False}
             
             # Handle Empty Arena / No Monster
-            message = phrase if phrase else "The path is clear for now."
+            message = f"\n{phrase}" if phrase else "\nThe path is clear for now."
             self.logs.append(message)
             self.save_state()
             return {"sequence": [[message]], "dead": False}
+            # --- END FIX ---
 
         # 3. NON-COMBAT EVENT (Regen / Quest)
         else:
             result = self.events.resolve_non_combat(70)
+            # Note: resolve_non_combat now adds \n to its first line internally
             self.logs.extend(result["log"])
             self.save_state()
             # Wrap the log in a list of lists so it prints instantly as one block
@@ -122,6 +127,8 @@ class AdventureSession:
             # We add a newline at the start of the block for spacing
             turn_logs = result["phrases"]
             if turn_logs:
+                # Combat engine already adds \n--- Combat Turn --- 
+                # so we don't need extra spacing here
                 sequence.append(turn_logs)
 
             # Check Safety

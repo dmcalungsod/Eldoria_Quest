@@ -181,7 +181,7 @@ class AdventureRewards:
 
         if loot_lines:
             block = "\n".join(loot_lines)
-            logs.append(f"\n{E.ITEM_BOX} **Loot Acquired**\n```ansi\n{block}\n```")
+            logs.append(f"\n{E.ITEM_BOX} **Loot Acquired**\n```ansi{block}```")
 
         # QUEST UPDATES
         self._update_quests(

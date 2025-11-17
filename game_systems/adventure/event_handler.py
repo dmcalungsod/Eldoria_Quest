@@ -4,6 +4,8 @@ event_handler.py
 Handles non-combat logic:
 - HP/MP Regeneration
 - Quest Objective checks
+
+Refactored to add spacing (\n) for better readability.
 """
 
 import random
@@ -30,7 +32,9 @@ class EventHandler:
         vitals = self.db.get_player_vitals(self.discord_id)
         
         if vitals["current_hp"] >= stats.max_hp and vitals["current_mp"] >= stats.max_mp:
-            return {"log": [AdventureEvents.no_event_found()], "dead": False}
+            # Add spacing
+            msg = f"\n{AdventureEvents.no_event_found()}"
+            return {"log": [msg], "dead": False}
             
         hp_regen = max(1, int(stats.endurance * 0.5) + 1)
         mp_regen = max(1, int(stats.magic * 0.5) + 1)
@@ -40,7 +44,12 @@ class EventHandler:
         
         self.db.set_player_vitals(self.discord_id, new_hp, new_mp)
         
-        logs = AdventureEvents.regeneration()
+        # Fetch base logs and add spacing to the first line
+        base_logs = AdventureEvents.regeneration()
+        if base_logs:
+            base_logs[0] = f"\n{base_logs[0]}"
+        logs = base_logs
+
         if new_hp > vitals["current_hp"]: 
             logs.append(f"You regenerated `{new_hp - vitals['current_hp']}` HP.")
         if new_mp > vitals["current_mp"]: 
@@ -65,12 +74,18 @@ class EventHandler:
                         current = (progress.get(obj_type) or {}).get(task, 0)
                         if current < req:
                             self.quest_system.update_progress(self.discord_id, quest["id"], obj_type, task, 1)
+                            
+                            # Format event text with spacing
+                            event_text = f"\n{AdventureEvents.quest_event(obj_type, task)}"
+                            
                             return {
                                 "log": [
-                                    AdventureEvents.quest_event(obj_type, task), 
+                                    event_text, 
                                     f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"
                                 ], 
                                 "dead": False
                             }
-                            
-        return {"log": [AdventureEvents.no_event_found()], "dead": False}
+        
+        # No event found -> Spaced generic message
+        msg = f"\n{AdventureEvents.no_event_found()}"
+        return {"log": [msg], "dead": False}
