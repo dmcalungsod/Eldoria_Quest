@@ -2,7 +2,7 @@
 adventure_rewards.py
 
 Handles post-battle reward distribution, including:
-- Loot generation
+- Loot generation (Now aggregated/bundled)
 - Quest progression
 - Stat EXP & automatic stat growth
 - Skill EXP & skill level-ups
@@ -15,6 +15,7 @@ All messages and logs have been rewritten for clarity and thematic consistency.
 import random
 import logging
 import json
+from collections import defaultdict
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -134,12 +135,13 @@ class AdventureRewards:
     # LOOT + QUEST LOGIC
     # ------------------------------------------------------------
     def _process_loot_and_quests(self, combat_result, quest_system, inventory_manager, session_loot, logs):
-        loot_lines = []
-
+        # Use a counter to bundle items: Key = (Name, Rarity), Value = Count
+        loot_bundle = defaultdict(int)
+        
         # RAW EXP REWARD
         exp_gain = combat_result["exp"]
         self._add_loot_to_session(session_loot, "exp", exp_gain)
-        loot_lines.append(get_rarity_ansi("Common", f"• {exp_gain} EXP"))
+        # We'll add EXP to the lines at the end to keep it at the top
 
         # Player luck affects rare drops
         stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
@@ -159,7 +161,7 @@ class AdventureRewards:
 
             if random.randint(1, 100) <= final_chance:
                 self._add_loot_to_session(session_loot, drop_key, 1)
-                loot_lines.append(get_rarity_ansi(rarity, f"• {name}"))
+                loot_bundle[(name, rarity)] += 1
 
         # EQUIPMENT DROPS
         eq_list = item_manager.generate_monster_loot(combat_result["monster_data"])
@@ -175,13 +177,36 @@ class AdventureRewards:
                     item["slot"],
                     item["source"],
                 )
-                loot_lines.append(get_rarity_ansi(item["rarity"], f"• {item['name']}"))
+                loot_bundle[(item['name'], item['rarity'])] += 1
             except Exception as e:
                 logger.error(f"Equipment add error: {e}")
 
+        # --- GENERATE FORMATTED LOG LINES ---
+        loot_lines = []
+        
+        # 1. EXP Line
+        loot_lines.append(get_rarity_ansi("Common", f"• {exp_gain} EXP"))
+
+        # 2. Sort and add item lines
+        # Sorting by Rarity (Common -> Mythical) then Name
+        rarity_order = {"Common": 0, "Uncommon": 1, "Rare": 2, "Epic": 3, "Legendary": 4, "Mythical": 5}
+        
+        sorted_loot = sorted(
+            loot_bundle.items(), 
+            key=lambda x: (rarity_order.get(x[0][1], 0), x[0][0])
+        )
+
+        for (name, rarity), count in sorted_loot:
+            if count > 1:
+                text = f"• {name} (x{count})"
+            else:
+                text = f"• {name}"
+            loot_lines.append(get_rarity_ansi(rarity, text))
+
         if loot_lines:
             block = "\n".join(loot_lines)
-            logs.append(f"\n{E.ITEM_BOX} **Loot Acquired**\n```ansi{block}```")
+            logs.append(f"\n{E.ITEM_BOX} **Loot Acquired**```ansi\n{block}\n```")
+
 
         # QUEST UPDATES
         self._update_quests(
