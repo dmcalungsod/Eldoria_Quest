@@ -9,18 +9,12 @@ import math
 
 
 class ExpCalculator:
-    TIER_MULTIPLIER = {
-        "Normal": 1.0,
-        "Elite": 2.5,
-        "Boss": 10.0
-    }
+    TIER_MULTIPLIER = {"Normal": 1.0, "Elite": 2.5, "Boss": 10.0}
 
     @staticmethod
     # --- MODIFIED FUNCTION SIGNATURE ---
-    def calculate_exp(
-        player_level: int, monster_data: dict, exp_boost_mult: float = 1.0
-    ) -> int:
-    # --- END MODIFIED SIGNATURE ---
+    def calculate_exp(player_level: int, monster_data: dict, exp_boost_mult: float = 1.0) -> int:
+        # --- END MODIFIED SIGNATURE ---
         """
         Calculates XP reward for a single player.
         """
@@ -41,7 +35,7 @@ class ExpCalculator:
         level_diff = player_level - monster_level
         if level_diff >= 5:
             excess = level_diff - 4
-            reduction_fraction = min(0.8, 0.1 * excess) # Cap at 80% reduction
+            reduction_fraction = min(0.8, 0.1 * excess)  # Cap at 80% reduction
             raw_xp = raw_xp * (1.0 - reduction_fraction)
 
         return max(0, math.floor(raw_xp))

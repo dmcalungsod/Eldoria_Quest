@@ -36,9 +36,7 @@ class QuestSystem:
         cur = conn.cursor()
 
         # Retrieve the adventurer's Guild Rank
-        cur.execute(
-            "SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,)
-        )
+        cur.execute("SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,))
         player_rank_data = cur.fetchone()
 
         if not player_rank_data:
@@ -48,22 +46,16 @@ class QuestSystem:
         player_rank = player_rank_data["rank"]
 
         # Get all quests already taken or completed to avoid duplication
-        cur.execute(
-            "SELECT quest_id FROM player_quests WHERE discord_id = ?", (discord_id,)
-        )
+        cur.execute("SELECT quest_id FROM player_quests WHERE discord_id = ?", (discord_id,))
         taken_quest_ids = {row["quest_id"] for row in cur.fetchall()}
 
         # Fetch quests locked to the adventurer's current Guild Rank
-        cur.execute(
-            "SELECT id, title, tier, summary FROM quests WHERE tier = ?", (player_rank,)
-        )
+        cur.execute("SELECT id, title, tier, summary FROM quests WHERE tier = ?", (player_rank,))
         all_quests = cur.fetchall()
         conn.close()
 
         # Filter out previously taken quests
-        available_quests = [
-            dict(q) for q in all_quests if q["id"] not in taken_quest_ids
-        ]
+        available_quests = [dict(q) for q in all_quests if q["id"] not in taken_quest_ids]
         return available_quests
 
     # -----------------------------------------------------------

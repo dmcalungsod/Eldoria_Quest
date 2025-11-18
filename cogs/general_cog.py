@@ -22,13 +22,10 @@ class GeneralCog(commands.Cog):
         # Latency is in seconds, convert to ms
         latency_ms = round(self.bot.latency * 1000)
 
-        embed = discord.Embed(
-            title="🏓 Pong!",
-            description=f"Latency: **{latency_ms}ms**",
-            color=discord.Color.blue()
-        )
+        embed = discord.Embed(title="🏓 Pong!", description=f"Latency: **{latency_ms}ms**", color=discord.Color.blue())
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(GeneralCog(bot))

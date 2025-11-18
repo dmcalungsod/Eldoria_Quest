@@ -113,9 +113,7 @@ class EquipmentManager:
         equipped_items = cur.fetchall()
 
         for item in equipped_items:
-            bonuses = self._get_item_bonuses(
-                item["item_key"], item["item_source_table"]
-            )
+            bonuses = self._get_item_bonuses(item["item_key"], item["item_source_table"])
             for stat, value in bonuses.items():
                 stats.add_bonus_stat(stat, value)
 
@@ -130,12 +128,7 @@ class EquipmentManager:
             skill_data = SKILLS.get(p_skill["skill_key"])
 
             # Check if it's a passive skill with bonuses
-            if (
-                skill_data
-                and skill_data.get("type") == "Passive"
-                and "passive_bonus" in skill_data
-            ):
-
+            if skill_data and skill_data.get("type") == "Passive" and "passive_bonus" in skill_data:
                 skill_level = p_skill["skill_level"]
 
                 for stat, bonus_percent in skill_data["passive_bonus"].items():
@@ -161,9 +154,7 @@ class EquipmentManager:
 
                         # Calculate the bonus
                         total_bonus_percent = bonus_percent * skill_level
-                        bonus_amount = math.ceil(
-                            current_stat_total * total_bonus_percent
-                        )
+                        bonus_amount = math.ceil(current_stat_total * total_bonus_percent)
 
                         stats.add_bonus_stat(stat_name, bonus_amount)
 
@@ -254,9 +245,7 @@ class EquipmentManager:
                 ),
             )
         else:
-            cur.execute(
-                "UPDATE inventory SET equipped = 1 WHERE id = ?", (inventory_db_id,)
-            )
+            cur.execute("UPDATE inventory SET equipped = 1 WHERE id = ?", (inventory_db_id,))
 
         conn.commit()
         conn.close()

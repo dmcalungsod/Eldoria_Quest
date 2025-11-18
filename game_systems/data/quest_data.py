@@ -270,7 +270,7 @@ QUESTS_D_TIER = [
         "A cunning goblin lieutenant has unified several scattered tribes. His camp rings with stolen steel and crude banners. If left unchecked, an organized horde might rise.",
         # --- FIX: Changed "Goblin Lieutenant Krag" to "Bramble Goblin" (a tougher goblin) ---
         json.dumps({"defeat": {"Bramble Goblin": 1}}),
-        json.dumps({"exp": 120, "aurum": 55, "item": "Captains' Ale (Embolden)"}), # Fixed item
+        json.dumps({"exp": 120, "aurum": 55, "item": "Captains' Ale (Embolden)"}),  # Fixed item
     ),
     (
         22,
@@ -282,7 +282,7 @@ QUESTS_D_TIER = [
         "A Heartwood Sprite has been corrupted by a splinter of Veil energy lodged in its body. Leira believes an adventurer with a steady hand can help remove it—if they can survive its thrashing.",
         # --- FIX: Changed "Sprite" to "Wisp-Sentinel" ---
         json.dumps({"subdue": "Wisp-Sentinel", "remove": "Veil Splinter"}),
-        json.dumps({"exp": 110, "aurum": 40, "item": "Sap of Renewal"}), # Fixed item
+        json.dumps({"exp": 110, "aurum": 40, "item": "Sap of Renewal"}),  # Fixed item
     ),
     (
         23,
@@ -294,7 +294,7 @@ QUESTS_D_TIER = [
         "The Moonfang Wolf is a silver-coated predator that leads lesser wolves with eerie discipline. Yorin fears it will turn its pack upon the village unless someone challenges it.",
         # --- FIX: Changed "Moonfang Wolf" to "Ridge Wolf" ---
         json.dumps({"defeat": {"Ridge Wolf": 1}}),
-        json.dumps({"exp": 150, "aurum": 60, "item": "Glade Salve Vial"}), # Fixed item
+        json.dumps({"exp": 150, "aurum": 60, "item": "Glade Salve Vial"}),  # Fixed item
     ),
     (
         24,
@@ -328,7 +328,7 @@ QUESTS_D_TIER = [
         "Recover stolen trade goods.",
         "Bandit-goblins ambushed Salvi and fled into the thicket with his fabrics and spices. The merchant begs someone to reclaim the goods before the creatures burn or eat them.",
         json.dumps({"recover": {"Trade Crates": 5}}),
-        json.dumps({"exp": 100, "aurum": 35, "item": "Lunaris Tonic"}), # Fixed item
+        json.dumps({"exp": 100, "aurum": 35, "item": "Lunaris Tonic"}),  # Fixed item
     ),
     (
         27,
@@ -340,7 +340,7 @@ QUESTS_D_TIER = [
         "The Moonshadow Shrine’s white stones have turned black-veined, its pool reflecting horrors instead of moonlight. Mara needs an adventurer to drive off the wraithlings haunting it.",
         # --- FIX: Changed "Wraithling" to "Rookwood Shade" ---
         json.dumps({"defeat": {"Rookwood Shade": 5}, "use": "Purification Amulet"}),
-        json.dumps({"exp": 130, "aurum": 45, "item": "Wardkeeper's Vial"}), # Fixed item
+        json.dumps({"exp": 130, "aurum": 45, "item": "Wardkeeper's Vial"}),  # Fixed item
     ),
     (
         28,
@@ -352,7 +352,7 @@ QUESTS_D_TIER = [
         "The brood spiders answer to a single massive mother whose venom sacs can rot bark. Her growing brood threatens to spread beyond Webwood entirely.",
         # --- FIX: Changed "Spider Matron Vesska" to "Thicket Spider" (just more of them) ---
         json.dumps({"defeat": {"Thicket Spider": 10}}),
-        json.dumps({"exp": 160, "aurum": 70, "item": "Panacea Root Paste"}), # Fixed item
+        json.dumps({"exp": 160, "aurum": 70, "item": "Panacea Root Paste"}),  # Fixed item
     ),
     (
         29,
@@ -375,7 +375,7 @@ QUESTS_D_TIER = [
         "The Whispering Oak, ancient guardian of the forest, has begun muttering in tones unlike any druidic language. Leira suspects an unseen parasite clinging to its bark—one born of the Veil.",
         # --- FIX: Changed "Oak Parasite" to "Pine Wight" ---
         json.dumps({"inspect": "Oak", "defeat": {"Pine Wight": 1}}),
-        json.dumps({"exp": 140, "aurum": 50, "item": "Luck-Blessed Cordial"}), # Fixed item
+        json.dumps({"exp": 140, "aurum": 50, "item": "Luck-Blessed Cordial"}),  # Fixed item
     ),
 ]
 

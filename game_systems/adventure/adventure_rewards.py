@@ -61,6 +61,7 @@ STAT_EXP_GAINS = {
 # MAIN CLASS
 # ----------------------------
 
+
 class AdventureRewards:
     def __init__(self, db: DatabaseManager, discord_id: int):
         self.db = db
@@ -110,9 +111,7 @@ class AdventureRewards:
         # ----------------------------
         # LOOT & QUESTS
         # ----------------------------
-        self._process_loot_and_quests(
-            combat_result, quest_system, inventory_manager, session_loot, logs
-        )
+        self._process_loot_and_quests(combat_result, quest_system, inventory_manager, session_loot, logs)
 
         # ----------------------------
         # STAT EXP (practice-based growth)
@@ -177,7 +176,7 @@ class AdventureRewards:
                     item["slot"],
                     item["source"],
                 )
-                loot_bundle[(item['name'], item['rarity'])] += 1
+                loot_bundle[(item["name"], item["rarity"])] += 1
             except Exception as e:
                 logger.error(f"Equipment add error: {e}")
 
@@ -191,10 +190,7 @@ class AdventureRewards:
         # Sorting by Rarity (Common -> Mythical) then Name
         rarity_order = {"Common": 0, "Uncommon": 1, "Rare": 2, "Epic": 3, "Legendary": 4, "Mythical": 5}
 
-        sorted_loot = sorted(
-            loot_bundle.items(),
-            key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1])
-        )
+        sorted_loot = sorted(loot_bundle.items(), key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1]))
 
         for (name, rarity), count in sorted_loot:
             if count > 1:
@@ -207,7 +203,6 @@ class AdventureRewards:
             block = "\n".join(loot_lines)
             # --- FIX: Added \n to start to separate Loot from Victory message ---
             logs.append(f"{E.ITEM_BOX} **Loot Acquired**\n```ansi\n{block}```")
-
 
         # QUEST UPDATES
         self._update_quests(
@@ -262,7 +257,7 @@ class AdventureRewards:
                     SELECT stats_json, str_exp, end_exp, dex_exp, agi_exp, mag_exp, lck_exp
                     FROM stats WHERE discord_id=?
                     """,
-                    (self.discord_id,)
+                    (self.discord_id,),
                 )
                 row = cur.fetchone()
                 if not row:

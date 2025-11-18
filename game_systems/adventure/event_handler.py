@@ -82,11 +82,8 @@ class EventHandler:
                             event_text = f"\n{AdventureEvents.quest_event(obj_type, task)}"
 
                             return {
-                                "log": [
-                                    event_text,
-                                    f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"
-                                ],
-                                "dead": False
+                                "log": [event_text, f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"],
+                                "dead": False,
                             }
 
         # No event found -> Spaced generic message

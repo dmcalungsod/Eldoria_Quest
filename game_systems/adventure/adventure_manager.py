@@ -73,16 +73,16 @@ class AdventureManager:
 
         active_monster = {
             "name": f"Rank {next_rank} Examiner",
-            "level": 99,               # Cosmetic
-            "tier": "Boss",            # Forces manual combat
+            "level": 99,  # Cosmetic
+            "tier": "Boss",  # Forces manual combat
             "HP": boss_hp,
             "max_hp": boss_hp,
             "MP": 100,
             "ATK": boss_atk,
             "DEF": boss_def,
             "xp": 500,
-            "drops": [],               # No material drops for trials
-            "promotion_target": next_rank
+            "drops": [],  # No material drops for trials
+            "promotion_target": next_rank,
         }
 
         start_time = datetime.datetime.now()
@@ -92,10 +92,7 @@ class AdventureManager:
             cur = conn.cursor()
 
             # Clean old inactive sessions
-            cur.execute(
-                "DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0",
-                (discord_id,)
-            )
+            cur.execute("DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0", (discord_id,))
 
             # Insert new arena session
             cur.execute(
@@ -228,9 +225,7 @@ class AdventureManager:
             if not session_row:
                 return
 
-            session = AdventureSession(
-                self.db, self.quest_system, self.inventory_manager, discord_id, session_row
-            )
+            session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, session_row)
             total_exp = session.loot.pop("exp", 0)
 
             items_to_add = self._grant_rewards(session, total_exp, conn, player_stats)

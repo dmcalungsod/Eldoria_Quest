@@ -22,6 +22,7 @@ from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("discord")
 
+
 class CombatHandler:
     def __init__(self, db: DatabaseManager, discord_id: int):
         self.db = db
@@ -65,10 +66,16 @@ class CombatHandler:
                 return None, "Error: Monster data missing."
 
             active_monster = {
-                "name": template["name"], "level": template["level"], "tier": template["tier"],
-                "HP": template["hp"], "max_hp": template["hp"], "MP": 10,
-                "ATK": template["atk"], "DEF": template["def"], "xp": template["xp"],
-                "drops": template.get("drops", [])
+                "name": template["name"],
+                "level": template["level"],
+                "tier": template["tier"],
+                "HP": template["hp"],
+                "max_hp": template["hp"],
+                "MP": 10,
+                "ATK": template["atk"],
+                "DEF": template["def"],
+                "xp": template["xp"],
+                "drops": template.get("drops", []),
             }
 
             phrase = CombatPhrases.opening(active_monster)
@@ -90,7 +97,9 @@ class CombatHandler:
         with self.db.get_connection() as conn:
             cur = conn.cursor()
             # Get Class & Level
-            cur.execute("SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?", (self.discord_id,))
+            cur.execute(
+                "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?", (self.discord_id,)
+            )
             p_row = cur.fetchone()
 
             # Get Skills
@@ -100,7 +109,7 @@ class CombatHandler:
                    FROM player_skills ps
                    JOIN skills s ON ps.skill_key=s.key_id
                    WHERE ps.discord_id=? AND s.type='Active'""",
-                (self.discord_id,)
+                (self.discord_id,),
             )
             skills = [dict(row) for row in cur.fetchall()]
 
@@ -113,18 +122,13 @@ class CombatHandler:
                     s["buff_data"] = {}
 
         # 3. Setup Wrappers
-        player_wrapper = LevelUpSystem(
-            player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"]
-        )
+        player_wrapper = LevelUpSystem(player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"])
         player_wrapper.hp_current = vitals["current_hp"]
 
         boosts = self._fetch_active_boosts()
 
         # 4. Run Engine
-        engine = CombatEngine(
-            player_wrapper, active_monster, skills, vitals["current_mp"],
-            p_row["class_id"], boosts
-        )
+        engine = CombatEngine(player_wrapper, active_monster, skills, vitals["current_mp"], p_row["class_id"], boosts)
         result = engine.run_combat_turn()
 
         # 5. Update State (DB + Monster Object)
@@ -145,9 +149,14 @@ class CombatHandler:
     @staticmethod
     def create_empty_battle_report():
         return {
-            "str_hits": 0, "dex_hits": 0, "mag_hits": 0,
-            "player_crit": 0, "player_dodge": 0, "damage_taken": 0,
-            "skills_used": 0, "skill_key_used": None
+            "str_hits": 0,
+            "dex_hits": 0,
+            "mag_hits": 0,
+            "player_crit": 0,
+            "player_dodge": 0,
+            "damage_taken": 0,
+            "skills_used": 0,
+            "skill_key_used": None,
         }
 
     @staticmethod

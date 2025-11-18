@@ -16,14 +16,9 @@ from game_systems.player.player_stats import PlayerStats
 
 
 class AdventureEmbeds:
-
     @staticmethod
     def build_exploration_embed(
-        location_id: str,
-        log: list,
-        player_stats: PlayerStats,
-        vitals: sqlite3.Row,
-        session_row: sqlite3.Row
+        location_id: str, log: list, player_stats: PlayerStats, vitals: sqlite3.Row, session_row: sqlite3.Row
     ) -> discord.Embed:
         """
         Generates the main game interface embed.
@@ -77,7 +72,7 @@ class AdventureEmbeds:
 
         # 4. Player Vitals Field
         # Using emojis for clean layout
-        hp_percent = vitals['current_hp'] / max(player_stats.max_hp, 1)
+        hp_percent = vitals["current_hp"] / max(player_stats.max_hp, 1)
 
         # Simple status indicator
         status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
@@ -93,8 +88,8 @@ class AdventureEmbeds:
 
         # 5. Monster Vitals Field (Only in Manual Mode)
         if active_monster:
-            m_hp = active_monster.get('HP', 0)
-            m_max = active_monster.get('max_hp', m_hp) # Fallback
+            m_hp = active_monster.get("HP", 0)
+            m_max = active_monster.get("max_hp", m_hp)  # Fallback
 
             # Visual Health Bar
             percent = max(0, min(1, m_hp / m_max)) if m_max > 0 else 0

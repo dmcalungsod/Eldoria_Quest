@@ -15,9 +15,9 @@ import test_game_systems
 
 def main():
     """Run all test suites."""
-    print("\n" + "="*70)
-    print(" "*15 + "ELDORIA QUEST - COMPREHENSIVE TEST SUITE")
-    print("="*70)
+    print("\n" + "=" * 70)
+    print(" " * 15 + "ELDORIA QUEST - COMPREHENSIVE TEST SUITE")
+    print("=" * 70)
 
     print("\n\nThis will test:")
     print("  • Database operations and schema")
@@ -29,24 +29,24 @@ def main():
 
     all_passed = True
 
-    print("\n" + "-"*70)
+    print("\n" + "-" * 70)
     print("RUNNING DATABASE TESTS")
-    print("-"*70)
+    print("-" * 70)
     db_passed = test_database.run_all_tests()
     all_passed = all_passed and db_passed
 
-    print("\n" + "-"*70)
+    print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
-    print("-"*70)
+    print("-" * 70)
     game_passed = test_game_systems.run_all_tests()
     all_passed = all_passed and game_passed
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("FINAL TEST SUMMARY")
-    print("="*70)
+    print("=" * 70)
     print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
-    print("\n" + ("="*70))
+    print("\n" + ("=" * 70))
 
     if all_passed:
         print("\n🎉 ALL TESTS PASSED! Your bot is ready for adventure! 🎉\n")

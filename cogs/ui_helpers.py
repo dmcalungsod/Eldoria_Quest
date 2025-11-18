@@ -24,6 +24,7 @@ from game_systems.player.player_stats import PlayerStats
 # EMBED BUILDER
 # ======================================================================
 
+
 def build_inventory_embed(items: list) -> discord.Embed:
     """
     Construct the standardized inventory embed.
@@ -112,9 +113,8 @@ def build_inventory_embed(items: list) -> discord.Embed:
 # NAVIGATION CALLBACKS
 # ======================================================================
 
-async def back_to_profile_callback(
-    interaction: discord.Interaction, is_new_message: bool = False
-):
+
+async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
     """
     Return to the Character Status screen — the adventurer's
     personal profile recognized by the Guild.
@@ -131,9 +131,7 @@ async def back_to_profile_callback(
 
     player = await asyncio.to_thread(db.get_player, discord_id)
     if not player:
-        await interaction.followup.send(
-            "Error: No character data found.", ephemeral=True
-        )
+        await interaction.followup.send("Error: No character data found.", ephemeral=True)
         return
 
     # Fetch all dependent data in parallel for max responsiveness
@@ -154,10 +152,7 @@ async def back_to_profile_callback(
 
     embed = discord.Embed(
         title=f"{E.SCROLL} {player['name']}'s Character Status",
-        description=(
-            f"**Occupation:** Adventurer\n"
-            f"**Class:** {class_name}"
-        ),
+        description=(f"**Occupation:** Adventurer\n**Class:** {class_name}"),
         color=discord.Color.dark_red(),
     )
 
@@ -166,10 +161,7 @@ async def back_to_profile_callback(
 
     embed.add_field(
         name="Condition",
-        value=(
-            f"**Lv.** {player['level']}\n"
-            f"**Guild Rank:** {guild_data['rank'] if guild_data else 'Unregistered'}"
-        ),
+        value=(f"**Lv.** {player['level']}\n**Guild Rank:** {guild_data['rank'] if guild_data else 'Unregistered'}"),
         inline=True,
     )
 

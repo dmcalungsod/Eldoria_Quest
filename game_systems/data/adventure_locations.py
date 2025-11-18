@@ -20,12 +20,12 @@ LOCATIONS = {
         # --- NEW: High level spawn for stronger players ---
         "conditional_monsters": [
             {
-                "monster_key": "monster_007", # Hollow Spiderling (Lvl 5 Elite)
-                "weight": 10,                 # ~10% spawn chance if added
-                "min_level": 3                # Only appears for Level 3+
+                "monster_key": "monster_007",  # Hollow Spiderling (Lvl 5 Elite)
+                "weight": 10,  # ~10% spawn chance if added
+                "min_level": 3,  # Only appears for Level 3+
             }
         ],
-        "description": "The safe edge of the forest. Slimes and weak goblins lurk here."
+        "description": "The safe edge of the forest. Slimes and weak goblins lurk here.",
     },
     "whispering_thicket": {
         "name": "Whispering Thicket",
@@ -39,7 +39,7 @@ LOCATIONS = {
             ("monster_006", 20),  # Forest Wolf Pup
             ("monster_008", 10),  # Thicket Spider
         ],
-        "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs."
+        "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs.",
     },
     "deepgrove_roots": {
         "name": "Deepgrove Roots",
@@ -53,7 +53,7 @@ LOCATIONS = {
             ("monster_017", 15),  # Feral Stag (Boss-like)
             ("monster_020", 20),  # Ravaged Boar
         ],
-        "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot."
+        "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot.",
     },
     "guild_arena": {
         "name": "Guild Proving Grounds",
@@ -61,7 +61,7 @@ LOCATIONS = {
         "min_rank": "F",
         "level_req": 1,
         "duration_options": [],
-        "monsters": [], # Boss is custom-spawned
-        "description": "The dedicated arena for Adventurer rank examinations."
-    }
+        "monsters": [],  # Boss is custom-spawned
+        "description": "The dedicated arena for Adventurer rank examinations.",
+    },
 }

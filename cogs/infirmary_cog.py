@@ -65,11 +65,11 @@ class InfirmaryView(View):
         self.current_hp = player_data["current_hp"]
         self.current_mp = player_data["current_mp"]  # Added MP
         self.max_hp = player_stats.max_hp
-        self.max_mp = player_stats.max_mp            # Added Max MP
+        self.max_mp = player_stats.max_mp  # Added Max MP
         self.current_aurum = player_data["aurum"]
 
         self.missing_hp = max(0, self.max_hp - self.current_hp)
-        self.missing_mp = max(0, self.max_mp - self.current_mp) # Calculate missing MP
+        self.missing_mp = max(0, self.max_mp - self.current_mp)  # Calculate missing MP
 
         # Cost is based on HP loss, but healing restores both
         self.heal_cost = infirmary_cost(self.missing_hp)
@@ -118,10 +118,7 @@ class InfirmaryView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "These halls serve another adventurer.",
-                ephemeral=True
-            )
+            await interaction.response.send_message("These halls serve another adventurer.", ephemeral=True)
             return False
         return True
 
@@ -139,22 +136,21 @@ class InfirmaryView(View):
 
             # Reload authoritative record
             cur.execute(
-                "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id = ?",
-                (self.interaction_user.id,)
+                "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id = ?", (self.interaction_user.id,)
             )
             row = cur.fetchone()
             if not row:
                 return False, "Adventurer record could not be located."
 
             current_hp = row["current_hp"]
-            current_mp = row["current_mp"] # Fetch current MP
+            current_mp = row["current_mp"]  # Fetch current MP
             aurum = row["aurum"]
 
             # Load fresh stats for true max HP/MP
             stats_json = self.db.get_player_stats_json(self.interaction_user.id)
             player_stats = PlayerStats.from_dict(stats_json)
             max_hp = player_stats.max_hp
-            max_mp = player_stats.max_mp # Fetch max MP
+            max_mp = player_stats.max_mp  # Fetch max MP
 
             missing_hp = max(0, max_hp - current_hp)
             missing_mp = max(0, max_mp - current_mp)
@@ -177,10 +173,7 @@ class InfirmaryView(View):
             )
             conn.commit()
 
-            return True, (
-                f"You paid {cost} {E.AURUM}. "
-                f"Your condition has been treated — HP & MP fully restored."
-            )
+            return True, (f"You paid {cost} {E.AURUM}. Your condition has been treated — HP & MP fully restored.")
 
     # -----------------------------------------------------------------
     # Heal Button Callback
@@ -197,12 +190,7 @@ class InfirmaryView(View):
         player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
         player_stats = PlayerStats.from_dict(stats_json)
 
-        embed = InfirmaryView.build_infirmary_embed(
-            player_data,
-            player_stats,
-            status_message=message,
-            success=success
-        )
+        embed = InfirmaryView.build_infirmary_embed(player_data, player_stats, status_message=message, success=success)
 
         new_view = InfirmaryView(self.db, self.interaction_user, player_data, player_stats)
 
@@ -217,20 +205,16 @@ class InfirmaryView(View):
     # -----------------------------------------------------------------
     @staticmethod
     def build_infirmary_embed(
-        player_data: sqlite3.Row,
-        player_stats: PlayerStats,
-        status_message: str = None,
-        success: bool = True
+        player_data: sqlite3.Row, player_stats: PlayerStats, status_message: str = None, success: bool = True
     ) -> discord.Embed:
-
         current_hp = player_data["current_hp"]
-        current_mp = player_data["current_mp"] # Added MP
+        current_mp = player_data["current_mp"]  # Added MP
         max_hp = player_stats.max_hp
-        max_mp = player_stats.max_mp # Added Max MP
+        max_mp = player_stats.max_mp  # Added Max MP
         current_aurum = player_data["aurum"]
 
         missing_hp = max(0, max_hp - current_hp)
-        missing_mp = max(0, max_mp - current_mp) # Calculate missing MP
+        missing_mp = max(0, max_mp - current_mp)  # Calculate missing MP
 
         cost = infirmary_cost(missing_hp)
 
@@ -247,8 +231,7 @@ class InfirmaryView(View):
 
         if missing_hp > 0 or missing_mp > 0:
             description += (
-                f"A full course of treatment will cost **{cost} {E.AURUM}** "
-                f"(0.5 Aurum per missing HP, rounded up)."
+                f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP, rounded up)."
             )
         else:
             description += "You stand in peak condition; no treatment is required."

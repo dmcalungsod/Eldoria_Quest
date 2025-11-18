@@ -22,6 +22,7 @@ from game_systems.player.player_stats import PlayerStats
 
 # --- Developer Panel UI ---
 
+
 class DevPanelView(View):
     """
     An ephemeral UI view containing developer-only actions
@@ -33,21 +34,19 @@ class DevPanelView(View):
         db_manager: DatabaseManager,
         interaction_user: discord.User,
         player_data: sqlite3.Row,
-        active_boosts: List[Dict[str, Any]] # <-- NEW PARAMETER
+        active_boosts: List[Dict[str, Any]],  # <-- NEW PARAMETER
     ):
         super().__init__(timeout=180)  # 180-second timeout
         self.db = db_manager
         self.interaction_user = interaction_user
         # We store the data as a dict to safely update it
         self.player_data = dict(player_data)
-        self.active_boosts = active_boosts # <-- NEW
+        self.active_boosts = active_boosts  # <-- NEW
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Ensures only the original command user can interact."""
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your developer panel.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your developer panel.", ephemeral=True)
             return False
         return True
 
@@ -70,9 +69,7 @@ class DevPanelView(View):
             return "Invalid Time"
 
     @staticmethod
-    def build_dev_embed(
-        player_data: dict, active_boosts: List[Dict[str, Any]]
-    ) -> discord.Embed:
+    def build_dev_embed(player_data: dict, active_boosts: List[Dict[str, Any]]) -> discord.Embed:
         """Builds the embed showing the player's current currencies and active boosts."""
         embed = discord.Embed(
             title="Developer Control Panel",
@@ -86,17 +83,13 @@ class DevPanelView(View):
         else:
             boost_lines = []
             for boost in active_boosts:
-                key = boost['boost_key'].replace('_', ' ').title()
+                key = boost["boost_key"].replace("_", " ").title()
                 mult = f"+{(boost['multiplier'] - 1) * 100:.0f}%"
-                time_left = DevPanelView._format_time_remaining(boost['end_time'])
+                time_left = DevPanelView._format_time_remaining(boost["end_time"])
                 boost_lines.append(f"• **{key} ({mult})** - `{time_left}`")
             boost_status = "\n".join(boost_lines)
 
-        embed.add_field(
-            name="Global Boosts Status",
-            value=boost_status,
-            inline=False
-        )
+        embed.add_field(name="Global Boosts Status", value=boost_status, inline=False)
         # --- END NEW FIELD ---
 
         embed.add_field(
@@ -118,25 +111,19 @@ class DevPanelView(View):
         player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         boosts_task = asyncio.to_thread(self.db.get_active_boosts)
 
-        refreshed_player_data, refreshed_boosts = await asyncio.gather(
-            player_data_task, boosts_task
-        )
+        refreshed_player_data, refreshed_boosts = await asyncio.gather(player_data_task, boosts_task)
 
         self.player_data = dict(refreshed_player_data)
         self.active_boosts = refreshed_boosts
 
         # Build new embed and view
         new_embed = self.build_dev_embed(self.player_data, self.active_boosts)
-        new_view = DevPanelView(
-            self.db, self.interaction_user, self.player_data, self.active_boosts
-        )
+        new_view = DevPanelView(self.db, self.interaction_user, self.player_data, self.active_boosts)
 
         # Edit the original message
         await interaction.edit_original_response(embed=new_embed, view=new_view)
 
-    def _grant_resources(
-        self, discord_id: int, exp: int, aurum: int, vestige: int
-    ) -> bool:
+    def _grant_resources(self, discord_id: int, exp: int, aurum: int, vestige: int) -> bool:
         """
         A single, safe database function to add resources.
         This runs in a thread.
@@ -161,13 +148,9 @@ class DevPanelView(View):
             return False
 
     # --- HELPER FUNCTIONS for boosts (unchanged) ---
-    def _set_global_boost(
-        self, boost_key: str, multiplier: float, duration_hours: int
-    ) -> bool:
+    def _set_global_boost(self, boost_key: str, multiplier: float, duration_hours: int) -> bool:
         """Sets or updates a global boost in the DB."""
-        end_time = (
-            datetime.datetime.now() + datetime.timedelta(hours=duration_hours)
-        ).isoformat()
+        end_time = (datetime.datetime.now() + datetime.timedelta(hours=duration_hours)).isoformat()
         try:
             with self.db.get_connection() as conn:
                 cur = conn.cursor()
@@ -196,36 +179,22 @@ class DevPanelView(View):
 
     # --- Button Callbacks ---
 
-    @discord.ui.button(
-        label="Give 10,000 EXP + Vestige",
-        style=discord.ButtonStyle.success,
-        emoji="✨",
-        row=0
-    )
+    @discord.ui.button(label="Give 10,000 EXP + Vestige", style=discord.ButtonStyle.success, emoji="✨", row=0)
     async def give_exp_callback(self, interaction: discord.Interaction, button: Button):
         """Grants 10k EXP and 10k Vestige."""
         await interaction.response.defer()
 
-        await asyncio.to_thread(
-            self._grant_resources, self.interaction_user.id, 10000, 0, 10000
-        )
+        await asyncio.to_thread(self._grant_resources, self.interaction_user.id, 10000, 0, 10000)
 
         # Refresh the UI to show new values
         await self._refresh_view(interaction)
 
-    @discord.ui.button(
-        label="Give 5,000 Aurum",
-        style=discord.ButtonStyle.primary,
-        emoji=E.AURUM,
-        row=0
-    )
+    @discord.ui.button(label="Give 5,000 Aurum", style=discord.ButtonStyle.primary, emoji=E.AURUM, row=0)
     async def give_aurum_callback(self, interaction: discord.Interaction, button: Button):
         """Grants 5k Aurum."""
         await interaction.response.defer()
 
-        await asyncio.to_thread(
-            self._grant_resources, self.interaction_user.id, 0, 5000, 0
-        )
+        await asyncio.to_thread(self._grant_resources, self.interaction_user.id, 0, 5000, 0)
 
         await self._refresh_view(interaction)
 
@@ -233,7 +202,7 @@ class DevPanelView(View):
         label="Reset Vitals",
         style=discord.ButtonStyle.danger,
         emoji="❤️",
-        row=2 # <-- MOVED TO ROW 2
+        row=2,  # <-- MOVED TO ROW 2
     )
     async def reset_vitals_callback(self, interaction: discord.Interaction, button: Button):
         """Resets HP and MP to their max values."""
@@ -244,28 +213,20 @@ class DevPanelView(View):
             stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
             stats = PlayerStats.from_dict(stats_json)
 
-            await asyncio.to_thread(
-                self.db.set_player_vitals, self.interaction_user.id, stats.max_hp, stats.max_mp
-            )
+            await asyncio.to_thread(self.db.set_player_vitals, self.interaction_user.id, stats.max_hp, stats.max_mp)
 
             # --- MODIFIED: Call _refresh_view ---
             await self._refresh_view(interaction)
             # --- END MODIFIED ---
 
             await interaction.followup.send(
-                f"HP and MP have been restored to {stats.max_hp}/{stats.max_mp}.",
-                ephemeral=True
+                f"HP and MP have been restored to {stats.max_hp}/{stats.max_mp}.", ephemeral=True
             )
         except Exception as e:
             await interaction.followup.send(f"Error resetting vitals: {e}", ephemeral=True)
 
     # --- NEW BUTTONS (Callbacks now refresh the view) ---
-    @discord.ui.button(
-        label="+100% EXP (1 Hr)",
-        style=discord.ButtonStyle.success,
-        emoji="🚀",
-        row=1
-    )
+    @discord.ui.button(label="+100% EXP (1 Hr)", style=discord.ButtonStyle.success, emoji="🚀", row=1)
     async def give_exp_boost_callback(self, interaction: discord.Interaction, button: Button):
         """Sets EXP boost to 2.0x for 1 hour."""
         await interaction.response.defer()
@@ -275,12 +236,7 @@ class DevPanelView(View):
         await self._refresh_view(interaction)
         # --- END MODIFIED ---
 
-    @discord.ui.button(
-        label="+50% Loot (1 Hr)",
-        style=discord.ButtonStyle.primary,
-        emoji=E.LCK,
-        row=1
-    )
+    @discord.ui.button(label="+50% Loot (1 Hr)", style=discord.ButtonStyle.primary, emoji=E.LCK, row=1)
     async def give_loot_boost_callback(self, interaction: discord.Interaction, button: Button):
         """Sets Loot boost to 1.5x for 1 hour."""
         await interaction.response.defer()
@@ -294,7 +250,7 @@ class DevPanelView(View):
         label="Clear All Boosts",
         style=discord.ButtonStyle.danger,
         emoji=E.ERROR,
-        row=2 # <-- MOVED TO ROW 2
+        row=2,  # <-- MOVED TO ROW 2
     )
     async def clear_boosts_callback(self, interaction: discord.Interaction, button: Button):
         """Clears all active boosts."""
@@ -307,6 +263,7 @@ class DevPanelView(View):
 
 
 # --- Developer Cog ---
+
 
 class DeveloperCog(commands.Cog):
     """
@@ -335,8 +292,7 @@ class DeveloperCog(commands.Cog):
 
             if not player_data:
                 await interaction.followup.send(
-                    f"{E.ERROR} You do not have a character. Use `/start` first.",
-                    ephemeral=True
+                    f"{E.ERROR} You do not have a character. Use `/start` first.", ephemeral=True
                 )
                 return
 
@@ -348,24 +304,19 @@ class DeveloperCog(commands.Cog):
             await interaction.followup.send(embed=embed, view=view, ephemeral=True)
 
         except Exception as e:
-            await interaction.followup.send(
-                f"An error occurred: {e}", ephemeral=True
-            )
+            await interaction.followup.send(f"An error occurred: {e}", ephemeral=True)
 
     @dev_panel.error
     async def dev_panel_error(self, interaction: discord.Interaction, error):
         """Catches errors for the dev panel command."""
         if isinstance(error, commands.NotOwner):
-            await interaction.response.send_message(
-                "You are not authorized to use this command.", ephemeral=True
-            )
+            await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
         else:
-            await interaction.response.send_message(
-                f"An unexpected error occurred: {error}", ephemeral=True
-            )
+            await interaction.response.send_message(f"An unexpected error occurred: {error}", ephemeral=True)
 
 
 # --- Setup Function ---
+
 
 async def setup(bot: commands.Bot):
     """Adds the DeveloperCog to the bot."""

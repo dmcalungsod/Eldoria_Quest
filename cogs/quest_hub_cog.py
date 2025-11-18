@@ -27,6 +27,7 @@ from .ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
 # QUEST LEDGER VIEW (READ-ONLY)
 # ======================================================================
 
+
 class QuestLedgerView(View):
     """
     Displays the player's currently accepted quests.
@@ -64,6 +65,7 @@ class QuestLedgerView(View):
 # ======================================================================
 # QUEST LOG (TURN-IN VIEW)
 # ======================================================================
+
 
 class QuestLogView(View):
     """
@@ -141,9 +143,7 @@ class QuestLogView(View):
         )
 
         # Refresh quest list
-        new_active_quests = await asyncio.to_thread(
-            self.quest_system.get_player_quests, self.interaction_user.id
-        )
+        new_active_quests = await asyncio.to_thread(self.quest_system.get_player_quests, self.interaction_user.id)
 
         embed = interaction.message.embeds[0]
         embed.description = message
@@ -189,12 +189,20 @@ class QuestLogView(View):
 # QUEST BOARD VIEW
 # ======================================================================
 
+
 class QuestBoardView(View):
     """
     Displays all available quests in a dropdown list.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quests: list, interaction_user: discord.User, status_message: str = None, parent_back_data: tuple = None):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        quests: list,
+        interaction_user: discord.User,
+        status_message: str = None,
+        parent_back_data: tuple = None,
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quests = quests
@@ -306,8 +314,7 @@ class QuestBoardView(View):
 
         # Pass navigation context to Detail View
         view = QuestDetailView(
-            self.db, quest_id, self.quests, self.interaction_user,
-            parent_back_data=self.parent_back_data
+            self.db, quest_id, self.quests, self.interaction_user, parent_back_data=self.parent_back_data
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -322,12 +329,14 @@ class QuestBoardView(View):
         )
 
         if status_msg:
-             embed.add_field(name="Update", value=status_msg, inline=False)
+            embed.add_field(name="Update", value=status_msg, inline=False)
 
         embed.add_field(name="Available Contracts", value="Select a quest from the dropdown.")
 
         # Pass navigation context back
-        view = QuestBoardView(self.db, quests, self.interaction_user, status_message=status_msg, parent_back_data=self.parent_back_data)
+        view = QuestBoardView(
+            self.db, quests, self.interaction_user, status_message=status_msg, parent_back_data=self.parent_back_data
+        )
         await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -335,12 +344,20 @@ class QuestBoardView(View):
 # QUEST DETAIL VIEW
 # ======================================================================
 
+
 class QuestDetailView(View):
     """
     Displays full details for a specific quest and allows acceptance.
     """
 
-    def __init__(self, db_manager: DatabaseManager, quest_id: int, quests_list: list, interaction_user: discord.User, parent_back_data: tuple = None):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        quest_id: int,
+        quests_list: list,
+        interaction_user: discord.User,
+        parent_back_data: tuple = None,
+    ):
         super().__init__(timeout=None)
         self.db = db_manager
         self.quest_id = quest_id
@@ -390,7 +407,9 @@ class QuestDetailView(View):
 
         await self.back_to_quest_board_callback(interaction, deferred=True, status_message=status_msg)
 
-    async def back_to_quest_board_callback(self, interaction: discord.Interaction, deferred: bool = False, status_message: str = None):
+    async def back_to_quest_board_callback(
+        self, interaction: discord.Interaction, deferred: bool = False, status_message: str = None
+    ):
         if not deferred and not interaction.response.is_done():
             await interaction.response.defer()
 
@@ -415,9 +434,11 @@ class QuestDetailView(View):
 
         # Restore the Board View with the original navigation context
         view = QuestBoardView(
-            self.db, available_quests, self.interaction_user,
+            self.db,
+            available_quests,
+            self.interaction_user,
             status_message=status_message,
-            parent_back_data=self.parent_back_data
+            parent_back_data=self.parent_back_data,
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -425,6 +446,7 @@ class QuestDetailView(View):
 # ======================================================================
 # COG LOADER
 # ======================================================================
+
 
 class QuestHubCog(commands.Cog):
     def __init__(self, bot: commands.Bot):

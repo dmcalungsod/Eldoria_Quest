@@ -39,7 +39,7 @@ def setup_test_database():
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
     db_populate.DATABASE_NAME = TEST_DB_PATH
-    DatabaseManager.__init__ = lambda self: setattr(self, 'db_name', TEST_DB_PATH)
+    DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
 
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
 
@@ -76,7 +76,7 @@ def setup_test_environment():
         "DEX": {"base": 10, "bonus": 0},
         "AGI": {"base": 8, "bonus": 0},
         "MAG": {"base": 5, "bonus": 0},
-        "LCK": {"base": 10, "bonus": 0}
+        "LCK": {"base": 10, "bonus": 0},
     }
 
     db.create_player(
@@ -87,7 +87,7 @@ def setup_test_environment():
         initial_hp=150,
         initial_mp=30,
         race="Human",
-        gender="Male"
+        gender="Male",
     )
 
     print("✓ Test environment ready")
@@ -99,14 +99,7 @@ def test_player_stats():
     print("\n=== Testing PlayerStats ===")
 
     try:
-        stats = PlayerStats(
-            str_base=15,
-            end_base=12,
-            dex_base=10,
-            agi_base=8,
-            mag_base=5,
-            lck_base=10
-        )
+        stats = PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
 
         print(f"✓ PlayerStats created: STR={stats.strength}, END={stats.endurance}")
         print(f"  Max HP: {stats.max_hp}, Max MP: {stats.max_mp}")
@@ -126,6 +119,7 @@ def test_player_stats():
     except Exception as e:
         print(f"✗ PlayerStats test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -144,7 +138,7 @@ def test_inventory_system(test_discord_id):
             item_type="equipment",
             rarity="Uncommon",
             amount=1,
-            slot="Weapon"
+            slot="Weapon",
         )
         print("✓ Item added to inventory")
 
@@ -158,7 +152,7 @@ def test_inventory_system(test_discord_id):
             item_name="Health Potion",
             item_type="consumable",
             rarity="Common",
-            amount=5
+            amount=5,
         )
         print("✓ Consumable added to inventory")
 
@@ -170,6 +164,7 @@ def test_inventory_system(test_discord_id):
     except Exception as e:
         print(f"✗ Inventory test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -196,7 +191,7 @@ def test_equipment_system(test_discord_id):
                     rarity=weapon["rarity"],
                     amount=1,
                     slot=weapon["slot"],
-                    item_source_table="equipment"
+                    item_source_table="equipment",
                 )
                 print(f"✓ Added {weapon['name']} to inventory")
 
@@ -213,6 +208,7 @@ def test_equipment_system(test_discord_id):
     except Exception as e:
         print(f"✗ Equipment test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -228,30 +224,14 @@ def test_combat_system(test_discord_id):
 
         player = db.get_player(test_discord_id)
         player_wrapper = LevelUpSystem(
-            stats=player_stats,
-            level=player["level"],
-            exp=player["experience"],
-            exp_to_next=player["exp_to_next"]
+            stats=player_stats, level=player["level"], exp=player["experience"], exp_to_next=player["exp_to_next"]
         )
         player_wrapper.hp_current = 150
 
-        test_monster = {
-            "name": "Test Goblin",
-            "HP": 50,
-            "ATK": 10,
-            "DEF": 5,
-            "DEX": 8,
-            "MAG": 0,
-            "Level": 1,
-            "EXP": 20
-        }
+        test_monster = {"name": "Test Goblin", "HP": 50, "ATK": 10, "DEF": 5, "DEX": 8, "MAG": 0, "Level": 1, "EXP": 20}
 
         engine = CombatEngine(
-            player=player_wrapper,
-            monster=test_monster,
-            player_skills=[],
-            player_mp=30,
-            player_class_id=1
+            player=player_wrapper, monster=test_monster, player_skills=[], player_mp=30, player_class_id=1
         )
 
         result = engine.run_combat_turn()
@@ -268,6 +248,7 @@ def test_combat_system(test_discord_id):
     except Exception as e:
         print(f"✗ Combat test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -277,28 +258,14 @@ def test_damage_formulas():
     print("\n=== Testing Damage Formulas ===")
 
     try:
-        player_stats = PlayerStats(
-            str_base=15,
-            end_base=12,
-            dex_base=10,
-            agi_base=8,
-            mag_base=5,
-            lck_base=10
-        )
+        player_stats = PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
 
-        monster = {
-            "DEF": 5,
-            "Level": 1
-        }
+        monster = {"DEF": 5, "Level": 1}
 
         damage, crit = DamageFormula.player_basic_attack(player_stats, monster)
         print(f"✓ Basic attack: {damage} damage, Crit: {crit}")
 
-        test_skill = {
-            "name": "Power Strike",
-            "power_multiplier": 1.5,
-            "mp_cost": 10
-        }
+        test_skill = {"name": "Power Strike", "power_multiplier": 1.5, "mp_cost": 10}
 
         skill_damage, skill_crit = DamageFormula.player_skill(player_stats, monster, test_skill)
         print(f"✓ Skill attack: {skill_damage} damage, Crit: {skill_crit}")
@@ -308,6 +275,7 @@ def test_damage_formulas():
     except Exception as e:
         print(f"✗ Damage formula test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -323,10 +291,7 @@ def test_level_up_system(test_discord_id):
         player_stats = PlayerStats.from_dict(stats_json)
 
         level_system = LevelUpSystem(
-            stats=player_stats,
-            level=player["level"],
-            exp=player["experience"],
-            exp_to_next=player["exp_to_next"]
+            stats=player_stats, level=player["level"], exp=player["experience"], exp_to_next=player["exp_to_next"]
         )
 
         print(f"  Current Level: {level_system.level}")
@@ -342,6 +307,7 @@ def test_level_up_system(test_discord_id):
     except Exception as e:
         print(f"✗ Level-up test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -369,11 +335,11 @@ def cleanup_test_data(test_discord_id):
 
 def run_all_tests():
     """Run all game system tests."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ELDORIA QUEST - GAME SYSTEMS TEST SUITE")
-    print("="*60)
+    print("=" * 60)
     print("NOTE: Tests run on temporary database - production data is safe!")
-    print("="*60)
+    print("=" * 60)
 
     setup_test_database()
     test_discord_id = setup_test_environment()
@@ -399,9 +365,9 @@ def run_all_tests():
     cleanup_test_data(test_discord_id)
     cleanup_test_database()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST RESULTS SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     passed = sum(1 for _, result in results if result)
     total = len(results)
@@ -411,7 +377,7 @@ def run_all_tests():
         print(f"{status}: {test_name}")
 
     print(f"\nTotal: {passed}/{total} tests passed")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     return passed == total
 

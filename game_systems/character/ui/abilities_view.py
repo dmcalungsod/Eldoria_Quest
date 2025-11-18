@@ -69,9 +69,7 @@ class AbilitiesView(View):
     async def inventory_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        items = await asyncio.to_thread(
-            self.inventory_manager.get_inventory, self.interaction_user.id
-        )
+        items = await asyncio.to_thread(self.inventory_manager.get_inventory, self.interaction_user.id)
         embed = await asyncio.to_thread(build_inventory_embed, items)
 
         view = InventoryView(
@@ -90,26 +88,16 @@ class AbilitiesView(View):
     async def skills_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        skills = await asyncio.to_thread(
-            self.db.get_player_skills, self.interaction_user.id
-        )
+        skills = await asyncio.to_thread(self.db.get_player_skills, self.interaction_user.id)
 
         if not skills:
             skills_str = "*No recorded techniques.*"
         else:
-            skills_str = "\n".join(
-                [
-                    f"• **{s['name']}** — *{s['type']}*, Rank {s['skill_level']}"
-                    for s in skills
-                ]
-            )
+            skills_str = "\n".join([f"• **{s['name']}** — *{s['type']}*, Rank {s['skill_level']}" for s in skills])
 
         embed = discord.Embed(
             title="📖 Tome of Arts",
-            description=(
-                "*Collected techniques and disciplined forms.*\n\n"
-                f"{skills_str}"
-            ),
+            description=(f"*Collected techniques and disciplined forms.*\n\n{skills_str}"),
             color=discord.Color.purple(),
         )
 
@@ -121,6 +109,7 @@ class AbilitiesView(View):
 # --------------------------------------------------------------------
 # SKILLS VIEW
 # --------------------------------------------------------------------
+
 
 class SkillsView(View):
     def __init__(self, db, interaction_user):

@@ -5,22 +5,24 @@ Shared UI components, factories, and cached systems used throughout
 Guild-related views.
 """
 
+from typing import Any, Callable, Dict, Optional
+
 import discord
 from discord.ui import Button
-from typing import Optional, Callable, Dict, Any
 
-from database.database_manager import DatabaseManager
-from game_systems.guild_system.rank_system import RankSystem
-from game_systems.guild_system.guild_exchange import GuildExchange
 import game_systems.data.emojis as E
-
+from database.database_manager import DatabaseManager
+from game_systems.guild_system.guild_exchange import GuildExchange
+from game_systems.guild_system.rank_system import RankSystem
 
 # ======================================================
 # System Cache
 # ======================================================
 
+
 class SystemCache:
     """Singleton-style cache for frequently accessed systems."""
+
     _cache: Dict[str, Any] = {}
 
     @classmethod
@@ -47,9 +49,10 @@ class SystemCache:
 # Shared View Mixin
 # ======================================================
 
+
 class GuildViewMixin:
     """Mixin providing standardized interaction checks and back-button logic."""
-    
+
     db: DatabaseManager
     interaction_user: discord.User
     back_btn: Button
@@ -79,9 +82,10 @@ class GuildViewMixin:
 # Button Factory
 # ======================================================
 
+
 class ViewFactory:
     """Factory methods for producing standardized UI components."""
-    
+
     @staticmethod
     def create_button(
         label: str,
@@ -111,6 +115,7 @@ class ViewFactory:
 # ======================================================
 # Embed Templates
 # ======================================================
+
 
 class EmbedBuilder:
     """Centralized embed templates for Guild menus."""
@@ -146,8 +151,7 @@ class EmbedBuilder:
         return discord.Embed(
             title=f"{E.EXCHANGE} Guild Exchange",
             description=(
-                'A clerk glances up from their ledger. "If you have materials to trade, '
-                'I can exchange them for Aurum."'
+                'A clerk glances up from their ledger. "If you have materials to trade, I can exchange them for Aurum."'
             ),
             color=discord.Color.blue(),
         )

@@ -19,7 +19,6 @@ logger = logging.getLogger("discord")
 
 
 class CombatEngine:
-
     PLAYER_SKILL_CHANCE = 40  # 40% chance to use a skill if possible
 
     def __init__(
@@ -29,7 +28,7 @@ class CombatEngine:
         player_skills: list,
         player_mp: int,
         player_class_id: int,
-        active_boosts: dict = None, # <-- Receives a DICT now
+        active_boosts: dict = None,  # <-- Receives a DICT now
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -76,9 +75,7 @@ class CombatEngine:
             "skill_key_used": None,
         }
 
-        logger.info(
-            f"Combat Turn Start: Player Vitals: {self.player_hp} HP, {self.player_mp} MP"
-        )
+        logger.info(f"Combat Turn Start: Player Vitals: {self.player_hp} HP, {self.player_mp} MP")
         logger.info(f"Combat Turn Start: Monster HP: {self.monster_hp}")
 
         # --- 1. PLAYER'S TURN ---
@@ -110,9 +107,7 @@ class CombatEngine:
 
             else:
                 # --- Offensive Skill ---
-                dmg, crit, event_type = DamageFormula.player_skill(
-                    self.player.stats, self.monster, skill, skill_level
-                )
+                dmg, crit, event_type = DamageFormula.player_skill(self.player.stats, self.monster, skill, skill_level)
 
                 if event_type == "crit":
                     turn_report["player_crit"] = 1
@@ -125,11 +120,7 @@ class CombatEngine:
                     turn_report["str_hits"] = 1
 
                 self.monster_hp -= dmg
-                log.append(
-                    CombatPhrases.player_skill(
-                        self.player, self.monster, skill, dmg, crit
-                    )
-                )
+                log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
         else:
             # --- Basic Attack ---
             dmg, crit, event_type = DamageFormula.player_attack(self.player.stats, self.monster)
@@ -147,20 +138,14 @@ class CombatEngine:
                 turn_report["str_hits"] = 1
 
             self.monster_hp -= dmg
-            log.append(
-                CombatPhrases.player_attack(
-                    self.player, self.monster, dmg, crit, self.player_class_id
-                )
-            )
+            log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
 
         if self.monster_hp <= 0:
             logger.info(f"Combat End: Monster HP {self.monster_hp} <= 0. Player wins.")
             return self._player_victory(log, turn_report)
 
         # --- 2. MONSTER'S TURN ---
-        action = MonsterAI.choose_action(
-            self.monster, self.monster_hp, self.monster.get("MP", 0)
-        )
+        action = MonsterAI.choose_action(self.monster, self.monster_hp, self.monster.get("MP", 0))
         logger.info(f"Combat Monster AI: Selected {action['type']}")
 
         if action["type"] == "attack":
@@ -172,14 +157,10 @@ class CombatEngine:
                 turn_report["damage_taken"] = dmg
 
             self.player_hp -= dmg
-            log.append(
-                CombatPhrases.monster_attack(self.monster, self.player, dmg, crit)
-            )
+            log.append(CombatPhrases.monster_attack(self.monster, self.player, dmg, crit))
         elif action["type"] == "skill":
             skill = action["skill"]
-            dmg, crit, event_type = DamageFormula.monster_skill(
-                self.monster, self.player.stats, skill
-            )
+            dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.player.stats, skill)
 
             if event_type == "dodge":
                 turn_report["player_dodge"] = 1
@@ -187,9 +168,7 @@ class CombatEngine:
                 turn_report["damage_taken"] = dmg
 
             self.player_hp -= dmg
-            log.append(
-                CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit)
-            )
+            log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
         elif action["type"] == "buff":
             buff = action["buff"]
             MonsterAI.apply_buff(self.monster, buff)
@@ -207,7 +186,7 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
             "turn_report": turn_report,
-            "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
+            "active_boosts": self.active_boosts_dict,  # <-- Pass the dict back
         }
 
     def _decide_player_skill(self) -> dict:
@@ -225,9 +204,7 @@ class CombatEngine:
                 "reason": f"Roll {roll} > {self.PLAYER_SKILL_CHANCE}.",
             }
 
-        usable_skills = [
-            s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp
-        ]
+        usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
 
         if not usable_skills:
             return {"skill": None, "reason": "Not enough MP for any skill."}
@@ -235,9 +212,7 @@ class CombatEngine:
         # Priority 1: Healing (if below 50% HP)
         hp_threshold = self.player.stats.max_hp * 0.5
         if self.player_hp < hp_threshold:
-            heal_skill = next(
-                (s for s in usable_skills if s.get("heal_power", 0) > 0), None
-            )
+            heal_skill = next((s for s in usable_skills if s.get("heal_power", 0) > 0), None)
             if heal_skill:
                 return {
                     "skill": heal_skill,
@@ -246,9 +221,9 @@ class CombatEngine:
 
         # Priority 2: Buffs (simple check: if Mana Shield or Endure is available)
         utility_skills = [s for s in usable_skills if s.get("buff_data")]
-        if utility_skills and random.randint(1, 100) > 50: # 50% chance to use buff if one is available
-             chosen_skill = random.choice(utility_skills)
-             return {
+        if utility_skills and random.randint(1, 100) > 50:  # 50% chance to use buff if one is available
+            chosen_skill = random.choice(utility_skills)
+            return {
                 "skill": chosen_skill,
                 "reason": f"Rolled {roll}, prioritizing utility skill `{chosen_skill['name']}`.",
             }
@@ -285,7 +260,7 @@ class CombatEngine:
             "drops": drops,
             "monster_data": self.monster,
             "turn_report": turn_report,
-            "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
+            "active_boosts": self.active_boosts_dict,  # <-- Pass the dict back
         }
 
     def _monster_victory(self, log, turn_report):
@@ -300,5 +275,5 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
             "turn_report": turn_report,
-            "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
+            "active_boosts": self.active_boosts_dict,  # <-- Pass the dict back
         }

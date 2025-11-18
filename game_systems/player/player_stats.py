@@ -77,10 +77,7 @@ class PlayerStats:
     ...
     """
 
-    def __init__(
-        self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1
-    ):
-
+    def __init__(self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1):
         self._stats: Dict[str, StatBlock] = {
             "STR": StatBlock(base=str_base),
             "END": StatBlock(base=end_base),

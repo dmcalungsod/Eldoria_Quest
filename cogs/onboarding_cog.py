@@ -41,9 +41,7 @@ class StartMenuView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
@@ -67,29 +65,20 @@ class StartMenuView(View):
                 class_name = name
                 break
         if not class_name:
-            await interaction.response.send_message(
-                "This class does not exist.", ephemeral=True
-            )
+            await interaction.response.send_message("This class does not exist.", ephemeral=True)
             return
 
         class_data = CLASS_DEFINITIONS[class_name]
-        base_stats = [
-            f"`{stat:<3}: {value:>2}`" for stat, value in class_data["stats"].items()
-        ]
+        base_stats = [f"`{stat:<3}: {value:>2}`" for stat, value in class_data["stats"].items()]
         stats_lines = []
         for i in range(0, len(base_stats), 3):
             stats_lines.append("  ".join(base_stats[i : i + 3]))
         stats_block = "\n".join(stats_lines)
         descriptions = "\n".join(
-            [
-                f"> **{stat}** – {STAT_DESCRIPTIONS.get(stat, 'No description.')}"
-                for stat in class_data["stats"]
-            ]
+            [f"> **{stat}** – {STAT_DESCRIPTIONS.get(stat, 'No description.')}" for stat in class_data["stats"]]
         )
         description_string = (
-            f"{class_data['description']}\n\n"
-            f"**Base Stats**\n{stats_block}\n\n"
-            f"**Stat Descriptions:**\n{descriptions}"
+            f"{class_data['description']}\n\n**Base Stats**\n{stats_block}\n\n**Stat Descriptions:**\n{descriptions}"
         )
         embed = discord.Embed(
             title=class_name,
@@ -106,14 +95,12 @@ class ClassDetailView(View):
     The view that shows the details of a specific class.
     """
 
-    def __init__(
-        self, db_manager: DatabaseManager, class_id: int, interaction_user: discord.User
-    ):
+    def __init__(self, db_manager: DatabaseManager, class_id: int, interaction_user: discord.User):
         super().__init__(timeout=None)
         self.db = db_manager
         self.class_id = class_id
         self.interaction_user = interaction_user
-        self.creator = PlayerCreator(self.db) # Create instance
+        self.creator = PlayerCreator(self.db)  # Create instance
 
         create_button = Button(
             label="Create",
@@ -132,28 +119,21 @@ class ClassDetailView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
     async def create_button_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer() # Defer immediately
+        await interaction.response.defer()  # Defer immediately
 
         # --- ASYNC FIX ---
         success, message = await asyncio.to_thread(
-            self.creator.create_player,
-            interaction.user.id,
-            interaction.user.display_name,
-            self.class_id
+            self.creator.create_player, interaction.user.id, interaction.user.display_name, self.class_id
         )
         # --- END FIX ---
 
         if success:
-            welcome_title = (
-                f"Welcome, {interaction.user.display_name}, to Astraeon City."
-            )
+            welcome_title = f"Welcome, {interaction.user.display_name}, to Astraeon City."
             welcome_description = (
                 "Your name is known, but your deeds are not. The path ahead is fraught with peril... \n\n"
                 "To seek purpose, coin, or redemption, you must register with the **Adventurer's Guild**."
@@ -168,17 +148,11 @@ class ClassDetailView(View):
             await interaction.edit_original_response(embed=embed, view=view)
         else:
             # Use followup for the error message
-            await interaction.followup.send(
-                f"{E.WARNING} {message}", ephemeral=True
-            )
+            await interaction.followup.send(f"{E.WARNING} {message}", ephemeral=True)
 
     async def back_button_callback(self, interaction: discord.Interaction):
-        embed = discord.Embed(
-            title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold()
-        )
-        embed.set_footer(
-            text="Once you have chosen a class, you can create your character."
-        )
+        embed = discord.Embed(title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold())
+        embed.set_footer(text="Once you have chosen a class, you can create your character.")
         view = StartMenuView(self.db, self.interaction_user)
         await interaction.response.edit_message(embed=embed, view=view)
 
@@ -203,9 +177,7 @@ class CharacterMenuView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
@@ -215,33 +187,30 @@ class CharacterMenuView(View):
         try:
             with self.db.get_connection() as conn:
                 cur = conn.cursor()
-                cur.execute(
-                    "SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)
-                )
+                cur.execute("SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,))
                 if cur.fetchone():
-                    return False # Already registered
+                    return False  # Already registered
 
                 cur.execute(
                     "INSERT INTO guild_members (discord_id, join_date) VALUES (?, ?)",
                     (discord_id, join_date),
                 )
-            return True # New registration
+            return True  # New registration
         except Exception as e:
             print(f"Error during guild registration: {e}")
             return False
+
     # --- END HELPER ---
 
     async def register_button_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer() # Defer immediately
+        await interaction.response.defer()  # Defer immediately
 
         discord_id = interaction.user.id
         join_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # --- ASYNC FIX ---
         # We don't need the return value here, so we just await it
-        await asyncio.to_thread(
-            self._execute_guild_registration, discord_id, join_date
-        )
+        await asyncio.to_thread(self._execute_guild_registration, discord_id, join_date)
         # --- END FIX ---
 
         # This callback is async, so we can await it
@@ -273,12 +242,8 @@ class OnboardingCog(commands.Cog):
             await back_to_profile_callback(interaction, is_new_message=True)
             return
 
-        embed = discord.Embed(
-            title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold()
-        )
-        embed.set_footer(
-            text="Once you have chosen a class, you can create your character."
-        )
+        embed = discord.Embed(title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold())
+        embed.set_footer(text="Once you have chosen a class, you can create your character.")
 
         view = StartMenuView(self.db, interaction.user)
         await interaction.response.send_message(embed=embed, view=view, ephemeral=False)

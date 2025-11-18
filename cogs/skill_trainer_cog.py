@@ -74,9 +74,7 @@ class SkillTrainerView(View):
     # --------------------------------------------------------
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your session.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your session.", ephemeral=True)
             return False
         return True
 
@@ -114,7 +112,8 @@ class SkillTrainerView(View):
         )
 
         learnable = [
-            s for s in SKILLS.values()
+            s
+            for s in SKILLS.values()
             if s.get("class_id") == self.player_class_id
             and s.get("learn_cost", 0) > 0
             and s["key_id"] not in self.player_skills
@@ -217,9 +216,7 @@ class SkillTrainerView(View):
         skill_key, cost_str = interaction.data["values"][0].split(":")
         cost = int(cost_str)
 
-        success, error_msg = await asyncio.to_thread(
-            self._execute_learn_skill, skill_key, cost
-        )
+        success, error_msg = await asyncio.to_thread(self._execute_learn_skill, skill_key, cost)
 
         if not success:
             status = f"{E.ERROR} {error_msg}"
@@ -270,9 +267,7 @@ class SkillTrainerView(View):
         cost = int(cost_str)
         new_level = int(level_str) + 1
 
-        success, error_msg = await asyncio.to_thread(
-            self._execute_upgrade_skill, skill_key, cost, new_level
-        )
+        success, error_msg = await asyncio.to_thread(self._execute_upgrade_skill, skill_key, cost, new_level)
 
         if not success:
             status = f"{E.ERROR} {error_msg}"

@@ -25,7 +25,6 @@ class AdventureEvents:
         f"{E.FOREST} You pause to catch your breath by a stream...",
         f"{E.FOREST} You find a safe clearing and rest your weary limbs...",
         f"{E.FOREST} The air is calm. You take a moment to meditate...",
-
         # Expanded atmospheric set
         f"{E.FOREST} A faint warmth settles over you as the forest seems to breathe with you.",
         f"{E.FOREST} You steady your heartbeat and let the world fall quiet around you.",
@@ -91,7 +90,6 @@ class AdventureEvents:
         f"{E.FOREST} The forest is quiet... too quiet.",
         f"{E.FOREST} A cold wind blows, but no monsters appear.",
         f"{E.FOREST} You follow a game trail for a time, but it runs cold.",
-
         # Expanded
         f"{E.FOREST} Only the rustle of distant branches answers your search.",
         f"{E.FOREST} You sense movement, but it fades before you can track it.",

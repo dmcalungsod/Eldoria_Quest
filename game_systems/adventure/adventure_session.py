@@ -39,15 +39,11 @@ class AdventureSession:
     The DB holds:
         location_id, logs, loot, active state, active monster json
     """
+
     REGEN_CHANCE = 40  # % chance the step becomes a non-combat event
 
     def __init__(
-        self,
-        db: DatabaseManager,
-        quest_system,
-        inventory_manager,
-        discord_id: int,
-        row_data: Optional[dict] = None
+        self, db: DatabaseManager, quest_system, inventory_manager, discord_id: int, row_data: Optional[dict] = None
     ):
         self.db = db
         self.discord_id = discord_id
@@ -67,9 +63,7 @@ class AdventureSession:
             self.loot = json.loads(row_data["loot_collected"])
             self.active = bool(row_data["active"])
             self.active_monster = (
-                json.loads(row_data["active_monster_json"])
-                if row_data["active_monster_json"]
-                else None
+                json.loads(row_data["active_monster_json"]) if row_data["active_monster_json"] else None
             )
         else:
             self.active = False
@@ -193,8 +187,7 @@ class AdventureSession:
         if player_won:
             # --- FIX: Added spacing ---
             final_block.append(
-                f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} "
-                f"in {len(turn_reports)} rounds."
+                f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(turn_reports)} rounds."
             )
 
             # --- FIX: Corrected argument names to match adventure_rewards.py ---

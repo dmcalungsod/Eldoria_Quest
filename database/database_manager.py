@@ -152,6 +152,7 @@ class DatabaseManager:
 
         conn.close()
         return row
+
     # --- END NEW FUNCTION ---
 
     # ------------------------------------------------------------
@@ -231,9 +232,7 @@ class DatabaseManager:
     # ------------------------------------------------------------
     # UPDATE LEVEL+EXP
     # ------------------------------------------------------------
-    def update_player_level_data(
-        self, discord_id: int, level: int, exp: int, exp_to_next: int
-    ):
+    def update_player_level_data(self, discord_id: int, level: int, exp: int, exp_to_next: int):
         conn = self.connect()
         cur = conn.cursor()
 
@@ -262,16 +261,14 @@ class DatabaseManager:
         try:
             with self.get_connection() as conn:
                 cur = conn.cursor()
-                cur.execute(
-                    "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?",
-                    (now,)
-                )
+                cur.execute("SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?", (now,))
                 for row in cur.fetchall():
                     boosts.append(dict(row))
         except Exception as e:
             print(f"Error fetching active boosts: {e}")
 
         return boosts
+
     # --- END OF MODIFICATION ---
 
     # --- NEW HELPER FUNCTIONS FOR ASYNC ---
@@ -280,9 +277,7 @@ class DatabaseManager:
         """Fetches guild member rank."""
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute(
-            "SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,)
-        )
+        cur.execute("SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,))
         row = cur.fetchone()
         conn.close()
         return row

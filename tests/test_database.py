@@ -33,7 +33,7 @@ def setup_test_database():
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
     db_populate.DATABASE_NAME = TEST_DB_PATH
-    DatabaseManager.__init__ = lambda self: setattr(self, 'db_name', TEST_DB_PATH)
+    DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
 
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
 
@@ -92,7 +92,7 @@ def test_player_operations():
             "DEX": {"base": 10, "bonus": 0},
             "AGI": {"base": 10, "bonus": 0},
             "MAG": {"base": 10, "bonus": 0},
-            "LCK": {"base": 10, "bonus": 0}
+            "LCK": {"base": 10, "bonus": 0},
         }
 
         db.create_player(
@@ -103,7 +103,7 @@ def test_player_operations():
             initial_hp=100,
             initial_mp=20,
             race="Human",
-            gender="Male"
+            gender="Male",
         )
         print("✓ Player created successfully")
 
@@ -132,6 +132,7 @@ def test_player_operations():
     except Exception as e:
         print(f"✗ Player operations failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -248,11 +249,11 @@ def cleanup_test_data():
 
 def run_all_tests():
     """Run all database tests."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ELDORIA QUEST - DATABASE TEST SUITE")
-    print("="*60)
+    print("=" * 60)
     print("NOTE: Tests run on temporary database - production data is safe!")
-    print("="*60)
+    print("=" * 60)
 
     setup_test_database()
 
@@ -278,9 +279,9 @@ def run_all_tests():
     cleanup_test_data()
     cleanup_test_database()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TEST RESULTS SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     passed = sum(1 for _, result in results if result)
     total = len(results)
@@ -290,7 +291,7 @@ def run_all_tests():
         print(f"{status}: {test_name}")
 
     print(f"\nTotal: {passed}/{total} tests passed")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     return passed == total
 

@@ -21,7 +21,7 @@ CONSUMABLES = {
         "type": "hp",
         "effect": {"heal": 50},
         "rarity": "Common",
-        "description": "A modest vial of dew distilled from forest leaves. Restores a lick of vitality."
+        "description": "A modest vial of dew distilled from forest leaves. Restores a lick of vitality.",
     },
     "hp_potion_2": {
         "id": "hp_potion_2",
@@ -29,7 +29,7 @@ CONSUMABLES = {
         "type": "hp",
         "effect": {"heal": 120},
         "rarity": "Uncommon",
-        "description": "Balmed with sap and honey; travelers swear by its steadying warmth."
+        "description": "Balmed with sap and honey; travelers swear by its steadying warmth.",
     },
     "hp_large": {
         "id": "hp_large",
@@ -37,7 +37,7 @@ CONSUMABLES = {
         "type": "hp",
         "effect": {"heal": 300},
         "rarity": "Rare",
-        "description": "Bottled heartwood essence; a boon for the gravely wounded."
+        "description": "Bottled heartwood essence; a boon for the gravely wounded.",
     },
     "mp_potion_1": {
         "id": "mp_potion_1",
@@ -45,7 +45,7 @@ CONSUMABLES = {
         "type": "mp",
         "effect": {"mana": 40},
         "rarity": "Common",
-        "description": "A chalk-sweet draught; aids in gathering stray sigils of power."
+        "description": "A chalk-sweet draught; aids in gathering stray sigils of power.",
     },
     "mp_potion_2": {
         "id": "mp_potion_2",
@@ -53,7 +53,7 @@ CONSUMABLES = {
         "type": "mp",
         "effect": {"mana": 110},
         "rarity": "Uncommon",
-        "description": "Drawn from moon-scented mushrooms; used by apprentice mages."
+        "description": "Drawn from moon-scented mushrooms; used by apprentice mages.",
     },
     "antidote_basic": {
         "id": "antidote_basic",
@@ -61,7 +61,7 @@ CONSUMABLES = {
         "type": "antidote",
         "effect": {"cure_poison": True},
         "rarity": "Common",
-        "description": "A paste brewed from moss and nettle—pulls sting from the blood."
+        "description": "A paste brewed from moss and nettle—pulls sting from the blood.",
     },
     "stamina_tonic": {
         "id": "stamina_tonic",
@@ -69,7 +69,7 @@ CONSUMABLES = {
         "type": "buff",
         "effect": {"stamina_boost": 30, "duration_s": 180},
         "rarity": "Common",
-        "description": "Sipped before a chase; steadies the legs and clears the head."
+        "description": "Sipped before a chase; steadies the legs and clears the head.",
     },
     "strength_brew": {
         "id": "strength_brew",
@@ -77,7 +77,7 @@ CONSUMABLES = {
         "type": "buff",
         "effect": {"STR": 3, "duration_s": 120},
         "rarity": "Uncommon",
-        "description": "A warming draft that floods the arm with sudden might."
+        "description": "A warming draft that floods the arm with sudden might.",
     },
     "dex_elixir": {
         "id": "dex_elixir",
@@ -85,7 +85,7 @@ CONSUMABLES = {
         "type": "buff",
         "effect": {"DEX": 3, "duration_s": 120},
         "rarity": "Uncommon",
-        "description": "A shimmering sip that makes the hand deft for a time."
+        "description": "A shimmering sip that makes the hand deft for a time.",
     },
     "food_ration": {
         "id": "food_ration",
@@ -93,7 +93,7 @@ CONSUMABLES = {
         "type": "food",
         "effect": {"hp": 10, "stamina": 25},
         "rarity": "Common",
-        "description": "Dried meat and bread—plain, comforting, sustaining."
+        "description": "Dried meat and bread—plain, comforting, sustaining.",
     },
     "campfire_stew": {
         "id": "campfire_stew",
@@ -101,7 +101,7 @@ CONSUMABLES = {
         "type": "food",
         "effect": {"hp": 30, "stamina": 50},
         "rarity": "Uncommon",
-        "description": "A thick, hearty stew that bolsters the weary heart."
+        "description": "A thick, hearty stew that bolsters the weary heart.",
     },
     "throwing_bomb": {
         "id": "throwing_bomb",
@@ -109,7 +109,7 @@ CONSUMABLES = {
         "type": "throwable",
         "effect": {"aoe_atk": 40, "status": "blind", "chance": 20},
         "rarity": "Common",
-        "description": "When burst, it clouds sight with numbing spores."
+        "description": "When burst, it clouds sight with numbing spores.",
     },
     "regen_potion": {
         "id": "regen_potion",
@@ -117,7 +117,7 @@ CONSUMABLES = {
         "type": "hp",
         "effect": {"regen": 5, "duration_s": 30},
         "rarity": "Rare",
-        "description": "A dripping sap that mends slowly over time."
+        "description": "A dripping sap that mends slowly over time.",
     },
     "resist_elixir": {
         "id": "resist_elixir",
@@ -125,7 +125,7 @@ CONSUMABLES = {
         "type": "buff",
         "effect": {"damage_res": 5, "duration_s": 120},
         "rarity": "Rare",
-        "description": "Hums faintly; pushes away the keen edges of harm."
+        "description": "Hums faintly; pushes away the keen edges of harm.",
     },
     "antidote_strong": {
         "id": "antidote_strong",
@@ -133,7 +133,7 @@ CONSUMABLES = {
         "type": "antidote",
         "effect": {"cure_poison": True, "cure_bleed": True},
         "rarity": "Rare",
-        "description": "A thick paste that quiets the worst venoms."
+        "description": "A thick paste that quiets the worst venoms.",
     },
     "elixir_of_focus": {
         "id": "elixir_of_focus",
@@ -141,7 +141,7 @@ CONSUMABLES = {
         "type": "mp",
         "effect": {"mana": 200},
         "rarity": "Epic",
-        "description": "A scholar's secret: sharp as a quill."
+        "description": "A scholar's secret: sharp as a quill.",
     },
     "heroic_potion": {
         "id": "heroic_potion",
@@ -149,7 +149,7 @@ CONSUMABLES = {
         "type": "buff",
         "effect": {"STR": 5, "DEF": 5, "duration_s": 45},
         "rarity": "Epic",
-        "description": "A rare tonic gifted to those who stand against fate."
+        "description": "A rare tonic gifted to those who stand against fate.",
     },
     "mythic_amber": {
         "id": "mythic_amber",
@@ -157,7 +157,7 @@ CONSUMABLES = {
         "type": "hp",
         "effect": {"heal": 1500},
         "rarity": "Mythical",
-        "description": "Found only in whispered legends; restores life like a dawn."
+        "description": "Found only in whispered legends; restores life like a dawn.",
     },
     "smoke_pellet": {
         "id": "smoke_pellet",
@@ -165,7 +165,7 @@ CONSUMABLES = {
         "type": "throwable",
         "effect": {"escape": True},
         "rarity": "Common",
-        "description": "A quick, choking cloud that covers flight and trickery."
+        "description": "A quick, choking cloud that covers flight and trickery.",
     },
     "elixir_luck": {
         "id": "elixir_luck",
@@ -173,6 +173,6 @@ CONSUMABLES = {
         "type": "buff",
         "effect": {"LCK": 4, "duration_s": 180},
         "rarity": "Rare",
-        "description": "A whispered toast to fortune; coins seem to fall kinder."
-    }
+        "description": "A whispered toast to fortune; coins seem to fall kinder.",
+    },
 }

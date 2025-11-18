@@ -22,11 +22,7 @@ from .exploration_view import ExplorationView
 
 class AdventureSetupView(View):
     def __init__(
-        self,
-        db: DatabaseManager,
-        manager: AdventureManager,
-        interaction_user: discord.User,
-        player_rank: str
+        self, db: DatabaseManager, manager: AdventureManager, interaction_user: discord.User, player_rank: str
     ):
         super().__init__(timeout=None)
         self.db = db
@@ -55,11 +51,7 @@ class AdventureSetupView(View):
         self.add_item(self.location_select)
 
         # Back Button
-        self.back_btn = Button(
-            label="Return to Ledger",
-            style=discord.ButtonStyle.grey,
-            row=1
-        )
+        self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=1)
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
 
@@ -78,12 +70,7 @@ class AdventureSetupView(View):
         loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
 
         # 1. Start the adventure in DB
-        await asyncio.to_thread(
-            self.manager.start_adventure,
-            interaction.user.id,
-            loc_id,
-            duration_minutes=-1
-        )
+        await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, duration_minutes=-1)
 
         # 2. Fetch data for the next view
         stats_json = await asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
@@ -94,19 +81,15 @@ class AdventureSetupView(View):
         # 3. Initial Log
         initial_log = [
             f"You step beyond the walls into **{loc_data['name']}**.",
-            "The air shifts. You are now in the wilds."
+            "The air shifts. You are now in the wilds.",
         ]
 
         # 4. Build Embed
-        embed = AdventureEmbeds.build_exploration_embed(
-            loc_id, initial_log, player_stats, vitals, session_row
-        )
+        embed = AdventureEmbeds.build_exploration_embed(loc_id, initial_log, player_stats, vitals, session_row)
 
         # 5. Transition to Exploration View
         # active_monster defaults to None for new adventures
         view = ExplorationView(
-            self.db, self.manager, loc_id, initial_log,
-            self.interaction_user, player_stats,
-            active_monster=None
+            self.db, self.manager, loc_id, initial_log, self.interaction_user, player_stats, active_monster=None
         )
         await interaction.edit_original_response(embed=embed, view=view)

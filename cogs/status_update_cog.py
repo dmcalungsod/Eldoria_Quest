@@ -37,6 +37,7 @@ STAT_COSTS = {
 STAT_EXP_THRESHOLD = 100
 # --- END NEW ---
 
+
 # --- NEW HELPER FUNCTION ---
 def _make_progress_bar(current: float, max_val: int, bar_length: int = 10) -> str:
     """Generates a text-based progress bar."""
@@ -45,6 +46,8 @@ def _make_progress_bar(current: float, max_val: int, bar_length: int = 10) -> st
     filled_length = int(percentage * bar_length)
     bar = "█" * filled_length + "─" * (bar_length - filled_length)
     return f"[{bar}] {math.floor(current)}/{max_val}"
+
+
 # --- END NEW HELPER FUNCTION ---
 
 
@@ -90,9 +93,7 @@ class StatusUpdateView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your status.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your status.", ephemeral=True)
             return False
         return True
 
@@ -176,9 +177,7 @@ class StatusUpdateView(View):
         stat = interaction.data["custom_id"].split("_")[-1]
         cost = STAT_COSTS[stat]
 
-        success, error_msg, new_vestige = await asyncio.to_thread(
-            self._execute_stat_increase, stat, cost
-        )
+        success, error_msg, new_vestige = await asyncio.to_thread(self._execute_stat_increase, stat, cost)
 
         if not success:
             await interaction.followup.send(f"{E.ERROR} {error_msg}", ephemeral=True)
@@ -188,15 +187,11 @@ class StatusUpdateView(View):
         self.player_data["vestige_pool"] = new_vestige
 
         # --- Re-fetch stats_row for updated JSON ---
-        new_stats_row = await asyncio.to_thread(
-            self.db.get_player_stats_row, self.interaction_user.id
-        )
+        new_stats_row = await asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id)
 
         # Rebuild UI
         new_embed = self.build_status_embed(self.player_data, self.player_stats, new_stats_row)
-        new_view = StatusUpdateView(
-            self.db, self.interaction_user, self.player_data, self.player_stats, new_stats_row
-        )
+        new_view = StatusUpdateView(self.db, self.interaction_user, self.player_data, self.player_stats, new_stats_row)
 
         # Preserve callback on back button
         new_view.back_button.callback = self.back_button.callback

@@ -8,6 +8,7 @@ import sqlite3
 
 DB_NAME = "EQ_Game.db"
 
+
 def update_schema():
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
@@ -33,6 +34,7 @@ def update_schema():
     conn.commit()
     conn.close()
     print("--- Adventure Schema Update Complete ---")
+
 
 if __name__ == "__main__":
     update_schema()

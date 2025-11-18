@@ -25,7 +25,6 @@ class InventoryView(View):
         db_manager: DatabaseManager,
         interaction_user: discord.User,
         previous_view_callback,
-
         previous_view_label="Return",
     ):
         super().__init__(timeout=None)
@@ -40,31 +39,12 @@ class InventoryView(View):
         self.previous_view_label = previous_view_label
 
         # --- Dropdowns ---
-        self.equip_select = Select(
-            placeholder="Equip gear...",
-            min_values=1,
-            max_values=1,
-            row=0
-        )
-        self.unequip_select = Select(
-            placeholder="Remove equipped gear...",
-            min_values=1,
-            max_values=1,
-            row=1
-        )
-        self.use_select = Select(
-            placeholder="Use a provision...",
-            min_values=1,
-            max_values=1,
-            row=2
-        )
+        self.equip_select = Select(placeholder="Equip gear...", min_values=1, max_values=1, row=0)
+        self.unequip_select = Select(placeholder="Remove equipped gear...", min_values=1, max_values=1, row=1)
+        self.use_select = Select(placeholder="Use a provision...", min_values=1, max_values=1, row=2)
 
         # --- Back Button ---
-        self.back_button = Button(
-            label=self.previous_view_label,
-            style=discord.ButtonStyle.secondary,
-            row=3
-        )
+        self.back_button = Button(label=self.previous_view_label, style=discord.ButtonStyle.secondary, row=3)
 
         # Populate selects based on inventory
         self._populate_selects()
@@ -110,7 +90,7 @@ class InventoryView(View):
                         discord.SelectOption(
                             label=label,
                             value=value,
-                            emoji="🛡️"  # Equipped gear
+                            emoji="🛡️",  # Equipped gear
                         )
                     )
                 else:
@@ -118,30 +98,21 @@ class InventoryView(View):
                         discord.SelectOption(
                             label=label,
                             value=value,
-                            emoji="⚔️"  # Equipable gear
+                            emoji="⚔️",  # Equipable gear
                         )
                     )
 
             # --- Consumables ---
             elif item_type == "consumable":
                 label = f"{item['item_name']} (x{item['count']})"
-                use_options.append(
-                    discord.SelectOption(
-                        label=label,
-                        value=value,
-                        emoji="🧪"
-                    )
-                )
+                use_options.append(discord.SelectOption(label=label, value=value, emoji="🧪"))
 
         # Equip Dropdown
         if equip_options:
             self.equip_select.options = equip_options
             self.equip_select.disabled = False
         else:
-            self.equip_select.add_option(
-                label="No gear available to equip.",
-                value="disabled"
-            )
+            self.equip_select.add_option(label="No gear available to equip.", value="disabled")
             self.equip_select.disabled = True
 
         # Unequip Dropdown
@@ -149,10 +120,7 @@ class InventoryView(View):
             self.unequip_select.options = unequip_options
             self.unequip_select.disabled = False
         else:
-            self.unequip_select.add_option(
-                label="No gear currently equipped.",
-                value="disabled"
-            )
+            self.unequip_select.add_option(label="No gear currently equipped.", value="disabled")
             self.unequip_select.disabled = True
 
         # Consumable Dropdown
@@ -160,10 +128,7 @@ class InventoryView(View):
             self.use_select.options = use_options
             self.use_select.disabled = False
         else:
-            self.use_select.add_option(
-                label="No provisions available.",
-                value="disabled"
-            )
+            self.use_select.add_option(label="No provisions available.", value="disabled")
             self.use_select.disabled = True
 
     # ------------------------------------------------------------------
@@ -172,10 +137,7 @@ class InventoryView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "These supplies do not belong to you.",
-                ephemeral=True
-            )
+            await interaction.response.send_message("These supplies do not belong to you.", ephemeral=True)
             return False
         return True
 
@@ -187,11 +149,7 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.equip_select.values[0])
 
-        success, message = await asyncio.to_thread(
-            self.eq_manager.equip_item,
-            self.interaction_user.id,
-            inv_db_id
-        )
+        success, message = await asyncio.to_thread(self.eq_manager.equip_item, self.interaction_user.id, inv_db_id)
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -200,11 +158,7 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.unequip_select.values[0])
 
-        success, message = await asyncio.to_thread(
-            self.eq_manager.unequip_item,
-            self.interaction_user.id,
-            inv_db_id
-        )
+        success, message = await asyncio.to_thread(self.eq_manager.unequip_item, self.interaction_user.id, inv_db_id)
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -213,11 +167,7 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_db_id = int(self.use_select.values[0])
 
-        success, message = await asyncio.to_thread(
-            self.con_manager.use_item,
-            self.interaction_user.id,
-            inv_db_id
-        )
+        success, message = await asyncio.to_thread(self.con_manager.use_item, self.interaction_user.id, inv_db_id)
 
         await interaction.followup.send(message, ephemeral=True)
         await self._refresh_view(interaction)
@@ -227,24 +177,10 @@ class InventoryView(View):
     # ------------------------------------------------------------------
 
     async def _refresh_view(self, interaction: discord.Interaction):
-        items = await asyncio.to_thread(
-            self.inv_manager.get_inventory,
-            self.interaction_user.id
-        )
+        items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
 
-        embed = await asyncio.to_thread(
-            build_inventory_embed,
-            items
-        )
+        embed = await asyncio.to_thread(build_inventory_embed, items)
 
-        new_view = InventoryView(
-            self.db,
-            self.interaction_user,
-            self.previous_view_callback,
-            self.previous_view_label
-        )
+        new_view = InventoryView(self.db, self.interaction_user, self.previous_view_callback, self.previous_view_label)
 
-        await interaction.edit_original_response(
-            embed=embed,
-            view=new_view
-        )
+        await interaction.edit_original_response(embed=embed, view=new_view)

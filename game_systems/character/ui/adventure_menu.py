@@ -25,6 +25,7 @@ from game_systems.player.player_stats import PlayerStats
 # Adventure Menu View
 # ============================================================
 
+
 class AdventureView(View):
     """Character Menu → Adventure Menu."""
 
@@ -35,33 +36,20 @@ class AdventureView(View):
 
         # Begin Expedition
         btn_start = Button(
-            label="Begin Expedition",
-            style=discord.ButtonStyle.success,
-            custom_id="start_adv",
-            emoji="⚔️",
-            row=0
+            label="Begin Expedition", style=discord.ButtonStyle.success, custom_id="start_adv", emoji="⚔️", row=0
         )
         btn_start.callback = self.start_adventure_callback
         self.add_item(btn_start)
 
         # Guild Hall
         btn_guild = Button(
-            label="Guild Hall",
-            style=discord.ButtonStyle.primary,
-            custom_id="gh_link",
-            emoji="🏦",
-            row=1
+            label="Guild Hall", style=discord.ButtonStyle.primary, custom_id="gh_link", emoji="🏦", row=1
         )
         btn_guild.callback = self.guild_hall_callback
         self.add_item(btn_guild)
 
         # Return to Character Menu
-        btn_back = Button(
-            label="Return — Character",
-            style=discord.ButtonStyle.grey,
-            custom_id="back_prof",
-            row=2
-        )
+        btn_back = Button(label="Return — Character", style=discord.ButtonStyle.grey, custom_id="back_prof", row=2)
         btn_back.callback = back_to_profile_callback
         self.add_item(btn_back)
 
@@ -87,16 +75,12 @@ class AdventureView(View):
 
         if not adventure_cog:
             await interaction.response.send_message(
-                f"{E.ERROR} The adventure system is currently unavailable.",
-                ephemeral=True
+                f"{E.ERROR} The adventure system is currently unavailable.", ephemeral=True
             )
             return
 
         # Check if an adventure is already active
-        session = await asyncio.to_thread(
-            adventure_cog.manager.get_active_session,
-            self.interaction_user.id
-        )
+        session = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
 
         # --------------------------------------------------------
         # Resume existing adventure
@@ -122,20 +106,12 @@ class AdventureView(View):
             # --- END FIX ---
 
             # Fetch stats and vitals
-            stats_json = await asyncio.to_thread(
-                self.db.get_player_stats_json,
-                self.interaction_user.id
-            )
+            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
             stats = PlayerStats.from_dict(stats_json)
 
-            vitals = await asyncio.to_thread(
-                self.db.get_player_vitals,
-                self.interaction_user.id
-            )
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
 
-            embed = AdventureEmbeds.build_exploration_embed(
-                loc_id, logs, stats, vitals, session
-            )
+            embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, session)
 
             view = ExplorationView(
                 self.db,
@@ -144,7 +120,7 @@ class AdventureView(View):
                 logs,
                 self.interaction_user,
                 stats,
-                active_monster=active_monster # <-- Pass active monster
+                active_monster=active_monster,  # <-- Pass active monster
             )
 
             await interaction.edit_original_response(embed=embed, view=view)
@@ -155,10 +131,7 @@ class AdventureView(View):
         # --------------------------------------------------------
         await interaction.response.defer()
 
-        guild_member = await asyncio.to_thread(
-            self.db.get_guild_member_data,
-            self.interaction_user.id
-        )
+        guild_member = await asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id)
         rank = guild_member["rank"] if guild_member else "F"
 
         embed = discord.Embed(
@@ -167,15 +140,10 @@ class AdventureView(View):
                 "*The great gates of the city loom overhead, iron-bound and weathered by countless journeys.*\n\n"
                 "Select a destination to begin your expedition."
             ),
-            color=discord.Color.dark_green()
+            color=discord.Color.dark_green(),
         )
 
-        view = AdventureSetupView(
-            self.db,
-            adventure_cog.manager,
-            self.interaction_user,
-            rank
-        )
+        view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank)
         view.back_btn.callback = back_to_profile_callback
 
         await interaction.edit_original_response(embed=embed, view=view)

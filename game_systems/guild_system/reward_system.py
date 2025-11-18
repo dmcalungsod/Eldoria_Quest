@@ -116,7 +116,7 @@ class RewardSystem:
                     item_name=item_data["name"],
                     item_type="consumable",
                     rarity=item_data["rarity"],
-                    amount=1
+                    amount=1,
                 )
                 item_message_line = f"\n{E.ITEM_BOX} **Item Acquired:** `{item_data['name']}`"
             else:

@@ -23,12 +23,8 @@ if not os.path.exists(logs_dir):
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)  # Set to INFO or DEBUG for more details
-handler = logging.FileHandler(
-    filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w"
-)
-handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
+handler = logging.FileHandler(filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w")
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
 # --- Load Token & Guild ID ---
@@ -45,9 +41,7 @@ if GUILD_ID is None:
     print(
         "Warning: GUILD_ID not found in .env file. Slash commands will be registered globally, which can take up to an hour to update."
     )
-    logger.warning(
-        "GUILD_ID not found in .env file. Slash commands will be registered globally."
-    )
+    logger.warning("GUILD_ID not found in .env file. Slash commands will be registered globally.")
 
 
 # --- Bot Class ---
@@ -85,11 +79,7 @@ class EldoriaBot(commands.Bot):
 
         for filename in os.listdir(cogs_dir):
             # This logic automatically finds and loads your new cogs
-            if (
-                filename.endswith(".py")
-                and not filename.startswith("_")
-                and filename != "ui_helpers.py"
-            ):
+            if filename.endswith(".py") and not filename.startswith("_") and filename != "ui_helpers.py":
                 cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)

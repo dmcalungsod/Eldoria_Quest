@@ -26,12 +26,7 @@ class MonsterAI:
         if roll > 80:
             return {
                 "type": "skill",
-                "skill": {
-                    "name": "Heavy Blow",
-                    "power": 1.5,
-                    "mp_cost": 5,
-                    "desc_key": "special_hit"
-                }
+                "skill": {"name": "Heavy Blow", "power": 1.5, "mp_cost": 5, "desc_key": "special_hit"},
             }
 
         return {"type": "attack"}

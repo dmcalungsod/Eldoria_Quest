@@ -54,32 +54,17 @@ class ExplorationView(View):
         # Initialize button state based on active_monster
         label, style, emoji = self._get_button_state(self.active_monster)
 
-        self.forward_btn = Button(
-            label=label,
-            style=style,
-            emoji=emoji,
-            row=0
-        )
+        self.forward_btn = Button(label=label, style=style, emoji=emoji, row=0)
         self.forward_btn.callback = self.explore_callback
         self.add_item(self.forward_btn)
 
         # Open inventory
-        self.inventory_btn = Button(
-            label="Field Pack",
-            style=discord.ButtonStyle.secondary,
-            emoji=E.BACKPACK,
-            row=0
-        )
+        self.inventory_btn = Button(label="Field Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0)
         self.inventory_btn.callback = self.inventory_callback
         self.add_item(self.inventory_btn)
 
         # Retreat to Astraeon
-        self.withdraw_btn = Button(
-            label="Withdraw",
-            style=discord.ButtonStyle.danger,
-            emoji="⬅️",
-            row=0
-        )
+        self.withdraw_btn = Button(label="Withdraw", style=discord.ButtonStyle.danger, emoji="⬅️", row=0)
         self.withdraw_btn.callback = self.leave_callback
         self.add_item(self.withdraw_btn)
 
@@ -105,9 +90,7 @@ class ExplorationView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
@@ -123,9 +106,7 @@ class ExplorationView(View):
         await interaction.response.defer()
 
         # 1. Run step simulation
-        result = await asyncio.to_thread(
-            self.manager.simulate_adventure_step, interaction.user.id
-        )
+        result = await asyncio.to_thread(self.manager.simulate_adventure_step, interaction.user.id)
 
         sequence = result.get("sequence", [])
         is_dead = result.get("dead", False)
@@ -135,7 +116,6 @@ class ExplorationView(View):
 
         # 2. Playback Loop
         for index, block in enumerate(sequence):
-
             # Append to log
             self.log.extend(block)
             self.log = self.log[-15:]
@@ -145,9 +125,7 @@ class ExplorationView(View):
             session_task = asyncio.to_thread(self.manager.get_active_session, interaction.user.id)
             stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
 
-            vitals, session_row, stats_json = await asyncio.gather(
-                vitals_task, session_task, stats_json_task
-            )
+            vitals, session_row, stats_json = await asyncio.gather(vitals_task, session_task, stats_json_task)
             self.player_stats = PlayerStats.from_dict(stats_json)
 
             # Parse active monster for button state
@@ -159,7 +137,7 @@ class ExplorationView(View):
                     pass
 
             # --- BUTTON STATE LOGIC ---
-            is_last_frame = (index == len(sequence) - 1)
+            is_last_frame = index == len(sequence) - 1
 
             if is_dead and is_last_frame:
                 # Dead on the last frame
@@ -185,11 +163,7 @@ class ExplorationView(View):
 
             # 4. Rebuild Embed
             embed = AdventureEmbeds.build_exploration_embed(
-                self.location_id,
-                self.log,
-                self.player_stats,
-                vitals,
-                session_row
+                self.location_id, self.log, self.player_stats, vitals, session_row
             )
 
             if is_dead and is_last_frame:
@@ -221,7 +195,7 @@ class ExplorationView(View):
             self.db,
             self.interaction_user,
             previous_view_callback=self.return_from_inventory,
-            previous_view_label="Return to Exploration"
+            previous_view_label="Return to Exploration",
         )
 
         await interaction.edit_original_response(embed=embed, view=view)
@@ -248,11 +222,7 @@ class ExplorationView(View):
         self.withdraw_btn.disabled = False
 
         embed = AdventureEmbeds.build_exploration_embed(
-            self.location_id,
-            self.log,
-            self.player_stats,
-            vitals,
-            session_row
+            self.location_id, self.log, self.player_stats, vitals, session_row
         )
 
         await interaction.edit_original_response(embed=embed, view=self)
@@ -274,7 +244,7 @@ class ExplorationView(View):
                 "You breathe the stale, comforting air of the city once more.\n\n"
                 "**You have survived.**"
             ),
-            color=discord.Color.blue()
+            color=discord.Color.blue(),
         )
 
         view = View()

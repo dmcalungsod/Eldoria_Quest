@@ -155,9 +155,7 @@ class ItemManager:
     def get_monster(self, monster_name: str):
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute(
-            "SELECT * FROM monsters WHERE name LIKE ?", ("%" + monster_name + "%",)
-        )
+        cur.execute("SELECT * FROM monsters WHERE name LIKE ?", ("%" + monster_name + "%",))
         monster = cur.fetchone()
         conn.close()
         return monster

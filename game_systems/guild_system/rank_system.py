@@ -17,39 +17,23 @@ class RankSystem:
     """
 
     RANKS = {
-        "F": {
-            "title": "Initiate",
-            "next_rank": "E",
-            "requirements": {"quests_completed": 5, "normal_kills": 10}
-        },
-        "E": {
-            "title": "Novice",
-            "next_rank": "D",
-            "requirements": {"quests_completed": 20, "elite_kills": 1}
-        },
+        "F": {"title": "Initiate", "next_rank": "E", "requirements": {"quests_completed": 5, "normal_kills": 10}},
+        "E": {"title": "Novice", "next_rank": "D", "requirements": {"quests_completed": 20, "elite_kills": 1}},
         "D": {
             "title": "Apprentice",
             "next_rank": "C",
-            "requirements": {"quests_completed": 40, "elite_kills": 3, "boss_kills": 0}
+            "requirements": {"quests_completed": 40, "elite_kills": 3, "boss_kills": 0},
         },
-        "C": {
-            "title": "Adept",
-            "next_rank": "B",
-            "requirements": {"quests_completed": 80, "boss_kills": 1}
-        },
-        "B": {
-            "title": "Veteran",
-            "next_rank": "A",
-            "requirements": {"quests_completed": 150, "boss_kills": 5}
-        },
+        "C": {"title": "Adept", "next_rank": "B", "requirements": {"quests_completed": 80, "boss_kills": 1}},
+        "B": {"title": "Veteran", "next_rank": "A", "requirements": {"quests_completed": 150, "boss_kills": 5}},
         "A": {
             "title": "Master Adventurer",
             "next_rank": "S",
-            "requirements": {"quests_completed": 300, "boss_kills": 10}
+            "requirements": {"quests_completed": 300, "boss_kills": 10},
         },
-        "S":  {"title": "Elite",   "next_rank": "SS",  "requirements": {}},
+        "S": {"title": "Elite", "next_rank": "SS", "requirements": {}},
         "SS": {"title": "Paragon", "next_rank": "SSS", "requirements": {}},
-        "SSS": {"title": "Mythic", "next_rank": None,  "requirements": {}}
+        "SSS": {"title": "Mythic", "next_rank": None, "requirements": {}},
     }
 
     def __init__(self, db_manager: DatabaseManager):
@@ -108,10 +92,7 @@ class RankSystem:
         if not self.check_promotion_eligibility(discord_id):
             return False, "You have not yet met the requirements for a promotion."
 
-        return (
-            False,
-            "Promotion requires completing a Guild Trial. Open 'Check Rank' to begin the trial."
-        )
+        return (False, "Promotion requires completing a Guild Trial. Open 'Check Rank' to begin the trial.")
 
     def finalize_promotion(self, discord_id: int, new_rank: str) -> Tuple[bool, str]:
         """

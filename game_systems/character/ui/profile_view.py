@@ -33,33 +33,21 @@ class CharacterTabView(View):
 
         # --- Arcane Ledger ---
         btn_abilities = Button(
-            label="Arcane Ledger",
-            style=discord.ButtonStyle.primary,
-            custom_id="abilities",
-            emoji="📜",
-            row=0
+            label="Arcane Ledger", style=discord.ButtonStyle.primary, custom_id="abilities", emoji="📜", row=0
         )
         btn_abilities.callback = self.abilities_callback
         self.add_item(btn_abilities)
 
         # --- Expedition / Adventure ---
         btn_adventure = Button(
-            label="Expeditions",
-            style=discord.ButtonStyle.success,
-            custom_id="adventure",
-            emoji="🗺️",
-            row=0
+            label="Expeditions", style=discord.ButtonStyle.success, custom_id="adventure", emoji="🗺️", row=0
         )
         btn_adventure.callback = self.adventure_callback
         self.add_item(btn_adventure)
 
         # --- Status: Vestige & Vitals ---
         btn_status = Button(
-            label="Vestige & Vitals",
-            style=discord.ButtonStyle.secondary,
-            custom_id="status",
-            emoji=E.VESTIGE,
-            row=1
+            label="Vestige & Vitals", style=discord.ButtonStyle.secondary, custom_id="status", emoji=E.VESTIGE, row=1
         )
         btn_status.callback = self.status_callback
         self.add_item(btn_status)
@@ -70,10 +58,7 @@ class CharacterTabView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This profile does not belong to you.",
-                ephemeral=True
-            )
+            await interaction.response.send_message("This profile does not belong to you.", ephemeral=True)
             return False
         return True
 
@@ -86,10 +71,9 @@ class CharacterTabView(View):
         embed = discord.Embed(
             title="📜 Arcane Ledger",
             description=(
-                "*Your gathered knowledge, arms, and practiced arts.*\n"
-                "Manage inventory, equipment, and skills."
+                "*Your gathered knowledge, arms, and practiced arts.*\nManage inventory, equipment, and skills."
             ),
-            color=discord.Color.purple()
+            color=discord.Color.purple(),
         )
         view = AbilitiesView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
@@ -102,7 +86,7 @@ class CharacterTabView(View):
                 "*Beyond the city wards, the world grows darker.*\n"
                 "Begin or resume an expedition into the wilds of Eldoria."
             ),
-            color=discord.Color.dark_teal()
+            color=discord.Color.dark_teal(),
         )
         view = AdventureView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=embed, view=view)
@@ -113,7 +97,7 @@ class CharacterTabView(View):
         # Fetch player data and stats concurrently
         p_data, s_row = await asyncio.gather(
             asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-            asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id)
+            asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id),
         )
 
         stats = PlayerStats.from_dict(json.loads(s_row["stats_json"]))

@@ -24,21 +24,22 @@ from .ui_helpers import back_to_guild_hall_callback
 # SHOP PRICE LIST
 # ======================================================================
 SHOP_INVENTORY = {
-    "hp_potion_1": 15,      # Dewfall Tonic
-    "mp_potion_1": 15,      # Scholar's Draught
-    "antidote_basic": 25,   # Thicket Antidote
-    "smoke_pellet": 30,     # Whisper-Cloud Pellet
-    "food_ration": 10,      # Trailman's Ration
-    "hp_potion_2": 50,      # Glade Salve Vial
-    "mp_potion_2": 50,      # Lunaris Tonic
-    "strength_brew": 75,    # Captain’s Ale
-    "dex_elixir": 75,       # Starlit Tincture
+    "hp_potion_1": 15,  # Dewfall Tonic
+    "mp_potion_1": 15,  # Scholar's Draught
+    "antidote_basic": 25,  # Thicket Antidote
+    "smoke_pellet": 30,  # Whisper-Cloud Pellet
+    "food_ration": 10,  # Trailman's Ration
+    "hp_potion_2": 50,  # Glade Salve Vial
+    "mp_potion_2": 50,  # Lunaris Tonic
+    "strength_brew": 75,  # Captain’s Ale
+    "dex_elixir": 75,  # Starlit Tincture
 }
 
 
 # ======================================================================
 # SHOP VIEW
 # ======================================================================
+
 
 class ShopView(View):
     """
@@ -148,10 +149,7 @@ class ShopView(View):
         with self.db.get_connection() as conn:
             cur = conn.cursor()
 
-            cur.execute(
-                "SELECT aurum FROM players WHERE discord_id = ?",
-                (self.interaction_user.id,)
-            )
+            cur.execute("SELECT aurum FROM players WHERE discord_id = ?", (self.interaction_user.id,))
             player_data = cur.fetchone()
 
             if not player_data or player_data["aurum"] < price:
@@ -163,10 +161,7 @@ class ShopView(View):
 
             new_aurum = player_data["aurum"] - price
 
-            cur.execute(
-                "UPDATE players SET aurum = ? WHERE discord_id = ?",
-                (new_aurum, self.interaction_user.id)
-            )
+            cur.execute("UPDATE players SET aurum = ? WHERE discord_id = ?", (new_aurum, self.interaction_user.id))
 
         return (True, item_data, new_aurum)
 
@@ -179,9 +174,7 @@ class ShopView(View):
         item_key, price_str = interaction.data["values"][0].split(":")
         price = int(price_str)
 
-        success, result, new_aurum = await asyncio.to_thread(
-            self._execute_purchase, item_key, price
-        )
+        success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key, price)
 
         if not success:
             final_aurum = self.current_aurum
@@ -202,10 +195,7 @@ class ShopView(View):
             )
 
             status_name = "Requisition Complete"
-            status_value = (
-                f"{E.CHECK} Secured **1× {item_data['name']}** "
-                f"for **{price} {E.AURUM}**."
-            )
+            status_value = f"{E.CHECK} Secured **1× {item_data['name']}** for **{price} {E.AURUM}**."
 
         # ------------------------------------------------------------------
         # REBUILD UI
@@ -235,10 +225,12 @@ class ShopView(View):
 # COG LOADER
 # ======================================================================
 
+
 class ShopCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db = DatabaseManager()
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ShopCog(bot))

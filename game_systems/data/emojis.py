@@ -74,6 +74,7 @@ RARITY_COLORS = {
 }
 ANSI_RESET = "\u001b[0m"
 
+
 def get_rarity_ansi(rarity_name: str, text: str) -> str:
     """Wraps text in ANSI color codes for a given rarity."""
     if not rarity_name:

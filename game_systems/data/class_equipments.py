@@ -42,7 +42,7 @@ SLOTS = {
         "offhand_dagger",
         "bow",
         "leather_hood",
-        "rogue_armor", # <--- CHANGED
+        "rogue_armor",  # <--- CHANGED
         "medium_gloves",
         "medium_legs",
         "medium_boots",
@@ -102,7 +102,7 @@ STAT_BUDGETS = {
     # -- Armor --
     "heavy_armor": {"END": 0.8, "STR": 0.2},
     "medium_armor": {"END": 0.5, "AGI": 0.5},
-    "rogue_armor": {"AGI": 0.6, "END": 0.4}, # <--- ADDED: Rogue Armor budget (High Agility)
+    "rogue_armor": {"AGI": 0.6, "END": 0.4},  # <--- ADDED: Rogue Armor budget (High Agility)
     "robe": {"END": 0.5, "MAG": 0.5},
     "vestments": {"END": 0.6, "MAG": 0.4},
     # -- Helmets --
@@ -146,7 +146,6 @@ for class_name in CLASSES:
     class_id = CLASSES.index(class_name) + 1
 
     for rarity_name, rarity_data in RARITY_DATA.items():
-
         level = rarity_data["level"]
         multiplier = rarity_data["mult"]
         name_prefix = rarity_data["name"]
@@ -156,7 +155,6 @@ for class_name in CLASSES:
         total_stat_budget = ceil(level * multiplier)
 
         for slot in SLOTS[class_name]:
-
             # Get the stat distribution for this slot
             budget = STAT_BUDGETS.get(slot)
             if not budget:
@@ -182,9 +180,7 @@ for class_name in CLASSES:
             for stat, percentage in budget.items():
                 if stat == "MP_MULT":
                     # Special case: Add flat MP based on a multiplier of the budget
-                    stats_bonus["MP"] = ceil(
-                        total_stat_budget * percentage * 3
-                    )  # 3 is an arbitrary value, feels good
+                    stats_bonus["MP"] = ceil(total_stat_budget * percentage * 3)  # 3 is an arbitrary value, feels good
                 else:
                     # Normal stat
                     stats_bonus[stat] = ceil(total_stat_budget * percentage)

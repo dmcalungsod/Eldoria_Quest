@@ -45,11 +45,11 @@ class DamageFormula:
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
 
-        event_type = "hit" # Default event
+        event_type = "hit"  # Default event
 
         if is_crit:
             damage = int(damage * 1.5)
-            event_type = "crit" # --- NEW: Set event type
+            event_type = "crit"  # --- NEW: Set event type
 
         return max(1, damage), is_crit, event_type
 
@@ -107,19 +107,17 @@ class DamageFormula:
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
 
-        event_type = "hit" # Default event
+        event_type = "hit"  # Default event
 
         if is_crit:
             damage = int(damage * 1.5)
-            event_type = "crit" # --- NEW: Set event type
+            event_type = "crit"  # --- NEW: Set event type
 
         return max(1, damage), is_crit, event_type
 
     # --- THIS METHOD IS MODIFIED ---
     @staticmethod
-    def player_heal(
-        player_stats, current_hp: int, skill_data: dict, skill_level: int
-    ) -> Tuple[int, int, str]:
+    def player_heal(player_stats, current_hp: int, skill_data: dict, skill_level: int) -> Tuple[int, int, str]:
         """
         Calculates healing from a player's skill.
         Returns: (amount_healed: int, new_hp: int, event_type: str)
@@ -171,11 +169,11 @@ class DamageFormula:
         damage = int(base_damage * variance)
 
         is_crit = random.random() < 0.05
-        event_type = "hit" # Default event
+        event_type = "hit"  # Default event
 
         if is_crit:
             damage = int(damage * 1.5)
-            event_type = "crit" # --- NEW: Set event type
+            event_type = "crit"  # --- NEW: Set event type
 
         return max(1, damage), is_crit, event_type
 
