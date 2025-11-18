@@ -38,6 +38,7 @@ class DamageFormula:
         monster_def = monster.get("DEF", 0)
 
         # --- IMPROVED DEFENSE SCALING ---
+        # Defense now reduces damage based on the formula: DEF * (0.3 + 0.2 * min(1, DEF/100))
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))
         base_damage = max(1, attack_power - defense_reduction)
 
@@ -139,8 +140,8 @@ class DamageFormula:
 
         total_heal = final_base_heal + magic_bonus
 
-        # --- HEALING CAP ---
-        max_heal_percentage = 0.5  # Max 50% of HP in one heal
+        # --- HEALING CAP: Max 50% of HP in one heal ---
+        max_heal_percentage = 0.5
         total_heal = min(total_heal, max_hp * max_heal_percentage)
 
         variance = random.uniform(0.9, 1.1)

@@ -26,6 +26,7 @@ SCROLL = "📜"
 QUEST_SCROLL = "📜"  # Alias for SCROLL
 MAP = "🗺️"
 EXCHANGE = "🔄"
+PLAYER = "👤"  # <-- FIX: Added the missing PLAYER icon for Adventurer Status
 
 # Combat
 COMBAT = "⚔️"
