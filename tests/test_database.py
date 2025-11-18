@@ -5,36 +5,38 @@ Tests all database operations including players, inventory, quests, and combat.
 SAFE: Uses temporary test database, never touches production data.
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import sqlite3
-import json
 import tempfile
-from database.database_manager import DatabaseManager, DATABASE_NAME
+
 from database.create_database import create_tables
+from database.database_manager import DATABASE_NAME, DatabaseManager
 from database.populate_database import main as populate_db
 
 TEST_DB_PATH = None
 ORIGINAL_DB_PATH = None
 
+
 def setup_test_database():
     """Create a temporary test database."""
     global TEST_DB_PATH, ORIGINAL_DB_PATH
-    import database.database_manager as db_manager
     import database.create_database as db_create
+    import database.database_manager as db_manager
     import database.populate_database as db_populate
-    
+
     TEST_DB_PATH = tempfile.mktemp(suffix=".db")
     ORIGINAL_DB_PATH = DATABASE_NAME
-    
+
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
     db_populate.DATABASE_NAME = TEST_DB_PATH
-    DatabaseManager.__init__ = lambda self: setattr(self, 'db_name', TEST_DB_PATH)
-    
+    DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
+
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
+
 
 def cleanup_test_database():
     """Remove temporary test database."""
@@ -42,6 +44,7 @@ def cleanup_test_database():
     if TEST_DB_PATH and os.path.exists(TEST_DB_PATH):
         os.remove(TEST_DB_PATH)
         print(f"✓ Removed temporary test database: {TEST_DB_PATH}")
+
 
 def test_database_creation():
     print("\n=== Testing Database Creation ===")
@@ -53,6 +56,7 @@ def test_database_creation():
         print(f"✗ Database creation failed: {e}")
         return False
 
+
 def test_database_population():
     print("\n=== Testing Database Population ===")
     try:
@@ -63,11 +67,12 @@ def test_database_population():
         print(f"✗ Database population failed: {e}")
         return False
 
+
 def test_player_operations():
     print("\n=== Testing Player Operations ===")
     db = DatabaseManager()
     test_discord_id = 999999999
-    
+
     try:
         if db.player_exists(test_discord_id):
             conn = db.connect()
@@ -83,9 +88,9 @@ def test_player_operations():
             "DEX": {"base": 10, "bonus": 0},
             "AGI": {"base": 10, "bonus": 0},
             "MAG": {"base": 10, "bonus": 0},
-            "LCK": {"base": 10, "bonus": 0}
+            "LCK": {"base": 10, "bonus": 0},
         }
-        
+
         db.create_player(
             discord_id=test_discord_id,
             name="TestPlayer",
@@ -94,21 +99,23 @@ def test_player_operations():
             initial_hp=100,
             initial_mp=20,
             race="Human",
-            gender="Male"
+            gender="Male",
         )
         print("✓ Player created successfully")
-        
+
         player = db.get_player(test_discord_id)
         assert player is not None, "Player not found"
         assert player["name"] == "TestPlayer"
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Player operations failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def test_context_manager():
     print("\n=== Testing Context Manager ===")
@@ -124,6 +131,7 @@ def test_context_manager():
     except Exception as e:
         print(f"✗ Context manager test failed: {e}")
         return False
+
 
 def cleanup_test_data():
     print("\n=== Cleaning Up Test Data ===")
@@ -142,20 +150,21 @@ def cleanup_test_data():
         print(f"✗ Cleanup failed: {e}")
         return False
 
+
 def run_all_tests():
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ELDORIA QUEST - DATABASE TEST SUITE")
-    print("="*60)
-    
+    print("=" * 60)
+
     setup_test_database()
-    
+
     tests = [
         ("Database Creation", test_database_creation),
         ("Database Population", test_database_population),
         ("Context Manager", test_context_manager),
         ("Player Operations", test_player_operations),
     ]
-    
+
     results = []
     for test_name, test_func in tests:
         try:
@@ -164,21 +173,22 @@ def run_all_tests():
         except Exception as e:
             print(f"\n✗ {test_name} crashed: {e}")
             results.append((test_name, False))
-    
+
     cleanup_test_data()
     cleanup_test_database()
-    
+
     passed = sum(1 for _, result in results if result)
     total = len(results)
-    
+
     for test_name, result in results:
         status = "✓ PASS" if result else "✗ FAIL"
         print(f"{status}: {test_name}")
-    
+
     print(f"\nTotal: {passed}/{total} tests passed")
-    print("="*60 + "\n")
-    
+    print("=" * 60 + "\n")
+
     return passed == total
+
 
 if __name__ == "__main__":
     success = run_all_tests()
