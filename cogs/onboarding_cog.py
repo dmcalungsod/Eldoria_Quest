@@ -4,23 +4,23 @@ onboarding_cog.py
 Handles the /start command and the new player onboarding flow.
 """
 
+import asyncio
 from datetime import datetime
+
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ui import View, Button
-import asyncio
+from discord.ui import Button, View
 
+import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.player.player_creator import PlayerCreator
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 from game_systems.data.messages import WELCOME_MESSAGE, WELCOME_TITLE
 from game_systems.data.stat_descriptions import STAT_DESCRIPTIONS
-import game_systems.data.emojis as E
+from game_systems.player.player_creator import PlayerCreator
 
 # --- Handoff Import ---
 from .ui_helpers import back_to_profile_callback
-
 
 # ======================================================================
 # ONBOARDING VIEWS
@@ -140,16 +140,16 @@ class ClassDetailView(View):
 
     async def create_button_callback(self, interaction: discord.Interaction):
         await interaction.response.defer() # Defer immediately
-        
+
         # --- ASYNC FIX ---
         success, message = await asyncio.to_thread(
             self.creator.create_player,
-            interaction.user.id, 
-            interaction.user.display_name, 
+            interaction.user.id,
+            interaction.user.display_name,
             self.class_id
         )
         # --- END FIX ---
-        
+
         if success:
             welcome_title = (
                 f"Welcome, {interaction.user.display_name}, to Astraeon City."
@@ -233,7 +233,7 @@ class CharacterMenuView(View):
 
     async def register_button_callback(self, interaction: discord.Interaction):
         await interaction.response.defer() # Defer immediately
-        
+
         discord_id = interaction.user.id
         join_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -243,7 +243,7 @@ class CharacterMenuView(View):
             self._execute_guild_registration, discord_id, join_date
         )
         # --- END FIX ---
-        
+
         # This callback is async, so we can await it
         await back_to_profile_callback(interaction, is_new_message=False)
 
@@ -263,11 +263,11 @@ class OnboardingCog(commands.Cog):
         """
         The main entry point for new players.
         """
-        
+
         # --- ASYNC FIX ---
         player_exists = await asyncio.to_thread(self.db.player_exists, interaction.user.id)
         # --- END FIX ---
-        
+
         if player_exists:
             await interaction.response.defer()
             await back_to_profile_callback(interaction, is_new_message=True)
