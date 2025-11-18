@@ -253,7 +253,7 @@ class DatabaseManager:
     def get_active_boosts(self) -> List[Dict[str, Any]]:
         """
         Fetches all active (non-expired) global boosts.
-        Returns a list of dictionaries, 
+        Returns a list of dictionaries,
         e.g., [{"boost_key": "exp_boost", "multiplier": 2.0, "end_time": "..."}]
         """
         boosts = []

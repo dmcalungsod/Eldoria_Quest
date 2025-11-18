@@ -274,7 +274,7 @@ class QuestSystem:
         # Fetch progress and requirements
         cur.execute(
             """
-            SELECT pq.progress, q.objectives 
+            SELECT pq.progress, q.objectives
             FROM player_quests pq
             JOIN quests q ON pq.quest_id = q.id
             WHERE pq.discord_id = ? AND pq.quest_id = ? AND pq.status = 'in_progress'

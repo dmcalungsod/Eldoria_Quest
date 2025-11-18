@@ -5,8 +5,9 @@ Handles adventurer rank progression and promotions based on the formal
 Guild Rank System requirements.
 """
 
-from database.database_manager import DatabaseManager
 from typing import Dict, Optional, Tuple
+
+from database.database_manager import DatabaseManager
 
 
 class RankSystem:

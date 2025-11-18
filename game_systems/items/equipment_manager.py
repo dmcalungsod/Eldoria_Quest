@@ -207,7 +207,7 @@ class EquipmentManager:
 
         cur.execute(
             """
-            SELECT id FROM inventory 
+            SELECT id FROM inventory
             WHERE discord_id = ? AND slot = ? AND equipped = 1
         """,
             (discord_id, slot_to_equip),

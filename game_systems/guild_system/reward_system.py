@@ -84,7 +84,7 @@ class RewardSystem:
         # Update Merit
         cur.execute(
             """
-            UPDATE guild_members 
+            UPDATE guild_members
             SET merit_points = merit_points + ?,
                 quests_completed = quests_completed + 1
             WHERE discord_id = ?
