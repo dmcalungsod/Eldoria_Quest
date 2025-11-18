@@ -238,7 +238,8 @@ class CharacterMenuView(View):
         join_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # --- ASYNC FIX ---
-        success = await asyncio.to_thread(
+        # We don't need the return value here, so we just await it
+        await asyncio.to_thread(
             self._execute_guild_registration, discord_id, join_date
         )
         # --- END FIX ---

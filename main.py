@@ -7,6 +7,10 @@ import asyncio
 import logging
 import traceback
 
+# --- Import Database Functions at Top Level ---
+from database.create_database import create_tables
+from database.populate_database import main as populate_db
+
 # --- Path Configuration ---
 # This ensures that the bot can find your 'core' modules
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -131,9 +135,6 @@ class EldoriaBot(commands.Bot):
         print("-------------------------------------------------")
         logger.info(f"Bot '{self.user.name}' is online and ready.")
 
-
-from database.create_database import create_tables
-from database.populate_database import main as populate_db
 
 # --- Main Entry Point ---
 if __name__ == "__main__":

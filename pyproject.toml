@@ -7,7 +7,8 @@ target-version = "py310"
 [tool.ruff.lint]
 # E: Error, F: Pyflakes, I: Import Sorting, W: Warning
 select = ["E", "F", "I", "W"]
-ignore = []
+# Ignore E501 (Line too long) as narrative text often exceeds limits
+ignore = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"

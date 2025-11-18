@@ -154,7 +154,7 @@ class ExplorationView(View):
             if session_row and session_row["active_monster_json"]:
                 try:
                     current_monster = json.loads(session_row["active_monster_json"])
-                except:
+                except Exception:
                     pass
             
             # --- BUTTON STATE LOGIC ---
@@ -237,7 +237,7 @@ class ExplorationView(View):
         if session_row and session_row["active_monster_json"]:
             try:
                 current_monster = json.loads(session_row["active_monster_json"])
-            except:
+            except Exception:
                 pass
         
         self._update_forward_button(current_monster)

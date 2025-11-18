@@ -121,7 +121,7 @@ class AdventureView(View):
             if session["active_monster_json"]:
                 try:
                     active_monster = json.loads(session["active_monster_json"])
-                except:
+                except Exception:
                     pass
             # --- END FIX ---
 

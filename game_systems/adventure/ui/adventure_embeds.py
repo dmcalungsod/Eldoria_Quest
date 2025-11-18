@@ -75,7 +75,6 @@ class AdventureEmbeds:
         # 4. Player Vitals Field
         # Using emojis for clean layout
         hp_percent = vitals['current_hp'] / max(player_stats.max_hp, 1)
-        mp_percent = vitals['current_mp'] / max(player_stats.max_mp, 1)
         
         # Simple status indicator
         status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"

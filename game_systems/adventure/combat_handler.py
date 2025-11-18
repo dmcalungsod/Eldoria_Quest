@@ -107,8 +107,10 @@ class CombatHandler:
         # 2. Parse Buffs
         for s in skills:
             if s.get("buff_data"):
-                try: s["buff_data"] = json.loads(s["buff_data"])
-                except: s["buff_data"] = {}
+                try:
+                    s["buff_data"] = json.loads(s["buff_data"])
+                except Exception:
+                    s["buff_data"] = {}
 
         # 3. Setup Wrappers
         player_wrapper = LevelUpSystem(
@@ -137,7 +139,8 @@ class CombatHandler:
     def _fetch_active_boosts(self):
         try:
             return {b["boost_key"]: b["multiplier"] for b in self.db.get_active_boosts()}
-        except: return {}
+        except Exception:
+            return {}
 
     @staticmethod
     def create_empty_battle_report():

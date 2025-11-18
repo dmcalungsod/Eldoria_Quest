@@ -6,17 +6,14 @@ based on a player's gear.
 """
 
 import sqlite3
+import math
+import json
 from typing import Dict, Tuple
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 from game_systems.data.class_data import CLASSES
-
-# --- NEW IMPORTS ---
 from game_systems.data.skills_data import SKILLS
-import json
-
-# --- END IMPORTS ---
 
 
 class EquipmentManager:
@@ -85,7 +82,6 @@ class EquipmentManager:
                 bonuses[stat] = item_row[key]
         return bonuses
 
-    # --- THIS FUNCTION IS HEAVILY MODIFIED ---
     def recalculate_player_stats(self, discord_id: int) -> PlayerStats:
         """
         Recalculates a player's total stats based on equipped items AND passive skills.
@@ -166,9 +162,6 @@ class EquipmentManager:
                             current_stat_total = stats.luck
 
                         # Calculate the bonus
-                        # (e.g., 10% * 0.1 * level) = 1% per level
-                        # This scaling might be TOO strong, but let's test it.
-                        # Let's do: (BasePercent * SkillLevel)
                         total_bonus_percent = bonus_percent * skill_level
                         bonus_amount = math.ceil(
                             current_stat_total * total_bonus_percent
@@ -181,8 +174,6 @@ class EquipmentManager:
 
         conn.close()
         return stats
-
-    # --- END OF MODIFICATION ---
 
     def equip_item(self, discord_id: int, inventory_db_id: int) -> Tuple[bool, str]:
         """
