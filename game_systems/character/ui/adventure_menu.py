@@ -36,20 +36,24 @@ class AdventureView(View):
 
         # Begin Expedition
         btn_start = Button(
-            label="Begin Expedition", style=discord.ButtonStyle.success, custom_id="start_adv", emoji="⚔️", row=0
+            label="Begin Expedition",
+            style=discord.ButtonStyle.success,
+            custom_id="start_adv",
+            emoji="⚔️",
+            row=0,
         )
         btn_start.callback = self.start_adventure_callback
         self.add_item(btn_start)
 
-        # Guild Hall
-        btn_guild = Button(
-            label="Guild Hall", style=discord.ButtonStyle.primary, custom_id="gh_link", emoji="🏦", row=1
-        )
-        btn_guild.callback = self.guild_hall_callback
-        self.add_item(btn_guild)
+        # REMOVED: Guild Hall button was here (Moved to ProfileTabView)
 
         # Return to Character Menu
-        btn_back = Button(label="Return — Character", style=discord.ButtonStyle.grey, custom_id="back_prof", row=2)
+        btn_back = Button(
+            label="Return — Character",
+            style=discord.ButtonStyle.grey,
+            custom_id="back_prof",
+            row=1,  # <-- MOVED TO ROW 1
+        )
         btn_back.callback = back_to_profile_callback
         self.add_item(btn_back)
 

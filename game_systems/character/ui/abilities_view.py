@@ -29,7 +29,7 @@ class AbilitiesView(View):
 
         # Inventory Button
         btn_inv = Button(
-            label="Field Kit",
+            label="Manage Equipment",  # <-- NEW LABEL
             style=discord.ButtonStyle.secondary,
             custom_id="prof_inv",
             emoji=E.BACKPACK,
@@ -40,7 +40,7 @@ class AbilitiesView(View):
 
         # Skills Button
         btn_skills = Button(
-            label="Tome of Arts",
+            label="View Skills",  # <-- NEW LABEL
             style=discord.ButtonStyle.secondary,
             custom_id="prof_skills",
             emoji="✨",
@@ -51,7 +51,7 @@ class AbilitiesView(View):
 
         # Return Button
         btn_back = Button(
-            label="Return — Character",
+            label="Return — Profile",  # <-- NEW LABEL
             style=discord.ButtonStyle.grey,
             custom_id="back_prof",
             row=1,
@@ -124,5 +124,4 @@ class SkillsView(View):
         self.add_item(btn_back)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        # FIX: this was broken before
         return interaction.user.id == self.user.id

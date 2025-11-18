@@ -31,26 +31,49 @@ class CharacterTabView(View):
         self.db = db_manager
         self.interaction_user = interaction_user
 
-        # --- Arcane Ledger ---
-        btn_abilities = Button(
-            label="Arcane Ledger", style=discord.ButtonStyle.primary, custom_id="abilities", emoji="📜", row=0
-        )
-        btn_abilities.callback = self.abilities_callback
-        self.add_item(btn_abilities)
-
-        # --- Expedition / Adventure ---
+        # --- Expedition / Adventure (Row 0, Primary) ---
         btn_adventure = Button(
-            label="Expeditions", style=discord.ButtonStyle.success, custom_id="adventure", emoji="🗺️", row=0
+            label="Expeditions",
+            style=discord.ButtonStyle.success,
+            custom_id="adventure",
+            emoji="🗺️",
+            row=0,
         )
         btn_adventure.callback = self.adventure_callback
         self.add_item(btn_adventure)
 
-        # --- Status: Vestige & Vitals ---
+        # --- Abilities & Kit (Row 1, Primary for Character Management) ---
+        btn_abilities = Button(
+            label="Abilities & Kit",  # <-- UPDATED LABEL
+            style=discord.ButtonStyle.primary,
+            custom_id="abilities",
+            emoji=E.BACKPACK,
+            row=1,
+        )
+        btn_abilities.callback = self.abilities_callback
+        self.add_item(btn_abilities)
+
+        # --- Status: Vestige & Vitals (Row 1, Secondary) ---
         btn_status = Button(
-            label="Vestige & Vitals", style=discord.ButtonStyle.secondary, custom_id="status", emoji=E.VESTIGE, row=1
+            label="Vestige & Vitals",
+            style=discord.ButtonStyle.secondary,
+            custom_id="status",
+            emoji=E.VESTIGE,
+            row=1,
         )
         btn_status.callback = self.status_callback
         self.add_item(btn_status)
+
+        # --- Guild Hall (Row 2, New Placement for Direct Access) ---
+        btn_guild = Button(
+            label="Guild Hall",  # <-- NEW BUTTON
+            style=discord.ButtonStyle.secondary,
+            custom_id="gh_link",
+            emoji="🏦",
+            row=2,
+        )
+        btn_guild.callback = self.guild_hall_callback
+        self.add_item(btn_guild)
 
     # ------------------------------------------------------------------
     # Interaction Permissions Check
@@ -69,7 +92,7 @@ class CharacterTabView(View):
     async def abilities_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         embed = discord.Embed(
-            title="📜 Arcane Ledger",
+            title="📜 Abilities & Kit",  # <-- UPDATED TITLE
             description=(
                 "*Your gathered knowledge, arms, and practiced arts.*\nManage inventory, equipment, and skills."
             ),
@@ -109,3 +132,12 @@ class CharacterTabView(View):
         view.back_button.callback = ui_helpers.back_to_profile_callback
 
         await interaction.edit_original_response(embed=embed, view=view)
+
+    async def guild_hall_callback(self, interaction: discord.Interaction):  # <-- NEW CALLBACK
+        """Opens the Guild Hall Lobby directly."""
+
+        if not interaction.response.is_done():
+            await interaction.response.defer()
+
+        # We must call back_to_guild_hall_callback logic to handle fetching guild card data
+        await ui_helpers.back_to_guild_hall_callback(interaction)

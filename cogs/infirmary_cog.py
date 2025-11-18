@@ -15,7 +15,6 @@ Refactored to follow the one-UI policy (no ephemeral messages).
 import asyncio
 import math
 import sqlite3
-from typing import Tuple
 
 import discord
 from discord.ext import commands
@@ -125,7 +124,7 @@ class InfirmaryView(View):
     # -----------------------------------------------------------------
     # Blocking DB Transaction
     # -----------------------------------------------------------------
-    def _execute_heal_transaction(self) -> Tuple[bool, str]:
+    def _execute_heal_transaction(self) -> tuple[bool, str]:
         """
         Conducts the DB transaction verifying and applying treatment.
         Returns: (success, status_message)
@@ -173,7 +172,10 @@ class InfirmaryView(View):
             )
             conn.commit()
 
-            return True, (f"You paid {cost} {E.AURUM}. Your condition has been treated — HP & MP fully restored.")
+            return True, (
+                f"You paid {cost} {E.AURUM} for treatment. "  # <-- GRAMMAR FIX: Changed string copy
+                f"HP and MP fully restored."
+            )
 
     # -----------------------------------------------------------------
     # Heal Button Callback

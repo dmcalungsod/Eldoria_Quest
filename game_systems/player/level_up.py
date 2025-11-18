@@ -8,8 +8,6 @@ This module handles:
 - Integration with PlayerStats for recalculating derived stats (HP, MP)
 """
 
-from typing import Dict
-
 from .player_stats import PlayerStats
 
 
@@ -71,12 +69,15 @@ class LevelUpSystem:
         # --- END OF CHANGE ---
 
         # Increase the EXP required for the next level
-        self.exp_to_next = int(self.exp_to_next * 1.22)  # 22% growth rate
+        # --- LEVEL CURVE FIX: Using the derived quadratic formula ---
+        new_level = self.level
+        # R_L = 1000*L^2 - 500*L + 500
+        self.exp_to_next = int(1000 * new_level**2 - 500 * new_level + 500)
 
     # -----------------------------------------------------------
     # Serialization
     # -----------------------------------------------------------
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert all level + stat data to a dictionary for saving."""
         return {
             "level": self.level,
@@ -86,7 +87,7 @@ class LevelUpSystem:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict):
+    def from_dict(cls, data: dict):
         """Reconstruct a LevelUpSystem object from saved data."""
         stats = PlayerStats.from_dict(data["stats"])
         return cls(
