@@ -5,16 +5,32 @@ line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
-# E: Error, F: Pyflakes, I: Import Sorting, W: Warning
-select = ["E", "F", "I", "W"]
+# E: Error, F: Pyflakes, I: Import Sorting, W: Warning, UP: Modern Python features
+select = ["E", "F", "I", "W", "UP"]
 # Ignore E501 (Line too long) as narrative text often exceeds limits
-ignore = ["E501"]
+ignore = [
+    "E501",  # line-too-long
+    "F841",  # unused variable (sometimes useful in development)
+    "W503",  # line break before operator (style preference)
+]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+skip-magic-trailing-comma = false
 
 [tool.pytest.ini_options]
 # Tells pytest where to look for tests
 testpaths = ["tests"]
 python_files = "test_*.py"
+addopts = [
+    "--verbose",        # More detailed output
+    "--strict-markers", # Require marker registration
+    "--strict-config",  # Strict configuration
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: integration tests",
+]
+python_classes = "Test*"
+python_functions = "test_*"
