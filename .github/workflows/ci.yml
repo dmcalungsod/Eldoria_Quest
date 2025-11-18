@@ -47,7 +47,7 @@ jobs:
 
     # 5. Commit Changes (Only if Ruff made fixes)
     - name: Commit Ruff Fixes
-      uses: stefanzweifel/git-auto-commit-action@v5
+      uses: stefanzweifel/git-auto-commit-action@v7
       with:
         commit_message: "style: auto-fix code with Ruff"
         branch: ${{ github.head_ref }}
