@@ -41,10 +41,10 @@ def create_tables():
         gender TEXT,
         level INTEGER DEFAULT 1,
         experience INTEGER DEFAULT 0,
-        
+
         -- --- CHANGE 1: Set new default ---
         exp_to_next INTEGER DEFAULT 1000,
-        
+
         -- --- CHANGE 2: Add new Vestige pool ---
         vestige_pool INTEGER DEFAULT 0,
 
@@ -52,7 +52,7 @@ def create_tables():
         current_hp INTEGER DEFAULT 100,
         current_mp INTEGER DEFAULT 20,
         last_action_time TEXT,
-        
+
         FOREIGN KEY(class_id) REFERENCES classes(id)
     );
 
@@ -176,8 +176,8 @@ def create_tables():
         location TEXT,
         summary TEXT,
         description TEXT,
-        objectives TEXT, -- JSON
-        rewards TEXT -- JSON
+        objectives TEXT,
+        rewards TEXT
     );
 
     -- 12. Player Quests
@@ -185,14 +185,14 @@ def create_tables():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         discord_id INTEGER NOT NULL,
         quest_id INTEGER NOT NULL,
-        status TEXT NOT NULL, -- "in_progress", "completed"
-        progress TEXT, -- JSON
+        status TEXT NOT NULL,
+        progress TEXT,
 
         FOREIGN KEY(discord_id) REFERENCES players(discord_id),
         FOREIGN KEY(quest_id) REFERENCES quests(id)
     );
-    
-    -- 13. Materials (Loot Definitions)
+
+    -- 13. Materials
     CREATE TABLE IF NOT EXISTS materials (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         key_id TEXT UNIQUE,
@@ -202,7 +202,7 @@ def create_tables():
         value INTEGER DEFAULT 0
     );
 
-    -- 14. Inventory (Player Backpack)
+    -- 14. Inventory
     CREATE TABLE IF NOT EXISTS inventory (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         discord_id INTEGER NOT NULL,
@@ -214,10 +214,10 @@ def create_tables():
         item_source_table TEXT,
         count INTEGER DEFAULT 1,
         equipped INTEGER DEFAULT 0,
-        
+
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     );
-    
+
     -- 15. Adventure Sessions
     CREATE TABLE IF NOT EXISTS adventure_sessions (
         discord_id INTEGER PRIMARY KEY,
@@ -230,8 +230,8 @@ def create_tables():
         loot_collected TEXT DEFAULT '{}',
         active_monster_json TEXT DEFAULT NULL
     );
-    
-    -- 16. Skill Definitions
+
+    -- 16. Skills
     CREATE TABLE IF NOT EXISTS skills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         key_id TEXT UNIQUE,
@@ -239,27 +239,26 @@ def create_tables():
         description TEXT,
         type TEXT DEFAULT 'Active',
         class_id INTEGER,
-        
         mp_cost INTEGER DEFAULT 0,
         power_multiplier REAL DEFAULT 1.0,
         heal_power INTEGER DEFAULT 0,
-        buff_data TEXT, 
-        
+        buff_data TEXT,
+
         FOREIGN KEY(class_id) REFERENCES classes(id)
     );
-    
+
     -- 17. Player Skills
     CREATE TABLE IF NOT EXISTS player_skills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         discord_id INTEGER NOT NULL,
         skill_key TEXT NOT NULL,
         skill_level INTEGER DEFAULT 1,
-        
+
         FOREIGN KEY(discord_id) REFERENCES players(discord_id),
         FOREIGN KEY(skill_key) REFERENCES skills(key_id)
     );
 
-    -- 18. Global Boosts (for Devs)
+    -- 18. Global Boosts
     CREATE TABLE IF NOT EXISTS global_boosts (
         boost_key TEXT PRIMARY KEY,
         multiplier REAL DEFAULT 1.0,
@@ -267,9 +266,8 @@ def create_tables():
     );
     """
     )
-    
+
     # --- Robust Schema Migration ---
-    # List of new columns to add to the 'stats' table
     stat_exp_columns = [
         "str_exp REAL DEFAULT 0",
         "end_exp REAL DEFAULT 0",
@@ -279,7 +277,6 @@ def create_tables():
         "lck_exp REAL DEFAULT 0",
     ]
 
-    # Add columns to 'stats' table
     for column_def in stat_exp_columns:
         col_name = column_def.split(" ")[0]
         try:
@@ -289,9 +286,8 @@ def create_tables():
             if "duplicate column name" in str(e):
                 print(f"✔ Column '{col_name}' already exists in 'stats' table. Skipping.")
             else:
-                raise # Reraise if it's a different error
-    
-    # Add column to 'skills' table
+                raise
+
     try:
         cursor.execute("ALTER TABLE skills ADD COLUMN buff_data TEXT;")
         print("✔ Column 'buff_data' added to 'skills' table.")
@@ -299,9 +295,8 @@ def create_tables():
         if "duplicate column name" in str(e):
             print("✔ Column 'buff_data' already exists in 'skills' table. Skipping.")
         else:
-            raise # Reraise if it's a different error
-            
-    # --- NEW MIGRATION FOR SKILL EXP ---
+            raise
+
     try:
         cursor.execute("ALTER TABLE player_skills ADD COLUMN skill_exp REAL DEFAULT 0;")
         print("✔ Column 'skill_exp' added to 'player_skills' table.")
@@ -309,8 +304,7 @@ def create_tables():
         if "duplicate column name" in str(e):
             print("✔ Column 'skill_exp' already exists in 'player_skills' table. Skipping.")
         else:
-            raise # Reraise if it's a different error
-    # --- END OF NEW MIGRATION ---
+            raise
 
     conn.commit()
     conn.close()

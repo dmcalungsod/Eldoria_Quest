@@ -13,7 +13,7 @@ import json
 import sqlite3
 import asyncio
 from typing import Tuple
-import math # <-- NEW IMPORT
+import math  # <-- NEW IMPORT
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
@@ -39,10 +39,10 @@ STAT_EXP_THRESHOLD = 100
 # --- NEW HELPER FUNCTION ---
 def _make_progress_bar(current: float, max_val: int, bar_length: int = 10) -> str:
     """Generates a text-based progress bar."""
-    current = min(current, max_val) # Cap at max
+    current = min(current, max_val)
     percentage = current / max_val
     filled_length = int(percentage * bar_length)
-    bar = '█' * filled_length + '─' * (bar_length - filled_length)
+    bar = "█" * filled_length + "─" * (bar_length - filled_length)
     return f"[{bar}] {math.floor(current)}/{max_val}"
 # --- END NEW HELPER FUNCTION ---
 
@@ -62,7 +62,7 @@ class StatusUpdateView(View):
         interaction_user: discord.User,
         player_data: sqlite3.Row,
         player_stats: PlayerStats,
-        stats_row: sqlite3.Row, # <-- NEW: Receive the full stats row
+        stats_row: sqlite3.Row,
     ):
         super().__init__(timeout=None)
         self.db = db_manager
@@ -71,7 +71,7 @@ class StatusUpdateView(View):
         # Convert sqlite Row → dict so we can safely mutate values
         self.player_data = dict(player_data)
         self.player_stats = player_stats
-        self.stats_row = stats_row # <-- NEW: Store the stats row
+        self.stats_row = stats_row
         self.vestige_pool = self.player_data["vestige_pool"]
 
         # Add stat buttons
@@ -87,7 +87,6 @@ class StatusUpdateView(View):
         self.back_button.callback = back_to_profile_callback
         self.add_item(self.back_button)
 
-    # -------------------------------
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
             await interaction.response.send_message(
@@ -96,18 +95,16 @@ class StatusUpdateView(View):
             return False
         return True
 
-    # -------------------------------
     def add_stat_buttons(self):
         """Create one button per stat."""
 
         def make_btn(stat: str, row: int):
-            # FIX: Use the standard Unicode E.VESTIGE (🧬) inside the label
             return Button(
                 label=f"+1 {stat} ({STAT_COSTS[stat]} {E.VESTIGE})",
                 style=discord.ButtonStyle.secondary,
                 custom_id=f"increase_stat_{stat}",
                 disabled=self.vestige_pool < STAT_COSTS[stat],
-                emoji=None, # No longer needed
+                emoji=None,
                 row=row,
             )
 
@@ -154,7 +151,7 @@ class StatusUpdateView(View):
             # Update player table
             cur.execute(
                 """
-                UPDATE players 
+                UPDATE players
                 SET vestige_pool = ?, current_hp = ?, current_mp = ?
                 WHERE discord_id = ?
                 """,
@@ -188,40 +185,29 @@ class StatusUpdateView(View):
 
         # Update local Vestige pool
         self.player_data["vestige_pool"] = new_vestige
-        
-        # --- THIS IS THE FIX ---
-        # We must re-fetch the stats_row to get the updated stats_json
-        # (which now has the new base stat)
+
+        # --- Re-fetch stats_row for updated JSON ---
         new_stats_row = await asyncio.to_thread(
             self.db.get_player_stats_row, self.interaction_user.id
         )
-        # --- END OF FIX ---
 
         # Rebuild UI
         new_embed = self.build_status_embed(self.player_data, self.player_stats, new_stats_row)
         new_view = StatusUpdateView(
             self.db, self.interaction_user, self.player_data, self.player_stats, new_stats_row
         )
-        
-        # Manually re-assign the callback to the new view's button
+
+        # Preserve callback on back button
         new_view.back_button.callback = self.back_button.callback
         new_view.back_button.label = self.back_button.label
 
         await interaction.edit_original_response(embed=new_embed, view=new_view)
-        
-        # --- THIS IS THE LINE THAT WAS REMOVED ---
-        # await interaction.followup.send(
-        #     f"{E.CHECK} **{stat}** increased! Your vitality has been restored.",
-        #     ephemeral=True,
-        # )
-        # --- END OF REMOVAL ---
 
     # ==========================================================
     # EMBED
     # ==========================================================
     @staticmethod
     def build_status_embed(player_data, player_stats, stats_row):
-        # THIS IS YOUR NEW THEMATIC EMBED
         embed = discord.Embed(
             title="🜁 Attribute Awakening",
             description=(
@@ -243,10 +229,10 @@ class StatusUpdateView(View):
         embed.add_field(
             name="Current Attributes",
             value=formatted_stats,
-            inline=False
+            inline=False,
         )
-        
-        # --- NEW: Show Practice EXP Bars ---
+
+        # --- NEW: Practice EXP Bars ---
         practice_bars = (
             f"`STR:` {_make_progress_bar(stats_row['str_exp'], STAT_EXP_THRESHOLD)}\n"
             f"`END:` {_make_progress_bar(stats_row['end_exp'], STAT_EXP_THRESHOLD)}\n"
@@ -255,16 +241,16 @@ class StatusUpdateView(View):
             f"`MAG:` {_make_progress_bar(stats_row['mag_exp'], STAT_EXP_THRESHOLD)}\n"
             f"`LCK:` {_make_progress_bar(stats_row['lck_exp'], STAT_EXP_THRESHOLD)}"
         )
-        
+
         embed.add_field(
             name="Attribute Practice",
             value=practice_bars,
-            inline=False
+            inline=False,
         )
-        # --- END NEW ---
 
         embed.set_footer(text="Each attribute point reshapes the spirit. Choose wisely.")
         return embed
+
 
 # ==========================================================
 # COG LOADER
