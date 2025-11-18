@@ -10,18 +10,18 @@ Handles all UI Views related to the Questing System:
 Refactored to strictly adhere to ONE UI Policy and fix navigation crashes.
 """
 
-import discord
-from discord.ext import commands
-from discord.ui import View, Button, Select
 import asyncio
 
+import discord
+from discord.ext import commands
+from discord.ui import Button, Select, View
+
+import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.quest_system import QuestSystem
-import game_systems.data.emojis as E
 
 # --- Local Imports ---
-from .ui_helpers import back_to_profile_callback, back_to_guild_hall_callback
-
+from .ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
 
 # ======================================================================
 # QUEST LEDGER VIEW (READ-ONLY)
@@ -139,14 +139,14 @@ class QuestLogView(View):
             self.interaction_user.id,
             quest_id,
         )
-        
+
         # Refresh quest list
         new_active_quests = await asyncio.to_thread(
             self.quest_system.get_player_quests, self.interaction_user.id
         )
 
         embed = interaction.message.embeds[0]
-        embed.description = message 
+        embed.description = message
         embed.clear_fields()
 
         if not new_active_quests:
@@ -172,7 +172,7 @@ class QuestLogView(View):
                     value="\n".join(progress_lines) or "No objectives.",
                     inline=False,
                 )
-        
+
         if not success:
             embed.color = discord.Color.red()
             embed.title = f"{E.ERROR} Turn-In Rejected"
@@ -201,9 +201,9 @@ class QuestBoardView(View):
         self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
         self.status_message = status_message
-        
+
         # Store navigation context (Callback, Label)
-        self.parent_back_data = parent_back_data 
+        self.parent_back_data = parent_back_data
 
         # --- Quest Select ---
         self.quest_select = Select(
@@ -238,14 +238,14 @@ class QuestBoardView(View):
             style=discord.ButtonStyle.secondary,
             custom_id="back_to_guild_hall",
         )
-        
+
         # Apply parent context if it exists (persisting navigation)
         if self.parent_back_data:
             self.back_button.callback = self.parent_back_data[0]
             self.back_button.label = self.parent_back_data[1]
         else:
             self.back_button.callback = back_to_guild_hall_callback
-            
+
         self.add_item(self.back_button)
 
     # --- FIX: Added Method ---
@@ -306,7 +306,7 @@ class QuestBoardView(View):
 
         # Pass navigation context to Detail View
         view = QuestDetailView(
-            self.db, quest_id, self.quests, self.interaction_user, 
+            self.db, quest_id, self.quests, self.interaction_user,
             parent_back_data=self.parent_back_data
         )
         await interaction.edit_original_response(embed=embed, view=view)
@@ -314,18 +314,18 @@ class QuestBoardView(View):
     async def refresh_board(self, interaction: discord.Interaction, status_msg: str = None):
         """Helper to reload the board with a status message."""
         quests = await asyncio.to_thread(self.quest_system.get_available_quests, self.interaction_user.id)
-        
+
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
             description="The board is cluttered with parchment requests and sealed contracts.",
             color=discord.Color.dark_green(),
         )
-        
+
         if status_msg:
              embed.add_field(name="Update", value=status_msg, inline=False)
-             
+
         embed.add_field(name="Available Contracts", value="Select a quest from the dropdown.")
-        
+
         # Pass navigation context back
         view = QuestBoardView(self.db, quests, self.interaction_user, status_message=status_msg, parent_back_data=self.parent_back_data)
         await interaction.edit_original_response(embed=embed, view=view)
@@ -347,7 +347,7 @@ class QuestDetailView(View):
         self.quests_list = quests_list
         self.interaction_user = interaction_user
         self.quest_system = QuestSystem(self.db)
-        
+
         # Store navigation to return to the correct board state
         self.parent_back_data = parent_back_data
 
@@ -404,7 +404,7 @@ class QuestDetailView(View):
             description="The board is cluttered with parchment requests and sealed contracts.",
             color=discord.Color.dark_green(),
         )
-        
+
         if status_message:
             embed.add_field(name="Update", value=status_message, inline=False)
 
@@ -415,8 +415,8 @@ class QuestDetailView(View):
 
         # Restore the Board View with the original navigation context
         view = QuestBoardView(
-            self.db, available_quests, self.interaction_user, 
-            status_message=status_message, 
+            self.db, available_quests, self.interaction_user,
+            status_message=status_message,
             parent_back_data=self.parent_back_data
         )
         await interaction.edit_original_response(embed=embed, view=view)

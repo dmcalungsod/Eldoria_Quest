@@ -4,9 +4,10 @@ Controller for the Character UI system.
 No slash commands here; pure UI logic.
 """
 
-import discord
 from discord.ext import commands
+
 from database.database_manager import DatabaseManager
+
 
 class CharacterCog(commands.Cog):
     def __init__(self, bot: commands.Bot):

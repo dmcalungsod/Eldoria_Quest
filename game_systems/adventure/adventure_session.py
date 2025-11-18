@@ -17,9 +17,9 @@ Each inner list is rendered as one timed message in the UI.
 """
 
 import json
-import random
 import logging
-from typing import Optional, Dict, Any, List
+import random
+from typing import Any, Dict, List, Optional
 
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS

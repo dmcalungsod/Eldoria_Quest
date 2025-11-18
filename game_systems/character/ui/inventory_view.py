@@ -2,16 +2,16 @@
 game_systems/character/ui/inventory_view.py
 """
 
-import discord
 import asyncio
-from discord.ui import View, Select, Button
 
-from database.database_manager import DatabaseManager
-from game_systems.items.inventory_manager import InventoryManager
-from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.items.consumable_manager import ConsumableManager
+import discord
+from discord.ui import Button, Select, View
+
 from cogs.ui_helpers import build_inventory_embed
-import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.items.consumable_manager import ConsumableManager
+from game_systems.items.equipment_manager import EquipmentManager
+from game_systems.items.inventory_manager import InventoryManager
 
 
 class InventoryView(View):

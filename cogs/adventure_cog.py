@@ -6,8 +6,8 @@ Initializes the AdventureManager.
 No slash commands are exposed; access is handled via UI buttons.
 """
 
-import discord
 from discord.ext import commands
+
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 

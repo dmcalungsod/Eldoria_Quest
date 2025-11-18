@@ -5,20 +5,20 @@ Adventurer’s Guild Supply Depot Interface for *Eldoria Quest*.
 Refined for thematic consistency and adherence to the single-UI policy.
 """
 
-import discord
-from discord.ui import View, Button, Select
-from discord.ext import commands
 import asyncio
-from typing import Tuple, Dict, Any
+from typing import Any, Tuple
 
-from database.database_manager import DatabaseManager
-from game_systems.items.inventory_manager import InventoryManager
-from game_systems.data.consumables import CONSUMABLES
+import discord
+from discord.ext import commands
+from discord.ui import Button, Select, View
+
 import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.data.consumables import CONSUMABLES
+from game_systems.items.inventory_manager import InventoryManager
 
 # --- Local Imports ---
 from .ui_helpers import back_to_guild_hall_callback
-
 
 # ======================================================================
 # SHOP PRICE LIST

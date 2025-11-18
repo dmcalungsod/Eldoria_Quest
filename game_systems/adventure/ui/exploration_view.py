@@ -6,19 +6,20 @@ Refactored to support "Dramatic Timing", dynamic "Start Battle" button state,
 and "In Battle" disabled state for ALL buttons during animation.
 """
 
-import discord
-from discord.ui import View, Button
 import asyncio
 import json
 
+import discord
+from discord.ui import Button, View
+
+import game_systems.data.emojis as E
+from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
-from game_systems.player.player_stats import PlayerStats
 from game_systems.items.inventory_manager import InventoryManager
+from game_systems.player.player_stats import PlayerStats
 
-from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
 from .adventure_embeds import AdventureEmbeds
-import game_systems.data.emojis as E
 
 
 class ExplorationView(View):
@@ -125,16 +126,16 @@ class ExplorationView(View):
         result = await asyncio.to_thread(
             self.manager.simulate_adventure_step, interaction.user.id
         )
-        
+
         sequence = result.get("sequence", [])
         is_dead = result.get("dead", False)
-        
+
         # Animate if multiple frames (combat)
         animate = len(sequence) > 1
 
         # 2. Playback Loop
         for index, block in enumerate(sequence):
-            
+
             # Append to log
             self.log.extend(block)
             self.log = self.log[-15:]
@@ -148,7 +149,7 @@ class ExplorationView(View):
                 vitals_task, session_task, stats_json_task
             )
             self.player_stats = PlayerStats.from_dict(stats_json)
-            
+
             # Parse active monster for button state
             current_monster = None
             if session_row and session_row["active_monster_json"]:
@@ -156,7 +157,7 @@ class ExplorationView(View):
                     current_monster = json.loads(session_row["active_monster_json"])
                 except Exception:
                     pass
-            
+
             # --- BUTTON STATE LOGIC ---
             is_last_frame = (index == len(sequence) - 1)
 
@@ -164,14 +165,14 @@ class ExplorationView(View):
                 # Dead on the last frame
                 self.forward_btn.disabled = True
                 self.inventory_btn.disabled = True
-                self.withdraw_btn.disabled = False 
+                self.withdraw_btn.disabled = False
             elif animate and not is_last_frame:
                 # Mid-Battle: Disable ALL buttons
                 self.forward_btn.label = "In Battle"
                 self.forward_btn.style = discord.ButtonStyle.secondary
                 self.forward_btn.emoji = "⚔️"
                 self.forward_btn.disabled = True
-                
+
                 # Disable Field Pack and Withdraw during combat animation
                 self.inventory_btn.disabled = True
                 self.withdraw_btn.disabled = True
@@ -197,7 +198,7 @@ class ExplorationView(View):
 
             # Update Message
             await interaction.edit_original_response(embed=embed, view=self)
-            
+
             # Dramatic Pause
             if animate and not is_last_frame:
                 await asyncio.sleep(1.5)
@@ -209,7 +210,7 @@ class ExplorationView(View):
     async def inventory_callback(self, interaction: discord.Interaction):
         """Opens the Field Pack."""
         # FIX: Import from the correct game_systems path, not the cog
-        from game_systems.character.ui.inventory_view import InventoryView 
+        from game_systems.character.ui.inventory_view import InventoryView
 
         await interaction.response.defer()
 
@@ -239,9 +240,9 @@ class ExplorationView(View):
                 current_monster = json.loads(session_row["active_monster_json"])
             except Exception:
                 pass
-        
+
         self._update_forward_button(current_monster)
-        
+
         # Ensure other buttons are enabled when returning
         self.inventory_btn.disabled = False
         self.withdraw_btn.disabled = False
@@ -275,13 +276,13 @@ class ExplorationView(View):
             ),
             color=discord.Color.blue()
         )
-        
+
         view = View()
         btn = Button(label="Return to Profile", style=discord.ButtonStyle.primary)
-        
+
         async def return_callback(inter: discord.Interaction):
             await back_to_profile_callback(inter, is_new_message=False)
-            
+
         btn.callback = return_callback
         view.add_item(btn)
 

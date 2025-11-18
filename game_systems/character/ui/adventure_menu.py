@@ -5,25 +5,21 @@ Primary entry menu for the Adventure System.
 Allows players to begin new expeditions or resume ongoing ones.
 """
 
-import discord
 import asyncio
 import json
-from discord.ui import View, Button
 
-from database.database_manager import DatabaseManager
-from game_systems.player.player_stats import PlayerStats
-from game_systems.data.adventure_locations import LOCATIONS
+import discord
+from discord.ui import Button, View
+
 import game_systems.data.emojis as E
 
 # Modular imports
-from cogs.ui_helpers import (
-    back_to_profile_callback,
-    back_to_guild_hall_callback
-)
-from game_systems.adventure.ui.setup_view import AdventureSetupView
-from game_systems.adventure.ui.exploration_view import ExplorationView
+from cogs.ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
+from database.database_manager import DatabaseManager
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
-
+from game_systems.adventure.ui.exploration_view import ExplorationView
+from game_systems.adventure.ui.setup_view import AdventureSetupView
+from game_systems.player.player_stats import PlayerStats
 
 # ============================================================
 # Adventure Menu View
@@ -115,7 +111,7 @@ class AdventureView(View):
                 logs = json.loads(session["logs"])
             except Exception:
                 logs = []
-            
+
             # --- FIX: Parse active monster to update button state ---
             active_monster = None
             if session["active_monster_json"]:

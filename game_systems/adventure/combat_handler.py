@@ -9,16 +9,16 @@ Handles the heavy lifting for combat:
 """
 
 import json
-import random
 import logging
-from typing import Dict, List, Any, Tuple
+import random
+from typing import Any, Dict, Tuple
 
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.combat_phrases import CombatPhrases
 from game_systems.data.monsters import MONSTERS
-from game_systems.player.player_stats import PlayerStats
 from game_systems.player.level_up import LevelUpSystem
+from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("discord")
 
@@ -38,7 +38,7 @@ class CombatHandler:
 
             # 2. Check for Conditional Monsters (Level-based spawns)
             conditionals = location.get("conditional_monsters", [])
-            
+
             if conditionals:
                 # Fetch player level to determine eligibility
                 with self.db.get_connection() as conn:
@@ -92,14 +92,14 @@ class CombatHandler:
             # Get Class & Level
             cur.execute("SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?", (self.discord_id,))
             p_row = cur.fetchone()
-            
+
             # Get Skills
             cur.execute(
                 """SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost, 
                           s.power_multiplier, s.heal_power, s.buff_data 
                    FROM player_skills ps 
                    JOIN skills s ON ps.skill_key=s.key_id 
-                   WHERE ps.discord_id=? AND s.type='Active'""", 
+                   WHERE ps.discord_id=? AND s.type='Active'""",
                 (self.discord_id,)
             )
             skills = [dict(row) for row in cur.fetchall()]
@@ -122,7 +122,7 @@ class CombatHandler:
 
         # 4. Run Engine
         engine = CombatEngine(
-            player_wrapper, active_monster, skills, vitals["current_mp"], 
+            player_wrapper, active_monster, skills, vitals["current_mp"],
             p_row["class_id"], boosts
         )
         result = engine.run_combat_turn()
@@ -130,10 +130,10 @@ class CombatHandler:
         # 5. Update State (DB + Monster Object)
         self.db.set_player_vitals(self.discord_id, result["hp_current"], result["mp_current"])
         active_monster["HP"] = result["monster_hp"]
-        
+
         # 6. Update Report
         self._aggregate_battle_report(battle_report, result.get("turn_report", {}))
-        
+
         return result
 
     def _fetch_active_boosts(self):
@@ -145,8 +145,8 @@ class CombatHandler:
     @staticmethod
     def create_empty_battle_report():
         return {
-            "str_hits": 0, "dex_hits": 0, "mag_hits": 0, 
-            "player_crit": 0, "player_dodge": 0, "damage_taken": 0, 
+            "str_hits": 0, "dex_hits": 0, "mag_hits": 0,
+            "player_crit": 0, "player_dodge": 0, "damage_taken": 0,
             "skills_used": 0, "skill_key_used": None
         }
 

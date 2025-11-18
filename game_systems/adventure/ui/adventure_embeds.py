@@ -5,12 +5,15 @@ Handles the creation of Discord embeds for the adventure system.
 Dynamically adjusts layout based on Combat vs. Exploration state.
 """
 
-import discord
 import json
 import sqlite3
-from game_systems.player.player_stats import PlayerStats
+
+import discord
+
 import game_systems.data.emojis as E
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.player.player_stats import PlayerStats
+
 
 class AdventureEmbeds:
 
@@ -50,13 +53,13 @@ class AdventureEmbeds:
         # 3. Create Embed with FIXED HEIGHT LOG
         # We want exactly 12 lines of content to prevent UI jitter
         max_lines = 12
-        
+
         # Get the last N lines
         current_lines = log[-max_lines:] if log else ["The journey begins..."]
-        
+
         # Calculate padding needed
         padding_needed = max_lines - len(current_lines)
-        
+
         # Add invisible characters for padding to maintain height
         if padding_needed > 0:
             padding = ["\u200b"] * padding_needed
@@ -75,10 +78,10 @@ class AdventureEmbeds:
         # 4. Player Vitals Field
         # Using emojis for clean layout
         hp_percent = vitals['current_hp'] / max(player_stats.max_hp, 1)
-        
+
         # Simple status indicator
         status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
-        
+
         embed.add_field(
             name=f"Adventurer Status {status_icon}",
             value=(

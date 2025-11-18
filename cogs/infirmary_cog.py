@@ -12,17 +12,18 @@ Healing rate:
 Refactored to follow the one-UI policy (no ephemeral messages).
 """
 
-import discord
-from discord.ui import View, Button
-from discord.ext import commands
-import sqlite3
 import asyncio
-from typing import Tuple
 import math
+import sqlite3
+from typing import Tuple
 
+import discord
+from discord.ext import commands
+from discord.ui import Button, View
+
+import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
-import game_systems.data.emojis as E
 
 # --- Local Imports ---
 from .ui_helpers import back_to_guild_hall_callback
@@ -69,7 +70,7 @@ class InfirmaryView(View):
 
         self.missing_hp = max(0, self.max_hp - self.current_hp)
         self.missing_mp = max(0, self.max_mp - self.current_mp) # Calculate missing MP
-        
+
         # Cost is based on HP loss, but healing restores both
         self.heal_cost = infirmary_cost(self.missing_hp)
 
@@ -157,7 +158,7 @@ class InfirmaryView(View):
 
             missing_hp = max(0, max_hp - current_hp)
             missing_mp = max(0, max_mp - current_mp)
-            
+
             cost = infirmary_cost(missing_hp)
 
             if missing_hp <= 0 and missing_mp <= 0:
@@ -230,7 +231,7 @@ class InfirmaryView(View):
 
         missing_hp = max(0, max_hp - current_hp)
         missing_mp = max(0, max_mp - current_mp) # Calculate missing MP
-        
+
         cost = infirmary_cost(missing_hp)
 
         description = (

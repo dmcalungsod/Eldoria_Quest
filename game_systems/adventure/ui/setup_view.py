@@ -4,25 +4,28 @@ game_systems/adventure/ui/setup_view.py
 The preparation screen where players select their destination.
 """
 
-import discord
-from discord.ui import View, Select, Button
 import asyncio
+
+import discord
+from discord.ui import Button, Select, View
+
+import game_systems.data.emojis as E
+from cogs.ui_helpers import back_to_profile_callback
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
-import game_systems.data.emojis as E
 
-from .exploration_view import ExplorationView 
 from .adventure_embeds import AdventureEmbeds
-from cogs.ui_helpers import back_to_profile_callback
+from .exploration_view import ExplorationView
+
 
 class AdventureSetupView(View):
     def __init__(
-        self, 
-        db: DatabaseManager, 
-        manager: AdventureManager, 
-        interaction_user: discord.User, 
+        self,
+        db: DatabaseManager,
+        manager: AdventureManager,
+        interaction_user: discord.User,
         player_rank: str
     ):
         super().__init__(timeout=None)
@@ -50,11 +53,11 @@ class AdventureSetupView(View):
 
         self.location_select.callback = self.location_callback
         self.add_item(self.location_select)
-        
+
         # Back Button
         self.back_btn = Button(
-            label="Return to Ledger", 
-            style=discord.ButtonStyle.grey, 
+            label="Return to Ledger",
+            style=discord.ButtonStyle.grey,
             row=1
         )
         self.back_btn.callback = self.back_callback
@@ -65,7 +68,7 @@ class AdventureSetupView(View):
             await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
-        
+
     async def back_callback(self, interaction: discord.Interaction):
         await back_to_profile_callback(interaction, is_new_message=False)
 
@@ -76,9 +79,9 @@ class AdventureSetupView(View):
 
         # 1. Start the adventure in DB
         await asyncio.to_thread(
-            self.manager.start_adventure, 
-            interaction.user.id, 
-            loc_id, 
+            self.manager.start_adventure,
+            interaction.user.id,
+            loc_id,
             duration_minutes=-1
         )
 
@@ -93,7 +96,7 @@ class AdventureSetupView(View):
             f"You step beyond the walls into **{loc_data['name']}**.",
             "The air shifts. You are now in the wilds."
         ]
-        
+
         # 4. Build Embed
         embed = AdventureEmbeds.build_exploration_embed(
             loc_id, initial_log, player_stats, vitals, session_row
@@ -102,8 +105,8 @@ class AdventureSetupView(View):
         # 5. Transition to Exploration View
         # active_monster defaults to None for new adventures
         view = ExplorationView(
-            self.db, self.manager, loc_id, initial_log, 
+            self.db, self.manager, loc_id, initial_log,
             self.interaction_user, player_stats,
-            active_monster=None 
+            active_monster=None
         )
         await interaction.edit_original_response(embed=embed, view=view)

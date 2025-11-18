@@ -12,18 +12,18 @@ Handles post-battle reward distribution, including:
 All messages and logs have been rewritten for clarity and thematic consistency.
 """
 
-import random
-import logging
 import json
+import logging
+import random
 from collections import defaultdict
 
-from database.database_manager import DatabaseManager
-from game_systems.player.player_stats import PlayerStats
-from game_systems.data.materials import MATERIALS
-from game_systems.items.item_manager import item_manager
-from game_systems.data.emojis import get_rarity_ansi
-from game_systems.guild_system.rank_system import RankSystem
 import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.data.emojis import get_rarity_ansi
+from game_systems.data.materials import MATERIALS
+from game_systems.guild_system.rank_system import RankSystem
+from game_systems.items.item_manager import item_manager
+from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("discord")
 
@@ -137,7 +137,7 @@ class AdventureRewards:
     def _process_loot_and_quests(self, combat_result, quest_system, inventory_manager, session_loot, logs):
         # Use a counter to bundle items: Key = (Name, Rarity), Value = Count
         loot_bundle = defaultdict(int)
-        
+
         # RAW EXP REWARD
         exp_gain = combat_result["exp"]
         self._add_loot_to_session(session_loot, "exp", exp_gain)
@@ -183,16 +183,16 @@ class AdventureRewards:
 
         # --- GENERATE FORMATTED LOG LINES ---
         loot_lines = []
-        
+
         # 1. EXP Line
         loot_lines.append(get_rarity_ansi("Common", f"• {exp_gain} EXP"))
 
         # 2. Sort and add item lines
         # Sorting by Rarity (Common -> Mythical) then Name
         rarity_order = {"Common": 0, "Uncommon": 1, "Rare": 2, "Epic": 3, "Legendary": 4, "Mythical": 5}
-        
+
         sorted_loot = sorted(
-            loot_bundle.items(), 
+            loot_bundle.items(),
             key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1])
         )
 

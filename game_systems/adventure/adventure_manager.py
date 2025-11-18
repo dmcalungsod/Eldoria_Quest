@@ -6,17 +6,18 @@ Handles creation, progression, boss trials, and reward distribution.
 Compatible with the improved MANUAL + AUTO hybrid AdventureSession system.
 """
 
-import sqlite3
-import json
 import datetime
-from database.database_manager import DatabaseManager
-from game_systems.items.inventory_manager import InventoryManager
-from game_systems.guild_system.quest_system import QuestSystem
-from game_systems.player.player_stats import PlayerStats
-from game_systems.player.level_up import LevelUpSystem
-from .adventure_session import AdventureSession
-from game_systems.data.materials import MATERIALS
+import json
+
 import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.data.materials import MATERIALS
+from game_systems.guild_system.quest_system import QuestSystem
+from game_systems.items.inventory_manager import InventoryManager
+from game_systems.player.level_up import LevelUpSystem
+from game_systems.player.player_stats import PlayerStats
+
+from .adventure_session import AdventureSession
 
 
 class AdventureManager:

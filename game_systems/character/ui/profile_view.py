@@ -2,22 +2,22 @@
 game_systems/character/ui/profile_view.py
 """
 
-import discord
 import asyncio
 import json
-from discord.ui import View, Button
 
+import discord
+from discord.ui import Button, View
+
+# Helper imports (careful: avoid circular dependencies)
+import cogs.ui_helpers as ui_helpers
+import game_systems.data.emojis as E
+from cogs.status_update_cog import StatusUpdateView
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
-import game_systems.data.emojis as E
 
 # Modular imports
 from .abilities_view import AbilitiesView
 from .adventure_menu import AdventureView
-from cogs.status_update_cog import StatusUpdateView
-
-# Helper imports (careful: avoid circular dependencies)
-import cogs.ui_helpers as ui_helpers
 
 
 class CharacterTabView(View):

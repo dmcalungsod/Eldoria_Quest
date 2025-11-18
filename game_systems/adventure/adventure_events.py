@@ -6,6 +6,7 @@ Optimized for performance and future biome expansion.
 """
 
 import random
+
 import game_systems.data.emojis as E
 
 

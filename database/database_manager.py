@@ -4,12 +4,11 @@ Database Manager for Eldoria Quest
 Optimized with context managers for better performance and resource management.
 """
 
-import sqlite3
-import json
-from typing import Optional, Dict, Any, List
-from contextlib import contextmanager
 import datetime
-
+import json
+import sqlite3
+from contextlib import contextmanager
+from typing import Any, Dict, List, Optional
 
 DATABASE_NAME = "EQ_Game.db"
 
@@ -75,10 +74,9 @@ class DatabaseManager:
 
         cur.execute(
             """
-            INSERT INTO players (discord_id, name, class_id, race, gender, 
-                                 level, experience, exp_to_next, 
+            INSERT INTO players (discord_id, name, class_id, race, gender,
+                                 level, experience, exp_to_next,
                                  current_hp, current_mp)
-            
             -- --- THIS IS THE CHANGE ---
             VALUES (?, ?, ?, ?, ?, 1, 0, 1000, ?, ?)
             -- --- END OF CHANGE ---
@@ -139,7 +137,7 @@ class DatabaseManager:
             return {}
 
         return json.loads(row["stats_json"])
-    
+
     # --- NEW FUNCTION ---
     def get_player_stats_row(self, discord_id: int) -> Optional[sqlite3.Row]:
         """
@@ -260,7 +258,7 @@ class DatabaseManager:
         """
         boosts = []
         now = datetime.datetime.now().isoformat()
-        
+
         try:
             with self.get_connection() as conn:
                 cur = conn.cursor()
@@ -272,7 +270,7 @@ class DatabaseManager:
                     boosts.append(dict(row))
         except Exception as e:
             print(f"Error fetching active boosts: {e}")
-            
+
         return boosts
     # --- END OF MODIFICATION ---
 

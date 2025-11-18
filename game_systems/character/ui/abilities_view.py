@@ -2,14 +2,15 @@
 game_systems/character/ui/abilities_view.py
 """
 
-import discord
 import asyncio
-from discord.ui import View, Button
 
+import discord
+from discord.ui import Button, View
+
+import game_systems.data.emojis as E
+from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.items.inventory_manager import InventoryManager
-from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
-import game_systems.data.emojis as E
 
 from .inventory_view import InventoryView
 

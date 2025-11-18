@@ -11,15 +11,14 @@ Ensures consistent transitions between menus such as:
 - Skill Management
 """
 
-import discord
-from database.database_manager import DatabaseManager
-from game_systems.player.player_stats import PlayerStats
-import game_systems.data.emojis as E
 import asyncio
 
-from game_systems.items.item_manager import item_manager
-from game_systems.data.emojis import get_rarity_ansi
+import discord
 
+import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.data.emojis import get_rarity_ansi
+from game_systems.player.player_stats import PlayerStats
 
 # ======================================================================
 # EMBED BUILDER

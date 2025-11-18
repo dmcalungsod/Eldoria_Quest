@@ -2,8 +2,8 @@
 cogs/guild_hub_cog.py
 The Controller for the Guild System.
 """
-import discord
 from discord.ext import commands
+
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.ui.components import SystemCache
 

@@ -9,6 +9,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+
 class GeneralCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -20,13 +21,13 @@ class GeneralCog(commands.Cog):
         """
         # Latency is in seconds, convert to ms
         latency_ms = round(self.bot.latency * 1000)
-        
+
         embed = discord.Embed(
             title="🏓 Pong!",
             description=f"Latency: **{latency_ms}ms**",
             color=discord.Color.blue()
         )
-        
+
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 async def setup(bot: commands.Bot):

@@ -5,9 +5,9 @@ Adds 'materials' and 'inventory' tables to EQ_Game.db.
 Populates the materials table using data from game_systems/data/materials.py.
 """
 
+import os
 import sqlite3
 import sys
-import os
 
 # Ensure we can import from game_systems
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -49,7 +49,7 @@ def update_schema():
         item_type TEXT NOT NULL,  -- 'material', 'consumable', 'equipment'
         count INTEGER DEFAULT 1,
         equipped INTEGER DEFAULT 0, -- 0 = False, 1 = True
-        
+
         FOREIGN KEY(discord_id) REFERENCES players(discord_id)
     )
     """

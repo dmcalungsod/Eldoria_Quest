@@ -7,18 +7,18 @@ to learn new skills or upgrade existing ones.
 Refined for clarity, consistency, and ONE UI Policy compliance.
 """
 
-import discord
-from discord.ui import View, Button, Select
-from discord.ext import commands
-import json
-import sqlite3
-import math
 import asyncio
+import math
+import sqlite3
 from typing import Tuple
 
+import discord
+from discord.ext import commands
+from discord.ui import Button, Select, View
+
+import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.skills_data import SKILLS
-import game_systems.data.emojis as E
 
 # Local
 from .ui_helpers import back_to_guild_hall_callback
@@ -79,7 +79,7 @@ class SkillTrainerView(View):
             )
             return False
         return True
-        
+
     # --------------------------------------------------------
     # Navigation Helper (FIX ADDED HERE)
     # --------------------------------------------------------

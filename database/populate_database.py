@@ -5,10 +5,10 @@ Loads data from all game dictionary modules and inserts them into EQ_Game.db.
 This script is modular and imports data from the /game_systems/data/ directory.
 """
 
-import sqlite3
 import json
-import sys
 import os
+import sqlite3
+import sys
 
 # Add the project root to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -19,22 +19,15 @@ DB = "EQ_Game.db"
 
 # Attempt imports from the game_systems.data package
 try:
-    from game_systems.data import monsters
-    from game_systems.data import quest_items
-    from game_systems.data import consumables
+    # --- END FIX ---
+    from game_systems.data import consumables, materials, monsters, quest_data, quest_items, skills_data
+    from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
+    from game_systems.data.class_equipments import CLASS_EQUIPMENTS
 
     # --- FIX: We now import the new data dictionaries ---
     from game_systems.data.equipments import EQUIPMENT_DATA
-    from game_systems.data.class_equipments import CLASS_EQUIPMENTS
-
-    # --- END FIX ---
-    from game_systems.data import materials
-    from game_systems.data import quest_data
-
-    from game_systems.data import skills_data
-    from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 except ImportError as e:
-    print(f"Failed to import data modules from 'game_systems/data'.")
+    print("Failed to import data modules from 'game_systems/data'.")
     print("Please ensure you are running this script from the root of the project.")
     print(f"Import error: {e}")
     sys.exit(1)

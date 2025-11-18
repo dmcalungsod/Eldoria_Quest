@@ -5,13 +5,15 @@ Refactored to handle a single turn of auto-combat, including
 player auto-skill usage.
 """
 
-import random
 import logging
-from .damage_formula import DamageFormula
-from ..rewards.exp_calculator import ExpCalculator
-from ..monsters.monster_actions import MonsterAI
-from .combat_phrases import CombatPhrases
+import random
+
 import game_systems.data.emojis as E
+
+from ..monsters.monster_actions import MonsterAI
+from ..rewards.exp_calculator import ExpCalculator
+from .combat_phrases import CombatPhrases
+from .damage_formula import DamageFormula
 
 logger = logging.getLogger("discord")
 
@@ -49,7 +51,7 @@ class CombatEngine:
         # --- THIS IS THE FIX ---
         # Store the raw dict
         self.active_boosts_dict = active_boosts or {}
-        
+
         # Process the dict into simple multipliers
         self.exp_boost = self.active_boosts_dict.get("exp_boost", 1.0)
         self.loot_boost = self.active_boosts_dict.get("loot_boost", 1.0)
@@ -62,7 +64,7 @@ class CombatEngine:
         """
         log = []
         log.append(f"\n--- {E.COMBAT} Turn ---")
-        
+
         turn_report = {
             "str_hits": 0,
             "dex_hits": 0,
@@ -89,11 +91,11 @@ class CombatEngine:
             mp_cost = skill.get("mp_cost", 0)
             skill_level = skill.get("skill_level", 1)
             skill_key = skill.get("key_id", "")
-            
+
             self.player_mp -= mp_cost
             turn_report["skills_used"] = 1
             turn_report["skill_key_used"] = skill_key
-            
+
             if skill.get("heal_power", 0) > 0:
                 # --- Healing Skill ---
                 heal, new_hp, event_type = DamageFormula.player_heal(
@@ -101,27 +103,27 @@ class CombatEngine:
                 )
                 self.player_hp = new_hp
                 log.append(CombatPhrases.player_heal(self.player, skill, heal))
-                
+
             elif skill.get("buff_data"):
                 # --- Buff/Utility Skill ---
                 log.append(CombatPhrases.player_buff(self.player, skill))
-                
+
             else:
                 # --- Offensive Skill ---
                 dmg, crit, event_type = DamageFormula.player_skill(
                     self.player.stats, self.monster, skill, skill_level
                 )
-                
+
                 if event_type == "crit":
                     turn_report["player_crit"] = 1
-                
+
                 if skill_key in ["fireball", "explosion", "ice_lance", "smite"]:
                     turn_report["mag_hits"] = 1
                 elif skill_key in ["true_shot", "multi_shot", "double_strike", "toxic_blade"]:
                     turn_report["dex_hits"] = 1
                 elif skill_key in ["power_strike", "cleave"]:
                     turn_report["str_hits"] = 1
-                
+
                 self.monster_hp -= dmg
                 log.append(
                     CombatPhrases.player_skill(
@@ -131,10 +133,10 @@ class CombatEngine:
         else:
             # --- Basic Attack ---
             dmg, crit, event_type = DamageFormula.player_attack(self.player.stats, self.monster)
-            
+
             if event_type == "crit":
                 turn_report["player_crit"] = 1
-            
+
             if self.player_class_id in [1, 4]:
                 turn_report["str_hits"] = 1
             elif self.player_class_id in [3, 5]:
@@ -143,7 +145,7 @@ class CombatEngine:
                 turn_report["mag_hits"] = 1
             else:
                 turn_report["str_hits"] = 1
-            
+
             self.monster_hp -= dmg
             log.append(
                 CombatPhrases.player_attack(
@@ -163,7 +165,7 @@ class CombatEngine:
 
         if action["type"] == "attack":
             dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.player.stats)
-            
+
             if event_type == "dodge":
                 turn_report["player_dodge"] = 1
             else:
@@ -183,7 +185,7 @@ class CombatEngine:
                 turn_report["player_dodge"] = 1
             else:
                 turn_report["damage_taken"] = dmg
-            
+
             self.player_hp -= dmg
             log.append(
                 CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit)
@@ -204,7 +206,7 @@ class CombatEngine:
             "hp_current": self.player_hp,
             "mp_current": self.player_mp,
             "monster_hp": self.monster_hp,
-            "turn_report": turn_report, 
+            "turn_report": turn_report,
             "active_boosts": self.active_boosts_dict, # <-- Pass the dict back
         }
 
@@ -241,7 +243,7 @@ class CombatEngine:
                     "skill": heal_skill,
                     "reason": f"HP < {hp_threshold}, using Heal.",
                 }
-        
+
         # Priority 2: Buffs (simple check: if Mana Shield or Endure is available)
         utility_skills = [s for s in usable_skills if s.get("buff_data")]
         if utility_skills and random.randint(1, 100) > 50: # 50% chance to use buff if one is available
@@ -264,13 +266,13 @@ class CombatEngine:
 
     def _player_victory(self, log, turn_report):
         """Handles rewarding EXP and passing up monster drops."""
-        
+
         exp = ExpCalculator.calculate_exp(self.player.level, self.monster, self.exp_boost)
         drops = self.monster.get("drops", [])
         leveled_up = self.player.add_exp(exp)
 
         logger.info(f"Combat Player Victory. EXP: {exp} | Leveled Up: {leveled_up}")
-        
+
         log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up, self.player.level))
 
         return {
