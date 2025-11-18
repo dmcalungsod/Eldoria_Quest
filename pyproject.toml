@@ -1,0 +1,19 @@
+[tool.ruff]
+# Exclude logs and database files from checking
+exclude = [".git", "__pycache__", "build", "dist", "logs", "*.db"]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# E: Error, F: Pyflakes, I: Import Sorting, W: Warning
+select = ["E", "F", "I", "W"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+# Tells pytest where to look for tests
+testpaths = ["tests"]
+python_files = "test_*.py"
