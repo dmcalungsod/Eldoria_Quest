@@ -5,7 +5,6 @@ Manages player inventory: adding loot, removing items, and fetching the backpack
 Now uses 'item_key' as the primary identifier.
 """
 
-import sqlite3
 from database.database_manager import DatabaseManager
 
 

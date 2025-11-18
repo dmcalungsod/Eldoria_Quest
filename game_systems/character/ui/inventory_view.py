@@ -25,6 +25,7 @@ class InventoryView(View):
         db_manager: DatabaseManager,
         interaction_user: discord.User,
         previous_view_callback,
+
         previous_view_label="Return",
     ):
         super().__init__(timeout=None)
