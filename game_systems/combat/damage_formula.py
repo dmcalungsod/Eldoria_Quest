@@ -6,7 +6,6 @@ Exposes a static class 'DamageFormula' used by CombatEngine.
 """
 
 import random
-import math
 from typing import Tuple
 
 # --- IMPORT THE NEW HELPER ---
@@ -45,7 +44,7 @@ class DamageFormula:
         # Crit formula is unchanged as per your request
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
-        
+
         event_type = "hit" # Default event
 
         if is_crit:
@@ -107,7 +106,7 @@ class DamageFormula:
         # Crit formula is unchanged
         crit_chance = 0.05 + (luck_val * 0.005)
         is_crit = random.random() < crit_chance
-        
+
         event_type = "hit" # Default event
 
         if is_crit:
@@ -173,7 +172,7 @@ class DamageFormula:
 
         is_crit = random.random() < 0.05
         event_type = "hit" # Default event
-        
+
         if is_crit:
             damage = int(damage * 1.5)
             event_type = "crit" # --- NEW: Set event type
@@ -196,7 +195,7 @@ class DamageFormula:
         # We must capture all 3 values from monster_attack now
         damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats)
         # --- END OF FIX ---
-        
+
         multiplier = skill_data.get("power", 1.5)
         damage = int(damage * multiplier)
 

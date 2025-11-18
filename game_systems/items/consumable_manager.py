@@ -4,13 +4,12 @@ consumable_manager.py
 Handles all logic for using consumable items from the inventory.
 """
 
-import json
 from typing import Tuple
 
 from database.database_manager import DatabaseManager
+from game_systems.data.consumables import CONSUMABLES
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.player_stats import PlayerStats
-from game_systems.data.consumables import CONSUMABLES
 
 
 class ConsumableManager:

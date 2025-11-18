@@ -14,9 +14,9 @@ Also handles:
 - Item lookup by name, rarity, slot
 """
 
-import sqlite3
-import random
 import json
+import random
+import sqlite3
 from typing import Dict, List
 
 DB_NAME = "EQ_Game.db"

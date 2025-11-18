@@ -34,11 +34,11 @@ class InventoryManager:
         # We must find a stack that matches ALL properties, not just the key.
         cur.execute(
             """
-            SELECT id, count FROM inventory 
-            WHERE discord_id = ? 
-              AND item_key = ? 
+            SELECT id, count FROM inventory
+            WHERE discord_id = ?
+              AND item_key = ?
               AND rarity = ?
-              AND slot = ? 
+              AND slot = ?
               AND item_source_table = ?
               AND equipped = 0
             LIMIT 1
@@ -52,7 +52,7 @@ class InventoryManager:
             # Stack it on the existing unequipped row
             cur.execute(
                 """
-                UPDATE inventory SET count = count + ? 
+                UPDATE inventory SET count = count + ?
                 WHERE id = ?
             """,
                 (amount, row["id"]),
@@ -61,7 +61,7 @@ class InventoryManager:
             # Create new entry (it will default to equipped=0)
             cur.execute(
                 """
-                INSERT INTO inventory (discord_id, item_key, item_name, item_type, 
+                INSERT INTO inventory (discord_id, item_key, item_name, item_type,
                                        rarity, slot, item_source_table, count)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
@@ -126,10 +126,10 @@ class InventoryManager:
 
         cur.execute(
             """
-            SELECT id, item_key, item_name, item_type, slot, 
-                   rarity, item_source_table, count, equipped 
-            FROM inventory 
-            WHERE discord_id = ? 
+            SELECT id, item_key, item_name, item_type, slot,
+                   rarity, item_source_table, count, equipped
+            FROM inventory
+            WHERE discord_id = ?
             ORDER BY item_type, item_name
         """,
             (discord_id,),

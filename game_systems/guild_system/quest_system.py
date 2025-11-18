@@ -11,10 +11,11 @@ This system manages:
 """
 
 import json
+from typing import Dict, List, Optional, Tuple
+
+import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.reward_system import RewardSystem
-from typing import List, Dict, Optional, Tuple
-import game_systems.data.emojis as E
 
 
 class QuestSystem:

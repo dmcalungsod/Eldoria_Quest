@@ -5,15 +5,13 @@ Handles all logic for equipping, unequipping, and recalculating stats
 based on a player's gear.
 """
 
-import sqlite3
 import math
-import json
 from typing import Dict, Tuple
 
 from database.database_manager import DatabaseManager
-from game_systems.player.player_stats import PlayerStats
 from game_systems.data.class_data import CLASSES
 from game_systems.data.skills_data import SKILLS
+from game_systems.player.player_stats import PlayerStats
 
 
 class EquipmentManager:
@@ -241,7 +239,7 @@ class EquipmentManager:
             )
             cur.execute(
                 """
-                INSERT INTO inventory (discord_id, item_key, item_name, item_type, rarity, 
+                INSERT INTO inventory (discord_id, item_key, item_name, item_type, rarity,
                                        slot, item_source_table, count, equipped)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1)
                 """,
@@ -290,8 +288,8 @@ class EquipmentManager:
         cur.execute(
             """
             SELECT id FROM inventory
-            WHERE discord_id = ? 
-              AND item_key = ? 
+            WHERE discord_id = ?
+              AND item_key = ?
               AND rarity = ?
               AND slot = ?
               AND item_source_table = ?

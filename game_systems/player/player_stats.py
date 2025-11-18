@@ -6,9 +6,9 @@ Defines:
 - PlayerStats: 6 core stats + derived stats (HP, MP)
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Any
 import math  # <-- IMPORT MATH
+from dataclasses import dataclass
+from typing import Any, Dict, List
 
 
 # --- NEW HELPER FUNCTION ---

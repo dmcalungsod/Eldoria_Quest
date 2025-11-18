@@ -5,21 +5,22 @@ Tests combat, inventory, and player progression systems.
 SAFE: Uses temporary test database, never touches production data.
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import tempfile
-from database.database_manager import DatabaseManager, DATABASE_NAME
+
 from database.create_database import create_tables
+from database.database_manager import DATABASE_NAME, DatabaseManager
 from database.populate_database import main as populate_db
-from game_systems.player.player_stats import PlayerStats
-from game_systems.player.level_up import LevelUpSystem
-from game_systems.items.inventory_manager import InventoryManager
-from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.items.item_manager import ItemManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.damage_formula import DamageFormula
+from game_systems.items.equipment_manager import EquipmentManager
+from game_systems.items.inventory_manager import InventoryManager
+from game_systems.player.level_up import LevelUpSystem
+from game_systems.player.player_stats import PlayerStats
 
 TEST_DB_PATH = None
 ORIGINAL_DB_PATH = None
@@ -28,18 +29,18 @@ ORIGINAL_DB_PATH = None
 def setup_test_database():
     """Create a temporary test database."""
     global TEST_DB_PATH, ORIGINAL_DB_PATH
-    import database.database_manager as db_manager
     import database.create_database as db_create
+    import database.database_manager as db_manager
     import database.populate_database as db_populate
-    
+
     TEST_DB_PATH = tempfile.mktemp(suffix=".db")
     ORIGINAL_DB_PATH = DATABASE_NAME
-    
+
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
     db_populate.DATABASE_NAME = TEST_DB_PATH
     DatabaseManager.__init__ = lambda self: setattr(self, 'db_name', TEST_DB_PATH)
-    
+
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
 
 
@@ -56,10 +57,10 @@ def setup_test_environment():
     print("\n=== Setting Up Test Environment ===")
     create_tables()
     populate_db()
-    
+
     db = DatabaseManager()
     test_discord_id = 888888888
-    
+
     if db.player_exists(test_discord_id):
         conn = db.connect()
         cur = conn.cursor()
@@ -68,7 +69,7 @@ def setup_test_environment():
         cur.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
         conn.commit()
         conn.close()
-    
+
     test_stats = {
         "STR": {"base": 15, "bonus": 0},
         "END": {"base": 12, "bonus": 0},
@@ -77,7 +78,7 @@ def setup_test_environment():
         "MAG": {"base": 5, "bonus": 0},
         "LCK": {"base": 10, "bonus": 0}
     }
-    
+
     db.create_player(
         discord_id=test_discord_id,
         name="TestWarrior",
@@ -88,7 +89,7 @@ def setup_test_environment():
         race="Human",
         gender="Male"
     )
-    
+
     print("✓ Test environment ready")
     return test_discord_id
 
@@ -96,7 +97,7 @@ def setup_test_environment():
 def test_player_stats():
     """Test PlayerStats class."""
     print("\n=== Testing PlayerStats ===")
-    
+
     try:
         stats = PlayerStats(
             str_base=15,
@@ -106,22 +107,22 @@ def test_player_stats():
             mag_base=5,
             lck_base=10
         )
-        
+
         print(f"✓ PlayerStats created: STR={stats.strength}, END={stats.endurance}")
         print(f"  Max HP: {stats.max_hp}, Max MP: {stats.max_mp}")
         print(f"  Attack: {stats.attack}, Defense: {stats.defense}")
-        
+
         stats.add_bonus_stat("STR", 5)
         assert stats.strength == 20, "Bonus stat not added correctly"
         print("✓ Bonus stats working correctly")
-        
+
         stats_dict = stats.to_dict()
         restored_stats = PlayerStats.from_dict(stats_dict)
         assert restored_stats.strength == 20
         print("✓ Serialization/deserialization working")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ PlayerStats test failed: {e}")
         import traceback
@@ -134,7 +135,7 @@ def test_inventory_system(test_discord_id):
     print("\n=== Testing Inventory System ===")
     db = DatabaseManager()
     inv_manager = InventoryManager(db)
-    
+
     try:
         inv_manager.add_item(
             discord_id=test_discord_id,
@@ -146,11 +147,11 @@ def test_inventory_system(test_discord_id):
             slot="Weapon"
         )
         print("✓ Item added to inventory")
-        
+
         inventory = inv_manager.get_inventory(test_discord_id)
         assert len(inventory) > 0, "Inventory is empty"
         print(f"✓ Retrieved inventory: {len(inventory)} items")
-        
+
         inv_manager.add_item(
             discord_id=test_discord_id,
             item_key="health_potion",
@@ -160,12 +161,12 @@ def test_inventory_system(test_discord_id):
             amount=5
         )
         print("✓ Consumable added to inventory")
-        
+
         inventory = inv_manager.get_inventory(test_discord_id)
         print(f"✓ Updated inventory: {len(inventory)} items")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Inventory test failed: {e}")
         import traceback
@@ -179,13 +180,13 @@ def test_equipment_system(test_discord_id):
     db = DatabaseManager()
     equip_manager = EquipmentManager(db)
     inv_manager = InventoryManager(db)
-    
+
     try:
         with db.get_connection() as conn:
             cur = conn.cursor()
             cur.execute("SELECT * FROM equipment WHERE slot = 'Weapon' LIMIT 1")
             weapon = cur.fetchone()
-            
+
             if weapon:
                 inv_manager.add_item(
                     discord_id=test_discord_id,
@@ -198,17 +199,17 @@ def test_equipment_system(test_discord_id):
                     item_source_table="equipment"
                 )
                 print(f"✓ Added {weapon['name']} to inventory")
-        
+
         base_stats = db.get_player_stats_json(test_discord_id)
         base_str = base_stats.get("STR", {}).get("base", 0)
         print(f"  Base STR: {base_str}")
-        
+
         recalc_stats = equip_manager.recalculate_player_stats(test_discord_id)
-        print(f"  Recalculated stats working")
+        print("  Recalculated stats working")
         print(f"  Max HP: {recalc_stats.max_hp}, Attack: {recalc_stats.attack}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Equipment test failed: {e}")
         import traceback
@@ -220,11 +221,11 @@ def test_combat_system(test_discord_id):
     """Test combat engine."""
     print("\n=== Testing Combat System ===")
     db = DatabaseManager()
-    
+
     try:
         stats_json = db.get_player_stats_json(test_discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
-        
+
         player = db.get_player(test_discord_id)
         player_wrapper = LevelUpSystem(
             stats=player_stats,
@@ -233,7 +234,7 @@ def test_combat_system(test_discord_id):
             exp_to_next=player["exp_to_next"]
         )
         player_wrapper.hp_current = 150
-        
+
         test_monster = {
             "name": "Test Goblin",
             "HP": 50,
@@ -244,7 +245,7 @@ def test_combat_system(test_discord_id):
             "Level": 1,
             "EXP": 20
         }
-        
+
         engine = CombatEngine(
             player=player_wrapper,
             monster=test_monster,
@@ -252,18 +253,18 @@ def test_combat_system(test_discord_id):
             player_mp=30,
             player_class_id=1
         )
-        
+
         result = engine.run_combat_turn()
-        print(f"✓ Combat turn executed")
+        print("✓ Combat turn executed")
         print(f"  Player HP: {result['hp_current']}")
         print(f"  Monster HP: {result['monster_hp']}")
         print(f"  Turn log: {len(result['phrases'])} messages")
-        
+
         if result.get("winner"):
             print(f"  Winner: {result['winner']}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Combat test failed: {e}")
         import traceback
@@ -274,7 +275,7 @@ def test_combat_system(test_discord_id):
 def test_damage_formulas():
     """Test damage calculation formulas."""
     print("\n=== Testing Damage Formulas ===")
-    
+
     try:
         player_stats = PlayerStats(
             str_base=15,
@@ -284,26 +285,26 @@ def test_damage_formulas():
             mag_base=5,
             lck_base=10
         )
-        
+
         monster = {
             "DEF": 5,
             "Level": 1
         }
-        
+
         damage, crit = DamageFormula.player_basic_attack(player_stats, monster)
         print(f"✓ Basic attack: {damage} damage, Crit: {crit}")
-        
+
         test_skill = {
             "name": "Power Strike",
             "power_multiplier": 1.5,
             "mp_cost": 10
         }
-        
+
         skill_damage, skill_crit = DamageFormula.player_skill(player_stats, monster, test_skill)
         print(f"✓ Skill attack: {skill_damage} damage, Crit: {skill_crit}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Damage formula test failed: {e}")
         import traceback
@@ -315,29 +316,29 @@ def test_level_up_system(test_discord_id):
     """Test level-up and experience system."""
     print("\n=== Testing Level-Up System ===")
     db = DatabaseManager()
-    
+
     try:
         player = db.get_player(test_discord_id)
         stats_json = db.get_player_stats_json(test_discord_id)
         player_stats = PlayerStats.from_dict(stats_json)
-        
+
         level_system = LevelUpSystem(
             stats=player_stats,
             level=player["level"],
             exp=player["experience"],
             exp_to_next=player["exp_to_next"]
         )
-        
+
         print(f"  Current Level: {level_system.level}")
         print(f"  Current EXP: {level_system.exp}/{level_system.exp_to_next}")
-        
+
         level_system.add_exp(150)
-        print(f"✓ Added 150 EXP")
+        print("✓ Added 150 EXP")
         print(f"  New Level: {level_system.level}")
         print(f"  New EXP: {level_system.exp}/{level_system.exp_to_next}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Level-up test failed: {e}")
         import traceback
@@ -349,7 +350,7 @@ def cleanup_test_data(test_discord_id):
     """Clean up test data."""
     print("\n=== Cleaning Up Test Data ===")
     db = DatabaseManager()
-    
+
     try:
         conn = db.connect()
         cur = conn.cursor()
@@ -360,7 +361,7 @@ def cleanup_test_data(test_discord_id):
         conn.close()
         print("✓ Test data cleaned up")
         return True
-        
+
     except Exception as e:
         print(f"✗ Cleanup failed: {e}")
         return False
@@ -373,10 +374,10 @@ def run_all_tests():
     print("="*60)
     print("NOTE: Tests run on temporary database - production data is safe!")
     print("="*60)
-    
+
     setup_test_database()
     test_discord_id = setup_test_environment()
-    
+
     tests = [
         ("PlayerStats", lambda: test_player_stats()),
         ("Inventory System", lambda: test_inventory_system(test_discord_id)),
@@ -385,7 +386,7 @@ def run_all_tests():
         ("Combat System", lambda: test_combat_system(test_discord_id)),
         ("Level-Up System", lambda: test_level_up_system(test_discord_id)),
     ]
-    
+
     results = []
     for test_name, test_func in tests:
         try:
@@ -394,24 +395,24 @@ def run_all_tests():
         except Exception as e:
             print(f"\n✗ {test_name} crashed: {e}")
             results.append((test_name, False))
-    
+
     cleanup_test_data(test_discord_id)
     cleanup_test_database()
-    
+
     print("\n" + "="*60)
     print("TEST RESULTS SUMMARY")
     print("="*60)
-    
+
     passed = sum(1 for _, result in results if result)
     total = len(results)
-    
+
     for test_name, result in results:
         status = "✓ PASS" if result else "✗ FAIL"
         print(f"{status}: {test_name}")
-    
+
     print(f"\nTotal: {passed}/{total} tests passed")
     print("="*60 + "\n")
-    
+
     return passed == total
 
 

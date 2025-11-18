@@ -1,11 +1,11 @@
-import discord
-from discord.ext import commands
+import logging
 import os
 import sys
-from dotenv import load_dotenv
-import asyncio
-import logging
 import traceback
+
+import discord
+from discord.ext import commands
+from dotenv import load_dotenv
 
 # --- Import Database Functions at Top Level ---
 from database.create_database import create_tables
@@ -95,7 +95,7 @@ class EldoriaBot(commands.Bot):
                     await self.load_extension(cog_name)
                     print(f"  [+] Loaded: {cog_name}")
                     logger.info(f"Successfully loaded extension: {cog_name}")
-                except Exception as e:
+                except Exception:
                     # If a cog fails, log it and continue
                     print(f"  [!] FAILED to load: {cog_name}")
                     logger.error(f"Failed to load extension {cog_name}.", exc_info=True)
@@ -106,16 +106,16 @@ class EldoriaBot(commands.Bot):
         # --- COMMAND SYNC ---
         if GUILD_ID:
             guild = discord.Object(id=GUILD_ID)
-            
+
             # 1. FORCE CLEAR: This removes all cached commands for this guild
             self.tree.clear_commands(guild=guild)
-            
+
             # 2. COPY GLOBAL: Move the commands loaded from cogs (start, ping, devpanel) to the guild
             self.tree.copy_global_to(guild=guild)
-            
+
             # 3. SYNC: Push the clean list to Discord
             await self.tree.sync(guild=guild)
-            
+
             print(f"--- Cleared and Synced commands to Guild ID: {GUILD_ID} ---")
             logger.info(f"Cleared and Synced commands to Guild ID: {GUILD_ID}")
         else:

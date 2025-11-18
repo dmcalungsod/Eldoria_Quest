@@ -7,6 +7,7 @@ Exposes 'MonsterAI' class for CombatEngine.
 
 import random
 
+
 class MonsterAI:
     @staticmethod
     def choose_action(monster_data: dict, current_hp: int, current_mp: int) -> dict:
@@ -14,25 +15,25 @@ class MonsterAI:
         Decides the monster's next move.
         Returns a dict: {"type": "attack"|"skill"|"buff", "skill": {...}, "buff": {...}}
         """
-        # Basic logic: 
+        # Basic logic:
         # 70% Attack
         # 30% Skill (if MP allows)
-        
+
         roll = random.randint(1, 100)
-        
+
         # Placeholder for future skill logic
         # For now, mostly normal attacks
         if roll > 80:
             return {
-                "type": "skill", 
+                "type": "skill",
                 "skill": {
-                    "name": "Heavy Blow", 
-                    "power": 1.5, 
+                    "name": "Heavy Blow",
+                    "power": 1.5,
                     "mp_cost": 5,
                     "desc_key": "special_hit"
                 }
             }
-            
+
         return {"type": "attack"}
 
     @staticmethod

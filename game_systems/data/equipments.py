@@ -39,7 +39,7 @@ EQUIPMENT_DATA = {
         "slot": "rogue_armor",
         "rarity": "Common",
         "level_req": 1,
-        "stats_bonus": {"AGI": 2}, 
+        "stats_bonus": {"AGI": 2},
         "description": "Supple leather, worn thin by use, but allows freedom of movement.",
     },
     "gen_accessory_001": {

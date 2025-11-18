@@ -7,6 +7,7 @@ Exposes 'ExpCalculator' class for CombatEngine.
 
 import math
 
+
 class ExpCalculator:
     TIER_MULTIPLIER = {
         "Normal": 1.0,
@@ -30,7 +31,7 @@ class ExpCalculator:
 
         # Apply Tier Multiplier
         tier_mult = ExpCalculator.TIER_MULTIPLIER.get(tier, 1.0)
-        
+
         # --- MODIFIED LINE ---
         raw_xp = base_xp * tier_mult * exp_boost_mult
         # --- END MODIFIED LINE ---

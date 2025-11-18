@@ -5,14 +5,16 @@ Handles the distribution of rewards upon quest completion.
 """
 
 import json
-from database.database_manager import DatabaseManager
-from game_systems.player.player_stats import PlayerStats
-from game_systems.player.level_up import LevelUpSystem
+
 import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.data.consumables import CONSUMABLES
 
 # --- NEW IMPORTS ---
 from game_systems.items.inventory_manager import InventoryManager
-from game_systems.data.consumables import CONSUMABLES
+from game_systems.player.level_up import LevelUpSystem
+from game_systems.player.player_stats import PlayerStats
+
 # --- END NEW IMPORTS ---
 
 

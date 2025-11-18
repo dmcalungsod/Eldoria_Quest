@@ -95,10 +95,10 @@ class CombatHandler:
 
             # Get Skills
             cur.execute(
-                """SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost, 
-                          s.power_multiplier, s.heal_power, s.buff_data 
-                   FROM player_skills ps 
-                   JOIN skills s ON ps.skill_key=s.key_id 
+                """SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
+                          s.power_multiplier, s.heal_power, s.buff_data
+                   FROM player_skills ps
+                   JOIN skills s ON ps.skill_key=s.key_id
                    WHERE ps.discord_id=? AND s.type='Active'""",
                 (self.discord_id,)
             )

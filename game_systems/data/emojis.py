@@ -15,7 +15,7 @@ GUILD_MERIT = "<:guild_prestige:1194437270363701338>"
 # UI Icons
 EXP = "✨"
 LEVEL_UP = "🌟"
-VESTIGE = "🧬" 
+VESTIGE = "🧬"
 ITEM_BOX = "📦"
 ERROR = "❌"
 MEDAL = "🏅"
@@ -59,7 +59,7 @@ FOREST = "🌲"
 THICKET = "🍃"
 CAVE = "🍄"
 HERB = "🌿"
-SWORDS = "⚔️" 
+SWORDS = "⚔️"
 SKULL = "💀"
 
 # --- ANSI Color Definitions ---

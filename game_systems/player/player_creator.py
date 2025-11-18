@@ -7,8 +7,9 @@ Handles:
 - Validating class IDs
 """
 
-from .player_stats import PlayerStats
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
+
+from .player_stats import PlayerStats
 
 
 class PlayerCreator:
@@ -76,11 +77,11 @@ class PlayerCreator:
             # 1. Find all default skills (learn_cost = 0) for this class_id
             # --- MODIFIED QUERY ---
             cur.execute(
-                "SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0", 
+                "SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0",
                 (class_id,)
             )
             # --- END OF MODIFICATION ---
-            
+
             default_skills = cur.fetchall()
 
             # 2. Add them to the player_skills table

@@ -8,8 +8,9 @@ Exposes the 'CombatPhrases' class for use within CombatEngine.
 """
 
 import random
-from game_systems.player.level_up import LevelUpSystem
+
 import game_systems.data.emojis as E
+from game_systems.player.level_up import LevelUpSystem
 
 
 class CombatPhrases:
@@ -198,19 +199,19 @@ class CombatPhrases:
 
         if skill.get("key_id") == "mana_shield":
             phrases = [
-                f"You focus, forming the **Mana Shield**— damage will drain MP instead of flesh.",
-                f"Arcane will surrounds you, crystallizing into the **Mana Shield**.",
-                f"Mystic energy swirls outward— **Mana Shield** activated.",
+                "You focus, forming the **Mana Shield**— damage will drain MP instead of flesh.",
+                "Arcane will surrounds you, crystallizing into the **Mana Shield**.",
+                "Mystic energy swirls outward— **Mana Shield** activated.",
             ]
         elif skill.get("key_id") == "endure":
             phrases = [
-                f"You brace yourself— **Endure** hardens your resolve.",
-                f"Your stance settles; **Endure** transforms you into an unmoving bulwark.",
+                "You brace yourself— **Endure** hardens your resolve.",
+                "Your stance settles; **Endure** transforms you into an unmoving bulwark.",
             ]
         elif skill.get("key_id") == "blessing":
             phrases = [
-                f"A divine radiance settles upon you— **Blessing** granted.",
-                f"An ancient whisper answers your call; **Blessing** strengthens your spirit.",
+                "A divine radiance settles upon you— **Blessing** granted.",
+                "An ancient whisper answers your call; **Blessing** strengthens your spirit.",
             ]
         else:
             phrases = [
@@ -348,7 +349,7 @@ class CombatPhrases:
         if "Goblin" in m_name:
             phrase = f"Cackling echoes in your fading vision… The {m_name} stands triumphant."
         elif "Wolf" in m_name:
-            phrase = f"A chilling howl rises as you fall— the hunt ends, and you were the prey."
+            phrase = "A chilling howl rises as you fall— the hunt ends, and you were the prey."
         elif "Slime" in m_name:
             phrase = f"The {m_name} engulfs you, its acidic form smothering the last of your strength."
         elif "Spider" in m_name:
