@@ -69,7 +69,7 @@ CLASSES = {
             "offhand_dagger",
             "bow",  # Weapons
             "leather_hood",
-            "rogue_armor",  # <--- CHANGED: Specific slot for Rogue
+            "rogue_armor",
             "medium_gloves",
             "medium_boots",
             "medium_legs",  # Armor
@@ -85,7 +85,8 @@ CLASSES = {
             "the profane. To their allies they are salvation—to their enemies, the radiant judgment "
             "they never see coming."
         ),
-        "stats": {"STR": 5, "END": 6, "DEX": 3, "AGI": 3, "MAG": 7, "LCK": 1},
+        # --- BUFFED STATS ---
+        "stats": {"STR": 5, "END": 7, "DEX": 3, "AGI": 3, "MAG": 8, "LCK": 1},
         "allowed_slots": [
             "mace",
             "shield",

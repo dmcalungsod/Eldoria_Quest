@@ -2,7 +2,7 @@
 combat_handler.py
 
 Manages combat initialization and turn resolution.
-Hardened with logging and safe database access.
+Hardened: Syncs session XP to prevent duplicate level-up messages.
 """
 
 import json
@@ -76,9 +76,11 @@ class CombatHandler:
             logger.error(f"Combat init failed for {self.discord_id}: {e}", exc_info=True)
             return None, "An error occurred while tracking the enemy."
 
-    def resolve_turn(self, active_monster: Dict[str, Any], battle_report: Dict[str, Any]) -> Dict[str, Any]:
+    def resolve_turn(self, active_monster: Dict[str, Any], battle_report: Dict[str, Any], accumulated_exp: int = 0) -> Dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
+        Args:
+            accumulated_exp: XP earned in this session but not yet saved to DB.
         """
         try:
             # 1. Load Data
@@ -117,14 +119,20 @@ class CombatHandler:
                     except (json.JSONDecodeError, TypeError):
                         s["buff_data"] = {}
 
-            # 3. Setup Engine
+            # 3. Setup Wrappers & Fast-Forward State
             player_wrapper = LevelUpSystem(
                 player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"]
             )
+            
+            # FIX: Apply session XP so leveling logic is up to date
+            if accumulated_exp > 0:
+                player_wrapper.add_exp(accumulated_exp)
+
             player_wrapper.hp_current = vitals["current_hp"]
             
             boosts = self._fetch_active_boosts()
 
+            # 4. Run Engine
             engine = CombatEngine(
                 player=player_wrapper, 
                 monster=active_monster, 
@@ -134,7 +142,6 @@ class CombatHandler:
                 active_boosts=boosts
             )
 
-            # 4. Run Turn
             result = engine.run_combat_turn()
 
             # 5. Persist State (Vitals & Monster HP)

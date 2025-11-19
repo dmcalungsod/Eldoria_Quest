@@ -108,6 +108,19 @@ class DevPanelView(View):
         except Exception as e:
             logger.error(f"Grant failed: {e}")
 
+    def _set_boost(self, key, multiplier, duration):
+        try:
+            self.db.set_global_boost(key, multiplier, duration)
+        except Exception as e:
+            logger.error(f"Set boost failed: {e}")
+
+    def _clear_boosts(self):
+        try:
+            self.db.clear_global_boosts()
+        except Exception as e:
+            logger.error(f"Clear boosts failed: {e}")
+
+    # --- Buttons Row 0: Grants ---
     @discord.ui.button(label="Give 10k XP/Vestige", style=discord.ButtonStyle.success, emoji="✨", row=0)
     async def exp_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
@@ -120,6 +133,20 @@ class DevPanelView(View):
         await asyncio.to_thread(self._grant, aurum=5000)
         await self._refresh_view(interaction)
 
+    # --- Buttons Row 1: Boosts ---
+    @discord.ui.button(label="+100% EXP (1h)", style=discord.ButtonStyle.success, emoji="🚀", row=1)
+    async def boost_exp_btn(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+        await asyncio.to_thread(self._set_boost, "exp_boost", 2.0, 1)
+        await self._refresh_view(interaction)
+
+    @discord.ui.button(label="+50% Loot (1h)", style=discord.ButtonStyle.primary, emoji="📦", row=1)
+    async def boost_loot_btn(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+        await asyncio.to_thread(self._set_boost, "loot_boost", 1.5, 1)
+        await self._refresh_view(interaction)
+
+    # --- Buttons Row 2: Utility ---
     @discord.ui.button(label="Full Heal", style=discord.ButtonStyle.danger, emoji="❤️", row=2)
     async def heal_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
@@ -130,6 +157,13 @@ class DevPanelView(View):
             await self._refresh_view(interaction)
         except Exception as e:
             logger.error(f"Admin heal error: {e}")
+
+    @discord.ui.button(label="Clear Boosts", style=discord.ButtonStyle.secondary, emoji="🚫", row=2)
+    async def clear_boost_btn(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+        await asyncio.to_thread(self._clear_boosts)
+        await self._refresh_view(interaction)
+
 
 class DeveloperCog(commands.Cog):
     def __init__(self, bot: commands.Bot):

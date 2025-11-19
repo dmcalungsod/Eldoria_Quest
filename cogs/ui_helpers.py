@@ -1,8 +1,10 @@
 """
-ui_helpers.py
+cogs/ui_helpers.py
 
 Shared UI components and navigation callbacks.
-Hardened against missing data and API errors.
+Hardened: Async data fetching.
+Atmosphere: Profile description restored.
+Fix: Added Level and EXP display back to profile.
 """
 
 import asyncio
@@ -20,14 +22,13 @@ def build_inventory_embed(items: list) -> discord.Embed:
     embed = discord.Embed(title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange())
 
     if not items:
-        embed.description = "Your backpack is empty."
+        embed.description = "*Your pack is light, holding only dust and echoes.*"
         return embed
 
     equipped = []
     categories = {"Equipment": [], "Consumable": [], "Material": [], "Misc": []}
     
-    # Aggregate unequipped items for display
-    unequipped_counts = {} # (type, name, rarity) -> count
+    unequipped_counts = {} 
 
     for item in items:
         itype = item["item_type"].title()
@@ -41,7 +42,6 @@ def build_inventory_embed(items: list) -> discord.Embed:
             key = (itype, name, rarity)
             unequipped_counts[key] = unequipped_counts.get(key, 0) + item["count"]
 
-    # Format Lists
     for (itype, name, rarity), count in sorted(unequipped_counts.items()):
         cat = itype if itype in categories else "Misc"
         text = f"• {name} (x{count})"
@@ -52,8 +52,6 @@ def build_inventory_embed(items: list) -> discord.Embed:
 
     for cat, lines in categories.items():
         if lines:
-            # Chunking to prevent embed limits (1024 chars)
-            # Simplified here, but in prod consider chunking logic
             val = "```ansi\n" + "\n".join(lines[:15]) + "\n```" 
             if len(lines) > 15: val += f"\n*(...and {len(lines)-15} more)*"
             embed.add_field(name=cat, value=val, inline=False)
@@ -62,7 +60,6 @@ def build_inventory_embed(items: list) -> discord.Embed:
 
 async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
     """Navigation: Returns to Character Profile."""
-    # Avoid circular imports
     from game_systems.character.ui.profile_view import CharacterTabView
 
     if not interaction.response.is_done():
@@ -72,42 +69,58 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
     discord_id = interaction.user.id
 
     try:
-        # Parallel Data Fetch
+        player = await asyncio.to_thread(db.get_player, discord_id)
+
+        if not player:
+            await interaction.followup.send("Character record not found.", ephemeral=True)
+            return
+
         tasks = [
-            asyncio.to_thread(db.get_player, discord_id),
             asyncio.to_thread(db.get_guild_member_data, discord_id),
             asyncio.to_thread(db.get_player_stats_json, discord_id),
-            asyncio.to_thread(db.get_player_skills, discord_id)
+            asyncio.to_thread(db.get_player_skills, discord_id),
+            asyncio.to_thread(db.get_class, player["class_id"])
         ]
         results = await asyncio.gather(*tasks)
         
-        player, guild_data, stats_json, skills = results
-
-        if not player:
-            await interaction.followup.send("Character not found.", ephemeral=True)
-            return
-
+        guild_data, stats_json, skills, class_data = results
         stats = PlayerStats.from_dict(stats_json)
+        class_name = class_data["name"] if class_data else "Unknown"
         
-        # Build Embed
+        description = (
+            f"**Name:** {player['name']}\n"
+            f"**Occupation:** Adventurer\n"
+            f"**Class:** {class_name}\n\n"
+            "*Registered with the Grand Archive of Astraeon. "
+            "A soul bound to the exploration of the unknown.*"
+        )
+
         embed = discord.Embed(
-            title=f"{E.SCROLL} {player['name']}'s Status",
-            description=f"**Class:** Adventurer", # In real app fetch class name
+            title=f"{E.SCROLL} Character Status",
+            description=description,
             color=discord.Color.dark_red()
         )
         
         if interaction.user.avatar:
             embed.set_thumbnail(url=interaction.user.avatar.url)
 
+        # Vitals & Level (FIXED)
         embed.add_field(
-            name="Vitals",
-            value=f"{E.HP} **HP:** {player['current_hp']}/{stats.max_hp}\n{E.MP} **MP:** {player['current_mp']}/{stats.max_mp}",
+            name="Condition",
+            value=(
+                f"**Level:** {player['level']}\n"
+                f"**EXP:** {player['experience']} / {player['exp_to_next']}\n"
+                f"{E.HP} **HP:** {player['current_hp']} / {stats.max_hp}\n"
+                f"{E.MP} **MP:** {player['current_mp']} / {stats.max_mp}"
+            ),
             inline=True
         )
         
+        # Rank
         rank = guild_data['rank'] if guild_data else "Unregistered"
         embed.add_field(name="Guild Rank", value=f"**{rank}**", inline=True)
         
+        # Stats
         stat_block = (
             f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
             f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
@@ -141,11 +154,24 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
 
         embed = discord.Embed(
             title="🏰 Adventurer’s Guild Hall",
-            description=f"Welcome, **{card['name']}** (Rank {card['rank']}).",
+            description=(
+                f"*The receptionist nods as you approach.*\n\n"
+                f"**{card['name']} — Rank {card['rank']}**\n"
+                "*“How may the Guild assist you today, Adventurer?”*"
+            ),
             color=discord.Color.dark_gold()
         )
-        # Add menu fields...
-        embed.add_field(name="Services", value="Quests, Shop, Exchange, Training", inline=False)
+        
+        embed.add_field(
+            name="📜 Quest Board",
+            value="Review available contracts and report successes.",
+            inline=False
+        )
+        embed.add_field(
+            name="⚙️ Guild Services",
+            value="Access the Shop, Exchange, Infirmary, or Training Grounds.",
+            inline=False
+        )
 
         view = GuildLobbyView(db, interaction.user)
         await interaction.edit_original_response(embed=embed, view=view)

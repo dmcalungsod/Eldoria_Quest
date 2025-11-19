@@ -196,7 +196,7 @@ class DatabaseManager:
             ).fetchone()
 
     # ============================================================
-    # GLOBAL SYSTEMS
+    # GLOBAL SYSTEMS (Boosts)
     # ============================================================
 
     def get_active_boosts(self) -> List[Dict[str, Any]]:
@@ -212,3 +212,28 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error fetching active boosts: {e}")
             return []
+
+    def set_global_boost(self, key: str, multiplier: float, duration_hours: int):
+        """
+        Sets a global boost (e.g., exp_boost, loot_boost).
+        Updates the record if it already exists.
+        """
+        end_time = (datetime.datetime.now() + datetime.timedelta(hours=duration_hours)).isoformat()
+        with self.get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO global_boosts (boost_key, multiplier, end_time)
+                VALUES (?, ?, ?)
+                ON CONFLICT(boost_key) DO UPDATE SET
+                    multiplier = excluded.multiplier,
+                    end_time = excluded.end_time
+                """,
+                (key, multiplier, end_time)
+            )
+            logger.info(f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h")
+
+    def clear_global_boosts(self):
+        """Removes all active global boosts."""
+        with self.get_connection() as conn:
+            conn.execute("DELETE FROM global_boosts")
+            logger.info("All Global Boosts cleared.")

@@ -3,6 +3,7 @@ cogs/infirmary_cog.py
 
 Healing services.
 Hardened against concurrency and logic errors.
+Atmosphere restored.
 """
 
 import asyncio
@@ -51,13 +52,13 @@ class InfirmaryView(View):
         self.add_item(self.heal_btn)
 
         # Back Button
-        self.back_btn = Button(label="Return to Hall", style=discord.ButtonStyle.grey, custom_id="back", row=1)
-        self.back_btn.callback = back_to_guild_hall_callback
-        self.add_item(self.back_btn)
+        self.back_button = Button(label="Return to Hall", style=discord.ButtonStyle.grey, custom_id="back", row=1)
+        self.back_button.callback = back_to_guild_hall_callback
+        self.add_item(self.back_button)
 
     def set_back_button(self, cb, label="Back"):
-        self.back_btn.callback = cb
-        self.back_btn.label = label
+        self.back_button.callback = cb
+        self.back_button.label = label
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user.id
@@ -100,27 +101,43 @@ class InfirmaryView(View):
         new_p_data, stats_json = await asyncio.gather(*tasks)
         new_stats = PlayerStats.from_dict(stats_json)
 
-        embed = self.build_embed(new_p_data, new_stats, msg, success)
+        embed = self.build_infirmary_embed(new_p_data, new_stats, msg, success)
         view = InfirmaryView(self.db, self.user, new_p_data, new_stats)
-        view.set_back_button(self.back_btn.callback, self.back_btn.label)
+        view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=view)
 
     @staticmethod
-    def build_embed(p_data, stats, msg=None, success=True) -> discord.Embed:
+    def build_infirmary_embed(p_data, stats, msg=None, success=True) -> discord.Embed:
         hp_miss = max(0, stats.max_hp - p_data["current_hp"])
         cost = infirmary_cost(hp_miss)
         
-        desc = (
-            f"**HP:** {p_data['current_hp']} / {stats.max_hp}\n"
-            f"**MP:** {p_data['current_mp']} / {stats.max_mp}\n"
-            f"**Purse:** {p_data['aurum']} {E.AURUM}\n\n"
-            f"Cost to Heal: **{cost}** Aurum"
+        description = (
+            "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
+            "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
+            "but genuine.\n\n"
+            "**Condition**\n"
+            f"> {E.HP} **HP:** {p_data['current_hp']} / {stats.max_hp}\n"
+            f"> {E.MP} **MP:** {p_data['current_mp']} / {stats.max_mp}\n\n"
+            "**Purse**\n"
+            f"> {E.AURUM} **Aurum:** {p_data['aurum']}\n\n"
         )
+
+        if hp_miss > 0:
+            description += (
+                f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP)."
+            )
+        else:
+            description += "You stand in peak condition; no treatment is required."
         
-        embed = discord.Embed(title="🏥 Infirmary", description=desc, color=discord.Color.green())
+        embed = discord.Embed(title="🏥 Adventurer’s Guild — Infirmary", description=description, color=discord.Color.dark_grey())
+        
         if msg:
-            embed.add_field(name="Status", value=f"{E.CHECK if success else E.ERROR} {msg}")
+            field_name = "Treatment Complete" if success else "Treatment Declined"
+            icon = E.CHECK if success else E.ERROR
+            embed.add_field(name=field_name, value=f"{icon} {msg}", inline=False)
+            embed.color = discord.Color.green() if success else discord.Color.red()
+            
         return embed
 
 class InfirmaryCog(commands.Cog):

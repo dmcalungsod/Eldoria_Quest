@@ -169,9 +169,13 @@ class AdventureSession:
         is_dead = False
         player_won = False
 
+        # Get accumulated XP to prevent duplicate level up messages
+        current_session_exp = self.loot.get("exp", 0)
+
         # Max 8 turns to avoid infinite loops
         for _ in range(8):
-            result = self.combat.resolve_turn(self.active_monster, report)
+            # FIX: Pass session XP
+            result = self.combat.resolve_turn(self.active_monster, report, current_session_exp)
             turn_reports.append(result.get("turn_report", {}))
 
             # Add narration for this turn
@@ -179,7 +183,6 @@ class AdventureSession:
                 sequence.append(result["phrases"])
 
             # Safety: Drop to manual if HP is too low
-            # We fetch stats again to be safe, or pass them down
             stats_json = self.db.get_player_stats_json(self.discord_id)
             stats = PlayerStats.from_dict(stats_json)
             
@@ -237,7 +240,10 @@ class AdventureSession:
         Executes a single combat turn for manual mode.
         """
         report = self.combat.create_empty_battle_report()
-        result = self.combat.resolve_turn(self.active_monster, report)
+        
+        # FIX: Pass session XP
+        current_session_exp = self.loot.get("exp", 0)
+        result = self.combat.resolve_turn(self.active_monster, report, current_session_exp)
 
         turn_logs = result["phrases"]
         is_dead = False

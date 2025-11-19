@@ -1,8 +1,9 @@
 """
-onboarding_cog.py
+cogs/onboarding_cog.py
 
 Character creation flow.
-Hardened against race conditions and double-creations.
+Hardened against race conditions.
+Atmosphere: Dark Fantasy Narrative Restored.
 """
 
 import asyncio
@@ -32,7 +33,6 @@ class StartMenuView(View):
         self._init_buttons()
 
     def _init_buttons(self):
-        # Static class list, safe to load synchronously
         sorted_classes = sorted(CLASS_DEFINITIONS.items(), key=lambda x: x[1]['id'])
         for name, data in sorted_classes:
             btn = Button(label=name, custom_id=f"cls_{data['id']}")
@@ -45,7 +45,6 @@ class StartMenuView(View):
     async def class_select_callback(self, interaction: discord.Interaction):
         class_id = int(interaction.data["custom_id"].split("_")[1])
         
-        # Find class data
         class_info = next((v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), None)
         class_name = next((k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), "Unknown")
 
@@ -53,11 +52,16 @@ class StartMenuView(View):
             await interaction.response.send_message("Class data error.", ephemeral=True)
             return
 
-        # Format Stats
+        # Format Stats with descriptions
         stats_str = "\n".join([f"`{k}: {v}`" for k, v in class_info["stats"].items()])
-        desc_str = f"{class_info['description']}\n\n**Base Stats:**\n{stats_str}"
-
-        embed = discord.Embed(title=class_name, description=desc_str, color=0x00B0F4)
+        
+        embed = discord.Embed(
+            title=f"Class: {class_name}",
+            description=f"{class_info['description']}\n\n**Base Attributes**\n{stats_str}",
+            color=0x00B0F4
+        )
+        embed.set_footer(text="Choose wisely. This decision shapes your fate.")
+        
         view = ClassDetailView(self.db, class_id, self.interaction_user)
         await interaction.response.edit_message(embed=embed, view=view)
 
@@ -72,33 +76,41 @@ class ClassDetailView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user.id
 
-    @discord.ui.button(label="Create Character", style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Accept Destiny", style=discord.ButtonStyle.success)
     async def create_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         
-        # 1. Final check for existing character (Race condition prevention)
         exists = await asyncio.to_thread(self.db.player_exists, self.user.id)
         if exists:
             await interaction.followup.send("You already have a character!", ephemeral=True)
             return
 
-        # 2. Create
         success, msg = await asyncio.to_thread(
             self.creator.create_player, self.user.id, self.user.display_name, self.class_id
         )
 
         if success:
-            embed = discord.Embed(
-                title="Welcome to Astraeon",
-                description="You have registered with the Guild. Your journey begins.",
-                color=discord.Color.gold()
+            # --- RESTORED ATMOSPHERIC TEXT ---
+            welcome_title = f"Welcome, {self.user.display_name}, to Astraeon City."
+            welcome_desc = (
+                "Your name is known, but your deeds are not. The path ahead is fraught with peril...\n\n"
+                "To seek purpose, coin, or redemption, you must register with the **Adventurer's Guild**."
+                "\n\n*The city gates loom above you, iron-bound and weathered by centuries of defense against the dark.*"
             )
+            
+            embed = discord.Embed(
+                title=welcome_title,
+                description=welcome_desc,
+                color=discord.Color.dark_gold()
+            )
+            embed.set_footer(text="Your journey begins now. Tread boldly.")
+            
             view = CharacterMenuView(self.db, self.user)
             await interaction.edit_original_response(embed=embed, view=view)
         else:
             await interaction.followup.send(f"{E.WARNING} {msg}", ephemeral=True)
 
-    @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Reconsider", style=discord.ButtonStyle.secondary)
     async def back_btn(self, interaction: discord.Interaction, button: Button):
         embed = discord.Embed(title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold())
         view = StartMenuView(self.db, self.user)

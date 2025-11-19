@@ -128,7 +128,8 @@ SKILLS = {
         "type": "Active",
         "class_id": 4,
         "mp_cost": 10,
-        "heal_power": 30,  # Base heal
+        # --- BUFFED: 30 -> 45 ---
+        "heal_power": 45,
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 200,
     },
@@ -139,7 +140,8 @@ SKILLS = {
         "type": "Active",
         "class_id": 4,
         "mp_cost": 8,
-        "power_multiplier": 1.5,
+        # --- BUFFED: 1.5 -> 1.7 ---
+        "power_multiplier": 1.7,
         "learn_cost": 1500,
         "upgrade_cost": 250,
     },

@@ -3,6 +3,7 @@ cogs/shop_cog.py
 
 Adventurer’s Guild Supply Depot.
 Hardened with atomic transactions and non-blocking UI.
+Atmosphere restored.
 """
 
 import asyncio
@@ -127,13 +128,17 @@ class ShopView(View):
         success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key, price)
 
         embed = discord.Embed(
-            title="🛒 Guild Supply",
-            description=f"**Funds:** {new_aurum if success else self.current_aurum} {E.AURUM}",
+            title="🛒 Guild Supply Depot",
+            description=(
+                "Within the Adventurer’s Guild, this modest counter distributes "
+                "the essentials needed for survival beyond the safety of its walls.\n\n"
+                f"You currently hold **{new_aurum if success else self.current_aurum} {E.AURUM}**."
+            ),
             color=discord.Color.green() if success else discord.Color.red()
         )
         
-        msg = f"{E.CHECK} Purchased **{result['name']}**." if success else f"{E.ERROR} {result}"
-        embed.add_field(name="Receipt", value=msg)
+        msg = f"{E.CHECK} Secured **1x {result['name']}**." if success else f"{E.ERROR} {result}"
+        embed.add_field(name="Transaction Receipt", value=msg)
 
         new_view = ShopView(self.db, self.interaction_user, new_aurum if success else self.current_aurum)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)

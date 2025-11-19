@@ -3,6 +3,7 @@ cogs/skill_trainer_cog.py
 
 Handles the Skill Trainer UI.
 Hardened: Atomic transactions for learning/upgrading skills.
+Atmosphere restored.
 """
 
 import asyncio
@@ -251,14 +252,17 @@ class SkillTrainerView(View):
         embed = discord.Embed(
             title="🧠 Guild Skill Trainer",
             description=(
-                f"**Available Vestige:** {player_data['vestige_pool']} {E.VESTIGE}\n"
-                "*Select a technique to learn or refine.*"
+                "*A quiet chamber lined with sigils, tomes, and training apparatus.*\n"
+                "*A seasoned mentor observes you, awaiting your intent.*\n\n"
+                f"**Current Vestige:** {player_data['vestige_pool']} {E.VESTIGE}"
             ),
             color=discord.Color.dark_blue(),
         )
 
         if status_message:
-            embed.add_field(name="Status", value=status_message, inline=False)
+            embed.add_field(name="Training Report", value=status_message, inline=False)
+        else:
+             embed.set_footer(text="Unaffordable options will appear disabled.")
 
         return embed
 

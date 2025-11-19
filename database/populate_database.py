@@ -11,7 +11,10 @@ import sqlite3
 import sys
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+# Only configure logging if running as main script
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
 logger = logging.getLogger("db_populate")
 
 # Add the project root to the Python path
@@ -169,19 +172,28 @@ def insert_materials(conn):
 
 def insert_skills(conn):
     logger.info("Inserting skills...")
+    
+    # IMPORTANT: Delete old skills to ensure columns are repopulated correctly
+    conn.execute("DELETE FROM skills;")
+
     data = []
     for s in skills_data.SKILLS.values():
         buff = s.get("buff") or s.get("debuff")
         buff_json = json.dumps(buff) if buff else None
         data.append((
             s["key_id"], s["name"], s["description"], s["type"], s.get("class_id", 0),
-            s.get("mp_cost", 0), s.get("power_multiplier", 1.0), s.get("heal_power", 0), buff_json
+            s.get("mp_cost", 0), s.get("power_multiplier", 1.0), s.get("heal_power", 0), buff_json,
+            s.get("learn_cost", 0), s.get("upgrade_cost", 0)
         ))
 
     conn.executemany(
         """
-        INSERT OR IGNORE INTO skills (key_id, name, description, type, class_id, mp_cost, power_multiplier, heal_power, buff_data)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO skills (
+            key_id, name, description, type, class_id, 
+            mp_cost, power_multiplier, heal_power, buff_data,
+            learn_cost, upgrade_cost
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         data
     )
