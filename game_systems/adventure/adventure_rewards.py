@@ -44,6 +44,7 @@ STAT_EXP_GAINS = {
     "lck_exp": lambda br: 0.5,
 }
 
+
 class AdventureRewards:
     def __init__(self, db: DatabaseManager, discord_id: int):
         self.db = db
@@ -56,12 +57,12 @@ class AdventureRewards:
         Coordinates all sub-systems safely.
         """
         logs = []
-        
+
         try:
             # 1. Promotion Trial
             monster_data = combat_result.get("monster_data", {})
             promo_rank = monster_data.get("promotion_target")
-            
+
             if promo_rank:
                 success, msg = self.rank_system.finalize_promotion(self.discord_id, promo_rank)
                 if success:
@@ -89,7 +90,7 @@ class AdventureRewards:
         """Calculates drops and updates quest progress."""
         loot_bundle = defaultdict(int)
         exp_gain = combat_result["exp"]
-        
+
         # Add XP to session loot immediately
         self._add_loot_to_session(session_loot, "exp", exp_gain)
 
@@ -105,7 +106,7 @@ class AdventureRewards:
             final_chance = base_chance * loot_boost
             if rarity in HIGH_RARITY_TIERS:
                 final_chance += luck_bonus
-            
+
             if random.randint(1, 100) <= final_chance:
                 self._add_loot_to_session(session_loot, drop_key, 1)
                 loot_bundle[(mat.get("name", drop_key), rarity)] += 1
@@ -115,14 +116,20 @@ class AdventureRewards:
         for item in eq_list:
             # Add item to DB immediately to prevent loss
             inventory_manager.add_item(
-                self.discord_id, str(item["id"]), item["name"], "equipment", 
-                item["rarity"], 1, item["slot"], item["source"]
+                self.discord_id,
+                str(item["id"]),
+                item["name"],
+                "equipment",
+                item["rarity"],
+                1,
+                item["slot"],
+                item["source"],
             )
             loot_bundle[(item["name"], item["rarity"])] += 1
 
         # Format Logs
         loot_lines = [get_rarity_ansi("Common", f"• {exp_gain} EXP")]
-        
+
         # Sort by Rarity
         rarity_order = {"Common": 0, "Uncommon": 1, "Rare": 2, "Epic": 3, "Legendary": 4, "Mythical": 5}
         sorted_loot = sorted(loot_bundle.items(), key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1]))
@@ -169,26 +176,28 @@ class AdventureRewards:
         Updates practice-based stat experience.
         """
         gains = {k: fn(br) for k, fn in STAT_EXP_GAINS.items()}
-        
+
         try:
             with self.db.get_connection() as conn:
                 row = conn.execute(
                     "SELECT stats_json, str_exp, end_exp, dex_exp, agi_exp, mag_exp, lck_exp FROM stats WHERE discord_id=?",
-                    (self.discord_id,)
+                    (self.discord_id,),
                 ).fetchone()
-                
-                if not row: return
+
+                if not row:
+                    return
 
                 stats_data = json.loads(row["stats_json"])
                 base_stats = {k: v.get("base", 1) for k, v in stats_data.items()}
-                
+
                 # Mutable exp dict
                 curr_exp = {k: row[k] for k in STAT_EXP_GAINS.keys()}
                 level_up_msgs = []
 
                 for exp_key, gain in gains.items():
-                    if gain <= 0: continue
-                    
+                    if gain <= 0:
+                        continue
+
                     stat_key = exp_key.split("_")[0].upper()
                     curr_exp[exp_key] += gain
 
@@ -205,18 +214,22 @@ class AdventureRewards:
 
                 conn.execute(
                     """
-                    UPDATE stats 
+                    UPDATE stats
                     SET stats_json=?, str_exp=?, end_exp=?, dex_exp=?, agi_exp=?, mag_exp=?, lck_exp=?
                     WHERE discord_id=?
                     """,
                     (
-                        json.dumps(stats_data), 
-                        curr_exp["str_exp"], curr_exp["end_exp"], curr_exp["dex_exp"], 
-                        curr_exp["agi_exp"], curr_exp["mag_exp"], curr_exp["lck_exp"], 
-                        self.discord_id
-                    )
+                        json.dumps(stats_data),
+                        curr_exp["str_exp"],
+                        curr_exp["end_exp"],
+                        curr_exp["dex_exp"],
+                        curr_exp["agi_exp"],
+                        curr_exp["mag_exp"],
+                        curr_exp["lck_exp"],
+                        self.discord_id,
+                    ),
                 )
-                
+
                 if level_up_msgs:
                     logs.append("\n" + "\n".join(level_up_msgs))
 
@@ -229,8 +242,9 @@ class AdventureRewards:
         for entry in report_list:
             if entry.get("skill_key_used"):
                 usage[entry["skill_key_used"]] += 1
-        
-        if not usage: return
+
+        if not usage:
+            return
 
         try:
             with self.db.get_connection() as conn:
@@ -238,15 +252,16 @@ class AdventureRewards:
                 for s_key, count in usage.items():
                     row = conn.execute(
                         """
-                        SELECT skill_level, skill_exp, s.name 
-                        FROM player_skills ps JOIN skills s ON ps.skill_key = s.key_id 
+                        SELECT skill_level, skill_exp, s.name
+                        FROM player_skills ps JOIN skills s ON ps.skill_key = s.key_id
                         WHERE ps.discord_id=? AND ps.skill_key=?
                         """,
-                        (self.discord_id, s_key)
+                        (self.discord_id, s_key),
                     ).fetchone()
-                    
-                    if not row: continue
-                    
+
+                    if not row:
+                        continue
+
                     lvl, exp, name = row["skill_level"], row["skill_exp"], row["name"]
                     gain = count * SKILL_EXP_PER_USE
                     exp += gain
@@ -258,9 +273,9 @@ class AdventureRewards:
 
                     conn.execute(
                         "UPDATE player_skills SET skill_level=?, skill_exp=? WHERE discord_id=? AND skill_key=?",
-                        (lvl, exp, self.discord_id, s_key)
+                        (lvl, exp, self.discord_id, s_key),
                     )
-                
+
                 if msgs:
                     logs.append("\n" + "\n".join(msgs))
         except Exception as e:

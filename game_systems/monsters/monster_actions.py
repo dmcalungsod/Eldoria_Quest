@@ -28,16 +28,11 @@ class MonsterAI:
                 # Example skill structure
                 return {
                     "type": "skill",
-                    "skill": {
-                        "name": "Heavy Blow", 
-                        "power": 1.5, 
-                        "mp_cost": 5, 
-                        "desc_key": "special_hit"
-                    },
+                    "skill": {"name": "Heavy Blow", "power": 1.5, "mp_cost": 5, "desc_key": "special_hit"},
                 }
 
             return {"type": "attack"}
-            
+
         except Exception:
             # Fallback to attack on any error
             return {"type": "attack"}

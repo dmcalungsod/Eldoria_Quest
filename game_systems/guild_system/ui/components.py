@@ -7,7 +7,8 @@ Hardened: Logging added, robust interaction checks.
 """
 
 import logging
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
 import discord
 from discord.ui import Button
@@ -31,7 +32,7 @@ class SystemCache:
     Prevents recreating heavy objects on every button click.
     """
 
-    _cache: Dict[str, Any] = {}
+    _cache: dict[str, Any] = {}
 
     @classmethod
     def get_rank_system(cls, db: DatabaseManager) -> RankSystem:
@@ -100,10 +101,10 @@ class ViewFactory:
         label: str,
         style: discord.ButtonStyle = discord.ButtonStyle.primary,
         custom_id: str = "",
-        emoji: Optional[str] = None,
+        emoji: str | None = None,
         row: int = 0,
         disabled: bool = False,
-        callback: Optional[Callable] = None,
+        callback: Callable | None = None,
     ) -> Button:
         """
         Creates a button with optional preset callback behavior.

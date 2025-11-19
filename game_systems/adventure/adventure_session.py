@@ -8,7 +8,7 @@ Hardened: Crash recovery, atomic state saving, and robust JSON handling.
 import json
 import logging
 import random
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
@@ -31,12 +31,7 @@ class AdventureSession:
     REGEN_CHANCE = 40  # % chance the step becomes a non-combat event
 
     def __init__(
-        self, 
-        db: DatabaseManager, 
-        quest_system, 
-        inventory_manager, 
-        discord_id: int, 
-        row_data: Optional[dict] = None
+        self, db: DatabaseManager, quest_system, inventory_manager, discord_id: int, row_data: dict | None = None
     ):
         self.db = db
         self.discord_id = discord_id
@@ -53,7 +48,7 @@ class AdventureSession:
         if row_data:
             self.location_id = row_data["location_id"]
             self.active = bool(row_data["active"])
-            
+
             # Safe JSON Load
             try:
                 self.logs = json.loads(row_data["logs"]) if row_data["logs"] else []
@@ -82,7 +77,7 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def simulate_step(self) -> Dict[str, Any]:
+    def simulate_step(self) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
         Returns: { "sequence": List[List[str]], "dead": bool }
@@ -145,8 +140,9 @@ class AdventureSession:
             stats_json = self.db.get_player_stats_json(self.discord_id)
             stats = PlayerStats.from_dict(stats_json)
             vitals = self.db.get_player_vitals(self.discord_id)
-            
-            if not vitals: return False
+
+            if not vitals:
+                return False
 
             # Only auto if HP > 30%
             current_hp = vitals["current_hp"]
@@ -159,13 +155,13 @@ class AdventureSession:
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(self) -> Dict[str, Any]:
+    def _resolve_auto_combat(self) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """
         report = self.combat.create_empty_battle_report()
         turn_reports = []
-        sequence: List[List[str]] = []
+        sequence: list[list[str]] = []
         is_dead = False
         player_won = False
 
@@ -185,7 +181,7 @@ class AdventureSession:
             # Safety: Drop to manual if HP is too low
             stats_json = self.db.get_player_stats_json(self.discord_id)
             stats = PlayerStats.from_dict(stats_json)
-            
+
             if result["hp_current"] / max(stats.max_hp, 1) < 0.30:
                 sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
                 break
@@ -206,7 +202,7 @@ class AdventureSession:
             final_block.append(
                 f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(turn_reports)} rounds."
             )
-            
+
             # Grant Rewards
             reward_texts = self.rewards.process_victory(
                 battle_report=report,
@@ -235,12 +231,12 @@ class AdventureSession:
     # MANUAL COMBAT TURN
     # ======================================================================
 
-    def _process_combat_turn(self) -> Dict[str, Any]:
+    def _process_combat_turn(self) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
         """
         report = self.combat.create_empty_battle_report()
-        
+
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
         result = self.combat.resolve_turn(self.active_monster, report, current_session_exp)
@@ -282,7 +278,7 @@ class AdventureSession:
         Writes the current adventure state to the database.
         """
         m_json = json.dumps(self.active_monster) if self.active_monster else None
-        
+
         # Limit logs to prevent DB bloat
         trimmed_logs = self.logs[-30:]
 

@@ -10,6 +10,7 @@ import logging
 import random
 
 import game_systems.data.emojis as E
+
 from ..monsters.monster_actions import MonsterAI
 from ..rewards.exp_calculator import ExpCalculator
 from .combat_phrases import CombatPhrases
@@ -44,7 +45,7 @@ class CombatEngine:
         self.player_class_id = player_class_id
 
         # Safe property access
-        self.player_hp = getattr(player, 'hp_current', 1)
+        self.player_hp = getattr(player, "hp_current", 1)
         self.player_mp = player_mp
         self.monster_hp = monster.get("HP", 1)
 
@@ -109,7 +110,7 @@ class CombatEngine:
 
                     if event_type == "crit":
                         turn_report["player_crit"] = 1
-                    
+
                     # Tag damage type for stat growth
                     self._tag_damage_type(skill_key, turn_report)
 
@@ -137,7 +138,7 @@ class CombatEngine:
 
             # Check Monster Death
             if self.monster_hp <= 0:
-                logger.info(f"Combat End: Monster defeated.")
+                logger.info("Combat End: Monster defeated.")
                 return self._player_victory(log, turn_report)
 
             # --- 2. MONSTER'S TURN ---
@@ -151,7 +152,7 @@ class CombatEngine:
                 else:
                     turn_report["damage_taken"] = dmg
                     self.player_hp -= dmg
-                
+
                 log.append(CombatPhrases.monster_attack(self.monster, self.player, dmg, crit))
 
             elif action["type"] == "skill":
@@ -163,7 +164,7 @@ class CombatEngine:
                 else:
                     turn_report["damage_taken"] = dmg
                     self.player_hp -= dmg
-                
+
                 log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
 
             elif action["type"] == "buff":
@@ -173,7 +174,7 @@ class CombatEngine:
 
             # Check Player Death
             if self.player_hp <= 0:
-                logger.info(f"Combat End: Player defeated.")
+                logger.info("Combat End: Player defeated.")
                 return self._monster_victory(log, turn_report)
 
             return {

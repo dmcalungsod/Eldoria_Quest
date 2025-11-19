@@ -6,6 +6,7 @@ Hardened: Safe string formatting and robust key handling.
 """
 
 import random
+
 import game_systems.data.emojis as E
 
 
@@ -127,7 +128,7 @@ class CombatPhrases:
     @staticmethod
     def player_buff(player, skill) -> str:
         skill_name = str(skill.get("name", "a buff"))
-        
+
         phrases = [
             f"You channel power into **{skill_name}**, altering your state.",
             f"A moment of focus— **{skill_name}** takes hold.",
@@ -161,7 +162,7 @@ class CombatPhrases:
                 f"You brace too late— `{damage}` damage from the {m_name}.{crit_text}",
                 f"Pain flares as the {m_name} hits you for `{damage}` damage.{crit_text}",
             ]
-        
+
         return random.choice(pool)
 
     @staticmethod
@@ -188,14 +189,11 @@ class CombatPhrases:
     def player_victory(monster, exp, gold, leveled_up, new_level) -> str:
         m_name = str(monster.get("name", "the enemy"))
         phrase = f"The {m_name} collapses, the threat fading."
-        
+
         msg = f"{phrase}\nGained `{exp} EXP`"
 
         if leveled_up:
-            msg += (
-                f"\n\n{E.LEVEL_UP} **A NEW THRESHOLD REACHED**\n"
-                f"You have reached **Level {new_level}**."
-            )
+            msg += f"\n\n{E.LEVEL_UP} **A NEW THRESHOLD REACHED**\nYou have reached **Level {new_level}**."
         return msg
 
     @staticmethod

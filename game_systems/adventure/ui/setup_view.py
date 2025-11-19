@@ -71,14 +71,14 @@ class AdventureSetupView(View):
 
     async def location_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        
+
         try:
             loc_id = self.location_select.values[0]
             loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
 
             # 1. Start the adventure in DB (Threaded)
             success = await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, -1)
-            
+
             if not success:
                 await interaction.followup.send("Failed to start adventure. Please try again.", ephemeral=True)
                 return
@@ -87,9 +87,9 @@ class AdventureSetupView(View):
             vitals, session_row, stats_json = await asyncio.gather(
                 asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
                 asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
-                asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
+                asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id),
             )
-            
+
             player_stats = PlayerStats.from_dict(stats_json)
 
             # 3. Initial Log

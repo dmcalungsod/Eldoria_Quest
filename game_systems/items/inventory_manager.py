@@ -6,10 +6,12 @@ Hardened against duplication bugs and concurrency issues.
 """
 
 import logging
-from typing import List, Dict, Any
+from typing import Any
+
 from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.items")
+
 
 class InventoryManager:
     def __init__(self, db_manager: DatabaseManager):
@@ -104,7 +106,7 @@ class InventoryManager:
                     conn.execute("DELETE FROM inventory WHERE id = ?", (row["id"],))
                 else:
                     conn.execute("UPDATE inventory SET count = ? WHERE id = ?", (new_count, row["id"]))
-                
+
                 logger.info(f"Removed {amount}x {item_key} from user {discord_id}")
                 return True
 
@@ -112,7 +114,7 @@ class InventoryManager:
             logger.error(f"Failed to remove item {item_key} for {discord_id}: {e}", exc_info=True)
             return False
 
-    def get_inventory(self, discord_id: int) -> List[Dict[str, Any]]:
+    def get_inventory(self, discord_id: int) -> list[dict[str, Any]]:
         """Fetches the player's full inventory."""
         try:
             with self.db.get_connection() as conn:

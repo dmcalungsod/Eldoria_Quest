@@ -5,7 +5,9 @@ No slash commands here; pure UI logic.
 """
 
 import logging
+
 from discord.ext import commands
+
 from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.cogs.character")

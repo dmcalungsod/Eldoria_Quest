@@ -8,7 +8,6 @@ This prevents exploits where a user could get rewards but not have the quest mar
 
 import json
 import logging
-from typing import Optional, Tuple
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
@@ -25,7 +24,7 @@ class RewardSystem:
         self.db = db_manager
         self.inv_manager = InventoryManager(db_manager)
 
-    def _get_consumable_data_by_name(self, item_name: str) -> Tuple[Optional[str], Optional[dict]]:
+    def _get_consumable_data_by_name(self, item_name: str) -> tuple[str | None, dict | None]:
         """Helper to find a consumable's key_id and data by its display name."""
         for key, data in CONSUMABLES.items():
             if data["name"] == item_name:
@@ -74,7 +73,7 @@ class RewardSystem:
                     exp=player_row["experience"],
                     exp_to_next=player_row["exp_to_next"],
                 )
-                
+
                 # Apply EXP to the level system object
                 leveled_up = level_system.add_exp(exp_reward)
 
@@ -82,15 +81,19 @@ class RewardSystem:
                 # Updates Level, EXP, Aurum, and Vestige simultaneously
                 conn.execute(
                     """
-                    UPDATE players 
-                    SET level = ?, experience = ?, exp_to_next = ?, 
+                    UPDATE players
+                    SET level = ?, experience = ?, exp_to_next = ?,
                         aurum = aurum + ?, vestige_pool = vestige_pool + ?
                     WHERE discord_id = ?
                     """,
                     (
-                        level_system.level, level_system.exp, level_system.exp_to_next,
-                        aurum_reward, exp_reward, discord_id
-                    )
+                        level_system.level,
+                        level_system.exp,
+                        level_system.exp_to_next,
+                        aurum_reward,
+                        exp_reward,
+                        discord_id,
+                    ),
                 )
 
                 # 5. EXECUTE DB UPDATES (Guild Merit)
@@ -101,14 +104,14 @@ class RewardSystem:
                         quests_completed = quests_completed + 1
                     WHERE discord_id = ?
                     """,
-                    (merit_reward, discord_id)
+                    (merit_reward, discord_id),
                 )
 
                 # 6. Update Stats JSON
                 # Required because level_system might have modified internal state if that logic exists
                 conn.execute(
                     "UPDATE stats SET stats_json = ? WHERE discord_id = ?",
-                    (json.dumps(level_system.stats.to_dict()), discord_id)
+                    (json.dumps(level_system.stats.to_dict()), discord_id),
                 )
 
                 # 7. Item Rewards (Must happen inside THIS transaction!)
@@ -116,7 +119,7 @@ class RewardSystem:
                 if item_reward_name:
                     item_key, item_data = self._get_consumable_data_by_name(item_reward_name)
                     if item_key and item_data:
-                        # Use direct SQL here since we are inside a transaction block 
+                        # Use direct SQL here since we are inside a transaction block
                         # and cannot call self.inv_manager.add_item (which starts its own transaction).
                         self._add_item_internal(conn, discord_id, item_key, item_data)
                         item_msg = f"\n{E.ITEM_BOX} **Item Acquired:** `{item_data['name']}`"
@@ -159,7 +162,7 @@ class RewardSystem:
             SELECT id, count FROM inventory
             WHERE discord_id = ? AND item_key = ? AND rarity = ? AND equipped = 0 LIMIT 1
             """,
-            (discord_id, item_key, item_data["rarity"])
+            (discord_id, item_key, item_data["rarity"]),
         ).fetchone()
 
         if row:
@@ -170,5 +173,5 @@ class RewardSystem:
                 INSERT INTO inventory (discord_id, item_key, item_name, item_type, rarity, count, equipped)
                 VALUES (?, ?, ?, 'consumable', ?, 1, 0)
                 """,
-                (discord_id, item_key, item_data["name"], item_data["rarity"])
+                (discord_id, item_key, item_data["name"], item_data["rarity"]),
             )

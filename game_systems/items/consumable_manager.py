@@ -5,9 +5,8 @@ Handles all logic for using consumable items from the inventory.
 Hardened: Uses atomic check-and-consume logic to prevent item loss on error.
 """
 
-import logging
 import json
-from typing import Tuple
+import logging
 
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
@@ -22,7 +21,7 @@ class ConsumableManager:
         self.db = db_manager
         self.inv_manager = InventoryManager(self.db)
 
-    def use_item(self, discord_id: int, inventory_db_id: int) -> Tuple[bool, str]:
+    def use_item(self, discord_id: int, inventory_db_id: int) -> tuple[bool, str]:
         """
         Uses a consumable item from the inventory.
         inventory_db_id is the PRIMARY KEY (id) from the inventory table.
@@ -33,7 +32,7 @@ class ConsumableManager:
                 # 1. Fetch Item & Verify Ownership
                 item = conn.execute(
                     "SELECT id, item_key, item_type, count FROM inventory WHERE id = ? AND discord_id = ?",
-                    (inventory_db_id, discord_id)
+                    (inventory_db_id, discord_id),
                 ).fetchone()
 
                 if not item:
@@ -51,20 +50,16 @@ class ConsumableManager:
 
                 # 3. Get Player Vitals & Stats
                 p_row = conn.execute(
-                    "SELECT current_hp, current_mp FROM players WHERE discord_id = ?", 
-                    (discord_id,)
+                    "SELECT current_hp, current_mp FROM players WHERE discord_id = ?", (discord_id,)
                 ).fetchone()
-                
-                s_row = conn.execute(
-                    "SELECT stats_json FROM stats WHERE discord_id = ?", 
-                    (discord_id,)
-                ).fetchone()
-                
+
+                s_row = conn.execute("SELECT stats_json FROM stats WHERE discord_id = ?", (discord_id,)).fetchone()
+
                 if not p_row or not s_row:
                     return False, "Player data error."
 
                 stats = PlayerStats.from_dict(json.loads(s_row["stats_json"]))
-                
+
                 current_hp = p_row["current_hp"]
                 current_mp = p_row["current_mp"]
                 max_hp = stats.max_hp
@@ -79,12 +74,12 @@ class ConsumableManager:
                     heal_amount = effect["heal"]
                     if current_hp >= max_hp:
                         return False, "You are already at full health."
-                    
+
                     old_hp = current_hp
                     new_hp = min(current_hp + heal_amount, max_hp)
                     healed_for = new_hp - old_hp
-                    
-                    current_hp = new_hp # Update local var for DB write later
+
+                    current_hp = new_hp  # Update local var for DB write later
                     message_lines.append(f"You healed for {healed_for} HP.")
                     item_used = True
 
@@ -93,12 +88,12 @@ class ConsumableManager:
                     mana_amount = effect["mana"]
                     if current_mp >= max_mp:
                         return False, "You are already at full mana."
-                    
+
                     old_mp = current_mp
                     new_mp = min(current_mp + mana_amount, max_mp)
                     restored_for = new_mp - old_mp
-                    
-                    current_mp = new_mp # Update local var for DB write later
+
+                    current_mp = new_mp  # Update local var for DB write later
                     message_lines.append(f"You restored {restored_for} MP.")
                     item_used = True
 
@@ -112,11 +107,11 @@ class ConsumableManager:
                     return False, "This item has no usable effect right now."
 
                 # 5. Apply Updates to DB (Atomically)
-                
+
                 # Update Vitals
                 conn.execute(
                     "UPDATE players SET current_hp = ?, current_mp = ? WHERE discord_id = ?",
-                    (current_hp, current_mp, discord_id)
+                    (current_hp, current_mp, discord_id),
                 )
 
                 # Remove Item

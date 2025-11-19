@@ -7,12 +7,14 @@ Hardened: Uses threaded database calls for material exchange to prevent bot free
 
 import asyncio
 import logging
+
 import discord
 from discord.ui import Button, View
 
 import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_guild_hall_callback
 from database.database_manager import DatabaseManager
+
 from .components import GuildViewMixin, SystemCache, ViewFactory
 
 logger = logging.getLogger("eldoria.ui.exchange")
@@ -38,11 +40,7 @@ class GuildExchangeView(View, GuildViewMixin):
 
         # Back Button
         self.back_btn = ViewFactory.create_button(
-            "Back to Hall", 
-            discord.ButtonStyle.secondary, 
-            "back_gh", 
-            row=1, 
-            callback=back_to_guild_hall_callback
+            "Back to Hall", discord.ButtonStyle.secondary, "back_gh", row=1, callback=back_to_guild_hall_callback
         )
         self.add_item(self.back_btn)
 
@@ -79,14 +77,14 @@ class GuildExchangeView(View, GuildViewMixin):
                 if len(items) > 15:
                     rows.append(f"...and {len(items) - 15} more.")
                 embed.add_field(name="Receipt", value="\n".join(rows))
-            
+
             embed.color = discord.Color.green()
 
             # Refresh view (Disable sell button since items are gone)
             new_view = GuildExchangeView(self.db, False, self.interaction_user)
-            
+
             # Preserve back button state
-            if hasattr(self, 'back_btn'):
+            if hasattr(self, "back_btn"):
                 new_view.set_back_button(self.back_btn.callback, self.back_btn.label)
 
             await interaction.edit_original_response(embed=embed, view=new_view)

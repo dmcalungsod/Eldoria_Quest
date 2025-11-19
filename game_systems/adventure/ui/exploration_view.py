@@ -8,6 +8,7 @@ Hardened: Prevents button-mashing race conditions during combat animation.
 import asyncio
 import json
 import logging
+
 import discord
 from discord.ui import Button, View
 
@@ -17,6 +18,7 @@ from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.player_stats import PlayerStats
+
 from .adventure_embeds import AdventureEmbeds
 
 logger = logging.getLogger("eldoria.ui.exploration")
@@ -33,7 +35,7 @@ class ExplorationView(View):
         player_stats: PlayerStats,
         active_monster: dict = None,
     ):
-        super().__init__(timeout=300) # 5 minutes
+        super().__init__(timeout=300)  # 5 minutes
         self.db = db
         self.manager = manager
         self.location_id = location_id
@@ -54,7 +56,9 @@ class ExplorationView(View):
         self.add_item(self.forward_btn)
 
         # Inventory
-        self.inv_btn = Button(label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack")
+        self.inv_btn = Button(
+            label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack"
+        )
         self.inv_btn.callback = self.inventory_callback
         self.add_item(self.inv_btn)
 
@@ -94,20 +98,22 @@ class ExplorationView(View):
             for i, block in enumerate(sequence):
                 # Update Log
                 self.log.extend(block)
-                self.log = self.log[-15:] # Keep log manageable
+                self.log = self.log[-15:]  # Keep log manageable
 
                 # Refresh Data
                 vitals, session, stats_json = await asyncio.gather(
                     asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id),
                     asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id),
-                    asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+                    asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
                 )
-                
+
                 self.player_stats = PlayerStats.from_dict(stats_json)
-                
+
                 # Check monster state from DB
                 try:
-                    self.active_monster = json.loads(session["active_monster_json"]) if session["active_monster_json"] else None
+                    self.active_monster = (
+                        json.loads(session["active_monster_json"]) if session["active_monster_json"] else None
+                    )
                 except Exception:
                     self.active_monster = None
 
@@ -116,12 +122,12 @@ class ExplorationView(View):
                     self.location_id, self.log, self.player_stats, vitals, session
                 )
 
-                is_last_frame = (i == len(sequence) - 1)
+                is_last_frame = i == len(sequence) - 1
 
                 if is_last_frame:
                     # Re-enable buttons
                     self._enable_all()
-                    
+
                     # Update Forward Button Appearance
                     lbl, sty, emo = self._get_button_state()
                     self.forward_btn.label = lbl
@@ -152,7 +158,7 @@ class ExplorationView(View):
     def _disable_all(self):
         for item in self.children:
             item.disabled = True
-        
+
         # Show "Thinking/Combat" state
         self.forward_btn.label = "..."
         self.forward_btn.style = discord.ButtonStyle.secondary
@@ -167,33 +173,27 @@ class ExplorationView(View):
     async def inventory_callback(self, interaction: discord.Interaction):
         # Avoid circular import
         from game_systems.character.ui.inventory_view import InventoryView
+
         await interaction.response.defer()
 
         items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
         embed = build_inventory_embed(items)
 
-        view = InventoryView(
-            self.db, 
-            self.interaction_user, 
-            self.return_from_inventory, 
-            "Return to Adventure"
-        )
+        view = InventoryView(self.db, self.interaction_user, self.return_from_inventory, "Return to Adventure")
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def return_from_inventory(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        
+
         # Refresh state on return
         vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
         session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
 
-        embed = AdventureEmbeds.build_exploration_embed(
-            self.location_id, self.log, self.player_stats, vitals, session
-        )
-        
+        embed = AdventureEmbeds.build_exploration_embed(self.location_id, self.log, self.player_stats, vitals, session)
+
         # Reset my buttons
         self._enable_all()
-        
+
         await interaction.edit_original_response(embed=embed, view=self)
 
     # --------------------------------------------------------

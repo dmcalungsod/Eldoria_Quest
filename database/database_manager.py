@@ -5,17 +5,18 @@ Fully optimized for SQLite with WAL mode, Foreign Key enforcement,
 and atomic transaction handling via context managers.
 """
 
-import json
-import sqlite3
-import logging
 import datetime
+import json
+import logging
+import sqlite3
 from contextlib import contextmanager
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")
 
 DATABASE_NAME = "EQ_Game.db"
+
 
 class DatabaseManager:
     """
@@ -74,8 +75,17 @@ class DatabaseManager:
             cur = conn.execute("SELECT 1 FROM players WHERE discord_id = ?", (discord_id,))
             return cur.fetchone() is not None
 
-    def create_player(self, discord_id: int, name: str, class_id: int, stats_data: Dict[str, Any],
-                      initial_hp: int, initial_mp: int, race: Optional[str] = None, gender: Optional[str] = None):
+    def create_player(
+        self,
+        discord_id: int,
+        name: str,
+        class_id: int,
+        stats_data: dict[str, Any],
+        initial_hp: int,
+        initial_mp: int,
+        race: str | None = None,
+        gender: str | None = None,
+    ):
         """Creates a new player with stats."""
         with self.get_connection() as conn:
             conn.execute(
@@ -94,7 +104,7 @@ class DatabaseManager:
             )
             logger.info(f"Created new player: {name} ({discord_id})")
 
-    def get_player(self, discord_id: int) -> Optional[sqlite3.Row]:
+    def get_player(self, discord_id: int) -> sqlite3.Row | None:
         """Fetches the main player record."""
         with self.get_connection() as conn:
             return conn.execute("SELECT * FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
@@ -103,7 +113,7 @@ class DatabaseManager:
     # STATS & VITALS
     # ============================================================
 
-    def get_player_stats_json(self, discord_id: int) -> Dict[str, Any]:
+    def get_player_stats_json(self, discord_id: int) -> dict[str, Any]:
         """Fetches and parses the JSON stats block."""
         with self.get_connection() as conn:
             row = conn.execute("SELECT stats_json FROM stats WHERE discord_id = ?", (discord_id,)).fetchone()
@@ -115,12 +125,12 @@ class DatabaseManager:
                 logger.error(f"Corrupted stats_json for user {discord_id}")
                 return {}
 
-    def get_player_stats_row(self, discord_id: int) -> Optional[sqlite3.Row]:
+    def get_player_stats_row(self, discord_id: int) -> sqlite3.Row | None:
         """Fetches the raw stats row (including practice EXP columns)."""
         with self.get_connection() as conn:
             return conn.execute("SELECT * FROM stats WHERE discord_id = ?", (discord_id,)).fetchone()
 
-    def update_player_stats(self, discord_id: int, stats_data: Dict[str, Any]):
+    def update_player_stats(self, discord_id: int, stats_data: dict[str, Any]):
         """Updates the JSON stats block."""
         with self.get_connection() as conn:
             conn.execute(
@@ -128,10 +138,12 @@ class DatabaseManager:
                 (json.dumps(stats_data), discord_id),
             )
 
-    def get_player_vitals(self, discord_id: int) -> Optional[sqlite3.Row]:
+    def get_player_vitals(self, discord_id: int) -> sqlite3.Row | None:
         """Fetches current HP/MP."""
         with self.get_connection() as conn:
-            return conn.execute("SELECT current_hp, current_mp FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
+            return conn.execute(
+                "SELECT current_hp, current_mp FROM players WHERE discord_id = ?", (discord_id,)
+            ).fetchone()
 
     def set_player_vitals(self, discord_id: int, hp: int, mp: int):
         """Updates current HP/MP."""
@@ -153,12 +165,12 @@ class DatabaseManager:
     # CLASS & SKILLS
     # ============================================================
 
-    def get_class(self, class_id: int) -> Optional[sqlite3.Row]:
+    def get_class(self, class_id: int) -> sqlite3.Row | None:
         """Fetches class definition."""
         with self.get_connection() as conn:
             return conn.execute("SELECT * FROM classes WHERE id = ?", (class_id,)).fetchone()
 
-    def get_player_skills(self, discord_id: int) -> List[sqlite3.Row]:
+    def get_player_skills(self, discord_id: int) -> list[sqlite3.Row]:
         """Fetches all learned skills joined with skill definitions."""
         with self.get_connection() as conn:
             cur = conn.execute(
@@ -177,19 +189,19 @@ class DatabaseManager:
     # GUILD SYSTEM
     # ============================================================
 
-    def get_guild_member_data(self, discord_id: int) -> Optional[sqlite3.Row]:
+    def get_guild_member_data(self, discord_id: int) -> sqlite3.Row | None:
         """Fetches guild membership details (Rank, Points)."""
         with self.get_connection() as conn:
             return conn.execute("SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)).fetchone()
 
-    def get_guild_card_data(self, discord_id: int) -> Optional[sqlite3.Row]:
+    def get_guild_card_data(self, discord_id: int) -> sqlite3.Row | None:
         """Fetches data specifically for the Guild Card UI."""
         with self.get_connection() as conn:
             return conn.execute(
                 """
-                SELECT p.name, gm.rank, gm.join_date 
-                FROM players p 
-                JOIN guild_members gm ON p.discord_id = gm.discord_id 
+                SELECT p.name, gm.rank, gm.join_date
+                FROM players p
+                JOIN guild_members gm ON p.discord_id = gm.discord_id
                 WHERE p.discord_id = ?
                 """,
                 (discord_id,),
@@ -199,14 +211,13 @@ class DatabaseManager:
     # GLOBAL SYSTEMS (Boosts)
     # ============================================================
 
-    def get_active_boosts(self) -> List[Dict[str, Any]]:
+    def get_active_boosts(self) -> list[dict[str, Any]]:
         """Fetches currently active global server boosts."""
         now = datetime.datetime.now().isoformat()
         try:
             with self.get_connection() as conn:
                 cur = conn.execute(
-                    "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?",
-                    (now,)
+                    "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?", (now,)
                 )
                 return [dict(row) for row in cur.fetchall()]
         except Exception as e:
@@ -228,7 +239,7 @@ class DatabaseManager:
                     multiplier = excluded.multiplier,
                     end_time = excluded.end_time
                 """,
-                (key, multiplier, end_time)
+                (key, multiplier, end_time),
             )
             logger.info(f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h")
 

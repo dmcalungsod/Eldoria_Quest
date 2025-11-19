@@ -6,7 +6,7 @@ Rebalanced: Lower minimum damage floor, better crit reward.
 """
 
 import random
-import math
+
 from game_systems.player.player_stats import calculate_tiered_bonus
 
 
@@ -17,14 +17,14 @@ class DamageFormula:
         "DEX": "dexterity",
         "AGI": "agility",
         "MAG": "magic",
-        "LCK": "luck"
+        "LCK": "luck",
     }
 
     @staticmethod
     def _get_stat(stats_obj, stat_code):
         if isinstance(stats_obj, dict):
             return stats_obj.get(stat_code, 0)
-        
+
         property_name = DamageFormula.STAT_PROPERTY_MAP.get(stat_code)
         if property_name:
             return getattr(stats_obj, property_name, 0)
@@ -41,15 +41,15 @@ class DamageFormula:
         str_bonus = calculate_tiered_bonus(str_val, 2.0)
         dex_bonus = calculate_tiered_bonus(dex_val, 1.0)
         mag_bonus = calculate_tiered_bonus(mag_val, 0.5)
-        
+
         attack_power = str_bonus + dex_bonus + mag_bonus
 
         # Defense
         monster_def = monster.get("DEF", 0)
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))
-        
+
         base_damage = max(1, attack_power - defense_reduction)
-        
+
         variance = random.uniform(0.9, 1.1)
         damage = int(base_damage * variance)
 
@@ -82,16 +82,16 @@ class DamageFormula:
             base_effect_per_point = 1.0
 
         attack_power = calculate_tiered_bonus(base_stat_value, base_effect_per_point)
-        
+
         base_multiplier = float(skill_data.get("power_multiplier", 1.0))
         final_multiplier = base_multiplier + (0.08 * (skill_level - 1))
         attack_power *= final_multiplier
 
         monster_def = monster.get("DEF", 0)
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))
-        
+
         base_damage = max(1, attack_power - defense_reduction)
-        
+
         variance = random.uniform(0.9, 1.1)
         damage = int(base_damage * variance)
 
@@ -110,7 +110,7 @@ class DamageFormula:
     def player_heal(player_stats, current_hp: int, skill_data: dict, skill_level: int) -> tuple[int, int, str]:
         base_heal = float(skill_data.get("heal_power", 0))
         mag_val = DamageFormula._get_stat(player_stats, "MAG")
-        
+
         if hasattr(player_stats, "max_hp"):
             max_hp = player_stats.max_hp
         else:
@@ -122,7 +122,7 @@ class DamageFormula:
         final_base_heal = base_heal * level_multiplier
 
         total_heal = final_base_heal + magic_bonus
-        max_allowed = max_hp * 0.6 
+        max_allowed = max_hp * 0.6
         total_heal = min(total_heal, max_allowed)
 
         variance = random.uniform(0.9, 1.1)
@@ -139,22 +139,22 @@ class DamageFormula:
         Reduced Chip Damage to 5%.
         """
         agi = DamageFormula._get_stat(player_stats, "AGI")
-        dodge_chance = agi * 0.001 
+        dodge_chance = agi * 0.001
         if random.random() < dodge_chance:
             return 0, False, "dodge"
 
         attack_power = monster.get("ATK", 10)
         end = DamageFormula._get_stat(player_stats, "END")
-        
+
         defense = calculate_tiered_bonus(end, 1.5)
         defense_reduction = defense * (0.3 + (0.2 * min(1, defense / 100)))
 
         base_damage = max(0, attack_power - defense_reduction)
-        
+
         # --- REBALANCED DEFENSE PENETRATION ---
         # 5% minimum damage instead of 10%
         min_damage = max(attack_power * 0.05, 1)
-        
+
         final_damage = max(base_damage, min_damage)
 
         variance = random.uniform(0.9, 1.1)
@@ -168,21 +168,6 @@ class DamageFormula:
             event_type = "crit"
 
         return max(1, damage), is_crit, event_type
-
-    @staticmethod
-    def monster_skill(monster, player_stats, skill_data):
-        # Skills shouldn't be easily dodged
-        agi = DamageFormula._get_stat(player_stats, "AGI")
-        dodge_chance = agi * 0.0005 
-        if random.random() < dodge_chance:
-            return 0, False, "dodge"
-
-        damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats)
-        
-        multiplier = float(skill_data.get("power", 1.5))
-        damage = int(damage * multiplier)
-
-        return damage, is_crit, event_type
 
     @staticmethod
     def monster_skill(monster, player_stats, skill_data):

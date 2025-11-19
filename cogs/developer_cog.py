@@ -6,10 +6,9 @@ SECURITY: Strict owner checks and audit logging.
 """
 
 import asyncio
-import logging
 import datetime
-import sqlite3
-from typing import Any, Dict, List
+import logging
+from typing import Any
 
 import discord
 from discord import app_commands
@@ -22,13 +21,14 @@ from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.admin")
 
+
 class DevPanelView(View):
     def __init__(
         self,
         db_manager: DatabaseManager,
         interaction_user: discord.User,
-        player_data: Dict[str, Any],
-        active_boosts: List[Dict[str, Any]],
+        player_data: dict[str, Any],
+        active_boosts: list[dict[str, Any]],
     ):
         super().__init__(timeout=180)
         self.db = db_manager
@@ -47,7 +47,8 @@ class DevPanelView(View):
         try:
             end_time = datetime.datetime.fromisoformat(end_time_iso)
             remaining = end_time - datetime.datetime.now()
-            if remaining.total_seconds() <= 0: return "Expired"
+            if remaining.total_seconds() <= 0:
+                return "Expired"
             mins, secs = divmod(int(remaining.total_seconds()), 60)
             return f"{mins}m {secs}s"
         except Exception:
@@ -89,10 +90,10 @@ class DevPanelView(View):
         # Fetch fresh data
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         boosts = await asyncio.to_thread(self.db.get_active_boosts)
-        
+
         self.player_data = dict(p_data) if p_data else {}
         self.active_boosts = boosts
-        
+
         embed = self.build_dev_embed(self.player_data, self.active_boosts)
         await interaction.edit_original_response(embed=embed, view=self)
 
@@ -102,7 +103,7 @@ class DevPanelView(View):
             with self.db.get_connection() as conn:
                 conn.execute(
                     "UPDATE players SET experience=experience+?, aurum=aurum+?, vestige_pool=vestige_pool+? WHERE discord_id=?",
-                    (exp, aurum, vestige, self.interaction_user.id)
+                    (exp, aurum, vestige, self.interaction_user.id),
                 )
             logger.warning(f"ADMIN GRANT: {self.interaction_user.name} gave self {exp}XP, {aurum}G, {vestige}V")
         except Exception as e:
@@ -174,17 +175,17 @@ class DeveloperCog(commands.Cog):
     @commands.is_owner()
     async def dev_panel(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        
+
         p_data = await asyncio.to_thread(self.db.get_player, interaction.user.id)
         if not p_data:
             await interaction.followup.send("No character found.", ephemeral=True)
             return
 
         boosts = await asyncio.to_thread(self.db.get_active_boosts)
-        
+
         view = DevPanelView(self.db, interaction.user, dict(p_data), boosts)
         embed = view.build_dev_embed(dict(p_data), boosts)
-        
+
         await interaction.followup.send(embed=embed, view=view, ephemeral=True)
 
     @dev_panel.error
@@ -194,6 +195,7 @@ class DeveloperCog(commands.Cog):
             await interaction.response.send_message("⛔ You are not the bot owner.", ephemeral=True)
         else:
             logger.error(f"Dev panel error: {error}")
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(DeveloperCog(bot))

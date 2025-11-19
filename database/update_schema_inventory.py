@@ -6,10 +6,10 @@ Populates the materials table using data from game_systems/data/materials.py.
 Hardened: Uses logging, path safety, and atomic commits.
 """
 
+import logging
 import os
 import sqlite3
 import sys
-import logging
 
 # Configure logging only if run directly
 if __name__ == "__main__":
@@ -29,6 +29,7 @@ try:
 except ImportError as e:
     logger.critical(f"Failed to import MATERIALS: {e}")
     sys.exit(1)
+
 
 def update_schema():
     try:
@@ -70,16 +71,16 @@ def update_schema():
 
         # 3. Populate Materials
         logger.info("Populating Materials...")
-        
-        data = [
-            (key, d["name"], d["description"], d["rarity"], d["value"]) 
-            for key, d in MATERIALS.items()
-        ]
 
-        cur.executemany("""
+        data = [(key, d["name"], d["description"], d["rarity"], d["value"]) for key, d in MATERIALS.items()]
+
+        cur.executemany(
+            """
             INSERT OR REPLACE INTO materials (key_id, name, description, rarity, value)
             VALUES (?, ?, ?, ?, ?)
-        """, data)
+        """,
+            data,
+        )
 
         logger.info(f"✔ Populated/Updated {len(data)} material definitions.")
 
@@ -89,6 +90,7 @@ def update_schema():
 
     except Exception as e:
         logger.critical(f"Update failed: {e}", exc_info=True)
+
 
 if __name__ == "__main__":
     update_schema()

@@ -7,7 +7,7 @@ Hardened: Tiered scaling logic and robust serialization.
 
 import math
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any
 
 
 # --- NEW HELPER FUNCTION (Used by Combat) ---
@@ -44,6 +44,7 @@ def calculate_tiered_bonus(stat_value: int, base_effect_per_point: float) -> int
 @dataclass
 class StatBlock:
     """Stores the base and bonus values of a stat."""
+
     base: int = 1
     bonus: int = 0
 
@@ -58,7 +59,7 @@ class PlayerStats:
     """
 
     def __init__(self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1):
-        self._stats: Dict[str, StatBlock] = {
+        self._stats: dict[str, StatBlock] = {
             "STR": StatBlock(base=str_base),
             "END": StatBlock(base=end_base),
             "DEX": StatBlock(base=dex_base),
@@ -121,7 +122,7 @@ class PlayerStats:
         if key in self._stats:
             self._stats[key].bonus += amount
 
-    def recalculate_bonuses(self, equipped_items: List[Any]):
+    def recalculate_bonuses(self, equipped_items: list[Any]):
         """Resets bonuses and re-applies them from item list."""
         # Reset all bonuses
         for key in self._stats:
@@ -134,21 +135,21 @@ class PlayerStats:
                 bonuses = item.get("stats_bonus", {})
             else:
                 bonuses = getattr(item, "stats_bonus", {})
-            
+
             if bonuses:
                 for stat, val in bonuses.items():
                     self.add_bonus_stat(stat, val)
 
     # --- Serialization ---
-    def to_dict(self) -> Dict[str, Dict[str, int]]:
+    def to_dict(self) -> dict[str, dict[str, int]]:
         return {k: {"base": v.base, "bonus": v.bonus} for k, v in self._stats.items()}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]):
         new = cls()
         if not data:
             return new
-            
+
         for key, vals in data.items():
             u = key.upper()
             if u in new._stats and isinstance(vals, dict):
@@ -157,10 +158,10 @@ class PlayerStats:
         return new
 
     # --- Simple output dicts ---
-    def get_base_stats_dict(self) -> Dict[str, int]:
+    def get_base_stats_dict(self) -> dict[str, int]:
         return {k: v.base for k, v in self._stats.items()}
 
-    def get_total_stats_dict(self) -> Dict[str, int]:
+    def get_total_stats_dict(self) -> dict[str, int]:
         return {
             "STR": self.strength,
             "END": self.endurance,

@@ -5,8 +5,8 @@ Creates the full Eldoria Quest database schema.
 Hardened: Safe schema migration and error reporting.
 """
 
-import sqlite3
 import logging
+import sqlite3
 
 # Only configure logging if running as main script to avoid duplicates
 if __name__ == "__main__":
@@ -15,6 +15,7 @@ if __name__ == "__main__":
 logger = logging.getLogger("db_create")
 
 DATABASE_NAME = "EQ_Game.db"
+
 
 def create_tables():
     try:
@@ -238,41 +239,48 @@ def create_tables():
         # ---------------------------------------------------
         # SCHEMA MIGRATION (Safe Column Adding)
         # ---------------------------------------------------
-        
+
         # List of columns to ensure exist in 'skills'
         skills_columns = [
             ("buff_data", "TEXT"),
             ("learn_cost", "INTEGER DEFAULT 0"),
-            ("upgrade_cost", "INTEGER DEFAULT 0")
+            ("upgrade_cost", "INTEGER DEFAULT 0"),
         ]
-        
+
         for col_name, col_type in skills_columns:
             try:
                 cursor.execute(f"ALTER TABLE skills ADD COLUMN {col_name} {col_type};")
                 logger.info(f"✔ Column '{col_name}' added to 'skills' table.")
             except sqlite3.OperationalError as e:
                 if "duplicate column name" in str(e):
-                    pass # Column exists, safe to ignore
+                    pass  # Column exists, safe to ignore
                 else:
                     logger.warning(f"Migration warning for {col_name}: {e}")
 
         # Ensure stat_exp columns in 'stats'
         stat_exp_columns = [
-            "str_exp REAL DEFAULT 0", "end_exp REAL DEFAULT 0", "dex_exp REAL DEFAULT 0",
-            "agi_exp REAL DEFAULT 0", "mag_exp REAL DEFAULT 0", "lck_exp REAL DEFAULT 0"
+            "str_exp REAL DEFAULT 0",
+            "end_exp REAL DEFAULT 0",
+            "dex_exp REAL DEFAULT 0",
+            "agi_exp REAL DEFAULT 0",
+            "mag_exp REAL DEFAULT 0",
+            "lck_exp REAL DEFAULT 0",
         ]
         for column_def in stat_exp_columns:
             try:
                 cursor.execute(f"ALTER TABLE stats ADD COLUMN {column_def};")
             except sqlite3.OperationalError as e:
-                if "duplicate column name" in str(e): pass
-                else: logger.warning(f"Migration warning for stats: {e}")
+                if "duplicate column name" in str(e):
+                    pass
+                else:
+                    logger.warning(f"Migration warning for stats: {e}")
 
         # Ensure skill_exp in 'player_skills'
         try:
             cursor.execute("ALTER TABLE player_skills ADD COLUMN skill_exp REAL DEFAULT 0;")
         except sqlite3.OperationalError as e:
-            if "duplicate column name" not in str(e): logger.warning(f"Migration warning: {e}")
+            if "duplicate column name" not in str(e):
+                logger.warning(f"Migration warning: {e}")
 
         logger.info("Database schema checked/created.")
         conn.commit()
@@ -281,6 +289,7 @@ def create_tables():
     except Exception as e:
         logger.critical(f"Schema creation failed: {e}")
         raise
+
 
 if __name__ == "__main__":
     create_tables()

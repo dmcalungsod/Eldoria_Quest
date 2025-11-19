@@ -6,8 +6,8 @@ Hardened: Robust JSON parsing and layout stability.
 """
 
 import json
-import sqlite3
 import logging
+import sqlite3
 
 import discord
 
@@ -78,7 +78,7 @@ class AdventureEmbeds:
         # Using emojis for clean layout
         try:
             hp_percent = vitals["current_hp"] / max(player_stats.max_hp, 1)
-            
+
             # Simple status indicator
             status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
 

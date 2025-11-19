@@ -19,7 +19,7 @@ class ExpCalculator:
         # Extract monster details with safe defaults
         monster_level = monster_data.get("level", 1)
         tier = monster_data.get("tier", "Normal")
-        
+
         # Default XP formula if not specified in data
         base_xp = monster_data.get("xp", monster_level * 8)
 
@@ -32,7 +32,7 @@ class ExpCalculator:
         # Level Difference Penalty
         # If player is 5+ levels higher, reduce XP to prevent farming low mobs
         level_diff = player_level - monster_level
-        
+
         if level_diff >= 5:
             excess = level_diff - 4
             # Max penalty 80% at level diff 12+

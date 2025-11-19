@@ -6,10 +6,13 @@ Hardened with atomic transactions to ensure complete character setup.
 """
 
 import logging
+
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
+
 from .player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.creator")
+
 
 class PlayerCreator:
     def __init__(self, db):
@@ -29,7 +32,7 @@ class PlayerCreator:
             if data["id"] == class_id:
                 class_name = name
                 break
-        
+
         if not class_name:
             return False, "Invalid class selection."
 
@@ -49,41 +52,43 @@ class PlayerCreator:
             with self.db.get_connection() as conn:
                 # 3. Insert Player Record & Stats (Handled by DB Manager logic or manually here for atomicity)
                 # We use the raw queries here to bundle skills in the same transaction context
-                
+
                 # Insert Player
                 conn.execute(
                     """
                     INSERT INTO players (
-                        discord_id, name, class_id, race, gender, 
+                        discord_id, name, class_id, race, gender,
                         level, experience, exp_to_next, current_hp, current_mp, vestige_pool, aurum
                     ) VALUES (?, ?, ?, ?, ?, 1, 0, 1000, ?, ?, 0, 0)
                     """,
-                    (discord_id, username, class_id, race, gender, stats.max_hp, stats.max_mp)
+                    (discord_id, username, class_id, race, gender, stats.max_hp, stats.max_mp),
                 )
 
                 # Insert Stats JSON
                 conn.execute(
                     "INSERT INTO stats (discord_id, stats_json) VALUES (?, ?)",
-                    (discord_id, str(stats.to_dict()).replace("'", '"')) # Simple dict->json str, essentially json.dumps
+                    (
+                        discord_id,
+                        str(stats.to_dict()).replace("'", '"'),
+                    ),  # Simple dict->json str, essentially json.dumps
                 )
-                
+
                 # 4. Add Default Skills
                 # Find skills with learn_cost=0 for this class
                 default_skills = conn.execute(
-                    "SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0", 
-                    (class_id,)
+                    "SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0", (class_id,)
                 ).fetchall()
 
                 for skill in default_skills:
                     conn.execute(
                         "INSERT INTO player_skills (discord_id, skill_key, skill_level) VALUES (?, ?, 1)",
-                        (discord_id, skill["key_id"])
+                        (discord_id, skill["key_id"]),
                     )
-                
+
                 # 5. Register Guild Member (Starting Rank F)
                 conn.execute(
                     "INSERT INTO guild_members (discord_id, rank, join_date) VALUES (?, 'F', datetime('now'))",
-                    (discord_id,)
+                    (discord_id,),
                 )
 
             logger.info(f"Character created for {username} ({discord_id})")

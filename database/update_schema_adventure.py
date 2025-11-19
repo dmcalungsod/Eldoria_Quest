@@ -5,8 +5,8 @@ Adds the 'adventure_sessions' table to tracking ongoing explorations.
 Hardened: Uses logging and safe execution block.
 """
 
-import sqlite3
 import logging
+import sqlite3
 
 # Configure logging only if run directly
 if __name__ == "__main__":
@@ -15,6 +15,7 @@ if __name__ == "__main__":
 logger = logging.getLogger("db_update_adv")
 
 DATABASE_NAME = "EQ_Game.db"
+
 
 def update_schema():
     try:
@@ -38,7 +39,7 @@ def update_schema():
             active_monster_json TEXT DEFAULT NULL
         )
         """)
-        
+
         logger.info("✔ Table 'adventure_sessions' created/checked.")
         conn.commit()
         conn.close()
@@ -46,6 +47,7 @@ def update_schema():
 
     except Exception as e:
         logger.critical(f"Schema update failed: {e}")
+
 
 if __name__ == "__main__":
     update_schema()

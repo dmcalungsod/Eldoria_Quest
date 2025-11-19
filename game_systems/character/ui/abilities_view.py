@@ -15,6 +15,7 @@ import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.items.inventory_manager import InventoryManager
+
 from .inventory_view import InventoryView
 
 logger = logging.getLogger("eldoria.ui.abilities")

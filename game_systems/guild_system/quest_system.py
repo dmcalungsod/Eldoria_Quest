@@ -7,27 +7,31 @@ Hardened: Atomic transactions and safe state validation.
 
 import json
 import logging
-from typing import Dict, List, Optional, Tuple
+
 from database.database_manager import DatabaseManager
+from game_systems.data.emojis import ERROR, WARNING
 from game_systems.guild_system.reward_system import RewardSystem
-from game_systems.data.emojis import ERROR, WARNING, CHECK
 
 logger = logging.getLogger("eldoria.quests")
+
 
 class QuestSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
         self.reward_system = RewardSystem(db_manager)
 
-    def get_available_quests(self, discord_id: int) -> List[Dict]:
+    def get_available_quests(self, discord_id: int) -> list[dict]:
         try:
             with self.db.get_connection() as conn:
                 rank_row = conn.execute("SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,)).fetchone()
-                if not rank_row: return []
-                
+                if not rank_row:
+                    return []
+
                 player_rank = rank_row["rank"]
 
-                taken = conn.execute("SELECT quest_id FROM player_quests WHERE discord_id = ?", (discord_id,)).fetchall()
+                taken = conn.execute(
+                    "SELECT quest_id FROM player_quests WHERE discord_id = ?", (discord_id,)
+                ).fetchall()
                 taken_ids = {row["quest_id"] for row in taken}
 
                 quests = conn.execute(
@@ -39,12 +43,13 @@ class QuestSystem:
             logger.error(f"Error fetching quests for {discord_id}: {e}", exc_info=True)
             return []
 
-    def get_quest_details(self, quest_id: int) -> Optional[Dict]:
+    def get_quest_details(self, quest_id: int) -> dict | None:
         try:
             with self.db.get_connection() as conn:
                 row = conn.execute("SELECT * FROM quests WHERE id = ?", (quest_id,)).fetchone()
-                if not row: return None
-                
+                if not row:
+                    return None
+
                 details = dict(row)
                 try:
                     details["objectives"] = json.loads(details["objectives"])
@@ -57,7 +62,7 @@ class QuestSystem:
             logger.error(f"Details fetch error: {e}")
             return None
 
-    def get_player_quests(self, discord_id: int) -> List[Dict]:
+    def get_player_quests(self, discord_id: int) -> list[dict]:
         try:
             with self.db.get_connection() as conn:
                 rows = conn.execute(
@@ -67,7 +72,7 @@ class QuestSystem:
                     JOIN quests q ON pq.quest_id = q.id
                     WHERE pq.discord_id = ? AND pq.status = 'in_progress'
                     """,
-                    (discord_id,)
+                    (discord_id,),
                 ).fetchall()
 
                 results = []
@@ -91,10 +96,12 @@ class QuestSystem:
                 exists = conn.execute(
                     "SELECT 1 FROM player_quests WHERE discord_id = ? AND quest_id = ?", (discord_id, quest_id)
                 ).fetchone()
-                if exists: return False
+                if exists:
+                    return False
 
                 q_data = conn.execute("SELECT objectives FROM quests WHERE id = ?", (quest_id,)).fetchone()
-                if not q_data: return False
+                if not q_data:
+                    return False
 
                 try:
                     objectives = json.loads(q_data["objectives"])
@@ -110,7 +117,7 @@ class QuestSystem:
 
                 conn.execute(
                     "INSERT INTO player_quests (discord_id, quest_id, status, progress) VALUES (?, ?, ?, ?)",
-                    (discord_id, quest_id, "in_progress", json.dumps(progress))
+                    (discord_id, quest_id, "in_progress", json.dumps(progress)),
                 )
                 logger.info(f"User {discord_id} accepted quest {quest_id}")
                 return True
@@ -122,11 +129,11 @@ class QuestSystem:
         try:
             with self.db.get_connection() as conn:
                 row = conn.execute(
-                    "SELECT progress FROM player_quests WHERE discord_id = ? AND quest_id = ?",
-                    (discord_id, quest_id)
+                    "SELECT progress FROM player_quests WHERE discord_id = ? AND quest_id = ?", (discord_id, quest_id)
                 ).fetchone()
-                
-                if not row: return False
+
+                if not row:
+                    return False
 
                 try:
                     progress = json.loads(row["progress"])
@@ -137,7 +144,7 @@ class QuestSystem:
                     progress[obj_type][target] += amount
                     conn.execute(
                         "UPDATE player_quests SET progress = ? WHERE discord_id = ? AND quest_id = ?",
-                        (json.dumps(progress), discord_id, quest_id)
+                        (json.dumps(progress), discord_id, quest_id),
                     )
                     return True
             return False
@@ -145,17 +152,17 @@ class QuestSystem:
             logger.error(f"Update progress error: {e}")
             return False
 
-    def complete_quest(self, discord_id: int, quest_id: int) -> Tuple[bool, str]:
+    def complete_quest(self, discord_id: int, quest_id: int) -> tuple[bool, str]:
         try:
             with self.db.get_connection() as conn:
                 row = conn.execute(
                     """
-                    SELECT pq.progress, q.objectives 
+                    SELECT pq.progress, q.objectives
                     FROM player_quests pq
                     JOIN quests q ON pq.quest_id = q.id
                     WHERE pq.discord_id = ? AND pq.quest_id = ? AND pq.status = 'in_progress'
                     """,
-                    (discord_id, quest_id)
+                    (discord_id, quest_id),
                 ).fetchone()
 
                 if not row:
@@ -169,9 +176,9 @@ class QuestSystem:
 
                 conn.execute(
                     "UPDATE player_quests SET status = 'completed' WHERE discord_id = ? AND quest_id = ?",
-                    (discord_id, quest_id)
+                    (discord_id, quest_id),
                 )
-                
+
             # Grant rewards
             reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
             return True, reward_msg
@@ -180,7 +187,7 @@ class QuestSystem:
             logger.error(f"Quest completion error: {e}", exc_info=True)
             return False, f"{ERROR} System error during completion."
 
-    def check_completion(self, progress: Dict, objectives: Dict) -> bool:
+    def check_completion(self, progress: dict, objectives: dict) -> bool:
         for obj_type, tasks in objectives.items():
             if isinstance(tasks, dict):
                 for target, req in tasks.items():

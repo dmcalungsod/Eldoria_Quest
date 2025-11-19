@@ -7,6 +7,7 @@ Hardened: Standardized logging and setup.
 """
 
 import logging
+
 from discord.ext import commands
 
 from database.database_manager import DatabaseManager

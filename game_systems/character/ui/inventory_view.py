@@ -7,6 +7,7 @@ Hardened: Async database operations for equipping/unequipping.
 
 import asyncio
 import logging
+
 import discord
 from discord.ui import Button, Select, View
 
@@ -34,7 +35,7 @@ class InventoryView(View):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
-        
+
         # Managers
         self.inv_manager = InventoryManager(self.db)
         self.eq_manager = EquipmentManager(self.db)
@@ -47,12 +48,8 @@ class InventoryView(View):
         self.equip_select = Select(placeholder="Equip...", min_values=1, max_values=1, row=0)
         self.unequip_select = Select(placeholder="Unequip...", min_values=1, max_values=1, row=1)
         self.use_select = Select(placeholder="Use Item...", min_values=1, max_values=1, row=2)
-        
-        self.back_button = Button(
-            label=self.previous_view_label, 
-            style=discord.ButtonStyle.secondary, 
-            row=3
-        )
+
+        self.back_button = Button(label=self.previous_view_label, style=discord.ButtonStyle.secondary, row=3)
 
         self._populate_ui()
 
@@ -87,7 +84,7 @@ class InventoryView(View):
                     unequip_opts.append(discord.SelectOption(label=label, value=val, emoji="🛡️"))
                 else:
                     equip_opts.append(discord.SelectOption(label=label, value=val, emoji="⚔️"))
-            
+
             elif item["item_type"] == "consumable":
                 label = f"{item['item_name']} (x{item['count']})"
                 use_opts.append(discord.SelectOption(label=label, value=val, emoji="🧪"))
@@ -99,7 +96,7 @@ class InventoryView(View):
 
     def _set_options(self, select, options, empty_msg):
         if options:
-            select.options = options[:25] # Discord limit
+            select.options = options[:25]  # Discord limit
             select.disabled = False
         else:
             select.add_option(label=empty_msg, value="disabled")
@@ -117,45 +114,34 @@ class InventoryView(View):
     async def equip_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         inv_id = int(interaction.data["values"][0])
-        
+
         # Run DB operation in thread
-        success, msg = await asyncio.to_thread(
-            self.eq_manager.equip_item, self.interaction_user.id, inv_id
-        )
-        
+        success, msg = await asyncio.to_thread(self.eq_manager.equip_item, self.interaction_user.id, inv_id)
+
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
 
     async def unequip_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         inv_id = int(interaction.data["values"][0])
-        
-        success, msg = await asyncio.to_thread(
-            self.eq_manager.unequip_item, self.interaction_user.id, inv_id
-        )
-        
+
+        success, msg = await asyncio.to_thread(self.eq_manager.unequip_item, self.interaction_user.id, inv_id)
+
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
 
     async def use_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         inv_id = int(interaction.data["values"][0])
-        
-        success, msg = await asyncio.to_thread(
-            self.con_manager.use_item, self.interaction_user.id, inv_id
-        )
-        
+
+        success, msg = await asyncio.to_thread(self.con_manager.use_item, self.interaction_user.id, inv_id)
+
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
 
     async def _refresh(self, interaction: discord.Interaction):
         items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
         embed = build_inventory_embed(items)
-        
-        new_view = InventoryView(
-            self.db, 
-            self.interaction_user, 
-            self.previous_view_callback, 
-            self.previous_view_label
-        )
+
+        new_view = InventoryView(self.db, self.interaction_user, self.previous_view_callback, self.previous_view_label)
         await interaction.edit_original_response(embed=embed, view=new_view)

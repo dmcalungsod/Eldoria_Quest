@@ -7,10 +7,9 @@ Atmosphere restored.
 """
 
 import asyncio
-import math
 import logging
+import math
 import sqlite3
-from typing import Tuple
 
 import discord
 from discord.ext import commands
@@ -19,6 +18,7 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.skills_data import SKILLS
+
 from .ui_helpers import back_to_guild_hall_callback
 
 logger = logging.getLogger("eldoria.ui.trainer")
@@ -97,7 +97,8 @@ class SkillTrainerView(View):
         )
 
         learnable = [
-            s for s in SKILLS.values()
+            s
+            for s in SKILLS.values()
             if s.get("class_id") == self.player_class_id
             and s.get("learn_cost", 0) > 0
             and s["key_id"] not in self.player_skills
@@ -112,7 +113,7 @@ class SkillTrainerView(View):
             cost = skill["learn_cost"]
             can_afford = self.vestige_pool >= cost
             emoji = "📖" if can_afford else "🔒"
-            
+
             learn_select.add_option(
                 label=f"{skill['name']} ({cost} V)",
                 value=f"{skill['key_id']}:{cost}",
@@ -166,52 +167,50 @@ class SkillTrainerView(View):
     # --------------------------------------------------------
     # Execution Logic (Threaded)
     # --------------------------------------------------------
-    def _execute_learn(self, skill_key: str, cost: int) -> Tuple[bool, str]:
+    def _execute_learn(self, skill_key: str, cost: int) -> tuple[bool, str]:
         try:
             with self.db.get_connection() as conn:
                 # 1. Verify Funds
                 row = conn.execute(
-                    "SELECT vestige_pool FROM players WHERE discord_id = ?", 
-                    (self.interaction_user.id,)
+                    "SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,)
                 ).fetchone()
-                
+
                 if not row or row["vestige_pool"] < cost:
                     return False, "Insufficient Vestige."
 
                 # 2. Deduct & Learn
                 conn.execute(
                     "UPDATE players SET vestige_pool = vestige_pool - ? WHERE discord_id = ?",
-                    (cost, self.interaction_user.id)
+                    (cost, self.interaction_user.id),
                 )
                 conn.execute(
                     "INSERT INTO player_skills (discord_id, skill_key, skill_level) VALUES (?, ?, 1)",
-                    (self.interaction_user.id, skill_key)
+                    (self.interaction_user.id, skill_key),
                 )
             return True, "Skill Learned!"
         except Exception as e:
             logger.error(f"Learn skill error: {e}")
             return False, "System error."
 
-    def _execute_upgrade(self, skill_key: str, cost: int, new_level: int) -> Tuple[bool, str]:
+    def _execute_upgrade(self, skill_key: str, cost: int, new_level: int) -> tuple[bool, str]:
         try:
             with self.db.get_connection() as conn:
                 # 1. Verify Funds
                 row = conn.execute(
-                    "SELECT vestige_pool FROM players WHERE discord_id = ?", 
-                    (self.interaction_user.id,)
+                    "SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,)
                 ).fetchone()
-                
+
                 if not row or row["vestige_pool"] < cost:
                     return False, "Insufficient Vestige."
 
                 # 2. Deduct & Upgrade
                 conn.execute(
                     "UPDATE players SET vestige_pool = vestige_pool - ? WHERE discord_id = ?",
-                    (cost, self.interaction_user.id)
+                    (cost, self.interaction_user.id),
                 )
                 conn.execute(
                     "UPDATE player_skills SET skill_level = ? WHERE discord_id = ? AND skill_key = ?",
-                    (new_level, self.interaction_user.id, skill_key)
+                    (new_level, self.interaction_user.id, skill_key),
                 )
             return True, "Skill Upgraded!"
         except Exception as e:
@@ -224,7 +223,7 @@ class SkillTrainerView(View):
     async def learn_skill_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         skill_key, cost = interaction.data["values"][0].split(":")
-        
+
         success, msg = await asyncio.to_thread(self._execute_learn, skill_key, int(cost))
         await self._refresh_ui(interaction, success, msg, skill_key)
 
@@ -232,19 +231,19 @@ class SkillTrainerView(View):
         await interaction.response.defer()
         skill_key, cost, level = interaction.data["values"][0].split(":")
         new_level = int(level) + 1
-        
+
         success, msg = await asyncio.to_thread(self._execute_upgrade, skill_key, int(cost), new_level)
         await self._refresh_ui(interaction, success, msg, skill_key, new_level)
 
     async def _refresh_ui(self, interaction, success, msg, skill_key, level=1):
         """Common refresh logic."""
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        
+
         embed = self.build_skill_embed(dict(p_data), msg if success else f"Error: {msg}")
-        
+
         new_view = SkillTrainerView(self.db, self.interaction_user, p_data)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
-        
+
         await interaction.edit_original_response(embed=embed, view=new_view)
 
     @staticmethod
@@ -262,7 +261,7 @@ class SkillTrainerView(View):
         if status_message:
             embed.add_field(name="Training Report", value=status_message, inline=False)
         else:
-             embed.set_footer(text="Unaffordable options will appear disabled.")
+            embed.set_footer(text="Unaffordable options will appear disabled.")
 
         return embed
 
@@ -271,6 +270,7 @@ class SkillTrainerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = DatabaseManager()
+
 
 async def setup(bot):
     await bot.add_cog(SkillTrainerCog(bot))

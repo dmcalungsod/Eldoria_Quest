@@ -59,9 +59,7 @@ class RankProgressView(View, GuildViewMixin):
 
         try:
             # Re-check eligibility (threaded DB call)
-            eligible = await asyncio.to_thread(
-                self.rank_system.check_promotion_eligibility, self.interaction_user.id
-            )
+            eligible = await asyncio.to_thread(self.rank_system.check_promotion_eligibility, self.interaction_user.id)
             if not eligible:
                 await interaction.followup.send(
                     f"{E.WARNING} You no longer meet the promotion requirements.", ephemeral=True
@@ -74,9 +72,7 @@ class RankProgressView(View, GuildViewMixin):
             next_rank_key = self.rank_system.get_next_rank(current_rank)
 
             if not next_rank_key:
-                await interaction.followup.send(
-                    f"{E.MEDAL} You have already reached the highest rank.", ephemeral=True
-                )
+                await interaction.followup.send(f"{E.MEDAL} You have already reached the highest rank.", ephemeral=True)
                 return
 
             next_rank_title = self.rank_system.RANKS.get(next_rank_key, {}).get("title", next_rank_key)
@@ -178,9 +174,10 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             # Build the exploration view and hand control over to the Adventure system
             # Note: Active monster is parsed inside ExplorationView from session_row if present
             import json
+
             active_monster = None
             if session_row and session_row["active_monster_json"]:
-                 active_monster = json.loads(session_row["active_monster_json"])
+                active_monster = json.loads(session_row["active_monster_json"])
 
             view = ExplorationView(
                 self.db,
@@ -189,7 +186,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
                 log=["Trial Started."],
                 interaction_user=self.interaction_user,
                 player_stats=stats,
-                active_monster=active_monster
+                active_monster=active_monster,
             )
 
             await interaction.edit_original_response(embed=embed, view=view)

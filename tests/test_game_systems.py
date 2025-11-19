@@ -8,11 +8,10 @@ SAFE: Uses temporary test database, never touches production data.
 import os
 import sys
 import tempfile
-import sqlite3
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DATABASE_NAME, DatabaseManager
+from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.damage_formula import DamageFormula
 from game_systems.items.equipment_manager import EquipmentManager
@@ -22,6 +21,7 @@ from game_systems.player.player_stats import PlayerStats
 
 TEST_DB_PATH = None
 
+
 def setup_test_database():
     """Create a temporary test database."""
     global TEST_DB_PATH
@@ -30,15 +30,16 @@ def setup_test_database():
     import database.populate_database as db_populate
 
     TEST_DB_PATH = tempfile.mktemp(suffix=".db")
-    
+
     # Patch paths
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
-    db_populate.DB = TEST_DB_PATH # FIX: Correct variable name
-    
+    db_populate.DB = TEST_DB_PATH  # FIX: Correct variable name
+
     DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
 
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
+
 
 def cleanup_test_database():
     """Remove temporary test database."""
@@ -50,13 +51,14 @@ def cleanup_test_database():
         except PermissionError:
             pass
 
+
 def setup_test_environment():
     """Set up test environment with database and test player."""
     print("\n=== Setting Up Test Environment ===")
-    
+
     import database.create_database as db_create
     import database.populate_database as db_populate
-    
+
     db_create.create_tables()
     db_populate.main()
 
@@ -92,6 +94,7 @@ def setup_test_environment():
     print("✓ Test environment ready")
     return test_discord_id
 
+
 def test_player_stats():
     """Test PlayerStats class."""
     print("\n=== Testing PlayerStats ===")
@@ -116,8 +119,10 @@ def test_player_stats():
     except Exception as e:
         print(f"✗ PlayerStats test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def test_inventory_system(test_discord_id):
     """Test inventory operations."""
@@ -133,8 +138,8 @@ def test_inventory_system(test_discord_id):
             item_type="equipment",
             rarity="Uncommon",
             amount=1,
-            slot="sword", # FIX: Use valid lowercase slot key
-            item_source_table="equipment"
+            slot="sword",  # FIX: Use valid lowercase slot key
+            item_source_table="equipment",
         )
         print("✓ Item added to inventory")
 
@@ -157,8 +162,10 @@ def test_inventory_system(test_discord_id):
     except Exception as e:
         print(f"✗ Inventory test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def test_equipment_system(test_discord_id):
     """Test equipment and stat recalculation."""
@@ -198,8 +205,10 @@ def test_equipment_system(test_discord_id):
     except Exception as e:
         print(f"✗ Equipment test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def test_combat_system(test_discord_id):
     """Test combat engine."""
@@ -231,8 +240,10 @@ def test_combat_system(test_discord_id):
     except Exception as e:
         print(f"✗ Combat test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def test_damage_formulas():
     """Test damage calculation formulas."""
@@ -254,8 +265,10 @@ def test_damage_formulas():
     except Exception as e:
         print(f"✗ Damage formula test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def test_level_up_system(test_discord_id):
     """Test level-up and experience system."""
@@ -278,8 +291,10 @@ def test_level_up_system(test_discord_id):
     except Exception as e:
         print(f"✗ Level-up test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def cleanup_test_data(test_discord_id):
     """Clean up test data."""
@@ -291,15 +306,16 @@ def cleanup_test_data(test_discord_id):
             conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
             conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
             conn.execute("DELETE FROM player_skills WHERE discord_id = ?", (test_discord_id,))
-            
+
             # Delete parent last
             conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
-            
+
         print("✓ Test data cleaned up")
         return True
     except Exception as e:
         print(f"✗ Cleanup failed: {e}")
         return False
+
 
 def run_all_tests():
     print("\n" + "=" * 60)
@@ -338,6 +354,7 @@ def run_all_tests():
     print("=" * 60 + "\n")
 
     return passed == total
+
 
 if __name__ == "__main__":
     success = run_all_tests()

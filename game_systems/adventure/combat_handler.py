@@ -8,7 +8,7 @@ Hardened: Syncs session XP to prevent duplicate level-up messages.
 import json
 import logging
 import random
-from typing import Any, Dict, Tuple, Optional
+from typing import Any
 
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
@@ -19,12 +19,13 @@ from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.combat")
 
+
 class CombatHandler:
     def __init__(self, db: DatabaseManager, discord_id: int):
         self.db = db
         self.discord_id = discord_id
 
-    def initiate_combat(self, location: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], str]:
+    def initiate_combat(self, location: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
         """
         Selects a monster and prepares the combat session.
         """
@@ -76,7 +77,9 @@ class CombatHandler:
             logger.error(f"Combat init failed for {self.discord_id}: {e}", exc_info=True)
             return None, "An error occurred while tracking the enemy."
 
-    def resolve_turn(self, active_monster: Dict[str, Any], battle_report: Dict[str, Any], accumulated_exp: int = 0) -> Dict[str, Any]:
+    def resolve_turn(
+        self, active_monster: dict[str, Any], battle_report: dict[str, Any], accumulated_exp: int = 0
+    ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
         Args:
@@ -94,20 +97,20 @@ class CombatHandler:
             with self.db.get_connection() as conn:
                 # Fetch Class & Level
                 p_row = conn.execute(
-                    "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?", 
-                    (self.discord_id,)
+                    "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?",
+                    (self.discord_id,),
                 ).fetchone()
 
                 # Fetch Active Skills
                 skills_cursor = conn.execute(
                     """
-                    SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost, 
+                    SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
                            s.power_multiplier, s.heal_power, s.buff_data
                     FROM player_skills ps
                     JOIN skills s ON ps.skill_key=s.key_id
                     WHERE ps.discord_id=? AND s.type='Active'
                     """,
-                    (self.discord_id,)
+                    (self.discord_id,),
                 )
                 skills = [dict(row) for row in skills_cursor.fetchall()]
 
@@ -120,26 +123,24 @@ class CombatHandler:
                         s["buff_data"] = {}
 
             # 3. Setup Wrappers & Fast-Forward State
-            player_wrapper = LevelUpSystem(
-                player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"]
-            )
-            
+            player_wrapper = LevelUpSystem(player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"])
+
             # FIX: Apply session XP so leveling logic is up to date
             if accumulated_exp > 0:
                 player_wrapper.add_exp(accumulated_exp)
 
             player_wrapper.hp_current = vitals["current_hp"]
-            
+
             boosts = self._fetch_active_boosts()
 
             # 4. Run Engine
             engine = CombatEngine(
-                player=player_wrapper, 
-                monster=active_monster, 
-                player_skills=skills, 
-                player_mp=vitals["current_mp"], 
-                player_class_id=p_row["class_id"], 
-                active_boosts=boosts
+                player=player_wrapper,
+                monster=active_monster,
+                player_skills=skills,
+                player_mp=vitals["current_mp"],
+                player_class_id=p_row["class_id"],
+                active_boosts=boosts,
             )
 
             result = engine.run_combat_turn()
@@ -164,10 +165,10 @@ class CombatHandler:
                 "mp_current": vitals["current_mp"] if vitals else 1,
                 "monster_hp": active_monster.get("HP", 0),
                 "turn_report": {},
-                "active_boosts": {}
+                "active_boosts": {},
             }
 
-    def _fetch_active_boosts(self) -> Dict[str, float]:
+    def _fetch_active_boosts(self) -> dict[str, float]:
         try:
             return {b["boost_key"]: b["multiplier"] for b in self.db.get_active_boosts()}
         except Exception:
@@ -176,9 +177,14 @@ class CombatHandler:
     @staticmethod
     def create_empty_battle_report():
         return {
-            "str_hits": 0, "dex_hits": 0, "mag_hits": 0,
-            "player_crit": 0, "player_dodge": 0, "damage_taken": 0,
-            "skills_used": 0, "skill_key_used": None,
+            "str_hits": 0,
+            "dex_hits": 0,
+            "mag_hits": 0,
+            "player_crit": 0,
+            "player_dodge": 0,
+            "damage_taken": 0,
+            "skills_used": 0,
+            "skill_key_used": None,
         }
 
     @staticmethod

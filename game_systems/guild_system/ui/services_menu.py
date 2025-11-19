@@ -62,7 +62,7 @@ class GuildServicesView(View, GuildViewMixin):
 
         await interaction.response.defer()
         exchange = SystemCache.get_guild_exchange(self.db)
-        
+
         # Heavy calculation in thread
         val, mats = await asyncio.to_thread(exchange.calculate_exchange_value, self.interaction_user.id)
 
@@ -72,8 +72,9 @@ class GuildServicesView(View, GuildViewMixin):
         else:
             # Limit list length
             rows = [f"• {m['item_name']} x{m['count']}" for m in mats[:10]]
-            if len(mats) > 10: rows.append("...")
-            
+            if len(mats) > 10:
+                rows.append("...")
+
             embed.add_field(name="Materials", value="\n".join(rows), inline=False)
             embed.add_field(name="Value", value=f"{val} Aurum", inline=False)
 
@@ -86,8 +87,9 @@ class GuildServicesView(View, GuildViewMixin):
 
         await interaction.response.defer()
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        if not p_data: return
-        
+        if not p_data:
+            return
+
         aurum = p_data["aurum"]
 
         embed = discord.Embed(title="Guild Supply", description=f"Funds: {aurum} Aurum", color=discord.Color.green())

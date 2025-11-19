@@ -70,10 +70,10 @@ class LevelUpSystem:
     def from_dict(cls, data: dict):
         if not data:
             return cls(PlayerStats())
-            
+
         stats_data = data.get("stats", {})
         stats = PlayerStats.from_dict(stats_data)
-        
+
         return cls(
             stats=stats,
             level=data.get("level", 1),

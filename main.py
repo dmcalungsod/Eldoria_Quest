@@ -8,10 +8,15 @@ Hardened: Safe startup, logging, and error handling.
 import logging
 import os
 import sys
-import asyncio
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+
+# --- Database Imports ---
+# Moved to top to satisfy PEP 8 / Ruff (E402)
+from database.create_database import create_tables
+from database.populate_database import main as populate_db
 
 # Ensure root dir is in path
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,9 +48,6 @@ if not TOKEN:
     logger.critical("Missing DISCORD_BOT_TOKEN in .env. Exiting.")
     sys.exit(1)
 
-# --- Database Init ---
-from database.create_database import create_tables
-from database.populate_database import main as populate_db
 
 def init_db():
     """Initializes the database safely on startup."""
@@ -58,25 +60,23 @@ def init_db():
         logger.critical(f"Database initialization failed: {e}", exc_info=True)
         sys.exit(1)
 
+
 # --- Bot Class ---
 class EldoriaBot(commands.Bot):
     def __init__(self):
         # Define intents
         intents = discord.Intents.default()
         intents.message_content = True  # Required for reading commands
-        
+
         super().__init__(
-            command_prefix="!",
-            intents=intents,
-            activity=discord.Game(name="Eldoria | /start"),
-            help_command=None
+            command_prefix="!", intents=intents, activity=discord.Game(name="Eldoria | /start"), help_command=None
         )
 
     async def setup_hook(self):
         """Loads Cogs and Syncs Commands."""
         logger.info("Loading Cogs...")
         cogs_dir = os.path.join(ROOT_DIR, "cogs")
-        
+
         if not os.path.exists(cogs_dir):
             logger.warning("'cogs' directory missing. Creating...")
             os.makedirs(cogs_dir, exist_ok=True)
@@ -111,15 +111,16 @@ class EldoriaBot(commands.Bot):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
         logger.info("Eldoria Quest is online and ready.")
 
+
 # --- Main Execution ---
 if __name__ == "__main__":
     # 1. Init Database
     init_db()
-    
+
     # 2. Start Bot
     bot = EldoriaBot()
     try:
-        bot.run(TOKEN, log_handler=None) # Use our custom logger
+        bot.run(TOKEN, log_handler=None)  # Use our custom logger
     except discord.LoginFailure:
         logger.critical("Invalid Token provided.")
     except Exception as e:

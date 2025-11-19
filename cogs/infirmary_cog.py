@@ -10,18 +10,23 @@ import asyncio
 import logging
 import math
 import sqlite3
+
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
+
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
+
 from .ui_helpers import back_to_guild_hall_callback
 
 logger = logging.getLogger("eldoria.infirmary")
 
+
 def infirmary_cost(missing_hp: int) -> int:
     return max(1, math.ceil(missing_hp * 0.5)) if missing_hp > 0 else 0
+
 
 class InfirmaryView(View):
     def __init__(self, db: DatabaseManager, user: discord.User, p_data: sqlite3.Row, stats: PlayerStats):
@@ -38,10 +43,10 @@ class InfirmaryView(View):
         self.cost = infirmary_cost(self.missing_hp)
 
         # Heal Button
-        disabled = (self.missing_hp <= 0 and self.missing_mp <= 0)
+        disabled = self.missing_hp <= 0 and self.missing_mp <= 0
         label = f"Heal ({self.cost} G)" if not disabled else "Fully Restored"
         style = discord.ButtonStyle.primary if not disabled else discord.ButtonStyle.secondary
-        
+
         # Disable if broke
         if p_data["aurum"] < self.cost:
             disabled = True
@@ -67,22 +72,24 @@ class InfirmaryView(View):
         try:
             with self.db.get_connection() as conn:
                 # Re-fetch to ensure atomic accuracy
-                row = conn.execute("SELECT current_hp, current_mp, aurum FROM players WHERE discord_id=?", (self.user.id,)).fetchone()
-                
+                row = conn.execute(
+                    "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id=?", (self.user.id,)
+                ).fetchone()
+
                 # Re-calculate costs dynamically
                 missing = max(0, self.stats.max_hp - row["current_hp"])
                 cost = infirmary_cost(missing)
 
                 if missing == 0 and row["current_mp"] >= self.stats.max_mp:
                     return False, "You are already healthy."
-                
+
                 if row["aurum"] < cost:
                     return False, "Insufficient funds."
 
                 # Apply
                 conn.execute(
                     "UPDATE players SET current_hp=?, current_mp=?, aurum=? WHERE discord_id=?",
-                    (self.stats.max_hp, self.stats.max_mp, row["aurum"] - cost, self.user.id)
+                    (self.stats.max_hp, self.stats.max_mp, row["aurum"] - cost, self.user.id),
                 )
                 return True, f"Restored HP/MP for {cost} Aurum."
         except Exception as e:
@@ -96,7 +103,7 @@ class InfirmaryView(View):
         # Refresh Data
         tasks = [
             asyncio.to_thread(self.db.get_player, self.user.id),
-            asyncio.to_thread(self.db.get_player_stats_json, self.user.id)
+            asyncio.to_thread(self.db.get_player_stats_json, self.user.id),
         ]
         new_p_data, stats_json = await asyncio.gather(*tasks)
         new_stats = PlayerStats.from_dict(stats_json)
@@ -111,7 +118,7 @@ class InfirmaryView(View):
     def build_infirmary_embed(p_data, stats, msg=None, success=True) -> discord.Embed:
         hp_miss = max(0, stats.max_hp - p_data["current_hp"])
         cost = infirmary_cost(hp_miss)
-        
+
         description = (
             "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
             "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
@@ -124,26 +131,28 @@ class InfirmaryView(View):
         )
 
         if hp_miss > 0:
-            description += (
-                f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP)."
-            )
+            description += f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP)."
         else:
             description += "You stand in peak condition; no treatment is required."
-        
-        embed = discord.Embed(title="🏥 Adventurer’s Guild — Infirmary", description=description, color=discord.Color.dark_grey())
-        
+
+        embed = discord.Embed(
+            title="🏥 Adventurer’s Guild — Infirmary", description=description, color=discord.Color.dark_grey()
+        )
+
         if msg:
             field_name = "Treatment Complete" if success else "Treatment Declined"
             icon = E.CHECK if success else E.ERROR
             embed.add_field(name=field_name, value=f"{icon} {msg}", inline=False)
             embed.color = discord.Color.green() if success else discord.Color.red()
-            
+
         return embed
+
 
 class InfirmaryCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = DatabaseManager()
+
 
 async def setup(bot):
     await bot.add_cog(InfirmaryCog(bot))

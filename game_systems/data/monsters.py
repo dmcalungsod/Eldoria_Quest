@@ -8,16 +8,46 @@ Rebalanced: Smoother difficulty curve (No more Level 3 wall).
 from math import ceil
 
 NAME_POOL = [
-    "Verdant Slime", "Glimmer Slime", "Goblin Grunt", "Goblin Scout",
-    "Bramble Goblin", "Forest Wolf Pup", "Hollow Spiderling", "Thicket Spider",
-    "Fen Wisp", "Briar Hound", "Mossback Tortoise", "Vineling",
-    "Burbling Sprite", "Rookwood Shade", "Gloam Hare", "Young Treant",
-    "Feral Stag", "Sapling Ent", "Ragged Urch", "Ravaged Boar",
-    "Pine Wight", "Marsh Crawler", "Sporeling", "Ridge Wolf",
-    "Stormling", "Thornback Boar", "Mire Lurker", "Duskling",
-    "Wisp-Sentinel", "Gnarled Brute", "Shade Warden", "Fen Revenant",
-    "Bramble King", "Glade Empress", "Sylvan Herald", "Elder Treant",
-    "Abyssal Wolf", "Blight Stag", "Wretched Entling", "Nightbloom",
+    "Verdant Slime",
+    "Glimmer Slime",
+    "Goblin Grunt",
+    "Goblin Scout",
+    "Bramble Goblin",
+    "Forest Wolf Pup",
+    "Hollow Spiderling",
+    "Thicket Spider",
+    "Fen Wisp",
+    "Briar Hound",
+    "Mossback Tortoise",
+    "Vineling",
+    "Burbling Sprite",
+    "Rookwood Shade",
+    "Gloam Hare",
+    "Young Treant",
+    "Feral Stag",
+    "Sapling Ent",
+    "Ragged Urch",
+    "Ravaged Boar",
+    "Pine Wight",
+    "Marsh Crawler",
+    "Sporeling",
+    "Ridge Wolf",
+    "Stormling",
+    "Thornback Boar",
+    "Mire Lurker",
+    "Duskling",
+    "Wisp-Sentinel",
+    "Gnarled Brute",
+    "Shade Warden",
+    "Fen Revenant",
+    "Bramble King",
+    "Glade Empress",
+    "Sylvan Herald",
+    "Elder Treant",
+    "Abyssal Wolf",
+    "Blight Stag",
+    "Wretched Entling",
+    "Nightbloom",
 ]
 
 MONSTERS = {}
@@ -36,22 +66,22 @@ for idx in range(1, 51):
     # --- Base Stats (Rebalanced) ---
     # Old: 40 + (lvl * 15)
     base_hp = 35 + (level * 12)
-    
+
     # Old: 8 + (lvl * 3) -> Too high for low levels
     # New: 5 + (lvl * 2) -> Lvl 1=7, Lvl 5=15, Lvl 10=25
     base_atk = 5 + (level * 2)
-    
+
     base_def = 1 + level
-    
+
     # --- Tier Multipliers ---
     if tier == "Boss":
-        hp = base_hp * 12      # Reduced from 15x
-        atk = base_atk * 2.5   # Reduced from 3.5x
+        hp = base_hp * 12  # Reduced from 15x
+        atk = base_atk * 2.5  # Reduced from 3.5x
         defense = base_def * 2
         xp_mult = 15.0
     elif tier == "Elite":
-        hp = base_hp * 4       # Kept same
-        atk = base_atk * 1.5   # Reduced from 1.8x
+        hp = base_hp * 4  # Kept same
+        atk = base_atk * 1.5  # Reduced from 1.8x
         defense = base_def * 1.5
         xp_mult = 4.0
     else:
@@ -83,11 +113,16 @@ for idx in range(1, 51):
         else:
             drops.append(("magic_stone_small", 80))
 
-    if "Slime" in name: drops.append(("slime_gel", 40))
-    elif "Goblin" in name: drops.append(("goblin_ear", 35))
-    elif "Wolf" in name: drops.append(("wolf_fang", 25))
-    elif "Spider" in name: drops.append(("spider_silk", 30))
-    elif "Treant" in name: drops.append(("treant_branch", 15))
+    if "Slime" in name:
+        drops.append(("slime_gel", 40))
+    elif "Goblin" in name:
+        drops.append(("goblin_ear", 35))
+    elif "Wolf" in name:
+        drops.append(("wolf_fang", 25))
+    elif "Spider" in name:
+        drops.append(("spider_silk", 30))
+    elif "Treant" in name:
+        drops.append(("treant_branch", 15))
 
     description = (
         f"In the whispering groves of the Shattered Veil, the {name} prowls. "
