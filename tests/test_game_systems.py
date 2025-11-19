@@ -7,14 +7,12 @@ SAFE: Uses temporary test database, never touches production data.
 
 import os
 import sys
+import tempfile
+import sqlite3
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import tempfile
-
-from database.create_database import create_tables
 from database.database_manager import DATABASE_NAME, DatabaseManager
-from database.populate_database import main as populate_db
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.damage_formula import DamageFormula
 from game_systems.items.equipment_manager import EquipmentManager
@@ -23,52 +21,53 @@ from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
 
 TEST_DB_PATH = None
-ORIGINAL_DB_PATH = None
-
 
 def setup_test_database():
     """Create a temporary test database."""
-    global TEST_DB_PATH, ORIGINAL_DB_PATH
+    global TEST_DB_PATH
     import database.create_database as db_create
     import database.database_manager as db_manager
     import database.populate_database as db_populate
 
     TEST_DB_PATH = tempfile.mktemp(suffix=".db")
-    ORIGINAL_DB_PATH = DATABASE_NAME
-
+    
+    # Patch paths
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
-    db_populate.DATABASE_NAME = TEST_DB_PATH
+    db_populate.DB = TEST_DB_PATH # FIX: Correct variable name
+    
     DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
 
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
-
 
 def cleanup_test_database():
     """Remove temporary test database."""
     global TEST_DB_PATH
     if TEST_DB_PATH and os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-        print(f"✓ Removed temporary test database: {TEST_DB_PATH}")
-
+        try:
+            os.remove(TEST_DB_PATH)
+            print(f"✓ Removed temporary test database: {TEST_DB_PATH}")
+        except PermissionError:
+            pass
 
 def setup_test_environment():
     """Set up test environment with database and test player."""
     print("\n=== Setting Up Test Environment ===")
-    create_tables()
-    populate_db()
+    
+    import database.create_database as db_create
+    import database.populate_database as db_populate
+    
+    db_create.create_tables()
+    db_populate.main()
 
     db = DatabaseManager()
     test_discord_id = 888888888
 
-    if db.player_exists(test_discord_id):
-        conn = db.connect()
-        cur = conn.cursor()
-        cur.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
-        cur.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
-        cur.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
-        conn.commit()
-        conn.close()
+    # FIX: Use get_connection context manager
+    with db.get_connection() as conn:
+        conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
+        conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
+        conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
 
     test_stats = {
         "STR": {"base": 15, "bonus": 0},
@@ -92,7 +91,6 @@ def setup_test_environment():
 
     print("✓ Test environment ready")
     return test_discord_id
-
 
 def test_player_stats():
     """Test PlayerStats class."""
@@ -118,10 +116,8 @@ def test_player_stats():
     except Exception as e:
         print(f"✗ PlayerStats test failed: {e}")
         import traceback
-
         traceback.print_exc()
         return False
-
 
 def test_inventory_system(test_discord_id):
     """Test inventory operations."""
@@ -137,7 +133,8 @@ def test_inventory_system(test_discord_id):
             item_type="equipment",
             rarity="Uncommon",
             amount=1,
-            slot="Weapon",
+            slot="sword", # FIX: Use valid lowercase slot key
+            item_source_table="equipment"
         )
         print("✓ Item added to inventory")
 
@@ -160,10 +157,8 @@ def test_inventory_system(test_discord_id):
     except Exception as e:
         print(f"✗ Inventory test failed: {e}")
         import traceback
-
         traceback.print_exc()
         return False
-
 
 def test_equipment_system(test_discord_id):
     """Test equipment and stat recalculation."""
@@ -175,8 +170,7 @@ def test_equipment_system(test_discord_id):
     try:
         # Ensure there's a weapon in the DB to give
         with db.get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM equipment WHERE slot = 'sword' LIMIT 1")
+            cur = conn.execute("SELECT * FROM equipment WHERE slot = 'sword' LIMIT 1")
             weapon = cur.fetchone()
 
             if weapon:
@@ -191,8 +185,10 @@ def test_equipment_system(test_discord_id):
                     item_source_table="equipment",
                 )
                 print(f"✓ Added {weapon['name']} to inventory")
+            else:
+                print("⚠ No sword found in DB, skipping equip test.")
 
-        # Force recalculation (will test the new 'math' import)
+        # Force recalculation
         recalc_stats = equip_manager.recalculate_player_stats(test_discord_id)
         print("✓ Recalculated stats working")
         print(f"  Max HP: {recalc_stats.max_hp}")
@@ -202,10 +198,8 @@ def test_equipment_system(test_discord_id):
     except Exception as e:
         print(f"✗ Equipment test failed: {e}")
         import traceback
-
         traceback.print_exc()
         return False
-
 
 def test_combat_system(test_discord_id):
     """Test combat engine."""
@@ -220,7 +214,6 @@ def test_combat_system(test_discord_id):
         player_wrapper = LevelUpSystem(
             stats=player_stats, level=player["level"], exp=player["experience"], exp_to_next=player["exp_to_next"]
         )
-        # Mock current vitals
         player_wrapper.hp_current = 150
 
         test_monster = {"name": "Test Goblin", "HP": 50, "ATK": 10, "DEF": 5, "DEX": 8, "MAG": 0, "Level": 1, "EXP": 20}
@@ -238,10 +231,8 @@ def test_combat_system(test_discord_id):
     except Exception as e:
         print(f"✗ Combat test failed: {e}")
         import traceback
-
         traceback.print_exc()
         return False
-
 
 def test_damage_formulas():
     """Test damage calculation formulas."""
@@ -249,16 +240,12 @@ def test_damage_formulas():
 
     try:
         player_stats = PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
-
         monster = {"DEF": 5, "Level": 1}
 
-        # FIX: Corrected method name from 'player_basic_attack' to 'player_attack'
         damage, crit, _ = DamageFormula.player_attack(player_stats, monster)
         print(f"✓ Basic attack: {damage} damage, Crit: {crit}")
 
         test_skill = {"key_id": "power_strike", "name": "Power Strike", "power_multiplier": 1.5, "mp_cost": 10}
-
-        # FIX: Added 'skill_level=1' argument
         skill_damage, skill_crit, _ = DamageFormula.player_skill(player_stats, monster, test_skill, skill_level=1)
         print(f"✓ Skill attack: {skill_damage} damage, Crit: {skill_crit}")
 
@@ -267,10 +254,8 @@ def test_damage_formulas():
     except Exception as e:
         print(f"✗ Damage formula test failed: {e}")
         import traceback
-
         traceback.print_exc()
         return False
-
 
 def test_level_up_system(test_discord_id):
     """Test level-up and experience system."""
@@ -293,29 +278,28 @@ def test_level_up_system(test_discord_id):
     except Exception as e:
         print(f"✗ Level-up test failed: {e}")
         import traceback
-
         traceback.print_exc()
         return False
-
 
 def cleanup_test_data(test_discord_id):
     """Clean up test data."""
     print("\n=== Cleaning Up Test Data ===")
     db = DatabaseManager()
     try:
-        conn = db.connect()
-        cur = conn.cursor()
-        cur.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
-        cur.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
-        cur.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
-        conn.commit()
-        conn.close()
+        with db.get_connection() as conn:
+            # Delete children first
+            conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
+            conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
+            conn.execute("DELETE FROM player_skills WHERE discord_id = ?", (test_discord_id,))
+            
+            # Delete parent last
+            conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
+            
         print("✓ Test data cleaned up")
         return True
     except Exception as e:
         print(f"✗ Cleanup failed: {e}")
         return False
-
 
 def run_all_tests():
     print("\n" + "=" * 60)
@@ -354,7 +338,6 @@ def run_all_tests():
     print("=" * 60 + "\n")
 
     return passed == total
-
 
 if __name__ == "__main__":
     success = run_all_tests()
