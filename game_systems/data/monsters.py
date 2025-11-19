@@ -2,7 +2,7 @@
 MONSTERS (forest beginner zone) — Eldoria Quest
 ----------------------------------------------
 Generates 50 forest-themed monsters (levels 1–30).
-Rebalanced: Smoother difficulty curve (No more Level 3 wall).
+REBALANCED: XP Rewards increased to match the steep leveling curve.
 """
 
 from math import ceil
@@ -63,40 +63,34 @@ for idx in range(1, 51):
     else:
         tier = "Normal"
 
-    # --- Base Stats (Rebalanced) ---
-    # Old: 40 + (lvl * 15)
+    # --- Base Stats ---
     base_hp = 35 + (level * 12)
-
-    # Old: 8 + (lvl * 3) -> Too high for low levels
-    # New: 5 + (lvl * 2) -> Lvl 1=7, Lvl 5=15, Lvl 10=25
     base_atk = 5 + (level * 2)
-
     base_def = 1 + level
 
     # --- Tier Multipliers ---
     if tier == "Boss":
-        hp = base_hp * 12  # Reduced from 15x
-        atk = base_atk * 2.5  # Reduced from 3.5x
+        hp = base_hp * 12
+        atk = base_atk * 2.5
         defense = base_def * 2
         xp_mult = 15.0
     elif tier == "Elite":
-        hp = base_hp * 4  # Kept same
-        atk = base_atk * 1.5  # Reduced from 1.8x
+        hp = base_hp * 4
+        atk = base_atk * 1.5
         defense = base_def * 1.5
         xp_mult = 4.0
     else:
         # Normal Mobs:
-        # Removed the "Level 3+ = 5x HP" rule.
-        # Instead, we give them a steady 2.5x HP boost so they aren't one-shotted,
-        # but don't become walls instantly.
+        # HP Multiplier kept at 2.5x as per user preference for difficulty model
         hp = base_hp * 2.5
         atk = base_atk
         defense = base_def
-        xp_mult = 1.2  # Slight bump
+        xp_mult = 1.2
 
-    # --- XP Calculation ---
-    # formula: (Level * 12) * Multiplier
-    xp = int((level * 12) * xp_mult)
+    # --- XP Calculation (FIXED) ---
+    # OLD: level * 12
+    # NEW: level * 25 (Doubled reward for the effort)
+    xp = int((level * 25) * xp_mult)
 
     # --- Drops ---
     drops = []
