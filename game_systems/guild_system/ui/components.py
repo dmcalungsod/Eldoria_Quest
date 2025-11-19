@@ -3,8 +3,10 @@ game_systems/guild_system/ui/components.py
 
 Shared UI components, factories, and cached systems used throughout
 Guild-related views.
+Hardened: Logging added, robust interaction checks.
 """
 
+import logging
 from typing import Any, Callable, Dict, Optional
 
 import discord
@@ -15,13 +17,19 @@ from database.database_manager import DatabaseManager
 from game_systems.guild_system.guild_exchange import GuildExchange
 from game_systems.guild_system.rank_system import RankSystem
 
+logger = logging.getLogger("eldoria.guild_ui")
+
+
 # ======================================================
 # System Cache
 # ======================================================
 
 
 class SystemCache:
-    """Singleton-style cache for frequently accessed systems."""
+    """
+    Singleton-style cache for frequently accessed systems.
+    Prevents recreating heavy objects on every button click.
+    """
 
     _cache: Dict[str, Any] = {}
 
@@ -42,6 +50,7 @@ class SystemCache:
     @classmethod
     def clear(cls):
         """Clears all cached systems."""
+        logger.debug("Clearing SystemCache.")
         cls._cache.clear()
 
 

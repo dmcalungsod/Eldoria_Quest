@@ -2,11 +2,12 @@
 game_systems/character/ui/adventure_menu.py
 
 Primary entry menu for the Adventure System.
-Allows players to begin new expeditions or resume ongoing ones.
+Hardened: Safe JSON parsing for session resumption.
 """
 
 import asyncio
 import json
+import logging
 
 import discord
 from discord.ui import Button, View
@@ -21,16 +22,14 @@ from game_systems.adventure.ui.exploration_view import ExplorationView
 from game_systems.adventure.ui.setup_view import AdventureSetupView
 from game_systems.player.player_stats import PlayerStats
 
-# ============================================================
-# Adventure Menu View
-# ============================================================
+logger = logging.getLogger("eldoria.ui.adventure_menu")
 
 
 class AdventureView(View):
     """Character Menu → Adventure Menu."""
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
 
@@ -45,14 +44,12 @@ class AdventureView(View):
         btn_start.callback = self.start_adventure_callback
         self.add_item(btn_start)
 
-        # REMOVED: Guild Hall button was here (Moved to ProfileTabView)
-
         # Return to Character Menu
         btn_back = Button(
             label="Return — Character",
             style=discord.ButtonStyle.grey,
             custom_id="back_prof",
-            row=1,  # <-- MOVED TO ROW 1
+            row=1,
         )
         btn_back.callback = back_to_profile_callback
         self.add_item(btn_back)
@@ -63,7 +60,10 @@ class AdventureView(View):
         """
         Restricts interaction to the original user.
         """
-        return interaction.user.id == self.interaction_user.id
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message("This is not your session.", ephemeral=True)
+            return False
+        return True
 
     # ------------------------------------------------------------
     # Begin or Resume Adventure
@@ -83,7 +83,7 @@ class AdventureView(View):
             )
             return
 
-        # Check if an adventure is already active
+        # Check if an adventure is already active (threaded)
         session = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
 
         # --------------------------------------------------------
@@ -96,38 +96,40 @@ class AdventureView(View):
             loc_id = session["location_id"]
 
             try:
-                logs = json.loads(session["logs"])
-            except Exception:
-                logs = []
+                logs = json.loads(session["logs"]) if session["logs"] else []
+            except json.JSONDecodeError:
+                logs = ["*Log corrupted or lost.*"]
 
-            # --- FIX: Parse active monster to update button state ---
+            # Parse active monster to update button state
             active_monster = None
             if session["active_monster_json"]:
                 try:
                     active_monster = json.loads(session["active_monster_json"])
                 except Exception:
-                    pass
-            # --- END FIX ---
+                    active_monster = None
 
             # Fetch stats and vitals
-            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
-            stats = PlayerStats.from_dict(stats_json)
+            try:
+                stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+                stats = PlayerStats.from_dict(stats_json)
+                vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
 
-            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+                embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, session)
 
-            embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, session)
+                view = ExplorationView(
+                    self.db,
+                    adventure_cog.manager,
+                    loc_id,
+                    logs,
+                    self.interaction_user,
+                    stats,
+                    active_monster=active_monster,
+                )
 
-            view = ExplorationView(
-                self.db,
-                adventure_cog.manager,
-                loc_id,
-                logs,
-                self.interaction_user,
-                stats,
-                active_monster=active_monster,  # <-- Pass active monster
-            )
-
-            await interaction.edit_original_response(embed=embed, view=view)
+                await interaction.edit_original_response(embed=embed, view=view)
+            except Exception as e:
+                logger.error(f"Resume adventure failed: {e}", exc_info=True)
+                await interaction.followup.send("Error resuming session.", ephemeral=True)
             return
 
         # --------------------------------------------------------
@@ -135,22 +137,26 @@ class AdventureView(View):
         # --------------------------------------------------------
         await interaction.response.defer()
 
-        guild_member = await asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id)
-        rank = guild_member["rank"] if guild_member else "F"
+        try:
+            guild_member = await asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id)
+            rank = guild_member["rank"] if guild_member else "F"
 
-        embed = discord.Embed(
-            title=f"{E.MAP} Prepare for Expedition",
-            description=(
-                "*The great gates of the city loom overhead, iron-bound and weathered by countless journeys.*\n\n"
-                "Select a destination to begin your expedition."
-            ),
-            color=discord.Color.dark_green(),
-        )
+            embed = discord.Embed(
+                title=f"{E.MAP} Prepare for Expedition",
+                description=(
+                    "*The great gates of the city loom overhead, iron-bound and weathered by countless journeys.*\n\n"
+                    "Select a destination to begin your expedition."
+                ),
+                color=discord.Color.dark_green(),
+            )
 
-        view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank)
-        view.back_btn.callback = back_to_profile_callback
+            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank)
+            view.back_btn.callback = back_to_profile_callback
 
-        await interaction.edit_original_response(embed=embed, view=view)
+            await interaction.edit_original_response(embed=embed, view=view)
+        except Exception as e:
+            logger.error(f"Start adventure menu failed: {e}", exc_info=True)
+            await interaction.followup.send("Error loading destinations.", ephemeral=True)
 
     # ------------------------------------------------------------
 

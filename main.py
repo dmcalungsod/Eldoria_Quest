@@ -1,147 +1,126 @@
+"""
+Main Entry Point for Eldoria Quest
+----------------------------------
+Initializes the bot, loads cogs, and ensures database integrity.
+Hardened: Safe startup, logging, and error handling.
+"""
+
 import logging
 import os
 import sys
-import traceback
-
+import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-# --- Import Database Functions at Top Level ---
-from database.create_database import create_tables
-from database.populate_database import main as populate_db
-
-# --- Path Configuration ---
-# This ensures that the bot can find your 'core' modules
+# Ensure root dir is in path
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
-# --- Setup Logging ---
-logs_dir = os.path.join(ROOT_DIR, "logs")
-if not os.path.exists(logs_dir):
-    os.makedirs(logs_dir)
-
-logger = logging.getLogger("discord")
-logger.setLevel(logging.INFO)  # Set to INFO or DEBUG for more details
-handler = logging.FileHandler(filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w")
-handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-logger.addHandler(handler)
-
-# --- Load Token & Guild ID ---
+# --- Configuration & Secrets ---
 load_dotenv()
 TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 GUILD_ID = os.getenv("GUILD_ID")
 
-if TOKEN is None:
-    print("CRITICAL ERROR: DISCORD_BOT_TOKEN not found in .env file.")
-    logger.critical("DISCORD_BOT_TOKEN not found in .env file. Bot cannot start.")
-    exit()
+# --- Logging Setup ---
+logs_dir = os.path.join(ROOT_DIR, "logs")
+os.makedirs(logs_dir, exist_ok=True)
 
-if GUILD_ID is None:
-    print(
-        "Warning: GUILD_ID not found in .env file. Slash commands will be registered globally, which can take up to an hour to update."
-    )
-    logger.warning("GUILD_ID not found in .env file. Slash commands will be registered globally.")
+logger = logging.getLogger("eldoria")
+logger.setLevel(logging.INFO)
 
+# File Handler
+file_handler = logging.FileHandler(filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w")
+file_handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+logger.addHandler(file_handler)
+
+# Console Handler
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+logger.addHandler(console_handler)
+
+if not TOKEN:
+    logger.critical("Missing DISCORD_BOT_TOKEN in .env. Exiting.")
+    sys.exit(1)
+
+# --- Database Init ---
+from database.create_database import create_tables
+from database.populate_database import main as populate_db
+
+def init_db():
+    """Initializes the database safely on startup."""
+    logger.info("Checking database schema...")
+    try:
+        create_tables()
+        populate_db()
+        logger.info("Database initialization complete.")
+    except Exception as e:
+        logger.critical(f"Database initialization failed: {e}", exc_info=True)
+        sys.exit(1)
 
 # --- Bot Class ---
 class EldoriaBot(commands.Bot):
-    """
-    Main Bot class for Eldoria Quest.
-    """
-
     def __init__(self):
-        # Define the intents your bot needs
+        # Define intents
         intents = discord.Intents.default()
-        intents.message_content = True  # Required for reading !commands
-        intents.members = True  # Optional: for greeting new members
-
+        intents.message_content = True  # Required for reading commands
+        
         super().__init__(
             command_prefix="!",
             intents=intents,
             activity=discord.Game(name="Eldoria | /start"),
-            help_command=None,  # We will build a custom one
+            help_command=None
         )
 
     async def setup_hook(self):
-        """
-        This is called once when the bot logs in.
-        It's the perfect place to load your Cogs (extensions).
-        """
-        print("--- Loading Cogs ---")
+        """Loads Cogs and Syncs Commands."""
         logger.info("Loading Cogs...")
-
         cogs_dir = os.path.join(ROOT_DIR, "cogs")
+        
         if not os.path.exists(cogs_dir):
-            os.makedirs(cogs_dir)
-            logger.warning("No 'cogs' directory found. Created one.")
-            print("No 'cogs' directory found. I've created one for you.")
+            logger.warning("'cogs' directory missing. Creating...")
+            os.makedirs(cogs_dir, exist_ok=True)
+            return
 
+        # Dynamic Cog Loading
         for filename in os.listdir(cogs_dir):
-            # This logic automatically finds and loads your new cogs
             if filename.endswith(".py") and not filename.startswith("_") and filename != "ui_helpers.py":
                 cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)
-                    print(f"  [+] Loaded: {cog_name}")
-                    logger.info(f"Successfully loaded extension: {cog_name}")
-                except Exception:
-                    # If a cog fails, log it and continue
-                    print(f"  [!] FAILED to load: {cog_name}")
-                    logger.error(f"Failed to load extension {cog_name}.", exc_info=True)
-                    traceback.print_exc()
+                    logger.info(f"Loaded extension: {cog_name}")
+                except Exception as e:
+                    logger.error(f"Failed to load {cog_name}: {e}", exc_info=True)
 
-        print("--- Cog loading complete ---")
-
-        # --- COMMAND SYNC ---
+        # Command Sync
         if GUILD_ID:
-            guild = discord.Object(id=GUILD_ID)
-
-            # 1. FORCE CLEAR: This removes all cached commands for this guild
-            self.tree.clear_commands(guild=guild)
-
-            # 2. COPY GLOBAL: Move the commands loaded from cogs (start, ping, devpanel) to the guild
-            self.tree.copy_global_to(guild=guild)
-
-            # 3. SYNC: Push the clean list to Discord
-            await self.tree.sync(guild=guild)
-
-            print(f"--- Cleared and Synced commands to Guild ID: {GUILD_ID} ---")
-            logger.info(f"Cleared and Synced commands to Guild ID: {GUILD_ID}")
+            try:
+                guild = discord.Object(id=GUILD_ID)
+                self.tree.clear_commands(guild=guild)
+                self.tree.copy_global_to(guild=guild)
+                await self.tree.sync(guild=guild)
+                logger.info(f"Commands synced to Guild ID: {GUILD_ID}")
+            except discord.HTTPException as e:
+                logger.error(f"Failed to sync commands to guild: {e}")
         else:
-            # If no guild ID, sync globally (slower propagation)
             await self.tree.sync()
-            print("--- Synced slash commands globally ---")
-            logger.info("Synced slash commands globally.")
+            logger.info("Commands synced globally (may take up to 1 hour).")
 
     async def on_ready(self):
-        """
-        Called when the bot is fully connected and ready.
-        """
-        print("-------------------------------------------------")
-        print(f"Logged in as: {self.user.name} (ID: {self.user.id})")
-        print(f"Discord.py Version: {discord.__version__}")
-        print("Eldoria is online and ready for adventure!")
-        print("-------------------------------------------------")
-        logger.info(f"Bot '{self.user.name}' is online and ready.")
+        """Called when bot is connected."""
+        logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
+        logger.info("Eldoria Quest is online and ready.")
 
-
-# --- Main Entry Point ---
+# --- Main Execution ---
 if __name__ == "__main__":
-    # Ensure the database schema is created and populated before the bot runs
-    print("--- Initializing Database ---")
-    create_tables()
-    populate_db()
-    print("--- Database Initialized and Populated ---")
-
+    # 1. Init Database
+    init_db()
+    
+    # 2. Start Bot
     bot = EldoriaBot()
-
     try:
-        # This starts the bot
-        bot.run(TOKEN, log_handler=handler)
-    except discord.errors.LoginFailure:
-        logger.critical("Improper token passed. Bot cannot log in.")
-        print("\nError: Improper token passed. Please check your .env file.")
+        bot.run(TOKEN, log_handler=None) # Use our custom logger
+    except discord.LoginFailure:
+        logger.critical("Invalid Token provided.")
     except Exception as e:
-        logger.critical(f"An unexpected error occurred: {e}", exc_info=True)
-        print(f"An unexpected error occurred: {e}")
+        logger.critical(f"Fatal runtime error: {e}", exc_info=True)

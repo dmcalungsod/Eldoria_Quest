@@ -1,5 +1,5 @@
 """
-quest_hub_cog.py
+cogs/quest_hub_cog.py
 
 Handles all UI Views related to the Questing System:
 - Quest Board (available quests)
@@ -8,9 +8,11 @@ Handles all UI Views related to the Questing System:
 - Quest Detail (viewing and accepting)
 
 Refactored to strictly adhere to ONE UI Policy and fix navigation crashes.
+Hardened with atomic status checks and concurrency protection.
 """
 
 import asyncio
+import logging
 
 import discord
 from discord.ext import commands
@@ -22,6 +24,9 @@ from game_systems.guild_system.quest_system import QuestSystem
 
 # --- Local Imports ---
 from .ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
+
+logger = logging.getLogger("eldoria.quest_ui")
+
 
 # ======================================================================
 # QUEST LEDGER VIEW (READ-ONLY)
@@ -35,7 +40,7 @@ class QuestLedgerView(View):
     """
 
     def __init__(self, db_manager: DatabaseManager, active_quests: list, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.active_quests = active_quests
         self.interaction_user = interaction_user
@@ -73,7 +78,7 @@ class QuestLogView(View):
     """
 
     def __init__(self, db_manager: DatabaseManager, active_quests: list, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.active_quests = active_quests
         self.interaction_user = interaction_user
@@ -100,6 +105,7 @@ class QuestLogView(View):
         # Determine completable quests synchronously
         completable_quests = []
         for quest in self.active_quests:
+            # Uses logic from QuestSystem to check progress vs objectives
             if self.quest_system.check_completion(quest["progress"], quest["objectives"]):
                 completable_quests.append(quest)
 
@@ -132,19 +138,29 @@ class QuestLogView(View):
         self.back_button.callback = callback_function
 
     async def complete_quest_callback(self, interaction: discord.Interaction):
+        """
+        Handles the turn-in logic.
+        Uses asyncio.to_thread to prevent blocking during DB writes.
+        """
         await interaction.response.defer()
 
-        quest_id = int(self.quest_select.values[0])
+        try:
+            quest_id = int(self.quest_select.values[0])
+        except (ValueError, IndexError):
+            await interaction.followup.send("Invalid selection.", ephemeral=True)
+            return
 
+        # Execute completion logic in thread
         success, message = await asyncio.to_thread(
             self.quest_system.complete_quest,
             self.interaction_user.id,
             quest_id,
         )
 
-        # Refresh quest list
+        # Refresh quest list to show updated state
         new_active_quests = await asyncio.to_thread(self.quest_system.get_player_quests, self.interaction_user.id)
 
+        # Rebuild the embed
         embed = interaction.message.embeds[0]
         embed.description = message
         embed.clear_fields()
@@ -178,7 +194,10 @@ class QuestLogView(View):
             embed.title = f"{E.ERROR} Turn-In Rejected"
         else:
             embed.color = discord.Color.gold()
+            # Log success
+            logger.info(f"User {self.interaction_user.id} completed quest {quest_id}")
 
+        # Show updated view
         new_view = QuestLogView(self.db, new_active_quests, self.interaction_user)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
@@ -203,7 +222,7 @@ class QuestBoardView(View):
         status_message: str = None,
         parent_back_data: tuple = None,
     ):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.quests = quests
         self.interaction_user = interaction_user
@@ -228,6 +247,7 @@ class QuestBoardView(View):
             )
             self.quest_select.disabled = True
         else:
+            # Limit to 25 options (Discord API limit)
             for quest in self.quests[:25]:
                 self.quest_select.add_option(
                     label=f"[{quest['tier']}-Rank] {quest['title']}",
@@ -239,8 +259,7 @@ class QuestBoardView(View):
         self.quest_select.callback = self.view_quest_details_callback
         self.add_item(self.quest_select)
 
-        # --- Back Button (FIXED) ---
-        # Must be an instance attribute to be modifiable
+        # --- Back Button ---
         self.back_button = Button(
             label="Back to Guild Hall",
             style=discord.ButtonStyle.secondary,
@@ -256,7 +275,6 @@ class QuestBoardView(View):
 
         self.add_item(self.back_button)
 
-    # --- FIX: Added Method ---
     def set_back_button(self, callback_function, label="Back"):
         """Allows external callers to change where the back button goes."""
         self.back_button.label = label
@@ -273,7 +291,12 @@ class QuestBoardView(View):
     async def view_quest_details_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        quest_id = int(self.quest_select.values[0])
+        try:
+            quest_id = int(self.quest_select.values[0])
+        except (ValueError, IndexError):
+            await self.refresh_board(interaction, f"{E.ERROR} Invalid quest selection.")
+            return
+
         quest_details = await asyncio.to_thread(self.quest_system.get_quest_details, quest_id)
 
         if not quest_details:
@@ -292,6 +315,9 @@ class QuestBoardView(View):
             if isinstance(tasks, dict):
                 for task, amt in tasks.items():
                     obj_lines.append(f"• **{obj_type.title()}:** {task} ({amt})")
+            else:
+                # Fallback for simple string tasks
+                obj_lines.append(f"• **{obj_type.title()}:** {tasks}")
 
         embed.add_field(
             name="Objectives",
@@ -331,7 +357,10 @@ class QuestBoardView(View):
         if status_msg:
             embed.add_field(name="Update", value=status_msg, inline=False)
 
-        embed.add_field(name="Available Contracts", value="Select a quest from the dropdown.")
+        embed.add_field(
+            name="Available Contracts",
+            value="Select a quest from the dropdown.",
+        )
 
         # Pass navigation context back
         view = QuestBoardView(
@@ -358,7 +387,7 @@ class QuestDetailView(View):
         interaction_user: discord.User,
         parent_back_data: tuple = None,
     ):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.quest_id = quest_id
         self.quests_list = quests_list
@@ -393,6 +422,7 @@ class QuestDetailView(View):
     async def accept_quest_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
+        # Perform atomic acceptance
         success = await asyncio.to_thread(
             self.quest_system.accept_quest,
             self.interaction_user.id,
@@ -402,6 +432,7 @@ class QuestDetailView(View):
         status_msg = ""
         if success:
             status_msg = f"{E.CHECK} Contract sealed. The details are recorded in your ledger."
+            logger.info(f"User {self.interaction_user.id} accepted quest {self.quest_id}")
         else:
             status_msg = f"{E.WARNING} You have already sworn to undertake this task."
 

@@ -1,11 +1,10 @@
 """
 Level Up System for Eldoria Quest
 
-This module handles:
-- Experience gain
-- Automatic level-up
-- Auto scaling experience requirements per level
-- Integration with PlayerStats for recalculating derived stats (HP, MP)
+Handles:
+- Experience calculation
+- Level-up thresholds (Quadratic curve)
+- State management for leveling
 """
 
 from .player_stats import PlayerStats
@@ -14,12 +13,9 @@ from .player_stats import PlayerStats
 class LevelUpSystem:
     """
     Standalone Level-Up Manager.
-
-    Leveling up no longer grants stats automatically.
-    It only increases the level and the EXP requirement for the next level.
+    Logic only; persistence is handled by external systems.
     """
 
-    # Updated to the new 6-stat system
     STAT_LIST = ["STR", "END", "DEX", "AGI", "MAG", "LCK"]
 
     def __init__(
@@ -27,28 +23,25 @@ class LevelUpSystem:
         stats: PlayerStats,
         level: int = 1,
         exp: int = 0,
-        # --- CHANGE 1: Set new default ---
         exp_to_next: int = 1000,
     ):
         self.stats = stats
-        self.level = level
-        self.exp = exp
-        self.exp_to_next = exp_to_next
+        self.level = max(1, level)
+        self.exp = max(0, exp)
+        self.exp_to_next = max(100, exp_to_next)
 
-    # -----------------------------------------------------------
-    # EXP Handling
-    # -----------------------------------------------------------
     def add_exp(self, amount: int) -> bool:
         """
         Adds EXP and checks for level-up.
-        Returns:
-            True if the player leveled up
-            False otherwise
+        Returns True if the player leveled up at least once.
         """
+        if amount <= 0:
+            return False
+
         self.exp += amount
         leveled_up = False
 
-        # Handle multiple level-ups if EXP exceeds requirement
+        # Handle multiple level-ups
         while self.exp >= self.exp_to_next:
             self.exp -= self.exp_to_next
             self.level_up()
@@ -56,29 +49,16 @@ class LevelUpSystem:
 
         return leveled_up
 
-    # -----------------------------------------------------------
-    # Level Up Logic
-    # -----------------------------------------------------------
     def level_up(self):
-        """Apply the level-up bonuses."""
+        """Apply level-up logic."""
         self.level += 1
 
-        # --- CHANGE 2: REMOVED AUTOMATIC STAT GAINS ---
-        # for stat in self.STAT_LIST:
-        #    self.stats.add_base_stat(stat, 1)
-        # --- END OF CHANGE ---
-
-        # Increase the EXP required for the next level
-        # --- LEVEL CURVE FIX: Using the derived quadratic formula ---
+        # Increase EXP requirement using quadratic formula
+        # Formula: R_L = 1000 * L^2 - 500 * L + 500
         new_level = self.level
-        # R_L = 1000*L^2 - 500*L + 500
-        self.exp_to_next = int(1000 * new_level**2 - 500 * new_level + 500)
+        self.exp_to_next = int(1000 * (new_level**2) - 500 * new_level + 500)
 
-    # -----------------------------------------------------------
-    # Serialization
-    # -----------------------------------------------------------
     def to_dict(self) -> dict:
-        """Convert all level + stat data to a dictionary for saving."""
         return {
             "level": self.level,
             "exp": self.exp,
@@ -88,12 +68,15 @@ class LevelUpSystem:
 
     @classmethod
     def from_dict(cls, data: dict):
-        """Reconstruct a LevelUpSystem object from saved data."""
-        stats = PlayerStats.from_dict(data["stats"])
+        if not data:
+            return cls(PlayerStats())
+            
+        stats_data = data.get("stats", {})
+        stats = PlayerStats.from_dict(stats_data)
+        
         return cls(
             stats=stats,
             level=data.get("level", 1),
             exp=data.get("exp", 0),
-            # --- CHANGE 3: Set new default ---
             exp_to_next=data.get("exp_to_next", 1000),
         )

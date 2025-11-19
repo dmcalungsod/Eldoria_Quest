@@ -1,35 +1,26 @@
 """
-Core Stats Module for Eldoria Quest
+game_systems/player/player_stats.py
 
-Defines:
-- StatBlock: stores base + bonus values
-- PlayerStats: 6 core stats + derived stats (HP, MP)
+Core Stats Module for Eldoria Quest
+Hardened: Tiered scaling logic and robust serialization.
 """
 
-import math  # <-- IMPORT MATH
+import math
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
 
-# --- NEW HELPER FUNCTION ---
-def calculate_tiered_bonus(stat_value, base_effect_per_point):
+# --- NEW HELPER FUNCTION (Used by Combat) ---
+def calculate_tiered_bonus(stat_value: int, base_effect_per_point: float) -> int:
     """
     Calculates a stat's total effect based on a tiered scaling
     where each 100-point milestone adds +25% to the base multiplier.
 
     Tier 1 (1-100 pts): 1.00x
     Tier 2 (101-200 pts): 1.25x
-    Tier 3 (201-300 pts): 1.50x
     ...
-    Tier 10 (901-999 pts): 3.25x
-
-    Example: 250 END (10 HP per point)
-    - 100 points @ 1.00x = 100 * 10 * 1.00 = 1000
-    - 100 points @ 1.25x = 100 * 10 * 1.25 = 1250
-    - 50 points  @ 1.50x =  50 * 10 * 1.50 =  750
-    - Total = 3000 HP
     """
-    total_effect = 0
+    total_effect = 0.0
     remaining_points = stat_value
     current_tier = 0
 
@@ -38,9 +29,6 @@ def calculate_tiered_bonus(stat_value, base_effect_per_point):
         points_in_this_tier = min(remaining_points, 100)
 
         # Calculate the additive multiplier
-        # Tier 0 (1-100) = 1.0 + (0 * 0.25) = 1.0x
-        # Tier 1 (101-200) = 1.0 + (1 * 0.25) = 1.25x
-        # Tier 2 (201-300) = 1.0 + (2 * 0.25) = 1.50x
         multiplier = 1.0 + (current_tier * 0.25)
 
         # Add to the total effect
@@ -53,13 +41,9 @@ def calculate_tiered_bonus(stat_value, base_effect_per_point):
     return math.floor(total_effect)
 
 
-# --- END NEW HELPER FUNCTION ---
-
-
 @dataclass
 class StatBlock:
     """Stores the base and bonus values of a stat."""
-
     base: int = 1
     bonus: int = 0
 
@@ -68,13 +52,9 @@ class StatBlock:
         return self.base + self.bonus
 
 
-# ---------------------------------------------
-# PlayerStats
-# ---------------------------------------------
 class PlayerStats:
     """
     Manages all stats for a player character.
-    ...
     """
 
     def __init__(self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1):
@@ -89,90 +69,98 @@ class PlayerStats:
 
     # --- Total stat properties ---
     @property
-    def strength(self):
+    def strength(self) -> int:
         return self._stats["STR"].total
 
     @property
-    def endurance(self):
+    def endurance(self) -> int:
         return self._stats["END"].total
 
     @property
-    def dexterity(self):
+    def dexterity(self) -> int:
         return self._stats["DEX"].total
 
     @property
-    def agility(self):
+    def agility(self) -> int:
         return self._stats["AGI"].total
 
     @property
-    def magic(self):
+    def magic(self) -> int:
         return self._stats["MAG"].total
 
     @property
-    def luck(self):
+    def luck(self) -> int:
         return self._stats["LCK"].total
 
-    # --- Derived stats (MODIFIED) ---
+    # --- Derived stats ---
     @property
     def max_hp(self) -> int:
-        # Formula was: 50 + (self.endurance * 10)
-        # NEW Formula: 50 + Tiered Bonus from END (10 HP per point)
-        hp_bonus = calculate_tiered_bonus(self.endurance, 10)
+        # Formula: 50 + Tiered Bonus from END (10 HP per point base)
+        hp_bonus = calculate_tiered_bonus(self.endurance, 10.0)
         return 50 + hp_bonus
 
     @property
     def max_mp(self) -> int:
-        # Formula was: 20 + (self.magic * 5)
-        # NEW Formula: 20 + Tiered Bonus from MAG (5 MP per point)
-        mp_bonus = calculate_tiered_bonus(self.magic, 5)
+        # Formula: 20 + Tiered Bonus from MAG (5 MP per point base)
+        mp_bonus = calculate_tiered_bonus(self.magic, 5.0)
         return 20 + mp_bonus
 
     # --- Stat modification ---
-    def set_base_stat(self, stat_name, value):
+    def set_base_stat(self, stat_name: str, value: int):
         key = stat_name.upper()
         if key in self._stats:
             self._stats[key].base = max(0, value)
 
-    def add_base_stat(self, stat_name, amount):
+    def add_base_stat(self, stat_name: str, amount: int):
         key = stat_name.upper()
         if key in self._stats:
             self._stats[key].base += amount
 
-    def add_bonus_stat(self, stat_name, amount):
+    def add_bonus_stat(self, stat_name: str, amount: int):
         key = stat_name.upper()
         if key in self._stats:
             self._stats[key].bonus += amount
 
     def recalculate_bonuses(self, equipped_items: List[Any]):
+        """Resets bonuses and re-applies them from item list."""
         # Reset all bonuses
         for key in self._stats:
             self._stats[key].bonus = 0
 
         # Apply item bonuses
         for item in equipped_items:
-            if hasattr(item, "stats_bonus") and isinstance(item.stats_bonus, dict):
-                for stat, val in item.stats_bonus.items():
+            # Handle dict or object items safely
+            if isinstance(item, dict):
+                bonuses = item.get("stats_bonus", {})
+            else:
+                bonuses = getattr(item, "stats_bonus", {})
+            
+            if bonuses:
+                for stat, val in bonuses.items():
                     self.add_bonus_stat(stat, val)
 
     # --- Serialization ---
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Dict[str, int]]:
         return {k: {"base": v.base, "bonus": v.bonus} for k, v in self._stats.items()}
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: Dict[str, Any]):
         new = cls()
+        if not data:
+            return new
+            
         for key, vals in data.items():
             u = key.upper()
-            if u in new._stats:
+            if u in new._stats and isinstance(vals, dict):
                 new._stats[u].base = vals.get("base", 1)
                 new._stats[u].bonus = vals.get("bonus", 0)
         return new
 
     # --- Simple output dicts ---
-    def get_base_stats_dict(self):
+    def get_base_stats_dict(self) -> Dict[str, int]:
         return {k: v.base for k, v in self._stats.items()}
 
-    def get_total_stats_dict(self):
+    def get_total_stats_dict(self) -> Dict[str, int]:
         return {
             "STR": self.strength,
             "END": self.endurance,

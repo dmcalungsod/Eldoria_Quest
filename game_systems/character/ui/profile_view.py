@@ -1,9 +1,13 @@
 """
 game_systems/character/ui/profile_view.py
+
+Main Hub for the player's interface.
+Hardened: Async database calls for status updates and sub-menus.
 """
 
 import asyncio
 import json
+import logging
 
 import discord
 from discord.ui import Button, View
@@ -19,6 +23,8 @@ from game_systems.player.player_stats import PlayerStats
 from .abilities_view import AbilitiesView
 from .adventure_menu import AdventureView
 
+logger = logging.getLogger("eldoria.ui.profile")
+
 
 class CharacterTabView(View):
     """
@@ -27,7 +33,7 @@ class CharacterTabView(View):
     """
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
 
@@ -44,7 +50,7 @@ class CharacterTabView(View):
 
         # --- Abilities & Kit (Row 1, Primary for Character Management) ---
         btn_abilities = Button(
-            label="Abilities & Kit",  # <-- UPDATED LABEL
+            label="Abilities & Kit",
             style=discord.ButtonStyle.primary,
             custom_id="abilities",
             emoji=E.BACKPACK,
@@ -66,7 +72,7 @@ class CharacterTabView(View):
 
         # --- Guild Hall (Row 2, New Placement for Direct Access) ---
         btn_guild = Button(
-            label="Guild Hall",  # <-- NEW BUTTON
+            label="Guild Hall",
             style=discord.ButtonStyle.secondary,
             custom_id="gh_link",
             emoji="🏦",
@@ -92,7 +98,7 @@ class CharacterTabView(View):
     async def abilities_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         embed = discord.Embed(
-            title="📜 Abilities & Kit",  # <-- UPDATED TITLE
+            title="📜 Abilities & Kit",
             description=(
                 "*Your gathered knowledge, arms, and practiced arts.*\nManage inventory, equipment, and skills."
             ),
@@ -117,27 +123,34 @@ class CharacterTabView(View):
     async def status_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        # Fetch player data and stats concurrently
-        p_data, s_row = await asyncio.gather(
-            asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-            asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id),
-        )
+        try:
+            # Fetch player data and stats concurrently in threads
+            p_data, s_row = await asyncio.gather(
+                asyncio.to_thread(self.db.get_player, self.interaction_user.id),
+                asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id),
+            )
 
-        stats = PlayerStats.from_dict(json.loads(s_row["stats_json"]))
+            if not p_data or not s_row:
+                await interaction.followup.send("Error retrieving character data.", ephemeral=True)
+                return
 
-        embed = StatusUpdateView.build_status_embed(p_data, stats, s_row)
-        view = StatusUpdateView(self.db, self.interaction_user, p_data, stats, s_row)
+            stats = PlayerStats.from_dict(json.loads(s_row["stats_json"]))
 
-        # Assign profile return callback
-        view.back_button.callback = ui_helpers.back_to_profile_callback
+            embed = StatusUpdateView.build_status_embed(p_data, stats, s_row)
+            view = StatusUpdateView(self.db, self.interaction_user, p_data, stats, s_row)
 
-        await interaction.edit_original_response(embed=embed, view=view)
+            # Assign profile return callback via helper
+            view.back_button.callback = ui_helpers.back_to_profile_callback
 
-    async def guild_hall_callback(self, interaction: discord.Interaction):  # <-- NEW CALLBACK
+            await interaction.edit_original_response(embed=embed, view=view)
+        except Exception as e:
+            logger.error(f"Status callback error for {self.interaction_user.id}: {e}", exc_info=True)
+            await interaction.followup.send("System error loading status.", ephemeral=True)
+
+    async def guild_hall_callback(self, interaction: discord.Interaction):
         """Opens the Guild Hall Lobby directly."""
-
         if not interaction.response.is_done():
             await interaction.response.defer()
 
-        # We must call back_to_guild_hall_callback logic to handle fetching guild card data
+        # Calls shared logic in ui_helpers to load the Guild Hall
         await ui_helpers.back_to_guild_hall_callback(interaction)

@@ -1,272 +1,132 @@
 """
 cogs/infirmary_cog.py
 
-Handles the Adventurer's Guild Infirmary UI where adventurers
-spend Aurum to restore HP and MP.
-
-Healing rate:
-    • 0.5 Aurum per missing HP (rounded up)
-    • Minimum cost: 1 Aurum if any HP is missing
-    • MP restoration is included in the treatment cost (currently free bonus)
-
-Refactored to follow the one-UI policy (no ephemeral messages).
+Healing services.
+Hardened against concurrency and logic errors.
 """
 
 import asyncio
+import logging
 import math
 import sqlite3
-
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
-
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
-
-# --- Local Imports ---
 from .ui_helpers import back_to_guild_hall_callback
 
+logger = logging.getLogger("eldoria.infirmary")
 
-# ---------------------------------------------------------------------
-# Healing cost: 0.5 Aurum per HP (rounded up, min 1 if missing > 0)
-# ---------------------------------------------------------------------
 def infirmary_cost(missing_hp: int) -> int:
-    if missing_hp <= 0:
-        return 0
-    return max(1, math.ceil(missing_hp * 0.5))
+    return max(1, math.ceil(missing_hp * 0.5)) if missing_hp > 0 else 0
 
-
-# =====================================================================
-# Infirmary View
-# =====================================================================
 class InfirmaryView(View):
-    """
-    The Adventurer’s Guild Infirmary interface.
-    Displays HP, MP, treatment cost, and offers paid healing.
-    """
+    def __init__(self, db: DatabaseManager, user: discord.User, p_data: sqlite3.Row, stats: PlayerStats):
+        super().__init__(timeout=180)
+        self.db = db
+        self.user = user
+        self.p_data = p_data
+        self.stats = stats
 
-    def __init__(
-        self,
-        db_manager: DatabaseManager,
-        interaction_user: discord.User,
-        player_data: sqlite3.Row,
-        player_stats: PlayerStats,
-    ):
-        super().__init__(timeout=None)
+        current_hp = p_data["current_hp"]
+        current_mp = p_data["current_mp"]
+        self.missing_hp = max(0, stats.max_hp - current_hp)
+        self.missing_mp = max(0, stats.max_mp - current_mp)
+        self.cost = infirmary_cost(self.missing_hp)
 
-        self.db = db_manager
-        self.interaction_user = interaction_user
-        self.player_data = player_data
-        self.player_stats = player_stats
+        # Heal Button
+        disabled = (self.missing_hp <= 0 and self.missing_mp <= 0)
+        label = f"Heal ({self.cost} G)" if not disabled else "Fully Restored"
+        style = discord.ButtonStyle.primary if not disabled else discord.ButtonStyle.secondary
+        
+        # Disable if broke
+        if p_data["aurum"] < self.cost:
+            disabled = True
+            label = "Insufficient Funds"
 
-        # Derived state
-        self.current_hp = player_data["current_hp"]
-        self.current_mp = player_data["current_mp"]  # Added MP
-        self.max_hp = player_stats.max_hp
-        self.max_mp = player_stats.max_mp  # Added Max MP
-        self.current_aurum = player_data["aurum"]
+        self.heal_btn = Button(label=label, style=style, custom_id="heal_btn", emoji="❤️", row=0, disabled=disabled)
+        self.heal_btn.callback = self.heal_callback
+        self.add_item(self.heal_btn)
 
-        self.missing_hp = max(0, self.max_hp - self.current_hp)
-        self.missing_mp = max(0, self.max_mp - self.current_mp)  # Calculate missing MP
-
-        # Cost is based on HP loss, but healing restores both
-        self.heal_cost = infirmary_cost(self.missing_hp)
-
-        # --------------------------------------------------------------
-        # Treatment Button
-        # --------------------------------------------------------------
-        # Enable healing if either HP or MP is missing
-        if self.missing_hp <= 0 and self.missing_mp <= 0:
-            heal_label = "You are already in full condition."
-            heal_disabled = True
-            heal_style = discord.ButtonStyle.secondary
-        else:
-            # --- FIX: Removed {E.AURUM} from label, replaced with text ---
-            heal_label = f"Receive Treatment ({self.heal_cost} Aurum)"
-            heal_disabled = self.current_aurum < self.heal_cost
-            heal_style = discord.ButtonStyle.primary
-
-        heal_button = Button(
-            label=heal_label,
-            style=heal_style,
-            custom_id="infirmary_heal",
-            emoji=E.AURUM,
-            row=0,
-            disabled=heal_disabled,
-        )
-        heal_button.callback = self.heal_callback
-        self.add_item(heal_button)
-
-        # --------------------------------------------------------------
         # Back Button
-        # --------------------------------------------------------------
-        self.back_button = Button(
-            label="Return — Guild Hall",
-            style=discord.ButtonStyle.grey,
-            custom_id="back_to_guild_hall",
-            row=1,
-        )
-        self.back_button.callback = back_to_guild_hall_callback
-        self.add_item(self.back_button)
+        self.back_btn = Button(label="Return to Hall", style=discord.ButtonStyle.grey, custom_id="back", row=1)
+        self.back_btn.callback = back_to_guild_hall_callback
+        self.add_item(self.back_btn)
 
-    def set_back_button(self, callback_function, label: str = "Back"):
-        """Allow parent views to override the 'Return' button."""
-        self.back_button.label = label
-        self.back_button.callback = callback_function
+    def set_back_button(self, cb, label="Back"):
+        self.back_btn.callback = cb
+        self.back_btn.label = label
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("These halls serve another adventurer.", ephemeral=True)
-            return False
-        return True
+        return interaction.user.id == self.user.id
 
-    # -----------------------------------------------------------------
-    # Blocking DB Transaction
-    # -----------------------------------------------------------------
-    def _execute_heal_transaction(self) -> tuple[bool, str]:
-        """
-        Conducts the DB transaction verifying and applying treatment.
-        Returns: (success, status_message)
-        """
+    def _execute_heal(self) -> tuple[bool, str]:
+        try:
+            with self.db.get_connection() as conn:
+                # Re-fetch to ensure atomic accuracy
+                row = conn.execute("SELECT current_hp, current_mp, aurum FROM players WHERE discord_id=?", (self.user.id,)).fetchone()
+                
+                # Re-calculate costs dynamically
+                missing = max(0, self.stats.max_hp - row["current_hp"])
+                cost = infirmary_cost(missing)
 
-        with self.db.get_connection() as conn:
-            cur = conn.cursor()
+                if missing == 0 and row["current_mp"] >= self.stats.max_mp:
+                    return False, "You are already healthy."
+                
+                if row["aurum"] < cost:
+                    return False, "Insufficient funds."
 
-            # Reload authoritative record
-            cur.execute(
-                "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id = ?", (self.interaction_user.id,)
-            )
-            row = cur.fetchone()
-            if not row:
-                return False, "Adventurer record could not be located."
+                # Apply
+                conn.execute(
+                    "UPDATE players SET current_hp=?, current_mp=?, aurum=? WHERE discord_id=?",
+                    (self.stats.max_hp, self.stats.max_mp, row["aurum"] - cost, self.user.id)
+                )
+                return True, f"Restored HP/MP for {cost} Aurum."
+        except Exception as e:
+            logger.error(f"Heal error: {e}")
+            return False, "System error."
 
-            current_hp = row["current_hp"]
-            current_mp = row["current_mp"]  # Fetch current MP
-            aurum = row["aurum"]
-
-            # Load fresh stats for true max HP/MP
-            stats_json = self.db.get_player_stats_json(self.interaction_user.id)
-            player_stats = PlayerStats.from_dict(stats_json)
-            max_hp = player_stats.max_hp
-            max_mp = player_stats.max_mp  # Fetch max MP
-
-            missing_hp = max(0, max_hp - current_hp)
-            missing_mp = max(0, max_mp - current_mp)
-
-            cost = infirmary_cost(missing_hp)
-
-            if missing_hp <= 0 and missing_mp <= 0:
-                return False, "You are already fully restored."
-            if aurum < cost:
-                return False, f"Insufficient Aurum. Treatment requires {cost} {E.AURUM}."
-
-            # Apply healing (Restore both HP and MP)
-            new_hp = max_hp
-            new_mp = max_mp
-            new_aurum = aurum - cost
-
-            cur.execute(
-                "UPDATE players SET current_hp = ?, current_mp = ?, aurum = ? WHERE discord_id = ?",
-                (new_hp, new_mp, new_aurum, self.interaction_user.id),
-            )
-            conn.commit()
-
-            return True, (
-                f"You paid {cost} {E.AURUM} for treatment. "  # <-- GRAMMAR FIX: Changed string copy
-                f"HP and MP fully restored."
-            )
-
-    # -----------------------------------------------------------------
-    # Heal Button Callback
-    # -----------------------------------------------------------------
     async def heal_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
+        success, msg = await asyncio.to_thread(self._execute_heal)
 
-        # Run DB transaction off-thread
-        success, message = await asyncio.to_thread(self._execute_heal_transaction)
+        # Refresh Data
+        tasks = [
+            asyncio.to_thread(self.db.get_player, self.user.id),
+            asyncio.to_thread(self.db.get_player_stats_json, self.user.id)
+        ]
+        new_p_data, stats_json = await asyncio.gather(*tasks)
+        new_stats = PlayerStats.from_dict(stats_json)
 
-        # Reload fresh data for UI state
-        player_data_task = asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        stats_json_task = asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
-        player_data, stats_json = await asyncio.gather(player_data_task, stats_json_task)
-        player_stats = PlayerStats.from_dict(stats_json)
+        embed = self.build_embed(new_p_data, new_stats, msg, success)
+        view = InfirmaryView(self.db, self.user, new_p_data, new_stats)
+        view.set_back_button(self.back_btn.callback, self.back_btn.label)
 
-        embed = InfirmaryView.build_infirmary_embed(player_data, player_stats, status_message=message, success=success)
+        await interaction.edit_original_response(embed=embed, view=view)
 
-        new_view = InfirmaryView(self.db, self.interaction_user, player_data, player_stats)
-
-        # Preserve custom back-behavior from parent view
-        new_view.back_button.callback = self.back_button.callback
-        new_view.back_button.label = self.back_button.label
-
-        await interaction.edit_original_response(embed=embed, view=new_view)
-
-    # -----------------------------------------------------------------
-    # Embed Builder
-    # -----------------------------------------------------------------
     @staticmethod
-    def build_infirmary_embed(
-        player_data: sqlite3.Row, player_stats: PlayerStats, status_message: str = None, success: bool = True
-    ) -> discord.Embed:
-        current_hp = player_data["current_hp"]
-        current_mp = player_data["current_mp"]  # Added MP
-        max_hp = player_stats.max_hp
-        max_mp = player_stats.max_mp  # Added Max MP
-        current_aurum = player_data["aurum"]
-
-        missing_hp = max(0, max_hp - current_hp)
-        missing_mp = max(0, max_mp - current_mp)  # Calculate missing MP
-
-        cost = infirmary_cost(missing_hp)
-
-        description = (
-            "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
-            "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
-            "but genuine.\n\n"
-            "**Condition**\n"
-            f"> {E.HP} **HP:** {current_hp} / {max_hp}\n"
-            f"> {E.MP} **MP:** {current_mp} / {max_mp}\n\n"
-            "**Purse**\n"
-            f"> {E.AURUM} **Aurum:** {current_aurum}\n\n"
+    def build_embed(p_data, stats, msg=None, success=True) -> discord.Embed:
+        hp_miss = max(0, stats.max_hp - p_data["current_hp"])
+        cost = infirmary_cost(hp_miss)
+        
+        desc = (
+            f"**HP:** {p_data['current_hp']} / {stats.max_hp}\n"
+            f"**MP:** {p_data['current_mp']} / {stats.max_mp}\n"
+            f"**Purse:** {p_data['aurum']} {E.AURUM}\n\n"
+            f"Cost to Heal: **{cost}** Aurum"
         )
-
-        if missing_hp > 0 or missing_mp > 0:
-            description += (
-                f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP, rounded up)."
-            )
-        else:
-            description += "You stand in peak condition; no treatment is required."
-
-        embed = discord.Embed(
-            title="🏥 Adventurer’s Guild — Infirmary",
-            description=description,
-            color=discord.Color.dark_grey(),
-        )
-
-        if status_message:
-            icon = E.CHECK if success else E.ERROR
-            field_title = "Treatment Complete" if success else "Treatment Declined"
-            embed.add_field(name=field_title, value=f"{icon} {status_message}", inline=False)
-            embed.color = discord.Color.green() if success else discord.Color.red()
-
-        embed.set_footer(text="Select 'Receive Treatment' to spend Aurum and restore HP & MP.")
-
+        
+        embed = discord.Embed(title="🏥 Infirmary", description=desc, color=discord.Color.green())
+        if msg:
+            embed.add_field(name="Status", value=f"{E.CHECK if success else E.ERROR} {msg}")
         return embed
 
-
-# =====================================================================
-# COG LOADER
-# =====================================================================
 class InfirmaryCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot):
         self.bot = bot
         self.db = DatabaseManager()
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        pass
-
-
-async def setup(bot: commands.Bot):
+async def setup(bot):
     await bot.add_cog(InfirmaryCog(bot))

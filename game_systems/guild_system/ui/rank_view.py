@@ -2,16 +2,11 @@
 game_systems/guild_system/ui/rank_view.py
 
 Refined Rank / Promotion UI for the Adventurer's Guild.
-
-Provides:
-- RankProgressView: shows promotion requirements and a "Begin Promotion Trial" button
-- RankTrialConfirmationView: confirmation screen and trial boot sequence
-
-This file focuses on robust checks, clearer naming, safer async/thread usage,
-and consistent, atmospheric messaging to match Eldoria's tone.
+Hardened: Async database calls, robust error handling, and logging.
 """
 
 import asyncio
+import logging
 
 import discord
 from discord.ui import View
@@ -22,6 +17,8 @@ from database.database_manager import DatabaseManager
 
 from .components import GuildViewMixin, SystemCache, ViewFactory
 
+logger = logging.getLogger("eldoria.ui.rank")
+
 
 class RankProgressView(View, GuildViewMixin):
     """
@@ -29,7 +26,7 @@ class RankProgressView(View, GuildViewMixin):
     """
 
     def __init__(self, db_manager: DatabaseManager, eligible: bool, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
         self.rank_system = SystemCache.get_rank_system(db_manager)
@@ -60,41 +57,50 @@ class RankProgressView(View, GuildViewMixin):
         """
         await interaction.response.defer()
 
-        # Re-check eligibility (threaded DB call)
-        eligible = await asyncio.to_thread(self.rank_system.check_promotion_eligibility, self.interaction_user.id)
-        if not eligible:
-            await interaction.followup.send(
-                f"{E.WARNING} You no longer meet the promotion requirements.", ephemeral=True
+        try:
+            # Re-check eligibility (threaded DB call)
+            eligible = await asyncio.to_thread(
+                self.rank_system.check_promotion_eligibility, self.interaction_user.id
             )
-            return
+            if not eligible:
+                await interaction.followup.send(
+                    f"{E.WARNING} You no longer meet the promotion requirements.", ephemeral=True
+                )
+                return
 
-        # Fetch current rank info to determine the target rank
-        player_info = await asyncio.to_thread(self.rank_system.get_rank_info, self.interaction_user.id)
-        current_rank = player_info.get("rank", "F")
-        next_rank_key = self.rank_system.get_next_rank(current_rank)
+            # Fetch current rank info to determine the target rank
+            player_info = await asyncio.to_thread(self.rank_system.get_rank_info, self.interaction_user.id)
+            current_rank = player_info.get("rank", "F")
+            next_rank_key = self.rank_system.get_next_rank(current_rank)
 
-        if not next_rank_key:
-            await interaction.followup.send(f"{E.MEDAL} You have already reached the highest rank.", ephemeral=True)
-            return
+            if not next_rank_key:
+                await interaction.followup.send(
+                    f"{E.MEDAL} You have already reached the highest rank.", ephemeral=True
+                )
+                return
 
-        next_rank_title = self.rank_system.RANKS.get(next_rank_key, {}).get("title", next_rank_key)
+            next_rank_title = self.rank_system.RANKS.get(next_rank_key, {}).get("title", next_rank_key)
 
-        # Build confirmation embed (clear, thematic, and explicit)
-        embed = discord.Embed(
-            title=f"{E.WARNING} Promotion Trial — Rank {next_rank_key}",
-            description=(
-                f"You stand before the threshold of advancement to **{next_rank_title}**.\n\n"
-                "**Trial Conditions**\n"
-                "• This encounter is **Boss-Tier** and far more lethal than normal assignments.\n"
-                "• **Auto-Combat is disabled.** You will face the Examiner in manual, turn-based combat.\n"
-                "• Failure means you do not pass the trial — prepare accordingly.\n\n"
-                "Do you accept the challenge and step into the arena?"
-            ),
-            color=discord.Color.orange(),
-        )
+            # Build confirmation embed (clear, thematic, and explicit)
+            embed = discord.Embed(
+                title=f"{E.WARNING} Promotion Trial — Rank {next_rank_key}",
+                description=(
+                    f"You stand before the threshold of advancement to **{next_rank_title}**.\n\n"
+                    "**Trial Conditions**\n"
+                    "• This encounter is **Boss-Tier** and far more lethal than normal assignments.\n"
+                    "• **Auto-Combat is disabled.** You will face the Examiner in manual, turn-based combat.\n"
+                    "• Failure means you do not pass the trial — prepare accordingly.\n\n"
+                    "Do you accept the challenge and step into the arena?"
+                ),
+                color=discord.Color.orange(),
+            )
 
-        view = RankTrialConfirmationView(self.db, self.interaction_user, next_rank_key)
-        await interaction.edit_original_response(embed=embed, view=view)
+            view = RankTrialConfirmationView(self.db, self.interaction_user, next_rank_key)
+            await interaction.edit_original_response(embed=embed, view=view)
+
+        except Exception as e:
+            logger.error(f"Promotion callback error for {self.interaction_user.id}: {e}", exc_info=True)
+            await interaction.followup.send("An error occurred checking eligibility.", ephemeral=True)
 
 
 class RankTrialConfirmationView(View, GuildViewMixin):
@@ -104,7 +110,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
     """
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, next_rank: str):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
         self.next_rank = next_rank
@@ -144,7 +150,8 @@ class RankTrialConfirmationView(View, GuildViewMixin):
                 adventure_cog.manager.start_promotion_trial, self.interaction_user.id, self.next_rank
             )
         except Exception as exc:
-            await interaction.followup.send(f"{E.ERROR} Failed to start promotion trial: {exc}", ephemeral=True)
+            logger.error(f"Failed to start trial for {self.interaction_user.id}: {exc}")
+            await interaction.followup.send(f"{E.ERROR} Failed to start promotion trial.", ephemeral=True)
             return
 
         # Local imports to avoid circular dependencies and keep startup fast
@@ -152,32 +159,44 @@ class RankTrialConfirmationView(View, GuildViewMixin):
         from game_systems.adventure.ui.exploration_view import ExplorationView
         from game_systems.player.player_stats import PlayerStats
 
-        # Gather data required to build the Exploration embed/view
-        stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
-        stats = PlayerStats.from_dict(stats_json)
-        vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
-        session_row = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
+        try:
+            # Gather data required to build the Exploration embed/view
+            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+            stats = PlayerStats.from_dict(stats_json)
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+            session_row = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
 
-        # Compose embed describing the start of the trial
-        embed = AdventureEmbeds.build_exploration_embed(
-            location_key="guild_arena",
-            initial_log=["You step into the arena. The Examiner's presence hangs heavy in the air."],
-            stats=stats,
-            vitals=vitals,
-            session_row=session_row,
-        )
+            # Compose embed describing the start of the trial
+            embed = AdventureEmbeds.build_exploration_embed(
+                location_id="guild_arena",
+                log=["You step into the arena. The Examiner's presence hangs heavy in the air."],
+                player_stats=stats,
+                vitals=vitals,
+                session_row=session_row,
+            )
 
-        # Build the exploration view and hand control over to the Adventure system
-        view = ExplorationView(
-            self.db,
-            adventure_cog.manager,
-            location_id="guild_arena",
-            log=["Trial Started."],
-            interaction_user=self.interaction_user,
-            player_stats=stats,
-        )
+            # Build the exploration view and hand control over to the Adventure system
+            # Note: Active monster is parsed inside ExplorationView from session_row if present
+            import json
+            active_monster = None
+            if session_row and session_row["active_monster_json"]:
+                 active_monster = json.loads(session_row["active_monster_json"])
 
-        await interaction.edit_original_response(embed=embed, view=view)
+            view = ExplorationView(
+                self.db,
+                adventure_cog.manager,
+                location_id="guild_arena",
+                log=["Trial Started."],
+                interaction_user=self.interaction_user,
+                player_stats=stats,
+                active_monster=active_monster
+            )
+
+            await interaction.edit_original_response(embed=embed, view=view)
+
+        except Exception as e:
+            logger.error(f"Trial UI load error: {e}", exc_info=True)
+            await interaction.followup.send("Error loading arena interface.", ephemeral=True)
 
     async def cancel_callback(self, interaction: discord.Interaction):
         """

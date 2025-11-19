@@ -1,8 +1,12 @@
 """
 game_systems/guild_system/ui/services_menu.py
+
+Sub-menu for Guild services (Shop, Infirmary, Exchange).
+Hardened: Async database loading for sub-views.
 """
 
 import asyncio
+import logging
 
 import discord
 from discord.ui import Button, View
@@ -13,10 +17,12 @@ from database.database_manager import DatabaseManager
 
 from .components import EmbedBuilder, GuildViewMixin, SystemCache, ViewFactory
 
+logger = logging.getLogger("eldoria.ui.services")
+
 
 class GuildServicesView(View, GuildViewMixin):
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
 
@@ -56,13 +62,18 @@ class GuildServicesView(View, GuildViewMixin):
 
         await interaction.response.defer()
         exchange = SystemCache.get_guild_exchange(self.db)
+        
+        # Heavy calculation in thread
         val, mats = await asyncio.to_thread(exchange.calculate_exchange_value, self.interaction_user.id)
 
         embed = EmbedBuilder.guild_exchange()
         if val == 0:
             embed.add_field(name="Materials", value="None.")
         else:
-            rows = [f"• {m['item_name']} x{m['count']}" for m in mats]
+            # Limit list length
+            rows = [f"• {m['item_name']} x{m['count']}" for m in mats[:10]]
+            if len(mats) > 10: rows.append("...")
+            
             embed.add_field(name="Materials", value="\n".join(rows), inline=False)
             embed.add_field(name="Value", value=f"{val} Aurum", inline=False)
 
@@ -75,6 +86,8 @@ class GuildServicesView(View, GuildViewMixin):
 
         await interaction.response.defer()
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        if not p_data: return
+        
         aurum = p_data["aurum"]
 
         embed = discord.Embed(title="Guild Supply", description=f"Funds: {aurum} Aurum", color=discord.Color.green())
@@ -88,16 +101,20 @@ class GuildServicesView(View, GuildViewMixin):
 
         await interaction.response.defer()
 
-        p_data, s_json = await asyncio.gather(
-            asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-            asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
-        )
-        stats = PlayerStats.from_dict(s_json)
+        # Parallel fetch
+        try:
+            p_data, s_json = await asyncio.gather(
+                asyncio.to_thread(self.db.get_player, self.interaction_user.id),
+                asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
+            )
+            stats = PlayerStats.from_dict(s_json)
 
-        embed = InfirmaryView.build_infirmary_embed(p_data, stats)
-        view = InfirmaryView(self.db, self.interaction_user, p_data, stats)
-        view.set_back_button(self.back_to_services, "Back to Services")
-        await interaction.edit_original_response(embed=embed, view=view)
+            embed = InfirmaryView.build_infirmary_embed(p_data, stats)
+            view = InfirmaryView(self.db, self.interaction_user, p_data, stats)
+            view.set_back_button(self.back_to_services, "Back to Services")
+            await interaction.edit_original_response(embed=embed, view=view)
+        except Exception as e:
+            logger.error(f"Infirmary open error: {e}")
 
     async def trainer_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.skill_trainer_cog import SkillTrainerView

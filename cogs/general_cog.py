@@ -2,12 +2,15 @@
 cogs/general_cog.py
 
 Handles general utility commands for all users.
-Currently supports: /ping
+Hardened: Added logging for monitoring.
 """
 
+import logging
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+logger = logging.getLogger("eldoria.general")
 
 
 class GeneralCog(commands.Cog):
@@ -19,12 +22,22 @@ class GeneralCog(commands.Cog):
         """
         Returns the bot's current websocket latency.
         """
-        # Latency is in seconds, convert to ms
-        latency_ms = round(self.bot.latency * 1000)
-
-        embed = discord.Embed(title="🏓 Pong!", description=f"Latency: **{latency_ms}ms**", color=discord.Color.blue())
-
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        try:
+            # Latency is in seconds, convert to ms
+            latency_ms = round(self.bot.latency * 1000)
+            
+            embed = discord.Embed(
+                title="🏓 Pong!", 
+                description=f"Latency: **{latency_ms}ms**", 
+                color=discord.Color.blue()
+            )
+            
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            logger.info(f"Ping requested by {interaction.user} ({latency_ms}ms)")
+            
+        except Exception as e:
+            logger.error(f"Ping command failed: {e}")
+            await interaction.response.send_message("Error calculating latency.", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

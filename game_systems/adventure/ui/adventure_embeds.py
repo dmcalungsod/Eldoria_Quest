@@ -2,17 +2,20 @@
 game_systems/adventure/ui/adventure_embeds.py
 
 Handles the creation of Discord embeds for the adventure system.
-Dynamically adjusts layout based on Combat vs. Exploration state.
+Hardened: Robust JSON parsing and layout stability.
 """
 
 import json
 import sqlite3
+import logging
 
 import discord
 
 import game_systems.data.emojis as E
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
+
+logger = logging.getLogger("eldoria.ui.embeds")
 
 
 class AdventureEmbeds:
@@ -32,13 +35,14 @@ class AdventureEmbeds:
         if session_row and session_row["active_monster_json"]:
             try:
                 active_monster = json.loads(session_row["active_monster_json"])
-            except Exception:
-                pass
+            except json.JSONDecodeError:
+                logger.error("Failed to parse active_monster_json for embed.")
+                active_monster = None
 
         # 2. Base Embed Styling
         if active_monster:
             # Manual Combat Mode (Boss/Elite) -> Red Theme
-            title = f"{E.COMBAT} Encounter: {active_monster['name']}"
+            title = f"{E.COMBAT} Encounter: {active_monster.get('name', 'Enemy')}"
             color = discord.Color.dark_red()
         else:
             # Exploration / Auto-Combat Result -> Green Theme
@@ -72,19 +76,22 @@ class AdventureEmbeds:
 
         # 4. Player Vitals Field
         # Using emojis for clean layout
-        hp_percent = vitals["current_hp"] / max(player_stats.max_hp, 1)
+        try:
+            hp_percent = vitals["current_hp"] / max(player_stats.max_hp, 1)
+            
+            # Simple status indicator
+            status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
 
-        # Simple status indicator
-        status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
-
-        embed.add_field(
-            name=f"Adventurer Status {status_icon}",
-            value=(
-                f"{E.HP} **HP:** {vitals['current_hp']} / {player_stats.max_hp}\n"
-                f"{E.MP} **MP:** {vitals['current_mp']} / {player_stats.max_mp}"
-            ),
-            inline=True,
-        )
+            embed.add_field(
+                name=f"Adventurer Status {status_icon}",
+                value=(
+                    f"{E.HP} **HP:** {vitals['current_hp']} / {player_stats.max_hp}\n"
+                    f"{E.MP} **MP:** {vitals['current_mp']} / {player_stats.max_mp}"
+                ),
+                inline=True,
+            )
+        except Exception:
+            embed.add_field(name="Adventurer Status", value="*Data Error*", inline=True)
 
         # 5. Monster Vitals Field (Only in Manual Mode)
         if active_monster:
@@ -98,7 +105,7 @@ class AdventureEmbeds:
             bar = "█" * filled + "░" * (bar_len - filled)
 
             embed.add_field(
-                name=f"VS. {active_monster['name']}",
+                name=f"VS. {active_monster.get('name', 'Enemy')}",
                 value=f"**HP:** `{bar}` {m_hp}/{m_max}",
                 inline=True,
             )

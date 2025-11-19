@@ -1,6 +1,7 @@
 """
 game_systems/guild_system/ui/lobby_view.py
 The main entry point for the Guild Hall.
+Hardened: Async loading and circular import protection.
 """
 
 import discord
@@ -11,14 +12,10 @@ from database.database_manager import DatabaseManager
 
 from .components import EmbedBuilder, GuildViewMixin, ViewFactory
 
-# Lazy imports inside methods to avoid circular deps
-# from .quests_menu import QuestsMenuView
-# from .services_menu import GuildServicesView
-
 
 class GuildLobbyView(View, GuildViewMixin):
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
         self._setup_buttons()

@@ -1,8 +1,11 @@
 """
 game_systems/guild_system/ui/quests_menu.py
+Sub-menu for quest operations.
+Hardened: Async processing and safe JSON data handling.
 """
 
 import asyncio
+import logging
 
 import discord
 from discord.ui import Button, View
@@ -15,6 +18,8 @@ from game_systems.guild_system.quest_system import QuestSystem
 from .components import EmbedBuilder, GuildViewMixin, SystemCache, ViewFactory
 from .rank_view import RankProgressView
 
+logger = logging.getLogger("eldoria.ui.quests")
+
 
 class QuestsMenuView(View, GuildViewMixin):
     """
@@ -23,7 +28,7 @@ class QuestsMenuView(View, GuildViewMixin):
     """
 
     def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
         self.rank_system = SystemCache.get_rank_system(db_manager)
@@ -154,39 +159,46 @@ class QuestsMenuView(View, GuildViewMixin):
     async def check_rank_callback(self, interaction: discord.Interaction, button: Button = None):
         await interaction.response.defer()
 
-        data = await asyncio.to_thread(self.rank_system.get_rank_info, self.interaction_user.id)
+        try:
+            data = await asyncio.to_thread(self.rank_system.get_rank_info, self.interaction_user.id)
+            if not data:
+                await interaction.followup.send("Error fetching rank data.", ephemeral=True)
+                return
 
-        cur_rank = data.get("rank", "F")
-        next_rank = self.rank_system.RANKS.get(cur_rank, {}).get("next_rank")
+            cur_rank = data.get("rank", "F")
+            next_rank = self.rank_system.RANKS.get(cur_rank, {}).get("next_rank")
 
-        # Max Rank
-        if not next_rank:
-            # --- Narrative Update ---
-            embed = discord.Embed(
-                title="Rank Evaluation",
-                description="You stand at the zenith of the Guild's hierarchy. There are no titles left to grant you.",
-                color=discord.Color.gold(),
-            )
-            view = RankProgressView(self.db, False, self.interaction_user)
+            # Max Rank
+            if not next_rank:
+                embed = discord.Embed(
+                    title="Rank Evaluation",
+                    description="You stand at the zenith of the Guild's hierarchy. There are no titles left to grant you.",
+                    color=discord.Color.gold(),
+                )
+                view = RankProgressView(self.db, False, self.interaction_user)
 
-        else:
-            reqs = self.rank_system.RANKS[cur_rank].get("requirements", {})
-            eligible = True
-            lines = []
+            else:
+                reqs = self.rank_system.RANKS[cur_rank].get("requirements", {})
+                eligible = True
+                lines = []
 
-            for key, required in reqs.items():
-                current = data.get(key, 0)
-                lines.append(f"• {key.replace('_', ' ').title()}: {current}/{required}")
-                if current < required:
-                    eligible = False
+                for key, required in reqs.items():
+                    current = data.get(key, 0)
+                    lines.append(f"• {key.replace('_', ' ').title()}: {current}/{required}")
+                    if current < required:
+                        eligible = False
 
-            embed = discord.Embed(title=f"Rank Evaluation: {cur_rank} → {next_rank}", color=discord.Color.blue())
-            embed.add_field(name="Requirements", value="\n".join(lines))
+                embed = discord.Embed(title=f"Rank Evaluation: {cur_rank} → {next_rank}", color=discord.Color.blue())
+                embed.add_field(name="Requirements", value="\n".join(lines))
 
-            view = RankProgressView(self.db, eligible, self.interaction_user)
+                view = RankProgressView(self.db, eligible, self.interaction_user)
 
-        view.set_back_button(self.back_to_this_menu, "Back to Quests")
-        await interaction.edit_original_response(embed=embed, view=view)
+            view.set_back_button(self.back_to_this_menu, "Back to Quests")
+            await interaction.edit_original_response(embed=embed, view=view)
+
+        except Exception as e:
+            logger.error(f"Rank check error for {self.interaction_user.id}: {e}", exc_info=True)
+            await interaction.followup.send("An error occurred checking rank status.", ephemeral=True)
 
     # ------------------------------
     # Return to Menu

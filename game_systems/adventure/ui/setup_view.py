@@ -2,9 +2,11 @@
 game_systems/adventure/ui/setup_view.py
 
 The preparation screen where players select their destination.
+Hardened: Async initialization and safe session creation.
 """
 
 import asyncio
+import logging
 
 import discord
 from discord.ui import Button, Select, View
@@ -19,12 +21,14 @@ from game_systems.player.player_stats import PlayerStats
 from .adventure_embeds import AdventureEmbeds
 from .exploration_view import ExplorationView
 
+logger = logging.getLogger("eldoria.ui.setup")
+
 
 class AdventureSetupView(View):
     def __init__(
         self, db: DatabaseManager, manager: AdventureManager, interaction_user: discord.User, player_rank: str
     ):
-        super().__init__(timeout=None)
+        super().__init__(timeout=180)
         self.db = db
         self.manager = manager
         self.interaction_user = interaction_user
@@ -40,6 +44,7 @@ class AdventureSetupView(View):
         # Populate Locations
         for loc_id, loc_data in LOCATIONS.items():
             # (Optional: Add Rank Check logic here if desired)
+            # e.g. if loc_data['min_rank'] > self.player_rank: continue
             self.location_select.add_option(
                 label=loc_data["name"],
                 value=loc_id,
@@ -66,30 +71,42 @@ class AdventureSetupView(View):
 
     async def location_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        loc_id = self.location_select.values[0]
-        loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
+        
+        try:
+            loc_id = self.location_select.values[0]
+            loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
 
-        # 1. Start the adventure in DB
-        await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, duration_minutes=-1)
+            # 1. Start the adventure in DB (Threaded)
+            success = await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, -1)
+            
+            if not success:
+                await interaction.followup.send("Failed to start adventure. Please try again.", ephemeral=True)
+                return
 
-        # 2. Fetch data for the next view
-        stats_json = await asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
-        player_stats = PlayerStats.from_dict(stats_json)
-        vitals = await asyncio.to_thread(self.db.get_player_vitals, interaction.user.id)
-        session_row = await asyncio.to_thread(self.manager.get_active_session, interaction.user.id)
+            # 2. Fetch data for the next view (Parallel)
+            vitals, session_row, stats_json = await asyncio.gather(
+                asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
+                asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
+                asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
+            )
+            
+            player_stats = PlayerStats.from_dict(stats_json)
 
-        # 3. Initial Log
-        initial_log = [
-            f"You step beyond the walls into **{loc_data['name']}**.",
-            "The air shifts. You are now in the wilds.",
-        ]
+            # 3. Initial Log
+            initial_log = [
+                f"You step beyond the walls into **{loc_data['name']}**.",
+                "The air shifts. You are now in the wilds.",
+            ]
 
-        # 4. Build Embed
-        embed = AdventureEmbeds.build_exploration_embed(loc_id, initial_log, player_stats, vitals, session_row)
+            # 4. Build Embed
+            embed = AdventureEmbeds.build_exploration_embed(loc_id, initial_log, player_stats, vitals, session_row)
 
-        # 5. Transition to Exploration View
-        # active_monster defaults to None for new adventures
-        view = ExplorationView(
-            self.db, self.manager, loc_id, initial_log, self.interaction_user, player_stats, active_monster=None
-        )
-        await interaction.edit_original_response(embed=embed, view=view)
+            # 5. Transition to Exploration View
+            view = ExplorationView(
+                self.db, self.manager, loc_id, initial_log, self.interaction_user, player_stats, active_monster=None
+            )
+            await interaction.edit_original_response(embed=embed, view=view)
+
+        except Exception as e:
+            logger.error(f"Location setup error: {e}", exc_info=True)
+            await interaction.followup.send("An error occurred starting the expedition.", ephemeral=True)

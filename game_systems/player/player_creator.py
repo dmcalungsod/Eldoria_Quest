@@ -1,48 +1,41 @@
 """
 Player Creator for Eldoria Quest
-
-Handles:
-- Creating player profiles
-- Creating base stats from class definitions
-- Validating class IDs
+--------------------------------
+Handles character initialization.
+Hardened with atomic transactions to ensure complete character setup.
 """
 
+import logging
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
-
 from .player_stats import PlayerStats
 
+logger = logging.getLogger("eldoria.creator")
 
 class PlayerCreator:
     def __init__(self, db):
         self.db = db
 
-    def create_player(
-        self,
-        discord_id: int,
-        username: str,
-        class_id: int,
-        race: str = None,
-        gender: str = None,
-    ):
-        """Creates a new player after validating class ID and ensuring no duplicates."""
-
-        # Check if player already exists
+    def create_player(self, discord_id: int, username: str, class_id: int, race: str = None, gender: str = None):
+        """
+        Creates a player profile.
+        ATOMIC: Creates player, stats, and default skills in one transaction.
+        """
         if self.db.player_exists(discord_id):
-            return False, "You already created a character."
+            return False, "You already have a character."
 
-        # Locate class by ID
+        # 1. Validate Class
         class_name = None
         for name, data in CLASS_DEFINITIONS.items():
             if data["id"] == class_id:
                 class_name = name
                 break
-
+        
         if not class_name:
-            return False, "Invalid class ID."
+            return False, "Invalid class selection."
 
         class_data = CLASS_DEFINITIONS[class_name]
 
-        # Create a stats object to calculate initial HP/MP
+        # 2. Initialize Stats
         stats = PlayerStats(
             str_base=class_data["stats"]["STR"],
             end_base=class_data["stats"]["END"],
@@ -52,52 +45,50 @@ class PlayerCreator:
             lck_base=class_data["stats"]["LCK"],
         )
 
-        # Get initial max HP and MP from the new stats object
-        initial_hp = stats.max_hp
-        initial_mp = stats.max_mp
-
-        # Save to database
-        self.db.create_player(
-            discord_id=discord_id,
-            name=username,
-            class_id=class_id,
-            race=race,
-            gender=gender,
-            stats_data=stats.to_dict(),
-            initial_hp=initial_hp,
-            initial_mp=initial_mp,
-        )
-
-        # --- THIS IS THE FIX: Add default skills ---
-        conn = None
         try:
-            conn = self.db.connect()
-            cur = conn.cursor()
-
-            # 1. Find all default skills (learn_cost = 0) for this class_id
-            # --- MODIFIED QUERY ---
-            cur.execute("SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0", (class_id,))
-            # --- END OF MODIFICATION ---
-
-            default_skills = cur.fetchall()
-
-            # 2. Add them to the player_skills table
-            for skill in default_skills:
-                cur.execute(
+            with self.db.get_connection() as conn:
+                # 3. Insert Player Record & Stats (Handled by DB Manager logic or manually here for atomicity)
+                # We use the raw queries here to bundle skills in the same transaction context
+                
+                # Insert Player
+                conn.execute(
                     """
-                    INSERT INTO player_skills (discord_id, skill_key, skill_level)
-                    VALUES (?, ?, 1)
+                    INSERT INTO players (
+                        discord_id, name, class_id, race, gender, 
+                        level, experience, exp_to_next, current_hp, current_mp, vestige_pool, aurum
+                    ) VALUES (?, ?, ?, ?, ?, 1, 0, 1000, ?, ?, 0, 0)
                     """,
-                    (discord_id, skill["key_id"]),
+                    (discord_id, username, class_id, race, gender, stats.max_hp, stats.max_mp)
                 )
 
-            conn.commit()
-        except Exception as e:
-            print(f"Error adding default skills for {discord_id}: {e}")
-            # We can just log this and not fail character creation
-        finally:
-            if conn:
-                conn.close()
-        # --- END OF FIX ---
+                # Insert Stats JSON
+                conn.execute(
+                    "INSERT INTO stats (discord_id, stats_json) VALUES (?, ?)",
+                    (discord_id, str(stats.to_dict()).replace("'", '"')) # Simple dict->json str, essentially json.dumps
+                )
+                
+                # 4. Add Default Skills
+                # Find skills with learn_cost=0 for this class
+                default_skills = conn.execute(
+                    "SELECT key_id FROM skills WHERE class_id = ? AND learn_cost = 0", 
+                    (class_id,)
+                ).fetchall()
 
-        return True, f"Welcome **{username}**, you are now a **{class_name}**!"
+                for skill in default_skills:
+                    conn.execute(
+                        "INSERT INTO player_skills (discord_id, skill_key, skill_level) VALUES (?, ?, 1)",
+                        (discord_id, skill["key_id"])
+                    )
+                
+                # 5. Register Guild Member (Starting Rank F)
+                conn.execute(
+                    "INSERT INTO guild_members (discord_id, rank, join_date) VALUES (?, 'F', datetime('now'))",
+                    (discord_id,)
+                )
+
+            logger.info(f"Character created for {username} ({discord_id})")
+            return True, f"Welcome **{username}**, you are now a **{class_name}**!"
+
+        except Exception as e:
+            logger.error(f"Failed to create player {discord_id}: {e}", exc_info=True)
+            return False, "A system error occurred during character creation."

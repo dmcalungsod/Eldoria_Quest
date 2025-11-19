@@ -1,309 +1,192 @@
 """
-quest_system.py
+game_systems/guild_system/quest_system.py
 
-Handles all logic related to quests issued by the Adventurer's Guild.
-
-This system manages:
-- Retrieving quests appropriate for a player's Guild Rank
-- Accepting official Guild-issued assignments
-- Tracking objective progress during expeditions
-- Completing quests and triggering reward distribution
+Manages quest tracking, updates, and completion.
+Hardened: Atomic transactions and safe state validation.
 """
 
 import json
+import logging
 from typing import Dict, List, Optional, Tuple
-
-import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.reward_system import RewardSystem
+from game_systems.data.emojis import ERROR, WARNING, CHECK
 
+logger = logging.getLogger("eldoria.quests")
 
 class QuestSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
         self.reward_system = RewardSystem(db_manager)
 
-    # -----------------------------------------------------------
-    #  Fetching Quests
-    # -----------------------------------------------------------
-
     def get_available_quests(self, discord_id: int) -> List[Dict]:
-        """
-        Fetches quests suited to the Adventurer's Guild Rank.
-        Returns a list of quest dictionaries.
-        """
-        conn = self.db.connect()
-        cur = conn.cursor()
+        try:
+            with self.db.get_connection() as conn:
+                rank_row = conn.execute("SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,)).fetchone()
+                if not rank_row: return []
+                
+                player_rank = rank_row["rank"]
 
-        # Retrieve the adventurer's Guild Rank
-        cur.execute("SELECT rank FROM guild_members WHERE discord_id = ?", (discord_id,))
-        player_rank_data = cur.fetchone()
+                taken = conn.execute("SELECT quest_id FROM player_quests WHERE discord_id = ?", (discord_id,)).fetchall()
+                taken_ids = {row["quest_id"] for row in taken}
 
-        if not player_rank_data:
-            conn.close()
+                quests = conn.execute(
+                    "SELECT id, title, tier, summary FROM quests WHERE tier = ?", (player_rank,)
+                ).fetchall()
+
+                return [dict(q) for q in quests if q["id"] not in taken_ids]
+        except Exception as e:
+            logger.error(f"Error fetching quests for {discord_id}: {e}", exc_info=True)
             return []
 
-        player_rank = player_rank_data["rank"]
-
-        # Get all quests already taken or completed to avoid duplication
-        cur.execute("SELECT quest_id FROM player_quests WHERE discord_id = ?", (discord_id,))
-        taken_quest_ids = {row["quest_id"] for row in cur.fetchall()}
-
-        # Fetch quests locked to the adventurer's current Guild Rank
-        cur.execute("SELECT id, title, tier, summary FROM quests WHERE tier = ?", (player_rank,))
-        all_quests = cur.fetchall()
-        conn.close()
-
-        # Filter out previously taken quests
-        available_quests = [dict(q) for q in all_quests if q["id"] not in taken_quest_ids]
-        return available_quests
-
-    # -----------------------------------------------------------
-    #  Detailed Quest Data
-    # -----------------------------------------------------------
-
     def get_quest_details(self, quest_id: int) -> Optional[Dict]:
-        """
-        Retrieves full quest details from the Guild Registry:
-        - Lore summary
-        - Objective list
-        - Reward package (EXP, Gold, Guild Merit, items)
-        """
-        conn = self.db.connect()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM quests WHERE id = ?", (quest_id,))
-        quest_data = cur.fetchone()
-        conn.close()
-
-        if quest_data:
-            details = dict(quest_data)
-            # Parse JSON fields
-            try:
-                details["objectives"] = json.loads(details["objectives"])
-                details["rewards"] = json.loads(details["rewards"])
-            except json.JSONDecodeError:
-                # Fallback for empty or malformed JSON
-                details["objectives"] = {}
-                details["rewards"] = {}
-            return details
-
-        return None
-
-    # -----------------------------------------------------------
-    #  Accepting a Quest
-    # -----------------------------------------------------------
-
-    def accept_quest(self, discord_id: int, quest_id: int) -> bool:
-        """
-        Registers the adventurer for an official quest.
-        - Prevents registering for the same quest twice
-        - Initializes objective progress based on the quest data
-        """
-        conn = self.db.connect()
-        cur = conn.cursor()
-
-        # Check if the quest is already in progress or finished
-        cur.execute(
-            "SELECT id FROM player_quests WHERE discord_id = ? AND quest_id = ?",
-            (discord_id, quest_id),
-        )
-        if cur.fetchone():
-            conn.close()
-            return False
-
-        quest_details = self.get_quest_details(quest_id)
-        if not quest_details:
-            conn.close()
-            return False
-
-        # Initialize objective tracker structure (start at 0)
-        initial_progress = {}
-        for obj_type, tasks in quest_details["objectives"].items():
-            if isinstance(tasks, dict):
-                initial_progress[obj_type] = {task: 0 for task in tasks}
-            else:
-                # For string objectives like "Locate Lina", treat as count 0
-                initial_progress[obj_type] = {tasks: 0}
-
-        cur.execute(
-            "INSERT INTO player_quests (discord_id, quest_id, status, progress) VALUES (?, ?, ?, ?)",
-            (discord_id, quest_id, "in_progress", json.dumps(initial_progress)),
-        )
-
-        conn.commit()
-        conn.close()
-        return True
-
-    # -----------------------------------------------------------
-    #  Retrieving Active Quests
-    # -----------------------------------------------------------
+        try:
+            with self.db.get_connection() as conn:
+                row = conn.execute("SELECT * FROM quests WHERE id = ?", (quest_id,)).fetchone()
+                if not row: return None
+                
+                details = dict(row)
+                try:
+                    details["objectives"] = json.loads(details["objectives"])
+                    details["rewards"] = json.loads(details["rewards"])
+                except json.JSONDecodeError:
+                    details["objectives"] = {}
+                    details["rewards"] = {}
+                return details
+        except Exception as e:
+            logger.error(f"Details fetch error: {e}")
+            return None
 
     def get_player_quests(self, discord_id: int) -> List[Dict]:
-        """
-        Retrieves every active assignment the adventurer is currently undertaking.
-        Equivalent to the Guild “Adventurer Task Ledger”.
-        """
-        conn = self.db.connect()
-        cur = conn.cursor()
-
-        cur.execute(
-            """
-            SELECT q.id, q.title, q.summary, pq.status, pq.progress, q.objectives
-            FROM player_quests pq
-            JOIN quests q ON pq.quest_id = q.id
-            WHERE pq.discord_id = ? AND pq.status = 'in_progress'
-        """,
-            (discord_id,),
-        )
-
-        player_quests = [dict(row) for row in cur.fetchall()]
-        conn.close()
-
-        for quest in player_quests:
-            # Safe parsing of progress and objectives
-            try:
-                quest["progress"] = json.loads(quest["progress"])
-                quest["objectives"] = json.loads(quest["objectives"])
-            except json.JSONDecodeError:
-                quest["progress"] = {}
-                quest["objectives"] = {}
-
-        return player_quests
-
-    # -----------------------------------------------------------
-    #  Updating Quest Progress
-    # -----------------------------------------------------------
-
-    def update_progress(
-        self,
-        discord_id: int,
-        quest_id: int,
-        obj_type: str,
-        target: str,
-        amount: int = 1,
-    ) -> bool:
-        """
-        Updates the adventurer’s progress during an expedition.
-
-        Parameters:
-        - obj_type: The category (e.g., "defeat", "collect")
-        - target: The specific item/monster name (e.g., "Forest Slime")
-        - amount: How much to increment progress by
-        """
-        conn = self.db.connect()
-        cur = conn.cursor()
-
-        cur.execute(
-            "SELECT progress FROM player_quests WHERE discord_id = ? AND quest_id = ?",
-            (discord_id, quest_id),
-        )
-        row = cur.fetchone()
-
-        if not row:
-            conn.close()
-            return False
-
         try:
-            progress = json.loads(row["progress"])
-        except json.JSONDecodeError:
-            conn.close()
-            return False
+            with self.db.get_connection() as conn:
+                rows = conn.execute(
+                    """
+                    SELECT q.id, q.title, q.summary, pq.status, pq.progress, q.objectives
+                    FROM player_quests pq
+                    JOIN quests q ON pq.quest_id = q.id
+                    WHERE pq.discord_id = ? AND pq.status = 'in_progress'
+                    """,
+                    (discord_id,)
+                ).fetchall()
 
-        # Check if this objective exists in the player's tracking data
-        if obj_type in progress and target in progress[obj_type]:
-            progress[obj_type][target] += amount
+                results = []
+                for row in rows:
+                    d = dict(row)
+                    try:
+                        d["progress"] = json.loads(d["progress"])
+                        d["objectives"] = json.loads(d["objectives"])
+                    except json.JSONDecodeError:
+                        d["progress"] = {}
+                        d["objectives"] = {}
+                    results.append(d)
+                return results
+        except Exception as e:
+            logger.error(f"Player quests error: {e}")
+            return []
 
-            cur.execute(
-                "UPDATE player_quests SET progress = ? WHERE discord_id = ? AND quest_id = ?",
-                (json.dumps(progress), discord_id, quest_id),
-            )
-            conn.commit()
-            conn.close()
-            return True
+    def accept_quest(self, discord_id: int, quest_id: int) -> bool:
+        try:
+            with self.db.get_connection() as conn:
+                exists = conn.execute(
+                    "SELECT 1 FROM player_quests WHERE discord_id = ? AND quest_id = ?", (discord_id, quest_id)
+                ).fetchone()
+                if exists: return False
 
-        conn.close()
-        return False
+                q_data = conn.execute("SELECT objectives FROM quests WHERE id = ?", (quest_id,)).fetchone()
+                if not q_data: return False
 
-    # -----------------------------------------------------------
-    #  Objective Completion Check
-    # -----------------------------------------------------------
-
-    def check_completion(self, progress: Dict, objectives: Dict) -> bool:
-        """
-        Compares actual progress vs. required objectives.
-        Returns True only if ALL tasks meet or exceed the quota.
-        """
-        for obj_type, tasks in objectives.items():
-            if isinstance(tasks, dict):
-                for target, required_amt in tasks.items():
-                    current_amt = progress.get(obj_type, {}).get(target, 0)
-                    if current_amt < required_amt:
-                        return False
-            else:
-                # Handle single string objectives (treated as boolean/count of 1)
-                target = tasks
-                current_amt = progress.get(obj_type, {}).get(target, 0)
-                if current_amt < 1:
+                try:
+                    objectives = json.loads(q_data["objectives"])
+                except json.JSONDecodeError:
                     return False
 
-        return True
+                progress = {}
+                for type_, targets in objectives.items():
+                    if isinstance(targets, dict):
+                        progress[type_] = {t: 0 for t in targets}
+                    else:
+                        progress[type_] = {targets: 0}
 
-    # -----------------------------------------------------------
-    #  Completing a Quest
-    # -----------------------------------------------------------
+                conn.execute(
+                    "INSERT INTO player_quests (discord_id, quest_id, status, progress) VALUES (?, ?, ?, ?)",
+                    (discord_id, quest_id, "in_progress", json.dumps(progress))
+                )
+                logger.info(f"User {discord_id} accepted quest {quest_id}")
+                return True
+        except Exception as e:
+            logger.error(f"Accept quest error: {e}", exc_info=True)
+            return False
+
+    def update_progress(self, discord_id: int, quest_id: int, obj_type: str, target: str, amount: int = 1) -> bool:
+        try:
+            with self.db.get_connection() as conn:
+                row = conn.execute(
+                    "SELECT progress FROM player_quests WHERE discord_id = ? AND quest_id = ?",
+                    (discord_id, quest_id)
+                ).fetchone()
+                
+                if not row: return False
+
+                try:
+                    progress = json.loads(row["progress"])
+                except json.JSONDecodeError:
+                    return False
+
+                if obj_type in progress and target in progress[obj_type]:
+                    progress[obj_type][target] += amount
+                    conn.execute(
+                        "UPDATE player_quests SET progress = ? WHERE discord_id = ? AND quest_id = ?",
+                        (json.dumps(progress), discord_id, quest_id)
+                    )
+                    return True
+            return False
+        except Exception as e:
+            logger.error(f"Update progress error: {e}")
+            return False
 
     def complete_quest(self, discord_id: int, quest_id: int) -> Tuple[bool, str]:
-        """
-        Governs official quest completion:
-        1. Validates if the quest is active
-        2. Validates if objectives are met
-        3. Calls RewardSystem to distribute loot/XP
-        4. Marks quest as 'completed' in DB
-        """
-        conn = self.db.connect()
-        cur = conn.cursor()
+        try:
+            with self.db.get_connection() as conn:
+                row = conn.execute(
+                    """
+                    SELECT pq.progress, q.objectives 
+                    FROM player_quests pq
+                    JOIN quests q ON pq.quest_id = q.id
+                    WHERE pq.discord_id = ? AND pq.quest_id = ? AND pq.status = 'in_progress'
+                    """,
+                    (discord_id, quest_id)
+                ).fetchone()
 
-        # Fetch progress and requirements
-        cur.execute(
-            """
-            SELECT pq.progress, q.objectives
-            FROM player_quests pq
-            JOIN quests q ON pq.quest_id = q.id
-            WHERE pq.discord_id = ? AND pq.quest_id = ? AND pq.status = 'in_progress'
-        """,
-            (discord_id, quest_id),
-        )
+                if not row:
+                    return False, f"{ERROR} Quest inactive or already completed."
 
-        row = cur.fetchone()
-        conn.close()
+                progress = json.loads(row["progress"])
+                objectives = json.loads(row["objectives"])
 
-        if not row:
-            return (
-                False,
-                f"{E.ERROR} This quest is not active or has already been resolved.",
-            )
+                if not self.check_completion(progress, objectives):
+                    return False, f"{WARNING} Objectives not met."
 
-        progress = json.loads(row["progress"])
-        objectives = json.loads(row["objectives"])
+                conn.execute(
+                    "UPDATE player_quests SET status = 'completed' WHERE discord_id = ? AND quest_id = ?",
+                    (discord_id, quest_id)
+                )
+                
+            # Grant rewards
+            reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
+            return True, reward_msg
 
-        # Validation
-        if not self.check_completion(progress, objectives):
-            return False, f"{E.WARNING} The required objectives have not yet been met."
+        except Exception as e:
+            logger.error(f"Quest completion error: {e}", exc_info=True)
+            return False, f"{ERROR} System error during completion."
 
-        # Distribute Rewards via RewardSystem
-        reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
-
-        # Mark as Completed
-        conn = self.db.connect()
-        cur = conn.cursor()
-        cur.execute(
-            "UPDATE player_quests SET status = 'completed' WHERE discord_id = ? AND quest_id = ?",
-            (discord_id, quest_id),
-        )
-        conn.commit()
-        conn.close()
-
-        # --- THIS IS THE FIX ---
-        # Return only the reward message, not extra text
-        return True, reward_msg
-        # --- END OF FIX ---
+    def check_completion(self, progress: Dict, objectives: Dict) -> bool:
+        for obj_type, tasks in objectives.items():
+            if isinstance(tasks, dict):
+                for target, req in tasks.items():
+                    if progress.get(obj_type, {}).get(target, 0) < req:
+                        return False
+            else:
+                if progress.get(obj_type, {}).get(tasks, 0) < 1:
+                    return False
+        return True
