@@ -185,6 +185,21 @@ class DatabaseManager:
             )
             return cur.fetchall()
 
+    def get_combat_skills(self, discord_id: int) -> list[dict[str, Any]]:
+        """Fetches detailed skill info for combat (Active skills only)."""
+        with self.get_connection() as conn:
+            cur = conn.execute(
+                """
+                SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
+                       s.power_multiplier, s.heal_power, s.buff_data
+                FROM player_skills ps
+                JOIN skills s ON ps.skill_key=s.key_id
+                WHERE ps.discord_id=? AND s.type='Active'
+                """,
+                (discord_id,),
+            )
+            return [dict(row) for row in cur.fetchall()]
+
     # ============================================================
     # GUILD SYSTEM
     # ============================================================

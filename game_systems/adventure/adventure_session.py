@@ -168,21 +168,57 @@ class AdventureSession:
         # Get accumulated XP to prevent duplicate level up messages
         current_session_exp = self.loot.get("exp", 0)
 
+        # Prefetch data once to avoid repeated DB calls in the loop
+        try:
+            stats_json = self.db.get_player_stats_json(self.discord_id)
+            player_stats = PlayerStats.from_dict(stats_json)
+
+            # Fetch vitals as a dict so we can update it locally
+            vitals_row = self.db.get_player_vitals(self.discord_id)
+            vitals = dict(vitals_row) if vitals_row else None
+
+            player_row = self.db.get_player(self.discord_id)
+            skills = self.db.get_combat_skills(self.discord_id)
+
+            active_boosts_list = self.db.get_active_boosts()
+            boosts_dict = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
+
+            context = {
+                "player_stats": player_stats,
+                "vitals": vitals,
+                "player_row": player_row,
+                "skills": skills,
+                "active_boosts": boosts_dict
+            }
+        except Exception as e:
+            logger.error(f"Auto-combat prefetch failed: {e}")
+            return {"sequence": [["Error starting auto-combat."]], "dead": False}
+
+        if not vitals:
+             return {"sequence": [["Error: Vitals not found."]], "dead": False}
+
         # Max 8 turns to avoid infinite loops
         for _ in range(8):
             # FIX: Pass session XP
-            result = self.combat.resolve_turn(self.active_monster, report, current_session_exp)
+            result = self.combat.resolve_turn(
+                self.active_monster,
+                report,
+                current_session_exp,
+                context=context,
+                persist_vitals=False
+            )
             turn_reports.append(result.get("turn_report", {}))
+
+            # Update local vitals for next iteration
+            context["vitals"]["current_hp"] = result["hp_current"]
+            context["vitals"]["current_mp"] = result["mp_current"]
 
             # Add narration for this turn
             if result["phrases"]:
                 sequence.append(result["phrases"])
 
             # Safety: Drop to manual if HP is too low
-            stats_json = self.db.get_player_stats_json(self.discord_id)
-            stats = PlayerStats.from_dict(stats_json)
-
-            if result["hp_current"] / max(stats.max_hp, 1) < 0.30:
+            if result["hp_current"] / max(player_stats.max_hp, 1) < 0.30:
                 sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
                 break
 
@@ -195,6 +231,9 @@ class AdventureSession:
                 player_won = True
                 self.active_monster = None
                 break
+
+        # Save final vitals
+        self.db.set_player_vitals(self.discord_id, context["vitals"]["current_hp"], context["vitals"]["current_mp"])
 
         # Final Results Block
         final_block = []

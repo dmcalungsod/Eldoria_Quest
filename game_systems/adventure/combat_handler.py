@@ -78,45 +78,61 @@ class CombatHandler:
             return None, "An error occurred while tracking the enemy."
 
     def resolve_turn(
-        self, active_monster: dict[str, Any], battle_report: dict[str, Any], accumulated_exp: int = 0
+        self,
+        active_monster: dict[str, Any],
+        battle_report: dict[str, Any],
+        accumulated_exp: int = 0,
+        context: dict[str, Any] | None = None,
+        persist_vitals: bool = True,
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
         Args:
             accumulated_exp: XP earned in this session but not yet saved to DB.
+            context: Optional pre-fetched data to avoid DB calls.
+            persist_vitals: Whether to write HP/MP to DB immediately.
         """
         try:
             # 1. Load Data
-            stats_json = self.db.get_player_stats_json(self.discord_id)
-            player_stats = PlayerStats.from_dict(stats_json)
-            vitals = self.db.get_player_vitals(self.discord_id)
+            if context:
+                player_stats = context["player_stats"]
+                vitals = context["vitals"]
+                p_row = context["player_row"]
+                skills = context["skills"]
+                boosts = context.get("active_boosts", {})
+            else:
+                stats_json = self.db.get_player_stats_json(self.discord_id)
+                player_stats = PlayerStats.from_dict(stats_json)
+                vitals = self.db.get_player_vitals(self.discord_id)
 
-            if not vitals:
-                raise ValueError("Player vitals not found.")
+                if not vitals:
+                    raise ValueError("Player vitals not found.")
 
-            with self.db.get_connection() as conn:
-                # Fetch Class & Level
-                p_row = conn.execute(
-                    "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?",
-                    (self.discord_id,),
-                ).fetchone()
+                with self.db.get_connection() as conn:
+                    # Fetch Class & Level
+                    p_row = conn.execute(
+                        "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?",
+                        (self.discord_id,),
+                    ).fetchone()
 
-                # Fetch Active Skills
-                skills_cursor = conn.execute(
-                    """
-                    SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
-                           s.power_multiplier, s.heal_power, s.buff_data
-                    FROM player_skills ps
-                    JOIN skills s ON ps.skill_key=s.key_id
-                    WHERE ps.discord_id=? AND s.type='Active'
-                    """,
-                    (self.discord_id,),
-                )
-                skills = [dict(row) for row in skills_cursor.fetchall()]
+                    # Fetch Active Skills
+                    skills_cursor = conn.execute(
+                        """
+                        SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
+                               s.power_multiplier, s.heal_power, s.buff_data
+                        FROM player_skills ps
+                        JOIN skills s ON ps.skill_key=s.key_id
+                        WHERE ps.discord_id=? AND s.type='Active'
+                        """,
+                        (self.discord_id,),
+                    )
+                    skills = [dict(row) for row in skills_cursor.fetchall()]
+
+                boosts = self._fetch_active_boosts()
 
             # 2. Parse Skill Buffs safely
             for s in skills:
-                if s.get("buff_data"):
+                if s.get("buff_data") and isinstance(s["buff_data"], str):
                     try:
                         s["buff_data"] = json.loads(s["buff_data"])
                     except (json.JSONDecodeError, TypeError):
@@ -130,8 +146,6 @@ class CombatHandler:
                 player_wrapper.add_exp(accumulated_exp)
 
             player_wrapper.hp_current = vitals["current_hp"]
-
-            boosts = self._fetch_active_boosts()
 
             # 4. Run Engine
             engine = CombatEngine(
@@ -147,7 +161,8 @@ class CombatHandler:
 
             # 5. Persist State (Vitals & Monster HP)
             # We update vitals immediately so if bot crashes, HP loss is saved
-            self.db.set_player_vitals(self.discord_id, result["hp_current"], result["mp_current"])
+            if persist_vitals:
+                self.db.set_player_vitals(self.discord_id, result["hp_current"], result["mp_current"])
             active_monster["HP"] = result["monster_hp"]
 
             # 6. Update Report
