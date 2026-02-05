@@ -188,3 +188,19 @@ class DamageFormula:
         damage = int(damage * multiplier)
 
         return damage, is_crit, event_type
+
+    @staticmethod
+    def monster_heal(monster_max_hp: int, current_hp: int, skill_data: dict) -> tuple[int, int, str]:
+        """
+        Calculates monster healing.
+        """
+        heal_amount = float(skill_data.get("heal_power", 0))
+
+        # Variance
+        variance = random.uniform(0.9, 1.1)
+        heal_amount = int(heal_amount * variance)
+
+        new_hp = min(current_hp + heal_amount, monster_max_hp)
+        actual_healed = int(new_hp - current_hp)
+
+        return actual_healed, int(new_hp), "heal"

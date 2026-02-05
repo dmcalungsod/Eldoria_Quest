@@ -7,6 +7,8 @@ REBALANCED: XP Rewards increased to match the steep leveling curve.
 
 from math import ceil
 
+from game_systems.monsters.monster_skills import MONSTER_SKILLS
+
 NAME_POOL = [
     "Verdant Slime",
     "Glimmer Slime",
@@ -107,6 +109,35 @@ for idx in range(1, 51):
         else:
             drops.append(("magic_stone_small", 80))
 
+    # --- Skills Assignment ---
+    skills = []
+    if "Slime" in name:
+        skills.append(MONSTER_SKILLS["mend"])
+        skills.append(MONSTER_SKILLS["poison_spit"])
+    elif "Goblin" in name:
+        skills.append(MONSTER_SKILLS["rapid_strike"])
+        if level > 5:
+            skills.append(MONSTER_SKILLS["heavy_blow"])
+    elif "Wolf" in name or "Hound" in name:
+        skills.append(MONSTER_SKILLS["vicious_bite"])
+        skills.append(MONSTER_SKILLS["rapid_strike"])
+    elif "Treant" in name or "Ent" in name:
+        skills.append(MONSTER_SKILLS["crushing_slam"])
+        skills.append(MONSTER_SKILLS["regenerate"])
+    elif "Wisp" in name or "Shade" in name:
+        skills.append(MONSTER_SKILLS["ember"])
+    elif "Boss" in tier or "King" in name or "Empress" in name:
+        skills.append(MONSTER_SKILLS["heavy_blow"])
+        skills.append(MONSTER_SKILLS["flame_breath"])
+        skills.append(MONSTER_SKILLS["regenerate"])
+    else:
+        # Default skills for others
+        if level >= 10:
+             skills.append(MONSTER_SKILLS["heavy_blow"])
+        else:
+             skills.append(MONSTER_SKILLS["rapid_strike"])
+
+    # Additional drops based on type
     if "Slime" in name:
         drops.append(("slime_gel", 40))
     elif "Goblin" in name:
@@ -133,6 +164,7 @@ for idx in range(1, 51):
         "def": int(defense),
         "xp": xp,
         "drops": drops,
+        "skills": skills,
         "description": description,
     }
 

@@ -157,15 +157,29 @@ class CombatEngine:
 
             elif action["type"] == "skill":
                 skill = action["skill"]
-                dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.player.stats, skill)
+                mp_cost = skill.get("mp_cost", 0)
+                self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
 
-                if event_type == "dodge":
-                    turn_report["player_dodge"] = 1
+                if skill.get("heal_power", 0) > 0:
+                    # --- Monster Healing ---
+                    heal, new_hp, event_type = DamageFormula.monster_heal(
+                        self.monster.get("max_hp", self.monster_hp),
+                        self.monster_hp,
+                        skill,
+                    )
+                    self.monster_hp = new_hp
+                    log.append(CombatPhrases.monster_heal(self.monster, skill, heal))
                 else:
-                    turn_report["damage_taken"] = dmg
-                    self.player_hp -= dmg
+                    # --- Monster Offensive Skill ---
+                    dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.player.stats, skill)
 
-                log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
+                    if event_type == "dodge":
+                        turn_report["player_dodge"] = 1
+                    else:
+                        turn_report["damage_taken"] = dmg
+                        self.player_hp -= dmg
+
+                    log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
 
             elif action["type"] == "buff":
                 buff = action["buff"]

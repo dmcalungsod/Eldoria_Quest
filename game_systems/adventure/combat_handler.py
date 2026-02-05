@@ -63,11 +63,12 @@ class CombatHandler:
                 "tier": template["tier"],
                 "HP": template["hp"],
                 "max_hp": template["hp"],
-                "MP": 10,
+                "MP": 10 + (template["level"] * 3),
                 "ATK": template["atk"],
                 "DEF": template["def"],
                 "xp": template["xp"],
                 "drops": template.get("drops", []),
+                "skills": list(template.get("skills", [])),
             }
 
             phrase = CombatPhrases.opening(active_monster)
