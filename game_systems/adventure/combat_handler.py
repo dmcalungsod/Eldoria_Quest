@@ -8,6 +8,7 @@ Hardened: Syncs session XP to prevent duplicate level-up messages.
 import json
 import logging
 import random
+import time
 from typing import Any
 
 from database.database_manager import DatabaseManager
@@ -21,6 +22,11 @@ logger = logging.getLogger("eldoria.combat")
 
 
 class CombatHandler:
+    # Class-level cache for global boosts
+    _boost_cache: dict[str, float] = {}
+    _boost_cache_time: float = 0.0
+    _CACHE_TTL: int = 60  # seconds
+
     def __init__(self, db: DatabaseManager, discord_id: int):
         self.db = db
         self.discord_id = discord_id
@@ -193,7 +199,14 @@ class CombatHandler:
 
     def _fetch_active_boosts(self) -> dict[str, float]:
         try:
-            return {b["boost_key"]: b["multiplier"] for b in self.db.get_active_boosts()}
+            now = time.time()
+            if now - CombatHandler._boost_cache_time < CombatHandler._CACHE_TTL:
+                return CombatHandler._boost_cache.copy()
+
+            boosts = {b["boost_key"]: b["multiplier"] for b in self.db.get_active_boosts()}
+            CombatHandler._boost_cache = boosts
+            CombatHandler._boost_cache_time = now
+            return boosts.copy()
         except Exception:
             return {}
 
