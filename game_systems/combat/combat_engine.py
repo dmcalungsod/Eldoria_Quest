@@ -62,6 +62,11 @@ class CombatEngine:
         log = []
         log.append(f"\n--- {E.COMBAT} Turn ---")
 
+        # Process Buffs
+        buff_msgs = MonsterAI.handle_buffs(self.monster)
+        if buff_msgs:
+            log.extend(buff_msgs)
+
         turn_report = {
             "str_hits": 0,
             "dex_hits": 0,
@@ -183,6 +188,8 @@ class CombatEngine:
 
             elif action["type"] == "buff":
                 buff = action["buff"]
+                mp_cost = buff.get("mp_cost", 0)
+                self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
                 MonsterAI.apply_buff(self.monster, buff)
                 log.append(CombatPhrases.monster_buff(self.monster, buff))
 

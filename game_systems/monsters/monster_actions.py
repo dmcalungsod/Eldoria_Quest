@@ -33,7 +33,10 @@ class MonsterAI:
                         return {"type": "skill", "skill": chosen}
 
             # 2. Offensive Skill Logic
-            offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0]
+            offensive_skills = [
+                s for s in usable_skills
+                if s.get("heal_power", 0) == 0 and not s.get("buff_data")
+            ]
 
             if offensive_skills:
                 # Base chance to use skill over normal attack
@@ -50,7 +53,15 @@ class MonsterAI:
                     chosen = random.choice(offensive_skills)
                     return {"type": "skill", "skill": chosen}
 
-            # 3. Default Attack
+            # 3. Buff Logic
+            buff_skills = [s for s in usable_skills if s.get("buff_data")]
+            if buff_skills:
+                # 25% chance to use a buff if available
+                if random.randint(1, 100) <= 25:
+                    chosen = random.choice(buff_skills)
+                    return {"type": "buff", "buff": chosen}
+
+            # 4. Default Attack
             return {"type": "attack"}
 
         except Exception:
@@ -58,9 +69,65 @@ class MonsterAI:
             return {"type": "attack"}
 
     @staticmethod
-    def apply_buff(monster_data: dict, buff_data: dict):
+    def apply_buff(monster_data: dict, buff_skill: dict):
         """
-        Applies a buff to the monster state (Placeholder).
+        Applies a buff to the monster state.
+        buff_skill contains "buff_data" with:
+        {
+            "stat": "ATK"|"DEF",
+            "multiplier": float,
+            "duration": int
+        }
         """
-        # Logic to modify monster stats temporarily would go here
-        pass
+        buff_data = buff_skill.get("buff_data", {})
+        if not buff_data:
+            return
+
+        if "buffs" not in monster_data:
+            monster_data["buffs"] = []
+
+        stat = buff_data.get("stat")
+        multiplier = float(buff_data.get("multiplier", 1.0))
+        duration = int(buff_data.get("duration", 3))
+
+        # Calculate increase
+        current_val = monster_data.get(stat, 0)
+        new_val = int(current_val * multiplier)
+        increase = new_val - current_val
+
+        # Apply
+        monster_data[stat] = new_val
+
+        # Record
+        buff_record = {
+            "stat": stat,
+            "increase": increase,
+            "duration": duration,
+            "name": buff_skill.get("name", "Unknown Buff")
+        }
+        monster_data["buffs"].append(buff_record)
+
+    @staticmethod
+    def handle_buffs(monster_data: dict) -> list[str]:
+        """
+        Decrements buff duration and reverts expired buffs.
+        Returns a list of expiration messages.
+        """
+        expired_msgs = []
+        if "buffs" not in monster_data:
+            return expired_msgs
+
+        active_buffs = []
+        for buff in monster_data["buffs"]:
+            buff["duration"] -= 1
+            if buff["duration"] <= 0:
+                # Revert
+                stat = buff["stat"]
+                increase = buff["increase"]
+                monster_data[stat] = max(0, monster_data.get(stat, 0) - increase)
+                expired_msgs.append(f"{monster_data.get('name', 'Monster')}'s {buff['name']} wore off.")
+            else:
+                active_buffs.append(buff)
+
+        monster_data["buffs"] = active_buffs
+        return expired_msgs
