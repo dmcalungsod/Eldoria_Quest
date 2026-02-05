@@ -234,6 +234,13 @@ def create_tables():
             multiplier REAL DEFAULT 1.0,
             end_time TEXT NOT NULL
         );
+
+        -- Performance Indexes
+        CREATE INDEX IF NOT EXISTS idx_inventory_discord_id ON inventory(discord_id);
+        CREATE INDEX IF NOT EXISTS idx_player_skills_discord_id ON player_skills(discord_id);
+        CREATE INDEX IF NOT EXISTS idx_player_skills_skill_key ON player_skills(skill_key);
+        CREATE INDEX IF NOT EXISTS idx_player_quests_discord_id ON player_quests(discord_id);
+        CREATE INDEX IF NOT EXISTS idx_player_quests_quest_id ON player_quests(quest_id);
         """)
 
         # ---------------------------------------------------
