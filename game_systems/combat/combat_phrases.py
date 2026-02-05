@@ -200,3 +200,14 @@ class CombatPhrases:
     def player_defeated(monster) -> str:
         m_name = str(monster.get("name", "the creature"))
         return f"{E.DEFEAT} Your vision blurs. The {m_name}'s final blow sends you collapsing into darkness."
+
+    @staticmethod
+    def monster_heal(monster, skill, amount) -> str:
+        m_name = str(monster.get("name", "the creature"))
+        skill_name = str(skill.get("name", "healing"))
+
+        phrases = [
+            f"The {m_name} uses **{skill_name}** and recovers `{amount}` HP.",
+            f"A green light surrounds the {m_name} as it uses **{skill_name}** (+`{amount}` HP).",
+        ]
+        return random.choice(phrases)
