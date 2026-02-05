@@ -20,6 +20,13 @@ logger = logging.getLogger("eldoria.ui.embeds")
 
 class AdventureEmbeds:
     @staticmethod
+    def _make_bar(current: int, max_val: int, length: int = 10) -> str:
+        """Generates a visual progress bar string."""
+        percent = max(0, min(1, current / max(max_val, 1)))
+        filled = int(percent * length)
+        return "█" * filled + "░" * (length - filled)
+
+    @staticmethod
     def build_exploration_embed(
         location_id: str, log: list, player_stats: PlayerStats, vitals: sqlite3.Row, session_row: sqlite3.Row
     ) -> discord.Embed:
@@ -78,6 +85,8 @@ class AdventureEmbeds:
         # Using emojis for clean layout
         try:
             hp_percent = vitals["current_hp"] / max(player_stats.max_hp, 1)
+            hp_bar = AdventureEmbeds._make_bar(vitals["current_hp"], player_stats.max_hp)
+            mp_bar = AdventureEmbeds._make_bar(vitals["current_mp"], player_stats.max_mp)
 
             # Simple status indicator
             status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
@@ -85,8 +94,8 @@ class AdventureEmbeds:
             embed.add_field(
                 name=f"Adventurer Status {status_icon}",
                 value=(
-                    f"{E.HP} **HP:** {vitals['current_hp']} / {player_stats.max_hp}\n"
-                    f"{E.MP} **MP:** {vitals['current_mp']} / {player_stats.max_mp}"
+                    f"{E.HP} **HP:** `{hp_bar}` {vitals['current_hp']}/{player_stats.max_hp}\n"
+                    f"{E.MP} **MP:** `{mp_bar}` {vitals['current_mp']}/{player_stats.max_mp}"
                 ),
                 inline=True,
             )
@@ -97,12 +106,7 @@ class AdventureEmbeds:
         if active_monster:
             m_hp = active_monster.get("HP", 0)
             m_max = active_monster.get("max_hp", m_hp)  # Fallback
-
-            # Visual Health Bar
-            percent = max(0, min(1, m_hp / m_max)) if m_max > 0 else 0
-            bar_len = 12
-            filled = int(percent * bar_len)
-            bar = "█" * filled + "░" * (bar_len - filled)
+            bar = AdventureEmbeds._make_bar(m_hp, m_max, length=12)
 
             embed.add_field(
                 name=f"VS. {active_monster.get('name', 'Enemy')}",
