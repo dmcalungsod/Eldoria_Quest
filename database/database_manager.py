@@ -37,6 +37,7 @@ class DatabaseManager:
             return
 
         self.db_name = db_name
+        self._class_cache = {}
         self._initialize_db_settings()
         self._initialized = True
 
@@ -177,10 +178,18 @@ class DatabaseManager:
     # CLASS & SKILLS
     # ============================================================
 
-    def get_class(self, class_id: int) -> sqlite3.Row | None:
-        """Fetches class definition."""
+    def get_class(self, class_id: int) -> dict[str, Any] | None:
+        """Fetches class definition with caching."""
+        if class_id in self._class_cache:
+            return self._class_cache[class_id]
+
         with self.get_connection() as conn:
-            return conn.execute("SELECT * FROM classes WHERE id = ?", (class_id,)).fetchone()
+            row = conn.execute("SELECT * FROM classes WHERE id = ?", (class_id,)).fetchone()
+            if row:
+                data = dict(row)
+                self._class_cache[class_id] = data
+                return data
+            return None
 
     def get_player_skills(self, discord_id: int) -> list[sqlite3.Row]:
         """Fetches all learned skills joined with skill definitions."""
