@@ -65,7 +65,6 @@ def setup_test_environment():
     db = DatabaseManager()
     test_discord_id = 888888888
 
-    # FIX: Use get_connection context manager
     with db.get_connection() as conn:
         conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
         conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
