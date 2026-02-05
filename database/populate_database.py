@@ -22,7 +22,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-DB = "EQ_Game.db"
+DATABASE_NAME = "EQ_Game.db"
 
 try:
     from game_systems.data import consumables, materials, monsters, quest_data, quest_items, skills_data
@@ -244,7 +244,7 @@ def insert_skills(conn):
 
 def main():
     try:
-        conn = sqlite3.connect(DB)
+        conn = sqlite3.connect(DATABASE_NAME)
 
         insert_monsters(conn)
         insert_quest_items(conn)
