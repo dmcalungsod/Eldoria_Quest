@@ -97,11 +97,38 @@ class ConsumableManager:
                     message_lines.append(f"You restored {restored_for} MP.")
                     item_used = True
 
-                # -- Buff Logic (Placeholder) --
-                if "buff" in effect:
-                    # Logic to insert into a 'active_buffs' table would go here
-                    # For now we pass, or implement if buff system exists
-                    pass
+                # -- Buff Logic --
+                # Treat as buff if explicit type OR has duration
+                is_buff_item = item_data.get("type") == "buff"
+                duration = effect.get("duration_s")
+
+                if is_buff_item or duration:
+                    duration = duration or 300  # Default fallback
+                    buffs_applied = []
+
+                    # Keys to ignore as they are immediate effects or metadata
+                    ignored_keys = {
+                        "heal", "mana", "duration_s",
+                        "cure_poison", "cure_bleed",
+                        "escape", "aoe_atk", "status", "chance"
+                    }
+
+                    for key, val in effect.items():
+                        if key not in ignored_keys:
+                            # Store this effect as an active buff
+                            self.db.add_active_buff(
+                                discord_id,
+                                item_key,
+                                item_data["name"],
+                                key,
+                                val,
+                                duration
+                            )
+                            buffs_applied.append(f"{key.upper()} +{val}")
+
+                    if buffs_applied:
+                        message_lines.append(f"Buffs applied: {', '.join(buffs_applied)} ({duration}s).")
+                        item_used = True
 
                 if not item_used:
                     return False, "This item has no usable effect right now."

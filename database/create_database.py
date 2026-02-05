@@ -235,7 +235,19 @@ def create_tables():
             end_time TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS active_buffs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            discord_id INTEGER NOT NULL,
+            buff_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            stat TEXT NOT NULL,
+            amount REAL NOT NULL,
+            end_time TEXT NOT NULL,
+            FOREIGN KEY(discord_id) REFERENCES players(discord_id)
+        );
+
         -- Performance Indexes
+        CREATE INDEX IF NOT EXISTS idx_active_buffs_discord_id ON active_buffs(discord_id);
         CREATE INDEX IF NOT EXISTS idx_inventory_discord_id ON inventory(discord_id);
         CREATE INDEX IF NOT EXISTS idx_player_skills_discord_id ON player_skills(discord_id);
         CREATE INDEX IF NOT EXISTS idx_player_skills_skill_key ON player_skills(skill_key);

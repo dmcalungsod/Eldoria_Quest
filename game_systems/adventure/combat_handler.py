@@ -104,6 +104,13 @@ class CombatHandler:
             else:
                 stats_json = self.db.get_player_stats_json(self.discord_id)
                 player_stats = PlayerStats.from_dict(stats_json)
+
+                # Apply Active Buffs (Manual Mode)
+                self.db.clear_expired_buffs(self.discord_id)
+                active_buffs = self.db.get_active_buffs(self.discord_id)
+                for buff in active_buffs:
+                    player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+
                 vitals = self.db.get_player_vitals(self.discord_id)
 
                 if not vitals:
