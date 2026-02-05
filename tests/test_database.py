@@ -28,7 +28,7 @@ def setup_test_database():
     # Patch the database paths in all modules
     db_manager.DATABASE_NAME = TEST_DB_PATH
     db_create.DATABASE_NAME = TEST_DB_PATH
-    db_populate.DB = TEST_DB_PATH  # FIX: Variable name is DB, not DATABASE_NAME
+    db_populate.DATABASE_NAME = TEST_DB_PATH
 
     # Re-init DatabaseManager to pick up the change
     DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
