@@ -91,9 +91,14 @@ class ShopView(View):
         item_select.callback = self.purchase_item_callback
         return item_select
 
-    def _execute_purchase(self, item_key: str, price: int) -> tuple[bool, Any, int]:
+    def _execute_purchase(self, item_key: str) -> tuple[bool, Any, int]:
         """Atomic purchase transaction."""
         try:
+            # SECURITY: Fetch price from server inventory, do not trust client
+            price = SHOP_INVENTORY.get(item_key)
+            if price is None:
+                return (False, "Item not available.", 0)
+
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 return (False, "Item data missing.", 0)
@@ -135,10 +140,10 @@ class ShopView(View):
     async def purchase_item_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        item_key, price_str = interaction.data["values"][0].split(":")
-        price = int(price_str)
+        # Vulnerability Fix: Ignore client-provided price
+        item_key = interaction.data["values"][0].split(":")[0]
 
-        success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key, price)
+        success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key)
 
         embed = discord.Embed(
             title="🛒 Guild Supply Depot",
