@@ -95,27 +95,28 @@ class ExplorationView(View):
             is_dead = result.get("dead", False)
 
             # 3. Animation Loop
+
+            # Refresh Data (Once before animation loop)
+            vitals, session, stats_json = await asyncio.gather(
+                asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id),
+                asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id),
+                asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
+            )
+
+            self.player_stats = PlayerStats.from_dict(stats_json)
+
+            # Check monster state from DB
+            try:
+                self.active_monster = (
+                    json.loads(session["active_monster_json"]) if session["active_monster_json"] else None
+                )
+            except Exception:
+                self.active_monster = None
+
             for i, block in enumerate(sequence):
                 # Update Log
                 self.log.extend(block)
                 self.log = self.log[-15:]  # Keep log manageable
-
-                # Refresh Data
-                vitals, session, stats_json = await asyncio.gather(
-                    asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id),
-                    asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id),
-                    asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
-                )
-
-                self.player_stats = PlayerStats.from_dict(stats_json)
-
-                # Check monster state from DB
-                try:
-                    self.active_monster = (
-                        json.loads(session["active_monster_json"]) if session["active_monster_json"] else None
-                    )
-                except Exception:
-                    self.active_monster = None
 
                 # Prepare UI state
                 embed = AdventureEmbeds.build_exploration_embed(
