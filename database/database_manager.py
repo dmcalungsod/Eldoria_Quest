@@ -284,3 +284,38 @@ class DatabaseManager:
         with self.get_connection() as conn:
             conn.execute("DELETE FROM global_boosts")
             logger.info("All Global Boosts cleared.")
+
+    # ============================================================
+    # ACTIVE BUFFS
+    # ============================================================
+
+    def add_active_buff(self, discord_id: int, buff_id: str, name: str, stat: str, amount: float, duration_s: int):
+        """Adds a buff to the player."""
+        end_time = (datetime.datetime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
+        with self.get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO active_buffs (discord_id, buff_id, name, stat, amount, end_time)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (discord_id, buff_id, name, stat, amount, end_time),
+            )
+
+    def get_active_buffs(self, discord_id: int) -> list[dict[str, Any]]:
+        """Fetches active buffs for the player."""
+        now = datetime.datetime.now().isoformat()
+        with self.get_connection() as conn:
+            cur = conn.execute(
+                "SELECT * FROM active_buffs WHERE discord_id = ? AND end_time > ?",
+                (discord_id, now),
+            )
+            return [dict(row) for row in cur.fetchall()]
+
+    def clear_expired_buffs(self, discord_id: int):
+        """Removes expired buffs."""
+        now = datetime.datetime.now().isoformat()
+        with self.get_connection() as conn:
+            conn.execute(
+                "DELETE FROM active_buffs WHERE discord_id = ? AND end_time <= ?",
+                (discord_id, now),
+            )

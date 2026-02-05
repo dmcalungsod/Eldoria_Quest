@@ -173,6 +173,12 @@ class AdventureSession:
             stats_json = self.db.get_player_stats_json(self.discord_id)
             player_stats = PlayerStats.from_dict(stats_json)
 
+            # Apply Active Buffs (Prefetch)
+            self.db.clear_expired_buffs(self.discord_id)
+            active_buffs = self.db.get_active_buffs(self.discord_id)
+            for buff in active_buffs:
+                player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+
             # Fetch vitals as a dict so we can update it locally
             vitals_row = self.db.get_player_vitals(self.discord_id)
             vitals = dict(vitals_row) if vitals_row else None
