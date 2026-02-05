@@ -199,7 +199,6 @@ class AdventureSession:
 
         # Max 8 turns to avoid infinite loops
         for _ in range(8):
-            # FIX: Pass session XP
             result = self.combat.resolve_turn(
                 self.active_monster,
                 report,
@@ -276,7 +275,6 @@ class AdventureSession:
         """
         report = self.combat.create_empty_battle_report()
 
-        # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
         result = self.combat.resolve_turn(self.active_monster, report, current_session_exp)
 

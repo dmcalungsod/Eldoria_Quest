@@ -141,7 +141,6 @@ class CombatHandler:
             # 3. Setup Wrappers & Fast-Forward State
             player_wrapper = LevelUpSystem(player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"])
 
-            # FIX: Apply session XP so leveling logic is up to date
             if accumulated_exp > 0:
                 player_wrapper.add_exp(accumulated_exp)
 
