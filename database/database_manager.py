@@ -24,9 +24,21 @@ class DatabaseManager:
     Enforces thread safety, connection cleanup, and data integrity.
     """
 
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(DatabaseManager, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, db_name: str = DATABASE_NAME):
+        if self._initialized:
+            return
+
         self.db_name = db_name
         self._initialize_db_settings()
+        self._initialized = True
 
     def _initialize_db_settings(self):
         """Applies performance and integrity settings on startup."""
@@ -34,8 +46,6 @@ class DatabaseManager:
             with sqlite3.connect(self.db_name) as conn:
                 # Write-Ahead Logging allows concurrent readers/writers
                 conn.execute("PRAGMA journal_mode=WAL;")
-                # NORMAL sync is faster and safe enough for WAL
-                conn.execute("PRAGMA synchronous=NORMAL;")
         except sqlite3.Error as e:
             logger.critical(f"Failed to set database PRAGMAs: {e}")
 
@@ -54,6 +64,8 @@ class DatabaseManager:
             conn.row_factory = sqlite3.Row
             # Crucial: Enforce relational integrity
             conn.execute("PRAGMA foreign_keys = ON;")
+            # NORMAL sync is faster and safe enough for WAL - Must be set per connection
+            conn.execute("PRAGMA synchronous=NORMAL;")
             yield conn
             conn.commit()
         except sqlite3.Error as e:
