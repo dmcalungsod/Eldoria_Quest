@@ -138,7 +138,7 @@ def test_inventory_system(test_discord_id):
             item_type="equipment",
             rarity="Uncommon",
             amount=1,
-            slot="sword",  # FIX: Use valid lowercase slot key
+            slot="sword",
             item_source_table="equipment",
         )
         print("✓ Item added to inventory")
