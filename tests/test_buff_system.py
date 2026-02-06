@@ -1,13 +1,11 @@
-import unittest
-import sqlite3
 import os
-import json
 import time
+import unittest
+
 from database.database_manager import DatabaseManager
+from game_systems.adventure.combat_handler import CombatHandler
 from game_systems.items.consumable_manager import ConsumableManager
 from game_systems.player.player_stats import PlayerStats
-from game_systems.adventure.combat_handler import CombatHandler
-from game_systems.data.consumables import CONSUMABLES
 
 TEST_DB = "test_buffs.db"
 

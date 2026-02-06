@@ -1,6 +1,6 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 from unittest.mock import MagicMock
 
 # Mock discord before importing cogs.ui_helpers
@@ -12,24 +12,12 @@ sys.modules["discord.ext.commands"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Now we can safely import, but we need to handle other imports if they fail
-# cogs.ui_helpers imports game_systems.data.emojis, DatabaseManager, PlayerStats
-# We might need to mock those too if they have complex dependencies, but they seem pure-ish or safe.
-# DatabaseManager might try to init sqlite, but only on instantiation.
+# Import the function directly now that it exists
+from cogs.ui_helpers import make_progress_bar  # noqa: E402
 
-try:
-    from cogs.ui_helpers import make_progress_bar
-except ImportError:
-    # If the function is not yet defined (which it isn't), this will fail.
-    # But since we write the test first, we can define a dummy or just expect this to work AFTER step 2.
-    # For now, I'll write the test assuming the function exists.
-    pass
 
 class TestUIHelpers(unittest.TestCase):
     def test_make_progress_bar(self):
-        # We need to import it here to ensure it's available after we modify the file
-        from cogs.ui_helpers import make_progress_bar
-
         # 0%
         self.assertEqual(make_progress_bar(0, 100, 10), "░░░░░░░░░░")
         # 10%
