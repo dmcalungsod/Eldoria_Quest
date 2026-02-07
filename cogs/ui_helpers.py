@@ -20,6 +20,13 @@ from game_systems.player.player_stats import PlayerStats
 logger = logging.getLogger("eldoria.ui")
 
 
+def make_progress_bar(current: int, max_val: int, length: int = 10) -> str:
+    """Generates a visual progress bar string."""
+    percent = max(0, min(1, current / max(max_val, 1)))
+    filled = int(percent * length)
+    return "█" * filled + "░" * (length - filled)
+
+
 def build_inventory_embed(items: list) -> discord.Embed:
     """Constructs the inventory display."""
     embed = discord.Embed(title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange())
@@ -108,13 +115,17 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
             embed.set_thumbnail(url=interaction.user.avatar.url)
 
         # Vitals & Level (FIXED)
+        hp_bar = make_progress_bar(player['current_hp'], stats.max_hp)
+        mp_bar = make_progress_bar(player['current_mp'], stats.max_mp)
+        exp_bar = make_progress_bar(player['experience'], player['exp_to_next'])
+
         embed.add_field(
             name="Condition",
             value=(
                 f"**Level:** {player['level']}\n"
-                f"**EXP:** {player['experience']} / {player['exp_to_next']}\n"
-                f"{E.HP} **HP:** {player['current_hp']} / {stats.max_hp}\n"
-                f"{E.MP} **MP:** {player['current_mp']} / {stats.max_mp}"
+                f"**EXP:** `{exp_bar}` {player['experience']} / {player['exp_to_next']}\n"
+                f"{E.HP} **HP:** `{hp_bar}` {player['current_hp']} / {stats.max_hp}\n"
+                f"{E.MP} **MP:** `{mp_bar}` {player['current_mp']} / {stats.max_mp}"
             ),
             inline=True,
         )
