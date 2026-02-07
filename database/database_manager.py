@@ -9,6 +9,7 @@ import datetime
 import json
 import logging
 import sqlite3
+import time
 from contextlib import contextmanager
 from typing import Any
 
@@ -38,6 +39,8 @@ class DatabaseManager:
 
         self.db_name = db_name
         self._class_cache = {}
+        self._boost_cache = []
+        self._boost_cache_time = 0
         self._initialize_db_settings()
         self._initialized = True
 
@@ -249,13 +252,19 @@ class DatabaseManager:
 
     def get_active_boosts(self) -> list[dict[str, Any]]:
         """Fetches currently active global server boosts."""
+        if time.time() - self._boost_cache_time < 60:
+            return self._boost_cache
+
         now = datetime.datetime.now().isoformat()
         try:
             with self.get_connection() as conn:
                 cur = conn.execute(
                     "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?", (now,)
                 )
-                return [dict(row) for row in cur.fetchall()]
+                data = [dict(row) for row in cur.fetchall()]
+                self._boost_cache = data
+                self._boost_cache_time = time.time()
+                return data
         except Exception as e:
             logger.error(f"Error fetching active boosts: {e}")
             return []
@@ -278,12 +287,14 @@ class DatabaseManager:
                 (key, multiplier, end_time),
             )
             logger.info(f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h")
+        self._boost_cache_time = 0
 
     def clear_global_boosts(self):
         """Removes all active global boosts."""
         with self.get_connection() as conn:
             conn.execute("DELETE FROM global_boosts")
             logger.info("All Global Boosts cleared.")
+        self._boost_cache_time = 0
 
     # ============================================================
     # ACTIVE BUFFS
