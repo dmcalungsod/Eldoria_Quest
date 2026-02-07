@@ -10,6 +10,7 @@ import json
 import logging
 
 from database.database_manager import DatabaseManager
+from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import COMBAT
 from game_systems.data.materials import MATERIALS
 from game_systems.guild_system.quest_system import QuestSystem
@@ -30,6 +31,15 @@ class AdventureManager:
         self.quest_system = QuestSystem(self.db)
 
     def start_adventure(self, discord_id: int, location_id: str, duration_minutes: int) -> bool:
+        # Security Validation
+        if location_id not in LOCATIONS:
+            logger.warning(f"Security: User {discord_id} attempted start_adventure with invalid location '{location_id}'")
+            return False
+
+        if duration_minutes <= 0 and duration_minutes != -1:
+            logger.warning(f"Security: User {discord_id} attempted start_adventure with invalid duration {duration_minutes}")
+            return False
+
         start_time = datetime.datetime.now()
         end_time = (
             start_time + datetime.timedelta(days=90)
