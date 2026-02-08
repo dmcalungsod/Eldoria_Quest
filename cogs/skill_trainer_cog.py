@@ -116,7 +116,7 @@ class SkillTrainerView(View):
 
             learn_select.add_option(
                 label=f"{skill['name']} ({cost} V)",
-                value=f"{skill['key_id']}:{cost}",
+                value=f"{skill['key_id']}",
                 description=skill["description"][:90],
                 emoji=emoji,
             )
@@ -152,7 +152,7 @@ class SkillTrainerView(View):
 
             upgrade_select.add_option(
                 label=f"{data['name']} (Lv. {level} → {level + 1})",
-                value=f"{skill_key}:{upgrade_cost}:{level}",
+                value=f"{skill_key}",
                 description=f"Cost: {upgrade_cost} Vestige",
                 emoji=emoji,
             )
@@ -167,8 +167,14 @@ class SkillTrainerView(View):
     # --------------------------------------------------------
     # Execution Logic (Threaded)
     # --------------------------------------------------------
-    def _execute_learn(self, skill_key: str, cost: int) -> tuple[bool, str]:
+    def _execute_learn(self, skill_key: str) -> tuple[bool, str]:
         try:
+            skill_data = SKILLS.get(skill_key)
+            if not skill_data:
+                return False, "Skill not found."
+
+            cost = skill_data.get("learn_cost", 0)
+
             with self.db.get_connection() as conn:
                 # 1. Verify Funds
                 row = conn.execute(
@@ -192,15 +198,34 @@ class SkillTrainerView(View):
             logger.error(f"Learn skill error: {e}")
             return False, "System error."
 
-    def _execute_upgrade(self, skill_key: str, cost: int, new_level: int) -> tuple[bool, str]:
+    def _execute_upgrade(self, skill_key: str) -> tuple[bool, str]:
         try:
+            skill_data = SKILLS.get(skill_key)
+            if not skill_data:
+                return False, "Skill not found."
+
+            base_cost = skill_data.get("upgrade_cost", 0)
+
             with self.db.get_connection() as conn:
-                # 1. Verify Funds
-                row = conn.execute(
+                # 1. Fetch Current Level & Vestige
+                # We fetch player skills inside transaction to ensure atomic read-modify-write logic
+                skill_row = conn.execute(
+                    "SELECT skill_level FROM player_skills WHERE discord_id = ? AND skill_key = ?",
+                    (self.interaction_user.id, skill_key)
+                ).fetchone()
+
+                if not skill_row:
+                    return False, "Skill not learned."
+
+                current_level = skill_row["skill_level"]
+                cost = get_upgrade_cost(base_cost, current_level)
+                new_level = current_level + 1
+
+                player_row = conn.execute(
                     "SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,)
                 ).fetchone()
 
-                if not row or row["vestige_pool"] < cost:
+                if not player_row or player_row["vestige_pool"] < cost:
                     return False, "Insufficient Vestige."
 
                 # 2. Deduct & Upgrade
@@ -222,18 +247,17 @@ class SkillTrainerView(View):
     # --------------------------------------------------------
     async def learn_skill_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        skill_key, cost = interaction.data["values"][0].split(":")
+        skill_key = interaction.data["values"][0]
 
-        success, msg = await asyncio.to_thread(self._execute_learn, skill_key, int(cost))
+        success, msg = await asyncio.to_thread(self._execute_learn, skill_key)
         await self._refresh_ui(interaction, success, msg, skill_key)
 
     async def upgrade_skill_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        skill_key, cost, level = interaction.data["values"][0].split(":")
-        new_level = int(level) + 1
+        skill_key = interaction.data["values"][0]
 
-        success, msg = await asyncio.to_thread(self._execute_upgrade, skill_key, int(cost), new_level)
-        await self._refresh_ui(interaction, success, msg, skill_key, new_level)
+        success, msg = await asyncio.to_thread(self._execute_upgrade, skill_key)
+        await self._refresh_ui(interaction, success, msg, skill_key)
 
     async def _refresh_ui(self, interaction, success, msg, skill_key, level=1):
         """Common refresh logic."""
