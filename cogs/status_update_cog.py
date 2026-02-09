@@ -19,23 +19,13 @@ from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES
 from game_systems.player.player_stats import PlayerStats
 
-from .ui_helpers import back_to_profile_callback
+from .ui_helpers import back_to_profile_callback, make_progress_bar
 
 logger = logging.getLogger("eldoria.status")
 
 # Base costs remain the same, but scaling will be added
 BASE_STAT_COSTS = {"STR": 10, "END": 10, "DEX": 10, "AGI": 12, "MAG": 12, "LCK": 20}
 STAT_EXP_THRESHOLD = 100
-
-
-# --- HELPER FUNCTION ---
-def _make_progress_bar(current: float, max_val: int, bar_length: int = 10) -> str:
-    """Generates a text-based progress bar."""
-    current = min(current, max_val)
-    percentage = current / max_val
-    filled_length = int(percentage * bar_length)
-    bar = "█" * filled_length + "─" * (bar_length - filled_length)
-    return f"[{bar}] {math.floor(current)}/{max_val}"
 
 
 class StatusUpdateView(View):
@@ -223,12 +213,12 @@ class StatusUpdateView(View):
         # Practice bars visualization (restored)
         if s_row:
             practice_bars = (
-                f"`STR:` {_make_progress_bar(s_row['str_exp'], STAT_EXP_THRESHOLD)}\n"
-                f"`END:` {_make_progress_bar(s_row['end_exp'], STAT_EXP_THRESHOLD)}\n"
-                f"`DEX:` {_make_progress_bar(s_row['dex_exp'], STAT_EXP_THRESHOLD)}\n"
-                f"`AGI:` {_make_progress_bar(s_row['agi_exp'], STAT_EXP_THRESHOLD)}\n"
-                f"`MAG:` {_make_progress_bar(s_row['mag_exp'], STAT_EXP_THRESHOLD)}\n"
-                f"`LCK:` {_make_progress_bar(s_row['lck_exp'], STAT_EXP_THRESHOLD)}"
+                f"`STR:` {make_progress_bar(s_row['str_exp'], STAT_EXP_THRESHOLD)}\n"
+                f"`END:` {make_progress_bar(s_row['end_exp'], STAT_EXP_THRESHOLD)}\n"
+                f"`DEX:` {make_progress_bar(s_row['dex_exp'], STAT_EXP_THRESHOLD)}\n"
+                f"`AGI:` {make_progress_bar(s_row['agi_exp'], STAT_EXP_THRESHOLD)}\n"
+                f"`MAG:` {make_progress_bar(s_row['mag_exp'], STAT_EXP_THRESHOLD)}\n"
+                f"`LCK:` {make_progress_bar(s_row['lck_exp'], STAT_EXP_THRESHOLD)}"
             )
             embed.add_field(name="Practice Progress", value=practice_bars, inline=False)
 

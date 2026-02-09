@@ -9,6 +9,7 @@ Fix: Added Level and EXP display back to profile.
 
 import asyncio
 import logging
+import math
 
 import discord
 
@@ -18,6 +19,18 @@ from game_systems.data.emojis import get_rarity_ansi
 from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.ui")
+
+
+def make_progress_bar(current: float, max_val: int, bar_length: int = 10) -> str:
+    """Generates a text-based progress bar."""
+    if max_val <= 0:
+        return f"[░░░░░░░░░░] {math.floor(current)}/0"
+
+    current = max(0, current) # Ensure no negative
+    percentage = min(current, max_val) / max_val
+    filled_length = int(percentage * bar_length)
+    bar = "█" * filled_length + "░" * (bar_length - filled_length)
+    return f"[{bar}] {math.floor(current)}/{max_val}"
 
 
 def build_inventory_embed(items: list) -> discord.Embed:
@@ -112,9 +125,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
             name="Condition",
             value=(
                 f"**Level:** {player['level']}\n"
-                f"**EXP:** {player['experience']} / {player['exp_to_next']}\n"
-                f"{E.HP} **HP:** {player['current_hp']} / {stats.max_hp}\n"
-                f"{E.MP} **MP:** {player['current_mp']} / {stats.max_mp}"
+                f"**EXP:** {make_progress_bar(player['experience'], player['exp_to_next'], 8)}\n"
+                f"{E.HP} **HP:** {make_progress_bar(player['current_hp'], stats.max_hp, 8)}\n"
+                f"{E.MP} **MP:** {make_progress_bar(player['current_mp'], stats.max_mp, 8)}"
             ),
             inline=True,
         )
