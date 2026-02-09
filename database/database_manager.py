@@ -9,6 +9,7 @@ import datetime
 import json
 import logging
 import sqlite3
+import time
 from contextlib import contextmanager
 from typing import Any
 
@@ -38,6 +39,8 @@ class DatabaseManager:
 
         self.db_name = db_name
         self._class_cache = {}
+        self._active_boosts_cache = []
+        self._active_boosts_cache_time = 0.0
         self._initialize_db_settings()
         self._initialized = True
 
@@ -249,13 +252,25 @@ class DatabaseManager:
 
     def get_active_boosts(self) -> list[dict[str, Any]]:
         """Fetches currently active global server boosts."""
-        now = datetime.datetime.now().isoformat()
         try:
+            # Check Cache (60s TTL)
+            now_ts = time.time()
+            if now_ts - self._active_boosts_cache_time < 60:
+                # Return deep copy to prevent mutation
+                return [b.copy() for b in self._active_boosts_cache]
+
+            now_iso = datetime.datetime.now().isoformat()
             with self.get_connection() as conn:
                 cur = conn.execute(
-                    "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?", (now,)
+                    "SELECT boost_key, multiplier, end_time FROM global_boosts WHERE end_time > ?", (now_iso,)
                 )
-                return [dict(row) for row in cur.fetchall()]
+                results = [dict(row) for row in cur.fetchall()]
+
+                # Update Cache
+                self._active_boosts_cache = results
+                self._active_boosts_cache_time = now_ts
+                return [b.copy() for b in results]
+
         except Exception as e:
             logger.error(f"Error fetching active boosts: {e}")
             return []
@@ -277,12 +292,16 @@ class DatabaseManager:
                 """,
                 (key, multiplier, end_time),
             )
+            # Invalidate Cache
+            self._active_boosts_cache_time = 0.0
             logger.info(f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h")
 
     def clear_global_boosts(self):
         """Removes all active global boosts."""
         with self.get_connection() as conn:
             conn.execute("DELETE FROM global_boosts")
+            # Invalidate Cache
+            self._active_boosts_cache_time = 0.0
             logger.info("All Global Boosts cleared.")
 
     # ============================================================
