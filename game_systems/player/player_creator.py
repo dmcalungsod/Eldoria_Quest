@@ -5,6 +5,7 @@ Handles character initialization.
 Hardened with atomic transactions to ensure complete character setup.
 """
 
+import json
 import logging
 
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
@@ -69,8 +70,8 @@ class PlayerCreator:
                     "INSERT INTO stats (discord_id, stats_json) VALUES (?, ?)",
                     (
                         discord_id,
-                        str(stats.to_dict()).replace("'", '"'),
-                    ),  # Simple dict->json str, essentially json.dumps
+                        json.dumps(stats.to_dict()),
+                    ),
                 )
 
                 # 4. Add Default Skills
