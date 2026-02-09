@@ -1,5 +1,5 @@
-import sqlite3
 import logging
+import sqlite3
 
 DATABASE_NAME = "EQ_Game.db"
 
