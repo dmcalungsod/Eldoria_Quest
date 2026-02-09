@@ -22,11 +22,6 @@ logger = logging.getLogger("eldoria.combat")
 
 
 class CombatHandler:
-    # Class-level cache for global boosts
-    _boost_cache: dict[str, float] = {}
-    _boost_cache_time: float = 0.0
-    _CACHE_TTL: int = 60  # seconds
-
     def __init__(self, db: DatabaseManager, discord_id: int):
         self.db = db
         self.discord_id = discord_id
@@ -142,7 +137,8 @@ class CombatHandler:
                     )
                     skills = [dict(row) for row in skills_cursor.fetchall()]
 
-                boosts = self._fetch_active_boosts()
+                active_boosts_list = self.db.get_active_boosts()
+                boosts = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
 
             # 2. Parse Skill Buffs safely
             for s in skills:
@@ -196,19 +192,6 @@ class CombatHandler:
                 "turn_report": {},
                 "active_boosts": {},
             }
-
-    def _fetch_active_boosts(self) -> dict[str, float]:
-        try:
-            now = time.time()
-            if now - CombatHandler._boost_cache_time < CombatHandler._CACHE_TTL:
-                return CombatHandler._boost_cache.copy()
-
-            boosts = {b["boost_key"]: b["multiplier"] for b in self.db.get_active_boosts()}
-            CombatHandler._boost_cache = boosts
-            CombatHandler._boost_cache_time = now
-            return boosts.copy()
-        except Exception:
-            return {}
 
     @staticmethod
     def create_empty_battle_report():
