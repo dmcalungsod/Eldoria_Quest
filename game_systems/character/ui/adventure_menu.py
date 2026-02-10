@@ -138,8 +138,13 @@ class AdventureView(View):
         await interaction.response.defer()
 
         try:
-            guild_member = await asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id)
+            # Parallel fetch of guild rank and player level
+            guild_member, player_data = await asyncio.gather(
+                asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
+                asyncio.to_thread(self.db.get_player, self.interaction_user.id),
+            )
             rank = guild_member["rank"] if guild_member else "F"
+            level = player_data["level"] if player_data else 1
 
             embed = discord.Embed(
                 title=f"{E.MAP} Prepare for Expedition",
@@ -150,7 +155,7 @@ class AdventureView(View):
                 color=discord.Color.dark_green(),
             )
 
-            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank)
+            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank, level)
             view.back_btn.callback = back_to_profile_callback
 
             await interaction.edit_original_response(embed=embed, view=view)

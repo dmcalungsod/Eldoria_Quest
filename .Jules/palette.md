@@ -7,3 +7,7 @@
 ## 2025-05-18 - Consistent Progress Bars
 **Learning:** Reusing the same visual language (block characters `█`/`░`) for progress bars across different screens (Combat vs Profile) builds familiarity and reduces learning curve.
 **Action:** Use the shared utility `cogs.ui_helpers.make_progress_bar` to ensure consistent visualization styles across the app.
+
+## 2025-05-18 - [Locked Content Discovery]
+**Learning:** Hiding locked content reduces discoverability. Showing locked options with clear visual indicators (🔒) and requirement explanations (Req: Rank X) motivates users to progress.
+**Action:** When restricting choices in Select Menus, use 'Soft Disabling': Keep the option, modify the label to indicate lock status, and reject the interaction with an ephemeral explanation.
