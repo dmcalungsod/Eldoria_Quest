@@ -23,16 +23,24 @@ from .exploration_view import ExplorationView
 
 logger = logging.getLogger("eldoria.ui.setup")
 
+RANK_ORDER = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"]
+
 
 class AdventureSetupView(View):
     def __init__(
-        self, db: DatabaseManager, manager: AdventureManager, interaction_user: discord.User, player_rank: str
+        self,
+        db: DatabaseManager,
+        manager: AdventureManager,
+        interaction_user: discord.User,
+        player_rank: str,
+        player_level: int,
     ):
         super().__init__(timeout=180)
         self.db = db
         self.manager = manager
         self.interaction_user = interaction_user
         self.player_rank = player_rank
+        self.player_level = player_level
 
         self.location_select = Select(
             placeholder="Select Destination...",
@@ -43,13 +51,22 @@ class AdventureSetupView(View):
 
         # Populate Locations
         for loc_id, loc_data in LOCATIONS.items():
-            # (Optional: Add Rank Check logic here if desired)
-            # e.g. if loc_data['min_rank'] > self.player_rank: continue
+            is_unlocked = self._is_unlocked(loc_data)
+
+            if is_unlocked:
+                label = loc_data["name"]
+                desc = f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']})"
+                emoji = loc_data.get("emoji", E.MAP)
+            else:
+                label = f"{E.LOCKED} {loc_data['name']}"
+                desc = f"[LOCKED] Req: Lv.{loc_data['level_req']}, Rank {loc_data['min_rank']}"
+                emoji = E.LOCKED
+
             self.location_select.add_option(
-                label=loc_data["name"],
+                label=label,
                 value=loc_id,
-                description=f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']})",
-                emoji=loc_data.get("emoji", E.MAP),
+                description=desc,
+                emoji=emoji,
             )
 
         self.location_select.callback = self.location_callback
@@ -59,6 +76,28 @@ class AdventureSetupView(View):
         self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=1)
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
+
+    def _is_unlocked(self, loc_data: dict) -> bool:
+        """Checks if the player meets rank and level requirements."""
+        req_rank = loc_data["min_rank"]
+        req_level = loc_data["level_req"]
+
+        # Level Check
+        if self.player_level < req_level:
+            return False
+
+        # Rank Check
+        try:
+            player_rank_idx = RANK_ORDER.index(self.player_rank)
+            req_rank_idx = RANK_ORDER.index(req_rank)
+            if player_rank_idx < req_rank_idx:
+                return False
+        except ValueError:
+            # Fallback if rank is unknown (shouldn't happen)
+            logger.warning(f"Unknown rank encountered: {self.player_rank} or {req_rank}")
+            return False
+
+        return True
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -70,12 +109,19 @@ class AdventureSetupView(View):
         await back_to_profile_callback(interaction, is_new_message=False)
 
     async def location_callback(self, interaction: discord.Interaction):
+        loc_id = self.location_select.values[0]
+        loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
+
+        if not self._is_unlocked(loc_data):
+            await interaction.response.send_message(
+                f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}** and **Rank {loc_data['min_rank']}** to enter {loc_data['name']}.",
+                ephemeral=True,
+            )
+            return
+
         await interaction.response.defer()
 
         try:
-            loc_id = self.location_select.values[0]
-            loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
-
             # 1. Start the adventure in DB (Threaded)
             success = await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, -1)
 
