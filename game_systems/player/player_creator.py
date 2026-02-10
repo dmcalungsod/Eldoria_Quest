@@ -7,6 +7,7 @@ Hardened with atomic transactions to ensure complete character setup.
 
 import json
 import logging
+import re
 
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 
@@ -24,6 +25,17 @@ class PlayerCreator:
         Creates a player profile.
         ATOMIC: Creates player, stats, and default skills in one transaction.
         """
+        # --- SECURITY FIX: Sanitize Username ---
+        # 1. Remove Markdown characters
+        username = re.sub(r"[\*_~`|>]", "", username)
+        # 2. Trim whitespace
+        username = username.strip()
+        # 3. Enforce max length
+        username = username[:32]
+        # 4. Ensure not empty
+        if not username:
+            username = "Adventurer"
+
         if self.db.player_exists(discord_id):
             return False, "You already have a character."
 

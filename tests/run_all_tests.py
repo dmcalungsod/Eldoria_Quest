@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import test_database
 import test_game_systems
+import test_security
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
     print("  • Inventory and equipment systems")
     print("  • Combat and damage calculations")
     print("  • Level-up and progression systems")
+    print("  • Security and sanitization")
     print("\n")
 
     all_passed = True
@@ -41,11 +43,18 @@ def main():
     game_passed = test_game_systems.run_all_tests()
     all_passed = all_passed and game_passed
 
+    print("\n" + "-" * 70)
+    print("RUNNING SECURITY TESTS")
+    print("-" * 70)
+    security_passed = test_security.run_all_tests()
+    all_passed = all_passed and security_passed
+
     print("\n" + "=" * 70)
     print("FINAL TEST SUMMARY")
     print("=" * 70)
     print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
+    print(f"Security Tests: {'✓ PASSED' if security_passed else '✗ FAILED'}")
     print("\n" + ("=" * 70))
 
     if all_passed:

@@ -36,6 +36,10 @@ def setup_test_database():
     db_create.DATABASE_NAME = TEST_DB_PATH
     db_populate.DATABASE_NAME = TEST_DB_PATH
 
+    # Store original init if not already stored
+    if not hasattr(DatabaseManager, "_original_init"):
+        DatabaseManager._original_init = DatabaseManager.__init__
+
     DatabaseManager.__init__ = lambda self: setattr(self, "db_name", TEST_DB_PATH)
 
     print(f"✓ Using temporary test database: {TEST_DB_PATH}")
@@ -44,6 +48,11 @@ def setup_test_database():
 def cleanup_test_database():
     """Remove temporary test database."""
     global TEST_DB_PATH
+
+    # Restore original init
+    if hasattr(DatabaseManager, "_original_init"):
+        DatabaseManager.__init__ = DatabaseManager._original_init
+
     if TEST_DB_PATH and os.path.exists(TEST_DB_PATH):
         try:
             os.remove(TEST_DB_PATH)
