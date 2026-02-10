@@ -77,6 +77,65 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
+    def _fetch_combat_context(self) -> dict[str, Any] | None:
+        """
+        Fetches all necessary data for combat in a single batch of queries.
+        Returns None if critical data (vitals) is missing.
+        """
+        try:
+            stats_json = self.db.get_player_stats_json(self.discord_id)
+            player_stats = PlayerStats.from_dict(stats_json)
+
+            # Apply Active Buffs
+            self.db.clear_expired_buffs(self.discord_id)
+            active_buffs = self.db.get_active_buffs(self.discord_id)
+            for buff in active_buffs:
+                player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+
+            vitals_row = self.db.get_player_vitals(self.discord_id)
+            if not vitals_row:
+                return None
+            vitals = dict(vitals_row)
+
+            player_row = self.db.get_player(self.discord_id)
+            skills = self.db.get_combat_skills(self.discord_id)
+
+            active_boosts_list = self.db.get_active_boosts()
+            boosts_dict = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
+
+            return {
+                "player_stats": player_stats,
+                "vitals": vitals,
+                "player_row": player_row,
+                "skills": skills,
+                "active_boosts": boosts_dict,
+            }
+        except Exception as e:
+            logger.error(f"Combat context fetch failed: {e}")
+            return None
+
+    def _check_auto_condition(self, context: dict[str, Any]) -> bool:
+        """
+        Determines whether the player should use auto-combat using pre-fetched context.
+        """
+        if not self.active_monster:
+            return False
+
+        # Force manual for Bosses/Elites
+        if self.active_monster.get("tier") in ("Boss", "Elite"):
+            return False
+
+        if not context or not context.get("vitals"):
+            return False
+
+        try:
+            current_hp = context["vitals"]["current_hp"]
+            # Ensure max_hp is at least 1
+            max_hp = max(context["player_stats"].max_hp, 1)
+            return (current_hp / max_hp) >= 0.30
+        except Exception:
+            return False
+
     def simulate_step(self) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
@@ -89,9 +148,14 @@ class AdventureSession:
         try:
             # --- 1. Continue Combat ---
             if self.active_monster:
-                if self._should_auto():
-                    return self._resolve_auto_combat()
-                return self._process_combat_turn()
+                # Pre-fetch context to avoid repeated DB calls
+                context = self._fetch_combat_context()
+                if not context:
+                    return {"sequence": [["Error: Failed to load player data."]], "dead": False}
+
+                if self._check_auto_condition(context):
+                    return self._resolve_auto_combat(context)
+                return self._process_combat_turn(context)
 
             # --- 2. Trigger New Encounter ---
             if random.randint(1, 100) > self.REGEN_CHANCE:
@@ -122,40 +186,10 @@ class AdventureSession:
             return {"sequence": [["*An ominous force interrupts your journey (System Error).*"]], "dead": False}
 
     # ======================================================================
-    # AUTO COMBAT AI LOGIC
-    # ======================================================================
-
-    def _should_auto(self) -> bool:
-        """
-        Determines whether the player should use auto-combat.
-        """
-        if not self.active_monster:
-            return False
-
-        # Force manual for Bosses/Elites
-        if self.active_monster.get("tier") in ("Boss", "Elite"):
-            return False
-
-        try:
-            stats_json = self.db.get_player_stats_json(self.discord_id)
-            stats = PlayerStats.from_dict(stats_json)
-            vitals = self.db.get_player_vitals(self.discord_id)
-
-            if not vitals:
-                return False
-
-            # Only auto if HP > 30%
-            current_hp = vitals["current_hp"]
-            max_hp = max(stats.max_hp, 1)
-            return (current_hp / max_hp) >= 0.30
-        except Exception:
-            return False
-
-    # ======================================================================
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(self) -> dict[str, Any]:
+    def _resolve_auto_combat(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """
@@ -168,40 +202,15 @@ class AdventureSession:
         # Get accumulated XP to prevent duplicate level up messages
         current_session_exp = self.loot.get("exp", 0)
 
-        # Prefetch data once to avoid repeated DB calls in the loop
-        try:
-            stats_json = self.db.get_player_stats_json(self.discord_id)
-            player_stats = PlayerStats.from_dict(stats_json)
+        if context is None:
+            context = self._fetch_combat_context()
 
-            # Apply Active Buffs (Prefetch)
-            self.db.clear_expired_buffs(self.discord_id)
-            active_buffs = self.db.get_active_buffs(self.discord_id)
-            for buff in active_buffs:
-                player_stats.add_bonus_stat(buff["stat"], buff["amount"])
-
-            # Fetch vitals as a dict so we can update it locally
-            vitals_row = self.db.get_player_vitals(self.discord_id)
-            vitals = dict(vitals_row) if vitals_row else None
-
-            player_row = self.db.get_player(self.discord_id)
-            skills = self.db.get_combat_skills(self.discord_id)
-
-            active_boosts_list = self.db.get_active_boosts()
-            boosts_dict = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
-
-            context = {
-                "player_stats": player_stats,
-                "vitals": vitals,
-                "player_row": player_row,
-                "skills": skills,
-                "active_boosts": boosts_dict
-            }
-        except Exception as e:
-            logger.error(f"Auto-combat prefetch failed: {e}")
+        if not context:
             return {"sequence": [["Error starting auto-combat."]], "dead": False}
 
-        if not vitals:
-             return {"sequence": [["Error: Vitals not found."]], "dead": False}
+        # Local pointers from context
+        player_stats = context["player_stats"]
+        vitals = context["vitals"]
 
         # Max 8 turns to avoid infinite loops
         for _ in range(8):
@@ -276,7 +285,7 @@ class AdventureSession:
     # MANUAL COMBAT TURN
     # ======================================================================
 
-    def _process_combat_turn(self) -> dict[str, Any]:
+    def _process_combat_turn(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
         """
@@ -284,7 +293,9 @@ class AdventureSession:
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
-        result = self.combat.resolve_turn(self.active_monster, report, current_session_exp)
+        result = self.combat.resolve_turn(
+            self.active_monster, report, current_session_exp, context=context
+        )
 
         turn_logs = result["phrases"]
         is_dead = False
