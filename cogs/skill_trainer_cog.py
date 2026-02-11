@@ -167,8 +167,15 @@ class SkillTrainerView(View):
     # --------------------------------------------------------
     # Execution Logic (Threaded)
     # --------------------------------------------------------
-    def _execute_learn(self, skill_key: str, cost: int) -> tuple[bool, str]:
+    def _execute_learn(self, skill_key: str) -> tuple[bool, str]:
+        """Calculates cost server-side to prevent tampering."""
         try:
+            skill_data = SKILLS.get(skill_key)
+            if not skill_data:
+                return False, "Invalid skill."
+
+            cost = skill_data["learn_cost"]
+
             with self.db.get_connection() as conn:
                 # 1. Verify Funds
                 row = conn.execute(
@@ -178,7 +185,16 @@ class SkillTrainerView(View):
                 if not row or row["vestige_pool"] < cost:
                     return False, "Insufficient Vestige."
 
-                # 2. Deduct & Learn
+                # 2. Check if already learned
+                exists = conn.execute(
+                    "SELECT 1 FROM player_skills WHERE discord_id = ? AND skill_key = ?",
+                    (self.interaction_user.id, skill_key),
+                ).fetchone()
+
+                if exists:
+                    return False, "Skill already learned."
+
+                # 3. Deduct & Learn
                 conn.execute(
                     "UPDATE players SET vestige_pool = vestige_pool - ? WHERE discord_id = ?",
                     (cost, self.interaction_user.id),
@@ -192,18 +208,38 @@ class SkillTrainerView(View):
             logger.error(f"Learn skill error: {e}")
             return False, "System error."
 
-    def _execute_upgrade(self, skill_key: str, cost: int, new_level: int) -> tuple[bool, str]:
+    def _execute_upgrade(self, skill_key: str) -> tuple[bool, str, int]:
+        """Calculates cost server-side based on current level."""
         try:
+            skill_data = SKILLS.get(skill_key)
+            if not skill_data:
+                return False, "Invalid skill.", 0
+
+            base_cost = skill_data["upgrade_cost"]
+
             with self.db.get_connection() as conn:
-                # 1. Verify Funds
-                row = conn.execute(
+                # 1. Get Current Level
+                skill_row = conn.execute(
+                    "SELECT skill_level FROM player_skills WHERE discord_id = ? AND skill_key = ?",
+                    (self.interaction_user.id, skill_key),
+                ).fetchone()
+
+                if not skill_row:
+                    return False, "Skill not learned.", 0
+
+                current_level = skill_row["skill_level"]
+                cost = get_upgrade_cost(base_cost, current_level)
+                new_level = current_level + 1
+
+                # 2. Verify Funds
+                player_row = conn.execute(
                     "SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,)
                 ).fetchone()
 
-                if not row or row["vestige_pool"] < cost:
-                    return False, "Insufficient Vestige."
+                if not player_row or player_row["vestige_pool"] < cost:
+                    return False, "Insufficient Vestige.", current_level
 
-                # 2. Deduct & Upgrade
+                # 3. Deduct & Upgrade
                 conn.execute(
                     "UPDATE players SET vestige_pool = vestige_pool - ? WHERE discord_id = ?",
                     (cost, self.interaction_user.id),
@@ -212,27 +248,27 @@ class SkillTrainerView(View):
                     "UPDATE player_skills SET skill_level = ? WHERE discord_id = ? AND skill_key = ?",
                     (new_level, self.interaction_user.id, skill_key),
                 )
-            return True, "Skill Upgraded!"
+            return True, "Skill Upgraded!", new_level
         except Exception as e:
             logger.error(f"Upgrade skill error: {e}")
-            return False, "System error."
+            return False, "System error.", 0
 
     # --------------------------------------------------------
     # Callbacks
     # --------------------------------------------------------
     async def learn_skill_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        skill_key, cost = interaction.data["values"][0].split(":")
+        # Only skill_key is trusted from interaction
+        skill_key = interaction.data["values"][0].split(":")[0]
 
-        success, msg = await asyncio.to_thread(self._execute_learn, skill_key, int(cost))
+        success, msg = await asyncio.to_thread(self._execute_learn, skill_key)
         await self._refresh_ui(interaction, success, msg, skill_key)
 
     async def upgrade_skill_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        skill_key, cost, level = interaction.data["values"][0].split(":")
-        new_level = int(level) + 1
+        skill_key = interaction.data["values"][0].split(":")[0]
 
-        success, msg = await asyncio.to_thread(self._execute_upgrade, skill_key, int(cost), new_level)
+        success, msg, new_level = await asyncio.to_thread(self._execute_upgrade, skill_key)
         await self._refresh_ui(interaction, success, msg, skill_key, new_level)
 
     async def _refresh_ui(self, interaction, success, msg, skill_key, level=1):

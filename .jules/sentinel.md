@@ -7,3 +7,8 @@
 **Vulnerability:** Player statistics were being serialized to JSON using `str(dict).replace("'", '"')` instead of `json.dumps()`. This is brittle and can produce invalid JSON if strings contain quotes, or lead to injection if user input is ever stored in stats.
 **Learning:** Never manually construct JSON strings. Python's string representation of a dict is not valid JSON.
 **Prevention:** Always use the standard `json` library (`json.dumps`, `json.loads`) for serialization to ensure proper escaping and formatting.
+
+## 2024-06-03 - Skill Trainer Cost Manipulation
+**Vulnerability:** The Skill Trainer trusted the cost value sent back from the "Learn/Upgrade Skill" interaction (`value="skill_key:cost"`). Malicious users could modify this value to learn expensive skills for 0 cost or even negative values.
+**Learning:** This is a classic "Parameter Tampering" vulnerability. Discord interaction data is untrusted client input, even if it originated from the bot's own UI.
+**Prevention:** Only use the `skill_key` or unique identifier from the interaction. Always recalculate the cost server-side based on the current player state and authoritative data source (`SKILLS`).
