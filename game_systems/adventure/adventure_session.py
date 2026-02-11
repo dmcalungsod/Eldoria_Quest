@@ -105,6 +105,7 @@ class AdventureSession:
 
             return {
                 "player_stats": player_stats,
+                "stats_dict": player_stats.get_total_stats_dict(),
                 "vitals": vitals,
                 "player_row": player_row,
                 "skills": skills,
@@ -131,7 +132,11 @@ class AdventureSession:
         try:
             current_hp = context["vitals"]["current_hp"]
             # Ensure max_hp is at least 1
-            max_hp = max(context["player_stats"].max_hp, 1)
+            if "stats_dict" in context:
+                # Fallback to player_stats.max_hp if key missing
+                max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
+            else:
+                max_hp = max(context["player_stats"].max_hp, 1)
             return (current_hp / max_hp) >= 0.30
         except Exception:
             return False
@@ -210,6 +215,7 @@ class AdventureSession:
 
         # Local pointers from context
         player_stats = context["player_stats"]
+        stats_dict = context.get("stats_dict")
         vitals = context["vitals"]
 
         # Max 8 turns to avoid infinite loops
@@ -233,7 +239,8 @@ class AdventureSession:
                 sequence.append(result["phrases"])
 
             # Safety: Drop to manual if HP is too low
-            if result["hp_current"] / max(player_stats.max_hp, 1) < 0.30:
+            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
+            if result["hp_current"] / max(max_hp, 1) < 0.30:
                 sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
                 break
 

@@ -5,3 +5,7 @@
 ## 2024-05-24 - [Adventure Loop N+1 Query]
 **Learning:** `AdventureSession.simulate_step` triggered redundant DB queries by checking auto-combat conditions (fetching stats/vitals) then re-fetching them for combat execution. This doubled the query load for every single turn.
 **Action:** Lift data fetching to the parent method (`simulate_step`) using a context object. Pass this context to decision logic and execution logic. Reduces queries by ~20% per step.
+
+## 2024-05-24 - [Combat Stat Caching]
+**Learning:** Repeated property access in `PlayerStats` (which calculates totals on-the-fly) during combat loops added significant overhead, especially in auto-combat.
+**Action:** Pre-calculate a `stats_dict` once per adventure step and pass it to `CombatEngine`. Updated `DamageFormula` to handle dictionary inputs efficiently. Added robust fallbacks for critical stats like Max HP to prevent logic errors if the cache is malformed.
