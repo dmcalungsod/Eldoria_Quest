@@ -11,3 +11,7 @@
 ## 2025-05-18 - [Locked Content Discovery]
 **Learning:** Hiding locked content reduces discoverability. Showing locked options with clear visual indicators (🔒) and requirement explanations (Req: Rank X) motivates users to progress.
 **Action:** When restricting choices in Select Menus, use 'Soft Disabling': Keep the option, modify the label to indicate lock status, and reject the interaction with an ephemeral explanation.
+
+## 2025-05-19 - [Affordability Feedback]
+**Learning:** In strict Discord Select Menus where individual options cannot be disabled, users need immediate visual feedback on which items they can afford *before* clicking.
+**Action:** Use distinct emoji (🔒 vs 🪙) and label suffixes (`[Too Expensive]`) to indicate affordability state within Select options, preventing frustrating interaction failures.
