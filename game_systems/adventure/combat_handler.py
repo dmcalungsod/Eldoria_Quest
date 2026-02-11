@@ -8,7 +8,6 @@ Hardened: Syncs session XP to prevent duplicate level-up messages.
 import json
 import logging
 import random
-import time
 from typing import Any
 
 from database.database_manager import DatabaseManager
@@ -98,6 +97,7 @@ class CombatHandler:
             # 1. Load Data
             if context:
                 player_stats = context["player_stats"]
+                stats_dict = context.get("stats_dict")
                 vitals = context["vitals"]
                 p_row = context["player_row"]
                 skills = context["skills"]
@@ -111,6 +111,9 @@ class CombatHandler:
                 active_buffs = self.db.get_active_buffs(self.discord_id)
                 for buff in active_buffs:
                     player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+
+                # Generate cached stats dict
+                stats_dict = player_stats.get_total_stats_dict()
 
                 vitals = self.db.get_player_vitals(self.discord_id)
 
@@ -165,6 +168,7 @@ class CombatHandler:
                 player_mp=vitals["current_mp"],
                 player_class_id=p_row["class_id"],
                 active_boosts=boosts,
+                stats_dict=stats_dict,
             )
 
             result = engine.run_combat_turn()

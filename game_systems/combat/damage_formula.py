@@ -111,7 +111,9 @@ class DamageFormula:
         base_heal = float(skill_data.get("heal_power", 0))
         mag_val = DamageFormula._get_stat(player_stats, "MAG")
 
-        if hasattr(player_stats, "max_hp"):
+        if isinstance(player_stats, dict) and "HP" in player_stats:
+            max_hp = player_stats["HP"]
+        elif hasattr(player_stats, "max_hp"):
             max_hp = player_stats.max_hp
         else:
             end_val = DamageFormula._get_stat(player_stats, "END")

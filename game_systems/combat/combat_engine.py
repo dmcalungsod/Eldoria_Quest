@@ -30,6 +30,7 @@ class CombatEngine:
         player_mp: int,
         player_class_id: int,
         active_boosts: dict = None,
+        stats_dict: dict = None,
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -38,11 +39,19 @@ class CombatEngine:
         player_mp → Player's current MP
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
         active_boosts → Dict of active global boosts
+        stats_dict → Cached dictionary of player stats to avoid property overhead
         """
         self.player = player
         self.monster = monster
         self.player_skills = player_skills
         self.player_class_id = player_class_id
+
+        # Use cached stats if provided, otherwise generate them
+        if stats_dict:
+            self.stats_dict = stats_dict
+        else:
+            # Fallback to generating it (e.g. if caller didn't provide it)
+            self.stats_dict = self.player.stats.get_total_stats_dict()
 
         # Safe property access
         self.player_hp = getattr(player, "hp_current", 1)
@@ -98,7 +107,7 @@ class CombatEngine:
                 if skill.get("heal_power", 0) > 0:
                     # --- Healing Skill ---
                     heal, new_hp, event_type = DamageFormula.player_heal(
-                        self.player.stats, self.player_hp, skill, skill_level
+                        self.stats_dict, self.player_hp, skill, skill_level
                     )
                     self.player_hp = new_hp
                     log.append(CombatPhrases.player_heal(self.player, skill, heal))
@@ -110,7 +119,7 @@ class CombatEngine:
                 else:
                     # --- Offensive Skill ---
                     dmg, crit, event_type = DamageFormula.player_skill(
-                        self.player.stats, self.monster, skill, skill_level
+                        self.stats_dict, self.monster, skill, skill_level
                     )
 
                     if event_type == "crit":
@@ -123,7 +132,7 @@ class CombatEngine:
                     log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
             else:
                 # --- Basic Attack ---
-                dmg, crit, event_type = DamageFormula.player_attack(self.player.stats, self.monster)
+                dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
 
                 if event_type == "crit":
                     turn_report["player_crit"] = 1
@@ -150,7 +159,7 @@ class CombatEngine:
             action = MonsterAI.choose_action(self.monster, self.monster_hp, self.monster.get("MP", 0))
 
             if action["type"] == "attack":
-                dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.player.stats)
+                dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.stats_dict)
 
                 if event_type == "dodge":
                     turn_report["player_dodge"] = 1
@@ -176,7 +185,7 @@ class CombatEngine:
                     log.append(CombatPhrases.monster_heal(self.monster, skill, heal))
                 else:
                     # --- Monster Offensive Skill ---
-                    dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.player.stats, skill)
+                    dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
 
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
@@ -250,7 +259,7 @@ class CombatEngine:
             return {"skill": None, "reason": "Not enough MP."}
 
         # Priority 1: Healing (if below 50% HP)
-        hp_threshold = self.player.stats.max_hp * 0.5
+        hp_threshold = self.stats_dict.get("HP", self.player.stats.max_hp) * 0.5
         if self.player_hp < hp_threshold:
             heal_skill = next((s for s in usable_skills if s.get("heal_power", 0) > 0), None)
             if heal_skill:
