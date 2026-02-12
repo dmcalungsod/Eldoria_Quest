@@ -12,3 +12,8 @@
 **Vulnerability:** The Skill Trainer trusted the cost value sent back from the "Learn/Upgrade Skill" interaction (`value="skill_key:cost"`). Malicious users could modify this value to learn expensive skills for 0 cost or even negative values.
 **Learning:** This is a classic "Parameter Tampering" vulnerability. Discord interaction data is untrusted client input, even if it originated from the bot's own UI.
 **Prevention:** Only use the `skill_key` or unique identifier from the interaction. Always recalculate the cost server-side based on the current player state and authoritative data source (`SKILLS`).
+
+## 2024-06-15 - Quest Location Validation Bypass
+**Vulnerability:** The quest event system progressed "locate" and other objective types whenever a random non-combat event triggered, regardless of the player's current location. This allowed players to complete location-specific quests (e.g. "Locate Hidden Cave") by simply walking in circles in a safe zone.
+**Learning:** Context-sensitive actions (like finding a specific location) must be validated against the current state context (the player's location) before applying progress. Assuming "event happened = progress made" is insecure.
+**Prevention:** Always validate that the current game state (location, inventory, etc.) meets the specific requirements of the objective before granting progress. Pass context explicitly to handler functions.

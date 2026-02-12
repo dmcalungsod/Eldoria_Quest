@@ -180,7 +180,8 @@ class AdventureSession:
                 return {"sequence": [[msg]], "dead": False}
 
             # --- 3. Non-Combat Event ---
-            result = self.events.resolve_non_combat(regen_chance=70)
+            location_name = location.get("name")
+            result = self.events.resolve_non_combat(regen_chance=70, location_name=location_name)
             self.logs.extend(result["log"])
             self.save_state()
 

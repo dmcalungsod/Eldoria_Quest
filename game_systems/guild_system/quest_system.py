@@ -67,7 +67,7 @@ class QuestSystem:
             with self.db.get_connection() as conn:
                 rows = conn.execute(
                     """
-                    SELECT q.id, q.title, q.summary, pq.status, pq.progress, q.objectives
+                    SELECT q.id, q.title, q.summary, q.location, pq.status, pq.progress, q.objectives
                     FROM player_quests pq
                     JOIN quests q ON pq.quest_id = q.id
                     WHERE pq.discord_id = ? AND pq.status = 'in_progress'
