@@ -73,14 +73,27 @@ class ShopView(View):
             if not item_data:
                 continue
 
-            if self.current_aurum >= price:
+            can_afford = self.current_aurum >= price
+            if can_afford:
                 can_afford_any = True
 
+            emoji = E.AURUM if can_afford else E.LOCKED
+
+            # Ensure label does not exceed 100 characters
+            suffix = f" — {price} G"
+            if not can_afford:
+                suffix += " [Too Expensive]"
+
+            name = item_data['name']
+            max_name_len = 100 - len(suffix)
+            if len(name) > max_name_len:
+                name = name[:max_name_len - 1] + "…"
+
             item_select.add_option(
-                label=f"{item_data['name']} — {price} G",
+                label=f"{name}{suffix}",
                 value=f"{item_key}:{price}",
                 description=item_data["description"][:50],
-                emoji="🪙",
+                emoji=emoji,
             )
 
         if not can_afford_any:
