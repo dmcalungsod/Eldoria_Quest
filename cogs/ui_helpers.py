@@ -20,11 +20,27 @@ from game_systems.player.player_stats import PlayerStats
 logger = logging.getLogger("eldoria.ui")
 
 
-def make_progress_bar(current: int, max_val: int, length: int = 10) -> str:
-    """Generates a visual progress bar string using █ and ░."""
+def make_progress_bar(
+    current: int, max_val: int, length: int = 10, empty_char: str = "░", filled_char: str = "█"
+) -> str:
+    """Generates a visual progress bar string."""
     percent = max(0, min(1, current / max(max_val, 1)))
     filled = int(percent * length)
-    return "█" * filled + "░" * (length - filled)
+    return filled_char * filled + empty_char * (length - filled)
+
+
+def get_health_status_emoji(current: int, max_val: int) -> str:
+    """Returns a status emoji based on health percentage."""
+    if max_val <= 0:
+        return "🔴"
+
+    percent = current / max_val
+
+    if percent > 0.5:
+        return "🟢"
+    elif percent > 0.2:
+        return "🟡"
+    return "🔴"
 
 
 def build_inventory_embed(items: list) -> discord.Embed:
@@ -118,9 +134,10 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
         hp_bar = make_progress_bar(player["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(player["current_mp"], stats.max_mp)
         exp_bar = make_progress_bar(player["experience"], player["exp_to_next"])
+        status_emoji = get_health_status_emoji(player["current_hp"], stats.max_hp)
 
         embed.add_field(
-            name="Condition",
+            name=f"Condition {status_emoji}",
             value=(
                 f"**Level:** {player['level']}\n"
                 f"**EXP:** `{exp_bar}` {player['experience']} / {player['exp_to_next']}\n"

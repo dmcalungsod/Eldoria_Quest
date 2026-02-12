@@ -12,6 +12,7 @@ import sqlite3
 import discord
 
 import game_systems.data.emojis as E
+from cogs.ui_helpers import get_health_status_emoji, make_progress_bar
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
 
@@ -19,13 +20,6 @@ logger = logging.getLogger("eldoria.ui.embeds")
 
 
 class AdventureEmbeds:
-    @staticmethod
-    def _make_bar(current: int, max_val: int, length: int = 10) -> str:
-        """Generates a visual progress bar string."""
-        percent = max(0, min(1, current / max(max_val, 1)))
-        filled = int(percent * length)
-        return "█" * filled + "░" * (length - filled)
-
     @staticmethod
     def build_exploration_embed(
         location_id: str, log: list, player_stats: PlayerStats, vitals: sqlite3.Row, session_row: sqlite3.Row
@@ -84,12 +78,11 @@ class AdventureEmbeds:
         # 4. Player Vitals Field
         # Using emojis for clean layout
         try:
-            hp_percent = vitals["current_hp"] / max(player_stats.max_hp, 1)
-            hp_bar = AdventureEmbeds._make_bar(vitals["current_hp"], player_stats.max_hp)
-            mp_bar = AdventureEmbeds._make_bar(vitals["current_mp"], player_stats.max_mp)
+            hp_bar = make_progress_bar(vitals["current_hp"], player_stats.max_hp)
+            mp_bar = make_progress_bar(vitals["current_mp"], player_stats.max_mp)
 
             # Simple status indicator
-            status_icon = "🟢" if hp_percent > 0.5 else "🟡" if hp_percent > 0.2 else "🔴"
+            status_icon = get_health_status_emoji(vitals["current_hp"], player_stats.max_hp)
 
             embed.add_field(
                 name=f"Adventurer Status {status_icon}",
@@ -106,7 +99,7 @@ class AdventureEmbeds:
         if active_monster:
             m_hp = active_monster.get("HP", 0)
             m_max = active_monster.get("max_hp", m_hp)  # Fallback
-            bar = AdventureEmbeds._make_bar(m_hp, m_max, length=12)
+            bar = make_progress_bar(m_hp, m_max, length=12)
 
             embed.add_field(
                 name=f"VS. {active_monster.get('name', 'Enemy')}",
