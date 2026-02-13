@@ -14,6 +14,7 @@ from typing import Any
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.materials import MATERIALS
 from game_systems.player.player_stats import PlayerStats
 
@@ -28,13 +29,15 @@ class EventHandler:
         self.quest_system = quest_system
         self.discord_id = discord_id
 
-    def resolve_non_combat(self, regen_chance: int = 70, location_name: str | None = None) -> dict[str, Any]:
+    def resolve_non_combat(
+        self, location_id: str | None = None, regen_chance: int = 70, location_name: str | None = None
+    ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
                 return self._perform_regeneration()
             else:
-                return self._perform_quest_event(location_name)
+                return self._perform_quest_event(location_name, location_id)
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
@@ -97,7 +100,7 @@ class EventHandler:
             logger.error(f"Regen error for {self.discord_id}: {e}")
             return {"log": ["*You try to rest, but something feels wrong.*"], "dead": False}
 
-    def _perform_quest_event(self, location_name: str | None) -> dict[str, Any]:
+    def _perform_quest_event(self, location_name: str | None, location_id: str | None) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
         Updates quest progress if a relevant event is triggered.
@@ -138,29 +141,57 @@ class EventHandler:
                                     }
 
             # If no matching quest event was found, try wild gathering
-            return self._perform_wild_gathering()
+            return self._perform_wild_gathering(location_id)
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
             return {"log": ["*The path ahead is unclear.*"], "dead": False}
 
-    def _perform_wild_gathering(self) -> dict[str, Any]:
+    def _perform_wild_gathering(self, location_id: str | None) -> dict[str, Any]:
         """
         Attempts to find wild materials if no quest event triggered.
+        Now supports biome-specific drops and luck-based quantity.
         """
-        # 30% chance to find something
-        if random.random() < 0.30:
-            gatherables = ["medicinal_herb", "iron_ore", "ancient_wood"]
-            item_key = random.choice(gatherables)
+        # Determine gatherables for this location
+        gatherables = []
+        if location_id and location_id in LOCATIONS:
+            gatherables = LOCATIONS[location_id].get("gatherables", [])
+
+        # If no gatherables defined, fallback to general pool (or empty)
+        if not gatherables:
+            # Fallback for old compatibility or empty zones
+            gatherables = [("medicinal_herb", 50), ("iron_ore", 20), ("ancient_wood", 10)]
+
+        # 35% Base Chance
+        if random.random() < 0.35:
+            # Weighted Selection
+            choices, weights = zip(*gatherables)
+            item_key = random.choices(choices, weights=weights, k=1)[0]
             mat_data = MATERIALS.get(item_key)
 
             if mat_data:
+                # Calculate Quantity based on Luck
+                stats_json = self.db.get_player_stats_json(self.discord_id)
+                stats = PlayerStats.from_dict(stats_json)
+
+                # Formula: Base 1 + (Luck / 25)
+                bonus = int(stats.luck / 25)
+                # Cap at 3 items max for wild gathering to preserve economy
+                quantity = min(3, 1 + bonus)
+
+                # Random variance: 20% chance to get +1 extra
+                if random.random() < 0.20:
+                    quantity += 1
+
                 name = mat_data["name"]
-                event_text = f"\n{AdventureEvents.wild_gather_event(name)}"
+                # Format name with quantity if > 1
+                display_name = f"{name} (x{quantity})" if quantity > 1 else name
+
+                event_text = f"\n{AdventureEvents.wild_gather_event(display_name)}"
                 return {
                     "log": [event_text],
                     "dead": False,
-                    "loot": {item_key: 1},
+                    "loot": {item_key: quantity},
                 }
 
         # Fallback to nothing found
