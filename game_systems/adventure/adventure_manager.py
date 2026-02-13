@@ -103,33 +103,53 @@ class AdventureManager:
         except Exception as e:
             logger.error(f"Error handling death for {discord_id}: {e}")
 
-    def end_adventure(self, discord_id: int):
+    def end_adventure(self, discord_id: int) -> dict | None:
         try:
             stats_json = self.db.get_player_stats_json(discord_id)
             p_stats = PlayerStats.from_dict(stats_json)
             items_to_add = []
+            summary = None
 
             with self.db.get_connection() as conn:
                 row = conn.execute(
                     "SELECT * FROM adventure_sessions WHERE discord_id = ? AND active = 1", (discord_id,)
                 ).fetchone()
                 if not row:
-                    return
+                    return None
 
                 session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
                 total_exp = session.loot.pop("exp", 0)
 
+                # Capture state before rewards
+                p_row = conn.execute("SELECT level FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
+                old_level = p_row["level"]
+
                 items_to_add = self._grant_rewards_internal(session, total_exp, conn, p_stats)
 
+                # Capture state after rewards
+                p_row_new = conn.execute("SELECT level FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
+                new_level = p_row_new["level"]
+
                 conn.execute("UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?", (discord_id,))
+
+                summary = {
+                    "loot": items_to_add,
+                    "xp_gained": total_exp,
+                    "old_level": old_level,
+                    "new_level": new_level,
+                    "leveled_up": new_level > old_level,
+                }
 
             for item in items_to_add:
                 self.inventory_manager.add_item(
                     discord_id, item["key"], item["name"], item["type"], item["rarity"], item["amount"]
                 )
 
+            return summary
+
         except Exception as e:
             logger.error(f"Error ending adventure for {discord_id}: {e}", exc_info=True)
+            return None
 
     def _grant_rewards_internal(self, session, total_exp, conn, player_stats):
         """Helper to calculate rewards inside an existing DB transaction."""
