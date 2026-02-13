@@ -125,6 +125,56 @@ class DatabaseManager:
         with self.get_connection() as conn:
             return conn.execute("SELECT * FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
 
+    def get_combat_context_bundle(self, discord_id: int) -> dict[str, Any] | None:
+        """
+        Fetches all necessary data for combat in a single transaction.
+        Returns a dict with 'player', 'stats', 'buffs', 'skills'.
+        Returns None if player not found.
+        """
+        now_iso = datetime.datetime.now().isoformat()
+
+        with self.get_connection() as conn:
+            # 1. Player & Vitals
+            player_row = conn.execute("SELECT * FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
+            if not player_row:
+                return None
+
+            # 2. Stats JSON
+            stats_row = conn.execute("SELECT stats_json FROM stats WHERE discord_id = ?", (discord_id,)).fetchone()
+            stats_data = {}
+            if stats_row and stats_row["stats_json"]:
+                try:
+                    stats_data = json.loads(stats_row["stats_json"])
+                except json.JSONDecodeError:
+                    logger.error(f"Corrupted stats_json for user {discord_id}")
+
+            # 3. Active Buffs
+            cur_buffs = conn.execute(
+                "SELECT * FROM active_buffs WHERE discord_id = ? AND end_time > ?",
+                (discord_id, now_iso),
+            )
+            buffs = [dict(row) for row in cur_buffs.fetchall()]
+
+            # 4. Combat Skills
+            cur_skills = conn.execute(
+                """
+                SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
+                       s.power_multiplier, s.heal_power, s.buff_data
+                FROM player_skills ps
+                JOIN skills s ON ps.skill_key=s.key_id
+                WHERE ps.discord_id=? AND s.type='Active'
+                """,
+                (discord_id,),
+            )
+            skills = [dict(row) for row in cur_skills.fetchall()]
+
+        return {
+            "player": dict(player_row),
+            "stats": stats_data,
+            "buffs": buffs,
+            "skills": skills,
+        }
+
     # ============================================================
     # STATS & VITALS
     # ============================================================

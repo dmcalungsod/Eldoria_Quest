@@ -83,22 +83,29 @@ class AdventureSession:
         Returns None if critical data (vitals) is missing.
         """
         try:
-            stats_json = self.db.get_player_stats_json(self.discord_id)
-            player_stats = PlayerStats.from_dict(stats_json)
+            # OPTIMIZED: Use single transaction to fetch all data
+            bundle = self.db.get_combat_context_bundle(self.discord_id)
+            if not bundle:
+                return None
+
+            stats_data = bundle["stats"]
+            player_stats = PlayerStats.from_dict(stats_data)
 
             # Apply Active Buffs
-            active_buffs = self.db.get_active_buffs(self.discord_id)
+            active_buffs = bundle["buffs"]
             for buff in active_buffs:
                 player_stats.add_bonus_stat(buff["stat"], buff["amount"])
 
-            vitals_row = self.db.get_player_vitals(self.discord_id)
-            if not vitals_row:
-                return None
-            vitals = dict(vitals_row)
+            # Extract vitals from player row
+            player_row = bundle["player"]
+            vitals = {
+                "current_hp": player_row["current_hp"],
+                "current_mp": player_row["current_mp"],
+            }
 
-            player_row = self.db.get_player(self.discord_id)
-            skills = self.db.get_combat_skills(self.discord_id)
+            skills = bundle["skills"]
 
+            # Global boosts are cached, so this is cheap
             active_boosts_list = self.db.get_active_boosts()
             boosts_dict = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
 
