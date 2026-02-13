@@ -27,13 +27,13 @@ class EventHandler:
         self.quest_system = quest_system
         self.discord_id = discord_id
 
-    def resolve_non_combat(self, regen_chance: int = 70) -> dict[str, Any]:
+    def resolve_non_combat(self, regen_chance: int = 70, location_name: str | None = None) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
                 return self._perform_regeneration()
             else:
-                return self._perform_quest_event()
+                return self._perform_quest_event(location_name)
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
@@ -96,7 +96,7 @@ class EventHandler:
             logger.error(f"Regen error for {self.discord_id}: {e}")
             return {"log": ["*You try to rest, but something feels wrong.*"], "dead": False}
 
-    def _perform_quest_event(self) -> dict[str, Any]:
+    def _perform_quest_event(self, location_name: str | None) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
         Updates quest progress if a relevant event is triggered.
@@ -106,6 +106,11 @@ class EventHandler:
             event_types = ["gather", "locate", "examine", "survey", "escort", "retrieve", "deliver"]
 
             for quest in active_quests:
+                # SECURITY: Validate Quest Location
+                required_location = quest.get("location")
+                if required_location and required_location != location_name:
+                    continue
+
                 objectives = quest.get("objectives", {})
                 progress = quest.get("progress", {})
 
