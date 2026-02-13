@@ -7,6 +7,7 @@ Atmosphere restored.
 """
 
 import asyncio
+import json
 import logging
 import math
 import sqlite3
@@ -76,11 +77,25 @@ class InfirmaryView(View):
                     "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id=?", (self.user.id,)
                 ).fetchone()
 
+                # SECURITY: Fetch fresh stats to avoid stale state exploits
+                # (e.g. equipping gear in another tab then healing for cheap)
+                stats_row = conn.execute(
+                    "SELECT stats_json FROM stats WHERE discord_id=?", (self.user.id,)
+                ).fetchone()
+
+                if stats_row and stats_row["stats_json"]:
+                    fresh_stats = PlayerStats.from_dict(json.loads(stats_row["stats_json"]))
+                    max_hp = fresh_stats.max_hp
+                    max_mp = fresh_stats.max_mp
+                else:
+                    max_hp = self.stats.max_hp
+                    max_mp = self.stats.max_mp
+
                 # Re-calculate costs dynamically
-                missing = max(0, self.stats.max_hp - row["current_hp"])
+                missing = max(0, max_hp - row["current_hp"])
                 cost = infirmary_cost(missing)
 
-                if missing == 0 and row["current_mp"] >= self.stats.max_mp:
+                if missing == 0 and row["current_mp"] >= max_mp:
                     return False, "You are already healthy."
 
                 if row["aurum"] < cost:
@@ -89,7 +104,7 @@ class InfirmaryView(View):
                 # Apply
                 conn.execute(
                     "UPDATE players SET current_hp=?, current_mp=?, aurum=? WHERE discord_id=?",
-                    (self.stats.max_hp, self.stats.max_mp, row["aurum"] - cost, self.user.id),
+                    (max_hp, max_mp, row["aurum"] - cost, self.user.id),
                 )
                 return True, f"Restored HP/MP for {cost} Aurum."
         except Exception as e:
