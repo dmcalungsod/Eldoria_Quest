@@ -26,6 +26,10 @@ LOCATIONS = {
             }
         ],
         "description": "The safe edge of the forest. Slimes and weak goblins lurk here.",
+        "gatherables": [
+            ("medicinal_herb", 70),
+            ("magic_stone_fragment", 30),
+        ],
     },
     "whispering_thicket": {
         "name": "Whispering Thicket",
@@ -40,6 +44,11 @@ LOCATIONS = {
             ("monster_008", 10),  # Thicket Spider
         ],
         "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs.",
+        "gatherables": [
+            ("medicinal_herb", 40),
+            ("ancient_wood", 40),
+            ("magic_stone_small", 20),
+        ],
     },
     "deepgrove_roots": {
         "name": "Deepgrove Roots",
@@ -54,6 +63,11 @@ LOCATIONS = {
             ("monster_020", 20),  # Ravaged Boar
         ],
         "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot.",
+        "gatherables": [
+            ("ancient_wood", 50),
+            ("iron_ore", 30),
+            ("magic_stone_medium", 20),
+        ],
     },
     "guild_arena": {
         "name": "Guild Proving Grounds",

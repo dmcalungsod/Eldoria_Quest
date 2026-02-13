@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import test_database
 import test_game_systems
-import test_security
 import test_infirmary_security
+import test_security
 
 
 def main():

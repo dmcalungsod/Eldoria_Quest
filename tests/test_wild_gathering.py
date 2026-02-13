@@ -1,16 +1,15 @@
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import random
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.database_manager import DatabaseManager
-from game_systems.adventure.event_handler import EventHandler
 from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.data.materials import MATERIALS
+from game_systems.adventure.event_handler import EventHandler
+
 
 class TestWildGathering(unittest.TestCase):
     def setUp(self):
@@ -22,77 +21,88 @@ class TestWildGathering(unittest.TestCase):
         # Mock quest system to return no quests
         self.quest_system.get_player_quests.return_value = []
 
+        # Mock DB stats
+        self.mock_stats = {
+            "STR": {"base": 10}, "END": {"base": 10}, "DEX": {"base": 10},
+            "AGI": {"base": 10}, "MAG": {"base": 10}, "LCK": {"base": 50} # High luck
+        }
+        # get_player_stats_json returns a dict, not a string
+        self.db.get_player_stats_json.return_value = self.mock_stats
+
         # Setup EventHandler
         self.event_handler = EventHandler(self.db, self.quest_system, self.discord_id)
 
-    def test_wild_gathering_trigger(self):
-        """Test that wild gathering triggers when no quest event is found."""
+    def test_wild_gathering_trigger_with_location(self):
+        """Test that wild gathering uses location data."""
 
-        # Mock random to ensure no regeneration (return > regen_chance)
-        # and to ensure wild gathering success (return < 0.30)
-        # resolve_non_combat calls random.randint(1, 100). regen_chance is 70.
-        # So we need > 70. Let's say 80.
-        # Then _perform_wild_gathering calls random.random(). We need < 0.30. Let's say 0.1.
-
-        def side_effect_choice(seq):
-            if isinstance(seq, list) and "medicinal_herb" in seq:
-                return "medicinal_herb"
-            # If it's the phrases list, return the first one
-            return seq[0]
-
-        with patch('random.randint', return_value=80), \
-             patch('random.random', return_value=0.1), \
-             patch('random.choice', side_effect=side_effect_choice):
-
-             result = self.event_handler.resolve_non_combat(regen_chance=70)
-
-             self.assertIn("loot", result)
-             self.assertEqual(result["loot"], {"medicinal_herb": 1})
-             # We check if the item name (or part of the phrase) is in the log.
-             # The item name for "medicinal_herb" is "Medicinal Herb".
-             self.assertTrue(any("Medicinal Herb" in log for log in result["log"]))
-
-    def test_adventure_session_loot_processing(self):
-        """Test that AdventureSession correctly processes the loot returned by EventHandler."""
-
-        # Mock EventHandler to return loot
-        mock_event_result = {
-            "log": ["Found a herb!"],
-            "dead": False,
-            "loot": {"medicinal_herb": 1}
+        # Mock LOCATIONS in event_handler
+        mock_locations = {
+            "test_loc": {
+                "gatherables": [("test_herb", 100)]
+            }
         }
-        self.event_handler.resolve_non_combat = MagicMock(return_value=mock_event_result)
 
-        # Initialize AdventureSession
-        # We need to mock DB methods called in __init__
-        # But AdventureSession __init__ is lightweight if row_data is None
+        # Mock MATERIALS to include test_herb
+        with patch('game_systems.adventure.event_handler.LOCATIONS', mock_locations), \
+             patch.dict('game_systems.adventure.event_handler.MATERIALS', {"test_herb": {"name": "Test Herb"}}):
+
+            # Mock randoms
+            # randint(1, 100) -> 80 (skip regen)
+            # random() -> 0.1 (pass gather chance check < 0.35)
+            # choices -> ["test_herb"]
+            # random() again -> 0.9 (no extra item variance < 0.20)
+
+            with patch('random.randint', return_value=80), \
+                 patch('random.random', side_effect=[0.1, 0.9]), \
+                 patch('random.choices', return_value=["test_herb"]):
+
+                 result = self.event_handler.resolve_non_combat(location_id="test_loc", regen_chance=70)
+
+                 self.assertIn("loot", result)
+                 # Quantity check: Base 1 + (Luck 50 / 25) = 1 + 2 = 3. Cap is 3.
+                 self.assertEqual(result["loot"], {"test_herb": 3})
+                 self.assertTrue(any("Test Herb (x3)" in log for log in result["log"]))
+
+    def test_wild_gathering_no_gatherables(self):
+        """Test fallback when location has no gatherables."""
+
+        mock_locations = {
+            "empty_loc": {
+                "gatherables": []
+            }
+        }
+
+        with patch('game_systems.adventure.event_handler.LOCATIONS', mock_locations):
+            # Should fallback to default pool
+             with patch('random.randint', return_value=80), \
+                  patch('random.random', side_effect=[0.1, 0.9]), \
+                  patch('random.choices', return_value=["medicinal_herb"]): # Fallback pool item
+
+                 result = self.event_handler.resolve_non_combat(location_id="empty_loc", regen_chance=70)
+                 self.assertIn("loot", result)
+                 self.assertIn("medicinal_herb", result["loot"])
+
+    def test_adventure_session_integration(self):
+        """Test that AdventureSession passes location_id correctly."""
 
         session = AdventureSession(self.db, self.quest_system, self.inventory_manager, self.discord_id)
+        session.events = MagicMock()
+        session.events.resolve_non_combat.return_value = {"log": [], "dead": False}
 
-        # Inject our event handler
-        session.events = self.event_handler
+        session.location_id = "test_forest"
 
-        # Mock location
-        with patch('game_systems.adventure.adventure_session.LOCATIONS', {"forest": {"name": "Forest"}}):
-            session.location_id = "forest"
-
-            # Mock other things to bypass combat checks
-            session.active_monster = None
-
-            # Mock save_state to avoid DB calls
-            session.save_state = MagicMock()
-
-            # Run simulate_step
-            # We need to force non-combat path.
-            # AdventureSession calls random.randint(1, 100) > REGEN_CHANCE (40) to trigger encounter.
-            # We want NO encounter, so random <= 40.
-
+        # Mock LOCATIONS
+        with patch('game_systems.adventure.adventure_session.LOCATIONS', {"test_forest": {"name": "Forest"}}):
+            # Force non-combat
             with patch('random.randint', return_value=10):
-                result = session.simulate_step()
+                session.simulate_step()
 
-                # Check if loot was added to session
-                self.assertIn("medicinal_herb", session.loot)
-                self.assertEqual(session.loot["medicinal_herb"], 1)
+                # Check call args
+                session.events.resolve_non_combat.assert_called_with(
+                    location_id="test_forest",
+                    regen_chance=70,
+                    location_name="Forest"
+                )
 
 if __name__ == '__main__':
     unittest.main()

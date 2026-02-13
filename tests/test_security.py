@@ -13,11 +13,13 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import importlib
-import database.database_manager as db_manager_module
-from database.database_manager import DatabaseManager
+
 import database.create_database as db_create
+import database.database_manager as db_manager_module
 import database.populate_database as db_populate
+from database.database_manager import DatabaseManager
 from game_systems.player.player_creator import PlayerCreator
+
 
 class TestSecurity(unittest.TestCase):
     def setUp(self):
