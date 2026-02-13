@@ -17,3 +17,8 @@
 **Vulnerability:** The quest event system progressed "locate" and other objective types whenever a random non-combat event triggered, regardless of the player's current location. This allowed players to complete location-specific quests (e.g. "Locate Hidden Cave") by simply walking in circles in a safe zone.
 **Learning:** Context-sensitive actions (like finding a specific location) must be validated against the current state context (the player's location) before applying progress. Assuming "event happened = progress made" is insecure.
 **Prevention:** Always validate that the current game state (location, inventory, etc.) meets the specific requirements of the objective before granting progress. Pass context explicitly to handler functions.
+
+## 2025-10-27 - Stale State in Persistent Views
+**Vulnerability:** The `InfirmaryView` used cached `PlayerStats` from initialization to calculate healing costs and apply updates. If the player's stats changed in the database (e.g., via equipment swap in another session) while the view was open, the healing logic would use outdated values, leading to potential exploits (overhealing or incorrect costs).
+**Learning:** UI Views in Discord.py are persistent in memory but the underlying database state is not. Relying on `self.attributes` initialized in `__init__` for critical logic is dangerous if that state can change externally.
+**Prevention:** Always re-fetch critical data (like player stats or balances) from the database at the start of any sensitive transactional method (like `_execute_heal`), ensuring the logic uses the current authoritative state.
