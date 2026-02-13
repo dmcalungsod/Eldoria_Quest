@@ -14,6 +14,7 @@ from typing import Any
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.data.materials import MATERIALS
 from game_systems.player.player_stats import PlayerStats
 
 from .adventure_events import AdventureEvents
@@ -136,10 +137,32 @@ class EventHandler:
                                         "dead": False,
                                     }
 
-            # If no matching quest event was found, return generic flavor text
-            msg = f"\n{AdventureEvents.no_event_found()}"
-            return {"log": [msg], "dead": False}
+            # If no matching quest event was found, try wild gathering
+            return self._perform_wild_gathering()
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
             return {"log": ["*The path ahead is unclear.*"], "dead": False}
+
+    def _perform_wild_gathering(self) -> dict[str, Any]:
+        """
+        Attempts to find wild materials if no quest event triggered.
+        """
+        # 30% chance to find something
+        if random.random() < 0.30:
+            gatherables = ["medicinal_herb", "iron_ore", "ancient_wood"]
+            item_key = random.choice(gatherables)
+            mat_data = MATERIALS.get(item_key)
+
+            if mat_data:
+                name = mat_data["name"]
+                event_text = f"\n{AdventureEvents.wild_gather_event(name)}"
+                return {
+                    "log": [event_text],
+                    "dead": False,
+                    "loot": {item_key: 1},
+                }
+
+        # Fallback to nothing found
+        msg = f"\n{AdventureEvents.no_event_found()}"
+        return {"log": [msg], "dead": False}
