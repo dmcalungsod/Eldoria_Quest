@@ -38,6 +38,9 @@ class AdventureManager:
         )
 
         try:
+            # Perform buff cleanup before starting new session
+            self.db.clear_expired_buffs(discord_id)
+
             with self.db.get_connection() as conn:
                 # Cleanup old sessions
                 conn.execute("DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0", (discord_id,))
@@ -190,6 +193,9 @@ class AdventureManager:
 
             start = datetime.datetime.now()
             end = start + datetime.timedelta(hours=1)
+
+            # Perform buff cleanup
+            self.db.clear_expired_buffs(discord_id)
 
             with self.db.get_connection() as conn:
                 conn.execute("DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0", (discord_id,))

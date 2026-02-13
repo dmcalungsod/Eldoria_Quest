@@ -9,3 +9,7 @@
 ## 2024-05-24 - [Combat Stat Caching]
 **Learning:** Repeated property access in `PlayerStats` (which calculates totals on-the-fly) during combat loops added significant overhead, especially in auto-combat.
 **Action:** Pre-calculate a `stats_dict` once per adventure step and pass it to `CombatEngine`. Updated `DamageFormula` to handle dictionary inputs efficiently. Added robust fallbacks for critical stats like Max HP to prevent logic errors if the cache is malformed.
+
+## 2024-05-25 - [Redundant Buff Cleanup on Hot Path]
+**Learning:** `AdventureSession` was executing a `DELETE` query (`clear_expired_buffs`) on every single turn/step to maintain `active_buffs` table hygiene. However, the read query (`get_active_buffs`) already filters out expired rows by timestamp.
+**Action:** Removed the `DELETE` operation from the hot path `_fetch_combat_context`. Moved the cleanup logic to `AdventureManager.start_adventure`, ensuring the table is pruned only when a new session begins (cold path), saving 1 write operation per turn.
