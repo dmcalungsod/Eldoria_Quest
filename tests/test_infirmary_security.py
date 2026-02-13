@@ -1,10 +1,11 @@
-import sys
 import os
+import sys
 import unittest
+
 sys.path.append(os.getcwd())
-from unittest.mock import MagicMock, patch
 import json
-import sqlite3
+from unittest.mock import MagicMock
+
 
 # --- MOCK DISCORD ---
 class MockView:
@@ -34,8 +35,9 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # --- IMPORT MODULE UNDER TEST ---
-from cogs.infirmary_cog import InfirmaryView
-from game_systems.player.player_stats import PlayerStats
+from cogs.infirmary_cog import InfirmaryView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestInfirmaryStateIssue(unittest.TestCase):
     def setUp(self):
