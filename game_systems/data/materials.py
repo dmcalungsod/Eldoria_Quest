@@ -80,4 +80,23 @@ MATERIALS = {
         "rarity": "Rare",
         "value": 400,  # Up from 250
     },
+    # --- Wild Gatherable Materials ---
+    "medicinal_herb": {
+        "name": "Medicinal Herb",
+        "description": "A common herb with slight healing properties.",
+        "rarity": "Common",
+        "value": 5,
+    },
+    "iron_ore": {
+        "name": "Iron Ore",
+        "description": "A chunk of raw iron suitable for smelting.",
+        "rarity": "Common",
+        "value": 12,
+    },
+    "ancient_wood": {
+        "name": "Ancient Wood",
+        "description": "A dense piece of wood from an old tree.",
+        "rarity": "Uncommon",
+        "value": 25,
+    },
 }

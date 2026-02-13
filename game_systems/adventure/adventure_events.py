@@ -61,6 +61,14 @@ class AdventureEvents:
         f"{E.CHECK} You carefully bag evidence linked to **{{}}**.",
     ]
 
+    WILD_GATHER_PHRASES = [
+        f"{E.HERB} You stumble upon **{{}}** growing wild.",
+        f"{E.HERB} A lucky find! You collect **{{}}** from the underbrush.",
+        f"{E.HERB} You notice **{{}}** hidden nearby and secure it.",
+        f"{E.HERB} The environment yields **{{}}** to your keen eye.",
+        f"{E.HERB} You gather **{{}}** while catching your breath.",
+    ]
+
     NO_EVENT_PHRASES = [
         f"{E.FOREST} You search the area but find nothing of interest.",
         f"{E.FOREST} The forest is quiet... too quiet.",
@@ -90,6 +98,10 @@ class AdventureEvents:
         if objective_type in ("examine", "survey"):
             return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
         return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+
+    @staticmethod
+    def wild_gather_event(item_name: str) -> str:
+        return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
 
     @staticmethod
     def no_event_found() -> str:

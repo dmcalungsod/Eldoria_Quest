@@ -189,6 +189,12 @@ class AdventureSession:
             location_name = location.get("name")
             result = self.events.resolve_non_combat(regen_chance=70, location_name=location_name)
             self.logs.extend(result["log"])
+
+            # Process gathered loot
+            if "loot" in result and result["loot"]:
+                for item_key, amount in result["loot"].items():
+                    self.loot[item_key] = self.loot.get(item_key, 0) + amount
+
             self.save_state()
 
             return {"sequence": [result["log"]], "dead": False}
