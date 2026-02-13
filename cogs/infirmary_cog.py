@@ -19,7 +19,7 @@ import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 
-from .ui_helpers import back_to_guild_hall_callback
+from .ui_helpers import back_to_guild_hall_callback, make_progress_bar
 
 logger = logging.getLogger("eldoria.infirmary")
 
@@ -119,13 +119,16 @@ class InfirmaryView(View):
         hp_miss = max(0, stats.max_hp - p_data["current_hp"])
         cost = infirmary_cost(hp_miss)
 
+        hp_bar = make_progress_bar(p_data["current_hp"], stats.max_hp)
+        mp_bar = make_progress_bar(p_data["current_mp"], stats.max_mp)
+
         description = (
             "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
             "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
             "but genuine.\n\n"
             "**Condition**\n"
-            f"> {E.HP} **HP:** {p_data['current_hp']} / {stats.max_hp}\n"
-            f"> {E.MP} **MP:** {p_data['current_mp']} / {stats.max_mp}\n\n"
+            f"> {E.HP} **HP:** `{hp_bar}` {p_data['current_hp']} / {stats.max_hp}\n"
+            f"> {E.MP} **MP:** `{mp_bar}` {p_data['current_mp']} / {stats.max_mp}\n\n"
             "**Purse**\n"
             f"> {E.AURUM} **Aurum:** {p_data['aurum']}\n\n"
         )
