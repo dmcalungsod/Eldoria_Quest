@@ -112,7 +112,7 @@ class EldoriaBot(commands.Bot):
         logger.info("Eldoria Quest is online and ready.")
 
 
-# --- Main Execution ---``
+# --- Main Execution ---
 if __name__ == "__main__":
     # 1. Init Database
     init_db()
