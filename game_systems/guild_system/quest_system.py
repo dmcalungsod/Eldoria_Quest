@@ -109,9 +109,18 @@ class QuestSystem:
             if exists:
                 return False
 
-            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1})
+            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1})
             if not quest:
                 return False
+
+            # --- SECURITY CHECK ---
+            player_rank = self.db.get_guild_member_field(discord_id, "rank")
+            if quest.get("tier") != player_rank:
+                logger.warning(
+                    f"Security: User {discord_id} (Rank {player_rank}) tried to accept Quest {quest_id} (Rank {quest.get('tier')})"
+                )
+                return False
+            # ----------------------
 
             try:
                 objectives = json.loads(quest["objectives"])

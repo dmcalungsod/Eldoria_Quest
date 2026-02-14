@@ -22,3 +22,8 @@
 **Vulnerability:** The `InfirmaryView` used cached `PlayerStats` from initialization to calculate healing costs and apply updates. If the player's stats changed in the database (e.g., via equipment swap in another session) while the view was open, the healing logic would use outdated values, leading to potential exploits (overhealing or incorrect costs).
 **Learning:** UI Views in Discord.py are persistent in memory but the underlying database state is not. Relying on `self.attributes` initialized in `__init__` for critical logic is dangerous if that state can change externally.
 **Prevention:** Always re-fetch critical data (like player stats or balances) from the database at the start of any sensitive transactional method (like `_execute_heal`), ensuring the logic uses the current authoritative state.
+
+## 2025-10-27 - Quest Acceptance Rank Bypass
+**Vulnerability:** `QuestSystem.accept_quest` allowed accepting quests of any tier by ID, bypassing the rank filtering used in the UI. A low-rank player could accept a high-rank quest if they knew the ID.
+**Learning:** Filtering at the UI/List level (`get_available_quests`) is insufficient. Critical state-changing actions must re-validate authorization/eligibility on the server side, as input IDs can be manipulated or stale.
+**Prevention:** Always re-validate eligibility (Rank, Level, Cost) within the transactional method itself, treating the ID as untrusted input.
