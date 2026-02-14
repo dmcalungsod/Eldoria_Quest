@@ -178,60 +178,49 @@ class AdventureRewards:
         gains = {k: fn(br) for k, fn in STAT_EXP_GAINS.items()}
 
         try:
-            with self.db.get_connection() as conn:
-                row = conn.execute(
-                    "SELECT stats_json, str_exp, end_exp, dex_exp, agi_exp, mag_exp, lck_exp FROM stats WHERE discord_id=?",
-                    (self.discord_id,),
-                ).fetchone()
+            row = self.db.get_stat_exp_row(self.discord_id)
 
-                if not row:
-                    return
+            if not row:
+                return
 
-                stats_data = json.loads(row["stats_json"])
-                base_stats = {k: v.get("base", 1) for k, v in stats_data.items()}
+            stats_data = json.loads(row["stats_json"])
+            base_stats = {k: v.get("base", 1) for k, v in stats_data.items()}
 
-                # Mutable exp dict
-                curr_exp = {k: row[k] for k in STAT_EXP_GAINS.keys()}
-                level_up_msgs = []
+            # Mutable exp dict
+            curr_exp = {k: row[k] for k in STAT_EXP_GAINS.keys()}
+            level_up_msgs = []
 
-                for exp_key, gain in gains.items():
-                    if gain <= 0:
-                        continue
+            for exp_key, gain in gains.items():
+                if gain <= 0:
+                    continue
 
-                    stat_key = exp_key.split("_")[0].upper()
-                    curr_exp[exp_key] += gain
+                stat_key = exp_key.split("_")[0].upper()
+                curr_exp[exp_key] += gain
 
-                    # Check Threshold
-                    while curr_exp[exp_key] >= STAT_EXP_THRESHOLD:
-                        curr_exp[exp_key] -= STAT_EXP_THRESHOLD
-                        base_stats[stat_key] += 1
-                        if stat_key in STAT_UP_MESSAGES:
-                            level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
+                # Check Threshold
+                while curr_exp[exp_key] >= STAT_EXP_THRESHOLD:
+                    curr_exp[exp_key] -= STAT_EXP_THRESHOLD
+                    base_stats[stat_key] += 1
+                    if stat_key in STAT_UP_MESSAGES:
+                        level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
 
-                # Save updates
-                for s, v in base_stats.items():
-                    stats_data[s]["base"] = v
+            # Save updates
+            for s, v in base_stats.items():
+                stats_data[s]["base"] = v
 
-                conn.execute(
-                    """
-                    UPDATE stats
-                    SET stats_json=?, str_exp=?, end_exp=?, dex_exp=?, agi_exp=?, mag_exp=?, lck_exp=?
-                    WHERE discord_id=?
-                    """,
-                    (
-                        json.dumps(stats_data),
-                        curr_exp["str_exp"],
-                        curr_exp["end_exp"],
-                        curr_exp["dex_exp"],
-                        curr_exp["agi_exp"],
-                        curr_exp["mag_exp"],
-                        curr_exp["lck_exp"],
-                        self.discord_id,
-                    ),
-                )
+            self.db.update_stat_exp(
+                self.discord_id,
+                json.dumps(stats_data),
+                curr_exp["str_exp"],
+                curr_exp["end_exp"],
+                curr_exp["dex_exp"],
+                curr_exp["agi_exp"],
+                curr_exp["mag_exp"],
+                curr_exp["lck_exp"],
+            )
 
-                if level_up_msgs:
-                    logs.append("\n" + "\n".join(level_up_msgs))
+            if level_up_msgs:
+                logs.append("\n" + "\n".join(level_up_msgs))
 
         except Exception as e:
             logger.error(f"Stat XP error: {e}")
@@ -247,45 +236,33 @@ class AdventureRewards:
             return
 
         try:
-            with self.db.get_connection() as conn:
-                msgs = []
-                for s_key, count in usage.items():
-                    row = conn.execute(
-                        """
-                        SELECT skill_level, skill_exp, s.name
-                        FROM player_skills ps JOIN skills s ON ps.skill_key = s.key_id
-                        WHERE ps.discord_id=? AND ps.skill_key=?
-                        """,
-                        (self.discord_id, s_key),
-                    ).fetchone()
+            msgs = []
+            for s_key, count in usage.items():
+                row = self.db.get_skill_with_definition(self.discord_id, s_key)
 
-                    if not row:
-                        continue
+                if not row:
+                    continue
 
-                    lvl, exp, name = row["skill_level"], row["skill_exp"], row["name"]
-                    gain = count * SKILL_EXP_PER_USE
-                    exp += gain
+                lvl, exp, name = row["skill_level"], row["skill_exp"], row["name"]
+                gain = count * SKILL_EXP_PER_USE
+                exp += gain
 
-                    while exp >= SKILL_EXP_THRESHOLD:
-                        exp -= SKILL_EXP_THRESHOLD
-                        lvl += 1
-                        msgs.append(f"{E.LEVEL_UP} **{name}** reached **Level {lvl}**!")
+                while exp >= SKILL_EXP_THRESHOLD:
+                    exp -= SKILL_EXP_THRESHOLD
+                    lvl += 1
+                    msgs.append(f"{E.LEVEL_UP} **{name}** reached **Level {lvl}**!")
 
-                    conn.execute(
-                        "UPDATE player_skills SET skill_level=?, skill_exp=? WHERE discord_id=? AND skill_key=?",
-                        (lvl, exp, self.discord_id, s_key),
-                    )
+                self.db.update_player_skill(self.discord_id, s_key, skill_level=lvl, skill_exp=exp)
 
-                if msgs:
-                    logs.append("\n" + "\n".join(msgs))
+            if msgs:
+                logs.append("\n" + "\n".join(msgs))
         except Exception as e:
             logger.error(f"Skill XP error: {e}")
 
     def _increment_kill_counter(self, tier):
-        col = {"Normal": "normal_kills", "Elite": "elite_kills", "Boss": "boss_kills"}.get(tier)
-        if col:
-            with self.db.get_connection() as conn:
-                conn.execute(f"UPDATE guild_members SET {col} = {col} + 1 WHERE discord_id=?", (self.discord_id,))
+        field = {"Normal": "normal_kills", "Elite": "elite_kills", "Boss": "boss_kills"}.get(tier)
+        if field:
+            self.db.increment_guild_stat(self.discord_id, field)
 
     def _add_loot_to_session(self, session_loot, key, amt):
         session_loot[key] = session_loot.get(key, 0) + amt

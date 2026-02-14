@@ -100,11 +100,7 @@ class DevPanelView(View):
     # --- Actions ---
     def _grant(self, exp=0, aurum=0, vestige=0):
         try:
-            with self.db.get_connection() as conn:
-                conn.execute(
-                    "UPDATE players SET experience=experience+?, aurum=aurum+?, vestige_pool=vestige_pool+? WHERE discord_id=?",
-                    (exp, aurum, vestige, self.interaction_user.id),
-                )
+            self.db.admin_grant(self.interaction_user.id, exp=exp, aurum=aurum, vestige=vestige)
             logger.warning(f"ADMIN GRANT: {self.interaction_user.name} gave self {exp}XP, {aurum}G, {vestige}V")
         except Exception as e:
             logger.error(f"Grant failed: {e}")

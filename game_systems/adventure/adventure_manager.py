@@ -41,19 +41,15 @@ class AdventureManager:
             # Perform buff cleanup before starting new session
             self.db.clear_expired_buffs(discord_id)
 
-            with self.db.get_connection() as conn:
-                # Cleanup old sessions
-                conn.execute("DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0", (discord_id,))
-
-                # Create new session
-                conn.execute(
-                    """
-                    INSERT OR REPLACE INTO adventure_sessions
-                    (discord_id, location_id, start_time, end_time, duration_minutes, active, logs, loot_collected)
-                    VALUES (?, ?, ?, ?, ?, 1, '[]', '{}')
-                    """,
-                    (discord_id, location_id, start_time.isoformat(), end_time.isoformat(), duration_minutes),
-                )
+            # Cleanup old sessions and create new one
+            self.db.delete_adventure_session(discord_id, active=0)
+            self.db.insert_adventure_session(
+                discord_id,
+                location_id,
+                start_time.isoformat(),
+                end_time.isoformat(),
+                duration_minutes,
+            )
             return True
         except Exception as e:
             logger.error(f"Failed to start adventure for {discord_id}: {e}")
@@ -61,10 +57,7 @@ class AdventureManager:
 
     def get_active_session(self, discord_id: int):
         try:
-            with self.db.get_connection() as conn:
-                return conn.execute(
-                    "SELECT * FROM adventure_sessions WHERE discord_id = ? AND active = 1", (discord_id,)
-                ).fetchone()
+            return self.db.get_active_adventure(discord_id)
         except Exception as e:
             logger.error(f"Error fetching session for {discord_id}: {e}")
             return None
@@ -89,16 +82,14 @@ class AdventureManager:
             stats_json = self.db.get_player_stats_json(discord_id)
             p_stats = PlayerStats.from_dict(stats_json)
 
-            with self.db.get_connection() as conn:
-                items = self._grant_rewards_internal(session, 0, conn, p_stats)
+            items = self._grant_rewards_internal(session, 0, p_stats)
 
             for item in items:
                 self.inventory_manager.add_item(
                     discord_id, item["key"], item["name"], item["type"], item["rarity"], item["amount"]
                 )
 
-            with self.db.get_connection() as conn:
-                conn.execute("UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?", (discord_id,))
+            self.db.end_adventure_session(discord_id)
 
         except Exception as e:
             logger.error(f"Error handling death for {discord_id}: {e}")
@@ -110,35 +101,30 @@ class AdventureManager:
             items_to_add = []
             summary = None
 
-            with self.db.get_connection() as conn:
-                row = conn.execute(
-                    "SELECT * FROM adventure_sessions WHERE discord_id = ? AND active = 1", (discord_id,)
-                ).fetchone()
-                if not row:
-                    return None
+            row = self.db.get_active_adventure(discord_id)
+            if not row:
+                return None
 
-                session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
-                total_exp = session.loot.pop("exp", 0)
+            session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
+            total_exp = session.loot.pop("exp", 0)
 
-                # Capture state before rewards
-                p_row = conn.execute("SELECT level FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
-                old_level = p_row["level"]
+            # Capture state before rewards
+            old_level = self.db.get_player_field(discord_id, "level")
 
-                items_to_add = self._grant_rewards_internal(session, total_exp, conn, p_stats)
+            items_to_add = self._grant_rewards_internal(session, total_exp, p_stats)
 
-                # Capture state after rewards
-                p_row_new = conn.execute("SELECT level FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
-                new_level = p_row_new["level"]
+            # Capture state after rewards
+            new_level = self.db.get_player_field(discord_id, "level")
 
-                conn.execute("UPDATE adventure_sessions SET active = 0 WHERE discord_id = ?", (discord_id,))
+            self.db.end_adventure_session(discord_id)
 
-                summary = {
-                    "loot": items_to_add,
-                    "xp_gained": total_exp,
-                    "old_level": old_level,
-                    "new_level": new_level,
-                    "leveled_up": new_level > old_level,
-                }
+            summary = {
+                "loot": items_to_add,
+                "xp_gained": total_exp,
+                "old_level": old_level,
+                "new_level": new_level,
+                "leveled_up": new_level > old_level,
+            }
 
             for item in items_to_add:
                 self.inventory_manager.add_item(
@@ -151,9 +137,9 @@ class AdventureManager:
             logger.error(f"Error ending adventure for {discord_id}: {e}", exc_info=True)
             return None
 
-    def _grant_rewards_internal(self, session, total_exp, conn, player_stats):
-        """Helper to calculate rewards inside an existing DB transaction."""
-        p_row = conn.execute("SELECT * FROM players WHERE discord_id = ?", (session.discord_id,)).fetchone()
+    def _grant_rewards_internal(self, session, total_exp, player_stats):
+        """Helper to calculate and apply rewards."""
+        p_row = self.db.get_player(session.discord_id)
 
         level_sys = LevelUpSystem(
             stats=player_stats, level=p_row["level"], exp=p_row["experience"], exp_to_next=p_row["exp_to_next"]
@@ -166,22 +152,15 @@ class AdventureManager:
         current_hp = p_row["current_hp"]
         saved_hp = 1 if current_hp <= 0 else current_hp
 
-        conn.execute(
-            """
-            UPDATE players
-            SET level = ?, experience = ?, exp_to_next = ?, vestige_pool = vestige_pool + ?, current_hp = ?, current_mp = ?
-            WHERE discord_id = ?
-            """,
-            (
-                level_sys.level,
-                level_sys.exp,
-                level_sys.exp_to_next,
-                total_exp,
-                saved_hp,
-                level_sys.stats.max_mp,
-                session.discord_id,
-            ),
+        self.db.update_player_fields(
+            session.discord_id,
+            level=level_sys.level,
+            experience=level_sys.exp,
+            exp_to_next=level_sys.exp_to_next,
+            current_hp=saved_hp,
+            current_mp=level_sys.stats.max_mp,
         )
+        self.db.increment_player_fields(session.discord_id, vestige_pool=total_exp)
 
         items_awarded = []
         for item_key, count in session.loot.items():
@@ -217,22 +196,24 @@ class AdventureManager:
             # Perform buff cleanup
             self.db.clear_expired_buffs(discord_id)
 
-            with self.db.get_connection() as conn:
-                conn.execute("DELETE FROM adventure_sessions WHERE discord_id = ? AND active = 0", (discord_id,))
-                conn.execute(
-                    """
-                    INSERT OR REPLACE INTO adventure_sessions
-                    (discord_id, location_id, start_time, end_time, duration_minutes, active, logs, loot_collected, active_monster_json)
-                    VALUES (?, 'guild_arena', ?, ?, -1, 1, ?, '{}', ?)
-                    """,
-                    (
-                        discord_id,
-                        start.isoformat(),
-                        end.isoformat(),
-                        json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
-                        json.dumps(active_monster),
-                    ),
-                )
+            # Cleanup old sessions
+            self.db.delete_adventure_session(discord_id, active=0)
+
+            # Create promotion trial session
+            self.db._col("adventure_sessions").delete_many({"discord_id": discord_id})
+            self.db._col("adventure_sessions").insert_one(
+                {
+                    "discord_id": discord_id,
+                    "location_id": "guild_arena",
+                    "start_time": start.isoformat(),
+                    "end_time": end.isoformat(),
+                    "duration_minutes": -1,
+                    "active": 1,
+                    "logs": json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
+                    "loot_collected": "{}",
+                    "active_monster_json": json.dumps(active_monster),
+                }
+            )
             return True
         except Exception as e:
             logger.error(f"Failed to start trial for {discord_id}: {e}")

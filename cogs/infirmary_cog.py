@@ -7,10 +7,8 @@ Atmosphere restored.
 """
 
 import asyncio
-import json
 import logging
 import math
-import sqlite3
 
 import discord
 from discord.ext import commands
@@ -30,15 +28,15 @@ def infirmary_cost(missing_hp: int) -> int:
 
 
 class InfirmaryView(View):
-    def __init__(self, db: DatabaseManager, user: discord.User, p_data: sqlite3.Row, stats: PlayerStats):
+    def __init__(self, db: DatabaseManager, user: discord.User, p_data, stats: PlayerStats):
         super().__init__(timeout=180)
         self.db = db
         self.user = user
-        self.p_data = p_data
+        self.p_data = dict(p_data) if not isinstance(p_data, dict) else p_data
         self.stats = stats
 
-        current_hp = p_data["current_hp"]
-        current_mp = p_data["current_mp"]
+        current_hp = self.p_data["current_hp"]
+        current_mp = self.p_data["current_mp"]
         self.missing_hp = max(0, stats.max_hp - current_hp)
         self.missing_mp = max(0, stats.max_mp - current_mp)
         self.cost = infirmary_cost(self.missing_hp)
@@ -49,7 +47,7 @@ class InfirmaryView(View):
         style = discord.ButtonStyle.primary if not disabled else discord.ButtonStyle.secondary
 
         # Disable if broke
-        if p_data["aurum"] < self.cost:
+        if self.p_data["aurum"] < self.cost:
             disabled = True
             label = "Insufficient Funds"
 
@@ -71,42 +69,37 @@ class InfirmaryView(View):
 
     def _execute_heal(self) -> tuple[bool, str]:
         try:
-            with self.db.get_connection() as conn:
-                # Re-fetch to ensure atomic accuracy
-                row = conn.execute(
-                    "SELECT current_hp, current_mp, aurum FROM players WHERE discord_id=?", (self.user.id,)
-                ).fetchone()
+            # Re-fetch to ensure atomic accuracy
+            vitals = self.db.get_player_vitals(self.user.id)
+            aurum = self.db.get_player_field(self.user.id, "aurum")
 
-                # SECURITY: Fetch fresh stats to avoid stale state exploits
-                # (e.g. equipping gear in another tab then healing for cheap)
-                stats_row = conn.execute(
-                    "SELECT stats_json FROM stats WHERE discord_id=?", (self.user.id,)
-                ).fetchone()
+            # SECURITY: Fetch fresh stats to avoid stale state exploits
+            stats_json = self.db.get_player_stats_json(self.user.id)
+            if stats_json:
+                fresh_stats = PlayerStats.from_dict(stats_json)
+                max_hp = fresh_stats.max_hp
+                max_mp = fresh_stats.max_mp
+            else:
+                max_hp = self.stats.max_hp
+                max_mp = self.stats.max_mp
 
-                if stats_row and stats_row["stats_json"]:
-                    fresh_stats = PlayerStats.from_dict(json.loads(stats_row["stats_json"]))
-                    max_hp = fresh_stats.max_hp
-                    max_mp = fresh_stats.max_mp
-                else:
-                    max_hp = self.stats.max_hp
-                    max_mp = self.stats.max_mp
+            if not vitals:
+                return False, "Player data error."
 
-                # Re-calculate costs dynamically
-                missing = max(0, max_hp - row["current_hp"])
-                cost = infirmary_cost(missing)
+            # Re-calculate costs dynamically
+            missing = max(0, max_hp - vitals["current_hp"])
+            cost = infirmary_cost(missing)
 
-                if missing == 0 and row["current_mp"] >= max_mp:
-                    return False, "You are already healthy."
+            if missing == 0 and vitals["current_mp"] >= max_mp:
+                return False, "You are already healthy."
 
-                if row["aurum"] < cost:
-                    return False, "Insufficient funds."
+            if aurum is None or aurum < cost:
+                return False, "Insufficient funds."
 
-                # Apply
-                conn.execute(
-                    "UPDATE players SET current_hp=?, current_mp=?, aurum=? WHERE discord_id=?",
-                    (max_hp, max_mp, row["aurum"] - cost, self.user.id),
-                )
-                return True, f"Restored HP/MP for {cost} Aurum."
+            # Apply
+            self.db.set_player_vitals(self.user.id, max_hp, max_mp)
+            self.db.set_player_field(self.user.id, "aurum", aurum - cost)
+            return True, f"Restored HP/MP for {cost} Aurum."
         except Exception as e:
             logger.error(f"Heal error: {e}")
             return False, "System error."
@@ -131,21 +124,22 @@ class InfirmaryView(View):
 
     @staticmethod
     def build_infirmary_embed(p_data, stats, msg=None, success=True) -> discord.Embed:
-        hp_miss = max(0, stats.max_hp - p_data["current_hp"])
+        p = dict(p_data) if not isinstance(p_data, dict) else p_data
+        hp_miss = max(0, stats.max_hp - p["current_hp"])
         cost = infirmary_cost(hp_miss)
 
-        hp_bar = make_progress_bar(p_data["current_hp"], stats.max_hp)
-        mp_bar = make_progress_bar(p_data["current_mp"], stats.max_mp)
+        hp_bar = make_progress_bar(p["current_hp"], stats.max_hp)
+        mp_bar = make_progress_bar(p["current_mp"], stats.max_mp)
 
         description = (
             "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
             "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
             "but genuine.\n\n"
             "**Condition**\n"
-            f"> {E.HP} **HP:** `{hp_bar}` {p_data['current_hp']} / {stats.max_hp}\n"
-            f"> {E.MP} **MP:** `{mp_bar}` {p_data['current_mp']} / {stats.max_mp}\n\n"
+            f"> {E.HP} **HP:** `{hp_bar}` {p['current_hp']} / {stats.max_hp}\n"
+            f"> {E.MP} **MP:** `{mp_bar}` {p['current_mp']} / {stats.max_mp}\n\n"
             "**Purse**\n"
-            f"> {E.AURUM} **Aurum:** {p_data['aurum']}\n\n"
+            f"> {E.AURUM} **Aurum:** {p['aurum']}\n\n"
         )
 
         if hp_miss > 0:
@@ -154,7 +148,7 @@ class InfirmaryView(View):
             description += "You stand in peak condition; no treatment is required."
 
         embed = discord.Embed(
-            title="🏥 Adventurer’s Guild — Infirmary", description=description, color=discord.Color.dark_grey()
+            title="🏥 Adventurer's Guild — Infirmary", description=description, color=discord.Color.dark_grey()
         )
 
         if msg:

@@ -9,7 +9,6 @@ Atmosphere restored.
 import asyncio
 import logging
 import math
-import sqlite3
 
 import discord
 from discord.ext import commands
@@ -36,12 +35,12 @@ class SkillTrainerView(View):
         self,
         db_manager: DatabaseManager,
         interaction_user: discord.User,
-        player_data: sqlite3.Row,
+        player_data,
     ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
-        self.player_data = dict(player_data)  # Convert to dict for safe local mutation
+        self.player_data = dict(player_data) if not isinstance(player_data, dict) else player_data
 
         self.vestige_pool = self.player_data["vestige_pool"]
         self.player_class_id = self.player_data["class_id"]
@@ -66,12 +65,8 @@ class SkillTrainerView(View):
     def _get_player_skills_sync(self) -> dict:
         """Helper to get skills for UI setup."""
         try:
-            with self.db.get_connection() as conn:
-                rows = conn.execute(
-                    "SELECT skill_key, skill_level FROM player_skills WHERE discord_id = ?",
-                    (self.interaction_user.id,),
-                ).fetchall()
-            return {row["skill_key"]: row["skill_level"] for row in rows}
+            skills = self.db.get_all_player_skills(self.interaction_user.id)
+            return {s["skill_key"]: s["skill_level"] for s in skills}
         except Exception:
             return {}
 
@@ -175,35 +170,7 @@ class SkillTrainerView(View):
                 return False, "Invalid skill."
 
             cost = skill_data["learn_cost"]
-
-            with self.db.get_connection() as conn:
-                # 1. Verify Funds
-                row = conn.execute(
-                    "SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,)
-                ).fetchone()
-
-                if not row or row["vestige_pool"] < cost:
-                    return False, "Insufficient Vestige."
-
-                # 2. Check if already learned
-                exists = conn.execute(
-                    "SELECT 1 FROM player_skills WHERE discord_id = ? AND skill_key = ?",
-                    (self.interaction_user.id, skill_key),
-                ).fetchone()
-
-                if exists:
-                    return False, "Skill already learned."
-
-                # 3. Deduct & Learn
-                conn.execute(
-                    "UPDATE players SET vestige_pool = vestige_pool - ? WHERE discord_id = ?",
-                    (cost, self.interaction_user.id),
-                )
-                conn.execute(
-                    "INSERT INTO player_skills (discord_id, skill_key, skill_level) VALUES (?, ?, 1)",
-                    (self.interaction_user.id, skill_key),
-                )
-            return True, "Skill Learned!"
+            return self.db.learn_skill(self.interaction_user.id, skill_key, cost)
         except Exception as e:
             logger.error(f"Learn skill error: {e}")
             return False, "System error."
@@ -217,38 +184,7 @@ class SkillTrainerView(View):
 
             base_cost = skill_data["upgrade_cost"]
 
-            with self.db.get_connection() as conn:
-                # 1. Get Current Level
-                skill_row = conn.execute(
-                    "SELECT skill_level FROM player_skills WHERE discord_id = ? AND skill_key = ?",
-                    (self.interaction_user.id, skill_key),
-                ).fetchone()
-
-                if not skill_row:
-                    return False, "Skill not learned.", 0
-
-                current_level = skill_row["skill_level"]
-                cost = get_upgrade_cost(base_cost, current_level)
-                new_level = current_level + 1
-
-                # 2. Verify Funds
-                player_row = conn.execute(
-                    "SELECT vestige_pool FROM players WHERE discord_id = ?", (self.interaction_user.id,)
-                ).fetchone()
-
-                if not player_row or player_row["vestige_pool"] < cost:
-                    return False, "Insufficient Vestige.", current_level
-
-                # 3. Deduct & Upgrade
-                conn.execute(
-                    "UPDATE players SET vestige_pool = vestige_pool - ? WHERE discord_id = ?",
-                    (cost, self.interaction_user.id),
-                )
-                conn.execute(
-                    "UPDATE player_skills SET skill_level = ? WHERE discord_id = ? AND skill_key = ?",
-                    (new_level, self.interaction_user.id, skill_key),
-                )
-            return True, "Skill Upgraded!", new_level
+            return self.db.upgrade_skill(self.interaction_user.id, skill_key, base_cost)
         except Exception as e:
             logger.error(f"Upgrade skill error: {e}")
             return False, "System error.", 0

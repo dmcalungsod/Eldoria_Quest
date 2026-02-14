@@ -12,7 +12,7 @@ services:
         sync: false          # Set manually in Render dashboard
       - key: GUILD_ID
         sync: false
-      - key: DATABASE_NAME
-        value: EQ_Game.db
+      - key: MONGO_URI
+        sync: false          # Set manually in Render dashboard
       - key: PYTHON_VERSION
         value: "3.13.9"

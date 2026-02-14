@@ -237,11 +237,7 @@ class AdventureSession:
         for _ in range(8):
             # FIX: Pass session XP
             result = self.combat.resolve_turn(
-                self.active_monster,
-                report,
-                current_session_exp,
-                context=context,
-                persist_vitals=False
+                self.active_monster, report, current_session_exp, context=context, persist_vitals=False
             )
             turn_reports.append(result.get("turn_report", {}))
 
@@ -315,9 +311,7 @@ class AdventureSession:
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
-        result = self.combat.resolve_turn(
-            self.active_monster, report, current_session_exp, context=context
-        )
+        result = self.combat.resolve_turn(self.active_monster, report, current_session_exp, context=context)
 
         turn_logs = result["phrases"]
         is_dead = False
@@ -361,20 +355,12 @@ class AdventureSession:
         trimmed_logs = self.logs[-30:]
 
         try:
-            with self.db.get_connection() as conn:
-                conn.execute(
-                    """
-                    UPDATE adventure_sessions
-                    SET logs=?, loot_collected=?, active=?, active_monster_json=?
-                    WHERE discord_id=? AND active=1
-                    """,
-                    (
-                        json.dumps(trimmed_logs),
-                        json.dumps(self.loot),
-                        1 if self.active else 0,
-                        m_json,
-                        self.discord_id,
-                    ),
-                )
+            self.db.update_adventure_session(
+                self.discord_id,
+                logs=json.dumps(trimmed_logs),
+                loot_collected=json.dumps(self.loot),
+                active=1 if self.active else 0,
+                active_monster_json=m_json,
+            )
         except Exception as e:
             logger.error(f"[AdventureSession] Failed to save state for {self.discord_id}: {e}")

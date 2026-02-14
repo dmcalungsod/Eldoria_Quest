@@ -2,16 +2,16 @@
 item_manager.py
 
 Unified item lookup system.
-Hardened with parameterized queries and safe table whitelisting.
+Hardened with safe collection lookups for MongoDB.
 """
 
 import json
 import logging
 import random
-import sqlite3
+
+from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.items")
-DB_NAME = "EQ_Game.db"
 
 STAT_MAP = {
     "str_bonus": "STR",
@@ -25,14 +25,8 @@ VALID_EQUIP_TABLES = {"equipment", "class_equipment"}
 
 
 class ItemManager:
-    def __init__(self, db_path=DB_NAME):
-        self.db_path = db_path
-
-    def connect(self):
-        """Creates a read-only connection for lookups."""
-        conn = sqlite3.connect(self.db_path, timeout=5.0)
-        conn.row_factory = sqlite3.Row
-        return conn
+    def __init__(self):
+        self.db = DatabaseManager()
 
     def get_equipment_stats(self, item_key: str, source_table: str) -> dict:
         """Fetches stats for a specific item safely."""
@@ -41,14 +35,10 @@ class ItemManager:
             return {}
 
         try:
-            with self.connect() as conn:
-                # Safe f-string: source_table is whitelisted above
-                row = conn.execute(f"SELECT * FROM {source_table} WHERE id = ?", (item_key,)).fetchone()
-
-                if not row:
-                    return {}
-
-                return {stat: row[key] for key, stat in STAT_MAP.items() if key in row.keys() and row[key] != 0}
+            row = self.db._col(source_table).find_one({"id": int(item_key)}, {"_id": 0})
+            if not row:
+                return {}
+            return {stat: row[key] for key, stat in STAT_MAP.items() if key in row and row[key] != 0}
         except Exception as e:
             logger.error(f"Error fetching stats for {item_key}: {e}")
             return {}
@@ -56,36 +46,37 @@ class ItemManager:
     # --------------------------------------------------------------------
     # GENERIC ITEM LOOKUP
     # --------------------------------------------------------------------
-    def _lookup(self, table: str, query: str, params: tuple) -> sqlite3.Row | None:
+    def _lookup(self, collection_name: str, query: dict) -> dict | None:
         """Internal helper for safe single-row lookups."""
         try:
-            with self.connect() as conn:
-                return conn.execute(f"SELECT * FROM {table} WHERE {query}", params).fetchone()
+            return self.db._col(collection_name).find_one(query, {"_id": 0})
         except Exception as e:
-            logger.error(f"Lookup error in {table}: {e}")
+            logger.error(f"Lookup error in {collection_name}: {e}")
             return None
 
     def get_equipment_by_id(self, equip_id: int):
-        return self._lookup("equipment", "id = ?", (equip_id,))
+        return self._lookup("equipment", {"id": equip_id})
 
     def get_equipment_by_name(self, name: str):
-        return self._lookup("equipment", "name LIKE ?", (f"%{name}%",))
+        return self._lookup("equipment", {"name": {"$regex": name, "$options": "i"}})
 
     def get_consumable(self, name: str):
-        return self._lookup("consumables", "name LIKE ?", (f"%{name}%",))
+        return self._lookup("consumables", {"name": {"$regex": name, "$options": "i"}})
 
     def get_quest_item(self, name: str):
-        return self._lookup("quest_items", "name LIKE ?", (f"%{name}%",))
+        return self._lookup("quest_items", {"name": {"$regex": name, "$options": "i"}})
 
     # --------------------------------------------------------------------
     # CLASS EQUIPMENT
     # --------------------------------------------------------------------
     def get_class_equipment_for_class(self, class_id: int, level: int = 1):
         try:
-            with self.connect() as conn:
-                return conn.execute(
-                    "SELECT * FROM class_equipment WHERE class_id = ? AND min_level <= ?", (class_id, level)
-                ).fetchall()
+            return list(
+                self.db._col("class_equipment").find(
+                    {"class_id": class_id, "min_level": {"$lte": level}},
+                    {"_id": 0},
+                )
+            )
         except Exception as e:
             logger.error(f"Class equipment lookup error: {e}")
             return []
@@ -113,20 +104,25 @@ class ItemManager:
             rarity = self.roll_rarity()
             level = monster_row.get("level", 1)
 
-            with self.connect() as conn:
-                # Get one random item matching criteria
-                row = conn.execute(
-                    """
-                    SELECT id, name, rarity, slot, 'equipment' AS source
-                    FROM equipment
-                    WHERE rarity = ? AND min_level <= ?
-                    ORDER BY RANDOM() LIMIT 1
-                    """,
-                    (rarity, level),
-                ).fetchone()
+            # Use MongoDB aggregation for random sampling
+            pipeline = [
+                {"$match": {"rarity": rarity, "min_level": {"$lte": level}}},
+                {"$sample": {"size": 1}},
+                {"$project": {"_id": 0}},
+            ]
+            results = list(self.db._col("equipment").aggregate(pipeline))
 
-                if row:
-                    loot.append(dict(row))
+            if results:
+                row = results[0]
+                loot.append(
+                    {
+                        "id": row["id"],
+                        "name": row["name"],
+                        "rarity": row["rarity"],
+                        "slot": row.get("slot"),
+                        "source": "equipment",
+                    }
+                )
         except Exception as e:
             logger.error(f"Loot generation error: {e}")
 
@@ -136,23 +132,28 @@ class ItemManager:
     # SEARCH
     # --------------------------------------------------------------------
     def search_items(self, text: str):
-        """Searches all item tables safely."""
-        search_term = f"%{text}%"
+        """Searches all item collections."""
         try:
-            with self.connect() as conn:
-                # UNION ALL query to search everything at once
-                return conn.execute(
-                    """
-                    SELECT id, name, rarity, slot, 'equipment' AS table_name FROM equipment WHERE name LIKE ?
-                    UNION ALL
-                    SELECT id, name, rarity, slot, 'class_equipment' FROM class_equipment WHERE name LIKE ?
-                    UNION ALL
-                    SELECT id, name, rarity, NULL, 'consumables' FROM consumables WHERE name LIKE ?
-                    UNION ALL
-                    SELECT id, name, rarity, NULL, 'quest_items' FROM quest_items WHERE name LIKE ?
-                    """,
-                    (search_term, search_term, search_term, search_term),
-                ).fetchall()
+            regex_filter = {"$regex": text, "$options": "i"}
+            results = []
+
+            # Equipment
+            for row in self.db._col("equipment").find({"name": regex_filter}, {"_id": 0}):
+                results.append({**row, "table_name": "equipment"})
+
+            # Class Equipment
+            for row in self.db._col("class_equipment").find({"name": regex_filter}, {"_id": 0}):
+                results.append({**row, "table_name": "class_equipment"})
+
+            # Consumables
+            for row in self.db._col("consumables").find({"name": regex_filter}, {"_id": 0}):
+                results.append({**row, "table_name": "consumables"})
+
+            # Quest Items
+            for row in self.db._col("quest_items").find({"name": regex_filter}, {"_id": 0}):
+                results.append({**row, "table_name": "quest_items"})
+
+            return results
         except Exception as e:
             logger.error(f"Search error: {e}")
             return []

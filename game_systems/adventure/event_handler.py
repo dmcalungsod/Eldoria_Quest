@@ -53,35 +53,28 @@ class EventHandler:
             stats_json = self.db.get_player_stats_json(self.discord_id)
             stats = PlayerStats.from_dict(stats_json)
 
-            with self.db.get_connection() as conn:
-                # Fetch current vitals inside transaction to ensure currency
-                row = conn.execute(
-                    "SELECT current_hp, current_mp FROM players WHERE discord_id = ?", (self.discord_id,)
-                ).fetchone()
+            row = self.db.get_player_vitals(self.discord_id)
 
-                if not row:
-                    return {"log": ["Error: Player data not found."], "dead": False}
+            if not row:
+                return {"log": ["Error: Player data not found."], "dead": False}
 
-                current_hp = row["current_hp"]
-                current_mp = row["current_mp"]
+            current_hp = row["current_hp"]
+            current_mp = row["current_mp"]
 
-                # If already full, return "no event" flavor text
-                if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
-                    msg = f"\n{AdventureEvents.no_event_found()}"
-                    return {"log": [msg], "dead": False}
+            # If already full, return "no event" flavor text
+            if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
+                msg = f"\n{AdventureEvents.no_event_found()}"
+                return {"log": [msg], "dead": False}
 
-                # Calculate Regen Amounts
-                hp_regen = max(1, int(stats.endurance * 0.5) + 1)
-                mp_regen = max(1, int(stats.magic * 0.5) + 1)
+            # Calculate Regen Amounts
+            hp_regen = max(1, int(stats.endurance * 0.5) + 1)
+            mp_regen = max(1, int(stats.magic * 0.5) + 1)
 
-                new_hp = min(current_hp + hp_regen, stats.max_hp)
-                new_mp = min(current_mp + mp_regen, stats.max_mp)
+            new_hp = min(current_hp + hp_regen, stats.max_hp)
+            new_mp = min(current_mp + mp_regen, stats.max_mp)
 
-                # Apply Update Atomically
-                conn.execute(
-                    "UPDATE players SET current_hp = ?, current_mp = ? WHERE discord_id = ?",
-                    (new_hp, new_mp, self.discord_id),
-                )
+            # Apply Update
+            self.db.set_player_vitals(self.discord_id, new_hp, new_mp)
 
             # Build Log Messages
             base_logs = AdventureEvents.regeneration()

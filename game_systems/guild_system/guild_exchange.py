@@ -2,7 +2,7 @@
 guild_exchange.py
 
 Handles exchanging materials for currency.
-Hardened: Atomic transactions prevent duping/currency exploits.
+Hardened: Uses DatabaseManager methods to prevent duping/currency exploits.
 """
 
 import logging
@@ -23,12 +23,12 @@ class GuildExchange:
         material_list = []
 
         try:
-            with self.db.get_connection() as conn:
-                cursor = conn.execute(
-                    "SELECT item_key, item_name, count FROM inventory WHERE discord_id = ? AND item_type = 'material'",
-                    (discord_id,),
+            items = list(
+                self.db._col("inventory").find(
+                    {"discord_id": discord_id, "item_type": "material"},
+                    {"_id": 0, "item_key": 1, "item_name": 1, "count": 1},
                 )
-                items = [dict(row) for row in cursor.fetchall()]
+            )
 
             for item in items:
                 mat_data = MATERIALS.get(item["item_key"])
@@ -45,7 +45,7 @@ class GuildExchange:
     def exchange_all_materials(self, discord_id: int) -> tuple[int, list[dict]]:
         """
         Sells all materials.
-        ATOMIC: Deletes items AND adds gold in one go.
+        Deletes items AND adds gold.
         """
         # 1. Calculate first (InMemory)
         total_val, items = self.calculate_exchange_value(discord_id)
@@ -53,12 +53,11 @@ class GuildExchange:
             return 0, []
 
         try:
-            with self.db.get_connection() as conn:
-                # 2. Add Aurum
-                conn.execute("UPDATE players SET aurum = aurum + ? WHERE discord_id = ?", (total_val, discord_id))
+            # 2. Add Aurum
+            self.db.increment_player_fields(discord_id, aurum=total_val)
 
-                # 3. Delete Materials
-                conn.execute("DELETE FROM inventory WHERE discord_id = ? AND item_type = 'material'", (discord_id,))
+            # 3. Delete Materials
+            self.db._col("inventory").delete_many({"discord_id": discord_id, "item_type": "material"})
 
             logger.info(f"User {discord_id} exchanged materials for {total_val} Aurum.")
             return total_val, items

@@ -36,9 +36,7 @@ class CombatHandler:
             # 2. Conditional Spawns (Level Check)
             conditionals = location.get("conditional_monsters", [])
             if conditionals:
-                with self.db.get_connection() as conn:
-                    row = conn.execute("SELECT level FROM players WHERE discord_id = ?", (self.discord_id,)).fetchone()
-                    player_level = row["level"] if row else 1
+                player_level = self.db.get_player_field(self.discord_id, "level") or 1
 
                 for cond in conditionals:
                     if player_level >= cond.get("min_level", 1):
@@ -120,25 +118,8 @@ class CombatHandler:
                 if not vitals:
                     raise ValueError("Player vitals not found.")
 
-                with self.db.get_connection() as conn:
-                    # Fetch Class & Level
-                    p_row = conn.execute(
-                        "SELECT level, experience, exp_to_next, class_id FROM players WHERE discord_id=?",
-                        (self.discord_id,),
-                    ).fetchone()
-
-                    # Fetch Active Skills
-                    skills_cursor = conn.execute(
-                        """
-                        SELECT s.key_id, s.name, s.type, ps.skill_level, s.mp_cost,
-                               s.power_multiplier, s.heal_power, s.buff_data
-                        FROM player_skills ps
-                        JOIN skills s ON ps.skill_key=s.key_id
-                        WHERE ps.discord_id=? AND s.type='Active'
-                        """,
-                        (self.discord_id,),
-                    )
-                    skills = [dict(row) for row in skills_cursor.fetchall()]
+                p_row = self.db.get_player(self.discord_id)
+                skills = self.db.get_combat_skills(self.discord_id)
 
                 active_boosts_list = self.db.get_active_boosts()
                 boosts = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}

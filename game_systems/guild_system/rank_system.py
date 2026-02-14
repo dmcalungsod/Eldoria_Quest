@@ -29,9 +29,8 @@ class RankSystem:
         self.db = db_manager
 
     def get_rank_info(self, discord_id: int) -> dict | None:
-        with self.db.get_connection() as conn:
-            row = conn.execute("SELECT * FROM guild_members WHERE discord_id = ?", (discord_id,)).fetchone()
-            return dict(row) if row else None
+        row = self.db.get_guild_member(discord_id)
+        return dict(row) if row else None
 
     def check_promotion_eligibility(self, discord_id: int) -> bool:
         player_data = self.get_rank_info(discord_id)
@@ -55,13 +54,9 @@ class RankSystem:
         return self.RANKS.get(current_rank, {}).get("next_rank")
 
     def finalize_promotion(self, discord_id: int, new_rank: str) -> tuple[bool, str]:
-        """
-        Applies rank up.
-        """
+        """Applies rank up."""
         try:
-            with self.db.get_connection() as conn:
-                conn.execute("UPDATE guild_members SET rank = ? WHERE discord_id = ?", (new_rank, discord_id))
-
+            self.db.update_guild_member_rank(discord_id, new_rank)
             title = self.RANKS.get(new_rank, {}).get("title", "Adventurer")
             return True, f"Promoted to Rank {new_rank} — {title}."
         except Exception as e:

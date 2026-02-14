@@ -2,8 +2,7 @@
 reward_system.py
 
 Handles the distribution of rewards upon quest completion.
-ATOMIC: Grants EXP, Gold, Items, and Guild Merit in a single transaction block.
-This prevents exploits where a user could get rewards but not have the quest marked complete.
+ATOMIC: Grants EXP, Gold, Items, and Guild Merit via dedicated DatabaseManager methods.
 """
 
 import json
@@ -33,101 +32,78 @@ class RewardSystem:
 
     def grant_rewards(self, discord_id: int, quest_id: int) -> str:
         """
-        Grants all rewards (EXP, Aurum, Merit, Items) for a quest within a single atomic transaction.
+        Grants all rewards (EXP, Aurum, Merit, Items) for a quest.
         Returns a formatted summary string.
         """
         try:
-            with self.db.get_connection() as conn:
-                # 1. Fetch Quest Reward Data
-                quest_row = conn.execute("SELECT rewards, title FROM quests WHERE id = ?", (quest_id,)).fetchone()
-                if not quest_row:
-                    return f"{E.ERROR} Error: Quest definition not found."
+            # 1. Fetch Quest Reward Data
+            quest_row = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "rewards": 1, "title": 1})
+            if not quest_row:
+                return f"{E.ERROR} Error: Quest definition not found."
 
-                try:
-                    rewards_data = json.loads(quest_row["rewards"])
-                except json.JSONDecodeError:
-                    logger.error(f"Corrupt reward JSON for quest {quest_id}")
-                    return f"{E.ERROR} Error: Reward data corrupted."
+            try:
+                rewards_data = json.loads(quest_row["rewards"])
+            except json.JSONDecodeError:
+                logger.error(f"Corrupt reward JSON for quest {quest_id}")
+                return f"{E.ERROR} Error: Reward data corrupted."
 
-                exp_reward = rewards_data.get("exp", 0)
-                aurum_reward = rewards_data.get("aurum", 0)
-                merit_reward = rewards_data.get("merit", 5)
-                item_reward_name = rewards_data.get("item", None)
+            exp_reward = rewards_data.get("exp", 0)
+            aurum_reward = rewards_data.get("aurum", 0)
+            merit_reward = rewards_data.get("merit", 5)
+            item_reward_name = rewards_data.get("item", None)
 
-                # 2. Fetch Player Data (Locking row implicitly via transaction)
-                player_row = conn.execute("SELECT * FROM players WHERE discord_id = ?", (discord_id,)).fetchone()
-                if not player_row:
-                    return f"{E.ERROR} Error: Player record missing."
+            # 2. Fetch Player Data
+            player_row = self.db.get_player(discord_id)
+            if not player_row:
+                return f"{E.ERROR} Error: Player record missing."
 
-                # 3. Process Level Up Logic
-                # We read stats to calculate next level requirements
-                stats_row = conn.execute("SELECT stats_json FROM stats WHERE discord_id = ?", (discord_id,)).fetchone()
-                if stats_row and stats_row["stats_json"]:
-                    stats = PlayerStats.from_dict(json.loads(stats_row["stats_json"]))
-                else:
-                    stats = PlayerStats()
+            # 3. Process Level Up Logic
+            stats_json = self.db.get_player_stats_json(discord_id)
+            if stats_json:
+                stats = PlayerStats.from_dict(stats_json)
+            else:
+                stats = PlayerStats()
 
-                level_system = LevelUpSystem(
-                    stats=stats,
-                    level=player_row["level"],
-                    exp=player_row["experience"],
-                    exp_to_next=player_row["exp_to_next"],
-                )
+            level_system = LevelUpSystem(
+                stats=stats,
+                level=player_row["level"],
+                exp=player_row["experience"],
+                exp_to_next=player_row["exp_to_next"],
+            )
 
-                # Apply EXP to the level system object
-                leveled_up = level_system.add_exp(exp_reward)
+            leveled_up = level_system.add_exp(exp_reward)
 
-                # 4. EXECUTE DB UPDATES (Player)
-                # Updates Level, EXP, Aurum, and Vestige simultaneously
-                conn.execute(
-                    """
-                    UPDATE players
-                    SET level = ?, experience = ?, exp_to_next = ?,
-                        aurum = aurum + ?, vestige_pool = vestige_pool + ?
-                    WHERE discord_id = ?
-                    """,
-                    (
-                        level_system.level,
-                        level_system.exp,
-                        level_system.exp_to_next,
-                        aurum_reward,
-                        exp_reward,
+            # 4. Grant rewards via dedicated DatabaseManager method
+            self.db.grant_quest_rewards(
+                discord_id,
+                level=level_system.level,
+                exp=level_system.exp,
+                exp_to_next=level_system.exp_to_next,
+                aurum_add=aurum_reward,
+                vestige_add=exp_reward,
+                merit_add=merit_reward,
+                stats_json_str=json.dumps(level_system.stats.to_dict()),
+            )
+
+            # 5. Item Rewards
+            item_msg = ""
+            if item_reward_name:
+                item_key, item_data = self._get_consumable_data_by_name(item_reward_name)
+                if item_key and item_data:
+                    self.db.add_inventory_item(
                         discord_id,
-                    ),
-                )
+                        item_key,
+                        item_data["name"],
+                        "consumable",
+                        item_data["rarity"],
+                        1,
+                    )
+                    item_msg = f"\n{E.ITEM_BOX} **Item Acquired:** `{item_data['name']}`"
+                else:
+                    logger.warning(f"Quest {quest_id} tried to give unknown item '{item_reward_name}'")
+                    item_msg = f"\n{E.WARNING} *Reward item '{item_reward_name}' not found in database.*"
 
-                # 5. EXECUTE DB UPDATES (Guild Merit)
-                conn.execute(
-                    """
-                    UPDATE guild_members
-                    SET merit_points = merit_points + ?,
-                        quests_completed = quests_completed + 1
-                    WHERE discord_id = ?
-                    """,
-                    (merit_reward, discord_id),
-                )
-
-                # 6. Update Stats JSON
-                # Required because level_system might have modified internal state if that logic exists
-                conn.execute(
-                    "UPDATE stats SET stats_json = ? WHERE discord_id = ?",
-                    (json.dumps(level_system.stats.to_dict()), discord_id),
-                )
-
-                # 7. Item Rewards (Must happen inside THIS transaction!)
-                item_msg = ""
-                if item_reward_name:
-                    item_key, item_data = self._get_consumable_data_by_name(item_reward_name)
-                    if item_key and item_data:
-                        # Use direct SQL here since we are inside a transaction block
-                        # and cannot call self.inv_manager.add_item (which starts its own transaction).
-                        self._add_item_internal(conn, discord_id, item_key, item_data)
-                        item_msg = f"\n{E.ITEM_BOX} **Item Acquired:** `{item_data['name']}`"
-                    else:
-                        logger.warning(f"Quest {quest_id} tried to give unknown item '{item_reward_name}'")
-                        item_msg = f"\n{E.WARNING} *Reward item '{item_reward_name}' not found in database.*"
-
-            # -------- SUMMARY GENERATION (Outside Transaction) --------
+            # -------- SUMMARY GENERATION --------
             summary = (
                 f"{E.MEDAL} **Quest Complete!**\n"
                 "Your accomplishments have been formally recorded.\n\n"
@@ -150,28 +126,3 @@ class RewardSystem:
         except Exception as e:
             logger.error(f"Reward grant failed for {discord_id}: {e}", exc_info=True)
             return f"{E.ERROR} A system error occurred while claiming rewards."
-
-    def _add_item_internal(self, conn, discord_id, item_key, item_data):
-        """
-        Internal helper to add items within an existing transaction cursor.
-        This duplicates logic from InventoryManager but accepts an open cursor ('conn').
-        """
-        # Check for existing stack
-        row = conn.execute(
-            """
-            SELECT id, count FROM inventory
-            WHERE discord_id = ? AND item_key = ? AND rarity = ? AND equipped = 0 LIMIT 1
-            """,
-            (discord_id, item_key, item_data["rarity"]),
-        ).fetchone()
-
-        if row:
-            conn.execute("UPDATE inventory SET count = count + 1 WHERE id = ?", (row["id"],))
-        else:
-            conn.execute(
-                """
-                INSERT INTO inventory (discord_id, item_key, item_name, item_type, rarity, count, equipped)
-                VALUES (?, ?, ?, 'consumable', ?, 1, 0)
-                """,
-                (discord_id, item_key, item_data["name"], item_data["rarity"]),
-            )

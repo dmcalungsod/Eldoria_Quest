@@ -33,7 +33,7 @@ class StatusUpdateView(View):
         super().__init__(timeout=180)
         self.db = db
         self.user = user
-        self.p_data = dict(p_data)
+        self.p_data = dict(p_data) if not isinstance(p_data, dict) else p_data
         self.stats = stats
         self.stats_row = stats_row
         self.vestige = self.p_data["vestige_pool"]
@@ -126,37 +126,32 @@ class StatusUpdateView(View):
 
     def _execute_upgrade(self, stat: str, amount: int) -> tuple[bool, str, int]:
         try:
-            with self.db.get_connection() as conn:
-                # Re-fetch stats to ensure atomic calculation validity
-                row = conn.execute("SELECT vestige_pool FROM players WHERE discord_id=?", (self.user.id,)).fetchone()
-                stats_row = conn.execute("SELECT stats_json FROM stats WHERE discord_id=?", (self.user.id,)).fetchone()
+            # Re-fetch stats to ensure atomic calculation validity
+            vestige = self.db.get_player_field(self.user.id, "vestige_pool")
+            stats_json = self.db.get_player_stats_json(self.user.id)
 
-                if not row or not stats_row:
-                    return False, "Data sync error.", 0
+            if vestige is None or not stats_json:
+                return False, "Data sync error.", 0
 
-                # Re-create stats object to get current base
-                current_stats = PlayerStats.from_dict(json.loads(stats_row["stats_json"]))
-                base_val = getattr(current_stats, "_stats")[stat].base
+            # Re-create stats object to get current base
+            current_stats = PlayerStats.from_dict(stats_json)
+            base_val = getattr(current_stats, "_stats")[stat].base
 
-                # Recalculate cost inside transaction for safety
-                total_cost = self._calculate_bulk_cost(stat, base_val, amount)
+            # Recalculate cost for safety
+            total_cost = self._calculate_bulk_cost(stat, base_val, amount)
 
-                if row["vestige_pool"] < total_cost:
-                    return False, "Insufficient Vestige.", 0
+            if vestige < total_cost:
+                return False, "Insufficient Vestige.", 0
 
-                # Apply Upgrade
-                current_stats.add_base_stat(stat, amount)
-                new_vestige = row["vestige_pool"] - total_cost
+            # Apply Upgrade
+            current_stats.add_base_stat(stat, amount)
+            new_vestige = vestige - total_cost
 
-                conn.execute(
-                    "UPDATE players SET vestige_pool=?, current_hp=?, current_mp=? WHERE discord_id=?",
-                    (new_vestige, current_stats.max_hp, current_stats.max_mp, self.user.id),
-                )
-                conn.execute(
-                    "UPDATE stats SET stats_json=? WHERE discord_id=?",
-                    (json.dumps(current_stats.to_dict()), self.user.id),
-                )
-                return True, "", new_vestige
+            self.db.update_player_vestige_and_vitals(
+                self.user.id, new_vestige, current_stats.max_hp, current_stats.max_mp
+            )
+            self.db.update_player_stats(self.user.id, current_stats.to_dict())
+            return True, "", new_vestige
         except Exception as e:
             logger.error(f"Stat upgrade error: {e}")
             return False, "System Error.", 0

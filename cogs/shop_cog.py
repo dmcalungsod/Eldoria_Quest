@@ -1,7 +1,7 @@
 """
 cogs/shop_cog.py
 
-Adventurer’s Guild Supply Depot.
+Adventurer's Guild Supply Depot.
 Hardened with atomic transactions and non-blocking UI.
 Atmosphere restored.
 """
@@ -84,10 +84,10 @@ class ShopView(View):
             if not can_afford:
                 suffix += " [Too Expensive]"
 
-            name = item_data['name']
+            name = item_data["name"]
             max_name_len = 100 - len(suffix)
             if len(name) > max_name_len:
-                name = name[:max_name_len - 1] + "…"
+                name = name[: max_name_len - 1] + "…"
 
             item_select.add_option(
                 label=f"{name}{suffix}",
@@ -116,32 +116,25 @@ class ShopView(View):
             if not item_data:
                 return (False, "Item data missing.", 0)
 
-            with self.db.get_connection() as conn:
-                # Lock & Check Funds
-                row = conn.execute(
-                    "SELECT aurum FROM players WHERE discord_id = ?", (self.interaction_user.id,)
-                ).fetchone()
-                if not row or row["aurum"] < price:
-                    return (False, "Insufficient Aurum.", 0)
+            # Fetch current aurum
+            aurum = self.db.get_player_field(self.interaction_user.id, "aurum")
+            if aurum is None or aurum < price:
+                return (False, "Insufficient Aurum.", 0)
 
-                new_aurum = row["aurum"] - price
+            new_aurum = aurum - price
 
-                # Deduct Funds
-                conn.execute("UPDATE players SET aurum = ? WHERE discord_id = ?", (new_aurum, self.interaction_user.id))
+            # Deduct funds
+            self.db.set_player_field(self.interaction_user.id, "aurum", new_aurum)
 
-                # Add Item (Inline logic to keep transaction atomic)
-                existing = conn.execute(
-                    "SELECT id FROM inventory WHERE discord_id=? AND item_key=? AND rarity=? AND equipped=0 LIMIT 1",
-                    (self.interaction_user.id, item_key, item_data["rarity"]),
-                ).fetchone()
-
-                if existing:
-                    conn.execute("UPDATE inventory SET count=count+1 WHERE id=?", (existing["id"],))
-                else:
-                    conn.execute(
-                        "INSERT INTO inventory (discord_id, item_key, item_name, item_type, rarity, count, equipped) VALUES (?, ?, ?, 'consumable', ?, 1, 0)",
-                        (self.interaction_user.id, item_key, item_data["name"], item_data["rarity"]),
-                    )
+            # Add item
+            self.db.add_inventory_item(
+                self.interaction_user.id,
+                item_key,
+                item_data["name"],
+                "consumable",
+                item_data["rarity"],
+                1,
+            )
 
             logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
             return (True, item_data, new_aurum)
@@ -161,7 +154,7 @@ class ShopView(View):
         embed = discord.Embed(
             title="🛒 Guild Supply Depot",
             description=(
-                "Within the Adventurer’s Guild, this modest counter distributes "
+                "Within the Adventurer's Guild, this modest counter distributes "
                 "the essentials needed for survival beyond the safety of its walls.\n\n"
                 f"You currently hold **{new_aurum if success else self.current_aurum} {E.AURUM}**."
             ),

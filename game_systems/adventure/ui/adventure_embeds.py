@@ -7,7 +7,6 @@ Hardened: Robust JSON parsing and layout stability.
 
 import json
 import logging
-import sqlite3
 
 import discord
 
@@ -22,7 +21,7 @@ logger = logging.getLogger("eldoria.ui.embeds")
 class AdventureEmbeds:
     @staticmethod
     def build_exploration_embed(
-        location_id: str, log: list, player_stats: PlayerStats, vitals: sqlite3.Row, session_row: sqlite3.Row
+        location_id: str, log: list, player_stats: PlayerStats, vitals: dict, session_row: dict
     ) -> discord.Embed:
         """
         Generates the main game interface embed.
