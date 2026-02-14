@@ -64,7 +64,7 @@ class InventoryManager:
     def get_inventory(self, discord_id: int) -> list[dict[str, Any]]:
         """Fetches the player's full inventory."""
         try:
-            return self.db.get_inventory(discord_id)
+            return self.db.get_inventory_items(discord_id)
         except Exception as e:
             logger.error(f"Failed to fetch inventory for {discord_id}: {e}", exc_info=True)
             return []

@@ -2,64 +2,26 @@
 Security Test Suite
 -------------------
 Verifies that player names are sanitized against Markdown injection and excessive length.
+SAFE: Uses mocked DatabaseManager.
 """
 
 import os
 import sys
-import tempfile
 import unittest
+from unittest.mock import MagicMock
 
 # Add root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import importlib
-
-import database.create_database as db_create
-import database.database_manager as db_manager_module
-import database.populate_database as db_populate
 from database.database_manager import DatabaseManager
 from game_systems.player.player_creator import PlayerCreator
 
 
 class TestSecurity(unittest.TestCase):
     def setUp(self):
-        # FORCE CLEAN STATE: Reload module to clear any patches
-        importlib.reload(db_manager_module)
-        # Re-import DatabaseManager from the reloaded module
-        global DatabaseManager
-        from database.database_manager import DatabaseManager
-
-        # Create temp DB
-        self.db_fd, self.db_path = tempfile.mkstemp()
-
-        # Patch DatabaseManager to use temp DB
-        self.original_db_name = db_manager_module.DATABASE_NAME
-        db_manager_module.DATABASE_NAME = self.db_path
-        db_create.DATABASE_NAME = self.db_path
-        db_populate.DATABASE_NAME = self.db_path
-
-        # Init DB
-        db_create.create_tables()
-        db_populate.main()
-
-        # Reset Singleton if it exists
-        DatabaseManager._instance = None
-        DatabaseManager._initialized = False
-
-        self.db = DatabaseManager(self.db_path)
-        self.creator = PlayerCreator(self.db)
-
-    def tearDown(self):
-        # Reset Singleton
-        DatabaseManager._instance = None
-        DatabaseManager._initialized = False
-
-        # Remove temp file
-        os.close(self.db_fd)
-        os.remove(self.db_path)
-
-        # Restore DB name
-        db_manager_module.DATABASE_NAME = self.original_db_name
+        # Mock DatabaseManager
+        self.mock_db = MagicMock(spec=DatabaseManager)
+        self.creator = PlayerCreator(self.mock_db)
 
     def test_markdown_sanitization(self):
         """Test that markdown characters are removed from username."""
@@ -67,27 +29,41 @@ class TestSecurity(unittest.TestCase):
         dirty_name = "**Bold**_Italic_`Code`"
         expected_clean_name = "BoldItalicCode"
 
+        # Mock player not existing
+        self.mock_db.player_exists.return_value = False
+        self.mock_db.get_default_skill_keys.return_value = []
+
         success, msg = self.creator.create_player(discord_id, dirty_name, 1) # 1 is a valid class_id
 
         self.assertTrue(success, f"Player creation failed: {msg}")
 
-        player = self.db.get_player(discord_id)
-        self.assertIsNotNone(player)
-        self.assertEqual(player['name'], expected_clean_name, "Markdown characters were not removed!")
+        # Verify create_player_full called with sanitized name
+        self.mock_db.create_player_full.assert_called()
+        args, kwargs = self.mock_db.create_player_full.call_args
+        # username is 2nd positional arg or keyword 'username'
+        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+
+        self.assertEqual(actual_name, expected_clean_name, "Markdown characters were not removed!")
 
     def test_zalgo_and_length(self):
-        """Test that name is truncated to 32 chars and weird chars handled."""
+        """Test that name is truncated to 32 chars."""
         discord_id = 67890
         long_name = "A" * 50
         expected_len = 32
+
+        self.mock_db.player_exists.return_value = False
+        self.mock_db.get_default_skill_keys.return_value = []
 
         success, msg = self.creator.create_player(discord_id, long_name, 1)
 
         self.assertTrue(success, f"Player creation failed: {msg}")
 
-        player = self.db.get_player(discord_id)
-        self.assertEqual(len(player['name']), expected_len, "Name was not truncated!")
-        self.assertEqual(player['name'], "A" * 32)
+        self.mock_db.create_player_full.assert_called()
+        args, kwargs = self.mock_db.create_player_full.call_args
+        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+
+        self.assertEqual(len(actual_name), expected_len, "Name was not truncated!")
+        self.assertEqual(actual_name, "A" * 32)
 
 def run_all_tests():
     """Run the security test suite manually."""
@@ -98,4 +74,4 @@ def run_all_tests():
     return result.wasSuccessful()
 
 if __name__ == '__main__':
-    run_all_tests()
+    unittest.main()

@@ -1,11 +1,10 @@
 import os
 import sys
 import unittest
-
-sys.path.append(os.getcwd())
 import json
 from unittest.mock import MagicMock
 
+sys.path.append(os.getcwd())
 
 # --- MOCK DISCORD ---
 class MockView:
@@ -37,20 +36,18 @@ sys.modules["discord.ext.commands"] = MagicMock()
 # --- IMPORT MODULE UNDER TEST ---
 from cogs.infirmary_cog import InfirmaryView  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
-
+from database.database_manager import DatabaseManager # noqa: E402
 
 class TestInfirmaryStateIssue(unittest.TestCase):
     def setUp(self):
         # Mock DatabaseManager
-        self.db = MagicMock()
-        self.conn = MagicMock()
-        self.db.get_connection.return_value.__enter__.return_value = self.conn
+        self.mock_db = MagicMock(spec=DatabaseManager)
 
         # Setup User
         self.user = MagicMock()
         self.user.id = 12345
 
-        # Initial Player Data
+        # Initial Player Data (for View initialization)
         self.initial_p_data = {
             "current_hp": 50,
             "current_mp": 10,
@@ -71,61 +68,35 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         """
 
         # 1. Initialize View with initial stats (Max HP 150)
-        view = InfirmaryView(self.db, self.user, self.initial_p_data, self.initial_stats)
+        view = InfirmaryView(self.mock_db, self.user, self.initial_p_data, self.initial_stats)
 
         old_max_hp = self.initial_stats.max_hp # 150
         new_max_hp = 200 # Simulated new Max HP in DB
 
-        print(f"View initialized with Max HP: {old_max_hp}")
-
         # 2. Simulate DB state where player has changed
 
-        # Mock the fetchone for player vitals
-        self.conn.execute.return_value.fetchone.side_effect = [
-            # First call: fetch player vitals
-            {
-                "current_hp": 50,
-                "current_mp": 10,
-                "aurum": 1000
-            },
-            # Second call: fetch stats_json (THIS IS WHAT WE WILL ADD)
-            {
-                "stats_json": json.dumps({
-                    "STR": {"base": 10, "bonus": 0},
-                    "END": {"base": 15, "bonus": 0}, # Increased END -> Higher HP
-                    # END 15 -> HP = 50 + (15 * 10) = 200
-                })
-            }
-        ]
+        # Mock get_player_vitals (Current state)
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 50,
+            "current_mp": 10
+        }
+        self.mock_db.get_player_field.return_value = 1000 # Aurum
+
+        # Mock get_player_stats_json to return FRESH stats (Max HP 200)
+        fresh_stats = PlayerStats(str_base=10, end_base=15) # END 15 -> HP 200
+        self.mock_db.get_player_stats_json.return_value = fresh_stats.to_dict()
 
         # 3. Call _execute_heal
-        # Currently, the code won't make the second call, so side_effect might raise StopIteration if called twice,
-        # or just return the first one if called once.
-        # But we mocked side_effect list. If the code only calls fetchone once, it consumes first item.
-
         view._execute_heal()
 
-        # 4. Verify UPDATE
-        args_list = self.conn.execute.call_args_list
-        # We expect at least one UPDATE
-        update_call = [call for call in args_list if "UPDATE players SET" in call[0][0]]
+        # 4. Verify set_player_vitals called with FRESH Max HP (200)
+        self.mock_db.set_player_vitals.assert_called_with(
+            self.user.id, new_max_hp, fresh_stats.max_mp
+        )
 
-        self.assertTrue(update_call, "No UPDATE statement executed!")
-
-        # call object is (args, kwargs)
-        # args is (sql, params)
-        args = update_call[0][0]
-        sql = args[0]
-        params = args[1]
-
-        # params: (new_hp, new_mp, new_aurum, discord_id)
-        # We expect new_hp to be new_max_hp (200)
-
-        # If bug exists, params[0] == old_max_hp (150)
-        # If fix works, params[0] == new_max_hp (200)
-
-        self.assertEqual(params[0], new_max_hp,
-            f"Vulnerability Found: Healed to {params[0]} (Stale), expected {new_max_hp} (Fresh DB State)")
+        # Also ensure it wasn't called with old HP
+        args, _ = self.mock_db.set_player_vitals.call_args
+        self.assertEqual(args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)")
 
 def run_all_tests():
     """Run the infirmary security test suite manually."""
