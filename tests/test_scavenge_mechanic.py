@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Mock pymongo BEFORE any imports
 sys.modules['pymongo'] = MagicMock()
@@ -11,9 +11,10 @@ sys.modules['pymongo.errors'] = MagicMock()
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Now we can safely import modules that depend on pymongo
-from game_systems.adventure.event_handler import EventHandler
-from game_systems.adventure.adventure_events import AdventureEvents
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_events import AdventureEvents  # noqa: E402
+from game_systems.adventure.event_handler import EventHandler  # noqa: E402
+
 
 class TestDeadTurns(unittest.TestCase):
     def setUp(self):
@@ -43,7 +44,7 @@ class TestDeadTurns(unittest.TestCase):
             mock_randint.side_effect = [1, 1]
 
             with patch('random.choices', return_value=['medicinal_herb']):
-                 result = self.event_handler.resolve_non_combat(regen_chance=100)
+                result = self.event_handler.resolve_non_combat(regen_chance=100)
 
         # Should have SURGE message
         log_str = "\n".join(result["log"])
