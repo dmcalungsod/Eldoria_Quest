@@ -22,6 +22,19 @@ logger = logging.getLogger("eldoria.combat_engine")
 class CombatEngine:
     PLAYER_SKILL_CHANCE = 40  # 40% chance to use a skill if possible
 
+    _SKILL_DAMAGE_MAP = {
+        "fireball": "mag_hits",
+        "explosion": "mag_hits",
+        "ice_lance": "mag_hits",
+        "smite": "mag_hits",
+        "true_shot": "dex_hits",
+        "multi_shot": "dex_hits",
+        "double_strike": "dex_hits",
+        "toxic_blade": "dex_hits",
+        "power_strike": "str_hits",
+        "cleave": "str_hits",
+    }
+
     def __init__(
         self,
         player,
@@ -232,14 +245,7 @@ class CombatEngine:
 
     def _tag_damage_type(self, skill_key, report):
         """Helper to categorize skill damage for stat growth."""
-        if skill_key in ["fireball", "explosion", "ice_lance", "smite"]:
-            report["mag_hits"] = 1
-        elif skill_key in ["true_shot", "multi_shot", "double_strike", "toxic_blade"]:
-            report["dex_hits"] = 1
-        elif skill_key in ["power_strike", "cleave"]:
-            report["str_hits"] = 1
-        else:
-            report["str_hits"] = 1
+        report[self._SKILL_DAMAGE_MAP.get(skill_key, "str_hits")] = 1
 
     def _decide_player_skill(self) -> dict:
         """
