@@ -153,8 +153,8 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
 
         # Stats
         stat_block = (
-            f"`STR: {stats.strength:<3}` `END: {stats.endurance:<3}` `DEX: {stats.dexterity:<3}`\n"
-            f"`AGI: {stats.agility:<3}` `MAG: {stats.magic:<3}` `LCK: {stats.luck:<3}`"
+            f"{E.STR} `STR: {stats.strength:<3}` {E.END} `END: {stats.endurance:<3}` {E.DEX} `DEX: {stats.dexterity:<3}`\n"
+            f"{E.AGI} `AGI: {stats.agility:<3}` {E.MAG} `MAG: {stats.magic:<3}` {E.LCK} `LCK: {stats.luck:<3}`"
         )
         embed.add_field(name="Attributes", value=stat_block, inline=False)
 

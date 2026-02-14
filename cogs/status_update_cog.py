@@ -114,6 +114,7 @@ class StatusUpdateView(View):
             btn = Button(
                 label=f"+{self.multiplier} {stat} ({total_cost}V)",
                 custom_id=f"stat_{stat}",
+                emoji=getattr(E, stat, None),
                 row=row,
                 disabled=not can_afford,
                 style=discord.ButtonStyle.secondary,
@@ -200,8 +201,8 @@ class StatusUpdateView(View):
 
         base = stats.get_base_stats_dict()
         formatted_stats = (
-            f"`STR: {base['STR']:<4}` `END: {base['END']:<4}` `DEX: {base['DEX']:<4}`\n"
-            f"`AGI: {base['AGI']:<4}` `MAG: {base['MAG']:<4}` `LCK: {base['LCK']:<4}`"
+            f"{E.STR} `STR: {base['STR']:<4}` {E.END} `END: {base['END']:<4}` {E.DEX} `DEX: {base['DEX']:<4}`\n"
+            f"{E.AGI} `AGI: {base['AGI']:<4}` {E.MAG} `MAG: {base['MAG']:<4}` {E.LCK} `LCK: {base['LCK']:<4}`"
         )
         embed.add_field(name="Base Attributes", value=formatted_stats, inline=False)
 
