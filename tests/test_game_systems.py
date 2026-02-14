@@ -75,9 +75,9 @@ def setup_test_environment():
     test_discord_id = 888888888
 
     with db.get_connection() as conn:
-        conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
-        conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
-        conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
+        conn._col("inventory").delete_many({"discord_id": test_discord_id})
+        conn._col("players").delete_many({"discord_id": test_discord_id})
+        conn._col("stats").delete_many({"discord_id": test_discord_id})
 
     test_stats = {
         "STR": {"base": 15, "bonus": 0},
@@ -185,8 +185,7 @@ def test_equipment_system(test_discord_id):
     try:
         # Ensure there's a weapon in the DB to give
         with db.get_connection() as conn:
-            cur = conn.execute("SELECT * FROM equipment WHERE slot = 'sword' LIMIT 1")
-            weapon = cur.fetchone()
+            weapon = conn._col("equipment").find_one({"slot": "sword"})
 
             if weapon:
                 inv_manager.add_item(
@@ -311,12 +310,12 @@ def cleanup_test_data(test_discord_id):
     try:
         with db.get_connection() as conn:
             # Delete children first
-            conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM player_skills WHERE discord_id = ?", (test_discord_id,))
+            conn._col("inventory").delete_many({"discord_id": test_discord_id})
+            conn._col("stats").delete_many({"discord_id": test_discord_id})
+            conn._col("player_skills").delete_many({"discord_id": test_discord_id})
 
             # Delete parent last
-            conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
+            conn._col("players").delete_many({"discord_id": test_discord_id})
 
         print("✓ Test data cleaned up")
         return True
