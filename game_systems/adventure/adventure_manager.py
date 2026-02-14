@@ -107,6 +107,11 @@ class AdventureManager:
 
             session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
             total_exp = session.loot.pop("exp", 0)
+            total_aurum = session.loot.pop("aurum", 0)
+
+            # Apply Aurum
+            if total_aurum > 0:
+                self.db.increment_player_fields(discord_id, aurum=total_aurum)
 
             # Capture state before rewards
             old_level = self.db.get_player_field(discord_id, "level")
@@ -121,6 +126,7 @@ class AdventureManager:
             summary = {
                 "loot": items_to_add,
                 "xp_gained": total_exp,
+                "aurum_gained": total_aurum,
                 "old_level": old_level,
                 "new_level": new_level,
                 "leveled_up": new_level > old_level,
