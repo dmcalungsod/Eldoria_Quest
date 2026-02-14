@@ -81,8 +81,8 @@ def test_player_operations():
     try:
         # Clean up any existing test player
         with db.get_connection() as conn:
-            conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
+            conn._col("players").delete_one({"discord_id": test_discord_id})
+            conn._col("stats").delete_one({"discord_id": test_discord_id})
 
         test_stats = {
             "STR": {"base": 10, "bonus": 0},
@@ -95,10 +95,10 @@ def test_player_operations():
 
         # Ensure class 1 exists (Warrior) - should be there from population
         with db.get_connection() as conn:
-            exists = conn.execute("SELECT 1 FROM classes WHERE id=1").fetchone()
+            exists = conn._col("classes").find_one({"id": 1})
             if not exists:
                 print("⚠ Warning: Classes missing. Injecting Warrior class.")
-                conn.execute("INSERT INTO classes (id, name, description) VALUES (1, 'Warrior', 'Test')")
+                conn._col("classes").insert_one({"id": 1, "name": "Warrior", "description": "Test"})
 
         db.create_player(
             discord_id=test_discord_id,
@@ -131,9 +131,7 @@ def test_context_manager():
     db = DatabaseManager()
     try:
         with db.get_connection() as conn:
-            cur = conn.execute("SELECT COUNT(*) as count FROM classes")
-            result = cur.fetchone()
-            count = result["count"]
+            count = conn._col("classes").count_documents({})
             print(f"✓ Context manager working: {count} classes found")
         return True
     except Exception as e:
@@ -148,15 +146,15 @@ def cleanup_test_data():
     try:
         with db.get_connection() as conn:
             # Delete children first (Dependencies)
-            conn.execute("DELETE FROM inventory WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM stats WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM player_skills WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM guild_members WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM player_quests WHERE discord_id = ?", (test_discord_id,))
-            conn.execute("DELETE FROM adventure_sessions WHERE discord_id = ?", (test_discord_id,))
+            conn._col("inventory").delete_many({"discord_id": test_discord_id})
+            conn._col("stats").delete_many({"discord_id": test_discord_id})
+            conn._col("player_skills").delete_many({"discord_id": test_discord_id})
+            conn._col("guild_members").delete_many({"discord_id": test_discord_id})
+            conn._col("player_quests").delete_many({"discord_id": test_discord_id})
+            conn._col("adventure_sessions").delete_many({"discord_id": test_discord_id})
 
             # Delete parent last
-            conn.execute("DELETE FROM players WHERE discord_id = ?", (test_discord_id,))
+            conn._col("players").delete_many({"discord_id": test_discord_id})
 
         print("✓ Test data cleaned up")
         return True
