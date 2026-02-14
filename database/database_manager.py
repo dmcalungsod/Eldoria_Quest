@@ -169,12 +169,18 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
-        skills = []
-        for ps in player_skill_docs:
-            skill_def = self._col("skills").find_one(
-                {"key_id": ps["skill_key"], "type": "Active"},
+        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
+        skill_defs = list(
+            self._col("skills").find(
+                {"key_id": {"$in": skill_keys}, "type": "Active"},
                 {"_id": 0},
             )
+        )
+        skill_map = {s["key_id"]: s for s in skill_defs}
+
+        skills = []
+        for ps in player_skill_docs:
+            skill_def = skill_map.get(ps["skill_key"])
             if skill_def:
                 skills.append(
                     {
@@ -267,9 +273,18 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
+        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
+        skill_defs = list(
+            self._col("skills").find(
+                {"key_id": {"$in": skill_keys}},
+                {"_id": 0},
+            )
+        )
+        skill_map = {s["key_id"]: s for s in skill_defs}
+
         results = []
         for ps in player_skill_docs:
-            skill_def = self._col("skills").find_one({"key_id": ps["skill_key"]}, {"_id": 0})
+            skill_def = skill_map.get(ps["skill_key"])
             if skill_def:
                 results.append(
                     {
@@ -290,12 +305,18 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
-        skills = []
-        for ps in player_skill_docs:
-            skill_def = self._col("skills").find_one(
-                {"key_id": ps["skill_key"], "type": "Active"},
+        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
+        skill_defs = list(
+            self._col("skills").find(
+                {"key_id": {"$in": skill_keys}, "type": "Active"},
                 {"_id": 0},
             )
+        )
+        skill_map = {s["key_id"]: s for s in skill_defs}
+
+        skills = []
+        for ps in player_skill_docs:
+            skill_def = skill_map.get(ps["skill_key"])
             if skill_def:
                 skills.append(
                     {
