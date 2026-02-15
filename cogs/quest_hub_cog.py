@@ -23,7 +23,7 @@ from database.database_manager import DatabaseManager
 from game_systems.guild_system.quest_system import QuestSystem
 
 # --- Local Imports ---
-from .ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
+from .ui_helpers import back_to_guild_hall_callback, back_to_profile_callback, make_progress_bar
 
 logger = logging.getLogger("eldoria.quest_ui")
 
@@ -177,11 +177,13 @@ class QuestLogView(View):
                     if isinstance(tasks, dict):
                         for task, req in tasks.items():
                             cur = progress.get(obj_type, {}).get(task, 0)
-                            progress_lines.append(f"• {task}: {cur}/{req}")
+                            bar = make_progress_bar(cur, req, length=8)
+                            progress_lines.append(f"• {task}: `{bar}` {cur}/{req}")
                     else:
                         task = tasks
                         cur = progress.get(obj_type, {}).get(task, 0)
-                        progress_lines.append(f"• {obj_type.title()} {task}: {cur}/1")
+                        bar = make_progress_bar(cur, 1, length=8)
+                        progress_lines.append(f"• {obj_type.title()} {task}: `{bar}` {cur}/1")
 
                 embed.add_field(
                     name=f"{quest['title']} (ID: {quest['id']})",
