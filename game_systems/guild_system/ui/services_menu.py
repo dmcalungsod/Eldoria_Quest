@@ -51,6 +51,11 @@ class GuildServicesView(View, GuildViewMixin):
                 "Skill Trainer", discord.ButtonStyle.secondary, "g_trainer", "🧠", 1, callback=self.trainer_callback
             )
         )
+        self.add_item(
+            ViewFactory.create_button(
+                "Alchemist", discord.ButtonStyle.secondary, "g_alchemist", "⚗️", 1, callback=self.alchemist_callback
+            )
+        )
 
         self.back_btn = ViewFactory.create_button(
             "Back to Guild Lobby", discord.ButtonStyle.grey, "back_lobby", row=2, callback=back_to_guild_hall_callback
@@ -126,6 +131,18 @@ class GuildServicesView(View, GuildViewMixin):
 
         embed = SkillTrainerView.build_skill_embed(p_data)
         view = SkillTrainerView(self.db, self.interaction_user, p_data)
+        view.set_back_button(self.back_to_services, "Back to Services")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def alchemist_callback(self, interaction: discord.Interaction, button: Button = None):
+        from game_systems.crafting.ui.crafting_view import CraftingView
+
+        await interaction.response.defer()
+
+        # Build initial embed
+        view = CraftingView(self.db, self.interaction_user)
+        embed = view.build_embed()
+
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 

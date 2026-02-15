@@ -565,6 +565,54 @@ class DatabaseManager:
                 }
             )
 
+    def get_inventory_item_count(self, discord_id: int, item_key: str) -> int:
+        """Returns the total count of an item across all stacks."""
+        pipeline = [
+            {"$match": {"discord_id": discord_id, "item_key": item_key}},
+            {"$group": {"_id": None, "total": {"$sum": "$count"}}},
+        ]
+        result = list(self._col("inventory").aggregate(pipeline))
+        return result[0]["total"] if result else 0
+
+    def remove_inventory_item(self, discord_id: int, item_key: str, amount: int = 1) -> bool:
+        """
+        Removes items from inventory. Prioritizes unequipped stacks.
+        Returns True if successful, False if insufficient quantity.
+        """
+        if amount <= 0:
+            return False
+
+        # 1. Check total count
+        total = self.get_inventory_item_count(discord_id, item_key)
+        if total < amount:
+            return False
+
+        # 2. Fetch all stacks, sorted by equipped (0 first) then count (asc)
+        stacks = list(
+            self._col("inventory")
+            .find(
+                {"discord_id": discord_id, "item_key": item_key},
+            )
+            .sort([("equipped", 1), ("count", 1)])
+        )
+
+        remaining_to_remove = amount
+
+        for stack in stacks:
+            if remaining_to_remove <= 0:
+                break
+
+            remove_from_stack = min(stack["count"], remaining_to_remove)
+
+            if remove_from_stack == stack["count"]:
+                self._col("inventory").delete_one({"id": stack["id"]})
+            else:
+                self._col("inventory").update_one({"id": stack["id"]}, {"$inc": {"count": -remove_from_stack}})
+
+            remaining_to_remove -= remove_from_stack
+
+        return remaining_to_remove == 0
+
     def _next_inventory_id(self) -> int:
         """Generates the next auto-increment ID for inventory."""
         counter = self._col("counters").find_one_and_update(

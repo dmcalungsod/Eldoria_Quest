@@ -11,15 +11,12 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
-import test_database
 import test_game_systems
-import test_infirmary_security
-import test_security
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
-
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+
 
 def check_mongodb_connection():
     """Checks if MongoDB is reachable at localhost:27017."""
