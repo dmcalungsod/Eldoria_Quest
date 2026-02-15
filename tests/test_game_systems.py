@@ -16,7 +16,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.damage_formula import DamageFormula
-from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats

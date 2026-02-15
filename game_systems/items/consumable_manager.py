@@ -5,7 +5,6 @@ Handles all logic for using consumable items from the inventory.
 Hardened: Uses atomic check-and-consume logic to prevent item loss on error.
 """
 
-import json
 import logging
 
 from database.database_manager import DatabaseManager

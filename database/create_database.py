@@ -9,7 +9,6 @@ import logging
 import os
 
 from pymongo import ASCENDING, MongoClient
-from pymongo.errors import CollectionInvalid
 
 # Only configure logging if running as main script to avoid duplicates
 if __name__ == "__main__":

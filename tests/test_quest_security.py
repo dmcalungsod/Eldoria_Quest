@@ -1,12 +1,13 @@
-import unittest
-from unittest.mock import MagicMock, patch
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Add repo root to path
 sys.path.append(os.getcwd())
 
 from game_systems.guild_system.quest_system import QuestSystem
+
 
 class TestQuestSecurity(unittest.TestCase):
     def setUp(self):

@@ -1,7 +1,6 @@
 import os
 import sys
 import unittest
-import json
 from unittest.mock import MagicMock
 
 sys.path.append(os.getcwd())
@@ -35,8 +34,9 @@ sys.modules["discord.ext.commands"] = MagicMock()
 
 # --- IMPORT MODULE UNDER TEST ---
 from cogs.infirmary_cog import InfirmaryView  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
-from database.database_manager import DatabaseManager # noqa: E402
+
 
 class TestInfirmaryStateIssue(unittest.TestCase):
     def setUp(self):
