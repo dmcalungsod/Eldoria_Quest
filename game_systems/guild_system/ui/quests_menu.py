@@ -11,7 +11,7 @@ import discord
 from discord.ui import Button, View
 
 import game_systems.data.emojis as E
-from cogs.ui_helpers import back_to_guild_hall_callback
+from cogs.ui_helpers import back_to_guild_hall_callback, make_progress_bar
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.quest_system import QuestSystem
 
@@ -184,7 +184,8 @@ class QuestsMenuView(View, GuildViewMixin):
 
                 for key, required in reqs.items():
                     current = data.get(key, 0)
-                    lines.append(f"• {key.replace('_', ' ').title()}: {current}/{required}")
+                    bar = make_progress_bar(current, required, length=8)
+                    lines.append(f"• {key.replace('_', ' ').title()}: `{bar}` {current}/{required}")
                     if current < required:
                         eligible = False
 
@@ -221,9 +222,11 @@ class QuestsMenuView(View, GuildViewMixin):
             if isinstance(tasks, dict):
                 for task, required in tasks.items():
                     cur = prog.get(obj_type, {}).get(task, 0)
-                    lines.append(f"• {task}: {cur}/{required}")
+                    bar = make_progress_bar(cur, required, length=8)
+                    lines.append(f"• {task}: `{bar}` {cur}/{required}")
             else:
                 cur = prog.get(obj_type, {}).get(tasks, 0)
-                lines.append(f"• {obj_type.title()} {tasks}: {cur}/1")
+                bar = make_progress_bar(cur, 1, length=8)
+                lines.append(f"• {obj_type.title()} {tasks}: `{bar}` {cur}/1")
 
         return lines
