@@ -85,6 +85,26 @@ class AdventureEvents:
         f"{E.FOREST} The air thickens with the scent of rain.",
     ]
 
+    SURGE_PHRASES = [
+        f"{E.BUFF} Your health is full, so you push forward with renewed vigor!",
+        f"{E.BUFF} Feeling unstoppable, you channel your energy into the hunt.",
+        f"{E.BUFF} Vitality courses through you. You focus entirely on finding resources.",
+        f"{E.BUFF} You are at peak condition. Your senses sharpen.",
+        f"{E.BUFF} With no need to rest, you scour the area with double the effort.",
+    ]
+
+    SCAVENGE_AURUM_PHRASES = [
+        f"{E.AURUM} You didn't find materials, but you spotted a pouch containing **{{}} Aurum**.",
+        f"{E.AURUM} A gleam in the dirt reveals **{{}} Aurum**.",
+        f"{E.AURUM} Hidden in a hollow stump, you find **{{}} Aurum**.",
+    ]
+
+    SCAVENGE_EXP_PHRASES = [
+        f"{E.EXP} The search yielded no items, but you gained **{{}} XP** from studying the area.",
+        f"{E.EXP} You find ancient markings, earning **{{}} XP**.",
+        f"{E.EXP} Navigating the rough terrain grants you **{{}} XP**.",
+    ]
+
     @staticmethod
     def regeneration() -> list:
         return [random.choice(AdventureEvents.REGEN_PHRASES)]
@@ -102,6 +122,16 @@ class AdventureEvents:
     @staticmethod
     def wild_gather_event(item_name: str) -> str:
         return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
+
+    @staticmethod
+    def surge_event() -> str:
+        return random.choice(AdventureEvents.SURGE_PHRASES)
+
+    @staticmethod
+    def scavenge_event(reward_type: str, amount: int) -> str:
+        if reward_type == "aurum":
+            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
+        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
 
     @staticmethod
     def no_event_found() -> str:

@@ -16,6 +16,7 @@ import test_game_systems
 import test_infirmary_security
 import test_security
 import test_quest_security  # New security test
+import test_scavenge_mechanic  # Scavenge & Surge tests
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
@@ -38,6 +39,17 @@ def run_quest_security_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_quest_security)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+def run_scavenge_tests():
+    """Runs the scavenge & surge tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING SCAVENGE MECHANIC TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_scavenge_mechanic)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -66,7 +78,11 @@ def main():
     quest_passed = run_quest_security_tests()
     all_passed = all_passed and quest_passed
 
-    # 2. Integration Tests (Require MongoDB)
+    # 2. Scavenge Mechanic Tests (Mock-based, always run)
+    scavenge_passed = run_scavenge_tests()
+    all_passed = all_passed and scavenge_passed
+
+    # 3. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -110,6 +126,7 @@ def main():
     print("FINAL TEST SUMMARY")
     print("=" * 70)
     print(f"Quest Security Tests: {'✓ PASSED' if quest_passed else '✗ FAILED'}")
+    print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
 
     if db_available:
         print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")

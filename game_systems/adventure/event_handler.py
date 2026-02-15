@@ -35,7 +35,7 @@ class EventHandler:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration()
+                return self._perform_regeneration(location_id)
             else:
                 return self._perform_quest_event(location_name, location_id)
         except Exception as e:
@@ -43,7 +43,7 @@ class EventHandler:
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 
-    def _perform_regeneration(self) -> dict[str, Any]:
+    def _perform_regeneration(self, location_id: str | None = None) -> dict[str, Any]:
         """
         Calculates and applies regeneration safely.
         Uses an atomic transaction to ensure HP/MP updates are consistent.
@@ -61,10 +61,21 @@ class EventHandler:
             current_hp = row["current_hp"]
             current_mp = row["current_mp"]
 
-            # If already full, return "no event" flavor text
+            # If already full, trigger SURGE (High-chance gather)
             if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
-                msg = f"\n{AdventureEvents.no_event_found()}"
-                return {"log": [msg], "dead": False}
+                # Log the surge flavor text
+                surge_msg = f"\n{AdventureEvents.surge_event()}"
+
+                # Chain into gathering with +25% bonus
+                result = self._perform_wild_gathering(location_id, bonus_chance=25)
+
+                # Prepend the surge message to the gathering log
+                if result.get("log"):
+                    result["log"].insert(0, surge_msg)
+                else:
+                    result["log"] = [surge_msg]
+
+                return result
 
             # Calculate Regen Amounts
             hp_regen = max(1, int(stats.endurance * 0.5) + 1)
@@ -140,7 +151,7 @@ class EventHandler:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
             return {"log": ["*The path ahead is unclear.*"], "dead": False}
 
-    def _perform_wild_gathering(self, location_id: str | None) -> dict[str, Any]:
+    def _perform_wild_gathering(self, location_id: str | None, bonus_chance: int = 0) -> dict[str, Any]:
         """
         Attempts to find wild materials if no quest event triggered.
         Now supports biome-specific drops and luck-based quantity.
@@ -155,8 +166,9 @@ class EventHandler:
             # Fallback for old compatibility or empty zones
             gatherables = [("medicinal_herb", 50), ("iron_ore", 20), ("ancient_wood", 10)]
 
-        # 35% Base Chance
-        if random.random() < 0.35:
+        # 35% Base Chance + Bonus
+        base_chance = 35 + bonus_chance
+        if random.randint(1, 100) <= base_chance:
             # Weighted Selection
             choices, weights = zip(*gatherables)
             item_key = random.choices(choices, weights=weights, k=1)[0]
@@ -187,6 +199,15 @@ class EventHandler:
                     "loot": {item_key: quantity},
                 }
 
-        # Fallback to nothing found
-        msg = f"\n{AdventureEvents.no_event_found()}"
-        return {"log": [msg], "dead": False}
+        # Fallback to Scavenge (Aurum or XP) instead of "nothing found"
+        # 50% Aurum / 50% XP
+        if random.random() < 0.5:
+            # Aurum
+            amount = random.randint(1, 5)
+            msg = f"\n{AdventureEvents.scavenge_event('aurum', amount)}"
+            return {"log": [msg], "dead": False, "loot": {"aurum": amount}}
+        else:
+            # XP
+            amount = random.randint(5, 10)
+            msg = f"\n{AdventureEvents.scavenge_event('exp', amount)}"
+            return {"log": [msg], "dead": False, "loot": {"exp": amount}}
