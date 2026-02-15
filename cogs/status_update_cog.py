@@ -129,30 +129,39 @@ class StatusUpdateView(View):
         try:
             # Re-fetch stats to ensure atomic calculation validity
             vestige = self.db.get_player_field(self.user.id, "vestige_pool")
-            stats_json = self.db.get_player_stats_json(self.user.id)
+            stats_row = self.db.get_player_stats_row(self.user.id)
 
-            if vestige is None or not stats_json:
+            if vestige is None or not stats_row:
                 return False, "Data sync error.", 0
 
-            # Re-create stats object to get current base
-            current_stats = PlayerStats.from_dict(stats_json)
+            # SECURITY FIX: Use Optimistic Locking
+            raw_json_str = stats_row["stats_json"]
+            current_stats = PlayerStats.from_dict(json.loads(raw_json_str))
             base_val = getattr(current_stats, "_stats")[stat].base
 
             # Recalculate cost for safety
             total_cost = self._calculate_bulk_cost(stat, base_val, amount)
 
-            if vestige < total_cost:
+            # Phase 1: Deduct Vestige Atomically
+            if not self.db.deduct_vestige(self.user.id, total_cost):
                 return False, "Insufficient Vestige.", 0
 
-            # Apply Upgrade
+            # Apply Upgrade Locally
             current_stats.add_base_stat(stat, amount)
-            new_vestige = vestige - total_cost
 
-            self.db.update_player_vestige_and_vitals(
-                self.user.id, new_vestige, current_stats.max_hp, current_stats.max_mp
-            )
-            self.db.update_player_stats(self.user.id, current_stats.to_dict())
-            return True, "", new_vestige
+            # Phase 2: Update Stats with Optimistic Lock
+            # If the JSON string in DB has changed since we read it, this returns False
+            if not self.db.update_player_stats_optimistic(self.user.id, raw_json_str, current_stats.to_dict()):
+                # Rollback: Refund the cost
+                self.db.refund_vestige(self.user.id, total_cost)
+                logger.warning(f"Optimistic lock failed for user {self.user.id} upgrading {stat}")
+                return False, "System busy (Race Condition). Try again.", 0
+
+            # Phase 3: Update Derived Vitals (Max HP/MP)
+            # This is safe to run after; if it fails, only HP/MP caps are slightly stale
+            self.db.update_player_vitals(self.user.id, current_stats.max_hp, current_stats.max_mp)
+
+            return True, "", vestige - total_cost
         except Exception as e:
             logger.error(f"Stat upgrade error: {e}")
             return False, "System Error.", 0

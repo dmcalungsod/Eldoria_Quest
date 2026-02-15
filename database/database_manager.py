@@ -1027,6 +1027,42 @@ class DatabaseManager:
             {"$set": {"stats_json": stats_json_str}},
         )
 
+    def deduct_vestige(self, discord_id: int, amount: int) -> bool:
+        """
+        Safely deducts vestige with a balance check.
+        Returns True if successful, False if insufficient funds.
+        """
+        result = self._col("players").update_one(
+            {"discord_id": discord_id, "vestige_pool": {"$gte": amount}},
+            {"$inc": {"vestige_pool": -amount}},
+        )
+        return result.modified_count > 0
+
+    def refund_vestige(self, discord_id: int, amount: int):
+        """Refunds vestige (e.g., after a failed optimistic update)."""
+        self._col("players").update_one(
+            {"discord_id": discord_id},
+            {"$inc": {"vestige_pool": amount}},
+        )
+
+    def update_player_stats_optimistic(self, discord_id: int, old_json_str: str, new_stats_data: dict) -> bool:
+        """
+        Updates player stats only if the current stats_json matches old_json_str.
+        Prevents Lost Updates due to race conditions.
+        """
+        result = self._col("stats").update_one(
+            {"discord_id": discord_id, "stats_json": old_json_str},
+            {"$set": {"stats_json": json.dumps(new_stats_data)}},
+        )
+        return result.modified_count > 0
+
+    def update_player_vitals(self, discord_id: int, hp: int, mp: int):
+        """Updates just HP and MP."""
+        self._col("players").update_one(
+            {"discord_id": discord_id},
+            {"$set": {"current_hp": hp, "current_mp": mp}},
+        )
+
     def add_reward_item_internal(self, discord_id: int, item_key: str, item_data: dict):
         """Adds a reward item (consumable) within reward processing."""
         existing = self._col("inventory").find_one(
