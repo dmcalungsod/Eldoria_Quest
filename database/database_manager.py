@@ -13,8 +13,7 @@ import time
 from contextlib import contextmanager
 from typing import Any
 
-from pymongo import MongoClient, UpdateOne
-from pymongo.errors import PyMongoError
+from pymongo import MongoClient
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")
@@ -35,7 +34,7 @@ class DatabaseManager:
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(DatabaseManager, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self, mongo_uri: str | None = None, db_name: str | None = None):
@@ -169,12 +168,19 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
-        skills = []
-        for ps in player_skill_docs:
-            skill_def = self._col("skills").find_one(
-                {"key_id": ps["skill_key"], "type": "Active"},
+
+        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
+        skill_defs = list(
+            self._col("skills").find(
+                {"key_id": {"$in": skill_keys}, "type": "Active"},
                 {"_id": 0},
             )
+        )
+        skill_def_map = {s["key_id"]: s for s in skill_defs}
+
+        skills = []
+        for ps in player_skill_docs:
+            skill_def = skill_def_map.get(ps["skill_key"])
             if skill_def:
                 skills.append(
                     {
@@ -267,9 +273,18 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
+        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
+        skill_defs = list(
+            self._col("skills").find(
+                {"key_id": {"$in": skill_keys}},
+                {"_id": 0},
+            )
+        )
+        skill_def_map = {s["key_id"]: s for s in skill_defs}
+
         results = []
         for ps in player_skill_docs:
-            skill_def = self._col("skills").find_one({"key_id": ps["skill_key"]}, {"_id": 0})
+            skill_def = skill_def_map.get(ps["skill_key"])
             if skill_def:
                 results.append(
                     {
@@ -290,12 +305,18 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
-        skills = []
-        for ps in player_skill_docs:
-            skill_def = self._col("skills").find_one(
-                {"key_id": ps["skill_key"], "type": "Active"},
+        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
+        skill_defs = list(
+            self._col("skills").find(
+                {"key_id": {"$in": skill_keys}, "type": "Active"},
                 {"_id": 0},
             )
+        )
+        skill_def_map = {s["key_id"]: s for s in skill_defs}
+
+        skills = []
+        for ps in player_skill_docs:
+            skill_def = skill_def_map.get(ps["skill_key"])
             if skill_def:
                 skills.append(
                     {
@@ -1102,7 +1123,6 @@ class DatabaseManager:
             return False, "You are already healthy."
 
         # Recalculate cost from fresh data
-        from game_systems.player.player_stats import PlayerStats  # avoid circular at module level
 
         actual_cost = max(1, int(missing * 0.5)) if missing > 0 else 0
 
