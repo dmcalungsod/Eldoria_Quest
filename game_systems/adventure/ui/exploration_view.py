@@ -63,7 +63,8 @@ class ExplorationView(View):
         self.add_item(self.inv_btn)
 
         # Withdraw
-        self.leave_btn = Button(label="Withdraw", style=discord.ButtonStyle.danger, emoji="⬅️", row=0, custom_id="leave")
+        l_lbl, l_sty, l_emo = self._get_leave_button_state()
+        self.leave_btn = Button(label=l_lbl, style=l_sty, emoji=l_emo, row=0, custom_id="leave")
         self.leave_btn.callback = self.leave_callback
         self.add_item(self.leave_btn)
 
@@ -71,6 +72,11 @@ class ExplorationView(View):
         if self.active_monster:
             return "Battle", discord.ButtonStyle.danger, "⚔️"
         return "Forward", discord.ButtonStyle.success, "🥾"
+
+    def _get_leave_button_state(self):
+        if self.active_monster:
+            return "Flee", discord.ButtonStyle.danger, "🏃"
+        return "Return to Town", discord.ButtonStyle.primary, "🏠"
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -135,6 +141,12 @@ class ExplorationView(View):
                     self.forward_btn.style = sty
                     self.forward_btn.emoji = emo
 
+                    # Update Leave Button Appearance
+                    l_lbl, l_sty, l_emo = self._get_leave_button_state()
+                    self.leave_btn.label = l_lbl
+                    self.leave_btn.style = l_sty
+                    self.leave_btn.emoji = l_emo
+
                     if is_dead:
                         self.forward_btn.disabled = True
                         self.inv_btn.disabled = True
@@ -161,7 +173,7 @@ class ExplorationView(View):
             item.disabled = True
 
         # Show "Thinking/Combat" state
-        self.forward_btn.label = "..."
+        self.forward_btn.label = "Fighting..." if self.active_monster else "Exploring..."
         self.forward_btn.style = discord.ButtonStyle.secondary
 
     def _enable_all(self):
@@ -194,6 +206,18 @@ class ExplorationView(View):
 
         # Reset my buttons
         self._enable_all()
+
+        # Update Forward Button Appearance
+        lbl, sty, emo = self._get_button_state()
+        self.forward_btn.label = lbl
+        self.forward_btn.style = sty
+        self.forward_btn.emoji = emo
+
+        # Update Leave Button Appearance
+        l_lbl, l_sty, l_emo = self._get_leave_button_state()
+        self.leave_btn.label = l_lbl
+        self.leave_btn.style = l_sty
+        self.leave_btn.emoji = l_emo
 
         await interaction.edit_original_response(embed=embed, view=self)
 
