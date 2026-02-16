@@ -84,10 +84,17 @@ class AdventureManager:
 
             items = self._grant_rewards_internal(session, 0, p_stats)
 
-            for item in items:
-                self.inventory_manager.add_item(
-                    discord_id, item["key"], item["name"], item["type"], item["rarity"], item["amount"]
-                )
+            bulk_items = [
+                {
+                    "item_key": item["key"],
+                    "item_name": item["name"],
+                    "item_type": item["type"],
+                    "rarity": item["rarity"],
+                    "amount": item["amount"],
+                }
+                for item in items
+            ]
+            self.inventory_manager.add_items_bulk(discord_id, bulk_items)
 
             self.db.end_adventure_session(discord_id)
 
@@ -132,10 +139,17 @@ class AdventureManager:
                 "leveled_up": new_level > old_level,
             }
 
-            for item in items_to_add:
-                self.inventory_manager.add_item(
-                    discord_id, item["key"], item["name"], item["type"], item["rarity"], item["amount"]
-                )
+            bulk_items = [
+                {
+                    "item_key": item["key"],
+                    "item_name": item["name"],
+                    "item_type": item["type"],
+                    "rarity": item["rarity"],
+                    "amount": item["amount"],
+                }
+                for item in items_to_add
+            ]
+            self.inventory_manager.add_items_bulk(discord_id, bulk_items)
 
             return summary
 
