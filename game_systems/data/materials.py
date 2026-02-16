@@ -74,6 +74,12 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 40,  # Up from 22
     },
+    "boar_meat": {
+        "name": "Raw Boar Meat",
+        "description": "A slab of meat from a wild boar.",
+        "rarity": "Common",
+        "value": 15,
+    },
     "boss_talon": {
         "name": "Forest Boss Talon",
         "description": "A massive talon from a guardian of the forest.",

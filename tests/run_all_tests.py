@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
+import test_crafting_expanded  # Expanded crafting tests
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
@@ -51,6 +52,17 @@ def run_scavenge_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+def run_crafting_tests():
+    """Runs the crafting system tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING CRAFTING EXPANSION TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_crafting_expanded)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -66,6 +78,7 @@ def main():
     print("  • Security and sanitization")
     print("  • Infirmary Security")
     print("  • Quest Security (New)")
+    print("  • Crafting System Expansion (New)")
     print("\n")
 
     db_available = check_mongodb_connection()
@@ -79,7 +92,11 @@ def main():
     scavenge_passed = run_scavenge_tests()
     all_passed = all_passed and scavenge_passed
 
-    # 3. Integration Tests (Require MongoDB)
+    # 3. Crafting Tests (Mock-based, always run)
+    crafting_passed = run_crafting_tests()
+    all_passed = all_passed and crafting_passed
+
+    # 4. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -95,25 +112,6 @@ def main():
         game_passed = test_game_systems.run_all_tests()
         all_passed = all_passed and game_passed
 
-        # Security tests (legacy) rely on DB patching which might fail without real DB logic
-        # But let's try running them if DB is available.
-        # Note: test_security.py patches DatabaseManager to use a temp file path,
-        # which fails with pymongo client. So it's likely broken regardless of live DB unless fixed.
-        # We'll skip it for now to ensure CI pass, or try to run it and catch failure.
-        # Given the CI failure showed it didn't even get there, let's be conservative.
-
-        # print("\n" + "-" * 70)
-        # print("RUNNING SECURITY TESTS (Legacy)")
-        # print("-" * 70)
-        # security_passed = test_security.run_all_tests()
-        # all_passed = all_passed and security_passed
-
-        # print("\n" + "-" * 70)
-        # print("RUNNING INFIRMARY SECURITY TESTS")
-        # print("-" * 70)
-        # infirmary_passed = test_infirmary_security.run_all_tests()
-        # all_passed = all_passed and infirmary_passed
-
     else:
         print("\n⚠️  Skipping Integration Tests (Database, Game Systems, Legacy Security) - MongoDB unavailable.")
         # Mark as passed if we intentionally skipped them to avoid breaking CI
@@ -124,12 +122,11 @@ def main():
     print("=" * 70)
     print(f"Quest Security Tests: {'✓ PASSED' if quest_passed else '✗ FAILED'}")
     print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
+    print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
 
     if db_available:
         print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")
         print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
-        # print(f"Security Tests: {'✓ PASSED' if security_passed else '✗ FAILED'}")
-        # print(f"Infirmary Security Tests: {'✓ PASSED' if infirmary_passed else '✗ FAILED'}")
     else:
         print("Integration Tests: SKIPPED")
 
