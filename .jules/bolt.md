@@ -13,3 +13,7 @@
 ## 2024-05-25 - [Redundant Buff Cleanup on Hot Path]
 **Learning:** `AdventureSession` was executing a `DELETE` query (`clear_expired_buffs`) on every single turn/step to maintain `active_buffs` table hygiene. However, the read query (`get_active_buffs`) already filters out expired rows by timestamp.
 **Action:** Removed the `DELETE` operation from the hot path `_fetch_combat_context`. Moved the cleanup logic to `AdventureManager.start_adventure`, ensuring the table is pruned only when a new session begins (cold path), saving 1 write operation per turn.
+
+## 2024-05-26 - [Pre-parsing JSON in Database Layer]
+**Learning:** `CombatHandler` was parsing `buff_data` (JSON string) for every skill on every combat turn because MongoDB stores it as a string. This deserialization overhead accumulated in loops.
+**Action:** Implemented caching in `DatabaseManager` (`_skill_cache`) that parses `buff_data` once on load. Exposed pre-parsed dicts to consumers, removing redundant parsing logic from the hot path.

@@ -52,6 +52,7 @@ class DatabaseManager:
         self.db = self._client[self._db_name]
 
         self._class_cache: dict[int, dict] = {}
+        self._skill_cache: dict[str, dict] = {}  # Cache for skill definitions
         self._boost_cache: list[dict] = []
         self._boost_cache_time: float = 0.0
 
@@ -61,6 +62,22 @@ class DatabaseManager:
     # ============================================================
     # HELPERS
     # ============================================================
+
+    def _ensure_skill_cache(self):
+        """Loads all skills from DB into cache if empty."""
+        if self._skill_cache:
+            return
+
+        skill_docs = self._col("skills").find({})
+        for doc in skill_docs:
+            # Pre-parse buff_data if it's a string
+            if doc.get("buff_data") and isinstance(doc["buff_data"], str):
+                try:
+                    doc["buff_data"] = json.loads(doc["buff_data"])
+                except json.JSONDecodeError:
+                    doc["buff_data"] = {}
+
+            self._skill_cache[doc["key_id"]] = doc
 
     def _col(self, name: str):
         """Shorthand to get a collection."""
@@ -169,19 +186,11 @@ class DatabaseManager:
             )
         )
 
-        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
-        skill_defs = list(
-            self._col("skills").find(
-                {"key_id": {"$in": skill_keys}, "type": "Active"},
-                {"_id": 0},
-            )
-        )
-        skill_def_map = {s["key_id"]: s for s in skill_defs}
-
+        self._ensure_skill_cache()
         skills = []
         for ps in player_skill_docs:
-            skill_def = skill_def_map.get(ps["skill_key"])
-            if skill_def:
+            skill_def = self._skill_cache.get(ps["skill_key"])
+            if skill_def and skill_def["type"] == "Active":
                 skills.append(
                     {
                         "key_id": skill_def["key_id"],
@@ -273,18 +282,11 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
-        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
-        skill_defs = list(
-            self._col("skills").find(
-                {"key_id": {"$in": skill_keys}},
-                {"_id": 0},
-            )
-        )
-        skill_def_map = {s["key_id"]: s for s in skill_defs}
 
+        self._ensure_skill_cache()
         results = []
         for ps in player_skill_docs:
-            skill_def = skill_def_map.get(ps["skill_key"])
+            skill_def = self._skill_cache.get(ps["skill_key"])
             if skill_def:
                 results.append(
                     {
@@ -305,19 +307,12 @@ class DatabaseManager:
                 {"_id": 0},
             )
         )
-        skill_keys = [ps["skill_key"] for ps in player_skill_docs]
-        skill_defs = list(
-            self._col("skills").find(
-                {"key_id": {"$in": skill_keys}, "type": "Active"},
-                {"_id": 0},
-            )
-        )
-        skill_def_map = {s["key_id"]: s for s in skill_defs}
 
+        self._ensure_skill_cache()
         skills = []
         for ps in player_skill_docs:
-            skill_def = skill_def_map.get(ps["skill_key"])
-            if skill_def:
+            skill_def = self._skill_cache.get(ps["skill_key"])
+            if skill_def and skill_def["type"] == "Active":
                 skills.append(
                     {
                         "key_id": skill_def["key_id"],
@@ -906,7 +901,10 @@ class DatabaseManager:
         )
         if not ps:
             return None
-        skill_def = self._col("skills").find_one({"key_id": skill_key}, {"_id": 0})
+
+        self._ensure_skill_cache()
+        skill_def = self._skill_cache.get(skill_key)
+
         if not skill_def:
             return None
         return {
