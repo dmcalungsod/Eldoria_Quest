@@ -8,7 +8,9 @@ import logging
 
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
+from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.recipes import RECIPES
+from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
 
@@ -19,11 +21,14 @@ class CraftingSystem:
 
     def get_recipes(self, discord_id: int) -> dict:
         """Returns all available recipes for the player."""
-        return RECIPES
+        # Merge dictionaries.
+        all_recipes = {**RECIPES, **EQUIPMENT_RECIPES}
+        return all_recipes
 
     def can_craft(self, discord_id: int, recipe_id: str) -> tuple[bool, str]:
         """Checks if a player can craft a specific recipe."""
-        recipe = RECIPES.get(recipe_id)
+        all_recipes = self.get_recipes(discord_id)
+        recipe = all_recipes.get(recipe_id)
         if not recipe:
             return False, "Recipe not found."
 
@@ -42,6 +47,14 @@ class CraftingSystem:
 
         return True, "Ready to craft."
 
+    def _get_equipment_id_by_name(self, name: str) -> int | None:
+        """Finds the database ID for an equipment item by its name."""
+        # Query the 'equipment' collection
+        doc = self.db._col("equipment").find_one({"name": name}, {"id": 1})
+        if doc:
+            return doc["id"]
+        return None
+
     def craft_item(self, discord_id: int, recipe_id: str) -> tuple[bool, str, dict | None]:
         """
         Executes the crafting process safely.
@@ -52,11 +65,14 @@ class CraftingSystem:
         if not can:
             return False, msg, None
 
-        recipe = RECIPES[recipe_id]
+        all_recipes = self.get_recipes(discord_id)
+        recipe = all_recipes[recipe_id]
+
         cost = recipe.get("cost", 0)
         materials = recipe.get("materials", {})
         output_key = recipe["output_key"]
         output_amount = recipe.get("output_amount", 1)
+        recipe_type = recipe.get("type", "consumable")  # Default to consumable for legacy recipes
 
         try:
             # 1. Deduct Gold
@@ -69,20 +85,46 @@ class CraftingSystem:
                     # Continue best effort
 
             # 3. Add Output Item
-            item_data = CONSUMABLES.get(output_key)
-            if not item_data:
-                return False, "System Error: Output item data missing.", None
+            item_data = None
 
-            self.db.add_inventory_item(
-                discord_id,
-                output_key,
-                item_data["name"],
-                "consumable",
-                item_data["rarity"],
-                output_amount,
-                None,
-                None,
-            )
+            if recipe_type == "equipment":
+                # Equipment Crafting Logic
+                item_data = EQUIPMENT_DATA.get(output_key)
+                if not item_data:
+                    return False, "System Error: Equipment data missing.", None
+
+                # Resolve DB ID
+                db_id = self._get_equipment_id_by_name(item_data["name"])
+                if not db_id:
+                    return False, f"System Error: Equipment '{item_data['name']}' not found in database.", None
+
+                self.db.add_inventory_item(
+                    discord_id,
+                    str(db_id),  # Key must be the ID string for equipment stats logic
+                    item_data["name"],
+                    "equipment",
+                    item_data["rarity"],
+                    output_amount,
+                    item_data.get("slot"),
+                    "equipment",  # Item source table
+                )
+
+            else:
+                # Consumable Logic
+                item_data = CONSUMABLES.get(output_key)
+                if not item_data:
+                    return False, "System Error: Output item data missing.", None
+
+                self.db.add_inventory_item(
+                    discord_id,
+                    output_key,
+                    item_data["name"],
+                    "consumable",
+                    item_data["rarity"],
+                    output_amount,
+                    None,
+                    None,
+                )
 
             logger.info(f"User {discord_id} crafted {output_amount}x {output_key}")
             return True, f"Successfully crafted **{item_data['name']}** x{output_amount}!", item_data

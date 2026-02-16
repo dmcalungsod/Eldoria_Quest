@@ -55,7 +55,14 @@ class CraftingView(View):
             # Calculate if craftable
             # Optimization: could cache inventory counts, but DB call is fast enough
             can_craft, _ = self.crafting_system.can_craft(self.interaction_user.id, r_id)
-            emoji = E.POTION if can_craft else E.LOCKED
+
+            # Determine Emoji
+            if not can_craft:
+                emoji = E.LOCKED
+            elif r_data.get("type") == "equipment":
+                emoji = getattr(E, "SWORDS", "⚔️")
+            else:
+                emoji = E.POTION
 
             label = f"{r_data['name']} ({r_data['cost']} G)"
             desc = r_data['description'][:100]
@@ -93,7 +100,7 @@ class CraftingView(View):
         embed = discord.Embed(
             title="⚗️ Alchemist's Workbench",
             description="Bubbling cauldrons and drying herbs fill the air with strange scents.\n"
-            "Select a recipe to combine your materials into powerful concoctions.",
+            "Select a recipe to combine your materials into potions or equipment.",
             color=color,
         )
 
