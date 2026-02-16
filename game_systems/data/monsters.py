@@ -148,6 +148,9 @@ for idx in range(1, 51):
         drops.append(("spider_silk", 30))
     elif "Treant" in name:
         drops.append(("treant_branch", 15))
+    elif "Boar" in name:
+        drops.append(("boar_meat", 40))
+        drops.append(("boar_tusk", 25))
 
     description = (
         f"In the whispering groves of the Shattered Veil, the {name} prowls. "
