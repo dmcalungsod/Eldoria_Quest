@@ -13,7 +13,7 @@ import time
 from contextlib import contextmanager
 from typing import Any
 
-from pymongo import MongoClient
+from pymongo import MongoClient, InsertOne, UpdateOne
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")
@@ -559,6 +559,99 @@ class DatabaseManager:
                     "equipped": 0,
                 }
             )
+
+    def add_inventory_items_bulk(self, discord_id: int, items: list[dict]):
+        """
+        Efficiently adds multiple items to inventory.
+        Handles stacking and bulk insertion to reduce DB round-trips.
+        items: list of dicts with keys: item_key, item_name, item_type, rarity, amount, [slot], [item_source_table]
+        """
+        if not items:
+            return
+
+        # 1. Consolidate items to minimize operations
+        consolidated = {}
+        for item in items:
+            # Key matches find_stackable_item logic: (item_key, rarity, slot, item_source_table)
+            key = (item["item_key"], item["rarity"], item.get("slot"), item.get("item_source_table"))
+            if key not in consolidated:
+                consolidated[key] = {
+                    "item_key": item["item_key"],
+                    "item_name": item["item_name"],
+                    "item_type": item["item_type"],
+                    "rarity": item["rarity"],
+                    "slot": item.get("slot"),
+                    "item_source_table": item.get("item_source_table"),
+                    "amount": 0
+                }
+            consolidated[key]["amount"] += item["amount"]
+
+        # 2. Fetch all potentially relevant existing stacks in one query
+        # We only care about matching keys for this user that are unequipped
+        item_keys = [k[0] for k in consolidated.keys()]
+        query = {
+            "discord_id": discord_id,
+            "equipped": 0,
+            "item_key": {"$in": item_keys}
+        }
+        existing_docs = list(self._col("inventory").find(query))
+
+        # Map existing docs for O(1) lookup
+        # Key must match the consolidation key
+        existing_map = {}
+        for doc in existing_docs:
+            key = (doc["item_key"], doc["rarity"], doc.get("slot"), doc.get("item_source_table"))
+            existing_map[key] = doc
+
+        operations = []
+        new_items_data = []
+
+        # 3. Prepare Bulk Operations
+        for key, item_data in consolidated.items():
+            if key in existing_map:
+                # Update existing stack
+                doc_id = existing_map[key]["id"]
+                operations.append(UpdateOne({"id": doc_id}, {"$inc": {"count": item_data["amount"]}}))
+            else:
+                # Queue for insertion
+                new_items_data.append(item_data)
+
+        # 4. Generate IDs for new items in a single batch
+        if new_items_data:
+            count = len(new_items_data)
+            # Atomically reserve a block of IDs
+            counter_doc = self._col("counters").find_one_and_update(
+                {"_id": "inventory_id"},
+                {"$inc": {"seq": count}},
+                upsert=True,
+                return_document=True
+            )
+            # The range reserved is [end_seq - count + 1, end_seq]
+            end_seq = counter_doc["seq"]
+            start_seq = end_seq - count + 1
+
+            for i, item_data in enumerate(new_items_data):
+                new_id = start_seq + i
+                operations.append(InsertOne({
+                    "id": new_id,
+                    "discord_id": discord_id,
+                    "item_key": item_data["item_key"],
+                    "item_name": item_data["item_name"],
+                    "item_type": item_data["item_type"],
+                    "rarity": item_data["rarity"],
+                    "slot": item_data["slot"],
+                    "item_source_table": item_data["item_source_table"],
+                    "count": item_data["amount"],
+                    "equipped": 0
+                }))
+
+        # 5. Execute
+        if operations:
+            try:
+                self._col("inventory").bulk_write(operations)
+                logger.info(f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}")
+            except Exception as e:
+                logger.error(f"Failed to bulk add items for {discord_id}: {e}", exc_info=True)
 
     def get_inventory_item_count(self, discord_id: int, item_key: str) -> int:
         """Returns the total count of an item across all stacks."""

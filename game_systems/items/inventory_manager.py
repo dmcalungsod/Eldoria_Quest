@@ -47,6 +47,21 @@ class InventoryManager:
             logger.error(f"Failed to add item {item_key} for {discord_id}: {e}", exc_info=True)
             return False
 
+    def add_items_bulk(self, discord_id: int, items: list[dict]) -> bool:
+        """
+        Adds multiple items to inventory efficiently.
+        Delegates to DatabaseManager.add_inventory_items_bulk.
+        """
+        if not items:
+            return True
+
+        try:
+            self.db.add_inventory_items_bulk(discord_id, items)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to bulk add items for {discord_id}: {e}", exc_info=True)
+            return False
+
     def remove_item(self, discord_id: int, item_key: str, amount: int = 1) -> bool:
         """
         Removes items safely. Returns True if successful, False if insufficient quantity.
