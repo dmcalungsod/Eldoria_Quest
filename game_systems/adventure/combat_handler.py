@@ -124,14 +124,6 @@ class CombatHandler:
                 active_boosts_list = self.db.get_active_boosts()
                 boosts = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
 
-            # 2. Parse Skill Buffs safely
-            for s in skills:
-                if s.get("buff_data") and isinstance(s["buff_data"], str):
-                    try:
-                        s["buff_data"] = json.loads(s["buff_data"])
-                    except (json.JSONDecodeError, TypeError):
-                        s["buff_data"] = {}
-
             # 3. Setup Wrappers & Fast-Forward State
             player_wrapper = LevelUpSystem(player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"])
 
