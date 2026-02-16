@@ -115,6 +115,26 @@ class TestDatabaseManager(unittest.TestCase):
             {"$inc": {"count": 5}}
         )
 
+    def test_deduct_aurum(self):
+        # Mock successful deduction
+        self.mock_db.players.find_one_and_update.return_value = {"aurum": 50}
+
+        new_balance = self.db.deduct_aurum(12345, 100)
+
+        self.assertEqual(new_balance, 50)
+        self.mock_db.players.find_one_and_update.assert_called_with(
+            {"discord_id": 12345, "aurum": {"$gte": 100}},
+            {"$inc": {"aurum": -100}},
+            return_document=True
+        )
+
+        # Mock insufficient funds
+        self.mock_db.players.find_one_and_update.return_value = None
+
+        new_balance = self.db.deduct_aurum(12345, 1000)
+
+        self.assertIsNone(new_balance)
+
 
 def run_all_tests():
     """Runs the test suite for run_all_tests.py integration."""

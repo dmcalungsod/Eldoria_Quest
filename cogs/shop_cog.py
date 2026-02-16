@@ -116,17 +116,12 @@ class ShopView(View):
             if not item_data:
                 return (False, "Item data missing.", 0)
 
-            # Fetch current aurum
-            aurum = self.db.get_player_field(self.interaction_user.id, "aurum")
-            if aurum is None or aurum < price:
+            # 1. Atomic Deduction
+            new_aurum = self.db.deduct_aurum(self.interaction_user.id, price)
+            if new_aurum is None:
                 return (False, "Insufficient Aurum.", 0)
 
-            new_aurum = aurum - price
-
-            # Deduct funds
-            self.db.set_player_field(self.interaction_user.id, "aurum", new_aurum)
-
-            # Add item
+            # 2. Add item to inventory
             self.db.add_inventory_item(
                 self.interaction_user.id,
                 item_key,

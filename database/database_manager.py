@@ -1086,6 +1086,18 @@ class DatabaseManager:
         )
         return result.modified_count > 0
 
+    def deduct_aurum(self, discord_id: int, amount: int) -> int | None:
+        """
+        Safely deducts aurum with a balance check.
+        Returns the new balance if successful, None if insufficient funds.
+        """
+        result = self._col("players").find_one_and_update(
+            {"discord_id": discord_id, "aurum": {"$gte": amount}},
+            {"$inc": {"aurum": -amount}},
+            return_document=True
+        )
+        return result["aurum"] if result else None
+
     def refund_vestige(self, discord_id: int, amount: int):
         """Refunds vestige (e.g., after a failed optimistic update)."""
         self._col("players").update_one(
@@ -1149,17 +1161,12 @@ class DatabaseManager:
 
     def purchase_item(self, discord_id: int, item_key: str, item_data: dict, price: int) -> tuple[bool, Any, int]:
         """Atomic purchase: deducts gold and adds item."""
-        player = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "aurum": 1})
-        if not player or player["aurum"] < price:
+        # 1. Atomic Deduction
+        new_aurum = self.deduct_aurum(discord_id, price)
+        if new_aurum is None:
             return (False, "Insufficient Aurum.", 0)
 
-        new_aurum = player["aurum"] - price
-        self._col("players").update_one(
-            {"discord_id": discord_id},
-            {"$set": {"aurum": new_aurum}},
-        )
-
-        # Add item to inventory
+        # 2. Add item to inventory
         existing = self._col("inventory").find_one(
             {
                 "discord_id": discord_id,
