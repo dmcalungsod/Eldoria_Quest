@@ -25,7 +25,9 @@ class CombatHandler:
         self.db = db
         self.discord_id = discord_id
 
-    def initiate_combat(self, location: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
+    def initiate_combat(
+        self, location: dict[str, Any], player_level: int | None = None
+    ) -> tuple[dict[str, Any] | None, str]:
         """
         Selects a monster and prepares the combat session.
         """
@@ -36,7 +38,9 @@ class CombatHandler:
             # 2. Conditional Spawns (Level Check)
             conditionals = location.get("conditional_monsters", [])
             if conditionals:
-                player_level = self.db.get_player_field(self.discord_id, "level") or 1
+                # OPTIMIZATION: Use passed level if available, otherwise fetch from DB
+                if player_level is None:
+                    player_level = self.db.get_player_field(self.discord_id, "level") or 1
 
                 for cond in conditionals:
                     if player_level >= cond.get("min_level", 1):
