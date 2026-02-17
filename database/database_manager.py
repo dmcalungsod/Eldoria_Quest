@@ -202,6 +202,8 @@ class DatabaseManager:
                         "power_multiplier": skill_def.get("power_multiplier", 1.0),
                         "heal_power": skill_def.get("heal_power", 0),
                         "buff_data": skill_def.get("buff_data"),
+                        "scaling_stat": skill_def.get("scaling_stat", "MAG"),
+                        "scaling_factor": skill_def.get("scaling_factor", 1.0),
                     }
                 )
 
@@ -324,6 +326,8 @@ class DatabaseManager:
                         "power_multiplier": skill_def.get("power_multiplier", 1.0),
                         "heal_power": skill_def.get("heal_power", 0),
                         "buff_data": skill_def.get("buff_data"),
+                        "scaling_stat": skill_def.get("scaling_stat", "MAG"),
+                        "scaling_factor": skill_def.get("scaling_factor", 1.0),
                     }
                 )
         return skills

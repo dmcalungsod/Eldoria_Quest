@@ -17,6 +17,8 @@ SKILLS = {
         "power_multiplier": 1.5,
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 200,  # Base Vestige cost
+        "scaling_stat": "STR",
+        "scaling_factor": 2.7,
     },
     "cleave": {
         "key_id": "cleave",
@@ -28,6 +30,8 @@ SKILLS = {
         "power_multiplier": 1.1,  # Lower multiplier, but hits all
         "learn_cost": 2000,
         "upgrade_cost": 300,
+        "scaling_stat": "STR",
+        "scaling_factor": 2.7,
     },
     "endure": {
         "key_id": "endure",
@@ -39,6 +43,8 @@ SKILLS = {
         "buff": {"END_percent": 0.25, "duration": 3},  # +25% END for 3 turns
         "learn_cost": 1500,
         "upgrade_cost": 250,
+        "scaling_stat": "END",
+        "scaling_factor": 1.0,
     },
     # === MAGE (Class 2) ===
     "fireball": {
@@ -51,6 +57,8 @@ SKILLS = {
         "power_multiplier": 1.2,
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 200,
+        "scaling_stat": "MAG",
+        "scaling_factor": 2.8,
     },
     "ice_lance": {
         "key_id": "ice_lance",
@@ -62,6 +70,8 @@ SKILLS = {
         "power_multiplier": 1.4,
         "learn_cost": 2000,
         "upgrade_cost": 300,
+        "scaling_stat": "MAG",
+        "scaling_factor": 2.8,
     },
     "mana_shield": {
         "key_id": "mana_shield",
@@ -73,6 +83,8 @@ SKILLS = {
         "buff": {"mana_shield": True, "duration": 5},
         "learn_cost": 3000,
         "upgrade_cost": 400,
+        "scaling_stat": "MAG",
+        "scaling_factor": 1.0,
     },
     "explosion": {
         "key_id": "explosion",
@@ -84,6 +96,8 @@ SKILLS = {
         "power_multiplier": 2.5,
         "learn_cost": 10000,
         "upgrade_cost": 800,
+        "scaling_stat": "MAG",
+        "scaling_factor": 2.8,
     },
     # === ROGUE (Class 3) ===
     "stealth": {
@@ -96,6 +110,8 @@ SKILLS = {
         "passive_bonus": {"AGI_percent": 0.1},  # +10% AGI
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 500,
+        "scaling_stat": "AGI",
+        "scaling_factor": 1.0,
     },
     "double_strike": {
         "key_id": "double_strike",
@@ -107,6 +123,8 @@ SKILLS = {
         "power_multiplier": 1.8,  # Scaled with DEX
         "learn_cost": 2500,
         "upgrade_cost": 350,
+        "scaling_stat": "DEX",
+        "scaling_factor": 2.6,
     },
     "toxic_blade": {
         "key_id": "toxic_blade",
@@ -119,6 +137,8 @@ SKILLS = {
         "debuff": {"poison": 5, "duration": 3},  # 5 damage per turn for 3 turns
         "learn_cost": 2000,
         "upgrade_cost": 300,
+        "scaling_stat": "DEX",
+        "scaling_factor": 2.6,
     },
     # === CLERIC (Class 4) ===
     "heal": {
@@ -132,6 +152,8 @@ SKILLS = {
         "heal_power": 45,
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 200,
+        "scaling_stat": "MAG",
+        "scaling_factor": 1.5,
     },
     "smite": {
         "key_id": "smite",
@@ -144,6 +166,8 @@ SKILLS = {
         "power_multiplier": 1.7,
         "learn_cost": 1500,
         "upgrade_cost": 250,
+        "scaling_stat": "MAG",
+        "scaling_factor": 2.8,
     },
     "blessing": {
         "key_id": "blessing",
@@ -155,6 +179,8 @@ SKILLS = {
         "buff": {"all_stats_percent": 0.1, "duration": 3},  # +10% all stats
         "learn_cost": 3000,
         "upgrade_cost": 400,
+        "scaling_stat": "MAG",
+        "scaling_factor": 1.0,
     },
     # === RANGER (Class 5) ===
     "true_shot": {
@@ -167,6 +193,8 @@ SKILLS = {
         "power_multiplier": 1.4,
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 200,
+        "scaling_stat": "DEX",
+        "scaling_factor": 2.6,
     },
     "multi_shot": {
         "key_id": "multi_shot",
@@ -178,6 +206,8 @@ SKILLS = {
         "power_multiplier": 1.1,  # Lower multiplier, hits all
         "learn_cost": 2000,
         "upgrade_cost": 300,
+        "scaling_stat": "DEX",
+        "scaling_factor": 2.6,
     },
     "survivalist": {
         "key_id": "survivalist",
@@ -189,5 +219,7 @@ SKILLS = {
         "passive_bonus": {"END_percent": 0.1, "AGI_percent": 0.05},  # +10% END, +5% AGI
         "learn_cost": 3000,
         "upgrade_cost": 500,
+        "scaling_stat": "END",
+        "scaling_factor": 1.0,
     },
 }

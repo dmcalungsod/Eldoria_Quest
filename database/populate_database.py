@@ -259,6 +259,8 @@ def insert_skills(db):
                 "buff_data": buff_json,
                 "learn_cost": s.get("learn_cost", 0),
                 "upgrade_cost": s.get("upgrade_cost", 0),
+                "scaling_stat": s.get("scaling_stat", "MAG"),
+                "scaling_factor": s.get("scaling_factor", 1.0),
             }
         )
         auto_id += 1
