@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_session import AdventureSession
 from game_systems.adventure.event_handler import EventHandler
+from game_systems.player.player_stats import PlayerStats
 
 
 class TestWildGathering(unittest.TestCase):
@@ -28,6 +29,14 @@ class TestWildGathering(unittest.TestCase):
         }
         # get_player_stats_json returns a dict, not a string
         self.db.get_player_stats_json.return_value = self.mock_stats
+
+        # Prepare context for new optimization
+        self.stats_obj = PlayerStats.from_dict(self.mock_stats)
+        self.context = {
+            "player_stats": self.stats_obj,
+            "vitals": {"current_hp": 100, "current_mp": 50},
+            "stats_dict": self.stats_obj.get_total_stats_dict()
+        }
 
         # Setup EventHandler
         self.event_handler = EventHandler(self.db, self.quest_system, self.discord_id)
@@ -52,11 +61,18 @@ class TestWildGathering(unittest.TestCase):
             # choices -> ["test_herb"]
             # random() again -> 0.9 (no extra item variance < 0.20)
 
-            with patch('random.randint', return_value=80), \
-                 patch('random.random', side_effect=[0.1, 0.9]), \
+            # side_effect:
+            # 1. resolve_non_combat: 80 (Fail Regen, > 70)
+            # 2. _perform_wild_gathering: 1 (Success Gather, <= 35)
+            with patch('random.randint', side_effect=[80, 1]), \
+                 patch('random.random', side_effect=[0.9]), \
                  patch('random.choices', return_value=["test_herb"]):
 
-                 result = self.event_handler.resolve_non_combat(location_id="test_loc", regen_chance=70)
+                 result = self.event_handler.resolve_non_combat(
+                     context=self.context,
+                     location_id="test_loc",
+                     regen_chance=70
+                 )
 
                  self.assertIn("loot", result)
                  # Quantity check: Base 1 + (Luck 50 / 25) = 1 + 2 = 3. Cap is 3.
@@ -74,11 +90,16 @@ class TestWildGathering(unittest.TestCase):
 
         with patch('game_systems.adventure.event_handler.LOCATIONS', mock_locations):
             # Should fallback to default pool
-             with patch('random.randint', return_value=80), \
-                  patch('random.random', side_effect=[0.1, 0.9]), \
+             # side_effect: 80 (Fail Regen), 1 (Success Gather)
+             with patch('random.randint', side_effect=[80, 1]), \
+                  patch('random.random', side_effect=[0.9]), \
                   patch('random.choices', return_value=["medicinal_herb"]): # Fallback pool item
 
-                 result = self.event_handler.resolve_non_combat(location_id="empty_loc", regen_chance=70)
+                 result = self.event_handler.resolve_non_combat(
+                     context=self.context,
+                     location_id="empty_loc",
+                     regen_chance=70
+                 )
                  self.assertIn("loot", result)
                  self.assertIn("medicinal_herb", result["loot"])
 
@@ -88,6 +109,9 @@ class TestWildGathering(unittest.TestCase):
         session = AdventureSession(self.db, self.quest_system, self.inventory_manager, self.discord_id)
         session.events = MagicMock()
         session.events.resolve_non_combat.return_value = {"log": [], "dead": False}
+
+        # Mock _fetch_session_context to return our context
+        session._fetch_session_context = MagicMock(return_value=self.context)
 
         session.location_id = "test_forest"
 
@@ -99,6 +123,7 @@ class TestWildGathering(unittest.TestCase):
 
                 # Check call args
                 session.events.resolve_non_combat.assert_called_with(
+                    context=self.context,
                     location_id="test_forest",
                     regen_chance=70,
                     location_name="Forest"

@@ -30,36 +30,35 @@ class EventHandler:
         self.discord_id = discord_id
 
     def resolve_non_combat(
-        self, location_id: str | None = None, regen_chance: int = 70, location_name: str | None = None
+        self,
+        context: dict[str, Any],
+        location_id: str | None = None,
+        regen_chance: int = 70,
+        location_name: str | None = None,
     ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(location_id)
+                return self._perform_regeneration(context, location_id)
             else:
-                return self._perform_quest_event(location_name, location_id)
+                return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 
-    def _perform_regeneration(self, location_id: str | None = None) -> dict[str, Any]:
+    def _perform_regeneration(self, context: dict[str, Any], location_id: str | None = None) -> dict[str, Any]:
         """
         Calculates and applies regeneration safely.
         Uses an atomic transaction to ensure HP/MP updates are consistent.
         """
         try:
-            # Fetch static stats (read-only, safe outside transaction)
-            stats_json = self.db.get_player_stats_json(self.discord_id)
-            stats = PlayerStats.from_dict(stats_json)
+            # Use passed context instead of redundant DB lookups
+            stats = context["player_stats"]
+            vitals = context["vitals"]
 
-            row = self.db.get_player_vitals(self.discord_id)
-
-            if not row:
-                return {"log": ["Error: Player data not found."], "dead": False}
-
-            current_hp = row["current_hp"]
-            current_mp = row["current_mp"]
+            current_hp = vitals["current_hp"]
+            current_mp = vitals["current_mp"]
 
             # If already full, trigger SURGE (High-chance gather)
             if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
@@ -67,7 +66,7 @@ class EventHandler:
                 surge_msg = f"\n{AdventureEvents.surge_event()}"
 
                 # Chain into gathering with +25% bonus
-                result = self._perform_wild_gathering(location_id, bonus_chance=25)
+                result = self._perform_wild_gathering(context, location_id, bonus_chance=25)
 
                 # Prepend the surge message to the gathering log
                 if result.get("log"):
@@ -86,6 +85,9 @@ class EventHandler:
 
             # Apply Update
             self.db.set_player_vitals(self.discord_id, new_hp, new_mp)
+            # Update local context for consistency within the step
+            vitals["current_hp"] = new_hp
+            vitals["current_mp"] = new_mp
 
             # Build Log Messages
             base_logs = AdventureEvents.regeneration()
@@ -104,7 +106,9 @@ class EventHandler:
             logger.error(f"Regen error for {self.discord_id}: {e}")
             return {"log": ["*You try to rest, but something feels wrong.*"], "dead": False}
 
-    def _perform_quest_event(self, location_name: str | None, location_id: str | None) -> dict[str, Any]:
+    def _perform_quest_event(
+        self, context: dict[str, Any], location_name: str | None, location_id: str | None
+    ) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
         Updates quest progress if a relevant event is triggered.
@@ -145,13 +149,15 @@ class EventHandler:
                                     }
 
             # If no matching quest event was found, try wild gathering
-            return self._perform_wild_gathering(location_id)
+            return self._perform_wild_gathering(context, location_id)
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
             return {"log": ["*The path ahead is unclear.*"], "dead": False}
 
-    def _perform_wild_gathering(self, location_id: str | None, bonus_chance: int = 0) -> dict[str, Any]:
+    def _perform_wild_gathering(
+        self, context: dict[str, Any], location_id: str | None, bonus_chance: int = 0
+    ) -> dict[str, Any]:
         """
         Attempts to find wild materials if no quest event triggered.
         Now supports biome-specific drops and luck-based quantity.
@@ -176,8 +182,7 @@ class EventHandler:
 
             if mat_data:
                 # Calculate Quantity based on Luck
-                stats_json = self.db.get_player_stats_json(self.discord_id)
-                stats = PlayerStats.from_dict(stats_json)
+                stats = context["player_stats"]
 
                 # Formula: Base 1 + (Luck / 25)
                 bonus = int(stats.luck / 25)

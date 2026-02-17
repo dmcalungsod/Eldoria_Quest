@@ -77,9 +77,9 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_combat_context(self) -> dict[str, Any] | None:
+    def _fetch_session_context(self) -> dict[str, Any] | None:
         """
-        Fetches all necessary data for combat in a single batch of queries.
+        Fetches all necessary data for the adventure step (combat or non-combat) in a single batch.
         Returns None if critical data (vitals) is missing.
         """
         try:
@@ -91,7 +91,7 @@ class AdventureSession:
             stats_data = bundle["stats"]
             player_stats = PlayerStats.from_dict(stats_data)
 
-            # Apply Active Buffs
+            # Apply Active Buffs (Crucial: Ensures buffs apply to both combat and gathering)
             active_buffs = bundle["buffs"]
             for buff in active_buffs:
                 player_stats.add_bonus_stat(buff["stat"], buff["amount"])
@@ -118,7 +118,7 @@ class AdventureSession:
                 "active_boosts": boosts_dict,
             }
         except Exception as e:
-            logger.error(f"Combat context fetch failed: {e}")
+            logger.error(f"Session context fetch failed: {e}")
             return None
 
     def _check_auto_condition(self, context: dict[str, Any]) -> bool:
@@ -157,13 +157,15 @@ class AdventureSession:
             return {"sequence": [["Error: Unknown location data."]], "dead": True}
 
         try:
+            # --- 0. Pre-fetch Context (Optimized) ---
+            # We fetch context ONCE at the start for both combat and non-combat.
+            # This ensures Active Buffs are always available and reduces N+1 queries.
+            context = self._fetch_session_context()
+            if not context:
+                return {"sequence": [["Error: Failed to load player data."]], "dead": False}
+
             # --- 1. Continue Combat ---
             if self.active_monster:
-                # Pre-fetch context to avoid repeated DB calls
-                context = self._fetch_combat_context()
-                if not context:
-                    return {"sequence": [["Error: Failed to load player data."]], "dead": False}
-
                 if self._check_auto_condition(context):
                     return self._resolve_auto_combat(context)
                 return self._process_combat_turn(context)
@@ -187,8 +189,12 @@ class AdventureSession:
 
             # --- 3. Non-Combat Event ---
             location_name = location.get("name")
+            # Pass the pre-fetched context to event handler
             result = self.events.resolve_non_combat(
-                location_id=self.location_id, regen_chance=70, location_name=location_name
+                context=context,
+                location_id=self.location_id,
+                regen_chance=70,
+                location_name=location_name,
             )
             self.logs.extend(result["log"])
 
@@ -223,7 +229,7 @@ class AdventureSession:
         current_session_exp = self.loot.get("exp", 0)
 
         if context is None:
-            context = self._fetch_combat_context()
+            context = self._fetch_session_context()
 
         if not context:
             return {"sequence": [["Error starting auto-combat."]], "dead": False}
