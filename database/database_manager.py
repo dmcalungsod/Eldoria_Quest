@@ -8,6 +8,7 @@ Singleton pattern with connection pooling and atomic operations.
 import datetime
 import json
 import logging
+import math
 import os
 import time
 from contextlib import contextmanager
@@ -1302,22 +1303,32 @@ class DatabaseManager:
             return False, "You are already healthy."
 
         # Recalculate cost from fresh data
-
-        actual_cost = max(1, int(missing * 0.5)) if missing > 0 else 0
+        # Use math.ceil for consistent rounding (aligns with InfirmaryCog)
+        actual_cost = max(1, math.ceil(missing * 0.5)) if missing > 0 else 0
 
         if player["aurum"] < actual_cost:
             return False, "Insufficient funds."
 
-        self._col("players").update_one(
-            {"discord_id": discord_id},
+        # OPTIMISTIC LOCKING: Ensure HP hasn't changed since read
+        # ATOMIC UPDATE: Use $inc for aurum to prevent lost updates
+        result = self._col("players").update_one(
+            {
+                "discord_id": discord_id,
+                "current_hp": player["current_hp"],
+                "aurum": {"$gte": actual_cost}  # Double-check balance
+            },
             {
                 "$set": {
                     "current_hp": max_hp,
                     "current_mp": max_mp,
-                    "aurum": player["aurum"] - actual_cost,
-                }
+                },
+                "$inc": {"aurum": -actual_cost}
             },
         )
+
+        if result.modified_count == 0:
+            return False, "Healing failed due to state change. Please try again."
+
         return True, f"Restored HP/MP for {actual_cost} Aurum."
 
     # ============================================================

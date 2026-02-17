@@ -69,10 +69,6 @@ class InfirmaryView(View):
 
     def _execute_heal(self) -> tuple[bool, str]:
         try:
-            # Re-fetch to ensure atomic accuracy
-            vitals = self.db.get_player_vitals(self.user.id)
-            aurum = self.db.get_player_field(self.user.id, "aurum")
-
             # SECURITY: Fetch fresh stats to avoid stale state exploits
             stats_json = self.db.get_player_stats_json(self.user.id)
             if stats_json:
@@ -83,23 +79,8 @@ class InfirmaryView(View):
                 max_hp = self.stats.max_hp
                 max_mp = self.stats.max_mp
 
-            if not vitals:
-                return False, "Player data error."
-
-            # Re-calculate costs dynamically
-            missing = max(0, max_hp - vitals["current_hp"])
-            cost = infirmary_cost(missing)
-
-            if missing == 0 and vitals["current_mp"] >= max_mp:
-                return False, "You are already healthy."
-
-            if aurum is None or aurum < cost:
-                return False, "Insufficient funds."
-
-            # Apply
-            self.db.set_player_vitals(self.user.id, max_hp, max_mp)
-            self.db.set_player_field(self.user.id, "aurum", aurum - cost)
-            return True, f"Restored HP/MP for {cost} Aurum."
+            # Delegate to DatabaseManager for atomic execution
+            return self.db.execute_heal(self.user.id, max_hp, max_mp, cost=0)
         except Exception as e:
             logger.error(f"Heal error: {e}")
             return False, "System error."
