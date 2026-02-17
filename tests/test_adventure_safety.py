@@ -34,7 +34,7 @@ class TestAdventureDataLoss(unittest.TestCase):
         # Mock player stats
         self.mock_db.get_player_stats_json.return_value = {}
         self.mock_db.get_player.return_value = {
-            "level": 1, "experience": 0, "exp_to_next": 100, "current_hp": 10, "exp_to_next": 1000
+            "level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000
         }
 
         # Mock level values
@@ -79,7 +79,7 @@ class TestAdventureDataLoss(unittest.TestCase):
         }
         self.mock_db.get_player_stats_json.return_value = {}
         self.mock_db.get_player.return_value = {
-            "level": 1, "experience": 0, "exp_to_next": 100, "current_hp": 10, "exp_to_next": 1000
+            "level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000
         }
         self.mock_db.get_player_field.return_value = 1
 
