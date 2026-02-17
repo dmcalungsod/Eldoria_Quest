@@ -172,7 +172,9 @@ class AdventureSession:
 
             # --- 2. Trigger New Encounter ---
             if random.randint(1, 100) > self.REGEN_CHANCE:
-                monster, phrase = self.combat.initiate_combat(location)
+                # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
+                player_level = context["player_row"].get("level", 1)
+                monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
 
                 if monster:
                     # Start new combat
