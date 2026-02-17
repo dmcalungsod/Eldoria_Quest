@@ -28,17 +28,26 @@ logger = logging.getLogger("eldoria.ui.adventure_menu")
 class AdventureView(View):
     """Character Menu → Adventure Menu."""
 
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        active_session: bool = False,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
 
-        # Begin Expedition
+        # Determine button state based on active session
+        label = "Resume Expedition" if active_session else "Begin Expedition"
+        emoji = "🧭" if active_session else "⚔️"
+
+        # Begin/Resume Expedition
         btn_start = Button(
-            label="Begin Expedition",
+            label=label,
             style=discord.ButtonStyle.success,
             custom_id="start_adv",
-            emoji="⚔️",
+            emoji=emoji,
             row=0,
         )
         btn_start.callback = self.start_adventure_callback
