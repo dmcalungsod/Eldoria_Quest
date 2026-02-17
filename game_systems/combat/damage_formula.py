@@ -66,22 +66,12 @@ class DamageFormula:
 
     @staticmethod
     def player_skill(player_stats, monster, skill_data, skill_level: int):
-        skill_key = skill_data.get("key_id", "")
+        # Data-driven scaling
+        scaling_stat = skill_data.get("scaling_stat", "MAG")
+        scaling_factor = float(skill_data.get("scaling_factor", 1.0))
 
-        if skill_key in ["fireball", "explosion", "ice_lance", "smite"]:
-            base_stat_value = DamageFormula._get_stat(player_stats, "MAG")
-            base_effect_per_point = 2.8
-        elif skill_key in ["power_strike", "cleave"]:
-            base_stat_value = DamageFormula._get_stat(player_stats, "STR")
-            base_effect_per_point = 2.7
-        elif skill_key in ["true_shot", "multi_shot", "double_strike", "toxic_blade"]:
-            base_stat_value = DamageFormula._get_stat(player_stats, "DEX")
-            base_effect_per_point = 2.6
-        else:
-            base_stat_value = DamageFormula._get_stat(player_stats, "MAG")
-            base_effect_per_point = 1.0
-
-        attack_power = calculate_tiered_bonus(base_stat_value, base_effect_per_point)
+        base_stat_value = DamageFormula._get_stat(player_stats, scaling_stat)
+        attack_power = calculate_tiered_bonus(base_stat_value, scaling_factor)
 
         base_multiplier = float(skill_data.get("power_multiplier", 1.0))
         final_multiplier = base_multiplier + (0.08 * (skill_level - 1))
@@ -109,21 +99,26 @@ class DamageFormula:
     @staticmethod
     def player_heal(player_stats, current_hp: int, skill_data: dict, skill_level: int) -> tuple[int, int, str]:
         base_heal = float(skill_data.get("heal_power", 0))
-        mag_val = DamageFormula._get_stat(player_stats, "MAG")
+
+        # Use scaling stat if available (default MAG)
+        scaling_stat = skill_data.get("scaling_stat", "MAG")
+        scaling_factor = float(skill_data.get("scaling_factor", 1.5))
+        stat_val = DamageFormula._get_stat(player_stats, scaling_stat)
 
         if isinstance(player_stats, dict) and "HP" in player_stats:
             max_hp = player_stats["HP"]
         elif hasattr(player_stats, "max_hp"):
             max_hp = player_stats.max_hp
         else:
+            # Replicate PlayerStats logic properly
             end_val = DamageFormula._get_stat(player_stats, "END")
-            max_hp = 50 + (end_val * 10)
+            max_hp = 50 + calculate_tiered_bonus(end_val, 10.0)
 
-        magic_bonus = calculate_tiered_bonus(mag_val, 1.5)
+        stat_bonus = calculate_tiered_bonus(stat_val, scaling_factor)
         level_multiplier = 1.0 + (0.15 * (skill_level - 1))
         final_base_heal = base_heal * level_multiplier
 
-        total_heal = final_base_heal + magic_bonus
+        total_heal = final_base_heal + stat_bonus
         max_allowed = max_hp * 0.6
         total_heal = min(total_heal, max_allowed)
 
