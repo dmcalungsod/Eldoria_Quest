@@ -14,6 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.adventure_events import AdventureEvents  # noqa: E402
 from game_systems.adventure.event_handler import EventHandler  # noqa: E402
+from game_systems.player.player_stats import PlayerStats # noqa: E402
 
 
 class TestDeadTurns(unittest.TestCase):
@@ -35,6 +36,14 @@ class TestDeadTurns(unittest.TestCase):
         # Default to Full HP/MP for Surge tests
         self.mock_db.get_player_vitals.return_value = {"current_hp": 150, "current_mp": 70}
 
+        # Mock Context
+        self.player_stats = PlayerStats(str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10, lck_base=10)
+        self.context = {
+            "player_stats": self.player_stats,
+            "vitals": {"current_hp": 150, "current_mp": 70},
+            "stats_dict": self.player_stats.get_total_stats_dict()
+        }
+
     def test_surge_replaces_dead_turn(self):
         """Test that full HP/MP now triggers SURGE (gathering attempt) instead of 'no event'."""
         # Force regen path
@@ -44,7 +53,7 @@ class TestDeadTurns(unittest.TestCase):
             mock_randint.side_effect = [1, 1]
 
             with patch('random.choices', return_value=['medicinal_herb']):
-                result = self.event_handler.resolve_non_combat(regen_chance=100)
+                result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
 
         # Should have SURGE message
         log_str = "\n".join(result["log"])
@@ -70,7 +79,7 @@ class TestDeadTurns(unittest.TestCase):
             mock_randint.side_effect = [1, 100, 5]
             mock_random.return_value = 0.1
 
-            result = self.event_handler.resolve_non_combat(regen_chance=100)
+            result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
 
         # Should have SURGE message
         log_str = "\n".join(result["log"])
@@ -103,7 +112,7 @@ class TestDeadTurns(unittest.TestCase):
             mock_randint.side_effect = [100, 100, 10]
             mock_random.return_value = 0.6
 
-            result = self.event_handler.resolve_non_combat(regen_chance=0)
+            result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=0)
 
         # Should NOT have SURGE message
         log_str = "\n".join(result["log"])
