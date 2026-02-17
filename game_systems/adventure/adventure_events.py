@@ -57,6 +57,50 @@ class AdventureEvents:
         f"{E.SWORDS} The arena is unforgiving. You use this moment to steel your resolve.",
     ]
 
+    REGEN_LOW_HP = [
+        f"{E.HEART} Blood drips from your fingers. You lean against a wall, forcing yourself to breathe.",
+        f"{E.HEART} Your vision swims. You bind your wounds with trembling hands.",
+        f"{E.HEART} Every step is agony. You collapse for a moment, gathering what little strength remains.",
+        f"{E.HEART} You taste copper. Resting is no longer a choice; it is necessity.",
+        f"{E.HEART} The world spins. You grit your teeth and tighten the bandage.",
+    ]
+
+    REGEN_HIGH_HP = [
+        f"{E.BUFF} You feel the rhythm of the battle in your veins. You are ready for more.",
+        f"{E.BUFF} Your breath comes easy. You sharpen your senses, scanning for the next threat.",
+        f"{E.BUFF} You stretch your limbs, feeling the power coiling within your muscles.",
+        f"{E.BUFF} Unscathed and undeterred, you take a moment to center yourself.",
+        f"{E.BUFF} The danger only sharpens your focus. You are in control.",
+    ]
+
+    REGEN_CLASS_PHRASES = {
+        "Warrior": [
+            f"{E.SHIELD} You check the straps of your armor and wipe gore from your steel.",
+            f"{E.SHIELD} The weight of your weapon is comforting. You stand ready.",
+            f"{E.SHIELD} You roll your shoulders, working out the stiffness of battle.",
+        ],
+        "Mage": [
+            f"{E.MANA} You murmur an incantation, letting the ambient mana restore your focus.",
+            f"{E.MANA} You trace a sigil in the air, stabilizing the flow of magic within you.",
+            f"{E.MANA} The hum of the ley lines soothes your mind.",
+        ],
+        "Rogue": [
+            f"{E.DAGGER} You vanish into the shadows, checking your blades while unseen.",
+            f"{E.DAGGER} You listen to the silence, your breath barely a whisper.",
+            f"{E.DAGGER} You adjust your cloak, becoming one with the darkness.",
+        ],
+        "Cleric": [
+            f"{E.HEAL} You whisper a prayer, and a soft light knits your fatigue away.",
+            f"{E.HEAL} You clutch your holy symbol, finding peace in your faith.",
+            f"{E.HEAL} A moment of grace descends upon you, washing away the pain.",
+        ],
+        "Ranger": [
+            f"{E.BOW} You check the fletching of your arrows and scan the horizon.",
+            f"{E.BOW} You read the wind and the earth, finding a safe path.",
+            f"{E.BOW} The wild speaks to you, guiding you to a place of rest.",
+        ],
+    }
+
     GATHER_PHRASES = [
         f"{E.HERB} You spot a cluster of **{{}}** in the shade. You harvest it.",
         f"{E.HERB} A faint glow draws your attention — **{{}}**, thriving between roots.",
@@ -133,13 +177,32 @@ class AdventureEvents:
     ]
 
     @staticmethod
-    def regeneration(location_id: str | None = None) -> list:
+    def regeneration(
+        location_id: str | None = None,
+        class_name: str = "Adventurer",
+        hp_percent: float = 1.0,
+    ) -> list:
+        # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
+        if hp_percent < 0.30 and random.random() < 0.50:
+            return [random.choice(AdventureEvents.REGEN_LOW_HP)]
+
+        # 2. High HP (> 80%): 30% chance for confident flavor
+        if hp_percent > 0.80 and random.random() < 0.30:
+            return [random.choice(AdventureEvents.REGEN_HIGH_HP)]
+
+        # 3. Class-Specific Flavor: 30% chance
+        if class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
+            return [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
+
+        # 4. Location-Specific Fallback
         if location_id == "whispering_thicket":
             return [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
         if location_id == "deepgrove_roots":
             return [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
         if location_id == "guild_arena":
             return [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
+
+        # 5. Generic Fallback
         return [random.choice(AdventureEvents.REGEN_PHRASES)]
 
     @staticmethod
