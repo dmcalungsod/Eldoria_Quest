@@ -30,6 +30,33 @@ class AdventureEvents:
         f"{E.FOREST} A moment of stillness blankets you, renewing resolve.",
     ]
 
+    REGEN_PHRASES_THICKET = [
+        f"{E.THICKET} The canopy is so thick here that day feels like twilight. You rest against a moss-slicked trunk.",
+        f"{E.THICKET} You listen to the scuttling in the brush, forcing your breathing to slow.",
+        f"{E.THICKET} Shadows stretch long and thin. You take a moment to bind a scrap of cloth over a scratch.",
+        f"{E.THICKET} The air is heavy with pollen and unease. You wipe sweat from your brow.",
+        f"{E.THICKET} You find a hollow beneath a gnarled root and crouch, staying out of sight.",
+        f"{E.THICKET} Silence is a luxury here. You snatch a moment of peace while you can.",
+    ]
+
+    REGEN_PHRASES_ROOTS = [
+        f"{E.CAVE} The air tastes of rot. You crouch between the twisted roots, hoping nothing sees you.",
+        f"{E.CAVE} A low hum vibrates through the ground. You close your eyes, trying to ignore the corruption.",
+        f"{E.CAVE} You wring out a cloth damp with gray water. There is no comfort here, only a brief pause.",
+        f"{E.CAVE} The darkness presses in. You steady your nerves before moving on.",
+        f"{E.CAVE} Beneath the tangled roots, you find a dry spot to rest your aching legs.",
+        f"{E.CAVE} Every shadow looks like a threat. You rest with one hand on your weapon.",
+    ]
+
+    REGEN_PHRASES_ARENA = [
+        f"{E.SWORDS} You wipe sweat from your brow, the cheers of the crowd muffled by your focus.",
+        f"{E.SWORDS} The stone floor is cold beneath you. You check your weapon's edge.",
+        f"{E.SWORDS} You take a knee, analyzing your previous strikes. The next bout will be harder.",
+        f"{E.SWORDS} Amidst the dust and blood, you find a second wind.",
+        f"{E.SWORDS} You tighten your grip, letting the adrenaline fade just enough to think clearly.",
+        f"{E.SWORDS} The arena is unforgiving. You use this moment to steel your resolve.",
+    ]
+
     GATHER_PHRASES = [
         f"{E.HERB} You spot a cluster of **{{}}** in the shade. You harvest it.",
         f"{E.HERB} A faint glow draws your attention — **{{}}**, thriving between roots.",
@@ -106,7 +133,13 @@ class AdventureEvents:
     ]
 
     @staticmethod
-    def regeneration() -> list:
+    def regeneration(location_id: str | None = None) -> list:
+        if location_id == "whispering_thicket":
+            return [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
+        if location_id == "deepgrove_roots":
+            return [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
+        if location_id == "guild_arena":
+            return [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
         return [random.choice(AdventureEvents.REGEN_PHRASES)]
 
     @staticmethod
