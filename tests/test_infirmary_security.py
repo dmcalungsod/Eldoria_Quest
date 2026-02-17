@@ -89,13 +89,13 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # 3. Call _execute_heal
         view._execute_heal()
 
-        # 4. Verify set_player_vitals called with FRESH Max HP (200)
-        self.mock_db.set_player_vitals.assert_called_with(
-            self.user.id, new_max_hp, fresh_stats.max_mp
+        # 4. Verify execute_heal called with FRESH Max HP (200)
+        self.mock_db.execute_heal.assert_called_with(
+            self.user.id, new_max_hp, fresh_stats.max_mp, cost=0
         )
 
         # Also ensure it wasn't called with old HP
-        args, _ = self.mock_db.set_player_vitals.call_args
+        args, _ = self.mock_db.execute_heal.call_args
         self.assertEqual(args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)")
 
 def run_all_tests():
