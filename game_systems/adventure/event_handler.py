@@ -90,7 +90,7 @@ class EventHandler:
             vitals["current_mp"] = new_mp
 
             # Build Log Messages
-            base_logs = AdventureEvents.regeneration()
+            base_logs = AdventureEvents.regeneration(location_id)
             # Add newline to the first element for spacing
             if base_logs:
                 base_logs[0] = f"\n{base_logs[0]}"
