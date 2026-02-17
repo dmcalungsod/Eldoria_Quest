@@ -53,6 +53,10 @@ class EquipmentManager:
             except Exception:
                 stats = PlayerStats()
 
+            # Reset bonuses to prevent duplication on recalculation
+            for stat in stats._stats.values():
+                stat.bonus = 0
+
             # 2. Apply Equipped Item Bonuses
             equipped_items = self.db.get_equipped_items(discord_id)
 
