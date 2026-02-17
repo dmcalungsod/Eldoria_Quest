@@ -15,6 +15,7 @@ from typing import Any
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.class_data import CLASSES
 from game_systems.data.materials import MATERIALS
 from game_systems.player.player_stats import PlayerStats
 
@@ -89,8 +90,20 @@ class EventHandler:
             vitals["current_hp"] = new_hp
             vitals["current_mp"] = new_mp
 
+            # Resolve Class Name from ID
+            player_row = context.get("player_row", {})
+            class_id = player_row.get("class_id", 0)
+            class_name = "Adventurer"
+            for c_name, c_data in CLASSES.items():
+                if c_data["id"] == class_id:
+                    class_name = c_name
+                    break
+
+            # Calculate HP Percent for Narrative
+            hp_percent = new_hp / max(stats.max_hp, 1)
+
             # Build Log Messages
-            base_logs = AdventureEvents.regeneration(location_id)
+            base_logs = AdventureEvents.regeneration(location_id, class_name, hp_percent)
             # Add newline to the first element for spacing
             if base_logs:
                 base_logs[0] = f"\n{base_logs[0]}"

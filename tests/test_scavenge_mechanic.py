@@ -41,7 +41,8 @@ class TestDeadTurns(unittest.TestCase):
         self.context = {
             "player_stats": self.player_stats,
             "vitals": {"current_hp": 150, "current_mp": 70},
-            "stats_dict": self.player_stats.get_total_stats_dict()
+            "stats_dict": self.player_stats.get_total_stats_dict(),
+            "player_row": {"class_id": 1}
         }
 
     def test_surge_replaces_dead_turn(self):

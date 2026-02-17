@@ -65,6 +65,14 @@ HERB = "🌿"
 SWORDS = "⚔️"
 SKULL = "💀"
 
+# Narrative / Class Specific
+HEART = "💔"
+SHIELD = "🛡️"
+MANA = "✨"
+DAGGER = "🗡️"
+HEAL = "⚕️"
+BOW = "🏹"
+
 # --- ANSI Color Definitions ---
 RARITY_COLORS = {
     "Common": "\u001b[0;37m",  # Grey/White
