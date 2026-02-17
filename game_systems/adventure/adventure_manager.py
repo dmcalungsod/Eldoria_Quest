@@ -128,8 +128,6 @@ class AdventureManager:
             # Capture state after rewards
             new_level = self.db.get_player_field(discord_id, "level")
 
-            self.db.end_adventure_session(discord_id)
-
             summary = {
                 "loot": items_to_add,
                 "xp_gained": total_exp,
@@ -150,6 +148,9 @@ class AdventureManager:
                 for item in items_to_add
             ]
             self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+
+            # End session ONLY after items are safely added
+            self.db.end_adventure_session(discord_id)
 
             return summary
 

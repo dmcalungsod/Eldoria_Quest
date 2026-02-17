@@ -647,11 +647,8 @@ class DatabaseManager:
 
         # 5. Execute
         if operations:
-            try:
-                self._col("inventory").bulk_write(operations)
-                logger.info(f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}")
-            except Exception as e:
-                logger.error(f"Failed to bulk add items for {discord_id}: {e}", exc_info=True)
+            self._col("inventory").bulk_write(operations)
+            logger.info(f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}")
 
     def get_inventory_item_count(self, discord_id: int, item_key: str) -> int:
         """Returns the total count of an item across all stacks."""
