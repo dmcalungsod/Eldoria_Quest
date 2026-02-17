@@ -65,7 +65,18 @@ class CraftingView(View):
                 emoji = E.POTION
 
             label = f"{r_data['name']} ({r_data['cost']} G)"
-            desc = r_data['description'][:100]
+
+            # Construct materials string
+            mats = []
+            for m_key, m_amt in r_data.get("materials", {}).items():
+                m_name = m_key.replace("_", " ").title()
+                mats.append(f"{m_name} x{m_amt}")
+
+            mat_str = ", ".join(mats)
+            desc = f"Cost: {r_data['cost']}G • {mat_str}"
+
+            if len(desc) > 100:
+                desc = desc[:97] + "..."
 
             select.add_option(label=label, value=r_id, description=desc, emoji=emoji)
 

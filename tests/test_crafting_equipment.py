@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import MagicMock, patch
 from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
+from game_systems.data.equipments import EQUIPMENT_DATA
+from game_systems.data.materials import MATERIALS
 
 class TestCraftingEquipment(unittest.TestCase):
     def setUp(self):
@@ -74,6 +76,22 @@ class TestCraftingEquipment(unittest.TestCase):
         self.assertFalse(success)
         self.assertIn("Missing material", msg)
         self.mock_db.add_inventory_item.assert_not_called()
+
+    def test_recipe_data_integrity(self):
+        """Verifies that all equipment recipes point to valid items and materials."""
+        for recipe_id, recipe in EQUIPMENT_RECIPES.items():
+            # Check Output Key exists in EQUIPMENT_DATA
+            output_key = recipe["output_key"]
+            self.assertIn(output_key, EQUIPMENT_DATA, f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA.")
+
+            # Check Name matches EQUIPMENT_DATA name
+            equip_name = EQUIPMENT_DATA[output_key]["name"]
+            recipe_name = recipe["name"]
+            self.assertEqual(equip_name, recipe_name, f"Name mismatch for {recipe_id}. Recipe: '{recipe_name}', Equip: '{equip_name}'.")
+
+            # Check Materials exist in MATERIALS
+            for mat_key, amt in recipe["materials"].items():
+                self.assertIn(mat_key, MATERIALS, f"Material {mat_key} for {recipe_id} not found in MATERIALS.")
 
 if __name__ == '__main__':
     unittest.main()
