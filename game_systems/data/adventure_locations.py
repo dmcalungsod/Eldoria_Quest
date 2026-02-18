@@ -69,6 +69,38 @@ LOCATIONS = {
             ("magic_stone_medium", 20),
         ],
     },
+    "shrouded_fen": {
+        "name": "The Shrouded Fen",
+        "emoji": "🌫️",
+        "min_rank": "C",
+        "level_req": 15,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_022", 30),  # Marsh Crawler
+            ("monster_023", 20),  # Sporeling
+            ("monster_025", 20),  # Stormling
+            ("monster_027", 15),  # Mire Lurker
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_028",  # Duskling (Elite)
+                "weight": 10,
+                "min_level": 16,
+            },
+            {
+                "monster_key": "monster_034",  # Glade Empress (Boss)
+                "weight": 5,
+                "min_level": 18,
+            }
+        ],
+        "description": "A mist-choked wetland where the veil is thin. Shadows move in the fog, and the ground hungers for the unwary.",
+        "gatherables": [
+            ("medicinal_herb", 30),
+            ("ancient_wood", 30),
+            ("iron_ore", 20),
+            ("magic_stone_medium", 20),
+        ],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",
