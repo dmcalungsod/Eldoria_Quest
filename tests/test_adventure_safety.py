@@ -96,5 +96,37 @@ class TestAdventureDataLoss(unittest.TestCase):
         self.mock_db.end_adventure_session.assert_not_called()
         print("SUCCESS: Session not ended after item add failure.")
 
+    def test_invalid_start_adventure(self):
+        """
+        Verifies that start_adventure returns False for invalid inputs.
+        """
+        discord_id = 12345
+
+        # 1. Invalid Location
+        result = self.manager.start_adventure(discord_id, "invalid_zone", -1)
+        self.assertFalse(result, "Should fail with invalid location_id")
+        self.mock_db.insert_adventure_session.assert_not_called()
+
+        # 2. Invalid Duration (Too high)
+        # Using a valid location for this test
+        # We need to ensure "forest_outskirts" (or similar) is recognized as valid
+        # Since LOCATIONS is imported in adventure_manager, we rely on it being present.
+        # Assuming "forest_outskirts" exists in LOCATIONS as per previous read.
+
+        result = self.manager.start_adventure(discord_id, "forest_outskirts", 9999999)
+        self.assertFalse(result, "Should fail with excessive duration")
+        self.mock_db.insert_adventure_session.assert_not_called()
+
+        # 3. Invalid Duration (Negative but not -1)
+        result = self.manager.start_adventure(discord_id, "forest_outskirts", -5)
+        self.assertFalse(result, "Should fail with negative duration != -1")
+        self.mock_db.insert_adventure_session.assert_not_called()
+
+        # 4. Valid Case
+        result = self.manager.start_adventure(discord_id, "forest_outskirts", 60)
+        self.assertTrue(result, "Should succeed with valid inputs")
+        self.mock_db.insert_adventure_session.assert_called_once()
+        print("SUCCESS: Input validation passed.")
+
 if __name__ == '__main__':
     unittest.main()
