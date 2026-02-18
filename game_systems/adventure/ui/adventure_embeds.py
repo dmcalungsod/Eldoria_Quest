@@ -5,7 +5,6 @@ Handles the creation of Discord embeds for the adventure system.
 Hardened: Robust JSON parsing and layout stability.
 """
 
-import json
 import logging
 
 import discord
@@ -21,7 +20,7 @@ logger = logging.getLogger("eldoria.ui.embeds")
 class AdventureEmbeds:
     @staticmethod
     def build_exploration_embed(
-        location_id: str, log: list, player_stats: PlayerStats, vitals: dict, session_row: dict
+        location_id: str, log: list, player_stats: PlayerStats, vitals: dict, active_monster: dict | None
     ) -> discord.Embed:
         """
         Generates the main game interface embed.
@@ -31,13 +30,7 @@ class AdventureEmbeds:
         loc_data = LOCATIONS.get(location_id, {"name": "Unknown Zone", "emoji": E.MAP})
 
         # 1. Determine State (Combat vs Exploration)
-        active_monster = None
-        if session_row and session_row["active_monster_json"]:
-            try:
-                active_monster = json.loads(session_row["active_monster_json"])
-            except json.JSONDecodeError:
-                logger.error("Failed to parse active_monster_json for embed.")
-                active_monster = None
+        # active_monster is now passed directly, decoupling from DB session row
 
         # 2. Base Embed Styling
         if active_monster:

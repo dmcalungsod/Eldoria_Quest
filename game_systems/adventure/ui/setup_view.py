@@ -145,7 +145,7 @@ class AdventureSetupView(View):
             ]
 
             # 4. Build Embed
-            embed = AdventureEmbeds.build_exploration_embed(loc_id, initial_log, player_stats, vitals, session_row)
+            embed = AdventureEmbeds.build_exploration_embed(loc_id, initial_log, player_stats, vitals, active_monster=None)
 
             # 5. Transition to Exploration View
             view = ExplorationView(

@@ -123,7 +123,7 @@ class AdventureView(View):
                 stats = PlayerStats.from_dict(stats_json)
                 vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
 
-                embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, session)
+                embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, active_monster)
 
                 view = ExplorationView(
                     self.db,
