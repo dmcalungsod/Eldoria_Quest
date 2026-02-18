@@ -29,8 +29,8 @@ discord_mock.Color.gold.return_value = "gold"
 discord_mock.Color.orange.return_value = "orange"
 
 # Now import the module under test
-from game_systems.guild_system.ui.quests_menu import QuestsMenuView
-from game_systems.guild_system.quest_system import QuestSystem
+from game_systems.guild_system.ui.quests_menu import QuestsMenuView  # noqa: E402
+from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
 
 
 class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
