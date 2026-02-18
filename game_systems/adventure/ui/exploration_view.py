@@ -100,25 +100,13 @@ class ExplorationView(View):
             sequence = result.get("sequence", [])
             is_dead = result.get("dead", False)
 
+            # Use optimized return data
+            vitals = result.get("vitals", {"current_hp": 0, "current_mp": 0})
+            if result.get("player_stats"):
+                self.player_stats = result["player_stats"]
+            self.active_monster = result.get("active_monster")
+
             # 3. Animation Loop
-
-            # Refresh Data (Once before animation loop)
-            vitals, session, stats_json = await asyncio.gather(
-                asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id),
-                asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
-            )
-
-            self.player_stats = PlayerStats.from_dict(stats_json)
-
-            # Check monster state from DB
-            try:
-                self.active_monster = (
-                    json.loads(session["active_monster_json"]) if session["active_monster_json"] else None
-                )
-            except Exception:
-                self.active_monster = None
-
             for i, block in enumerate(sequence):
                 # Update Log
                 self.log.extend(block)
@@ -126,7 +114,7 @@ class ExplorationView(View):
 
                 # Prepare UI state
                 embed = AdventureEmbeds.build_exploration_embed(
-                    self.location_id, self.log, self.player_stats, vitals, session
+                    self.location_id, self.log, self.player_stats, vitals, self.active_monster
                 )
 
                 is_last_frame = i == len(sequence) - 1
@@ -202,7 +190,18 @@ class ExplorationView(View):
         vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
         session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
 
-        embed = AdventureEmbeds.build_exploration_embed(self.location_id, self.log, self.player_stats, vitals, session)
+        # Update monster state from session
+        if session and session.get("active_monster_json"):
+            try:
+                self.active_monster = json.loads(session["active_monster_json"])
+            except Exception:
+                self.active_monster = None
+        else:
+            self.active_monster = None
+
+        embed = AdventureEmbeds.build_exploration_embed(
+            self.location_id, self.log, self.player_stats, vitals, self.active_monster
+        )
 
         # Reset my buttons
         self._enable_all()

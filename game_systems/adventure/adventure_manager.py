@@ -76,7 +76,13 @@ class AdventureManager:
     def simulate_adventure_step(self, discord_id: int) -> dict:
         session_row = self.get_active_session(discord_id)
         if not session_row:
-            return {"sequence": [["Error: No active session found."]], "dead": True}
+            return {
+                "sequence": [["Error: No active session found."]],
+                "dead": True,
+                "vitals": {"current_hp": 0, "current_mp": 0},
+                "player_stats": None,
+                "active_monster": None,
+            }
 
         session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, session_row)
 

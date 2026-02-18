@@ -73,6 +73,16 @@ class AdventureSession:
             self.logs = []
             self.location_id = None
 
+    def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
+        """Helper to build the standardized result dictionary."""
+        return {
+            "sequence": sequence,
+            "dead": dead,
+            "vitals": context["vitals"] if context else {"current_hp": 0, "current_mp": 0},
+            "player_stats": context["player_stats"] if context else None,
+            "active_monster": self.active_monster,
+        }
+
     # ======================================================================
     # MAIN STEP LOGIC
     # ======================================================================
@@ -150,11 +160,11 @@ class AdventureSession:
     def simulate_step(self) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
-        Returns: { "sequence": List[List[str]], "dead": bool }
+        Returns: { "sequence": List[List[str]], "dead": bool, "vitals": dict, "player_stats": PlayerStats, "active_monster": dict }
         """
         location = LOCATIONS.get(self.location_id)
         if not location:
-            return {"sequence": [["Error: Unknown location data."]], "dead": True}
+            return self._build_result([["Error: Unknown location data."]], True, None)
 
         try:
             # --- 0. Pre-fetch Context (Optimized) ---
@@ -162,7 +172,7 @@ class AdventureSession:
             # This ensures Active Buffs are always available and reduces N+1 queries.
             context = self._fetch_session_context()
             if not context:
-                return {"sequence": [["Error: Failed to load player data."]], "dead": False}
+                return self._build_result([["Error: Failed to load player data."]], False, None)
 
             # --- 1. Continue Combat ---
             if self.active_monster:
@@ -181,13 +191,13 @@ class AdventureSession:
                     self.active_monster = monster
                     self.logs.append(phrase)
                     self.save_state()
-                    return {"sequence": [[phrase]], "dead": False}
+                    return self._build_result([[phrase]], False, context)
 
                 # Location has no monster this tick
                 msg = phrase or "The path is clear for now."
                 self.logs.append(msg)
                 self.save_state()
-                return {"sequence": [[msg]], "dead": False}
+                return self._build_result([[msg]], False, context)
 
             # --- 3. Non-Combat Event ---
             location_name = location.get("name")
@@ -207,11 +217,16 @@ class AdventureSession:
 
             self.save_state()
 
-            return {"sequence": [result["log"]], "dead": False}
+            # Event handler might have updated vitals (e.g. regeneration)
+            # Ensure context reflects this for return
+            if "vitals" in result:
+                context["vitals"] = result["vitals"]
+
+            return self._build_result([result["log"]], False, context)
 
         except Exception as e:
             logger.error(f"Simulation error for {self.discord_id}: {e}", exc_info=True)
-            return {"sequence": [["*An ominous force interrupts your journey (System Error).*"]], "dead": False}
+            return self._build_result([["*An ominous force interrupts your journey (System Error).*"]], False, None)
 
     # ======================================================================
     # AUTO COMBAT SEQUENCE
@@ -234,12 +249,12 @@ class AdventureSession:
             context = self._fetch_session_context()
 
         if not context:
-            return {"sequence": [["Error starting auto-combat."]], "dead": False}
+            return self._build_result([["Error starting auto-combat."]], False, None)
 
         # Local pointers from context
         player_stats = context["player_stats"]
         stats_dict = context.get("stats_dict")
-        vitals = context["vitals"]
+        # vitals are in context and updated in loop
 
         # Max 8 turns to avoid infinite loops
         for _ in range(8):
@@ -305,7 +320,7 @@ class AdventureSession:
             self.logs.extend(frame)
 
         self.save_state()
-        return {"sequence": sequence, "dead": is_dead}
+        return self._build_result(sequence, is_dead, context)
 
     # ======================================================================
     # MANUAL COMBAT TURN
@@ -320,6 +335,11 @@ class AdventureSession:
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
         result = self.combat.resolve_turn(self.active_monster, report, current_session_exp, context=context)
+
+        # Update context vitals from combat result
+        if context:
+            context["vitals"]["current_hp"] = result.get("hp_current", context["vitals"]["current_hp"])
+            context["vitals"]["current_mp"] = result.get("mp_current", context["vitals"]["current_mp"])
 
         turn_logs = result["phrases"]
         is_dead = False
@@ -347,7 +367,7 @@ class AdventureSession:
         self.logs.extend(turn_logs)
         self.save_state()
 
-        return {"sequence": [turn_logs], "dead": is_dead}
+        return self._build_result([turn_logs], is_dead, context)
 
     # ======================================================================
     # PERSISTENCE

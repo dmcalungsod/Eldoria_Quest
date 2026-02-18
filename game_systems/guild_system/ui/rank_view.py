@@ -162,23 +162,21 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
             session_row = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
 
+            import json
+            active_monster = None
+            if session_row and session_row["active_monster_json"]:
+                active_monster = json.loads(session_row["active_monster_json"])
+
             # Compose embed describing the start of the trial
             embed = AdventureEmbeds.build_exploration_embed(
                 location_id="guild_arena",
                 log=["You step into the arena. The Examiner's presence hangs heavy in the air."],
                 player_stats=stats,
                 vitals=vitals,
-                session_row=session_row,
+                active_monster=active_monster,
             )
 
             # Build the exploration view and hand control over to the Adventure system
-            # Note: Active monster is parsed inside ExplorationView from session_row if present
-            import json
-
-            active_monster = None
-            if session_row and session_row["active_monster_json"]:
-                active_monster = json.loads(session_row["active_monster_json"])
-
             view = ExplorationView(
                 self.db,
                 adventure_cog.manager,
