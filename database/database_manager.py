@@ -710,6 +710,26 @@ class DatabaseManager:
         result = list(self._col("inventory").aggregate(pipeline))
         return result[0]["total"] if result else 0
 
+    def consume_item_atomic(self, inv_id: int, amount: int = 1) -> bool:
+        """
+        Atomically decrements item count if sufficient quantity exists.
+        Returns True if successful, False if insufficient.
+        """
+        # Attempt to decrement count only if currently >= amount
+        result = self._col("inventory").find_one_and_update(
+            {"id": inv_id, "count": {"$gte": amount}},
+            {"$inc": {"count": -amount}},
+            return_document=True  # Return the new document
+        )
+
+        if result:
+            # If count reached 0, clean up the item
+            if result["count"] == 0:
+                # Use stricter filter to avoid deleting if count increased concurrently
+                self._col("inventory").delete_one({"id": inv_id, "count": 0})
+            return True
+        return False
+
     def remove_inventory_item(self, discord_id: int, item_key: str, amount: int = 1) -> bool:
         """
         Removes items from inventory. Prioritizes unequipped stacks.
