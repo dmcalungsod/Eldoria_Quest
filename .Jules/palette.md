@@ -15,3 +15,7 @@
 ## 2025-05-19 - [Affordability Feedback]
 **Learning:** In strict Discord Select Menus where individual options cannot be disabled, users need immediate visual feedback on which items they can afford *before* clicking.
 **Action:** Use distinct emoji (🔒 vs 🪙) and label suffixes (`[Too Expensive]`) to indicate affordability state within Select options, preventing frustrating interaction failures.
+
+## 2025-05-23 - [Empty State Turn-In Feedback]
+**Learning:** Presenting a "disabled" state (like a grayed-out dropdown) without explaining *why* the action is unavailable creates a frustrating dead end.
+**Action:** When a primary action (like Quest Turn-In) is unavailable, replace the generic empty state with actionable feedback—specifically listing the *progress* of incomplete tasks so the user knows exactly what remains to be done.
