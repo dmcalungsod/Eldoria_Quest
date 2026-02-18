@@ -157,36 +157,77 @@ class DatabaseManager:
         """
         now_iso = datetime.datetime.now().isoformat()
 
-        # 1. Player & Vitals
-        player_row = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0})
-        if not player_row:
+        # Optimized: Single Aggregation Pipeline to reduce DB round-trips from 4 to 1
+        pipeline = [
+            {"$match": {"discord_id": discord_id}},
+            {
+                "$lookup": {
+                    "from": "stats",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$discord_id", "$$did"]}}},
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "stats_docs",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "active_buffs",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$discord_id", "$$did"]},
+                                        {"$gt": ["$end_time", now_iso]},
+                                    ]
+                                }
+                            }
+                        },
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "buffs",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "player_skills",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$discord_id", "$$did"]}}},
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "player_skills",
+                }
+            },
+            {"$project": {"_id": 0}},
+        ]
+
+        result = list(self._col("players").aggregate(pipeline))
+
+        if not result:
             return None
 
-        # 2. Stats JSON
-        stats_row = self._col("stats").find_one({"discord_id": discord_id}, {"_id": 0})
+        data = result[0]
+
+        # 1. Process Stats
         stats_data = {}
-        if stats_row and stats_row.get("stats_json"):
-            try:
-                stats_data = json.loads(stats_row["stats_json"])
-            except json.JSONDecodeError:
-                logger.error(f"Corrupted stats_json for user {discord_id}")
+        if data.get("stats_docs"):
+            stats_row = data["stats_docs"][0]
+            if stats_row.get("stats_json"):
+                try:
+                    stats_data = json.loads(stats_row["stats_json"])
+                except json.JSONDecodeError:
+                    logger.error(f"Corrupted stats_json for user {discord_id}")
 
-        # 3. Active Buffs
-        buffs = list(
-            self._col("active_buffs").find(
-                {"discord_id": discord_id, "end_time": {"$gt": now_iso}},
-                {"_id": 0},
-            )
-        )
+        # 2. Process Buffs
+        # Buffs are already list of dicts from lookup
+        buffs = data.get("buffs", [])
 
-        # 4. Combat Skills (join player_skills + skills)
-        player_skill_docs = list(
-            self._col("player_skills").find(
-                {"discord_id": discord_id},
-                {"_id": 0},
-            )
-        )
-
+        # 3. Process Skills
+        player_skill_docs = data.get("player_skills", [])
         self._ensure_skill_cache()
         skills = []
         for ps in player_skill_docs:
@@ -206,6 +247,11 @@ class DatabaseManager:
                         "scaling_factor": skill_def.get("scaling_factor", 1.0),
                     }
                 )
+
+        # 4. Extract Player Row (remove joined fields)
+        player_row = {
+            k: v for k, v in data.items() if k not in ["stats_docs", "buffs", "player_skills"]
+        }
 
         return {
             "player": player_row,

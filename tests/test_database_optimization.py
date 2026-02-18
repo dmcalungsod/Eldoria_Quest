@@ -42,17 +42,18 @@ class TestDatabaseOptimization(unittest.TestCase):
     def test_get_combat_context_bundle_optimization(self):
         discord_id = 12345
 
-        # Mock player data
-        self.mock_db["players"].find_one.return_value = {"discord_id": discord_id, "name": "Test"}
-        self.mock_db["stats"].find_one.return_value = {"stats_json": "{}"}
-        self.mock_db["active_buffs"].find.return_value = []
-
-        # Mock player skills (3 skills)
-        self.mock_db["player_skills"].find.return_value = [
-            {"skill_key": "skill_1", "skill_level": 1},
-            {"skill_key": "skill_2", "skill_level": 1},
-            {"skill_key": "skill_3", "skill_level": 1},
-        ]
+        # Mock aggregation result used in the new implementation
+        mock_agg_result = [{
+            "discord_id": discord_id, "name": "Test",
+            "stats_docs": [{"stats_json": "{}"}],
+            "buffs": [],
+            "player_skills": [
+                {"skill_key": "skill_1", "skill_level": 1},
+                {"skill_key": "skill_2", "skill_level": 1},
+                {"skill_key": "skill_3", "skill_level": 1},
+            ]
+        }]
+        self.mock_db["players"].aggregate.return_value = mock_agg_result
 
         # Setup find return value (cursor) for optimized version
         mock_cursor = [
