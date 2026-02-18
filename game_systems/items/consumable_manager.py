@@ -56,9 +56,10 @@ class ConsumableManager:
             max_hp = stats.max_hp
             max_mp = stats.max_mp
 
-            # 4. Calculate Effects
+            # 4. Calculate Effects (In Memory Only)
             item_used = False
             message_lines = []
+            buffs_to_apply = []
 
             # -- Heal Logic --
             if "heal" in effect:
@@ -94,7 +95,6 @@ class ConsumableManager:
 
             if is_buff_item or duration:
                 duration = duration or 300
-                buffs_applied = []
 
                 ignored_keys = {
                     "heal",
@@ -108,28 +108,48 @@ class ConsumableManager:
                     "chance",
                 }
 
+                buff_names_for_msg = []
                 for key, val in effect.items():
                     if key not in ignored_keys:
-                        self.db.add_active_buff(discord_id, item_key, item_data["name"], key, val, duration)
-                        buffs_applied.append(f"{key.upper()} +{val}")
+                        # Defer DB write until after consumption
+                        buffs_to_apply.append({
+                            "key": key,
+                            "val": val,
+                            "duration": duration
+                        })
+                        buff_names_for_msg.append(f"{key.upper()} +{val}")
 
-                if buffs_applied:
-                    message_lines.append(f"Buffs applied: {', '.join(buffs_applied)} ({duration}s).")
+                if buff_names_for_msg:
+                    message_lines.append(f"Buffs applied: {', '.join(buff_names_for_msg)} ({duration}s).")
                     item_used = True
 
             if not item_used:
                 return False, "This item has no usable effect right now."
 
-            # 5. Apply Updates
-            self.db.set_player_vitals(discord_id, current_hp, current_mp)
+            # 5. Consume Item Atomically (Fixes Race Condition)
+            # We do this BEFORE applying effects to prevent duplication
+            if not self.db.consume_item_atomic(inventory_db_id, 1):
+                return False, "Item no longer available."
 
-            # Remove Item
-            if item.get("count", 1) > 1:
-                self.db.decrement_inventory_count(inventory_db_id)
-            else:
-                self.db.delete_inventory_item(inventory_db_id)
+            try:
+                # 6. Apply Updates (Vitals)
+                self.db.set_player_vitals(discord_id, current_hp, current_mp)
 
-            return True, " ".join(message_lines)
+                # 7. Apply Buffs (Deferred)
+                for b in buffs_to_apply:
+                    self.db.add_active_buff(
+                        discord_id, item_key, item_data["name"],
+                        b["key"], b["val"], b["duration"]
+                    )
+
+                return True, " ".join(message_lines)
+
+            except Exception as e:
+                # Rollback: Refund item if effect application fails
+                logger.error(f"Item use error for {discord_id} (Refunding): {e}", exc_info=True)
+                self.db.increment_inventory_count(inventory_db_id, 1)
+                # Re-raise to be caught by outer block for generic error message
+                raise e
 
         except Exception as e:
             logger.error(f"Item use error for {discord_id}: {e}", exc_info=True)
