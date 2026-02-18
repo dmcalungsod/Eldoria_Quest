@@ -15,6 +15,42 @@ class AdventureEvents:
     Generates atmospheric narrative lines for Eldoria’s exploration system.
     """
 
+    # --- ATMOSPHERIC INTROS (New) ---
+    ATMOSPHERE_FOREST = [
+        "Sunlight fractures through the leaves, dappling the ground in shifting patterns.",
+        "The wind sighs through the branches, carrying the scent of pine and old earth.",
+        "A distant bird call echoes, sharp and lonely against the silence.",
+        "Dust motes dance in a shaft of light that pierces the canopy.",
+        "The undergrowth rustles with unseen life, watching your passage.",
+        "Clouds drift overhead, casting fleeting shadows across your path.",
+    ]
+
+    ATMOSPHERE_THICKET = [
+        "Fog clings to the ground, swirling around your ankles like cold spirits.",
+        "The air here is thick and humid, tasting of copper and decay.",
+        "Twisted vines hang like nooses from the trees above.",
+        "A sudden chill drops the temperature, making your breath mist.",
+        "Silence presses in, heavy and unnatural, broken only by your heartbeat.",
+        "The light turns grey and sickly as the canopy thickens.",
+    ]
+
+    ATMOSPHERE_ROOTS = [
+        "Bioluminescent fungi cast a sickly pale glow on the cavern walls.",
+        "Water drips rhythmically from a stalactite, marking the passage of time.",
+        "The smell of ozone and rot fills the stagnant air.",
+        "Shadows seem to lengthen and grasp at your boots.",
+        "A low vibration thrums through the floor, as if the earth itself is groaning.",
+        "The air is stale, heavy with the weight of the earth above.",
+    ]
+
+    ATMOSPHERE_ARENA = [
+        "The roar of the crowd seems distant, muffled by your focus.",
+        "Sand crunches beneath your boots, stained with the history of violence.",
+        "The metallic tang of blood hangs in the dry air.",
+        "Sunlight glares off the stone walls, blinding and unforgiving.",
+    ]
+
+    # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
         f"{E.FOREST} You find a safe clearing and rest your weary limbs...",
@@ -49,9 +85,9 @@ class AdventureEvents:
     ]
 
     REGEN_PHRASES_ARENA = [
-        f"{E.SWORDS} You wipe sweat from your brow, the cheers of the crowd muffled by your focus.",
+        f"{E.SWORDS} You wipe sweat from your brow. The next bout will be harder.",
         f"{E.SWORDS} The stone floor is cold beneath you. You check your weapon's edge.",
-        f"{E.SWORDS} You take a knee, analyzing your previous strikes. The next bout will be harder.",
+        f"{E.SWORDS} You take a knee, analyzing your previous strikes.",
         f"{E.SWORDS} Amidst the dust and blood, you find a second wind.",
         f"{E.SWORDS} You tighten your grip, letting the adrenaline fade just enough to think clearly.",
         f"{E.SWORDS} The arena is unforgiving. You use this moment to steel your resolve.",
@@ -182,28 +218,52 @@ class AdventureEvents:
         class_name: str = "Adventurer",
         hp_percent: float = 1.0,
     ) -> list:
+        # Define the base message list
+        base_logs = []
+
         # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
         if hp_percent < 0.30 and random.random() < 0.50:
-            return [random.choice(AdventureEvents.REGEN_LOW_HP)]
+            base_logs = [random.choice(AdventureEvents.REGEN_LOW_HP)]
 
         # 2. High HP (> 80%): 30% chance for confident flavor
-        if hp_percent > 0.80 and random.random() < 0.30:
-            return [random.choice(AdventureEvents.REGEN_HIGH_HP)]
+        elif hp_percent > 0.80 and random.random() < 0.30:
+            base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
 
         # 3. Class-Specific Flavor: 30% chance
-        if class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
-            return [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
+        elif (
+            class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30
+        ):
+            base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
 
         # 4. Location-Specific Fallback
-        if location_id == "whispering_thicket":
-            return [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
-        if location_id == "deepgrove_roots":
-            return [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
-        if location_id == "guild_arena":
-            return [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
+        elif location_id == "whispering_thicket":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
+        elif location_id == "deepgrove_roots":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
+        elif location_id == "guild_arena":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
         # 5. Generic Fallback
-        return [random.choice(AdventureEvents.REGEN_PHRASES)]
+        else:
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES)]
+
+        # --- ATMOSPHERIC PREPEND ---
+        # 40% chance to add an atmospheric intro line
+        if random.random() < 0.40:
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_FOREST  # Default
+
+            if location_id == "whispering_thicket":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_THICKET
+            elif location_id == "deepgrove_roots":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
+            elif location_id == "guild_arena":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
+
+            # Select and prepend
+            atmospheric_line = random.choice(atmosphere_pool)
+            base_logs.insert(0, atmospheric_line)
+
+        return base_logs
 
     @staticmethod
     def quest_event(objective_type: str, target_name: str) -> str:
