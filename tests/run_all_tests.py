@@ -17,6 +17,7 @@ import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui        # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
+import test_adventure_race  # New race condition test
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
@@ -80,6 +81,17 @@ def run_ux_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+def run_race_tests():
+    """Runs the race condition tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING RACE CONDITION TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_adventure_race)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -97,6 +109,7 @@ def main():
     print("  • Quest Security (New)")
     print("  • Crafting System Expansion (New)")
     print("  • UX Tests (New)")
+    print("  • Adventure Race Conditions (New)")
     print("\n")
 
     db_available = check_mongodb_connection()
@@ -118,7 +131,11 @@ def main():
     ux_passed = run_ux_tests()
     all_passed = all_passed and ux_passed
 
-    # 5. Integration Tests (Require MongoDB)
+    # 5. Adventure Race Tests (Mock-based, always run)
+    race_passed = run_race_tests()
+    all_passed = all_passed and race_passed
+
+    # 6. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -146,6 +163,7 @@ def main():
     print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
     print(f"UX Tests: {'✓ PASSED' if ux_passed else '✗ FAILED'}")
+    print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
 
     if db_available:
         print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")

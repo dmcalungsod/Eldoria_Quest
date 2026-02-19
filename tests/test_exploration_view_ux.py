@@ -1,8 +1,10 @@
 import sys
 import unittest
+import importlib
 from unittest.mock import MagicMock
 
 # 1. Mock Discord
+# We need to aggressively patch discord BEFORE importing anything that uses it
 mock_discord = MagicMock()
 mock_discord.ButtonStyle.success = "success"
 mock_discord.ButtonStyle.danger = "danger"
@@ -11,6 +13,12 @@ mock_discord.ButtonStyle.primary = "primary"
 mock_discord.Color.dark_red.return_value = "dark_red"
 mock_discord.Color.dark_green.return_value = "dark_green"
 mock_discord.Color.dark_grey.return_value = "dark_grey"
+
+# Forcefully remove discord if it's already loaded to ensure mocks take precedence
+if "discord" in sys.modules:
+    del sys.modules["discord"]
+if "discord.ui" in sys.modules:
+    del sys.modules["discord.ui"]
 
 sys.modules["discord"] = mock_discord
 sys.modules["discord.ui"] = MagicMock()
@@ -48,6 +56,9 @@ import os  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import game_systems.adventure.ui.exploration_view  # noqa: E402
+# Force reload to ensure it picks up the mocked discord module
+importlib.reload(game_systems.adventure.ui.exploration_view)
 from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
 
 
