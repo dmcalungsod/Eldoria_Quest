@@ -26,8 +26,8 @@ class PlayerCreator:
         ATOMIC: Creates player, stats, and default skills in one transaction.
         """
         # --- SECURITY FIX: Sanitize Username ---
-        # 1. Remove Markdown characters
-        username = re.sub(r"[\*_~`|>]", "", username)
+        # 1. Remove Markdown characters (including link syntax)
+        username = re.sub(r"[\*_~`|>\[\]\(\)]", "", username)
         # 2. Trim whitespace
         username = username.strip()
         # 3. Enforce max length

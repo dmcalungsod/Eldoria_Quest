@@ -10,6 +10,10 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+
 # Add root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -64,6 +68,28 @@ class TestSecurity(unittest.TestCase):
 
         self.assertEqual(len(actual_name), expected_len, "Name was not truncated!")
         self.assertEqual(actual_name, "A" * 32)
+
+    def test_link_injection(self):
+        """Test that markdown link syntax is removed or sanitized."""
+        discord_id = 12345
+        # Attempt to create a link that looks like a system message
+        malicious_name = "[ClickMe](http://evil.com)"
+
+        self.mock_db.player_exists.return_value = False
+        self.mock_db.get_default_skill_keys.return_value = []
+
+        success, msg = self.creator.create_player(discord_id, malicious_name, 1)
+
+        self.assertTrue(success, f"Player creation failed: {msg}")
+
+        # Verify create_player_full called with sanitized name
+        args, kwargs = self.mock_db.create_player_full.call_args
+        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+
+        self.assertNotIn("[", actual_name, "Username still contains '['")
+        self.assertNotIn("]", actual_name, "Username still contains ']'")
+        self.assertNotIn("(", actual_name, "Username still contains '('")
+        self.assertNotIn(")", actual_name, "Username still contains ')'")
 
 def run_all_tests():
     """Run the security test suite manually."""

@@ -12,15 +12,32 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
 import test_game_systems
+try:
+    from pymongo import MongoClient
+    from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+except ImportError:
+    # If pymongo is missing, mock it to allow other imports to succeed
+    from unittest.mock import MagicMock
+    sys.modules["pymongo"] = MagicMock()
+    sys.modules["pymongo.errors"] = MagicMock()
+    MongoClient = None
+    ConnectionFailure = None
+    ServerSelectionTimeoutError = None
+
+# Import existing test suites
+import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_crafting_expanded  # Expanded crafting tests
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+import test_security # Added test_security
 
 
 def check_mongodb_connection():
     """Checks if MongoDB is reachable at localhost:27017."""
+    if MongoClient is None:
+        print("⚠ pymongo not installed. Skipping integration tests.")
+        return False
+
     try:
         client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)
         client.admin.command('ping')
@@ -63,6 +80,17 @@ def run_crafting_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+def run_security_tests():
+    """Runs the general security tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING GENERAL SECURITY TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_security)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -75,7 +103,7 @@ def main():
     print("  • Inventory and equipment systems")
     print("  • Combat and damage calculations")
     print("  • Level-up and progression systems")
-    print("  • Security and sanitization")
+    print("  • Security and sanitization (UPDATED)")
     print("  • Infirmary Security")
     print("  • Quest Security (New)")
     print("  • Crafting System Expansion (New)")
@@ -96,7 +124,11 @@ def main():
     crafting_passed = run_crafting_tests()
     all_passed = all_passed and crafting_passed
 
-    # 4. Integration Tests (Require MongoDB)
+    # 4. General Security Tests (Mock-based, always run)
+    security_passed = run_security_tests()
+    all_passed = all_passed and security_passed
+
+    # 5. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -123,6 +155,7 @@ def main():
     print(f"Quest Security Tests: {'✓ PASSED' if quest_passed else '✗ FAILED'}")
     print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
+    print(f"General Security Tests: {'✓ PASSED' if security_passed else '✗ FAILED'}")
 
     if db_available:
         print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")
