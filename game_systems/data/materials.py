@@ -105,4 +105,30 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 25,
     },
+    # --- RARE CRAFTING MATERIALS ---
+    "shadow_essence": {
+        "name": "Shadow Essence",
+        "description": "A vial of swirling darkness gathered from spirits.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "ironwood_heart": {
+        "name": "Ironwood Heart",
+        "description": "The petrified heart of an Elder Treant.",
+        "rarity": "Rare",
+        "value": 200,
+    },
+    # --- EPIC CRAFTING MATERIALS ---
+    "titan_shard": {
+        "name": "Titan Shard",
+        "description": "A fragment of metal so hard it feels impossible.",
+        "rarity": "Epic",
+        "value": 800,
+    },
+    "celestial_dust": {
+        "name": "Celestial Dust",
+        "description": "Glimmering dust that falls from the stars.",
+        "rarity": "Epic",
+        "value": 1000,
+    },
 }

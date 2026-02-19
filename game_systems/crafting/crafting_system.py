@@ -47,14 +47,6 @@ class CraftingSystem:
 
         return True, "Ready to craft."
 
-    def _get_equipment_id_by_name(self, name: str) -> int | None:
-        """Finds the database ID for an equipment item by its name."""
-        # Query the 'equipment' collection
-        doc = self.db._col("equipment").find_one({"name": name}, {"id": 1})
-        if doc:
-            return doc["id"]
-        return None
-
     def craft_item(self, discord_id: int, recipe_id: str) -> tuple[bool, str, dict | None]:
         """
         Executes the crafting process safely.
@@ -94,7 +86,7 @@ class CraftingSystem:
                     return False, "System Error: Equipment data missing.", None
 
                 # Resolve DB ID
-                db_id = self._get_equipment_id_by_name(item_data["name"])
+                db_id = self.db.get_equipment_id_by_name(item_data["name"])
                 if not db_id:
                     return False, f"System Error: Equipment '{item_data['name']}' not found in database.", None
 

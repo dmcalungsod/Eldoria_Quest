@@ -832,6 +832,13 @@ class DatabaseManager:
     # EQUIPMENT DATA (New methods for external call sites)
     # ============================================================
 
+    def get_equipment_id_by_name(self, name: str) -> int | None:
+        """Finds the database ID for an equipment item by its name."""
+        doc = self._col("equipment").find_one({"name": name}, {"id": 1})
+        if doc:
+            return doc["id"]
+        return None
+
     def get_item_from_source_table(self, table_name: str, item_id: str) -> dict | None:
         """Fetches an item from equipment or class_equipment collection."""
         valid_tables = {"equipment", "class_equipment"}
