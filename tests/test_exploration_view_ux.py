@@ -56,6 +56,9 @@ import os  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import game_systems.adventure.ui.exploration_view  # noqa: E402
+# Force reload to ensure it picks up the mocked discord module
+importlib.reload(game_systems.adventure.ui.exploration_view)
 from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
 
 
