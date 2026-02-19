@@ -8,9 +8,9 @@ import logging
 
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
+from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.recipes import RECIPES
-from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
 

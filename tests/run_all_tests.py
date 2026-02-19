@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
 import test_game_systems
+
 try:
     from pymongo import MongoClient
     from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
@@ -25,11 +26,10 @@ except ImportError:
     ServerSelectionTimeoutError = None
 
 # Import existing test suites
-import test_game_systems
+import test_crafting_expanded  # Expanded crafting tests
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
-import test_crafting_expanded  # Expanded crafting tests
-import test_security # Added test_security
+import test_security  # Added test_security
 
 
 def check_mongodb_connection():

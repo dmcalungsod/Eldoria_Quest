@@ -4,8 +4,8 @@ Tests for Expanded Crafting System
 Verifies new recipes and material handling.
 """
 
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock
 
@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.recipes import RECIPES
+
 
 class TestCraftingExpanded(unittest.TestCase):
     def setUp(self):

@@ -43,13 +43,15 @@ sys.modules["game_systems.adventure.ui.setup_view"] = MagicMock()
 sys.modules["pymongo"] = MagicMock()
 
 import os  # noqa: E402
+
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import the class under test
 # This must happen AFTER mocking
-from game_systems.character.ui.adventure_menu import AdventureView  # noqa: E402
 from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.character.ui.adventure_menu import AdventureView  # noqa: E402
+
 
 class TestAdventureUX(unittest.TestCase):
     def test_adventure_view_resume(self):

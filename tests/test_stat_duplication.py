@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
+
 from game_systems.items.equipment_manager import EquipmentManager
+
 
 class TestStatDuplication(unittest.TestCase):
     def setUp(self):
