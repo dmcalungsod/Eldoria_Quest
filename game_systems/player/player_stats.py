@@ -19,26 +19,32 @@ def calculate_tiered_bonus(stat_value: int, base_effect_per_point: float) -> int
     Tier 1 (1-100 pts): 1.00x
     Tier 2 (101-200 pts): 1.25x
     ...
+
+    Optimized: Uses O(1) arithmetic formula instead of O(N) loop.
+    Formula:
+      T = floor(stat / 100)
+      R = stat % 100
+      Total = 100 * base * (T + 0.125 * T * (T - 1)) + R * base * (1 + 0.25 * T)
     """
-    total_effect = 0.0
-    remaining_points = stat_value
-    current_tier = 0
+    if stat_value <= 0:
+        return 0
 
-    while remaining_points > 0:
-        # Determine points to calculate for this tier
-        points_in_this_tier = min(remaining_points, 100)
+    # Number of full 100-point tiers
+    full_tiers = stat_value // 100
+    # Remaining points in the partial tier
+    remaining_points = stat_value % 100
 
-        # Calculate the additive multiplier
-        multiplier = 1.0 + (current_tier * 0.25)
+    # 1. Contribution from full tiers
+    # Sum of arithmetic series: 100 * base * sum(1 + 0.25*i for i in 0..T-1)
+    # Sum = 100 * base * (T + 0.125 * T * (T-1))
+    full_tiers_effect = 100.0 * base_effect_per_point * (full_tiers + 0.125 * full_tiers * (full_tiers - 1))
 
-        # Add to the total effect
-        total_effect += points_in_this_tier * base_effect_per_point * multiplier
+    # 2. Contribution from remaining points
+    # Multiplier for the current tier is (1 + 0.25 * T)
+    current_tier_multiplier = 1.0 + (full_tiers * 0.25)
+    remaining_effect = remaining_points * base_effect_per_point * current_tier_multiplier
 
-        # Decrement points and move to the next tier
-        remaining_points -= points_in_this_tier
-        current_tier += 1
-
-    return math.floor(total_effect)
+    return math.floor(full_tiers_effect + remaining_effect)
 
 
 @dataclass

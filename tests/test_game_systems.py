@@ -13,6 +13,12 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Mock external dependencies for environments where they aren't installed
+sys.modules['pymongo'] = MagicMock()
+sys.modules['pymongo.errors'] = MagicMock()
+sys.modules['discord'] = MagicMock()
+sys.modules['discord.ext'] = MagicMock()
+
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.damage_formula import DamageFormula
@@ -42,6 +48,32 @@ class TestGameSystems(unittest.TestCase):
         stats_dict = stats.to_dict()
         restored_stats = PlayerStats.from_dict(stats_dict)
         self.assertEqual(restored_stats.strength, 20)
+
+    def test_tiered_bonus_calculation(self):
+        """Test the tiered bonus calculation logic explicitly."""
+        from game_systems.player.player_stats import calculate_tiered_bonus
+
+        # Helper for loop logic (reference implementation)
+        def reference_calc(val, base):
+            total = 0.0
+            remaining = val
+            tier = 0
+            while remaining > 0:
+                pts = min(remaining, 100)
+                mult = 1.0 + (tier * 0.25)
+                total += pts * base * mult
+                remaining -= pts
+                tier += 1
+            return int(total // 1)  # match math.floor behavior
+
+        test_cases = [0, 1, 50, 99, 100, 101, 150, 199, 200, 250, 300, 500, 1000, 1234, 5000]
+        base_values = [1.0, 0.5, 2.0, 10.0]
+
+        for val in test_cases:
+            for base in base_values:
+                expected = reference_calc(val, base)
+                result = calculate_tiered_bonus(val, base)
+                self.assertEqual(result, expected, f"Failed for val={val}, base={base}")
 
     def test_inventory_system(self):
         """Test inventory operations logic."""
