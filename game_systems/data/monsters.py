@@ -100,6 +100,7 @@ for idx in range(1, 51):
         drops.append(("magic_stone_large", 100))
         drops.append(("magic_stone_flawless", 25))
         drops.append(("boss_talon", 100))
+        drops.append(("celestial_dust", 15))
     elif tier == "Elite":
         drops.append(("magic_stone_medium", 80))
         drops.append(("magic_stone_large", 15))
@@ -148,9 +149,15 @@ for idx in range(1, 51):
         drops.append(("spider_silk", 30))
     elif "Treant" in name:
         drops.append(("treant_branch", 15))
+        if tier in ["Elite", "Boss"]:
+            drops.append(("ironwood_heart", 20))
     elif "Boar" in name:
         drops.append(("boar_meat", 40))
         drops.append(("boar_tusk", 25))
+    elif any(x in name for x in ["Wisp", "Shade", "Duskling", "Revenant", "Wight"]):
+        drops.append(("shadow_essence", 15))
+    elif any(x in name for x in ["Brute", "Sentinel", "King", "Empress"]):
+        drops.append(("titan_shard", 10))
 
     description = (
         f"In the whispering groves of the Shattered Veil, the {name} prowls. "

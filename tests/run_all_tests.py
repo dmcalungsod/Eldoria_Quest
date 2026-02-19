@@ -15,6 +15,7 @@ import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_crafting_expanded  # Expanded crafting tests
+import test_crafting_ui        # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
@@ -60,6 +61,10 @@ def run_crafting_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_crafting_expanded)
+
+    # Also load UI tests
+    suite.addTests(loader.loadTestsFromModule(test_crafting_ui))
+
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
