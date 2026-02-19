@@ -19,3 +19,7 @@
 ## 2025-05-23 - [Empty State Turn-In Feedback]
 **Learning:** Presenting a "disabled" state (like a grayed-out dropdown) without explaining *why* the action is unavailable creates a frustrating dead end.
 **Action:** When a primary action (like Quest Turn-In) is unavailable, replace the generic empty state with actionable feedback—specifically listing the *progress* of incomplete tasks so the user knows exactly what remains to be done.
+
+## 2025-05-23 - [Context-Aware Button States]
+**Learning:** In turn-based interfaces where mistakes are costly (like death), changing button style (Green -> Red) based on critical status (Low HP) provides vital, non-textual warnings.
+**Action:** Use `discord.ButtonStyle.danger` to signal "Caution" on primary actions when user vitals are critical (<30%), preventing accidental progression into danger.

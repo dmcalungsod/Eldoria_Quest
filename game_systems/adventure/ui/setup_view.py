@@ -149,7 +149,14 @@ class AdventureSetupView(View):
 
             # 5. Transition to Exploration View
             view = ExplorationView(
-                self.db, self.manager, loc_id, initial_log, self.interaction_user, player_stats, active_monster=None
+                self.db,
+                self.manager,
+                loc_id,
+                initial_log,
+                self.interaction_user,
+                player_stats,
+                vitals=vitals,
+                active_monster=None,
             )
             await interaction.edit_original_response(embed=embed, view=view)
 
