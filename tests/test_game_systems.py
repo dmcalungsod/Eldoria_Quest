@@ -19,12 +19,12 @@ sys.modules['pymongo.errors'] = MagicMock()
 sys.modules['discord'] = MagicMock()
 sys.modules['discord.ext'] = MagicMock()
 
-from database.database_manager import DatabaseManager
-from game_systems.combat.combat_engine import CombatEngine
-from game_systems.combat.damage_formula import DamageFormula
-from game_systems.items.inventory_manager import InventoryManager
-from game_systems.player.level_up import LevelUpSystem
-from game_systems.player.player_stats import PlayerStats
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
+from game_systems.combat.damage_formula import DamageFormula  # noqa: E402
+from game_systems.items.inventory_manager import InventoryManager  # noqa: E402
+from game_systems.player.level_up import LevelUpSystem  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestGameSystems(unittest.TestCase):
