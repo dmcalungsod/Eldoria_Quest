@@ -49,6 +49,34 @@ class CombatPhrases:
                 f"Silk trembles overhead as a {name} lowers itself.",
                 f"A {name} crawls forth, venom glistening on its fangs.",
             ]
+        elif "Boar" in name or "Stag" in name or "Brute" in name:
+            phrases = [
+                f"The undergrowth explodes as a {name} charges into view!",
+                f"A massive {name} paws the ground, preparing to trample you.",
+                f"Heavy hooves thunder against the earth—a {name} is attacking!",
+                f"Snorting with aggression, a {name} lowers its head to strike.",
+            ]
+        elif any(k in name for k in ["Treant", "Ent", "Vineling", "Bramble", "Sporeling"]):
+            phrases = [
+                f"A {name} creaks to life, detaching itself from the forest.",
+                f"Roots snap and shift as a {name} lumbers toward you.",
+                f"The trees themselves seem to turn against you—a {name} awakens.",
+                f"A {name} rises from the earth, moss and bark forming a deadly shape.",
+            ]
+        elif any(k in name for k in ["Wisp", "Shade", "Revenant", "Wight", "Stormling", "Duskling", "Sprite"]):
+            phrases = [
+                f"The temperature plummets as a {name} flickers into existence.",
+                f"A spectral chill washes over you—a {name} drifts closer.",
+                f"A {name} manifests from the gloom, eyes burning with cold light.",
+                f"Ethereal silence falls, broken only by the hum of a {name}.",
+            ]
+        elif any(k in name for k in ["Crawler", "Urch", "Lurker"]):
+            phrases = [
+                f"Damp earth churns as a {name} scuttles forth.",
+                f"A {name} emerges from the muck, clicking its mandibles.",
+                f"Something wet and many-legged moves in the shadows—a {name} appears.",
+                f"The stench of rot heralds the arrival of a {name}.",
+            ]
         elif "Undead" in name or "Skeleton" in name or "Zombie" in name:
             phrases = [
                 f"A {name} shambles forward, bones rattling with ancient hatred.",
@@ -242,11 +270,40 @@ class CombatPhrases:
                 f"A sharp leg pierces your defense— `{damage}` damage.{crit_text}",
                 f"Venom burns as the {m_name} strikes for `{damage}` damage.{crit_text}",
             ]
-        elif "Bear" in m_name:
+        elif "Bear" in m_name or "Boar" in m_name or "Stag" in m_name or "Brute" in m_name:
             pool = [
                 f"The {m_name} swipes with massive force, dealing `{damage}` damage!{crit_text}",
                 f"You are thrown back by the {m_name}'s charge— `{damage}` damage.{crit_text}",
                 f"Bone-crushing weight slams into you for `{damage}` damage.{crit_text}",
+                f"The {m_name} gores you with brutal efficiency— `{damage}` damage.{crit_text}",
+            ]
+        elif any(k in m_name for k in ["Treant", "Ent", "Vineling", "Bramble", "Sporeling"]):
+            pool = [
+                f"A heavy branch bludgeons you for `{damage}` damage!{crit_text}",
+                f"Roots whip out, lashing your skin for `{damage}` damage.{crit_text}",
+                f"The {m_name} crushes you with the weight of old wood— `{damage}` damage.{crit_text}",
+                f"Thorns tear at your flesh as the {m_name} strikes for `{damage}` damage.{crit_text}",
+            ]
+        elif any(k in m_name for k in ["Wisp", "Shade", "Revenant", "Wight", "Stormling", "Duskling", "Sprite"]):
+            pool = [
+                f"A cold touch drains your vitality— `{damage}` damage.{crit_text}",
+                f"The {m_name} passes through your guard, chilling you for `{damage}` damage!{crit_text}",
+                f"Spectral energy flares, burning you with cold fire for `{damage}` damage.{crit_text}",
+                f"The {m_name} strikes with an otherworldly force— `{damage}` damage.{crit_text}",
+            ]
+        elif any(k in m_name for k in ["Crawler", "Urch", "Lurker"]):
+            pool = [
+                f"The {m_name} pinches you with serrated limbs for `{damage}` damage!{crit_text}",
+                f"Acidic slime burns your skin as the {m_name} strikes— `{damage}` damage.{crit_text}",
+                f"Mandibles snap shut on your arm— `{damage}` damage.{crit_text}",
+                f"The {m_name} swarms over your defenses, biting for `{damage}` damage.{crit_text}",
+            ]
+        elif "Undead" in m_name or "Skeleton" in m_name or "Zombie" in m_name:
+            pool = [
+                f"A rotting fist slams into you for `{damage}` damage!{crit_text}",
+                f"Bones rattle as the {m_name} strikes— `{damage}` damage.{crit_text}",
+                f"A rusty weapon swings with unnatural strength, dealing `{damage}` damage.{crit_text}",
+                f"The {m_name} lurches forward, tearing at you for `{damage}` damage.{crit_text}",
             ]
         else:
             pool = [
