@@ -1,8 +1,8 @@
 
-import unittest
 import asyncio
-from unittest.mock import MagicMock, AsyncMock, patch
 import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock
 
 # Mock discord if not available
 try:
@@ -13,7 +13,6 @@ except ImportError:
     mock_discord = MagicMock()
     sys.modules["discord"] = mock_discord
     sys.modules["discord.ui"] = MagicMock()
-    from discord.ui import Button, View
 
     # Mock Button and View specifically to allow inheritance
     class View:
@@ -38,10 +37,11 @@ except ImportError:
 
 # Now import the code under test
 # We need to ensure we can import from game_systems
-from game_systems.adventure.ui.exploration_view import ExplorationView
-from game_systems.adventure.adventure_manager import AdventureManager
 from database.database_manager import DatabaseManager
+from game_systems.adventure.adventure_manager import AdventureManager
+from game_systems.adventure.ui.exploration_view import ExplorationView
 from game_systems.player.player_stats import PlayerStats
+
 
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
     async def test_race_condition_double_click(self):
