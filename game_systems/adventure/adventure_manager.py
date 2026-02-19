@@ -183,12 +183,17 @@ class AdventureManager:
             stats=player_stats, level=p_row["level"], exp=p_row["experience"], exp_to_next=p_row["exp_to_next"]
         )
 
+        leveled_up = False
         if total_exp > 0:
-            level_sys.add_exp(total_exp)
+            leveled_up = level_sys.add_exp(total_exp)
 
         # Save Vitals & Level
         current_hp = p_row["current_hp"]
         saved_hp = 1 if current_hp <= 0 else current_hp
+
+        # FIX: Only restore MP on level up, otherwise preserve current MP
+        # Prevents "free healing" exploit by ending adventure
+        target_mp = level_sys.stats.max_mp if leveled_up else p_row["current_mp"]
 
         self.db.update_player_fields(
             session.discord_id,
@@ -196,7 +201,7 @@ class AdventureManager:
             experience=level_sys.exp,
             exp_to_next=level_sys.exp_to_next,
             current_hp=saved_hp,
-            current_mp=level_sys.stats.max_mp,
+            current_mp=target_mp,
         )
         self.db.increment_player_fields(session.discord_id, vestige_pool=total_exp)
 

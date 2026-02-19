@@ -25,6 +25,7 @@ from game_systems.combat.damage_formula import DamageFormula  # noqa: E402
 from game_systems.items.inventory_manager import InventoryManager  # noqa: E402
 from game_systems.player.level_up import LevelUpSystem  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 
 
 class TestGameSystems(unittest.TestCase):
@@ -32,6 +33,7 @@ class TestGameSystems(unittest.TestCase):
         # Mock DatabaseManager
         self.mock_db = MagicMock(spec=DatabaseManager)
         self.mock_db.player_exists.return_value = True
+        self.mock_bot = MagicMock()
 
     def test_player_stats(self):
         """Test PlayerStats class."""
@@ -171,6 +173,56 @@ class TestGameSystems(unittest.TestCase):
         # Test Level Up
         level_system.add_exp(60) # Total 110 > 100
         self.assertGreater(level_system.level, 1)
+
+    def test_adventure_mp_persistence(self):
+        """Test that MP is preserved after adventure unless leveled up."""
+        discord_id = 12345
+        manager = AdventureManager(self.mock_db, self.mock_bot)
+
+        # Setup Player & Stats
+        player_row = {
+            "discord_id": discord_id,
+            "level": 1,
+            "experience": 0,
+            "exp_to_next": 100,
+            "current_hp": 20,
+            "current_mp": 10, # Current MP
+            "vestige_pool": 0,
+            "aurum": 0
+        }
+        stats = PlayerStats(mag_base=10) # Max MP > 10
+
+        # Mocks
+        self.mock_db.get_player.return_value = player_row
+        self.mock_db.get_player_stats_json.return_value = stats.to_dict()
+        self.mock_db.get_active_adventure.return_value = {
+            "discord_id": discord_id, "location_id": "loc", "active": 1,
+            "logs": "[]", "loot_collected": '{"exp": 10}', "active_monster_json": None
+        }
+        self.mock_db.get_player_field.return_value = 1
+
+        # Mock Session
+        with patch('game_systems.adventure.adventure_manager.AdventureSession') as MockSession:
+            session = MockSession.return_value
+            session.loot = {"exp": 10}
+            session.discord_id = discord_id
+
+            manager.end_adventure(discord_id)
+
+            # Check preservation
+            args, kwargs = self.mock_db.update_player_fields.call_args
+            self.assertEqual(kwargs['current_mp'], 10, "MP should be preserved")
+
+            # NOW TEST LEVEL UP CASE
+            # Reset Mock
+            self.mock_db.update_player_fields.reset_mock()
+            session.loot = {"exp": 200} # Level up
+            player_row["experience"] = 90
+
+            manager.end_adventure(discord_id)
+
+            args, kwargs = self.mock_db.update_player_fields.call_args
+            self.assertEqual(kwargs['current_mp'], stats.max_mp, "MP should reset on level up")
 
 
 def run_all_tests():
