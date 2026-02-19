@@ -184,6 +184,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
                 log=["Trial Started."],
                 interaction_user=self.interaction_user,
                 player_stats=stats,
+                vitals=vitals,
                 active_monster=active_monster,
             )
 

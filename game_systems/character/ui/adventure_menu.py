@@ -132,6 +132,7 @@ class AdventureView(View):
                     logs,
                     self.interaction_user,
                     stats,
+                    vitals=vitals,
                     active_monster=active_monster,
                 )
 

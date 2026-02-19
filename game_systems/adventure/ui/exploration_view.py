@@ -33,6 +33,7 @@ class ExplorationView(View):
         log: list,
         interaction_user: discord.User,
         player_stats: PlayerStats,
+        vitals: dict = None,
         active_monster: dict = None,
     ):
         super().__init__(timeout=300)  # 5 minutes
@@ -42,6 +43,7 @@ class ExplorationView(View):
         self.log = log or []
         self.interaction_user = interaction_user
         self.player_stats = player_stats
+        self.vitals = vitals or {}
         self.inv_manager = InventoryManager(self.db)
         self.active_monster = active_monster
 
@@ -71,6 +73,13 @@ class ExplorationView(View):
     def _get_button_state(self):
         if self.active_monster:
             return "Battle", discord.ButtonStyle.danger, "⚔️"
+
+        # UX: Warn if HP is critically low (< 30%)
+        current_hp = self.vitals.get("current_hp", 0)
+        max_hp = max(self.player_stats.max_hp, 1)
+        if (current_hp / max_hp) < 0.3:
+            return "Forward", discord.ButtonStyle.danger, "⚠️"
+
         return "Forward", discord.ButtonStyle.success, "🥾"
 
     def _get_leave_button_state(self):
@@ -102,6 +111,7 @@ class ExplorationView(View):
 
             # Use optimized return data
             vitals = result.get("vitals", {"current_hp": 0, "current_mp": 0})
+            self.vitals = vitals
             if result.get("player_stats"):
                 self.player_stats = result["player_stats"]
             self.active_monster = result.get("active_monster")
@@ -188,6 +198,7 @@ class ExplorationView(View):
 
         # Refresh state on return
         vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+        self.vitals = vitals or {}
         session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
 
         # Update monster state from session

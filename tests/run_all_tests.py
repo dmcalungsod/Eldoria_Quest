@@ -15,6 +15,7 @@ import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_crafting_expanded  # Expanded crafting tests
+import test_exploration_view_ux  # New UX test
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
@@ -63,6 +64,17 @@ def run_crafting_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+def run_ux_tests():
+    """Runs the UX tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING UX TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_exploration_view_ux)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -79,6 +91,7 @@ def main():
     print("  • Infirmary Security")
     print("  • Quest Security (New)")
     print("  • Crafting System Expansion (New)")
+    print("  • UX Tests (New)")
     print("\n")
 
     db_available = check_mongodb_connection()
@@ -96,7 +109,11 @@ def main():
     crafting_passed = run_crafting_tests()
     all_passed = all_passed and crafting_passed
 
-    # 4. Integration Tests (Require MongoDB)
+    # 4. UX Tests (Mock-based, always run)
+    ux_passed = run_ux_tests()
+    all_passed = all_passed and ux_passed
+
+    # 5. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -123,6 +140,7 @@ def main():
     print(f"Quest Security Tests: {'✓ PASSED' if quest_passed else '✗ FAILED'}")
     print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
+    print(f"UX Tests: {'✓ PASSED' if ux_passed else '✗ FAILED'}")
 
     if db_available:
         print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")
