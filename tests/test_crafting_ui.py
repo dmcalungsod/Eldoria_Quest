@@ -60,7 +60,7 @@ sys.modules["discord.ui"] = mock_ui
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import View
-from game_systems.crafting.ui.crafting_view import CraftingView
+from game_systems.crafting.ui.crafting_view import CraftingView  # noqa: E402
 
 class TestCraftingUI(unittest.TestCase):
     def setUp(self):
@@ -120,8 +120,8 @@ class TestCraftingUI(unittest.TestCase):
         # Should contain potion_1 but NOT sword_1
         labels = [opt["label"] for opt in select.options]
         # "Health Potion (10 G)"
-        self.assertTrue(any("Health Potion" in l for l in labels))
-        self.assertFalse(any("Iron Sword" in l for l in labels))
+        self.assertTrue(any("Health Potion" in lbl for lbl in labels))
+        self.assertFalse(any("Iron Sword" in lbl for lbl in labels))
 
     def test_category_equipment(self):
         """Test initialization with equipment category."""
@@ -140,8 +140,8 @@ class TestCraftingUI(unittest.TestCase):
 
         # Should contain sword_1 but NOT potion_1
         labels = [opt["label"] for opt in select.options]
-        self.assertTrue(any("Iron Sword" in l for l in labels))
-        self.assertFalse(any("Health Potion" in l for l in labels))
+        self.assertTrue(any("Iron Sword" in lbl for lbl in labels))
+        self.assertFalse(any("Health Potion" in lbl for lbl in labels))
 
 if __name__ == "__main__":
     unittest.main()
