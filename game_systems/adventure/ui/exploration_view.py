@@ -46,6 +46,7 @@ class ExplorationView(View):
         self.vitals = vitals or {}
         self.inv_manager = InventoryManager(self.db)
         self.active_monster = active_monster
+        self.processing = False
 
         # Button Setup
         self._setup_buttons()
@@ -97,13 +98,18 @@ class ExplorationView(View):
     # MAIN GAME LOOP
     # --------------------------------------------------------
     async def explore_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
+        if self.processing:
+            await interaction.response.send_message("Please wait...", ephemeral=True)
+            return
 
-        # 1. Disable UI immediately
-        self._disable_all()
-        await interaction.edit_original_response(view=self)
-
+        self.processing = True
         try:
+            await interaction.response.defer()
+
+            # 1. Disable UI immediately
+            self._disable_all()
+            await interaction.edit_original_response(view=self)
+
             # 2. Run Simulation Thread
             result = await asyncio.to_thread(self.manager.simulate_adventure_step, self.interaction_user.id)
             sequence = result.get("sequence", [])
@@ -162,6 +168,8 @@ class ExplorationView(View):
             logger.error(f"Exploration error: {e}", exc_info=True)
             self._enable_all()
             await interaction.edit_original_response(view=self)
+        finally:
+            self.processing = False
 
     # --------------------------------------------------------
     # Helpers
@@ -182,59 +190,83 @@ class ExplorationView(View):
     # Inventory Navigation
     # --------------------------------------------------------
     async def inventory_callback(self, interaction: discord.Interaction):
-        # Avoid circular import
-        from game_systems.character.ui.inventory_view import InventoryView
+        if self.processing:
+            await interaction.response.send_message("Please wait...", ephemeral=True)
+            return
 
-        await interaction.response.defer()
+        self.processing = True
+        try:
+            # Avoid circular import
+            from game_systems.character.ui.inventory_view import InventoryView
 
-        items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
-        embed = build_inventory_embed(items)
+            await interaction.response.defer()
 
-        view = InventoryView(self.db, self.interaction_user, self.return_from_inventory, "Return to Adventure")
-        await interaction.edit_original_response(embed=embed, view=view)
+            items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
+            embed = build_inventory_embed(items)
+
+            view = InventoryView(self.db, self.interaction_user, self.return_from_inventory, "Return to Adventure")
+            await interaction.edit_original_response(embed=embed, view=view)
+        finally:
+            self.processing = False
 
     async def return_from_inventory(self, interaction: discord.Interaction):
-        await interaction.response.defer()
+        if self.processing:
+            await interaction.response.send_message("Please wait...", ephemeral=True)
+            return
 
-        # Refresh state on return
-        vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
-        self.vitals = vitals or {}
-        session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
+        self.processing = True
+        try:
+            await interaction.response.defer()
 
-        # Update monster state from session
-        if session and session.get("active_monster_json"):
-            try:
-                self.active_monster = json.loads(session["active_monster_json"])
-            except Exception:
+            # Refresh state on return
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+            self.vitals = vitals or {}
+            session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
+
+            # Update monster state from session
+            if session and session.get("active_monster_json"):
+                try:
+                    self.active_monster = json.loads(session["active_monster_json"])
+                except Exception:
+                    self.active_monster = None
+            else:
                 self.active_monster = None
-        else:
-            self.active_monster = None
 
-        embed = AdventureEmbeds.build_exploration_embed(
-            self.location_id, self.log, self.player_stats, vitals, self.active_monster
-        )
+            embed = AdventureEmbeds.build_exploration_embed(
+                self.location_id, self.log, self.player_stats, vitals, self.active_monster
+            )
 
-        # Reset my buttons
-        self._enable_all()
+            # Reset my buttons
+            self._enable_all()
 
-        # Update Forward Button Appearance
-        lbl, sty, emo = self._get_button_state()
-        self.forward_btn.label = lbl
-        self.forward_btn.style = sty
-        self.forward_btn.emoji = emo
+            # Update Forward Button Appearance
+            lbl, sty, emo = self._get_button_state()
+            self.forward_btn.label = lbl
+            self.forward_btn.style = sty
+            self.forward_btn.emoji = emo
 
-        # Update Leave Button Appearance
-        l_lbl, l_sty, l_emo = self._get_leave_button_state()
-        self.leave_btn.label = l_lbl
-        self.leave_btn.style = l_sty
-        self.leave_btn.emoji = l_emo
+            # Update Leave Button Appearance
+            l_lbl, l_sty, l_emo = self._get_leave_button_state()
+            self.leave_btn.label = l_lbl
+            self.leave_btn.style = l_sty
+            self.leave_btn.emoji = l_emo
 
-        await interaction.edit_original_response(embed=embed, view=self)
+            await interaction.edit_original_response(embed=embed, view=self)
+        finally:
+            self.processing = False
 
     # --------------------------------------------------------
     # Withdraw
     # --------------------------------------------------------
     async def leave_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
-        await back_to_profile_callback(interaction, is_new_message=False)
+        if self.processing:
+            await interaction.response.send_message("Please wait...", ephemeral=True)
+            return
+
+        self.processing = True
+        try:
+            await interaction.response.defer()
+            await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
+            await back_to_profile_callback(interaction, is_new_message=False)
+        finally:
+            self.processing = False
