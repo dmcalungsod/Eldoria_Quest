@@ -7,21 +7,35 @@ Verifies new recipes and material handling.
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.recipes import RECIPES
 
 
 class TestCraftingExpanded(unittest.TestCase):
     def setUp(self):
+        # Patch sys.modules to mock pymongo globally for this test
+        self.patcher = patch.dict("sys.modules", {
+            "pymongo": MagicMock(),
+            "pymongo.collection": MagicMock(),
+            "pymongo.results": MagicMock()
+        })
+        self.patcher.start()
+
+        # Import CraftingSystem inside the test method (after patching)
+        # This prevents ImportError due to missing pymongo
+        from game_systems.crafting.crafting_system import CraftingSystem
+
         self.mock_db = MagicMock()
         self.crafting = CraftingSystem(self.mock_db)
         self.discord_id = 12345
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_new_recipes_exist(self):
         """Verify new recipes are loaded."""
