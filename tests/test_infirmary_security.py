@@ -19,6 +19,9 @@ class MockButton:
         self.callback = None
         self.label = label
 
+    def _is_v2(self):
+        return True
+
 discord = MagicMock()
 discord.ui.View = MockView
 discord.ui.Button = MockButton

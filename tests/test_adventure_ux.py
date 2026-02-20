@@ -25,6 +25,9 @@ class MockButton:
         self.row = row
         self.callback = None
 
+    def _is_v2(self):
+        return True
+
 # Assign it to the mocked module
 sys.modules["discord.ui"].View = MockView
 sys.modules["discord.ui"].Button = MockButton

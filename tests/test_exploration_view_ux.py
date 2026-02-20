@@ -41,6 +41,9 @@ class MockButton:
         self.callback = None
         self.disabled = False
 
+    def _is_v2(self):
+        return True
+
 sys.modules["discord.ui"].View = MockView
 sys.modules["discord.ui"].Button = MockButton
 

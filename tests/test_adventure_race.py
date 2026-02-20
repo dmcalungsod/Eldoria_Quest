@@ -31,6 +31,9 @@ except ImportError:
             self.disabled = False
             self.callback = None
 
+        def _is_v2(self):
+            return True
+
     sys.modules["discord.ui"].View = View
     sys.modules["discord.ui"].Button = Button
     discord = mock_discord
