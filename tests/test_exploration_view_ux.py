@@ -40,6 +40,8 @@ class MockView:
         self.timeout = timeout
     def add_item(self, item):
         self.children.append(item)
+    def clear_items(self):
+        self.children.clear()
 
 class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
@@ -145,8 +147,9 @@ class TestExplorationViewUX(unittest.TestCase):
             active_monster=monster
         )
 
+        # Updated: Now expects "Attack" button
         btn = view.children[0]
-        self.assertEqual(btn.label, "Battle")
+        self.assertEqual(btn.label, "Attack")
         self.assertEqual(btn.style, "danger")
 
 if __name__ == "__main__":

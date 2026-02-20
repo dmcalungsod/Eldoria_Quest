@@ -18,6 +18,7 @@ import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui        # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
 import test_adventure_race  # New race condition test
+import test_combat_actions  # New Combat Actions test
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
@@ -92,6 +93,17 @@ def run_race_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+def run_combat_action_tests():
+    """Runs the combat action tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING COMBAT ACTION TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_combat_actions)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -135,14 +147,19 @@ def main():
     race_passed = run_race_tests()
     all_passed = all_passed and race_passed
 
-    # 6. Game Systems Tests (Mock-based, always run)
+    # 6. Combat Action Tests (Mock-based, always run)
+    combat_actions_passed = run_combat_action_tests()
+    all_passed = all_passed and combat_actions_passed
+
+    # 7. Game Systems Tests (Mock-based, always run)
+    # 7. Game Systems Tests (Mock-based, always run)
     print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
     print("-" * 70)
     game_passed = test_game_systems.run_all_tests()
     all_passed = all_passed and game_passed
 
-    # 7. Integration Tests (Require MongoDB)
+    # 8. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -163,6 +180,7 @@ def main():
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
     print(f"UX Tests: {'✓ PASSED' if ux_passed else '✗ FAILED'}")
     print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
+    print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
     if db_available:

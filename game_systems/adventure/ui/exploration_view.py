@@ -49,44 +49,59 @@ class ExplorationView(View):
         self.processing = False
 
         # Button Setup
-        self._setup_buttons()
+        self._update_view_state()
 
-    def _setup_buttons(self):
-        # Dynamic Forward Button
-        label, style, emoji = self._get_button_state()
-        self.forward_btn = Button(label=label, style=style, emoji=emoji, row=0, custom_id="forward")
-        self.forward_btn.callback = self.explore_callback
-        self.add_item(self.forward_btn)
+    def _update_view_state(self):
+        self.clear_items()
 
-        # Inventory
-        self.inv_btn = Button(
-            label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack"
-        )
-        self.inv_btn.callback = self.inventory_callback
-        self.add_item(self.inv_btn)
-
-        # Withdraw
-        l_lbl, l_sty, l_emo = self._get_leave_button_state()
-        self.leave_btn = Button(label=l_lbl, style=l_sty, emoji=l_emo, row=0, custom_id="leave")
-        self.leave_btn.callback = self.leave_callback
-        self.add_item(self.leave_btn)
-
-    def _get_button_state(self):
         if self.active_monster:
-            return "Battle", discord.ButtonStyle.danger, "⚔️"
+            # --- COMBAT MODE ---
 
-        # UX: Warn if HP is critically low (< 30%)
-        current_hp = self.vitals.get("current_hp", 0)
-        max_hp = max(self.player_stats.max_hp, 1)
-        if (current_hp / max_hp) < 0.3:
-            return "Forward", discord.ButtonStyle.danger, "⚠️"
+            # 1. Attack
+            attack_btn = Button(label="Attack", style=discord.ButtonStyle.danger, emoji=E.SWORDS, row=0, custom_id="attack")
+            attack_btn.callback = self.action_attack
+            self.add_item(attack_btn)
 
-        return "Forward", discord.ButtonStyle.success, "🥾"
+            # 2. Defend
+            defend_btn = Button(label="Defend", style=discord.ButtonStyle.secondary, emoji=E.SHIELD, row=0, custom_id="defend")
+            defend_btn.callback = self.action_defend
+            self.add_item(defend_btn)
 
-    def _get_leave_button_state(self):
-        if self.active_monster:
-            return "Flee", discord.ButtonStyle.danger, "🏃"
-        return "Return to Town", discord.ButtonStyle.primary, "🏠"
+            # 3. Flee
+            flee_btn = Button(label="Flee", style=discord.ButtonStyle.secondary, emoji="🏃", row=0, custom_id="flee")
+            flee_btn.callback = self.action_flee
+            self.add_item(flee_btn)
+
+            # 4. Pack (New Row)
+            inv_btn = Button(label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack")
+            inv_btn.callback = self.inventory_callback
+            self.add_item(inv_btn)
+
+        else:
+            # --- EXPLORATION MODE ---
+
+            # UX: Warn if HP is critically low (< 30%)
+            current_hp = self.vitals.get("current_hp", 0)
+            max_hp = max(self.player_stats.max_hp, 1)
+            if (current_hp / max_hp) < 0.3:
+                label, style, emoji = "Forward", discord.ButtonStyle.danger, "⚠️"
+            else:
+                label, style, emoji = "Forward", discord.ButtonStyle.success, "🥾"
+
+            # 1. Forward
+            forward_btn = Button(label=label, style=style, emoji=emoji, row=0, custom_id="forward")
+            forward_btn.callback = self.explore_callback
+            self.add_item(forward_btn)
+
+            # 2. Pack
+            inv_btn = Button(label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack")
+            inv_btn.callback = self.inventory_callback
+            self.add_item(inv_btn)
+
+            # 3. Return
+            leave_btn = Button(label="Return to Town", style=discord.ButtonStyle.primary, emoji="🏠", row=0, custom_id="leave")
+            leave_btn.callback = self.leave_callback
+            self.add_item(leave_btn)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -98,6 +113,18 @@ class ExplorationView(View):
     # MAIN GAME LOOP
     # --------------------------------------------------------
     async def explore_callback(self, interaction: discord.Interaction):
+        await self._perform_simulation(interaction, action=None)
+
+    async def action_attack(self, interaction: discord.Interaction):
+        await self._perform_simulation(interaction, action="attack")
+
+    async def action_defend(self, interaction: discord.Interaction):
+        await self._perform_simulation(interaction, action="defend")
+
+    async def action_flee(self, interaction: discord.Interaction):
+        await self._perform_simulation(interaction, action="flee")
+
+    async def _perform_simulation(self, interaction: discord.Interaction, action: str = None):
         if self.processing:
             await interaction.response.send_message("Please wait...", ephemeral=True)
             return
@@ -111,7 +138,7 @@ class ExplorationView(View):
             await interaction.edit_original_response(view=self)
 
             # 2. Run Simulation Thread
-            result = await asyncio.to_thread(self.manager.simulate_adventure_step, self.interaction_user.id)
+            result = await asyncio.to_thread(self.manager.simulate_adventure_step, self.interaction_user.id, action)
             sequence = result.get("sequence", [])
             is_dead = result.get("dead", False)
 
@@ -136,24 +163,11 @@ class ExplorationView(View):
                 is_last_frame = i == len(sequence) - 1
 
                 if is_last_frame:
-                    # Re-enable buttons
-                    self._enable_all()
-
-                    # Update Forward Button Appearance
-                    lbl, sty, emo = self._get_button_state()
-                    self.forward_btn.label = lbl
-                    self.forward_btn.style = sty
-                    self.forward_btn.emoji = emo
-
-                    # Update Leave Button Appearance
-                    l_lbl, l_sty, l_emo = self._get_leave_button_state()
-                    self.leave_btn.label = l_lbl
-                    self.leave_btn.style = l_sty
-                    self.leave_btn.emoji = l_emo
+                    # Refresh Buttons based on new state
+                    self._update_view_state()
 
                     if is_dead:
-                        self.forward_btn.disabled = True
-                        self.inv_btn.disabled = True
+                        self._disable_all()
                         embed.color = discord.Color.dark_grey()
                         embed.set_footer(text="You have fallen.")
 
@@ -166,7 +180,8 @@ class ExplorationView(View):
 
         except Exception as e:
             logger.error(f"Exploration error: {e}", exc_info=True)
-            self._enable_all()
+            # Restore state
+            self._update_view_state()
             await interaction.edit_original_response(view=self)
         finally:
             self.processing = False
@@ -177,14 +192,6 @@ class ExplorationView(View):
     def _disable_all(self):
         for item in self.children:
             item.disabled = True
-
-        # Show "Thinking/Combat" state
-        self.forward_btn.label = "Fighting..." if self.active_monster else "Exploring..."
-        self.forward_btn.style = discord.ButtonStyle.secondary
-
-    def _enable_all(self):
-        for item in self.children:
-            item.disabled = False
 
     # --------------------------------------------------------
     # Inventory Navigation
@@ -237,19 +244,7 @@ class ExplorationView(View):
             )
 
             # Reset my buttons
-            self._enable_all()
-
-            # Update Forward Button Appearance
-            lbl, sty, emo = self._get_button_state()
-            self.forward_btn.label = lbl
-            self.forward_btn.style = sty
-            self.forward_btn.emoji = emo
-
-            # Update Leave Button Appearance
-            l_lbl, l_sty, l_emo = self._get_leave_button_state()
-            self.leave_btn.label = l_lbl
-            self.leave_btn.style = l_sty
-            self.leave_btn.emoji = l_emo
+            self._update_view_state()
 
             await interaction.edit_original_response(embed=embed, view=self)
         finally:
