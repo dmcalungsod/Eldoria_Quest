@@ -242,6 +242,12 @@ class ExplorationView(View):
             await interaction.response.send_message("Please wait...", ephemeral=True)
             return
 
+        # --- SECURITY FIX: DoS Protection ---
+        if action and len(action) > 64:
+            logger.warning(f"DoS Attempt: Action too long from {self.interaction_user.id}: {action[:20]}...")
+            await interaction.response.send_message("Invalid action data.", ephemeral=True)
+            return
+
         self.processing = True
         try:
             await interaction.response.defer()
