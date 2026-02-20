@@ -508,4 +508,81 @@ MONSTERS["monster_120"] = {
     "description": "The center of the void. To look upon it is to know the end.",
 }
 
+# --- THE SUNKEN GROTTO MONSTERS (Rank C+) ---
+
+# 121: Coral Golem (Tank)
+MONSTERS["monster_121"] = {
+    "id": 121,
+    "name": "Coral Golem",
+    "level": 18,
+    "tier": "Normal",
+    "hp": 550,
+    "atk": 45,
+    "def": 30,
+    "xp": 450,
+    "drops": [("coral_fragment", 60), ("magic_stone_medium", 20)],
+    "skills": [MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["crushing_depths"]],
+    "description": "A walking reef of sharp coral and sea-stone, animated by ancient magic.",
+}
+
+# 122: Abyssal Eel (Fast)
+MONSTERS["monster_122"] = {
+    "id": 122,
+    "name": "Abyssal Eel",
+    "level": 19,
+    "tier": "Normal",
+    "hp": 380,
+    "atk": 55,
+    "def": 10,
+    "xp": 420,
+    "drops": [("bioluminescent_scale", 40), ("magic_stone_small", 50)],
+    "skills": [MONSTER_SKILLS["water_jet"], MONSTER_SKILLS["rapid_strike"]],
+    "description": "A serpent of the deep that moves with terrifying speed.",
+}
+
+# 123: Tide Siren (Magic)
+MONSTERS["monster_123"] = {
+    "id": 123,
+    "name": "Tide Siren",
+    "level": 19,
+    "tier": "Normal",
+    "hp": 350,
+    "atk": 60,
+    "def": 12,
+    "xp": 440,
+    "drops": [("siren_voice_box", 25), ("pearl", 10), ("magic_stone_medium", 30)],
+    "skills": [MONSTER_SKILLS["bubble_beam"], MONSTER_SKILLS["mend"]],
+    "description": "Its song is beautiful, but its intent is deadly.",
+}
+
+# 124: Deep Crawler (Elite)
+MONSTERS["monster_124"] = {
+    "id": 124,
+    "name": "Deep Crawler",
+    "level": 21,
+    "tier": "Elite",
+    "hp": 1100,
+    "atk": 75,
+    "def": 45,
+    "xp": 1800,
+    "drops": [("coral_fragment", 50), ("bioluminescent_scale", 40)],
+    "skills": [MONSTER_SKILLS["crushing_depths"], MONSTER_SKILLS["tidal_wave"]],
+    "description": "A massive crustacean with armor thick enough to turn blades.",
+}
+
+# 125: Leviathan (Boss)
+MONSTERS["monster_125"] = {
+    "id": 125,
+    "name": "Leviathan",
+    "level": 23,
+    "tier": "Boss",
+    "hp": 4000,
+    "atk": 100,
+    "def": 55,
+    "xp": 7000,
+    "drops": [("abyssal_pearl", 100), ("magic_stone_large", 50), ("siren_voice_box", 50)],
+    "skills": [MONSTER_SKILLS["tidal_wave"], MONSTER_SKILLS["water_jet"], MONSTER_SKILLS["regenerate"]],
+    "description": "The king of the sunken depths. It swallows light and hope alike.",
+}
+
 __all__ = ["MONSTERS"]
