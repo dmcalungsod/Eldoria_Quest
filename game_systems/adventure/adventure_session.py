@@ -159,7 +159,7 @@ class AdventureSession:
         except Exception:
             return False
 
-    def simulate_step(self, context_bundle: dict | None = None) -> dict[str, Any]:
+    def simulate_step(self, context_bundle: dict | None = None, action: str = None) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
         Returns: { "sequence": List[List[str]], "dead": bool, "vitals": dict, "player_stats": PlayerStats, "active_monster": dict }
@@ -178,9 +178,21 @@ class AdventureSession:
 
             # --- 1. Continue Combat ---
             if self.active_monster:
-                if self._check_auto_condition(context):
+                if action == "flee":
+                    return self._attempt_flee(context)
+
+                if action == "defend":
+                    return self._process_combat_turn(context, action="defend")
+
+                should_auto = self._check_auto_condition(context)
+
+                # If explicit attack or implicit auto, and eligible -> Auto
+                if (action == "attack" or not action) and should_auto:
                     return self._resolve_auto_combat(context)
-                return self._process_combat_turn(context)
+
+                # Otherwise manual single turn
+                final_action = action if action else "attack"
+                return self._process_combat_turn(context, action=final_action)
 
             # --- 2. Trigger New Encounter ---
             if random.randint(1, 100) > self.REGEN_CHANCE:
@@ -229,6 +241,37 @@ class AdventureSession:
         except Exception as e:
             logger.error(f"Simulation error for {self.discord_id}: {e}", exc_info=True)
             return self._build_result([["*An ominous force interrupts your journey (System Error).*"]], False, None)
+
+    def _attempt_flee(self, context: dict[str, Any]) -> dict[str, Any]:
+        """
+        Calculates flee chance based on Agility vs Monster Level.
+        """
+        if not self.active_monster or not context:
+             return self._build_result([["Error: Invalid flee state."]], False, context)
+
+        player_stats = context["player_stats"]
+        agi = player_stats.agility
+        monster_level = self.active_monster.get("level", 1)
+
+        # Formula: 50% base + 2% per Agility point diff from Monster Level
+        # This rewards high agility builds.
+        # Example: AGI 20 vs Lvl 10 = +20% -> 70% chance.
+        bonus = (agi - monster_level) * 2
+        chance = max(10, min(90, 50 + bonus))
+
+        roll = random.randint(1, 100)
+
+        if roll <= chance:
+            # Success
+            self.active_monster = None
+            msg = [f"🏃 **You fled!** (Chance: {chance}%) - You escape into the shadows."]
+            self.logs.extend(msg)
+            self.save_state()
+            return self._build_result([msg], False, context)
+        else:
+            # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
+            self.logs.append(f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!")
+            return self._process_combat_turn(context, action="flee_failed")
 
     # ======================================================================
     # AUTO COMBAT SEQUENCE
@@ -328,7 +371,7 @@ class AdventureSession:
     # MANUAL COMBAT TURN
     # ======================================================================
 
-    def _process_combat_turn(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _process_combat_turn(self, context: dict[str, Any] | None = None, action: str = "attack") -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
         """
@@ -336,7 +379,7 @@ class AdventureSession:
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
-        result = self.combat.resolve_turn(self.active_monster, report, current_session_exp, context=context)
+        result = self.combat.resolve_turn(self.active_monster, report, current_session_exp, context=context, action=action)
 
         # Update context vitals from combat result
         if context:
