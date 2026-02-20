@@ -114,6 +114,15 @@ def create_tables(db=None):
     # --- locations ---
     db["locations"].create_index("id", unique=True)
 
+    # --- tournaments ---
+    db["tournaments"].create_index("id", unique=True)
+    db["tournaments"].create_index("active")
+    db["tournaments"].create_index("end_time")
+
+    # --- tournament_scores ---
+    db["tournament_scores"].create_index([("discord_id", ASCENDING), ("tournament_id", ASCENDING)], unique=True)
+    db["tournament_scores"].create_index([("tournament_id", ASCENDING), ("score", -1)])
+
     logger.info("MongoDB collections and indexes verified/created.")
 
 
