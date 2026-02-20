@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # and DatabaseManager imports it at the module level.
 sys.modules["pymongo"] = MagicMock()
 
-from game_systems.guild_system.tournament_system import TournamentSystem
+from game_systems.guild_system.tournament_system import TournamentSystem  # noqa: E402
 
 class TestTournamentSystem(unittest.TestCase):
     def setUp(self):
