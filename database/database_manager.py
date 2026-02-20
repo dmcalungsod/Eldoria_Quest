@@ -328,6 +328,21 @@ class DatabaseManager:
             {"$set": {"current_hp": hp, "current_mp": mp}},
         )
 
+    def clamp_player_vitals(self, discord_id: int, max_hp: int, max_mp: int):
+        """
+        Atomically clamps HP/MP to the given maximums.
+        Uses MongoDB $min operator to ensure values never exceed max_hp/max_mp.
+        """
+        self._col("players").update_one(
+            {"discord_id": discord_id},
+            {
+                "$min": {
+                    "current_hp": max_hp,
+                    "current_mp": max_mp
+                }
+            }
+        )
+
     def update_player_level_data(self, discord_id: int, level: int, exp: int, exp_to_next: int):
         """Updates level and experience values."""
         self._col("players").update_one(

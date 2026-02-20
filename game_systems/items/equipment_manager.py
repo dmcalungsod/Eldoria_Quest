@@ -176,6 +176,12 @@ class EquipmentManager:
 
             # 4. Save Updates
             self.db.update_player_stats(discord_id, stats.to_dict())
+
+            # 5. Check for HP/MP Overflow (and clamp if needed)
+            # This prevents players from retaining high HP/MP after unequipping items.
+            # Using atomic clamp to avoid race conditions.
+            self.db.clamp_player_vitals(discord_id, stats.max_hp, stats.max_mp)
+
             return stats
 
         except Exception as e:
