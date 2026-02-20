@@ -5,7 +5,6 @@ Manages combat initialization and turn resolution.
 Hardened: Syncs session XP to prevent duplicate level-up messages.
 """
 
-import json
 import logging
 import random
 from typing import Any

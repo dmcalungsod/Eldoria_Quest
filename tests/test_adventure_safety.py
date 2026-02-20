@@ -1,14 +1,15 @@
 
-import unittest
-from unittest.mock import MagicMock, ANY
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.adventure.adventure_manager import AdventureManager
 from database.database_manager import DatabaseManager
+from game_systems.adventure.adventure_manager import AdventureManager
+
 
 class TestAdventureDataLoss(unittest.TestCase):
     def setUp(self):

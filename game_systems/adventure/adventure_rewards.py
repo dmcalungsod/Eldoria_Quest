@@ -12,9 +12,9 @@ from collections import defaultdict
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.achievement_system import AchievementSystem
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.materials import MATERIALS
-from game_systems.achievement_system import AchievementSystem
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.items.item_manager import item_manager
 from game_systems.player.player_stats import PlayerStats

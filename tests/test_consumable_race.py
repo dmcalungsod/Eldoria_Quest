@@ -1,7 +1,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from game_systems.items.consumable_manager import ConsumableManager
+
 from database.database_manager import DatabaseManager
+from game_systems.items.consumable_manager import ConsumableManager
+
 
 class TestConsumableRace(unittest.TestCase):
     def setUp(self):
