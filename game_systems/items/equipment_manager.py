@@ -62,6 +62,11 @@ class EquipmentManager:
         "Mythical": 6,
     }
 
+    # Slot Groups for Conflict Resolution
+    TWO_HANDED_SLOTS = {"greatsword", "bow", "staff"}
+    OFF_HAND_SLOTS = {"shield", "orb", "tome", "quiver", "offhand_dagger"}
+    MAIN_HAND_SLOTS = {"sword", "mace", "dagger", "wand"}
+
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
 
@@ -258,10 +263,35 @@ class EquipmentManager:
             if item["slot"] not in allowed:
                 return False, f"Your class cannot equip {item['slot']} items."
 
-            # Check for existing equipped item in that slot
-            existing = self.db.get_equipped_in_slot(discord_id, item["slot"])
-            if existing:
-                self._unequip_logic(discord_id, existing["id"])
+            # Resolve Slot Conflicts (Two-Handed / Main Hand / Off Hand)
+            conflicts_msg = ""
+            slots_to_check = set()
+            target_slot = item["slot"]
+
+            if target_slot in self.TWO_HANDED_SLOTS:
+                slots_to_check.update(self.MAIN_HAND_SLOTS)
+                slots_to_check.update(self.OFF_HAND_SLOTS)
+                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            elif target_slot in self.MAIN_HAND_SLOTS:
+                slots_to_check.update(self.MAIN_HAND_SLOTS)
+                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            elif target_slot in self.OFF_HAND_SLOTS:
+                slots_to_check.update(self.OFF_HAND_SLOTS)
+                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            else:
+                # Normal armor/accessory slot - just check self
+                slots_to_check.add(target_slot)
+
+            # Find and unequip conflicting items
+            equipped_items = self.db.get_equipped_items(discord_id)
+            for eq_item in equipped_items:
+                eq_slot = eq_item.get("slot")
+                if eq_slot in slots_to_check:
+                    try:
+                        self._unequip_logic(discord_id, eq_item["id"])
+                        conflicts_msg += f" (Unequipped {eq_item['item_name']})"
+                    except Exception as e:
+                        logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
 
             # Equip the new item
             if item.get("count", 1) > 1:
@@ -298,7 +328,7 @@ class EquipmentManager:
 
             # Recalculate stats
             self.recalculate_player_stats(discord_id)
-            return True, "Item equipped."
+            return True, f"Item equipped.{conflicts_msg}"
 
         except Exception as e:
             logger.error(f"Equip error: {e}", exc_info=True)

@@ -26,6 +26,7 @@ VALID_SLOTS = {
     "staff",
     "tome",
     "orb",
+    "wand",
     "dagger",
     "offhand_dagger",
     "bow",
