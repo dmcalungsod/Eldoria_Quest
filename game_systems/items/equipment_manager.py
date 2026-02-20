@@ -28,6 +28,25 @@ class EquipmentManager:
         "lck_bonus": "LCK",
     }
 
+    # Quality Multipliers (Relative to Common=1.0)
+    QUALITY_MULTIPLIERS = {
+        "Common": 1.0,
+        "Uncommon": 1.1,
+        "Rare": 1.25,
+        "Epic": 1.5,
+        "Legendary": 2.0,
+        "Mythical": 3.0,
+    }
+
+    RARITY_TIERS = {
+        "Common": 1,
+        "Uncommon": 2,
+        "Rare": 3,
+        "Epic": 4,
+        "Legendary": 5,
+        "Mythical": 6,
+    }
+
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
 
@@ -67,9 +86,26 @@ class EquipmentManager:
 
                 item_data = self.db._col(table).find_one({"id": int(item["item_key"])}, {"_id": 0})
                 if item_data:
+                    # Calculate Quality Scaling
+                    base_rarity = item_data.get("rarity", "Common")
+                    current_rarity = item.get("rarity", base_rarity)
+
+                    base_tier = self.RARITY_TIERS.get(base_rarity, 1)
+                    current_tier = self.RARITY_TIERS.get(current_rarity, 1)
+
+                    multiplier = 1.0
+                    if current_tier > base_tier:
+                        base_mult = self.QUALITY_MULTIPLIERS.get(base_rarity, 1.0)
+                        curr_mult = self.QUALITY_MULTIPLIERS.get(current_rarity, 1.0)
+                        if base_mult > 0:
+                            multiplier = curr_mult / base_mult
+
                     for col, stat_name in self.STAT_MAP.items():
                         if col in item_data and item_data[col]:
-                            stats.add_bonus_stat(stat_name, item_data[col])
+                            base_val = item_data[col]
+                            # Apply multiplier and round up
+                            final_val = math.ceil(base_val * multiplier)
+                            stats.add_bonus_stat(stat_name, final_val)
 
             # 3. Apply Passive Skill Bonuses
             player_skills = self.db.get_all_player_skills(discord_id)
