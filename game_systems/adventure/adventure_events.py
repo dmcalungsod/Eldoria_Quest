@@ -23,6 +23,12 @@ class AdventureEvents:
         "Dust motes dance in a shaft of light that pierces the canopy.",
         "The undergrowth rustles with unseen life, watching your passage.",
         "Clouds drift overhead, casting fleeting shadows across your path.",
+        "A sudden gust shakes the treetops, sending a cascade of leaves spiraling down.",
+        "Moss-covered stones line the path, silent sentinels of a forgotten age.",
+        "The air is cool and still, heavy with the promise of rain.",
+        "Roots snake across the trail like the veins of the earth itself.",
+        "Somewhere nearby, a stream babbles, indifferent to your journey.",
+        "A ray of sun highlights a patch of wildflowers, a brief moment of beauty.",
     ]
 
     ATMOSPHERE_THICKET = [
@@ -32,6 +38,12 @@ class AdventureEvents:
         "A sudden chill drops the temperature, making your breath mist.",
         "Silence presses in, heavy and unnatural, broken only by your heartbeat.",
         "The light turns grey and sickly as the canopy thickens.",
+        "Thorns snag at your clothes, as if the forest itself is trying to hold you back.",
+        "The ground is soft and yielding, threatening to swallow your boots.",
+        "Strange, pale fungi grow in clusters, glowing faintly in the gloom.",
+        "A crow watches you from a dead branch, its eyes intelligent and cruel.",
+        "The wind whispers through the dry leaves, sounding almost like voices.",
+        "Shadows seem to detach themselves from the trees, moving just out of sight.",
     ]
 
     ATMOSPHERE_ROOTS = [
@@ -41,6 +53,12 @@ class AdventureEvents:
         "Shadows seem to lengthen and grasp at your boots.",
         "A low vibration thrums through the floor, as if the earth itself is groaning.",
         "The air is stale, heavy with the weight of the earth above.",
+        "Your footsteps echo loudly, alerting anything that might be listening.",
+        "Veins of unknown ore glitter in the darkness, tempting and treacherous.",
+        "A cold draft flows from a side passage, carrying the scent of deep water.",
+        "Roots break through the stone ceiling, hanging like paralyzed limbs.",
+        "The silence here is absolute, pressing against your ears.",
+        "Dust falls from above, a reminder of the crushing weight over your head.",
     ]
 
     ATMOSPHERE_ARENA = [
@@ -48,6 +66,10 @@ class AdventureEvents:
         "Sand crunches beneath your boots, stained with the history of violence.",
         "The metallic tang of blood hangs in the dry air.",
         "Sunlight glares off the stone walls, blinding and unforgiving.",
+        "Discarded weapons litter the edges of the pit, monuments to failure.",
+        "The gate grinds open with a sound like a beast's growl.",
+        "You feel the gaze of unseen spectators, hungry for spectacle.",
+        "Dust swirls in the center of the arena, forming fleeting shapes.",
     ]
 
     # --- REGENERATION PHRASES ---
