@@ -86,6 +86,23 @@ def build_inventory_embed(items: list) -> discord.Embed:
     return embed
 
 
+async def get_player_or_error(
+    interaction: discord.Interaction, db: DatabaseManager, content: str = "Character record not found."
+) -> dict | None:
+    """
+    Fetches the player record. If not found, sends an ephemeral error message.
+    Returns the player dict or None.
+    """
+    player = await asyncio.to_thread(db.get_player, interaction.user.id)
+    if not player:
+        if not interaction.response.is_done():
+            await interaction.response.send_message(content, ephemeral=True)
+        else:
+            await interaction.followup.send(content, ephemeral=True)
+        return None
+    return player
+
+
 async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
     """Navigation: Returns to Character Profile."""
     from game_systems.character.ui.profile_view import CharacterTabView
@@ -97,10 +114,8 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
     discord_id = interaction.user.id
 
     try:
-        player = await asyncio.to_thread(db.get_player, discord_id)
-
+        player = await get_player_or_error(interaction, db)
         if not player:
-            await interaction.followup.send("Character record not found.", ephemeral=True)
             return
 
         tasks = [
@@ -182,6 +197,11 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
 
     db = DatabaseManager()
     try:
+        # Validate player existence first
+        player = await get_player_or_error(interaction, db)
+        if not player:
+            return
+
         card = await asyncio.to_thread(db.get_guild_card_data, interaction.user.id)
         if not card:
             await interaction.followup.send("You are not a guild member.", ephemeral=True)

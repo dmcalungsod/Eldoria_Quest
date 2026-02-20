@@ -19,7 +19,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.items.inventory_manager import InventoryManager
 
-from .ui_helpers import back_to_guild_hall_callback
+from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
 logger = logging.getLogger("eldoria.shop")
 
@@ -139,6 +139,10 @@ class ShopView(View):
             return (False, "System error.", 0)
 
     async def purchase_item_callback(self, interaction: discord.Interaction):
+        # Validate player existence first
+        if not await get_player_or_error(interaction, self.db):
+            return
+
         await interaction.response.defer()
 
         # Vulnerability Fix: Ignore client-provided price
