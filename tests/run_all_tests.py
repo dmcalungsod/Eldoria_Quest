@@ -33,6 +33,7 @@ import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_security  # General security test
 import test_tournament_system  # New Tournament System tests
+import test_dos_prevention  # New DoS prevention tests
 
 
 def check_mongodb_connection():
@@ -82,6 +83,8 @@ def run_general_security_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_security)
+    # Add DoS prevention tests to the general security suite
+    suite.addTests(loader.loadTestsFromModule(test_dos_prevention))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
