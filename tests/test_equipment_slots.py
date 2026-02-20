@@ -1,13 +1,13 @@
-
-import unittest
-from unittest.mock import MagicMock, patch
 import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Mock pymongo before importing modules that use it
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.items.equipment_manager import EquipmentManager
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+
 
 class TestEquipmentSlots(unittest.TestCase):
     def setUp(self):
@@ -15,7 +15,7 @@ class TestEquipmentSlots(unittest.TestCase):
         self.manager = EquipmentManager(self.mock_db)
 
         # Setup common mock returns
-        self.mock_db.get_player_field.return_value = 2 # Class ID 2 (Mage)
+        self.mock_db.get_player_field.return_value = 2  # Class ID 2 (Mage)
         self.mock_db.get_player.return_value = {"class_id": 2, "level": 10, "name": "MagePlayer"}
         self.mock_db.get_guild_rank.return_value = "A"
 
@@ -26,23 +26,37 @@ class TestEquipmentSlots(unittest.TestCase):
 
         # Mocking items
         self.wand = {
-            "id": 101, "item_key": "gen_wand_001", "item_name": "Apprentice Wand",
-            "item_type": "equipment", "slot": "wand", "rarity": "Common", "equipped": 0, "count": 1
+            "id": 101,
+            "item_key": "gen_wand_001",
+            "item_name": "Apprentice Wand",
+            "item_type": "equipment",
+            "slot": "wand",
+            "rarity": "Common",
+            "equipped": 0,
+            "count": 1,
         }
         self.orb = {
-            "id": 102, "item_key": "gen_orb_001", "item_name": "Basic Orb",
-            "item_type": "equipment", "slot": "orb", "rarity": "Common", "equipped": 0, "count": 1
+            "id": 102,
+            "item_key": "gen_orb_001",
+            "item_name": "Basic Orb",
+            "item_type": "equipment",
+            "slot": "orb",
+            "rarity": "Common",
+            "equipped": 0,
+            "count": 1,
         }
         self.staff = {
-            "id": 103, "item_key": "gen_staff_001", "item_name": "Gnarled Staff",
-            "item_type": "equipment", "slot": "staff", "rarity": "Common", "equipped": 0, "count": 1
+            "id": 103,
+            "item_key": "gen_staff_001",
+            "item_name": "Gnarled Staff",
+            "item_type": "equipment",
+            "slot": "staff",
+            "rarity": "Common",
+            "equipped": 0,
+            "count": 1,
         }
 
-        self.inventory = {
-            101: self.wand,
-            102: self.orb,
-            103: self.staff
-        }
+        self.inventory = {101: self.wand, 102: self.orb, 103: self.staff}
 
         self.mock_db.get_inventory_item.side_effect = lambda uid, iid: self.inventory.get(iid)
 
@@ -54,12 +68,14 @@ class TestEquipmentSlots(unittest.TestCase):
         def mock_unequip(uid, iid):
             if iid in self.inventory:
                 self.inventory[iid]["equipped"] = 0
+
         self.manager._unequip_logic = MagicMock(side_effect=mock_unequip)
 
         # Mock set_item_equipped
         def mock_equip(iid, val):
-             if iid in self.inventory:
+            if iid in self.inventory:
                 self.inventory[iid]["equipped"] = val
+
         self.mock_db.set_item_equipped.side_effect = mock_equip
 
     def test_wand_and_orb_coexist(self):
@@ -119,6 +135,7 @@ class TestEquipmentSlots(unittest.TestCase):
         self.assertTrue(success)
         self.manager._unequip_logic.assert_called_with(1, 103)
         self.assertIn("Unequipped Gnarled Staff", msg)
+
 
 if __name__ == "__main__":
     unittest.main()
