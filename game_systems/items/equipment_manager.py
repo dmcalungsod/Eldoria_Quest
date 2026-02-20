@@ -8,6 +8,8 @@ Hardened: Atomic equipment swaps via MongoDB DatabaseManager methods.
 import logging
 import math
 
+import pymongo.errors
+
 from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES
 from game_systems.data.skills_data import SKILLS
@@ -153,9 +155,15 @@ class EquipmentManager:
                     item.get("item_source_table"),
                 )
                 if new_item:
-                    self.db.set_item_equipped(new_item["id"], 1)
+                    try:
+                        self.db.set_item_equipped(new_item["id"], 1)
+                    except pymongo.errors.DuplicateKeyError:
+                        return False, "Equipment slot update conflict."
             else:
-                self.db.set_item_equipped(inventory_db_id, 1)
+                try:
+                    self.db.set_item_equipped(inventory_db_id, 1)
+                except pymongo.errors.DuplicateKeyError:
+                    return False, "Equipment slot update conflict."
 
             # Recalculate stats
             self.recalculate_player_stats(discord_id)
