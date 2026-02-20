@@ -128,6 +128,8 @@ class DatabaseManager:
                 "current_mp": initial_mp,
                 "vestige_pool": 0,
                 "aurum": 0,
+                "titles": [],
+                "active_title": None,
             }
         )
         self._col("stats").insert_one(
@@ -1520,6 +1522,8 @@ class DatabaseManager:
                 "current_mp": max_mp,
                 "vestige_pool": 0,
                 "aurum": 0,
+                "titles": [],
+                "active_title": None,
             }
         )
 
@@ -1552,3 +1556,57 @@ class DatabaseManager:
 
         # Guild Membership
         self.insert_guild_member(discord_id)
+
+    # ============================================================
+    # TITLES (New methods for external call sites)
+    # ============================================================
+
+    def add_title(self, discord_id: int, title: str) -> bool:
+        """
+        Adds a title to the player's collection.
+        Returns True if the title was newly added, False if already present.
+        """
+        result = self._col("players").update_one(
+            {"discord_id": discord_id},
+            {"$addToSet": {"titles": title}},
+        )
+        return result.modified_count > 0
+
+    def get_titles(self, discord_id: int) -> list[str]:
+        """Fetches all titles earned by the player."""
+        doc = self._col("players").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "titles": 1}
+        )
+        return doc.get("titles", []) if doc else []
+
+    def set_active_title(self, discord_id: int, title: str | None) -> bool:
+        """
+        Sets the active title. Verifies the player owns the title.
+        Returns True if successful, False if title not owned.
+        """
+        if title is None:
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$set": {"active_title": None}}
+            )
+            return True
+
+        # Check ownership
+        titles = self.get_titles(discord_id)
+        if title not in titles:
+            return False
+
+        self._col("players").update_one(
+            {"discord_id": discord_id},
+            {"$set": {"active_title": title}}
+        )
+        return True
+
+    def get_active_title(self, discord_id: int) -> str | None:
+        """Fetches the currently active title."""
+        doc = self._col("players").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "active_title": 1}
+        )
+        return doc.get("active_title") if doc else None
