@@ -16,6 +16,7 @@ from game_systems.achievement_system import AchievementSystem
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.materials import MATERIALS
 from game_systems.guild_system.rank_system import RankSystem
+from game_systems.guild_system.tournament_system import TournamentSystem
 from game_systems.items.item_manager import item_manager
 from game_systems.player.player_stats import PlayerStats
 
@@ -82,6 +83,16 @@ class AdventureRewards:
             # 5. Kill Counters
             tier = monster_data.get("tier")
             self._increment_kill_counter(tier)
+
+            # --- TOURNAMENT HOOK ---
+            try:
+                tournament = TournamentSystem(self.db)
+                tournament.record_action(self.discord_id, "monster_kills", 1)
+                if tier == "Boss":
+                    tournament.record_action(self.discord_id, "boss_kills", 1)
+            except Exception as e:
+                logger.error(f"Tournament hook error: {e}")
+            # -----------------------
 
             # 6. Achievements
             ach_msg = self.achievement_system.check_kill_achievements(self.discord_id, tier)

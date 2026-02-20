@@ -1638,3 +1638,86 @@ class DatabaseManager:
             {"_id": 0, "active_title": 1}
         )
         return doc.get("active_title") if doc else None
+
+    # ============================================================
+    # TOURNAMENTS (New methods for external call sites)
+    # ============================================================
+
+    def _next_tournament_id(self) -> int:
+        """Generates the next auto-increment ID for tournaments."""
+        counter = self._col("counters").find_one_and_update(
+            {"_id": "tournament_id"},
+            {"$inc": {"seq": 1}},
+            upsert=True,
+            return_document=True,
+        )
+        return counter["seq"]
+
+    def create_tournament(self, type: str, start_time: str, end_time: str) -> int:
+        """Creates a new active tournament."""
+        new_id = self._next_tournament_id()
+        self._col("tournaments").insert_one(
+            {
+                "id": new_id,
+                "type": type,
+                "start_time": start_time,
+                "end_time": end_time,
+                "active": 1,
+            }
+        )
+        return new_id
+
+    def get_active_tournament(self) -> dict | None:
+        """Fetches the current active tournament."""
+        return self._col("tournaments").find_one(
+            {"active": 1},
+            {"_id": 0},
+        )
+
+    def end_active_tournament(self):
+        """Marks all active tournaments as inactive."""
+        self._col("tournaments").update_many(
+            {"active": 1},
+            {"$set": {"active": 0}},
+        )
+
+    def update_tournament_score(self, discord_id: int, tournament_id: int, score_increment: int):
+        """Updates (increments) a player's score for a tournament."""
+        self._col("tournament_scores").update_one(
+            {"discord_id": discord_id, "tournament_id": tournament_id},
+            {"$inc": {"score": score_increment}},
+            upsert=True,
+        )
+
+    def get_tournament_leaderboard(self, tournament_id: int, limit: int = 10) -> list[dict]:
+        """Fetches the top players for a tournament."""
+        pipeline = [
+            {"$match": {"tournament_id": tournament_id}},
+            {"$sort": {"score": -1}},
+            {"$limit": limit},
+            {
+                "$lookup": {
+                    "from": "players",
+                    "localField": "discord_id",
+                    "foreignField": "discord_id",
+                    "as": "player_info",
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "discord_id": 1,
+                    "score": 1,
+                    "name": {"$arrayElemAt": ["$player_info.name", 0]},
+                }
+            },
+        ]
+        return list(self._col("tournament_scores").aggregate(pipeline))
+
+    def get_player_tournament_score(self, discord_id: int, tournament_id: int) -> int:
+        """Fetches a player's score for a specific tournament."""
+        doc = self._col("tournament_scores").find_one(
+            {"discord_id": discord_id, "tournament_id": tournament_id},
+            {"_id": 0, "score": 1},
+        )
+        return doc["score"] if doc else 0

@@ -11,6 +11,7 @@ import logging
 from database.database_manager import DatabaseManager
 from game_systems.data.emojis import ERROR, WARNING
 from game_systems.guild_system.reward_system import RewardSystem
+from game_systems.guild_system.tournament_system import TournamentSystem
 
 logger = logging.getLogger("eldoria.quests")
 
@@ -202,6 +203,15 @@ class QuestSystem:
 
             # Grant rewards
             reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
+
+            # --- TOURNAMENT HOOK ---
+            try:
+                tournament = TournamentSystem(self.db)
+                tournament.record_action(discord_id, "quests_completed", 1)
+            except Exception as e:
+                logger.error(f"Tournament hook error: {e}")
+            # -----------------------
+
             return True, reward_msg
 
         except Exception as e:

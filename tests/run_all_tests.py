@@ -22,6 +22,7 @@ import test_exploration_view_ux  # New UX test
 import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
+import test_tournament_system  # New Tournament System tests
 
 
 def check_mongodb_connection():
@@ -105,6 +106,17 @@ def run_combat_action_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+def run_tournament_tests():
+    """Runs the tournament system tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING TOURNAMENT SYSTEM TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_tournament_system)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -152,7 +164,11 @@ def main():
     combat_actions_passed = run_combat_action_tests()
     all_passed = all_passed and combat_actions_passed
 
-    # 7. Game Systems Tests (Mock-based, always run)
+    # 7. Tournament Tests (Mock-based, always run)
+    tournament_passed = run_tournament_tests()
+    all_passed = all_passed and tournament_passed
+
+    # 8. Game Systems Tests (Mock-based, always run)
     # 7. Game Systems Tests (Mock-based, always run)
     print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
@@ -182,6 +198,7 @@ def main():
     print(f"UX Tests: {'✓ PASSED' if ux_passed else '✗ FAILED'}")
     print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
     print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
+    print(f"Tournament System Tests: {'✓ PASSED' if tournament_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
     if db_available:
