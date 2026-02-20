@@ -9,31 +9,31 @@ MATERIALS = {
     # --- Magic Stones (Core Income) ---
     "magic_stone_fragment": {
         "name": "Magic Stone Fragment",
-        "description": "A tiny, impure shard of mana.",
+        "description": "A tiny, impure shard of crystallized mana.",
         "rarity": "Common",
         "value": 5,  # Up from 2
     },
     "magic_stone_small": {
         "name": "Magic Stone (Small)",
-        "description": "A small, cloudy stone from a low-level monster.",
+        "description": "A small, cloudy stone of mana harvested from a low-level monster.",
         "rarity": "Common",
         "value": 15,  # Up from 8
     },
     "magic_stone_medium": {
         "name": "Magic Stone (Medium)",
-        "description": "A decent-sized stone with a faint pulse.",
+        "description": "A decent-sized stone pulsating with the energy of the Veil.",
         "rarity": "Uncommon",
         "value": 50,  # Up from 30
     },
     "magic_stone_large": {
         "name": "Magic Stone (Large)",
-        "description": "A heavy, fist-sized stone that hums with power.",
+        "description": "A heavy, fist-sized stone that hums with the raw power of the Sundering.",
         "rarity": "Rare",
         "value": 180,  # Up from 120
     },
     "magic_stone_flawless": {
         "name": "Magic Stone (Flawless)",
-        "description": "A brilliant, pure crystal of condensed mana.",
+        "description": "A brilliant, pure crystal of condensed mana. The lifeblood of Astraeon.",
         "rarity": "Epic",
         "value": 750,  # Up from 500
     },
@@ -152,7 +152,7 @@ MATERIALS = {
     },
     "celestial_dust": {
         "name": "Celestial Dust",
-        "description": "Glimmering dust that falls from the stars.",
+        "description": "Glimmering dust that falls from the cracks in the sky, cold as the Void.",
         "rarity": "Epic",
         "value": 1000,
     },
@@ -209,7 +209,7 @@ MATERIALS = {
     # --- The Void Sanctum Materials (Rank S) ---
     "void_dust": {
         "name": "Void Dust",
-        "description": "A pile of fine, dark dust that seems to absorb light.",
+        "description": "A pile of fine, dark dust that drinks the light around it.",
         "rarity": "Common",
         "value": 30,
     },
@@ -227,13 +227,13 @@ MATERIALS = {
     },
     "null_stone": {
         "name": "Null Stone",
-        "description": "A heavy stone that feels like it weighs nothing.",
+        "description": "A heavy stone that feels like it weighs nothing. A paradox of the Void.",
         "rarity": "Rare",
         "value": 250,
     },
     "void_heart": {
         "name": "Void Heart",
-        "description": "A pulsating core of pure nothingness.",
+        "description": "A pulsating core of pure nothingness. It hungers for the light.",
         "rarity": "Epic",
         "value": 1500,
     },
