@@ -1,7 +1,7 @@
 
-import unittest
-import sys
 import os
+import sys
+import unittest
 from unittest.mock import MagicMock
 
 # Add repo root to path
@@ -11,8 +11,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules['pymongo'] = MagicMock()
 sys.modules['discord'] = MagicMock()
 
-from game_systems.player.level_up import LevelUpSystem
-from game_systems.player.player_stats import PlayerStats
+from game_systems.player.level_up import LevelUpSystem  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestLevelCurve(unittest.TestCase):
     def test_xp_curve_values(self):

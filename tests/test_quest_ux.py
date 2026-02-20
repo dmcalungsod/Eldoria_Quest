@@ -1,6 +1,6 @@
 import sys
 import unittest
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Mock discord modules BEFORE importing anything else
 discord_mock = MagicMock()
@@ -30,7 +30,6 @@ discord_mock.Color.orange.return_value = "orange"
 
 # Now import the module under test
 from game_systems.guild_system.ui.quests_menu import QuestsMenuView  # noqa: E402
-from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
 
 
 class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):

@@ -14,7 +14,7 @@ import time
 from contextlib import contextmanager
 from typing import Any
 
-from pymongo import MongoClient, InsertOne, UpdateOne
+from pymongo import InsertOne, MongoClient, UpdateOne
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")

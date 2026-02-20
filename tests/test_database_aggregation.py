@@ -1,9 +1,10 @@
 
+import json
 import unittest
 from unittest.mock import MagicMock, patch
-import json
-import datetime
+
 from database.database_manager import DatabaseManager
+
 
 class TestDatabaseAggregation(unittest.TestCase):
     def setUp(self):

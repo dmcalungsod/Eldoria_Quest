@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock
-import sys
-import os
 
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
@@ -9,7 +9,8 @@ sys.modules["pymongo"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.achievement_system import AchievementSystem
+from game_systems.achievement_system import AchievementSystem  # noqa: E402
+
 
 class TestAchievementLogic(unittest.TestCase):
     def setUp(self):

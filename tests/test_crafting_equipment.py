@@ -1,9 +1,11 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+
 from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.materials import MATERIALS
+
 
 class TestCraftingEquipment(unittest.TestCase):
     def setUp(self):

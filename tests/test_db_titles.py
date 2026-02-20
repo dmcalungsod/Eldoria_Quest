@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Mock pymongo BEFORE import
 sys.modules["pymongo"] = MagicMock()
@@ -9,7 +9,8 @@ sys.modules["pymongo"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
+
 
 class TestDatabaseTitles(unittest.TestCase):
     def setUp(self):
