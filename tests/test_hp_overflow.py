@@ -1,8 +1,8 @@
+import json
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock
-import sys
-import os
-import json
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,23 +13,42 @@ mock_pymongo.errors.DuplicateKeyError = Exception
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.player.player_stats import PlayerStats
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class MockDatabaseManager:
     def __init__(self):
         self.players = {
-            123: {"discord_id": 123, "current_hp": 250, "current_mp": 50, "class_id": 1, "level": 10, "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}', "aurum": 100}
+            123: {
+                "discord_id": 123,
+                "current_hp": 250,
+                "current_mp": 50,
+                "class_id": 1,
+                "level": 10,
+                "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}',
+                "aurum": 100,
+            }
         }
         self.stats = {
-            123: {"discord_id": 123, "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}'}
+            123: {
+                "discord_id": 123,
+                "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}',
+            }
         }
         self.inventory = {
             1: {
-                "id": 1, "discord_id": 123, "item_key": "1", "item_name": "Helmet",
-                "item_type": "equipment", "slot": "Head", "rarity": "Common", "equipped": 1,
-                "str_bonus": 0, "end_bonus": 10, # +10 END
-                "item_source_table": "equipment"
+                "id": 1,
+                "discord_id": 123,
+                "item_key": "1",
+                "item_name": "Helmet",
+                "item_type": "equipment",
+                "slot": "Head",
+                "rarity": "Common",
+                "equipped": 1,
+                "str_bonus": 0,
+                "end_bonus": 10,  # +10 END
+                "item_source_table": "equipment",
             }
         }
         self.equipment_data = {
@@ -49,7 +68,11 @@ class MockDatabaseManager:
             self.stats[discord_id]["stats_json"] = json.dumps(stats_dict)
 
     def get_equipped_items(self, discord_id):
-        return [i for i in self.inventory.values() if i["discord_id"] == discord_id and i["equipped"] == 1]
+        return [
+            i
+            for i in self.inventory.values()
+            if i["discord_id"] == discord_id and i["equipped"] == 1
+        ]
 
     def get_inventory_item(self, discord_id, item_id):
         return self.inventory.get(item_id)
@@ -66,7 +89,10 @@ class MockDatabaseManager:
 
     def get_player_vitals(self, discord_id):
         if discord_id in self.players:
-            return {"current_hp": self.players[discord_id]["current_hp"], "current_mp": self.players[discord_id]["current_mp"]}
+            return {
+                "current_hp": self.players[discord_id]["current_hp"],
+                "current_mp": self.players[discord_id]["current_mp"],
+            }
         return None
 
     def set_player_vitals(self, discord_id, hp, mp):
@@ -77,10 +103,12 @@ class MockDatabaseManager:
     def _col(self, name):
         # Mock collection for item lookup
         m = MagicMock()
+
         def find_one(query, projection=None):
             if name == "equipment":
                 return self.equipment_data.get(int(query.get("id")))
             return None
+
         m.find_one.side_effect = find_one
 
         # Add update_one mock
@@ -94,7 +122,11 @@ class MockDatabaseManager:
 
     def get_equipped_in_slot(self, discord_id, slot):
         for item in self.inventory.values():
-            if item["discord_id"] == discord_id and item.get("slot") == slot and item.get("equipped") == 1:
+            if (
+                item["discord_id"] == discord_id
+                and item.get("slot") == slot
+                and item.get("equipped") == 1
+            ):
                 return item
         return None
 
@@ -103,6 +135,7 @@ class MockDatabaseManager:
 
     def get_player_field(self, discord_id, field):
         return self.players.get(discord_id, {}).get(field)
+
 
 class TestHPOverflow(unittest.TestCase):
     def test_hp_clamp_on_unequip(self):
@@ -133,15 +166,18 @@ class TestHPOverflow(unittest.TestCase):
         fresh_stats_json = db.get_player_stats_json(123)
         fresh_stats = PlayerStats.from_dict(fresh_stats_json)
 
-        self.assertEqual(fresh_stats.endurance, 10) # Base 10, Bonus 0
-        self.assertEqual(fresh_stats.max_hp, 150) # 50 + 10*10
+        self.assertEqual(fresh_stats.endurance, 10)  # Base 10, Bonus 0
+        self.assertEqual(fresh_stats.max_hp, 150)  # 50 + 10*10
 
         # Verify Current HP is clamped
         current_hp = db.players[123]["current_hp"]
         print(f"Current HP after unequip: {current_hp}")
 
         # Correct behavior: Current HP should be clamped to 150
-        self.assertLessEqual(current_hp, 150, f"HP Overflow! Current: {current_hp}, Max allowed: 150")
+        self.assertLessEqual(
+            current_hp, 150, f"HP Overflow! Current: {current_hp}, Max allowed: 150"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
