@@ -101,6 +101,32 @@ LOCATIONS = {
             ("magic_stone_medium", 20),
         ],
     },
+    "crystal_caverns": {
+        "name": "The Crystal Caverns",
+        "emoji": "💎",
+        "min_rank": "B",
+        "level_req": 20,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_101", 30),  # Crystal Golem
+            ("monster_102", 30),  # Prism Spider
+            ("monster_103", 25),  # Shard Wisp
+            ("monster_104", 15),  # Obsidian Gargoyle
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_105",  # Crystalline Guardian (Boss)
+                "weight": 5,
+                "min_level": 25,
+            }
+        ],
+        "description": "A breathtaking subterranean world of glowing crystals and ancient technology.",
+        "gatherables": [
+            ("luminescent_crystal", 40),
+            ("mithril_ore", 30),
+            ("magic_stone_medium", 30),
+        ],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",

@@ -61,6 +61,21 @@ class AdventureEvents:
         "Dust falls from above, a reminder of the crushing weight over your head.",
     ]
 
+    ATMOSPHERE_CRYSTAL = [
+        "The cavern walls pulse with a soft, rhythmic blue light.",
+        "Your reflection is fractured into a thousand pieces by the crystal formations.",
+        "A low hum fills the air, resonating in your bones.",
+        "The ground is slick with condensation and crushed gemstones.",
+        "Clusters of crystals chime softly in the subterranean breeze.",
+        "Light refracts through the pillars, creating dazzling rainbows in the dark.",
+        "The air is cold and crisp, smelling of ozone and ancient stone.",
+        "Shadows here are sharp and jagged, cut by beams of luminescence.",
+        "You hear the skittering of many legs echoing off the glass-like walls.",
+        "A stalactite drips glowing fluid into a pool of still water.",
+        "The silence is broken only by the faint crackle of magical energy.",
+        "You feel watched by the very walls, as if the crystals have eyes.",
+    ]
+
     ATMOSPHERE_ARENA = [
         "The roar of the crowd seems distant, muffled by your focus.",
         "Sand crunches beneath your boots, stained with the history of violence.",
@@ -104,6 +119,15 @@ class AdventureEvents:
         f"{E.CAVE} The darkness presses in. You steady your nerves before moving on.",
         f"{E.CAVE} Beneath the tangled roots, you find a dry spot to rest your aching legs.",
         f"{E.CAVE} Every shadow looks like a threat. You rest with one hand on your weapon.",
+    ]
+
+    REGEN_PHRASES_CRYSTAL = [
+        f"{E.CRYSTAL} You lean against a warm crystal pillar, letting its energy seep into you.",
+        f"{E.CRYSTAL} The blue light is soothing. You take a moment to clear your mind.",
+        f"{E.CRYSTAL} You find a safe alcove among the quartz and catch your breath.",
+        f"{E.CRYSTAL} The hum of the crystals resonates with your heartbeat, calming you.",
+        f"{E.CRYSTAL} You check your gear in the reflection of a massive gemstone.",
+        f"{E.CRYSTAL} The air is pure here. You breathe deeply, feeling your strength return.",
     ]
 
     REGEN_PHRASES_ARENA = [
@@ -262,6 +286,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
         elif location_id == "deepgrove_roots":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
+        elif location_id == "crystal_caverns":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
@@ -278,6 +304,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_THICKET
             elif location_id == "deepgrove_roots":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
+            elif location_id == "crystal_caverns":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 

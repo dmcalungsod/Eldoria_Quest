@@ -99,6 +99,12 @@ MATERIALS = {
         "rarity": "Common",
         "value": 12,
     },
+    "luminescent_crystal": {
+        "name": "Luminescent Crystal",
+        "description": "A crystal that glows with a cold inner light.",
+        "rarity": "Uncommon",
+        "value": 45,
+    },
     "ancient_wood": {
         "name": "Ancient Wood",
         "description": "A dense piece of wood from an old tree.",
@@ -112,6 +118,12 @@ MATERIALS = {
         "rarity": "Rare",
         "value": 150,
     },
+    "mithril_ore": {
+        "name": "Mithril Ore",
+        "description": "Lightweight, silvery ore prized by smiths.",
+        "rarity": "Rare",
+        "value": 120,
+    },
     "ironwood_heart": {
         "name": "Ironwood Heart",
         "description": "The petrified heart of an Elder Treant.",
@@ -119,6 +131,12 @@ MATERIALS = {
         "value": 200,
     },
     # --- EPIC CRAFTING MATERIALS ---
+    "crystal_heart": {
+        "name": "Crystal Heart",
+        "description": "The pulsating core of a crystalline construct.",
+        "rarity": "Epic",
+        "value": 900,
+    },
     "titan_shard": {
         "name": "Titan Shard",
         "description": "A fragment of metal so hard it feels impossible.",

@@ -178,4 +178,81 @@ for idx in range(1, 51):
         "description": description,
     }
 
+# --- CRYSTAL CAVERNS MONSTERS (Rank B) ---
+
+# 101: Crystal Golem (Tank)
+MONSTERS["monster_101"] = {
+    "id": 101,
+    "name": "Crystal Golem",
+    "level": 22,
+    "tier": "Normal",
+    "hp": 700,
+    "atk": 50,
+    "def": 35,
+    "xp": 550,
+    "drops": [("magic_stone_medium", 80), ("luminescent_crystal", 40)],
+    "skills": [MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["crystal_shard"]],
+    "description": "A lumbering construct of jagged quartz, ancient and unyielding."
+}
+
+# 102: Prism Spider (Fast)
+MONSTERS["monster_102"] = {
+    "id": 102,
+    "name": "Prism Spider",
+    "level": 20,
+    "tier": "Normal",
+    "hp": 450,
+    "atk": 60,
+    "def": 15,
+    "xp": 500,
+    "drops": [("spider_silk", 50), ("luminescent_crystal", 30)],
+    "skills": [MONSTER_SKILLS["rapid_strike"], MONSTER_SKILLS["crystal_shard"]],
+    "description": "Its translucent carapace makes it hard to track in the shimmering light."
+}
+
+# 103: Shard Wisp (Magic)
+MONSTERS["monster_103"] = {
+    "id": 103,
+    "name": "Shard Wisp",
+    "level": 21,
+    "tier": "Normal",
+    "hp": 400,
+    "atk": 70,
+    "def": 10,
+    "xp": 525,
+    "drops": [("magic_stone_medium", 90), ("mithril_ore", 20)],
+    "skills": [MONSTER_SKILLS["prism_beam"], MONSTER_SKILLS["ember"]],
+    "description": "A floating orb of condensed mana and light."
+}
+
+# 104: Obsidian Gargoyle (Flying/Elite)
+MONSTERS["monster_104"] = {
+    "id": 104,
+    "name": "Obsidian Gargoyle",
+    "level": 23,
+    "tier": "Elite",
+    "hp": 1200,
+    "atk": 80,
+    "def": 40,
+    "xp": 2000,
+    "drops": [("magic_stone_large", 50), ("mithril_ore", 40)],
+    "skills": [MONSTER_SKILLS["crushing_slam"], MONSTER_SKILLS["flame_breath"]],
+    "description": "Carved from volcanic glass, it swoops down with crushing weight."
+}
+
+# 105: Crystalline Guardian (Boss)
+MONSTERS["monster_105"] = {
+    "id": 105,
+    "name": "Crystalline Guardian",
+    "level": 25,
+    "tier": "Boss",
+    "hp": 5000,
+    "atk": 110,
+    "def": 60,
+    "xp": 8000,
+    "drops": [("magic_stone_flawless", 100), ("crystal_heart", 100), ("mithril_ore", 50)],
+    "skills": [MONSTER_SKILLS["prism_beam"], MONSTER_SKILLS["crystal_shard"], MONSTER_SKILLS["regenerate"]],
+    "description": "The heart of the caverns, a massive entity of living light and stone."
+}
+
 __all__ = ["MONSTERS"]

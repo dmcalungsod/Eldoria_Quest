@@ -39,8 +39,24 @@ MONSTER_SKILLS = {
         "type": "physical",
         "desc_key": "bite"
     },
+    "crystal_shard": {
+        "key_id": "crystal_shard",
+        "name": "Crystal Shard",
+        "power": 1.4,
+        "mp_cost": 6,
+        "type": "physical",
+        "desc_key": "special_hit"
+    },
 
     # Magical / Elemental
+    "prism_beam": {
+        "key_id": "prism_beam",
+        "name": "Prism Beam",
+        "power": 1.8,
+        "mp_cost": 12,
+        "type": "magical",
+        "desc_key": "magic"
+    },
     "ember": {
         "key_id": "ember",
         "name": "Ember",
