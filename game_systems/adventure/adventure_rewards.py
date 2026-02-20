@@ -118,6 +118,7 @@ class AdventureRewards:
         """Calculates drops and updates quest progress."""
         loot_bundle = defaultdict(int)
         exp_gain = combat_result["exp"]
+        actual_drops = []  # Track items that actually dropped for quests
 
         # Add XP to session loot immediately
         self._add_loot_to_session(session_loot, "exp", exp_gain)
@@ -138,6 +139,7 @@ class AdventureRewards:
             if random.randint(1, 100) <= final_chance:
                 self._add_loot_to_session(session_loot, drop_key, 1)
                 loot_bundle[(mat.get("name", drop_key), rarity)] += 1
+                actual_drops.append(drop_key)
 
         # Equipment Drops
         eq_list = item_manager.generate_monster_loot(combat_result["monster_data"])
@@ -154,6 +156,8 @@ class AdventureRewards:
                 item["source"],
             )
             loot_bundle[(item["name"], item["rarity"])] += 1
+            # Assuming equipment doesn't trigger "collect" quests for now, or if it does, it's not handled here.
+            # Usually collect quests are for materials.
 
         # Format Logs
         loot_lines = [get_rarity_ansi("Common", f"• {exp_gain} EXP")]
@@ -171,9 +175,10 @@ class AdventureRewards:
             logs.append(f"{E.ITEM_BOX} **Loot Acquired**\n```ansi\n{block}```")
 
         # Quest Updates
-        self._update_quests(quest_system, combat_result["monster_data"]["name"], combat_result.get("drops", []), logs)
+        # FIX: Pass only actual drops, not potential drops
+        self._update_quests(quest_system, combat_result["monster_data"]["name"], actual_drops, logs)
 
-    def _update_quests(self, quest_system, monster_name, drops, logs):
+    def _update_quests(self, quest_system, monster_name, actual_drops, logs):
         updated = []
         quests = quest_system.get_player_quests(self.discord_id)
 
@@ -188,7 +193,8 @@ class AdventureRewards:
 
             # Collect check
             if "collect" in objs:
-                for dk, _ in drops:
+                # Iterate through actual drops instead of potential drops
+                for dk in actual_drops:
                     if dk in objs["collect"]:
                         quest_system.update_progress(self.discord_id, q["id"], "collect", dk)
                         progress_made = True
@@ -198,6 +204,15 @@ class AdventureRewards:
 
         if updated:
             logs.append(f"\n{E.QUEST_SCROLL} *Quest Updated: {', '.join(updated)}*")
+
+    def _calculate_growth(self, current_exp, gain, threshold):
+        """Helper to calculate leveling progress."""
+        current_exp += gain
+        levels_gained = 0
+        while current_exp >= threshold:
+            current_exp -= threshold
+            levels_gained += 1
+        return current_exp, levels_gained
 
     def _process_stat_exp(self, br, logs):
         """
@@ -223,14 +238,18 @@ class AdventureRewards:
                     continue
 
                 stat_key = exp_key.split("_")[0].upper()
-                curr_exp[exp_key] += gain
 
-                # Check Threshold
-                while curr_exp[exp_key] >= STAT_EXP_THRESHOLD:
-                    curr_exp[exp_key] -= STAT_EXP_THRESHOLD
-                    base_stats[stat_key] += 1
+                new_exp, levels = self._calculate_growth(curr_exp[exp_key], gain, STAT_EXP_THRESHOLD)
+                curr_exp[exp_key] = new_exp
+
+                if levels > 0:
+                    base_stats[stat_key] += levels
                     if stat_key in STAT_UP_MESSAGES:
-                        level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
+                        # Append message only once per stat type to avoid spam, or repeat?
+                        # Original code appended once per level. Let's keep it simple.
+                        # Assuming usually 1 level at a time.
+                        for _ in range(levels):
+                            level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
 
             # Save updates
             for s, v in base_stats.items():
@@ -273,14 +292,14 @@ class AdventureRewards:
 
                 lvl, exp, name = row["skill_level"], row["skill_exp"], row["name"]
                 gain = count * SKILL_EXP_PER_USE
-                exp += gain
 
-                while exp >= SKILL_EXP_THRESHOLD:
-                    exp -= SKILL_EXP_THRESHOLD
-                    lvl += 1
+                new_exp, levels = self._calculate_growth(exp, gain, SKILL_EXP_THRESHOLD)
+
+                if levels > 0:
+                    lvl += levels
                     msgs.append(f"{E.LEVEL_UP} **{name}** reached **Level {lvl}**!")
 
-                self.db.update_player_skill(self.discord_id, s_key, skill_level=lvl, skill_exp=exp)
+                self.db.update_player_skill(self.discord_id, s_key, skill_level=lvl, skill_exp=new_exp)
 
             if msgs:
                 logs.append("\n" + "\n".join(msgs))
