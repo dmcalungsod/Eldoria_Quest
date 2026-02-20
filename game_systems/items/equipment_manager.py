@@ -78,8 +78,8 @@ class EquipmentManager:
 
     def check_requirements(self, item_data: dict, player_data: dict) -> tuple[bool, str | None]:
         """
-        Validates if a player can equip an item based on Level and Rank.
-        player_data must contain: 'level', 'rank' (from guild).
+        Validates if a player can equip an item based on Level, Rank, and Class.
+        player_data must contain: 'level', 'rank' (from guild), 'class_name'.
         """
         # 1. Level Requirement
         req_level = item_data.get("level_req", 1)
@@ -92,6 +92,13 @@ class EquipmentManager:
             p_rank = player_data.get("rank", "F")
             if self.RANK_VALUES.get(p_rank, 1) < self.RANK_VALUES.get(req_rank, 1):
                 return False, f"Req: Rank {req_rank}"
+
+        # 3. Class Restriction
+        allowed_classes = item_data.get("class_restrictions")
+        if allowed_classes:
+            p_class = player_data.get("class_name")
+            if not p_class or p_class not in allowed_classes:
+                return False, f"Class Restricted: {', '.join(allowed_classes)}"
 
         return True, None
 
@@ -195,9 +202,18 @@ class EquipmentManager:
             if not player:
                 return False, "Player not found."
 
-            # Fetch rank
+            # Fetch rank and class
             guild_rank = self.db.get_guild_rank(discord_id) or "F"
-            player_data = {"level": player.get("level", 1), "rank": guild_rank}
+
+            # Resolve Class Name
+            class_id = player.get("class_id")
+            class_name = next((k for k, v in CLASSES.items() if v["id"] == class_id), None)
+
+            player_data = {
+                "level": player.get("level", 1),
+                "rank": guild_rank,
+                "class_name": class_name,
+            }
 
             # Fetch full item static data for requirements
             # Try EQUIPMENT_DATA first (in-memory)

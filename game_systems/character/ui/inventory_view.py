@@ -13,6 +13,7 @@ from discord.ui import Button, Select, View
 
 from cogs.ui_helpers import build_inventory_embed
 from database.database_manager import DatabaseManager
+from game_systems.data.class_data import CLASSES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.items.consumable_manager import ConsumableManager
 from game_systems.items.equipment_manager import EquipmentManager
@@ -81,7 +82,17 @@ class InventoryView(View):
             guild_rank = "F"
             allowed_slots = []
 
-        player_data = {"level": player.get("level", 1) if player else 1, "rank": guild_rank}
+        # Resolve Class Name
+        class_name = None
+        if player:
+            class_id = player.get("class_id")
+            class_name = next((k for k, v in CLASSES.items() if v["id"] == class_id), None)
+
+        player_data = {
+            "level": player.get("level", 1) if player else 1,
+            "rank": guild_rank,
+            "class_name": class_name,
+        }
 
         equip_opts = []
         unequip_opts = []
