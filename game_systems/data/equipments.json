@@ -331,5 +331,29 @@
             "MAG": 15
         },
         "description": "A pulsating magma core set in gold. It beats in time with your heart."
+    },
+    "acc_warrior_ring": {
+        "name": "Ring of Iron Will",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "class_restrictions": ["Warrior"],
+        "stats_bonus": {
+            "STR": 5,
+            "END": 5
+        },
+        "description": "A heavy iron band inscribed with the code of the shield-bearer."
+    },
+    "acc_mage_ring": {
+        "name": "Ring of Arcane Focus",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "class_restrictions": ["Mage"],
+        "stats_bonus": {
+            "MAG": 8,
+            "MP": 20
+        },
+        "description": "A delicate silver ring that hums when near ley lines."
     }
 }
