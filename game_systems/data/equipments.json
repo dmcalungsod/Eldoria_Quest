@@ -142,6 +142,7 @@
         "slot": "sword",
         "rarity": "Epic",
         "level_req": 20,
+        "rank_restriction": "B",
         "stats_bonus": {
             "STR": 45,
             "DEX": 15
@@ -164,6 +165,7 @@
         "slot": "staff",
         "rarity": "Epic",
         "level_req": 20,
+        "rank_restriction": "B",
         "stats_bonus": {
             "MAG": 50,
             "MP": 75
@@ -186,6 +188,7 @@
         "slot": "sword",
         "rarity": "Legendary",
         "level_req": 35,
+        "rank_restriction": "A",
         "stats_bonus": {
             "STR": 110,
             "DEX": 30
@@ -197,6 +200,7 @@
         "slot": "staff",
         "rarity": "Legendary",
         "level_req": 35,
+        "rank_restriction": "A",
         "stats_bonus": {
             "MAG": 120,
             "MP": 150
@@ -208,6 +212,7 @@
         "slot": "heavy_armor",
         "rarity": "Legendary",
         "level_req": 35,
+        "rank_restriction": "A",
         "stats_bonus": {
             "END": 100,
             "STR": 40
@@ -230,6 +235,7 @@
         "slot": "sword",
         "rarity": "Mythical",
         "level_req": 50,
+        "rank_restriction": "S",
         "stats_bonus": {
             "STR": 200,
             "DEX": 75
@@ -241,6 +247,7 @@
         "slot": "staff",
         "rarity": "Mythical",
         "level_req": 50,
+        "rank_restriction": "S",
         "stats_bonus": {
             "MAG": 225,
             "MP": 250
@@ -252,6 +259,7 @@
         "slot": "heavy_armor",
         "rarity": "Mythical",
         "level_req": 50,
+        "rank_restriction": "S",
         "stats_bonus": {
             "END": 200,
             "STR": 75

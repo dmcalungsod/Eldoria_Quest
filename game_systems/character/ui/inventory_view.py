@@ -13,6 +13,7 @@ from discord.ui import Button, Select, View
 
 from cogs.ui_helpers import build_inventory_embed
 from database.database_manager import DatabaseManager
+from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.items.consumable_manager import ConsumableManager
 from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.items.inventory_manager import InventoryManager
@@ -67,10 +68,20 @@ class InventoryView(View):
     def _populate_ui(self):
         """Populate dropdowns synchronously (safe for view init)."""
         try:
+            # Fetch player data for validation
+            player = self.db.get_player(self.interaction_user.id)
+            guild_rank = self.db.get_guild_rank(self.interaction_user.id) or "F"
+            allowed_slots = self.eq_manager._get_player_allowed_slots(self.interaction_user.id)
+
             # Using inventory manager's method which should be efficient enough
             items = self.inv_manager.get_inventory(self.interaction_user.id)
         except Exception:
             items = []
+            player = None
+            guild_rank = "F"
+            allowed_slots = []
+
+        player_data = {"level": player.get("level", 1) if player else 1, "rank": guild_rank}
 
         equip_opts = []
         unequip_opts = []
@@ -83,7 +94,31 @@ class InventoryView(View):
                 if item.get("equipped"):
                     unequip_opts.append(discord.SelectOption(label=label, value=val, emoji="🛡️"))
                 else:
-                    equip_opts.append(discord.SelectOption(label=label, value=val, emoji="⚔️"))
+                    # Check requirements for UI feedback
+                    static_data = EQUIPMENT_DATA.get(item["item_key"])
+                    full_item_data = (static_data or {}).copy()
+                    full_item_data.update(item)
+
+                    can_equip, reason = self.eq_manager.check_requirements(full_item_data, player_data)
+
+                    # Also check slot restrictions
+                    if can_equip and item["slot"] not in allowed_slots:
+                        can_equip = False
+                        reason = f"Class restricted ({item['slot']})"
+
+                    if can_equip:
+                        equip_opts.append(discord.SelectOption(label=label, value=val, emoji="⚔️"))
+                    else:
+                        # Greyed-out / Locked UI
+                        locked_label = f"🔒 {label[:80]}" # Truncate to ensure fit
+                        equip_opts.append(
+                            discord.SelectOption(
+                                label=locked_label,
+                                value=val,
+                                emoji="🚫",
+                                description=f"Cannot Equip: {reason}"
+                            )
+                        )
 
             elif item["item_type"] == "consumable":
                 label = f"{item['item_name']} (x{item['count']})"

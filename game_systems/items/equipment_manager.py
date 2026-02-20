@@ -12,6 +12,7 @@ import pymongo.errors
 
 from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES
+from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.skills_data import SKILLS
 from game_systems.player.player_stats import PlayerStats
 
@@ -20,6 +21,18 @@ logger = logging.getLogger("eldoria.equipment")
 
 class EquipmentManager:
     VALID_TABLES = {"equipment", "class_equipment"}
+
+    RANK_VALUES = {
+        "F": 1,
+        "E": 2,
+        "D": 3,
+        "C": 4,
+        "B": 5,
+        "A": 6,
+        "S": 7,
+        "SS": 8,
+        "SSS": 9,
+    }
 
     STAT_MAP = {
         "str_bonus": "STR",
@@ -62,6 +75,25 @@ class EquipmentManager:
             if data["id"] == class_id:
                 return data.get("allowed_slots", [])
         return []
+
+    def check_requirements(self, item_data: dict, player_data: dict) -> tuple[bool, str | None]:
+        """
+        Validates if a player can equip an item based on Level and Rank.
+        player_data must contain: 'level', 'rank' (from guild).
+        """
+        # 1. Level Requirement
+        req_level = item_data.get("level_req", 1)
+        if player_data.get("level", 1) < req_level:
+            return False, f"Req: Lvl {req_level}"
+
+        # 2. Rank Requirement
+        req_rank = item_data.get("rank_restriction")
+        if req_rank:
+            p_rank = player_data.get("rank", "F")
+            if self.RANK_VALUES.get(p_rank, 1) < self.RANK_VALUES.get(req_rank, 1):
+                return False, f"Req: Rank {req_rank}"
+
+        return True, None
 
     def recalculate_player_stats(self, discord_id: int) -> PlayerStats:
         """
@@ -158,7 +190,37 @@ class EquipmentManager:
             if item.get("equipped") == 1:
                 return False, "Already equipped."
 
-            # Validate Class Permissions
+            # Fetch player data for validation
+            player = self.db.get_player(discord_id)
+            if not player:
+                return False, "Player not found."
+
+            # Fetch rank
+            guild_rank = self.db.get_guild_rank(discord_id) or "F"
+            player_data = {"level": player.get("level", 1), "rank": guild_rank}
+
+            # Fetch full item static data for requirements
+            # Try EQUIPMENT_DATA first (in-memory)
+            static_data = EQUIPMENT_DATA.get(item["item_key"])
+
+            # Fallback to DB lookup if not in static dict (e.g. dynamic items)
+            if not static_data and item.get("item_source_table"):
+                # Note: get_item_from_source_table uses ID (int), but item_key is usually string in JSON
+                # However, inventory 'item_key' matches 'key' in JSON.
+                # DB lookup usually expects 'id'.
+                # Let's rely on item_key matching JSON keys for now as primary method.
+                pass
+
+            # Merge inventory data over static data (in case of dynamic overrides)
+            full_item_data = (static_data or {}).copy()
+            full_item_data.update(item)
+
+            # 1. Validate Requirements (Level, Rank)
+            can_equip, reason = self.check_requirements(full_item_data, player_data)
+            if not can_equip:
+                return False, f"Cannot equip: {reason}"
+
+            # 2. Validate Class Permissions (Slots)
             allowed = self._get_player_allowed_slots(discord_id)
             if item["slot"] not in allowed:
                 return False, f"Your class cannot equip {item['slot']} items."
