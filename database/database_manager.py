@@ -202,6 +202,26 @@ class DatabaseManager:
                     "as": "player_skills",
                 }
             },
+            {
+                "$lookup": {
+                    "from": "adventure_sessions",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$discord_id", "$$did"]},
+                                        {"$eq": ["$active", 1]},
+                                    ]
+                                }
+                            }
+                        },
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "active_session",
+                }
+            },
             {"$project": {"_id": 0}},
         ]
 
@@ -248,9 +268,15 @@ class DatabaseManager:
                     }
                 )
 
-        # 4. Extract Player Row (remove joined fields)
+        # 4. Extract Session
+        active_session = data.get("active_session", [])
+        session_data = active_session[0] if active_session else None
+
+        # 5. Extract Player Row (remove joined fields)
         player_row = {
-            k: v for k, v in data.items() if k not in ["stats_docs", "buffs", "player_skills"]
+            k: v
+            for k, v in data.items()
+            if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
         }
 
         return {
@@ -258,6 +284,7 @@ class DatabaseManager:
             "stats": stats_data,
             "buffs": buffs,
             "skills": skills,
+            "active_session": session_data,
         }
 
     # ============================================================
