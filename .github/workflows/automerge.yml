@@ -1,0 +1,59 @@
+name: Auto-Merge and Cleanup
+
+on:
+  workflow_run:
+    workflows: ["Eldoria CI"]
+    types:
+      - completed
+  schedule:
+    # Run daily at midnight
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Auto-merge PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_LIST: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+        run: |
+          # The workflow_run event provides a list of PRs that triggered the workflow
+          # We iterate through them and merge
+
+          if [ "$PR_LIST" == "null" ] || [ -z "$PR_LIST" ]; then
+            echo "No PRs associated with this workflow run."
+            exit 0
+          fi
+
+          # Parse JSON to get numbers
+          echo "$PR_LIST" | jq -r '.[] | .number' | while read pr_number; do
+            if [ "$pr_number" != "null" ] && [ -n "$pr_number" ]; then
+              echo "Merging PR #$pr_number..."
+              # Attempt merge. If it fails (e.g. conflicts, other checks), it will log error but continue
+              gh pr merge "$pr_number" --merge || echo "Failed to merge PR #$pr_number"
+            fi
+          done
+
+  cleanup-branches:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'schedule' }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Prune Merged Branches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/prune_merged_branches.py
