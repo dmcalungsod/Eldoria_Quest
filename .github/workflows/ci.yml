@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build-and-test:
@@ -70,3 +71,16 @@ jobs:
       run: |
         # We use your existing test runner which handles DB creation/cleanup
         python tests/run_all_tests.py
+
+    # 7. Auto-merge PR (Only on PRs, only if all steps above passed)
+    - name: Auto-merge PR
+      if: github.event_name == 'pull_request' && success()
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        PR_NUM=${{ github.event.pull_request.number }}
+        echo "Waiting for all checks to pass on PR #$PR_NUM..."
+        # Wait for ALL checks (CodeRabbit, GitGuardian, etc.) to complete
+        gh pr checks $PR_NUM --watch --fail-fast
+        echo "All checks passed. Merging PR #$PR_NUM..."
+        gh pr merge $PR_NUM --squash --delete-branch
