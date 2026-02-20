@@ -1,4 +1,3 @@
-
 import os
 import sys
 import unittest
@@ -43,16 +42,19 @@ class TestDatabaseOptimization(unittest.TestCase):
         discord_id = 12345
 
         # Mock aggregation result used in the new implementation
-        mock_agg_result = [{
-            "discord_id": discord_id, "name": "Test",
-            "stats_docs": [{"stats_json": "{}"}],
-            "buffs": [],
-            "player_skills": [
-                {"skill_key": "skill_1", "skill_level": 1},
-                {"skill_key": "skill_2", "skill_level": 1},
-                {"skill_key": "skill_3", "skill_level": 1},
-            ]
-        }]
+        mock_agg_result = [
+            {
+                "discord_id": discord_id,
+                "name": "Test",
+                "stats_docs": [{"stats_json": "{}"}],
+                "buffs": [],
+                "player_skills": [
+                    {"skill_key": "skill_1", "skill_level": 1},
+                    {"skill_key": "skill_2", "skill_level": 1},
+                    {"skill_key": "skill_3", "skill_level": 1},
+                ],
+            }
+        ]
         self.mock_db["players"].aggregate.return_value = mock_agg_result
 
         # Setup find return value (cursor) for optimized version
@@ -140,6 +142,7 @@ class TestDatabaseOptimization(unittest.TestCase):
 
         self.assertEqual(find_calls, 1, f"Expected 1 find call, got {find_calls}")
         self.assertEqual(find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}")
+
 
 if __name__ == "__main__":
     unittest.main()

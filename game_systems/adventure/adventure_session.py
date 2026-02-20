@@ -250,7 +250,7 @@ class AdventureSession:
         Calculates flee chance based on Agility vs Monster Level.
         """
         if not self.active_monster or not context:
-             return self._build_result([["Error: Invalid flee state."]], False, context)
+            return self._build_result([["Error: Invalid flee state."]], False, context)
 
         player_stats = context["player_stats"]
         agi = player_stats.agility
@@ -382,7 +382,9 @@ class AdventureSession:
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
-        result = self.combat.resolve_turn(self.active_monster, report, current_session_exp, context=context, action=action)
+        result = self.combat.resolve_turn(
+            self.active_monster, report, current_session_exp, context=context, action=action
+        )
 
         # Update context vitals from combat result
         if context:

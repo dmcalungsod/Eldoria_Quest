@@ -32,7 +32,7 @@ class TestUIHelpers(unittest.TestCase):
         self.assertEqual(make_progress_bar(-10, 100, 10), "░░░░░░░░░░")
         # Zero max -> Should prevent division by zero and treat as 0% or empty
         # implementation detail: max(max_val, 1) usually used
-        self.assertEqual(make_progress_bar(50, 0, 10), "██████████") # wait, current/max(0,1) = 50/1 = 50 -> 100% ?
+        self.assertEqual(make_progress_bar(50, 0, 10), "██████████")  # wait, current/max(0,1) = 50/1 = 50 -> 100% ?
         # Actually logic is min(1, current/max(max_val, 1))
         # If max is 0, we treat it as 1. 50/1 = 50 -> clamped to 1. So full bar.
         # This seems acceptable for "0 max HP" which shouldn't happen, or maybe it means "invincible"?
@@ -42,6 +42,7 @@ class TestUIHelpers(unittest.TestCase):
 
         # Custom length
         self.assertEqual(make_progress_bar(5, 10, 4), "██░░")
+
 
 if __name__ == "__main__":
     unittest.main()

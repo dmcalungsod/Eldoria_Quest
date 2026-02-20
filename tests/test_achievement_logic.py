@@ -27,6 +27,7 @@ class TestAchievementLogic(unittest.TestCase):
         # Mock add_title to return True only for "Monster Hunter"
         def side_effect(did, title):
             return title == "Monster Hunter"
+
         self.mock_db.add_title.side_effect = side_effect
 
         msg = self.achievements.check_kill_achievements(discord_id, kill_type)
@@ -61,6 +62,7 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.assert_any_call(discord_id, "Adventurer")
         self.assertIn("**Title Unlocked:** Adventurer", msg)
+
 
 if __name__ == "__main__":
     unittest.main()

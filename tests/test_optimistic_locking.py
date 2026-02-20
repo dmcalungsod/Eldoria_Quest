@@ -1,4 +1,3 @@
-
 import json
 import os
 import sys
@@ -16,6 +15,7 @@ mock_pymongo = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = MagicMock()
 
+
 # Define a MockView that accepts init args and has methods used by StatusUpdateView
 class MockView:
     def __init__(self, timeout=None):
@@ -26,6 +26,7 @@ class MockView:
 
     def clear_items(self):
         self.children = []
+
 
 mock_discord_ui.View = MockView
 mock_discord_ui.Button = MagicMock()
@@ -54,6 +55,7 @@ except ImportError as e:
     print(f"Import Error: {e}")
     sys.exit(1)
 
+
 class TestOptimisticLocking(unittest.TestCase):
     def setUp(self):
         self.mock_db = MagicMock()
@@ -69,9 +71,12 @@ class TestOptimisticLocking(unittest.TestCase):
         # We need a valid stats dict structure for PlayerStats.from_dict to work without error
         # Assuming typical structure: {"STR": {"base": 10}, ...}
         self.stats_dict = {
-            "STR": {"base": 10}, "END": {"base": 10},
-            "DEX": {"base": 10}, "AGI": {"base": 10},
-            "MAG": {"base": 10}, "LCK": {"base": 10}
+            "STR": {"base": 10},
+            "END": {"base": 10},
+            "DEX": {"base": 10},
+            "AGI": {"base": 10},
+            "MAG": {"base": 10},
+            "LCK": {"base": 10},
         }
         self.stats_json_str = json.dumps(self.stats_dict)
 
@@ -81,10 +86,7 @@ class TestOptimisticLocking(unittest.TestCase):
 
         self.real_stats = PlayerStats.from_dict(self.stats_dict)
 
-        self.p_data = {
-            "vestige_pool": 100,
-            "class_id": 1
-        }
+        self.p_data = {"vestige_pool": 100, "class_id": 1}
 
         self.mock_stats_row = {"stats_json": self.stats_json_str}
 
@@ -96,13 +98,7 @@ class TestOptimisticLocking(unittest.TestCase):
         # Note: StatusUpdateView calls self._get_class_starting_stats which uses CLASSES constant
         # We might need to mock game_systems.data.class_data if it causes issues, but it should be fine.
 
-        self.view = StatusUpdateView(
-            self.mock_db,
-            self.mock_user,
-            self.p_data,
-            self.real_stats,
-            self.mock_stats_row
-        )
+        self.view = StatusUpdateView(self.mock_db, self.mock_user, self.p_data, self.real_stats, self.mock_stats_row)
 
     def test_upgrade_success(self):
         """Verify successful upgrade flow."""
@@ -153,6 +149,7 @@ class TestOptimisticLocking(unittest.TestCase):
 
         # Verify vitals not updated
         self.mock_db.update_player_vitals.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

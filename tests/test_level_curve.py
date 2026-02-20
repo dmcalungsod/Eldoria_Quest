@@ -1,4 +1,3 @@
-
 import os
 import sys
 import unittest
@@ -8,8 +7,8 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock dependencies
-sys.modules['pymongo'] = MagicMock()
-sys.modules['discord'] = MagicMock()
+sys.modules["pymongo"] = MagicMock()
+sys.modules["discord"] = MagicMock()
 
 from game_systems.player.level_up import LevelUpSystem  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
@@ -22,9 +21,9 @@ class TestLevelCurve(unittest.TestCase):
         200 * L^2 + 800 * L
         """
         expected_values = {
-            1: 1000,    # 200*1 + 800*1 = 1000
-            2: 2400,    # 200*4 + 800*2 = 800 + 1600 = 2400
-            5: 9000,    # 200*25 + 800*5 = 5000 + 4000 = 9000
+            1: 1000,  # 200*1 + 800*1 = 1000
+            2: 2400,  # 200*4 + 800*2 = 800 + 1600 = 2400
+            5: 9000,  # 200*25 + 800*5 = 5000 + 4000 = 9000
             10: 28000,  # 200*100 + 800*10 = 20000 + 8000 = 28000
             20: 96000,  # 200*400 + 800*20 = 80000 + 16000 = 96000
         }
@@ -38,14 +37,19 @@ class TestLevelCurve(unittest.TestCase):
                 self.assertEqual(system.exp_to_next, expected_xp, f"Level {level} XP Requirement mismatch")
             else:
                 # Create system just before target level
-                system = LevelUpSystem(stats, level=level-1, exp=0, exp_to_next=1000)
+                system = LevelUpSystem(stats, level=level - 1, exp=0, exp_to_next=1000)
 
                 # Trigger level up to reach `level` and calculate next XP requirement
                 system.level_up()
 
                 # Now at `level`. Check `exp_to_next`
                 current_xp_req = system.exp_to_next
-                self.assertEqual(current_xp_req, expected_xp, f"Level {level} XP Requirement mismatch: Expected {expected_xp}, Got {current_xp_req}")
+                self.assertEqual(
+                    current_xp_req,
+                    expected_xp,
+                    f"Level {level} XP Requirement mismatch: Expected {expected_xp}, Got {current_xp_req}",
+                )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

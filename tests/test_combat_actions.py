@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock external dependencies
-sys.modules['pymongo'] = MagicMock()
-sys.modules['discord'] = MagicMock()
+sys.modules["pymongo"] = MagicMock()
+sys.modules["discord"] = MagicMock()
 
 from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
 from game_systems.player.level_up import LevelUpSystem  # noqa: E402
@@ -29,11 +29,11 @@ class TestCombatActions(unittest.TestCase):
             "HP": 1000,
             "max_hp": 1000,
             "MP": 10,
-            "ATK": 20, # High attack to test mitigation
+            "ATK": 20,  # High attack to test mitigation
             "DEF": 0,
             "level": 1,
             "tier": "Normal",
-            "skills": []
+            "skills": [],
         }
 
     def test_defend_action(self):
@@ -50,12 +50,12 @@ class TestCombatActions(unittest.TestCase):
             player_mp=current_mp,
             player_class_id=1,
             stats_dict=stats,
-            action="defend"
+            action="defend",
         )
 
         # Mock RNG
-        with patch('random.random', return_value=0.9):
-            with patch('random.uniform', return_value=1.0):
+        with patch("random.random", return_value=0.9):
+            with patch("random.uniform", return_value=1.0):
                 result = engine.run_combat_turn()
 
         # Verify MP Restoration (5% of 100 = 5)
@@ -74,14 +74,14 @@ class TestCombatActions(unittest.TestCase):
             player_mp=current_mp,
             player_class_id=1,
             stats_dict=stats,
-            action="attack"
+            action="attack",
         )
 
         # Patch _decide_player_skill so we force a basic attack
         engine_attack._decide_player_skill = MagicMock(return_value={"skill": None})
 
-        with patch('random.random', return_value=0.9):
-             with patch('random.uniform', return_value=1.0):
+        with patch("random.random", return_value=0.9):
+            with patch("random.uniform", return_value=1.0):
                 result_attack = engine_attack.run_combat_turn()
 
         damage_attacked = result_attack["turn_report"]["damage_taken"]
@@ -98,11 +98,11 @@ class TestCombatActions(unittest.TestCase):
             player_mp=10,
             player_class_id=1,
             stats_dict={"MP": 100, "END": 10, "AGI": 10},
-            action="flee_failed"
+            action="flee_failed",
         )
 
-        with patch('random.random', return_value=0.9):
-            with patch('random.uniform', return_value=1.0):
+        with patch("random.random", return_value=0.9):
+            with patch("random.uniform", return_value=1.0):
                 result = engine.run_combat_turn()
 
         self.assertEqual(result["turn_report"]["str_hits"], 0, "Player should not attack on flee fail")
@@ -122,12 +122,12 @@ class TestCombatActions(unittest.TestCase):
             player_mp=current_mp,
             player_class_id=1,
             stats_dict=stats,
-            action="special_ability"
+            action="special_ability",
         )
 
         # Mock RNG to ensure hit and standard variance
-        with patch('random.random', return_value=0.9): # No crit
-            with patch('random.uniform', return_value=1.0): # No variance
+        with patch("random.random", return_value=0.9):  # No crit
+            with patch("random.uniform", return_value=1.0):  # No variance
                 # Run Special
                 result_special = engine.run_combat_turn()
 
@@ -143,14 +143,14 @@ class TestCombatActions(unittest.TestCase):
             player_mp=current_mp,
             player_class_id=1,
             stats_dict=stats,
-            action="attack"
+            action="attack",
         )
 
         # Force basic attack
         engine_normal._decide_player_skill = MagicMock(return_value={"skill": None})
 
-        with patch('random.random', return_value=0.9):
-            with patch('random.uniform', return_value=1.0):
+        with patch("random.random", return_value=0.9):
+            with patch("random.uniform", return_value=1.0):
                 result_normal = engine_normal.run_combat_turn()
 
         dmg_special = 1000 - result_special["monster_hp"]
@@ -164,5 +164,6 @@ class TestCombatActions(unittest.TestCase):
         # Allow small delta for integer rounding
         self.assertAlmostEqual(dmg_special, int(dmg_normal * 1.5), delta=1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

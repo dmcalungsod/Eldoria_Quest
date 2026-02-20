@@ -9,6 +9,7 @@ from game_systems.player.player_stats import PlayerStats
 
 TEST_DB = "test_buffs.db"
 
+
 class TestBuffSystem(unittest.TestCase):
     def setUp(self):
         if os.path.exists(TEST_DB):
@@ -76,7 +77,7 @@ class TestBuffSystem(unittest.TestCase):
         with self.db.get_connection() as conn:
             conn.execute(
                 "INSERT INTO inventory (discord_id, item_key, item_name, item_type, count) VALUES (?, ?, ?, ?, ?)",
-                (self.discord_id, "strength_brew", "Brew", "consumable", 1)
+                (self.discord_id, "strength_brew", "Brew", "consumable", 1),
             )
             inv_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
@@ -99,6 +100,7 @@ class TestBuffSystem(unittest.TestCase):
         # Monkeypatch PlayerStats.add_bonus_stat to verify call
         original_add_bonus = PlayerStats.add_bonus_stat
         log = []
+
         def mock_add_bonus(self, stat, amount):
             log.append((stat, amount))
             original_add_bonus(self, stat, amount)
@@ -123,6 +125,7 @@ class TestBuffSystem(unittest.TestCase):
 
         finally:
             PlayerStats.add_bonus_stat = original_add_bonus
+
 
 if __name__ == "__main__":
     unittest.main()

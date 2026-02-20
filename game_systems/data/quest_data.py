@@ -26,6 +26,7 @@ from pathlib import Path
 
 logger = logging.getLogger("eldoria.data")
 
+
 def load_quests():
     """
     Loads quest data from JSON file.
@@ -43,6 +44,7 @@ def load_quests():
     except json.JSONDecodeError as e:
         logger.error(f"CRITICAL: quests.json is invalid JSON: {e}")
         return []
+
 
 ALL_QUESTS = load_quests()
 
@@ -63,5 +65,5 @@ __all__ = [
     "QUESTS_C_TIER",
     "QUESTS_B_TIER",
     "QUESTS_A_TIER",
-    "QUESTS_S_TIER"
+    "QUESTS_S_TIER",
 ]

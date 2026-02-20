@@ -87,17 +87,13 @@ class QuestsMenuView(View, GuildViewMixin):
     # ------------------------------
     # Quest Board
     # ------------------------------
-    async def view_quests_callback(
-        self, interaction: discord.Interaction, button: Button = None
-    ):
+    async def view_quests_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.quest_hub_cog import QuestBoardView
 
         await interaction.response.defer()
 
         quest_system = QuestSystem(self.db)
-        quests = await asyncio.to_thread(
-            quest_system.get_available_quests, self.interaction_user.id
-        )
+        quests = await asyncio.to_thread(quest_system.get_available_quests, self.interaction_user.id)
 
         # --- Narrative Update ---
         embed = discord.Embed(
@@ -118,17 +114,13 @@ class QuestsMenuView(View, GuildViewMixin):
     # ------------------------------
     # Quest Ledger
     # ------------------------------
-    async def view_quest_ledger_callback(
-        self, interaction: discord.Interaction, button: Button = None
-    ):
+    async def view_quest_ledger_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.quest_hub_cog import QuestLedgerView
 
         await interaction.response.defer()
 
         quest_system = QuestSystem(self.db)
-        quests = await asyncio.to_thread(
-            quest_system.get_player_quests, self.interaction_user.id
-        )
+        quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
 
         # --- Narrative Update ---
         embed = discord.Embed(
@@ -158,25 +150,17 @@ class QuestsMenuView(View, GuildViewMixin):
     # ------------------------------
     # Quest Turn-In
     # ------------------------------
-    async def quest_turn_in_callback(
-        self, interaction: discord.Interaction, button: Button = None
-    ):
+    async def quest_turn_in_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.quest_hub_cog import QuestLogView
 
         await interaction.response.defer()
 
         quest_system = QuestSystem(self.db)
-        quests = await asyncio.to_thread(
-            quest_system.get_player_quests, self.interaction_user.id
-        )
+        quests = await asyncio.to_thread(quest_system.get_player_quests, self.interaction_user.id)
 
         # Check for completable quests
         completable_quests = [
-            q
-            for q in quests
-            if quest_system.check_completion(
-                q.get("progress", {}), q.get("objectives", {})
-            )
+            q for q in quests if quest_system.check_completion(q.get("progress", {}), q.get("objectives", {}))
         ]
 
         # --- Narrative Update ---
@@ -211,19 +195,13 @@ class QuestsMenuView(View, GuildViewMixin):
     # ------------------------------
     # Rank Evaluation
     # ------------------------------
-    async def check_rank_callback(
-        self, interaction: discord.Interaction, button: Button = None
-    ):
+    async def check_rank_callback(self, interaction: discord.Interaction, button: Button = None):
         await interaction.response.defer()
 
         try:
-            data = await asyncio.to_thread(
-                self.rank_system.get_rank_info, self.interaction_user.id
-            )
+            data = await asyncio.to_thread(self.rank_system.get_rank_info, self.interaction_user.id)
             if not data:
-                await interaction.followup.send(
-                    "Error fetching rank data.", ephemeral=True
-                )
+                await interaction.followup.send("Error fetching rank data.", ephemeral=True)
                 return
 
             cur_rank = data.get("rank", "F")
@@ -246,9 +224,7 @@ class QuestsMenuView(View, GuildViewMixin):
                 for key, required in reqs.items():
                     current = data.get(key, 0)
                     bar = make_progress_bar(current, required, length=8)
-                    lines.append(
-                        f"• {key.replace('_', ' ').title()}: `{bar}` {current}/{required}"
-                    )
+                    lines.append(f"• {key.replace('_', ' ').title()}: `{bar}` {current}/{required}")
                     if current < required:
                         eligible = False
 
@@ -264,12 +240,8 @@ class QuestsMenuView(View, GuildViewMixin):
             await interaction.edit_original_response(embed=embed, view=view)
 
         except Exception as e:
-            logger.error(
-                f"Rank check error for {self.interaction_user.id}: {e}", exc_info=True
-            )
-            await interaction.followup.send(
-                "An error occurred checking rank status.", ephemeral=True
-            )
+            logger.error(f"Rank check error for {self.interaction_user.id}: {e}", exc_info=True)
+            await interaction.followup.send("An error occurred checking rank status.", ephemeral=True)
 
     # ------------------------------
     # Return to Menu
@@ -277,9 +249,7 @@ class QuestsMenuView(View, GuildViewMixin):
     async def back_to_this_menu(self, interaction: discord.Interaction):
         await interaction.response.defer()
         view = QuestsMenuView(self.db, self.interaction_user)
-        await interaction.edit_original_response(
-            embed=EmbedBuilder.quest_menu(), view=view
-        )
+        await interaction.edit_original_response(embed=EmbedBuilder.quest_menu(), view=view)
 
     # ------------------------------
     # Helper: Format Quest Progress

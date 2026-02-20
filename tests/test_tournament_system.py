@@ -1,8 +1,8 @@
-import unittest
-from unittest.mock import MagicMock, patch
 import datetime
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Ensure root dir is in path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,6 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 
 from game_systems.guild_system.tournament_system import TournamentSystem  # noqa: E402
+
 
 class TestTournamentSystem(unittest.TestCase):
     def setUp(self):
@@ -33,15 +34,13 @@ class TestTournamentSystem(unittest.TestCase):
         args = self.mock_db.create_tournament.call_args_list[0]
         # In python 3.8+ call_args is a tuple (args, kwargs) or just use .args
         # checking args
-        created_type = args.kwargs.get('type')
+        created_type = args.kwargs.get("type")
         self.assertIn(created_type, self.system.TOURNAMENT_TYPES)
 
     def test_start_weekly_tournament_returns_existing(self):
         # Setup: Active tournament exists and is valid
         future_end = (datetime.datetime.now() + datetime.timedelta(days=1)).isoformat()
-        self.mock_db.get_active_tournament.return_value = {
-            "id": 50, "type": "monster_kills", "end_time": future_end
-        }
+        self.mock_db.get_active_tournament.return_value = {"id": 50, "type": "monster_kills", "end_time": future_end}
 
         # Execute
         t_id = self.system.start_weekly_tournament()
@@ -53,9 +52,7 @@ class TestTournamentSystem(unittest.TestCase):
     def test_record_action_updates_score(self):
         # Setup: Active tournament matches action
         future_end = (datetime.datetime.now() + datetime.timedelta(days=1)).isoformat()
-        self.mock_db.get_active_tournament.return_value = {
-            "id": 50, "type": "monster_kills", "end_time": future_end
-        }
+        self.mock_db.get_active_tournament.return_value = {"id": 50, "type": "monster_kills", "end_time": future_end}
 
         # Execute
         self.system.record_action(12345, "monster_kills", 5)
@@ -66,9 +63,7 @@ class TestTournamentSystem(unittest.TestCase):
     def test_record_action_ignores_mismatch(self):
         # Setup: Active tournament is quests, action is kills
         future_end = (datetime.datetime.now() + datetime.timedelta(days=1)).isoformat()
-        self.mock_db.get_active_tournament.return_value = {
-            "id": 50, "type": "quests_completed", "end_time": future_end
-        }
+        self.mock_db.get_active_tournament.return_value = {"id": 50, "type": "quests_completed", "end_time": future_end}
 
         # Execute
         self.system.record_action(12345, "monster_kills", 1)
@@ -78,9 +73,7 @@ class TestTournamentSystem(unittest.TestCase):
 
     def test_end_current_tournament_distributes_rewards(self):
         # Setup: Active tournament
-        self.mock_db.get_active_tournament.return_value = {
-            "id": 50, "type": "monster_kills"
-        }
+        self.mock_db.get_active_tournament.return_value = {"id": 50, "type": "monster_kills"}
         # Mock leaderboard
         self.mock_db.get_tournament_leaderboard.return_value = [
             {"discord_id": 1, "score": 100, "name": "Player1"},
@@ -91,11 +84,12 @@ class TestTournamentSystem(unittest.TestCase):
         result = self.system.end_current_tournament()
 
         # Verify
-        self.mock_db.increment_player_fields.assert_any_call(1, aurum=1000) # Rank 1
+        self.mock_db.increment_player_fields.assert_any_call(1, aurum=1000)  # Rank 1
         self.mock_db.increment_player_fields.assert_any_call(2, aurum=500)  # Rank 2
         self.mock_db.add_title.assert_called_with(1, "Grand Champion")
         self.mock_db.end_active_tournament.assert_called_once()
         self.assertIn("Player1", result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

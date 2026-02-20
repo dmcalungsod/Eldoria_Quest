@@ -4,8 +4,8 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 # Mock pymongo BEFORE any imports
-sys.modules['pymongo'] = MagicMock()
-sys.modules['pymongo.errors'] = MagicMock()
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Adjust path to import game modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,9 +26,12 @@ class TestDeadTurns(unittest.TestCase):
 
         # Common Mock Returns
         self.mock_db.get_player_stats_json.return_value = {
-            "STR": {"base": 10}, "END": {"base": 10},
-            "DEX": {"base": 10}, "AGI": {"base": 10},
-            "MAG": {"base": 10}, "LCK": {"base": 10}
+            "STR": {"base": 10},
+            "END": {"base": 10},
+            "DEX": {"base": 10},
+            "AGI": {"base": 10},
+            "MAG": {"base": 10},
+            "LCK": {"base": 10},
         }
         # Calculated Max HP (END=10): 50 + (10 * 10) = 150
         # Calculated Max MP (MAG=10): 20 + (10 * 5) = 70
@@ -42,18 +45,18 @@ class TestDeadTurns(unittest.TestCase):
             "player_stats": self.player_stats,
             "vitals": {"current_hp": 150, "current_mp": 70},
             "stats_dict": self.player_stats.get_total_stats_dict(),
-            "player_row": {"class_id": 1}
+            "player_row": {"class_id": 1},
         }
 
     def test_surge_replaces_dead_turn(self):
         """Test that full HP/MP now triggers SURGE (gathering attempt) instead of 'no event'."""
         # Force regen path
-        with patch('random.randint') as mock_randint:
+        with patch("random.randint") as mock_randint:
             # 1: random.randint(1,100) <= regen_chance (100) -> Enter regen
             # 1: random.randint(1,100) <= base_chance (35+25=60) -> Successful Gather
             mock_randint.side_effect = [1, 1]
 
-            with patch('random.choices', return_value=['medicinal_herb']):
+            with patch("random.choices", return_value=["medicinal_herb"]):
                 result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
 
         # Should have SURGE message
@@ -68,9 +71,7 @@ class TestDeadTurns(unittest.TestCase):
         # Case 1: Surge -> Failed Gather -> Scavenge
         self.mock_quest_system.get_player_quests.return_value = []
 
-        with patch('random.randint') as mock_randint, \
-             patch('random.random') as mock_random:
-
+        with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
             # Sequence:
             # 1. Regen check: 1 (success)
             # 2. Gather check: 100 (fail > 60)
@@ -101,9 +102,7 @@ class TestDeadTurns(unittest.TestCase):
         # Set NOT full HP/MP so we don't accidentally surge if regen logic was wrong
         # But here we pass regen_chance=0 so we skip regen anyway.
 
-        with patch('random.randint') as mock_randint, \
-             patch('random.random') as mock_random:
-
+        with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
             # Sequence:
             # 1. Regen check: 100 (fail, assuming chance < 100, let's pass regen_chance=0)
             # 2. Gather check: 100 (fail > 35)
@@ -127,5 +126,6 @@ class TestDeadTurns(unittest.TestCase):
         self.assertIn("exp", result["loot"])
         self.assertEqual(result["loot"]["exp"], 10)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

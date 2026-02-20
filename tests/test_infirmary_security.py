@@ -5,14 +5,18 @@ from unittest.mock import MagicMock
 
 sys.path.append(os.getcwd())
 
+
 # --- MOCK DISCORD ---
 class MockView:
     def __init__(self, timeout=180):
         pass
+
     def add_item(self, item):
         pass
+
     def clear_items(self):
         pass
+
 
 # Capture Real Item if available
 RealItem = object
@@ -22,6 +26,7 @@ if "discord.ui" in sys.modules:
     except AttributeError:
         pass
 
+
 class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
         self.callback = None
@@ -29,6 +34,7 @@ class MockButton(RealItem):
 
     def _is_v2(self):
         return False
+
 
 discord = MagicMock()
 discord.ui.View = MockView
@@ -59,11 +65,7 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         self.user.id = 12345
 
         # Initial Player Data (for View initialization)
-        self.initial_p_data = {
-            "current_hp": 50,
-            "current_mp": 10,
-            "aurum": 1000
-        }
+        self.initial_p_data = {"current_hp": 50, "current_mp": 10, "aurum": 1000}
 
         # Initial Stats (Max HP 150 based on base stats logic in PlayerStats)
         # PlayerStats(str_base=10, end_base=10) -> HP = 50 + (10 * 10) = 150
@@ -81,33 +83,31 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # 1. Initialize View with initial stats (Max HP 150)
         view = InfirmaryView(self.mock_db, self.user, self.initial_p_data, self.initial_stats)
 
-        old_max_hp = self.initial_stats.max_hp # 150
-        new_max_hp = 200 # Simulated new Max HP in DB
+        old_max_hp = self.initial_stats.max_hp  # 150
+        new_max_hp = 200  # Simulated new Max HP in DB
 
         # 2. Simulate DB state where player has changed
 
         # Mock get_player_vitals (Current state)
-        self.mock_db.get_player_vitals.return_value = {
-            "current_hp": 50,
-            "current_mp": 10
-        }
-        self.mock_db.get_player_field.return_value = 1000 # Aurum
+        self.mock_db.get_player_vitals.return_value = {"current_hp": 50, "current_mp": 10}
+        self.mock_db.get_player_field.return_value = 1000  # Aurum
 
         # Mock get_player_stats_json to return FRESH stats (Max HP 200)
-        fresh_stats = PlayerStats(str_base=10, end_base=15) # END 15 -> HP 200
+        fresh_stats = PlayerStats(str_base=10, end_base=15)  # END 15 -> HP 200
         self.mock_db.get_player_stats_json.return_value = fresh_stats.to_dict()
 
         # 3. Call _execute_heal
         view._execute_heal()
 
         # 4. Verify execute_heal called with FRESH Max HP (200)
-        self.mock_db.execute_heal.assert_called_with(
-            self.user.id, new_max_hp, fresh_stats.max_mp, cost=0
-        )
+        self.mock_db.execute_heal.assert_called_with(self.user.id, new_max_hp, fresh_stats.max_mp, cost=0)
 
         # Also ensure it wasn't called with old HP
         args, _ = self.mock_db.execute_heal.call_args
-        self.assertEqual(args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)")
+        self.assertEqual(
+            args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)"
+        )
+
 
 def run_all_tests():
     """Run the infirmary security test suite manually."""
@@ -116,6 +116,7 @@ def run_all_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -44,10 +44,7 @@ class TestDatabaseTitles(unittest.TestCase):
         result = self.db.add_title(discord_id, title)
 
         self.assertTrue(result)
-        self.mock_db.players.update_one.assert_called_with(
-            {"discord_id": discord_id},
-            {"$addToSet": {"titles": title}}
-        )
+        self.mock_db.players.update_one.assert_called_with({"discord_id": discord_id}, {"$addToSet": {"titles": title}})
 
     def test_get_titles(self):
         discord_id = 123
@@ -79,8 +76,7 @@ class TestDatabaseTitles(unittest.TestCase):
 
         self.assertTrue(result)
         self.mock_db.players.update_one.assert_called_with(
-            {"discord_id": discord_id},
-            {"$set": {"active_title": title}}
+            {"discord_id": discord_id}, {"$set": {"active_title": title}}
         )
 
     def test_set_active_title_fail_ownership(self):
@@ -102,10 +98,7 @@ class TestDatabaseTitles(unittest.TestCase):
         discord_id = 123
         result = self.db.set_active_title(discord_id, None)
         self.assertTrue(result)
-        self.mock_db.players.update_one.assert_called_with(
-            {"discord_id": discord_id},
-            {"$set": {"active_title": None}}
-        )
+        self.mock_db.players.update_one.assert_called_with({"discord_id": discord_id}, {"$set": {"active_title": None}})
 
     def test_get_active_title(self):
         discord_id = 123
@@ -114,6 +107,7 @@ class TestDatabaseTitles(unittest.TestCase):
 
         result = self.db.get_active_title(discord_id)
         self.assertEqual(result, title)
+
 
 if __name__ == "__main__":
     unittest.main()

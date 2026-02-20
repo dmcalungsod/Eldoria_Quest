@@ -14,10 +14,10 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock external dependencies for environments where they aren't installed
-sys.modules['pymongo'] = MagicMock()
-sys.modules['pymongo.errors'] = MagicMock()
-sys.modules['discord'] = MagicMock()
-sys.modules['discord.ext'] = MagicMock()
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["discord"] = MagicMock()
+sys.modules["discord.ext"] = MagicMock()
 
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
@@ -116,10 +116,10 @@ class TestGameSystems(unittest.TestCase):
         # but DamageFormula logic might be deterministic enough for basic checks
 
         # Mocking random for critical hit check
-        with patch('random.random', return_value=0.5): # No crit
-             damage, crit, _ = DamageFormula.player_attack(player_stats, monster)
-             self.assertIsInstance(damage, int)
-             self.assertFalse(crit)
+        with patch("random.random", return_value=0.5):  # No crit
+            damage, crit, _ = DamageFormula.player_attack(player_stats, monster)
+            self.assertIsInstance(damage, int)
+            self.assertFalse(crit)
 
     def test_combat_system(self):
         """Test combat engine initialization and turn execution."""
@@ -150,8 +150,8 @@ class TestGameSystems(unittest.TestCase):
         )
 
         # Mock random to ensure player hits and monster hits
-        with patch('random.random', return_value=0.5):
-             result = engine.run_combat_turn()
+        with patch("random.random", return_value=0.5):
+            result = engine.run_combat_turn()
 
         self.assertIn("phrases", result)
         self.assertIn("hp_current", result)
@@ -161,9 +161,7 @@ class TestGameSystems(unittest.TestCase):
         discord_id = 12345
         stats = PlayerStats(str_base=10)
 
-        level_system = LevelUpSystem(
-            stats=stats, level=1, exp=0, exp_to_next=100
-        )
+        level_system = LevelUpSystem(stats=stats, level=1, exp=0, exp_to_next=100)
 
         # Test adding EXP
         level_system.add_exp(50)
@@ -171,7 +169,7 @@ class TestGameSystems(unittest.TestCase):
         self.assertEqual(level_system.level, 1)
 
         # Test Level Up
-        level_system.add_exp(60) # Total 110 > 100
+        level_system.add_exp(60)  # Total 110 > 100
         self.assertGreater(level_system.level, 1)
 
     def test_adventure_mp_persistence(self):
@@ -186,23 +184,27 @@ class TestGameSystems(unittest.TestCase):
             "experience": 0,
             "exp_to_next": 100,
             "current_hp": 20,
-            "current_mp": 10, # Current MP
+            "current_mp": 10,  # Current MP
             "vestige_pool": 0,
-            "aurum": 0
+            "aurum": 0,
         }
-        stats = PlayerStats(mag_base=10) # Max MP > 10
+        stats = PlayerStats(mag_base=10)  # Max MP > 10
 
         # Mocks
         self.mock_db.get_player.return_value = player_row
         self.mock_db.get_player_stats_json.return_value = stats.to_dict()
         self.mock_db.get_active_adventure.return_value = {
-            "discord_id": discord_id, "location_id": "loc", "active": 1,
-            "logs": "[]", "loot_collected": '{"exp": 10}', "active_monster_json": None
+            "discord_id": discord_id,
+            "location_id": "loc",
+            "active": 1,
+            "logs": "[]",
+            "loot_collected": '{"exp": 10}',
+            "active_monster_json": None,
         }
         self.mock_db.get_player_field.return_value = 1
 
         # Mock Session
-        with patch('game_systems.adventure.adventure_manager.AdventureSession') as MockSession:
+        with patch("game_systems.adventure.adventure_manager.AdventureSession") as MockSession:
             session = MockSession.return_value
             session.loot = {"exp": 10}
             session.discord_id = discord_id
@@ -211,18 +213,18 @@ class TestGameSystems(unittest.TestCase):
 
             # Check preservation
             args, kwargs = self.mock_db.update_player_fields.call_args
-            self.assertEqual(kwargs['current_mp'], 10, "MP should be preserved")
+            self.assertEqual(kwargs["current_mp"], 10, "MP should be preserved")
 
             # NOW TEST LEVEL UP CASE
             # Reset Mock
             self.mock_db.update_player_fields.reset_mock()
-            session.loot = {"exp": 200} # Level up
+            session.loot = {"exp": 200}  # Level up
             player_row["experience"] = 90
 
             manager.end_adventure(discord_id)
 
             args, kwargs = self.mock_db.update_player_fields.call_args
-            self.assertEqual(kwargs['current_mp'], stats.max_mp, "MP should reset on level up")
+            self.assertEqual(kwargs["current_mp"], stats.max_mp, "MP should reset on level up")
 
 
 def run_all_tests():

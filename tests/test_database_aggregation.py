@@ -1,4 +1,3 @@
-
 import json
 import unittest
 from unittest.mock import MagicMock, patch
@@ -49,29 +48,24 @@ class TestDatabaseAggregation(unittest.TestCase):
 
         # Setup aggregate return
         # Structure: [{ ...player_fields..., stats_docs: [...], buffs: [...], player_skills: [...] }]
-        mock_agg_result = [{
-            "discord_id": discord_id,
-            "name": "Hero",
-            "current_hp": 100,
-            "current_mp": 50,
-            "stats_docs": [{"stats_json": json.dumps({"STR": 10})}],
-            "buffs": [{"name": "Might", "amount": 5}],
-            "player_skills": [{"skill_key": "fireball", "skill_level": 2}],
-            "active_session": [{"location_id": "forest"}]
-        }]
+        mock_agg_result = [
+            {
+                "discord_id": discord_id,
+                "name": "Hero",
+                "current_hp": 100,
+                "current_mp": 50,
+                "stats_docs": [{"stats_json": json.dumps({"STR": 10})}],
+                "buffs": [{"name": "Might", "amount": 5}],
+                "player_skills": [{"skill_key": "fireball", "skill_level": 2}],
+                "active_session": [{"location_id": "forest"}],
+            }
+        ]
 
         # aggregate returns a cursor, which is iterable.
         self.mock_db["players"].aggregate.return_value = mock_agg_result
 
         # Ensure skill cache is populated so we can resolve the skill
-        self.db._skill_cache = {
-            "fireball": {
-                "key_id": "fireball",
-                "name": "Fireball",
-                "type": "Active",
-                "mp_cost": 10
-            }
-        }
+        self.db._skill_cache = {"fireball": {"key_id": "fireball", "name": "Fireball", "type": "Active", "mp_cost": 10}}
 
         # Execute
         result = self.db.get_combat_context_bundle(discord_id)
@@ -87,11 +81,11 @@ class TestDatabaseAggregation(unittest.TestCase):
         print(f"active_buffs.find: {self.collections['active_buffs'].find.call_count}")
         print(f"player_skills.find: {self.collections['player_skills'].find.call_count}")
 
-        self.assertEqual(self.collections['players'].aggregate.call_count, 1, "Should use aggregation")
-        self.assertEqual(self.collections['players'].find_one.call_count, 0, "Should not use find_one on players")
-        self.assertEqual(self.collections['stats'].find_one.call_count, 0, "Should not use find_one on stats")
-        self.assertEqual(self.collections['active_buffs'].find.call_count, 0, "Should not use find on active_buffs")
-        self.assertEqual(self.collections['player_skills'].find.call_count, 0, "Should not use find on player_skills")
+        self.assertEqual(self.collections["players"].aggregate.call_count, 1, "Should use aggregation")
+        self.assertEqual(self.collections["players"].find_one.call_count, 0, "Should not use find_one on players")
+        self.assertEqual(self.collections["stats"].find_one.call_count, 0, "Should not use find_one on stats")
+        self.assertEqual(self.collections["active_buffs"].find.call_count, 0, "Should not use find on active_buffs")
+        self.assertEqual(self.collections["player_skills"].find.call_count, 0, "Should not use find on player_skills")
 
         # Check Result correctness
         self.assertIsNotNone(result)
@@ -121,28 +115,47 @@ class TestDatabaseAggregation(unittest.TestCase):
 
         # Verify Pipeline Structure (ensure _id projection prevents data leak)
         call_args = self.mock_db["players"].aggregate.call_args
-        pipeline = call_args[0][0] # first arg is pipeline list
+        pipeline = call_args[0][0]  # first arg is pipeline list
 
         # Check for stats lookup projection
-        stats_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "stats_docs")
+        stats_lookup = next(
+            stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "stats_docs"
+        )
         self.assertIn("pipeline", stats_lookup)
         stats_pipeline = stats_lookup["pipeline"]
-        self.assertTrue(any("$project" in stage and stage["$project"] == {"_id": 0} for stage in stats_pipeline), "Stats lookup should project out _id")
+        self.assertTrue(
+            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in stats_pipeline),
+            "Stats lookup should project out _id",
+        )
 
         # Check for buffs lookup projection
         buffs_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "buffs")
         buffs_pipeline = buffs_lookup["pipeline"]
-        self.assertTrue(any("$project" in stage and stage["$project"] == {"_id": 0} for stage in buffs_pipeline), "Buffs lookup should project out _id")
+        self.assertTrue(
+            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in buffs_pipeline),
+            "Buffs lookup should project out _id",
+        )
 
         # Check for player_skills lookup projection
-        skills_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "player_skills")
+        skills_lookup = next(
+            stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "player_skills"
+        )
         skills_pipeline = skills_lookup["pipeline"]
-        self.assertTrue(any("$project" in stage and stage["$project"] == {"_id": 0} for stage in skills_pipeline), "Skills lookup should project out _id")
+        self.assertTrue(
+            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in skills_pipeline),
+            "Skills lookup should project out _id",
+        )
 
         # Check for active_session lookup projection
-        session_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "active_session")
+        session_lookup = next(
+            stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "active_session"
+        )
         session_pipeline = session_lookup["pipeline"]
-        self.assertTrue(any("$project" in stage and stage["$project"] == {"_id": 0} for stage in session_pipeline), "Session lookup should project out _id")
+        self.assertTrue(
+            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in session_pipeline),
+            "Session lookup should project out _id",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

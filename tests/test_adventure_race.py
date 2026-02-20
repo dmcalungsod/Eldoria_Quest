@@ -1,4 +1,3 @@
-
 import asyncio
 import os
 import sys
@@ -16,6 +15,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 try:
     import discord
     from discord.ui import Button, View
+
     Item = discord.ui.Item
     if not isinstance(Item, type):
         raise ImportError("discord.ui.Item is not a type (likely mocked)")
@@ -31,8 +31,10 @@ except (ImportError, AttributeError):
     class View:
         def __init__(self, timeout=None):
             self.children = []
+
         def add_item(self, item):
             self.children.append(item)
+
         def clear_items(self):
             self.children.clear()
 
@@ -99,7 +101,7 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
             player_stats=mock_stats,
             vitals={"current_hp": 100, "current_mp": 100},
             active_monster=None,
-            class_id=1
+            class_id=1,
         )
 
         # Mock simulate_adventure_step to be slow
@@ -110,7 +112,7 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
                 "dead": False,
                 "vitals": {"current_hp": 100, "current_mp": 100},
                 "player_stats": None,
-                "active_monster": None
+                "active_monster": None,
             }
 
         # Patch asyncio.to_thread to run our slow simulation
@@ -124,11 +126,11 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         # we need to make sure the side_effect is thread-safe or simply use a delay.
 
         mock_manager.simulate_adventure_step.side_effect = lambda *args: {
-                "sequence": [["You step forward."]],
-                "dead": False,
-                "vitals": {"current_hp": 100, "current_mp": 100},
-                "player_stats": None,
-                "active_monster": None
+            "sequence": [["You step forward."]],
+            "dead": False,
+            "vitals": {"current_hp": 100, "current_mp": 100},
+            "player_stats": None,
+            "active_monster": None,
         }
 
         # To ensure the race condition, we need the first call to pause AFTER checking any lock (if present)
@@ -136,9 +138,11 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
 
         # We will wrap the manager method to include a delay
         original_side_effect = mock_manager.simulate_adventure_step.side_effect
+
         def delayed_side_effect(*args, **kwargs):
             import time
-            time.sleep(0.1) # Sync sleep to block the thread
+
+            time.sleep(0.1)  # Sync sleep to block the thread
             return original_side_effect(*args, **kwargs)
 
         mock_manager.simulate_adventure_step.side_effect = delayed_side_effect
@@ -161,7 +165,12 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         print(f"Call count: {mock_manager.simulate_adventure_step.call_count}")
 
         # Assertion: Should be 1
-        self.assertEqual(mock_manager.simulate_adventure_step.call_count, 1, "Simulation called more than once! Race condition detected.")
+        self.assertEqual(
+            mock_manager.simulate_adventure_step.call_count,
+            1,
+            "Simulation called more than once! Race condition detected.",
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

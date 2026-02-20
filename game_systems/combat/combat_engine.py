@@ -36,11 +36,43 @@ class CombatEngine:
     }
 
     _CLASS_SPECIALS = {
-        1: {"name": "Cleave", "damage_mult": 1.5, "emoji": "🪓", "type": "str", "log": "You swing your weapon in a massive arc!"},
-        2: {"name": "Fireball", "damage_mult": 2.0, "emoji": "🔥", "type": "mag", "log": "You unleash a torrent of arcane fire!"},
-        3: {"name": "Backstab", "damage_mult": 1.4, "emoji": "🗡️", "type": "dex", "log": "You strike from the shadows with lethal precision!"},
-        4: {"name": "Smite", "damage_mult": 1.2, "emoji": "✨", "type": "mag", "heal": 20, "log": "Holy light descends to judge your foe and mend your wounds!"},
-        5: {"name": "Aimed Shot", "damage_mult": 1.5, "emoji": "🏹", "type": "dex", "crit_bonus": 50, "log": "You take a breath and loose a perfect shot!"}
+        1: {
+            "name": "Cleave",
+            "damage_mult": 1.5,
+            "emoji": "🪓",
+            "type": "str",
+            "log": "You swing your weapon in a massive arc!",
+        },
+        2: {
+            "name": "Fireball",
+            "damage_mult": 2.0,
+            "emoji": "🔥",
+            "type": "mag",
+            "log": "You unleash a torrent of arcane fire!",
+        },
+        3: {
+            "name": "Backstab",
+            "damage_mult": 1.4,
+            "emoji": "🗡️",
+            "type": "dex",
+            "log": "You strike from the shadows with lethal precision!",
+        },
+        4: {
+            "name": "Smite",
+            "damage_mult": 1.2,
+            "emoji": "✨",
+            "type": "mag",
+            "heal": 20,
+            "log": "Holy light descends to judge your foe and mend your wounds!",
+        },
+        5: {
+            "name": "Aimed Shot",
+            "damage_mult": 1.5,
+            "emoji": "🏹",
+            "type": "dex",
+            "crit_bonus": 50,
+            "log": "You take a breath and loose a perfect shot!",
+        },
     }
 
     def __init__(
@@ -320,10 +352,10 @@ class CombatEngine:
 
         # Apply Special Effects
         if spec.get("crit_bonus"):
-             if random.randint(1, 100) <= spec["crit_bonus"]:
-                 dmg = int(dmg * 1.5)
-                 crit = True
-                 event_type = "crit"
+            if random.randint(1, 100) <= spec["crit_bonus"]:
+                dmg = int(dmg * 1.5)
+                crit = True
+                event_type = "crit"
 
         if spec.get("heal"):
             heal_amount = spec["heal"] + int(self.player.level * 2)

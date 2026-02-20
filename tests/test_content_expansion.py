@@ -1,5 +1,3 @@
-
-import json
 import unittest
 
 from game_systems.data.adventure_locations import LOCATIONS
@@ -45,7 +43,9 @@ class TestContentExpansion(unittest.TestCase):
             if "defeat" in objectives:
                 targets = objectives["defeat"]
                 for target_name in targets:
-                    self.assertIn(target_name, monster_names, f"Quest '{title}' references unknown monster '{target_name}'")
+                    self.assertIn(
+                        target_name, monster_names, f"Quest '{title}' references unknown monster '{target_name}'"
+                    )
 
     def test_quest_location_references(self):
         """Verify quests reference the correct location name."""
@@ -53,7 +53,10 @@ class TestContentExpansion(unittest.TestCase):
 
         for q in QUESTS_C_TIER:
             location = q["location"]
-            self.assertEqual(location, fen_name, f"Quest '{q['title']}' has incorrect location '{location}'. Expected '{fen_name}'")
+            self.assertEqual(
+                location, fen_name, f"Quest '{q['title']}' has incorrect location '{location}'. Expected '{fen_name}'"
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

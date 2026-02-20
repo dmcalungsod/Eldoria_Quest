@@ -134,9 +134,9 @@ for idx in range(1, 51):
     else:
         # Default skills for others
         if level >= 10:
-             skills.append(MONSTER_SKILLS["heavy_blow"])
+            skills.append(MONSTER_SKILLS["heavy_blow"])
         else:
-             skills.append(MONSTER_SKILLS["rapid_strike"])
+            skills.append(MONSTER_SKILLS["rapid_strike"])
 
     # Additional drops based on type
     if "Slime" in name:
@@ -192,7 +192,7 @@ MONSTERS["monster_101"] = {
     "xp": 550,
     "drops": [("magic_stone_medium", 80), ("luminescent_crystal", 40)],
     "skills": [MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["crystal_shard"]],
-    "description": "A lumbering construct of jagged quartz, ancient and unyielding."
+    "description": "A lumbering construct of jagged quartz, ancient and unyielding.",
 }
 
 # 102: Prism Spider (Fast)
@@ -207,7 +207,7 @@ MONSTERS["monster_102"] = {
     "xp": 500,
     "drops": [("spider_silk", 50), ("luminescent_crystal", 30)],
     "skills": [MONSTER_SKILLS["rapid_strike"], MONSTER_SKILLS["crystal_shard"]],
-    "description": "Its translucent carapace makes it hard to track in the shimmering light."
+    "description": "Its translucent carapace makes it hard to track in the shimmering light.",
 }
 
 # 103: Shard Wisp (Magic)
@@ -222,7 +222,7 @@ MONSTERS["monster_103"] = {
     "xp": 525,
     "drops": [("magic_stone_medium", 90), ("mithril_ore", 20)],
     "skills": [MONSTER_SKILLS["prism_beam"], MONSTER_SKILLS["ember"]],
-    "description": "A floating orb of condensed mana and light."
+    "description": "A floating orb of condensed mana and light.",
 }
 
 # 104: Obsidian Gargoyle (Flying/Elite)
@@ -237,7 +237,7 @@ MONSTERS["monster_104"] = {
     "xp": 2000,
     "drops": [("magic_stone_large", 50), ("mithril_ore", 40)],
     "skills": [MONSTER_SKILLS["crushing_slam"], MONSTER_SKILLS["flame_breath"]],
-    "description": "Carved from volcanic glass, it swoops down with crushing weight."
+    "description": "Carved from volcanic glass, it swoops down with crushing weight.",
 }
 
 # 105: Crystalline Guardian (Boss)
@@ -252,7 +252,7 @@ MONSTERS["monster_105"] = {
     "xp": 8000,
     "drops": [("magic_stone_flawless", 100), ("crystal_heart", 100), ("mithril_ore", 50)],
     "skills": [MONSTER_SKILLS["prism_beam"], MONSTER_SKILLS["crystal_shard"], MONSTER_SKILLS["regenerate"]],
-    "description": "The heart of the caverns, a massive entity of living light and stone."
+    "description": "The heart of the caverns, a massive entity of living light and stone.",
 }
 
 __all__ = ["MONSTERS"]

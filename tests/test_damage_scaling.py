@@ -46,7 +46,7 @@ class TestDamageScaling(unittest.TestCase):
         skill_heavy = {
             "key_id": "heavy_hit",
             "scaling_stat": "STR",
-            "scaling_factor": 5.0, # 10 * 5 = 50
+            "scaling_factor": 5.0,  # 10 * 5 = 50
             "power_multiplier": 1.0,
         }
 
@@ -79,5 +79,6 @@ class TestDamageScaling(unittest.TestCase):
         self.assertEqual(new_hp, max_hp)
         self.assertEqual(healed, 1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

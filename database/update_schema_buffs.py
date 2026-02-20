@@ -3,6 +3,7 @@ import sqlite3
 
 DATABASE_NAME = "EQ_Game.db"
 
+
 def update_schema():
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("db_update")
@@ -34,6 +35,7 @@ def update_schema():
 
     except Exception as e:
         logger.error(f"Schema update failed: {e}")
+
 
 if __name__ == "__main__":
     update_schema()

@@ -60,12 +60,16 @@ class ExplorationView(View):
             # --- COMBAT MODE ---
 
             # 1. Attack
-            attack_btn = Button(label="Attack", style=discord.ButtonStyle.danger, emoji=E.SWORDS, row=0, custom_id="attack")
+            attack_btn = Button(
+                label="Attack", style=discord.ButtonStyle.danger, emoji=E.SWORDS, row=0, custom_id="attack"
+            )
             attack_btn.callback = self.action_attack
             self.add_item(attack_btn)
 
             # 2. Defend
-            defend_btn = Button(label="Defend", style=discord.ButtonStyle.secondary, emoji=E.SHIELD, row=0, custom_id="defend")
+            defend_btn = Button(
+                label="Defend", style=discord.ButtonStyle.secondary, emoji=E.SHIELD, row=0, custom_id="defend"
+            )
             defend_btn.callback = self.action_defend
             self.add_item(defend_btn)
 
@@ -75,7 +79,9 @@ class ExplorationView(View):
             self.add_item(flee_btn)
 
             # 4. Pack (New Row)
-            inv_btn = Button(label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack")
+            inv_btn = Button(
+                label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack"
+            )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
 
@@ -90,7 +96,9 @@ class ExplorationView(View):
             }
             spec = specials.get(self.class_id, {"label": "Special", "emoji": "⚡"})
 
-            special_btn = Button(label=spec["label"], style=discord.ButtonStyle.primary, emoji=spec["emoji"], row=1, custom_id="special")
+            special_btn = Button(
+                label=spec["label"], style=discord.ButtonStyle.primary, emoji=spec["emoji"], row=1, custom_id="special"
+            )
             special_btn.callback = self.action_special
             self.add_item(special_btn)
 
@@ -111,12 +119,16 @@ class ExplorationView(View):
             self.add_item(forward_btn)
 
             # 2. Pack
-            inv_btn = Button(label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack")
+            inv_btn = Button(
+                label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack"
+            )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
 
             # 3. Return
-            leave_btn = Button(label="Return to Town", style=discord.ButtonStyle.primary, emoji="🏠", row=0, custom_id="leave")
+            leave_btn = Button(
+                label="Return to Town", style=discord.ButtonStyle.primary, emoji="🏠", row=0, custom_id="leave"
+            )
             leave_btn.callback = self.leave_callback
             self.add_item(leave_btn)
 

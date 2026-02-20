@@ -42,15 +42,11 @@ class TestCraftingExpanded(unittest.TestCase):
         # Mock inventory counts
         # "campfire_stew": {"boar_meat": 2, "medicinal_herb": 2, "magic_stone_fragment": 1}
         def get_count_side_effect(discord_id, item_key):
-            counts = {
-                "boar_meat": 5,
-                "medicinal_herb": 5,
-                "magic_stone_fragment": 5
-            }
+            counts = {"boar_meat": 5, "medicinal_herb": 5, "magic_stone_fragment": 5}
             return counts.get(item_key, 0)
 
         self.mock_db.get_inventory_item_count.side_effect = get_count_side_effect
-        self.mock_db.remove_inventory_item.return_value = True # Mock success removal
+        self.mock_db.remove_inventory_item.return_value = True  # Mock success removal
 
         # Attempt craft
         success, msg, item_data = self.crafting.craft_item(self.discord_id, recipe_id)
@@ -71,7 +67,7 @@ class TestCraftingExpanded(unittest.TestCase):
         self.mock_db.add_inventory_item.assert_called()
         args, _ = self.mock_db.add_inventory_item.call_args
         self.assertEqual(args[1], "campfire_stew")
-        self.assertEqual(args[5], 1) # Amount
+        self.assertEqual(args[5], 1)  # Amount
 
     def test_crafting_insufficient_materials(self):
         """Test failure when missing materials."""
@@ -83,9 +79,9 @@ class TestCraftingExpanded(unittest.TestCase):
         # Mock insufficient inventory
         def get_count_side_effect(discord_id, item_key):
             counts = {
-                "boar_meat": 1, # Need 2
+                "boar_meat": 1,  # Need 2
                 "medicinal_herb": 5,
-                "magic_stone_fragment": 5
+                "magic_stone_fragment": 5,
             }
             return counts.get(item_key, 0)
 
@@ -100,6 +96,7 @@ class TestCraftingExpanded(unittest.TestCase):
         self.mock_db.increment_player_fields.assert_not_called()
         self.mock_db.remove_inventory_item.assert_not_called()
         self.mock_db.add_inventory_item.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

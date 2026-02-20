@@ -57,9 +57,7 @@ class TestDatabaseManager(unittest.TestCase):
         self.mock_db.players.find_one.assert_called_with({"discord_id": 12345}, {"_id": 0})
 
     def test_create_player(self):
-        stats_data = {
-            "STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10
-        }
+        stats_data = {"STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10}
 
         # Test creation
         self.db.create_player(
@@ -70,7 +68,7 @@ class TestDatabaseManager(unittest.TestCase):
             gender="Male",
             initial_hp=100,
             initial_mp=50,
-            stats_data=stats_data
+            stats_data=stats_data,
         )
 
         # Verify calls
@@ -110,10 +108,7 @@ class TestDatabaseManager(unittest.TestCase):
         self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
 
         # Verify it updates existing item
-        self.mock_db.inventory.update_one.assert_called_with(
-            {"id": 50},
-            {"$inc": {"count": 5}}
-        )
+        self.mock_db.inventory.update_one.assert_called_with({"id": 50}, {"$inc": {"count": 5}})
 
     def test_deduct_aurum(self):
         # Mock successful deduction
@@ -123,9 +118,7 @@ class TestDatabaseManager(unittest.TestCase):
 
         self.assertEqual(new_balance, 50)
         self.mock_db.players.find_one_and_update.assert_called_with(
-            {"discord_id": 12345, "aurum": {"$gte": 100}},
-            {"$inc": {"aurum": -100}},
-            return_document=True
+            {"discord_id": 12345, "aurum": {"$gte": 100}}, {"$inc": {"aurum": -100}}, return_document=True
         )
 
         # Mock insufficient funds
@@ -143,6 +136,7 @@ def run_all_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 if __name__ == "__main__":
     unittest.main()

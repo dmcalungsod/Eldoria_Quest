@@ -19,16 +19,16 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
+import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
 import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
-import test_adventure_embeds  # New Embed test
 import test_game_systems
 import test_quest_security  # New security test
-import test_security  # General security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
+import test_security  # General security test
 import test_tournament_system  # New Tournament System tests
 
 
@@ -40,12 +40,13 @@ def check_mongodb_connection():
 
     try:
         client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)
-        client.admin.command('ping')
+        client.admin.command("ping")
         print("✓ MongoDB connection established.")
         return True
     except (ConnectionFailure, ServerSelectionTimeoutError):
         print("⚠ MongoDB connection failed. Skipping integration tests.")
         return False
+
 
 def run_quest_security_tests():
     """Runs the quest security tests (mock-based, no DB needed)."""
@@ -58,6 +59,7 @@ def run_quest_security_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+
 def run_general_security_tests():
     """Runs the general security tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -69,6 +71,7 @@ def run_general_security_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+
 def run_scavenge_tests():
     """Runs the scavenge & surge tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -79,6 +82,7 @@ def run_scavenge_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 def run_crafting_tests():
     """Runs the crafting system tests (mock-based, no DB needed)."""
@@ -95,6 +99,7 @@ def run_crafting_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+
 def run_ux_tests():
     """Runs the UX tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -107,6 +112,7 @@ def run_ux_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+
 def run_race_tests():
     """Runs the race condition tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -117,6 +123,7 @@ def run_race_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 def run_combat_action_tests():
     """Runs the combat action tests (mock-based, no DB needed)."""
@@ -129,6 +136,7 @@ def run_combat_action_tests():
     result = runner.run(suite)
     return result.wasSuccessful()
 
+
 def run_tournament_tests():
     """Runs the tournament system tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -139,6 +147,7 @@ def run_tournament_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 def main():
     """Run all test suites."""

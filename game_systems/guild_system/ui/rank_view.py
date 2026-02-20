@@ -165,6 +165,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             class_id = player_data["class_id"] if player_data else 1
 
             import json
+
             active_monster = None
             if session_row and session_row["active_monster_json"]:
                 active_monster = json.loads(session_row["active_monster_json"])

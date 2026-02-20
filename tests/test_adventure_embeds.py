@@ -52,7 +52,7 @@ class TestAdventureEmbeds(unittest.TestCase):
             log=self.log,
             player_stats=self.stats,
             vitals=self.vitals,
-            active_monster=None  # No monster
+            active_monster=None,  # No monster
         )
 
         # Verify footer text
@@ -68,12 +68,13 @@ class TestAdventureEmbeds(unittest.TestCase):
             log=self.log,
             player_stats=self.stats,
             vitals=self.vitals,
-            active_monster=monster  # Active monster
+            active_monster=monster,  # Active monster
         )
 
         # Verify footer text changes to combat instructions
         expected_footer = "Choose your combat action • Field Pack to use items"
         embed.set_footer.assert_called_with(text=expected_footer)
+
 
 if __name__ == "__main__":
     unittest.main()

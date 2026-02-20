@@ -1,4 +1,3 @@
-
 import sys
 from unittest.mock import MagicMock
 
@@ -26,17 +25,31 @@ class TestDayNightCycle(unittest.TestCase):
             "name": "Test Forest",
             "monsters": [("monster_001", 100)],
             "night_monsters": [("monster_003", 100)],
-            "conditional_monsters": []
+            "conditional_monsters": [],
         }
 
         self.original_monsters = MONSTERS.copy()
         MONSTERS["monster_001"] = {
-            "name": "Day Slime", "level": 1, "tier": "Normal", "hp": 10,
-            "atk": 1, "def": 1, "xp": 10, "drops": [], "skills": []
+            "name": "Day Slime",
+            "level": 1,
+            "tier": "Normal",
+            "hp": 10,
+            "atk": 1,
+            "def": 1,
+            "xp": 10,
+            "drops": [],
+            "skills": [],
         }
         MONSTERS["monster_003"] = {
-            "name": "Night Goblin", "level": 2, "tier": "Normal", "hp": 20,
-            "atk": 2, "def": 1, "xp": 20, "drops": [], "skills": []
+            "name": "Night Goblin",
+            "level": 2,
+            "tier": "Normal",
+            "hp": 20,
+            "atk": 2,
+            "def": 1,
+            "xp": 20,
+            "drops": [],
+            "skills": [],
         }
 
     def tearDown(self):
@@ -45,7 +58,7 @@ class TestDayNightCycle(unittest.TestCase):
 
     def test_day_encounter(self):
         # Patch the entire datetime module as imported in combat_handler
-        with patch('game_systems.adventure.combat_handler.datetime') as mock_datetime_module:
+        with patch("game_systems.adventure.combat_handler.datetime") as mock_datetime_module:
             # Setup the mock structure
             mock_dt_class = MagicMock()
             mock_datetime_module.datetime = mock_dt_class
@@ -63,7 +76,7 @@ class TestDayNightCycle(unittest.TestCase):
             self.assertNotIn("Nightfall", phrase)
 
     def test_night_encounter(self):
-        with patch('game_systems.adventure.combat_handler.datetime') as mock_datetime_module:
+        with patch("game_systems.adventure.combat_handler.datetime") as mock_datetime_module:
             mock_dt_class = MagicMock()
             mock_datetime_module.datetime = mock_dt_class
 
@@ -79,13 +92,9 @@ class TestDayNightCycle(unittest.TestCase):
             self.assertIn("Nightfall", phrase)
 
     def test_night_encounter_fallback(self):
-        location_no_night = {
-            "name": "Sunny Plains",
-            "monsters": [("monster_001", 100)],
-            "conditional_monsters": []
-        }
+        location_no_night = {"name": "Sunny Plains", "monsters": [("monster_001", 100)], "conditional_monsters": []}
 
-        with patch('game_systems.adventure.combat_handler.datetime') as mock_datetime_module:
+        with patch("game_systems.adventure.combat_handler.datetime") as mock_datetime_module:
             mock_dt_class = MagicMock()
             mock_datetime_module.datetime = mock_dt_class
 
@@ -100,5 +109,6 @@ class TestDayNightCycle(unittest.TestCase):
 
             self.assertIn("Nightfall", phrase)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

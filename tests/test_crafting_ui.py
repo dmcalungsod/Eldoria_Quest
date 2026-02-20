@@ -31,13 +31,16 @@ if "discord.ui" in sys.modules:
 
 sys.modules["discord"] = mock_discord
 
+
 # Mock UI Components
 class MockView:
     def __init__(self, timeout=None):
         self.children = []
         self.timeout = timeout
+
     def add_item(self, item):
         self.children.append(item)
+
 
 class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
@@ -52,8 +55,11 @@ class MockButton(RealItem):
     def _is_v2(self):
         return False
 
+
 class MockSelect:
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, disabled=False, row=None, custom_id=None):
+    def __init__(
+        self, placeholder=None, min_values=1, max_values=1, options=None, disabled=False, row=None, custom_id=None
+    ):
         self.placeholder = placeholder
         self.options = options or []
         self.disabled = disabled
@@ -62,6 +68,7 @@ class MockSelect:
 
     def add_option(self, label, value, description=None, emoji=None):
         self.options.append({"label": label, "value": value, "description": description, "emoji": emoji})
+
 
 mock_ui = MagicMock()
 mock_ui.View = MockView
@@ -87,18 +94,8 @@ class TestCraftingUI(unittest.TestCase):
 
         # Mock recipes
         self.recipes = {
-            "potion_1": {
-                "name": "Health Potion",
-                "cost": 10,
-                "type": "consumable",
-                "materials": {"herb": 1}
-            },
-            "sword_1": {
-                "name": "Iron Sword",
-                "cost": 50,
-                "type": "equipment",
-                "materials": {"iron": 2}
-            }
+            "potion_1": {"name": "Health Potion", "cost": 10, "type": "consumable", "materials": {"herb": 1}},
+            "sword_1": {"name": "Iron Sword", "cost": 50, "type": "equipment", "materials": {"iron": 2}},
         }
 
         # We need to make sure the instance returns these recipes
@@ -120,10 +117,10 @@ class TestCraftingUI(unittest.TestCase):
         btn_equip = view.children[1]
 
         self.assertEqual(btn_cons.label, "Consumables")
-        self.assertEqual(btn_cons.style, "primary") # Active
+        self.assertEqual(btn_cons.style, "primary")  # Active
 
         self.assertEqual(btn_equip.label, "Equipment")
-        self.assertEqual(btn_equip.style, "secondary") # Inactive
+        self.assertEqual(btn_equip.style, "secondary")  # Inactive
 
         # Check Select Menu (Row 1)
         select = view.children[2]
@@ -146,7 +143,7 @@ class TestCraftingUI(unittest.TestCase):
         btn_equip = view.children[1]
 
         self.assertEqual(btn_cons.style, "secondary")
-        self.assertEqual(btn_equip.style, "primary") # Active
+        self.assertEqual(btn_equip.style, "primary")  # Active
 
         # Check Select Menu
         select = view.children[2]
@@ -156,6 +153,7 @@ class TestCraftingUI(unittest.TestCase):
         labels = [opt["label"] for opt in select.options]
         self.assertTrue(any("Iron Sword" in lbl for lbl in labels))
         self.assertFalse(any("Health Potion" in lbl for lbl in labels))
+
 
 if __name__ == "__main__":
     unittest.main()

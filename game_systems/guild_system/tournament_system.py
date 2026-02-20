@@ -8,7 +8,6 @@ Handles starting events, tracking scores, and distributing rewards.
 import datetime
 import logging
 import random
-from typing import Optional, Tuple
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
@@ -129,7 +128,7 @@ class TournamentSystem:
         # Update Score
         self.db.update_tournament_score(discord_id, active["id"], value)
 
-    def get_leaderboard(self) -> Tuple[Optional[dict], list]:
+    def get_leaderboard(self) -> tuple[dict | None, list]:
         """
         Returns (active_tournament_info, leaderboard_list).
         Leaderboard list contains dicts with {name, score, rank}.

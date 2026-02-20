@@ -238,7 +238,7 @@ class CombatPhrases:
                 "The {name}'s blade sinks deep into your side! `{dmg}` damage! **(CRITICAL!)**",
                 "A vicious strike to your ribs leaves you gasping! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} exploits your stumble with a brutal shank! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Slime": (
             [
@@ -252,7 +252,7 @@ class CombatPhrases:
                 "The {name} envelops you, its acid dissolving your armor! `{dmg}` damage! **(CRITICAL!)**",
                 "A massive surge of sludge crushes the breath from you! `{dmg}` damage! **(CRITICAL!)**",
                 "You are trapped in the {name}'s corrosive grip! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Wolf": (
             [
@@ -266,7 +266,7 @@ class CombatPhrases:
                 "The {name}'s jaws lock onto your limb, tearing flesh! `{dmg}` damage! **(CRITICAL!)**",
                 "Claws shred through your defenses, leaving deep gouges! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} goes for the throat—you barely deflect it! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Hound": (
             [
@@ -280,7 +280,7 @@ class CombatPhrases:
                 "The {name}'s jaws lock onto your limb, tearing flesh! `{dmg}` damage! **(CRITICAL!)**",
                 "Claws shred through your defenses, leaving deep gouges! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} goes for the throat—you barely deflect it! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Spider": (
             [
@@ -294,7 +294,7 @@ class CombatPhrases:
                 "Venom floods your veins as the {name} lands a deep bite! `{dmg}` damage! **(CRITICAL!)**",
                 "A chitinous leg impales you, pinning you momentarily! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} strikes a nerve cluster—agony blinds you! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Boar": (
             [
@@ -308,7 +308,7 @@ class CombatPhrases:
                 "The {name} tramples you, crushing ribs under its weight! `{dmg}` damage! **(CRITICAL!)**",
                 "A tusk pierces deep, lifting you off your feet! `{dmg}` damage! **(CRITICAL!)**",
                 "The impact of the charge shatters your guard! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Bear": (
             [
@@ -320,7 +320,7 @@ class CombatPhrases:
             [
                 "The {name} crushes you in a bear hug, snapping bone! `{dmg}` damage! **(CRITICAL!)**",
                 "Massive claws tear through armor and flesh alike! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         "Treant": (
             [
@@ -334,11 +334,13 @@ class CombatPhrases:
                 "A root constricts your chest, cracking ribs! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} brings a massive trunk down, flattening you! `{dmg}` damage! **(CRITICAL!)**",
                 "Thorns tear deep into muscle, leaving you bleeding! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         # Mapped types for Treant-like
-        "Ent": "Treant", "Vineling": "Treant", "Bramble": "Treant", "Sporeling": "Treant",
-
+        "Ent": "Treant",
+        "Vineling": "Treant",
+        "Bramble": "Treant",
+        "Sporeling": "Treant",
         "Wisp": (
             [
                 "A cold touch drains your vitality— `{dmg}` damage.",
@@ -351,11 +353,15 @@ class CombatPhrases:
                 "The {name} passes straight through your heart—liquid ice fills your veins! `{dmg}` damage! **(CRITICAL!)**",
                 "Soul-flaying cold wracks your body! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} feeds directly on your life force! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         # Mapped types for Wisp-like
-        "Shade": "Wisp", "Revenant": "Wisp", "Wight": "Wisp", "Stormling": "Wisp", "Duskling": "Wisp", "Sprite": "Wisp",
-
+        "Shade": "Wisp",
+        "Revenant": "Wisp",
+        "Wight": "Wisp",
+        "Stormling": "Wisp",
+        "Duskling": "Wisp",
+        "Sprite": "Wisp",
         "Crawler": (
             [
                 "The {name} pinches you with serrated limbs for `{dmg}` damage!",
@@ -368,11 +374,11 @@ class CombatPhrases:
                 "The {name} burrows its mandibles into your flesh! `{dmg}` damage! **(CRITICAL!)**",
                 "Serrated limbs saw through your armor! `{dmg}` damage! **(CRITICAL!)**",
                 "Venom and acid overwhelm your senses! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         # Mapped types
-        "Urch": "Crawler", "Lurker": "Crawler",
-
+        "Urch": "Crawler",
+        "Lurker": "Crawler",
         "Undead": (
             [
                 "A rotting fist slams into you for `{dmg}` damage!",
@@ -385,10 +391,11 @@ class CombatPhrases:
                 "The {name}'s rusty blade finds a gap, infecting the wound! `{dmg}` damage! **(CRITICAL!)**",
                 "Unnatural strength shatters your block! `{dmg}` damage! **(CRITICAL!)**",
                 "The {name} tears a chunk of flesh away! `{dmg}` damage! **(CRITICAL!)**",
-            ]
+            ],
         ),
         # Mapped types
-        "Skeleton": "Undead", "Zombie": "Undead",
+        "Skeleton": "Undead",
+        "Zombie": "Undead",
     }
 
     GENERIC_ATTACK = (
@@ -403,7 +410,7 @@ class CombatPhrases:
             "A devastating blow sends you flying! `{dmg}` damage! **(CRITICAL!)**",
             "The {name} hits you with overwhelming force! `{dmg}` damage! **(CRITICAL!)**",
             "You are crushed under the {name}'s assault! `{dmg}` damage! **(CRITICAL!)**",
-        ]
+        ],
     )
 
     @staticmethod
@@ -421,9 +428,7 @@ class CombatPhrases:
         return f"**{random.choice(phrase_list).format(name=name)}**"
 
     @staticmethod
-    def player_attack(
-        player, monster: dict, damage: int, is_crit: bool, player_class_id: int
-    ) -> str:
+    def player_attack(player, monster: dict, damage: int, is_crit: bool, player_class_id: int) -> str:
         m_name = str(monster.get("name", "the enemy"))
 
         # Helper to format damage

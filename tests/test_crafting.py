@@ -28,6 +28,7 @@ class TestDatabaseEnhancements(unittest.TestCase):
         # Bridge collection access
         def get_collection(name):
             return getattr(self.mock_db, name)
+
         self.mock_db.__getitem__.side_effect = get_collection
 
         patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
@@ -50,10 +51,7 @@ class TestDatabaseEnhancements(unittest.TestCase):
         self.mock_db.inventory.aggregate.return_value = [{"total": 10}]
 
         # Mock stacks: 2 stacks of 5
-        self.mock_db.inventory.find.return_value.sort.return_value = [
-            {"id": 1, "count": 5},
-            {"id": 2, "count": 5}
-        ]
+        self.mock_db.inventory.find.return_value.sort.return_value = [{"id": 1, "count": 5}, {"id": 2, "count": 5}]
 
         # Remove 7
         success = self.db.remove_inventory_item(12345, "herb", 7)
@@ -99,6 +97,7 @@ class TestCraftingSystem(unittest.TestCase):
         self.db.increment_player_fields.assert_called()
         self.db.remove_inventory_item.assert_called()
         self.db.add_inventory_item.assert_called()
+
 
 if __name__ == "__main__":
     unittest.main()

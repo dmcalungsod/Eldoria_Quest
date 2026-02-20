@@ -23,9 +23,7 @@ class TestStatDuplication(unittest.TestCase):
 
         # 2. Setup equipped item (+5 STR)
         # Mock get_equipped_items to return one item
-        self.mock_db.get_equipped_items.return_value = [
-            {"item_key": "101", "item_source_table": "equipment"}
-        ]
+        self.mock_db.get_equipped_items.return_value = [{"item_key": "101", "item_source_table": "equipment"}]
 
         # Mock item data lookup
         # item_source_table is 'equipment', so it calls _col('equipment').find_one
@@ -37,13 +35,13 @@ class TestStatDuplication(unittest.TestCase):
         }
         self.mock_db._col.return_value = mock_collection
 
-        self.mock_db.get_player_field.return_value = 1 # class_id
+        self.mock_db.get_player_field.return_value = 1  # class_id
 
         # 3. First Recalculation
         stats1 = self.equipment_manager.recalculate_player_stats(123)
 
         # Verify first calculation is correct
-        self.assertEqual(stats1.strength, 15) # 10 base + 5 bonus
+        self.assertEqual(stats1.strength, 15)  # 10 base + 5 bonus
         self.assertEqual(stats1._stats["STR"].bonus, 5)
 
         # 4. Simulate saving the state
@@ -59,6 +57,7 @@ class TestStatDuplication(unittest.TestCase):
         # With the fix, bonuses should be reset before adding item bonuses again.
         self.assertEqual(stats2.strength, 15, "Strength should remain 15 (10+5).")
         self.assertEqual(stats2._stats["STR"].bonus, 5, "Bonus should remain 5.")
+
 
 if __name__ == "__main__":
     unittest.main()
