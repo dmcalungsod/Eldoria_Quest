@@ -21,8 +21,8 @@ sys.modules["cogs.ui_helpers"].make_progress_bar = MagicMock(return_value="[||||
 sys.modules["cogs.ui_helpers"].get_health_status_emoji = MagicMock(return_value="💚")
 
 # 2. Add path and Import
+import importlib  # noqa: E402
 import os  # noqa: E402
-import importlib
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -31,6 +31,7 @@ if "game_systems.adventure.ui.adventure_embeds" in sys.modules:
     del sys.modules["game_systems.adventure.ui.adventure_embeds"]
 
 import game_systems.adventure.ui.adventure_embeds  # noqa: E402
+
 importlib.reload(game_systems.adventure.ui.adventure_embeds)
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
