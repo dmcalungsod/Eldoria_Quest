@@ -49,6 +49,7 @@ class AdventureSession:
         if row_data:
             self.location_id = row_data["location_id"]
             self.active = bool(row_data["active"])
+            self.version = row_data.get("version", 1)
 
             # Safe JSON Load
             try:
@@ -73,6 +74,7 @@ class AdventureSession:
             self.loot = {}
             self.logs = []
             self.location_id = None
+            self.version = 1
 
     def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
         """Helper to build the standardized result dictionary."""
@@ -459,12 +461,18 @@ class AdventureSession:
         trimmed_logs = self.logs[-30:]
 
         try:
-            self.db.update_adventure_session(
+            success = self.db.update_adventure_session(
                 self.discord_id,
                 logs=json.dumps(trimmed_logs),
                 loot_collected=json.dumps(self.loot),
                 active=1 if self.active else 0,
                 active_monster_json=m_json,
+                previous_version=self.version,
             )
+            if not success:
+                raise RuntimeError("Adventure session state conflict (optimistic lock failed).")
+            self.version += 1
+
         except Exception as e:
             logger.error(f"[AdventureSession] Failed to save state for {self.discord_id}: {e}")
+            raise e  # Re-raise so simulate_step handles it as a System Error
