@@ -73,6 +73,30 @@ MONSTER_SKILLS = {
         "type": "physical",
         "desc_key": "poison",
     },
+    "ice_shard": {
+        "key_id": "ice_shard",
+        "name": "Ice Shard",
+        "power": 1.4,
+        "mp_cost": 6,
+        "type": "physical",
+        "desc_key": "special_hit",
+    },
+    "frost_breath": {
+        "key_id": "frost_breath",
+        "name": "Frost Breath",
+        "power": 1.6,
+        "mp_cost": 10,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "glacial_roar": {
+        "key_id": "glacial_roar",
+        "name": "Glacial Roar",
+        "power": 1.8,
+        "mp_cost": 12,
+        "type": "magical",
+        "desc_key": "magic",
+    },
     # Healing
     "mend": {
         "key_id": "mend",

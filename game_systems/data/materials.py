@@ -174,4 +174,29 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1100,
     },
+    # --- Frostfall Expanse Materials ---
+    "frost_crystal": {
+        "name": "Frost Crystal",
+        "description": "A shard of ice that never melts.",
+        "rarity": "Uncommon",
+        "value": 45,
+    },
+    "winter_wolf_pelt": {
+        "name": "Winter Wolf Pelt",
+        "description": "Thick white fur, warm enough to survive the tundra.",
+        "rarity": "Common",
+        "value": 25,
+    },
+    "ice_core": {
+        "name": "Ice Core",
+        "description": "The frozen heart of an ice construct.",
+        "rarity": "Rare",
+        "value": 180,
+    },
+    "frozen_scale": {
+        "name": "Frozen Scale",
+        "description": "A scale radiating intense cold.",
+        "rarity": "Epic",
+        "value": 950,
+    },
 }

@@ -164,6 +164,32 @@ LOCATIONS = {
             ("magic_stone_large", 10),
         ],
     },
+    "frostfall_expanse": {
+        "name": "The Frostfall Expanse",
+        "emoji": "❄️",
+        "min_rank": "A",
+        "level_req": 25,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_111", 30),  # Frost Wolf
+            ("monster_112", 25),  # Ice Golem
+            ("monster_113", 30),  # Chill Wisp
+            ("monster_114", 15),  # Glacial Drake
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_115",  # Cryon
+                "weight": 5,
+                "min_level": 29,
+            }
+        ],
+        "description": "A frozen wasteland where the wind cuts like a knife and only the strong survive.",
+        "gatherables": [
+            ("frost_crystal", 40),
+            ("winter_wolf_pelt", 30),
+            ("magic_stone_medium", 30),
+        ],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",

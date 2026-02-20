@@ -925,5 +925,98 @@
       "aurum": 2500,
       "item": "Magic Stone (Flawless)"
     }
+  },
+  {
+    "id": 51,
+    "title": "Wolf Pack Thinning",
+    "tier": "A",
+    "quest_giver": "Hunter Yorin",
+    "location": "Frostfall Border",
+    "summary": "Frost Wolves are encroaching on trade routes.",
+    "description": "The Frost Wolves have grown too numerous and are hunting near the main road. Yorin needs their numbers thinned to ensure safe passage for supply caravans.",
+    "objectives": {
+      "defeat": {
+        "Frost Wolf": 6
+      }
+    },
+    "rewards": {
+      "exp": 4500,
+      "aurum": 1400,
+      "item": "Winter Wolf Pelt"
+    }
+  },
+  {
+    "id": 52,
+    "title": "Core Collection",
+    "tier": "A",
+    "quest_giver": "Artificer Jolen",
+    "location": "Frostfall Expanse",
+    "summary": "Collect Ice Cores for research.",
+    "description": "Jolen believes Ice Cores can be used to create powerful cooling enchantments. He needs fresh samples from the constructs of the expanse.",
+    "objectives": {
+      "collect": {
+        "Ice Core": 3
+      }
+    },
+    "rewards": {
+      "exp": 4800,
+      "aurum": 1600
+    }
+  },
+  {
+    "id": 53,
+    "title": "Frozen Constructs",
+    "tier": "A",
+    "quest_giver": "Captain Rhea",
+    "location": "Glacial Valley",
+    "summary": "Ice Golems block the pass.",
+    "description": "A group of Ice Golems has blocked the only pass through the Glacial Valley. Rhea needs a heavy hitter to smash through their ranks.",
+    "objectives": {
+      "defeat": {
+        "Ice Golem": 4
+      }
+    },
+    "rewards": {
+      "exp": 5000,
+      "aurum": 1800
+    }
+  },
+  {
+    "id": 54,
+    "title": "Drake Danger",
+    "tier": "A",
+    "quest_giver": "Scout Valen",
+    "location": "Drake's Peak",
+    "summary": "Glacial Drakes are terrorizing the skies.",
+    "description": "Glacial Drakes are diving from the peaks, freezing scouts before they can report back. Valen needs someone to ground these beasts.",
+    "objectives": {
+      "defeat": {
+        "Glacial Drake": 3
+      }
+    },
+    "rewards": {
+      "exp": 5500,
+      "aurum": 2000,
+      "item": "Frozen Scale"
+    }
+  },
+  {
+    "id": 55,
+    "title": "The Frozen King",
+    "tier": "A",
+    "quest_giver": "Guildmaster Kael",
+    "location": "Cryon's Throne",
+    "summary": "Cryon threatens to freeze the world.",
+    "description": "Cryon, the Frozen King, stirs from his slumber. If he is not stopped, he will bring an eternal winter to Eldoria. End his reign.",
+    "objectives": {
+      "defeat": {
+        "Cryon, the Frozen King": 1
+      }
+    },
+    "rewards": {
+      "exp": 8000,
+      "aurum": 3000,
+      "item": "Magic Stone (Flawless)"
+    }
   }
 ]
