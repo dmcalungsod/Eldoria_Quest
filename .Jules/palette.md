@@ -23,3 +23,7 @@
 ## 2025-05-23 - [Context-Aware Button States]
 **Learning:** In turn-based interfaces where mistakes are costly (like death), changing button style (Green -> Red) based on critical status (Low HP) provides vital, non-textual warnings.
 **Action:** Use `discord.ButtonStyle.danger` to signal "Caution" on primary actions when user vitals are critical (<30%), preventing accidental progression into danger.
+
+## 2025-06-05 - [Context-Aware Instructions]
+**Learning:** When UI components change state (e.g., Exploration -> Combat), static instructions (like "Press Forward") that reference unavailable buttons create confusion and break trust in the UI.
+**Action:** Ensure instructional text (especially footers) dynamically updates to reflect only the currently valid actions, guiding the user accurately.
