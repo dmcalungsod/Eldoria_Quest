@@ -30,9 +30,16 @@ class QuestSystem:
             taken = self.db.get_player_quest_ids(discord_id)
             taken_ids = set(taken)
 
+            # Allow quests from current rank and all lower ranks to prevent progression lock
+            rank_order = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"]
+            if rank in rank_order:
+                allowed_tiers = rank_order[: rank_order.index(rank) + 1]
+            else:
+                allowed_tiers = [rank]
+
             quests = list(
                 self.db._col("quests").find(
-                    {"tier": rank},
+                    {"tier": {"$in": allowed_tiers}},
                     {"_id": 0, "id": 1, "title": 1, "tier": 1, "summary": 1},
                 )
             )
@@ -116,7 +123,17 @@ class QuestSystem:
 
             # --- SECURITY CHECK ---
             player_rank = self.db.get_guild_member_field(discord_id, "rank")
-            if quest.get("tier") != player_rank:
+            rank_order = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"]
+
+            allowed = False
+            if player_rank in rank_order:
+                allowed_tiers = rank_order[: rank_order.index(player_rank) + 1]
+                if quest.get("tier") in allowed_tiers:
+                    allowed = True
+            elif quest.get("tier") == player_rank:
+                allowed = True
+
+            if not allowed:
                 logger.warning(
                     f"Security: User {discord_id} (Rank {player_rank}) tried to accept Quest {quest_id} (Rank {quest.get('tier')})"
                 )
