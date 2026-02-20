@@ -54,9 +54,9 @@ class LevelUpSystem:
         self.level += 1
 
         # Increase EXP requirement using quadratic formula
-        # Formula: R_L = 1000 * L^2 - 500 * L + 500
+        # Formula: R_L = 200 * L^2 + 800 * L (Smoothed Curve)
         new_level = self.level
-        self.exp_to_next = int(1000 * (new_level**2) - 500 * new_level + 500)
+        self.exp_to_next = int(200 * (new_level**2) + 800 * new_level)
 
     def to_dict(self) -> dict:
         return {
