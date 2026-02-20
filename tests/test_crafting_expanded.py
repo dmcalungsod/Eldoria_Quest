@@ -13,6 +13,7 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.crafting.crafting_system import CraftingSystem
+from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.recipes import RECIPES
 
 
@@ -30,6 +31,14 @@ class TestCraftingExpanded(unittest.TestCase):
         self.assertIn("campfire_stew", RECIPES)
         self.assertIn("smoke_pellet", RECIPES)
         self.assertIn("regen_potion", RECIPES)
+
+    def test_molten_recipes_exist(self):
+        """Verify Molten Gear recipes are loaded."""
+        self.assertIn("craft_molten_blade", EQUIPMENT_RECIPES)
+        self.assertIn("craft_obsidian_dagger", EQUIPMENT_RECIPES)
+        self.assertIn("craft_magma_robes", EQUIPMENT_RECIPES)
+        self.assertIn("craft_drake_mail", EQUIPMENT_RECIPES)
+        self.assertIn("craft_heart_volcano", EQUIPMENT_RECIPES)
 
     def test_crafting_campfire_stew_success(self):
         """Test crafting 'campfire_stew' with sufficient materials."""

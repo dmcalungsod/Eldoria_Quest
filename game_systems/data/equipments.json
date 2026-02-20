@@ -276,5 +276,60 @@
             "MAG": 15
         },
         "description": "Hums with the echo of a forgotten god."
+    },
+    "gen_sword_molten": {
+        "name": "Molten Greatsword",
+        "slot": "greatsword",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "STR": 25,
+            "DEX": 10
+        },
+        "description": "A heavy blade that glows with the heat of the caldera."
+    },
+    "gen_dagger_molten": {
+        "name": "Obsidian Dagger",
+        "slot": "dagger",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "DEX": 28,
+            "AGI": 8
+        },
+        "description": "A jagged dagger carved from volcanic glass. Exceptionally sharp."
+    },
+    "gen_robe_molten": {
+        "name": "Magma-Infused Robes",
+        "slot": "robe",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "MAG": 30,
+            "END": 10
+        },
+        "description": "Robes woven with fire essence, warm to the touch."
+    },
+    "gen_heavyarmor_molten": {
+        "name": "Drake Scale Mail",
+        "slot": "heavy_armor",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "END": 35,
+            "STR": 10
+        },
+        "description": "Armor crafted from the heat-resistant scales of a Lava Drake."
+    },
+    "gen_accessory_molten": {
+        "name": "Heart of the Volcano",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 25,
+        "stats_bonus": {
+            "LCK": 25,
+            "MAG": 15
+        },
+        "description": "A pulsating magma core set in gold. It beats in time with your heart."
     }
 }
