@@ -295,10 +295,14 @@ class CombatEngine:
                 turn_report["player_crit"] = 1
 
             # Tag basic attack
-            if self.player_class_id in [1, 4]: turn_report["str_hits"] = 1
-            elif self.player_class_id in [3, 5]: turn_report["dex_hits"] = 1
-            elif self.player_class_id == 2: turn_report["mag_hits"] = 1
-            else: turn_report["str_hits"] = 1
+            if self.player_class_id in [1, 4]:
+                turn_report["str_hits"] = 1
+            elif self.player_class_id in [3, 5]:
+                turn_report["dex_hits"] = 1
+            elif self.player_class_id == 2:
+                turn_report["mag_hits"] = 1
+            else:
+                turn_report["str_hits"] = 1
 
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
