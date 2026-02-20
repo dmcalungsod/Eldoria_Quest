@@ -1018,5 +1018,99 @@
       "aurum": 3000,
       "item": "Magic Stone (Flawless)"
     }
+  },
+  {
+    "id": 56,
+    "title": "Tide of Stone",
+    "tier": "C",
+    "quest_giver": "Marine Biologist Liora",
+    "location": "The Sunken Grotto",
+    "summary": "Coral Golems are blocking underwater passages.",
+    "description": "The Sunken Grotto's natural pathways are being sealed off by migrating Coral Golems. Liora needs them cleared to access the deeper reefs where rare specimens thrive.",
+    "objectives": {
+      "defeat": {
+        "Coral Golem": 5
+      }
+    },
+    "rewards": {
+      "exp": 1300,
+      "aurum": 420,
+      "item": "Glade Salve Vial"
+    }
+  },
+  {
+    "id": 57,
+    "title": "Lurkers in the Deep",
+    "tier": "C",
+    "quest_giver": "Marine Biologist Liora",
+    "location": "The Sunken Grotto",
+    "summary": "Abyssal Eels are attacking research probes.",
+    "description": "Liora's magical probes, sent to monitor water quality, are being snapped up by Abyssal Eels. Thin their numbers so the research can continue.",
+    "objectives": {
+      "defeat": {
+        "Abyssal Eel": 5
+      }
+    },
+    "rewards": {
+      "exp": 1250,
+      "aurum": 400
+    }
+  },
+  {
+    "id": 58,
+    "title": "Siren's Call",
+    "tier": "C",
+    "quest_giver": "Historian Arin",
+    "location": "The Sunken Grotto",
+    "summary": "Tide Sirens are luring sailors to their doom.",
+    "description": "Old shanties speak of the Tide Sirens' song. Arin has found evidence that these songs are actually a form of corrupted magic that needs to be silenced.",
+    "objectives": {
+      "defeat": {
+        "Tide Siren": 5
+      }
+    },
+    "rewards": {
+      "exp": 1350,
+      "aurum": 450,
+      "item": "Lunaris Tonic"
+    }
+  },
+  {
+    "id": 59,
+    "title": "Crushing Depths",
+    "tier": "C",
+    "quest_giver": "Blacksmith Gorn",
+    "location": "The Sunken Grotto",
+    "summary": "Deep Crawler shells are needed for armor plating.",
+    "description": "The pressure in the Grotto makes Deep Crawler shells incredibly dense. Gorn wants to test if they can be forged into superior plate armor.",
+    "objectives": {
+      "defeat": {
+        "Deep Crawler": 3
+      }
+    },
+    "rewards": {
+      "exp": 1400,
+      "aurum": 500,
+      "item": "Wardkeeper's Vial"
+    }
+  },
+  {
+    "id": 60,
+    "title": "The Leviathan's Wake",
+    "tier": "C",
+    "quest_giver": "Guildmaster Kael",
+    "location": "The Sunken Grotto",
+    "summary": "The Leviathan has surfaced.",
+    "description": "The apex predator of the Grotto, the Leviathan, has grown too bold. Its thrashing causes tidal waves that threaten the coast. It must be put down.",
+    "objectives": {
+      "defeat": {
+        "Leviathan": 1
+      }
+    },
+    "rewards": {
+      "exp": 3000,
+      "aurum": 1500,
+      "item": "Magic Stone (Large)"
+    }
   }
 ]
