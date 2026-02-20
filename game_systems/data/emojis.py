@@ -21,6 +21,7 @@ LOCKED = "🔒"
 ERROR = "❌"
 MEDAL = "🏅"
 CHECK = "✅"
+SUCCESS = CHECK
 WARNING = "⚠️"
 BACKPACK = "🎒"
 SCROLL = "📜"

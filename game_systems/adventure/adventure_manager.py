@@ -13,6 +13,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import COMBAT
 from game_systems.data.materials import MATERIALS
+from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
@@ -29,6 +30,7 @@ class AdventureManager:
         self.bot = bot
         self.inventory_manager = InventoryManager(self.db)
         self.quest_system = QuestSystem(self.db)
+        self.faction_system = FactionSystem(self.db)
 
     def start_adventure(self, discord_id: int, location_id: str, duration_minutes: int) -> bool:
         # --- SECURITY FIX: Input Validation ---
@@ -148,6 +150,21 @@ class AdventureManager:
             # Capture state after rewards
             new_level = self.db.get_player_field(discord_id, "level")
 
+            # --- FACTION REPUTATION ---
+            duration_min = row.get("duration_minutes", 0)
+            # If duration is -1, calculate actual time elapsed
+            if duration_min == -1:
+                start_dt = datetime.datetime.fromisoformat(row["start_time"])
+                duration_min = int((datetime.datetime.now() - start_dt).total_seconds() / 60)
+
+            # Ensure non-negative duration
+            duration_min = max(0, duration_min)
+
+            faction_logs = self.faction_system.grant_reputation_for_adventure(
+                discord_id, duration_min, row.get("location_id")
+            )
+            # --------------------------
+
             summary = {
                 "loot": items_to_add,
                 "xp_gained": total_exp,
@@ -155,6 +172,7 @@ class AdventureManager:
                 "old_level": old_level,
                 "new_level": new_level,
                 "leveled_up": new_level > old_level,
+                "faction_logs": faction_logs,
             }
 
             bulk_items = [
