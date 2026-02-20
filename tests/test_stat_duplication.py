@@ -21,6 +21,9 @@ class TestStatDuplication(unittest.TestCase):
         }
         self.mock_db.get_player_stats_json.return_value = initial_stats
 
+        # Mock get_player_vitals to prevent clamping error
+        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+
         # 2. Setup equipped item (+5 STR)
         # Mock get_equipped_items to return one item
         self.mock_db.get_equipped_items.return_value = [{"item_key": "101", "item_source_table": "equipment"}]

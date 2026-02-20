@@ -1,81 +1,74 @@
 import sys
 import unittest
-from unittest.mock import MagicMock
-
-# Mock discord and its submodules
-mock_discord = MagicMock()
-sys.modules["discord"] = mock_discord
-sys.modules["discord.ui"] = MagicMock()
-
-
-# Define a Mock View class that captures add_item calls
-class MockView:
-    def __init__(self, timeout=None):
-        self.items = []
-        self.timeout = timeout
-
-    def add_item(self, item):
-        self.items.append(item)
-
-
-# Capture Real Item if available
-RealItem = object
-if "discord.ui" in sys.modules:
-    try:
-        RealItem = sys.modules["discord.ui"].Item
-    except AttributeError:
-        pass
-
-
-class MockButton(RealItem):
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
-        self.label = label
-        self.style = style
-        self.custom_id = custom_id
-        self.emoji = emoji
-        self.row = row
-        self.callback = None
-
-    def _is_v2(self):
-        return False
-
-
-# Assign it to the mocked module
-sys.modules["discord.ui"].View = MockView
-sys.modules["discord.ui"].Button = MockButton
-
-sys.modules["discord.ext"] = MagicMock()
-sys.modules["discord.ext.commands"] = MagicMock()
-
-# Mock cogs and other dependencies
-sys.modules["cogs"] = MagicMock()
-sys.modules["cogs.ui_helpers"] = MagicMock()
-sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
-sys.modules["game_systems.adventure.ui.exploration_view"] = MagicMock()
-sys.modules["game_systems.adventure.ui.setup_view"] = MagicMock()
-
-# Mock pymongo to avoid DB connection attempts if DatabaseManager is instantiated
-sys.modules["pymongo"] = MagicMock()
-
-import os  # noqa: E402
+from unittest.mock import MagicMock, patch
+import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import the class under test
-# This must happen AFTER mocking
-from database.database_manager import DatabaseManager  # noqa: E402
-from game_systems.character.ui.adventure_menu import AdventureView  # noqa: E402
-
-
 class TestAdventureUX(unittest.TestCase):
+    def setUp(self):
+        # 1. Mock dependencies
+        self.mock_discord = MagicMock()
+
+        # Define a Mock View class
+        class MockView:
+            def __init__(self, timeout=None):
+                self.items = []
+                self.timeout = timeout
+            def add_item(self, item):
+                self.items.append(item)
+
+        class MockButton:
+            def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
+                self.label = label
+                self.style = style
+                self.custom_id = custom_id
+                self.emoji = emoji
+                self.row = row
+                self.callback = None
+            def _is_v2(self):
+                return False
+
+        self.mock_discord.ui.View = MockView
+        self.mock_discord.ui.Button = MockButton
+
+        # Patch sys.modules
+        self.modules_patcher = patch.dict(sys.modules, {
+            "discord": self.mock_discord,
+            "discord.ui": self.mock_discord.ui,
+            "discord.ext": MagicMock(),
+            "discord.ext.commands": MagicMock(),
+            "cogs.ui_helpers": MagicMock(),
+            "game_systems.adventure.ui.adventure_embeds": MagicMock(),
+            "game_systems.adventure.ui.exploration_view": MagicMock(),
+            "game_systems.adventure.ui.setup_view": MagicMock(),
+            "pymongo": MagicMock(),
+        })
+        self.modules_patcher.start()
+
+        # Import module under test
+        # We need to reload it to use the mocked modules
+        if "game_systems.character.ui.adventure_menu" in sys.modules:
+            del sys.modules["game_systems.character.ui.adventure_menu"]
+
+        import game_systems.character.ui.adventure_menu
+        self.AdventureView = game_systems.character.ui.adventure_menu.AdventureView
+
+        # Import DatabaseManager (it needs mocked pymongo)
+        import database.database_manager
+        self.DatabaseManager = database.database_manager.DatabaseManager
+
+    def tearDown(self):
+        self.modules_patcher.stop()
+
     def test_adventure_view_resume(self):
         """Test that AdventureView shows 'Resume' when active_session is True."""
-        mock_db = MagicMock(spec=DatabaseManager)
+        mock_db = MagicMock(spec=self.DatabaseManager)
         mock_user = MagicMock()
 
         try:
-            view = AdventureView(mock_db, mock_user, active_session=True)
+            view = self.AdventureView(mock_db, mock_user, active_session=True)
 
             # Use our MockView implementation
             self.assertTrue(len(view.items) > 0)
@@ -91,11 +84,11 @@ class TestAdventureUX(unittest.TestCase):
 
     def test_adventure_view_begin(self):
         """Test that AdventureView shows 'Begin' when active_session is False."""
-        mock_db = MagicMock(spec=DatabaseManager)
+        mock_db = MagicMock(spec=self.DatabaseManager)
         mock_user = MagicMock()
 
         try:
-            view = AdventureView(mock_db, mock_user, active_session=False)
+            view = self.AdventureView(mock_db, mock_user, active_session=False)
 
             self.assertTrue(len(view.items) > 0)
 

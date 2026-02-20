@@ -25,8 +25,9 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
         importlib.reload(database.database_manager)
 
         # We need to ensure cogs.ui_helpers is loaded/reloaded with mocked discord
+        if "cogs.ui_helpers" in sys.modules:
+            del sys.modules["cogs.ui_helpers"]
         import cogs.ui_helpers
-        importlib.reload(cogs.ui_helpers)
 
         self.get_player_or_error = cogs.ui_helpers.get_player_or_error
         self.DatabaseManager = database.database_manager.DatabaseManager

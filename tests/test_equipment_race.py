@@ -2,24 +2,15 @@ import asyncio
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
-
-# Mock pymongo
-mock_pymongo = MagicMock()
-mock_pymongo.errors.DuplicateKeyError = Exception
-sys.modules["pymongo"] = mock_pymongo
-sys.modules["pymongo.errors"] = mock_pymongo.errors
-
-import threading  # noqa: E402
-import time  # noqa: E402
-
-import pymongo.errors  # noqa: E402
+from unittest.mock import MagicMock, patch
+import threading
+import time
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
-
+class DuplicateKeyError(Exception):
+    pass
 
 class MockDatabaseManager:
     def __init__(self):
@@ -57,7 +48,7 @@ class MockDatabaseManager:
         if self.enforce_constraint and equipped == 1:
             key = (item["discord_id"], item["slot"])
             if key in self.unique_constraint:
-                raise pymongo.errors.DuplicateKeyError("E11000 duplicate key error")
+                raise DuplicateKeyError("E11000 duplicate key error")
             self.unique_constraint.add(key)
 
         # If un-equipping, remove from constraint
@@ -111,11 +102,34 @@ class MockDatabaseManager:
     def set_player_vitals(self, discord_id, hp, mp):
         pass
 
+    def clamp_player_vitals(self, discord_id, max_hp, max_mp):
+        pass
+
     def _unequip_logic(self, discord_id, inv_id):
         self.set_item_equipped(inv_id, 0)
 
 
 class TestEquipmentRaceMock(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        # Mock pymongo
+        self.mock_pymongo = MagicMock()
+        self.mock_pymongo.errors.DuplicateKeyError = DuplicateKeyError
+
+        self.modules_patcher = patch.dict(sys.modules, {
+            "pymongo": self.mock_pymongo,
+            "pymongo.errors": self.mock_pymongo.errors
+        })
+        self.modules_patcher.start()
+
+        # Import module under test
+        if "game_systems.items.equipment_manager" in sys.modules:
+            del sys.modules["game_systems.items.equipment_manager"]
+        import game_systems.items.equipment_manager
+        self.EquipmentManager = game_systems.items.equipment_manager.EquipmentManager
+
+    def tearDown(self):
+        self.modules_patcher.stop()
+
     async def test_race_condition(self):
         """Verifies that concurrent equip requests for the same slot are handled safely."""
         db = MockDatabaseManager()
@@ -125,7 +139,7 @@ class TestEquipmentRaceMock(unittest.IsolatedAsyncioTestCase):
             102: {"id": 102, "discord_id": 12345, "item_type": "equipment", "slot": "Head", "equipped": 0, "item_key": "102", "rarity": "Common", "item_name": "Helm B"}
         }
 
-        manager = EquipmentManager(db)
+        manager = self.EquipmentManager(db)
         manager._get_player_allowed_slots = MagicMock(return_value=["Head"])
 
         loop = asyncio.get_running_loop()

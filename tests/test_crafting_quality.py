@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock dependencies before import
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
@@ -97,6 +98,9 @@ class TestCraftingQuality(unittest.TestCase):
         }
         self.mock_db._col.return_value.find_one.return_value = static_item
         self.mock_db.get_player_stats_json.return_value = {} # Empty stats
+
+        # Mock get_player_vitals to prevent clamping error
+        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
 
         # Setup inventory item (Upgraded to Uncommon)
         inventory_item = {

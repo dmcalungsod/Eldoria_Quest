@@ -118,7 +118,8 @@ class TestWildGathering(unittest.TestCase):
 
                 # Check call args
                 session.events.resolve_non_combat.assert_called_with(
-                    context=self.context, location_id="test_forest", regen_chance=70, location_name="Forest"
+                    context=self.context, location_id="test_forest", regen_chance=70, location_name="Forest",
+                    weather=unittest.mock.ANY
                 )
 
 

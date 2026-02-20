@@ -49,12 +49,13 @@ class TestContentExpansion(unittest.TestCase):
 
     def test_quest_location_references(self):
         """Verify quests reference the correct location name."""
-        fen_name = LOCATIONS["shrouded_fen"]["name"]
+        # Rank C quests are now split between "The Sunken Grotto" and "The Shrouded Fen"
+        valid_locations = {LOCATIONS["sunken_grotto"]["name"], LOCATIONS["shrouded_fen"]["name"]}
 
         for q in QUESTS_C_TIER:
             location = q["location"]
-            self.assertEqual(
-                location, fen_name, f"Quest '{q['title']}' has incorrect location '{location}'. Expected '{fen_name}'"
+            self.assertIn(
+                location, valid_locations, f"Quest '{q['title']}' has invalid location '{location}'."
             )
 
 

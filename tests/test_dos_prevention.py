@@ -1,104 +1,91 @@
 
 import asyncio
 import unittest
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 import sys
 import os
 import importlib
 
-# 1. Mock Discord BEFORE importing anything that uses it
-mock_discord = MagicMock()
-mock_discord.ButtonStyle.success = "success"
-mock_discord.ButtonStyle.danger = "danger"
-mock_discord.ButtonStyle.secondary = "secondary"
-mock_discord.ButtonStyle.primary = "primary"
-mock_discord.Color.dark_red.return_value = "dark_red"
-mock_discord.Color.dark_green.return_value = "dark_green"
-mock_discord.Color.dark_grey.return_value = "dark_grey"
-
-# Capture Real Item if available (for inheritance compatibility)
-RealItem = object
-if "discord.ui" in sys.modules:
-    try:
-        candidate = sys.modules["discord.ui"].Item
-        if isinstance(candidate, type):
-            RealItem = candidate
-    except AttributeError:
-        pass
-
-# Forcefully remove discord if it's already loaded to ensure mocks take precedence
-if "discord" in sys.modules:
-    del sys.modules["discord"]
-if "discord.ui" in sys.modules:
-    del sys.modules["discord.ui"]
-
-sys.modules["discord"] = mock_discord
-sys.modules["discord.ui"] = MagicMock()
-
-# Mock View and Button
-class MockView:
-    def __init__(self, timeout=None):
-        self.children = []
-        self.timeout = timeout
-
-    def add_item(self, item):
-        self.children.append(item)
-
-    def clear_items(self):
-        self.children.clear()
-
-class MockButton(RealItem):
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
-        self.label = label
-        self.style = style
-        self.custom_id = custom_id
-        self.emoji = emoji
-        self.row = row
-        self.callback = None
-        self.disabled = False
-
-class MockSelect(RealItem):
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
-        self.placeholder = placeholder
-        self.min_values = min_values
-        self.max_values = max_values
-        self.options = options
-        self.row = row
-        self.custom_id = custom_id
-        self.callback = None
-        self.disabled = False
-        self.values = []
-
-class MockSelectOption:
-    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
-        self.label = label
-        self.value = value
-        self.description = description
-        self.emoji = emoji
-        self.default = default
-
-mock_discord.SelectOption = MockSelectOption
-sys.modules["discord.ui"].View = MockView
-sys.modules["discord.ui"].Button = MockButton
-sys.modules["discord.ui"].Select = MockSelect
-
-# 2. Mock Dependencies
-sys.modules["pymongo"] = MagicMock()
-sys.modules["cogs"] = MagicMock()
-sys.modules["cogs.ui_helpers"] = MagicMock()
-sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
-
-# 3. Add path and Import
+# Add path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import game_systems.adventure.ui.exploration_view  # noqa: E402
-
-importlib.reload(game_systems.adventure.ui.exploration_view)
-from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
-from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from game_systems.player.player_stats import PlayerStats
 
 class TestDoSPrevention(unittest.TestCase):
     def setUp(self):
+        # 1. Mock dependencies
+        self.mock_discord = MagicMock()
+        self.mock_discord.ButtonStyle.success = "success"
+        self.mock_discord.ButtonStyle.danger = "danger"
+        self.mock_discord.ButtonStyle.secondary = "secondary"
+        self.mock_discord.ButtonStyle.primary = "primary"
+        self.mock_discord.Color.dark_red.return_value = "dark_red"
+        self.mock_discord.Color.dark_green.return_value = "dark_green"
+        self.mock_discord.Color.dark_grey.return_value = "dark_grey"
+
+        # Mock View/Button logic
+        class MockView:
+            def __init__(self, timeout=None):
+                self.children = []
+                self.timeout = timeout
+            def add_item(self, item):
+                self.children.append(item)
+            def clear_items(self):
+                self.children.clear()
+
+        class MockButton:
+            def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
+                self.label = label
+                self.style = style
+                self.custom_id = custom_id
+                self.emoji = emoji
+                self.row = row
+                self.callback = None
+                self.disabled = False
+
+        class MockSelect:
+            def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+                self.placeholder = placeholder
+                self.min_values = min_values
+                self.max_values = max_values
+                self.options = options
+                self.row = row
+                self.custom_id = custom_id
+                self.callback = None
+                self.disabled = False
+                self.values = []
+
+        class MockSelectOption:
+            def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+                self.label = label
+                self.value = value
+                self.description = description
+                self.emoji = emoji
+                self.default = default
+
+        self.mock_discord.SelectOption = MockSelectOption
+        self.mock_discord.ui.View = MockView
+        self.mock_discord.ui.Button = MockButton
+        self.mock_discord.ui.Select = MockSelect
+
+        # Patch modules
+        self.modules_patcher = patch.dict(sys.modules, {
+            "discord": self.mock_discord,
+            "discord.ui": self.mock_discord.ui,
+            "pymongo": MagicMock(),
+            "cogs.ui_helpers": MagicMock(),
+            "game_systems.adventure.ui.adventure_embeds": MagicMock(),
+        })
+        self.modules_patcher.start()
+
+        # Import module under test (reloading if necessary)
+        if "game_systems.adventure.ui.exploration_view" in sys.modules:
+            del sys.modules["game_systems.adventure.ui.exploration_view"]
+
+        import game_systems.adventure.ui.exploration_view
+        self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
+
+        # Test setup
         self.mock_db = MagicMock()
         self.mock_manager = MagicMock()
         self.mock_user = MagicMock()
@@ -109,7 +96,7 @@ class TestDoSPrevention(unittest.TestCase):
         # Setup manager
         self.mock_manager.simulate_adventure_step = MagicMock(return_value={})
 
-        self.view = ExplorationView(
+        self.view = self.ExplorationView(
             db=self.mock_db,
             manager=self.mock_manager,
             location_id="test_loc",
@@ -119,6 +106,9 @@ class TestDoSPrevention(unittest.TestCase):
             vitals={"current_hp": 100, "current_mp": 100},
             active_monster={"player_stance": "balanced"}
         )
+
+    def tearDown(self):
+        self.modules_patcher.stop()
 
     def test_huge_payload_stance_rejected(self):
         """Test sending a massive string as stance is REJECTED."""
