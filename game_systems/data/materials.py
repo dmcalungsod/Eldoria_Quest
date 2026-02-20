@@ -11,7 +11,7 @@ MATERIALS = {
         "name": "Magic Stone Fragment",
         "description": "A tiny, impure shard of crystallized mana.",
         "rarity": "Common",
-        "value": 5,  # Up from 2
+        "value": 8,  # Up from 5
     },
     "magic_stone_small": {
         "name": "Magic Stone (Small)",

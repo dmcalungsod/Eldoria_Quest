@@ -12,6 +12,11 @@ from unittest.mock import MagicMock
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# MOCK PYMONGO BEFORE IMPORTING
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.collection"] = MagicMock()
+sys.modules["pymongo.results"] = MagicMock()
+
 from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.recipes import RECIPES
