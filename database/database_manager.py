@@ -100,7 +100,10 @@ class DatabaseManager:
 
     def player_exists(self, discord_id: int) -> bool:
         """Checks if a player profile exists."""
-        return self._col("players").find_one({"discord_id": discord_id}, {"_id": 1}) is not None
+        return (
+            self._col("players").find_one({"discord_id": discord_id}, {"_id": 1})
+            is not None
+        )
 
     def create_player(
         self,
@@ -276,7 +279,9 @@ class DatabaseManager:
 
         # 5. Extract Player Row (remove joined fields)
         player_row = {
-            k: v for k, v in data.items() if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
+            k: v
+            for k, v in data.items()
+            if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
         }
 
         return {
@@ -293,7 +298,9 @@ class DatabaseManager:
 
     def get_player_stats_json(self, discord_id: int) -> dict[str, Any]:
         """Fetches and parses the JSON stats block."""
-        row = self._col("stats").find_one({"discord_id": discord_id}, {"_id": 0, "stats_json": 1})
+        row = self._col("stats").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "stats_json": 1}
+        )
         if not row or not row.get("stats_json"):
             return {}
         try:
@@ -328,7 +335,9 @@ class DatabaseManager:
             {"$set": {"current_hp": hp, "current_mp": mp}},
         )
 
-    def update_player_level_data(self, discord_id: int, level: int, exp: int, exp_to_next: int):
+    def update_player_level_data(
+        self, discord_id: int, level: int, exp: int, exp_to_next: int
+    ):
         """Updates level and experience values."""
         self._col("players").update_one(
             {"discord_id": discord_id},
@@ -411,15 +420,25 @@ class DatabaseManager:
 
     def get_guild_member_data(self, discord_id: int) -> dict | None:
         """Fetches guild membership details (Rank, Points)."""
-        return self._col("guild_members").find_one({"discord_id": discord_id}, {"_id": 0})
+        return self._col("guild_members").find_one(
+            {"discord_id": discord_id}, {"_id": 0}
+        )
 
     def get_guild_card_data(self, discord_id: int) -> dict | None:
         """Fetches data specifically for the Guild Card UI."""
-        player = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "name": 1})
-        guild = self._col("guild_members").find_one({"discord_id": discord_id}, {"_id": 0, "rank": 1, "join_date": 1})
+        player = self._col("players").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "name": 1}
+        )
+        guild = self._col("guild_members").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "rank": 1, "join_date": 1}
+        )
         if not player or not guild:
             return None
-        return {"name": player["name"], "rank": guild["rank"], "join_date": guild["join_date"]}
+        return {
+            "name": player["name"],
+            "rank": guild["rank"],
+            "join_date": guild["join_date"],
+        }
 
     # ============================================================
     # FACTION SYSTEM (New methods for Factions)
@@ -427,7 +446,9 @@ class DatabaseManager:
 
     def get_player_faction_data(self, discord_id: int) -> dict | None:
         """Fetches the player's faction membership (faction_id, reputation)."""
-        return self._col("player_factions").find_one({"discord_id": discord_id}, {"_id": 0})
+        return self._col("player_factions").find_one(
+            {"discord_id": discord_id}, {"_id": 0}
+        )
 
     def set_player_faction(self, discord_id: int, faction_id: str):
         """Sets the player's faction, resetting reputation to 0 if changing."""
@@ -510,14 +531,24 @@ class DatabaseManager:
         Sets a global boost (e.g., exp_boost, loot_boost).
         Updates the record if it already exists (upsert).
         """
-        end_time = (datetime.datetime.now() + datetime.timedelta(hours=duration_hours)).isoformat()
+        end_time = (
+            datetime.datetime.now() + datetime.timedelta(hours=duration_hours)
+        ).isoformat()
         self._col("global_boosts").update_one(
             {"boost_key": key},
-            {"$set": {"boost_key": key, "multiplier": multiplier, "end_time": end_time}},
+            {
+                "$set": {
+                    "boost_key": key,
+                    "multiplier": multiplier,
+                    "end_time": end_time,
+                }
+            },
             upsert=True,
         )
         self._boost_cache_time = 0.0  # Invalidate cache
-        logger.info(f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h")
+        logger.info(
+            f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h"
+        )
 
     def clear_global_boosts(self):
         """Removes all active global boosts."""
@@ -529,9 +560,19 @@ class DatabaseManager:
     # ACTIVE BUFFS
     # ============================================================
 
-    def add_active_buff(self, discord_id: int, buff_id: str, name: str, stat: str, amount: float, duration_s: int):
+    def add_active_buff(
+        self,
+        discord_id: int,
+        buff_id: str,
+        name: str,
+        stat: str,
+        amount: float,
+        duration_s: int,
+    ):
         """Adds a buff to the player."""
-        end_time = (datetime.datetime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
+        end_time = (
+            datetime.datetime.now() + datetime.timedelta(seconds=duration_s)
+        ).isoformat()
         self._col("active_buffs").insert_one(
             {
                 "discord_id": discord_id,
@@ -572,7 +613,12 @@ class DatabaseManager:
         self._col("adventure_sessions").delete_many(query)
 
     def insert_adventure_session(
-        self, discord_id: int, location_id: str, start_time: str, end_time: str, duration_minutes: int
+        self,
+        discord_id: int,
+        location_id: str,
+        start_time: str,
+        end_time: str,
+        duration_minutes: int,
     ):
         """Creates a new adventure session."""
         # Remove any existing sessions first (replace behavior)
@@ -696,7 +742,9 @@ class DatabaseManager:
         item_source_table: str | None = None,
     ):
         """Adds an item to inventory with stack merging."""
-        existing = self.find_stackable_item(discord_id, item_key, rarity, slot, item_source_table)
+        existing = self.find_stackable_item(
+            discord_id, item_key, rarity, slot, item_source_table
+        )
         if existing:
             self._col("inventory").update_one(
                 {"id": existing["id"]},
@@ -732,7 +780,12 @@ class DatabaseManager:
         consolidated = {}
         for item in items:
             # Key matches find_stackable_item logic: (item_key, rarity, slot, item_source_table)
-            key = (item["item_key"], item["rarity"], item.get("slot"), item.get("item_source_table"))
+            key = (
+                item["item_key"],
+                item["rarity"],
+                item.get("slot"),
+                item.get("item_source_table"),
+            )
             if key not in consolidated:
                 consolidated[key] = {
                     "item_key": item["item_key"],
@@ -748,14 +801,23 @@ class DatabaseManager:
         # 2. Fetch all potentially relevant existing stacks in one query
         # We only care about matching keys for this user that are unequipped
         item_keys = [k[0] for k in consolidated.keys()]
-        query = {"discord_id": discord_id, "equipped": 0, "item_key": {"$in": item_keys}}
+        query = {
+            "discord_id": discord_id,
+            "equipped": 0,
+            "item_key": {"$in": item_keys},
+        }
         existing_docs = list(self._col("inventory").find(query))
 
         # Map existing docs for O(1) lookup
         # Key must match the consolidation key
         existing_map = {}
         for doc in existing_docs:
-            key = (doc["item_key"], doc["rarity"], doc.get("slot"), doc.get("item_source_table"))
+            key = (
+                doc["item_key"],
+                doc["rarity"],
+                doc.get("slot"),
+                doc.get("item_source_table"),
+            )
             existing_map[key] = doc
 
         operations = []
@@ -766,7 +828,9 @@ class DatabaseManager:
             if key in existing_map:
                 # Update existing stack
                 doc_id = existing_map[key]["id"]
-                operations.append(UpdateOne({"id": doc_id}, {"$inc": {"count": item_data["amount"]}}))
+                operations.append(
+                    UpdateOne({"id": doc_id}, {"$inc": {"count": item_data["amount"]}})
+                )
             else:
                 # Queue for insertion
                 new_items_data.append(item_data)
@@ -776,7 +840,10 @@ class DatabaseManager:
             count = len(new_items_data)
             # Atomically reserve a block of IDs
             counter_doc = self._col("counters").find_one_and_update(
-                {"_id": "inventory_id"}, {"$inc": {"seq": count}}, upsert=True, return_document=True
+                {"_id": "inventory_id"},
+                {"$inc": {"seq": count}},
+                upsert=True,
+                return_document=True,
             )
             # The range reserved is [end_seq - count + 1, end_seq]
             end_seq = counter_doc["seq"]
@@ -804,7 +871,9 @@ class DatabaseManager:
         # 5. Execute
         if operations:
             self._col("inventory").bulk_write(operations)
-            logger.info(f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}")
+            logger.info(
+                f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}"
+            )
 
     def get_inventory_item_count(self, discord_id: int, item_key: str) -> int:
         """Returns the total count of an item across all stacks."""
@@ -835,7 +904,9 @@ class DatabaseManager:
             return True
         return False
 
-    def remove_inventory_item(self, discord_id: int, item_key: str, amount: int = 1) -> bool:
+    def remove_inventory_item(
+        self, discord_id: int, item_key: str, amount: int = 1
+    ) -> bool:
         """
         Removes items from inventory. Prioritizes unequipped stacks.
         Returns True if successful, False if insufficient quantity.
@@ -868,7 +939,9 @@ class DatabaseManager:
             if remove_from_stack == stack["count"]:
                 self._col("inventory").delete_one({"id": stack["id"]})
             else:
-                self._col("inventory").update_one({"id": stack["id"]}, {"$inc": {"count": -remove_from_stack}})
+                self._col("inventory").update_one(
+                    {"id": stack["id"]}, {"$inc": {"count": -remove_from_stack}}
+                )
 
             remaining_to_remove -= remove_from_stack
 
@@ -886,7 +959,9 @@ class DatabaseManager:
 
     def update_inventory_count(self, inv_id: int, new_count: int):
         """Updates item count."""
-        self._col("inventory").update_one({"id": inv_id}, {"$set": {"count": new_count}})
+        self._col("inventory").update_one(
+            {"id": inv_id}, {"$set": {"count": new_count}}
+        )
 
     def increment_inventory_count(self, inv_id: int, amount: int = 1):
         """Increments item count."""
@@ -902,11 +977,15 @@ class DatabaseManager:
 
     def delete_inventory_by_type(self, discord_id: int, item_type: str):
         """Deletes all inventory items of a specific type for a player."""
-        self._col("inventory").delete_many({"discord_id": discord_id, "item_type": item_type})
+        self._col("inventory").delete_many(
+            {"discord_id": discord_id, "item_type": item_type}
+        )
 
     def set_item_equipped(self, inv_id: int, equipped: int):
         """Sets the equipped status of an inventory item."""
-        self._col("inventory").update_one({"id": inv_id}, {"$set": {"equipped": equipped}})
+        self._col("inventory").update_one(
+            {"id": inv_id}, {"$set": {"equipped": equipped}}
+        )
 
     def get_equipped_in_slot(self, discord_id: int, slot: str) -> dict | None:
         """Finds the currently equipped item in a specific slot."""
@@ -1013,10 +1092,14 @@ class DatabaseManager:
 
     def get_quest_objectives(self, quest_id: int) -> str | None:
         """Fetches raw objectives JSON string for a quest."""
-        doc = self._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1})
+        doc = self._col("quests").find_one(
+            {"id": quest_id}, {"_id": 0, "objectives": 1}
+        )
         return doc["objectives"] if doc else None
 
-    def insert_player_quest(self, discord_id: int, quest_id: int, status: str, progress: str):
+    def insert_player_quest(
+        self, discord_id: int, quest_id: int, status: str, progress: str
+    ):
         """Inserts a new player quest record."""
         self._col("player_quests").insert_one(
             {
@@ -1042,7 +1125,9 @@ class DatabaseManager:
             {"$set": {"progress": progress}},
         )
 
-    def get_player_quest_with_objectives(self, discord_id: int, quest_id: int) -> dict | None:
+    def get_player_quest_with_objectives(
+        self, discord_id: int, quest_id: int
+    ) -> dict | None:
         """Fetches a player quest with quest objectives (for completion check)."""
         pq = self._col("player_quests").find_one(
             {"discord_id": discord_id, "quest_id": quest_id, "status": "in_progress"},
@@ -1050,7 +1135,9 @@ class DatabaseManager:
         )
         if not pq:
             return None
-        quest = self._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1})
+        quest = self._col("quests").find_one(
+            {"id": quest_id}, {"_id": 0, "objectives": 1}
+        )
         if not quest:
             return None
         return {"progress": pq["progress"], "objectives": quest["objectives"]}
@@ -1098,7 +1185,13 @@ class DatabaseManager:
 
     def increment_guild_stat(self, discord_id: int, field: str, amount: int = 1):
         """Increments a guild member stat field (merit_points, quests_completed, kills)."""
-        valid_fields = {"merit_points", "quests_completed", "normal_kills", "elite_kills", "boss_kills"}
+        valid_fields = {
+            "merit_points",
+            "quests_completed",
+            "normal_kills",
+            "elite_kills",
+            "boss_kills",
+        }
         if field not in valid_fields:
             return
         self._col("guild_members").update_one(
@@ -1123,7 +1216,9 @@ class DatabaseManager:
         )
         return [d["key_id"] for d in docs]
 
-    def insert_player_skill(self, discord_id: int, skill_key: str, skill_level: int = 1):
+    def insert_player_skill(
+        self, discord_id: int, skill_key: str, skill_level: int = 1
+    ):
         """Inserts a new player skill."""
         self._col("player_skills").insert_one(
             {
@@ -1152,7 +1247,11 @@ class DatabaseManager:
         )
 
     def update_player_skill(
-        self, discord_id: int, skill_key: str, skill_level: int | None = None, skill_exp: float | None = None
+        self,
+        discord_id: int,
+        skill_key: str,
+        skill_level: int | None = None,
+        skill_exp: float | None = None,
     ):
         """Updates skill level and/or exp."""
         update: dict[str, Any] = {}
@@ -1256,7 +1355,9 @@ class DatabaseManager:
             {"$set": {field: value}},
         )
 
-    def update_player_vestige_and_vitals(self, discord_id: int, vestige: int, hp: int, mp: int):
+    def update_player_vestige_and_vitals(
+        self, discord_id: int, vestige: int, hp: int, mp: int
+    ):
         """Atomically updates vestige_pool, current_hp, and current_mp."""
         self._col("players").update_one(
             {"discord_id": discord_id},
@@ -1311,6 +1412,26 @@ class DatabaseManager:
         if kill_type in valid:
             self.increment_guild_stat(discord_id, kill_type, amount)
 
+    def increment_specific_monster_kill(
+        self, discord_id: int, monster_name: str, amount: int = 1
+    ):
+        """Increments a specific monster kill count in the stats record."""
+        # Sanitize name for MongoDB field key (remove dots and $)
+        safe_name = monster_name.replace(".", "").replace("$", "")
+        self._col("stats").update_one(
+            {"discord_id": discord_id},
+            {"$inc": {f"monster_kills.{safe_name}": amount}},
+            upsert=True,
+        )
+
+    def get_specific_monster_kills(self, discord_id: int) -> dict[str, int]:
+        """Fetches the dictionary of specific monster kills."""
+        doc = self._col("stats").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "monster_kills": 1},
+        )
+        return doc.get("monster_kills", {}) if doc else {}
+
     # ============================================================
     # REWARD SYSTEM (New methods for external call sites)
     # ============================================================
@@ -1363,7 +1484,9 @@ class DatabaseManager:
         Returns the new balance if successful, None if insufficient funds.
         """
         result = self._col("players").find_one_and_update(
-            {"discord_id": discord_id, "aurum": {"$gte": amount}}, {"$inc": {"aurum": -amount}}, return_document=True
+            {"discord_id": discord_id, "aurum": {"$gte": amount}},
+            {"$inc": {"aurum": -amount}},
+            return_document=True,
         )
         return result["aurum"] if result else None
 
@@ -1374,7 +1497,9 @@ class DatabaseManager:
             {"$inc": {"vestige_pool": amount}},
         )
 
-    def update_player_stats_optimistic(self, discord_id: int, old_json_str: str, new_stats_data: dict) -> bool:
+    def update_player_stats_optimistic(
+        self, discord_id: int, old_json_str: str, new_stats_data: dict
+    ) -> bool:
         """
         Updates player stats only if the current stats_json matches old_json_str.
         Prevents Lost Updates due to race conditions.
@@ -1428,7 +1553,9 @@ class DatabaseManager:
     # SHOP (New methods for external call sites)
     # ============================================================
 
-    def purchase_item(self, discord_id: int, item_key: str, item_data: dict, price: int) -> tuple[bool, Any, int]:
+    def purchase_item(
+        self, discord_id: int, item_key: str, item_data: dict, price: int
+    ) -> tuple[bool, Any, int]:
         """Atomic purchase: deducts gold and adds item."""
         # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
@@ -1445,7 +1572,9 @@ class DatabaseManager:
             }
         )
         if existing:
-            self._col("inventory").update_one({"id": existing["id"]}, {"$inc": {"count": 1}})
+            self._col("inventory").update_one(
+                {"id": existing["id"]}, {"$inc": {"count": 1}}
+            )
         else:
             new_id = self._next_inventory_id()
             self._col("inventory").insert_one(
@@ -1469,7 +1598,9 @@ class DatabaseManager:
     # INFIRMARY (New methods for external call sites)
     # ============================================================
 
-    def execute_heal(self, discord_id: int, max_hp: int, max_mp: int, cost: int) -> tuple[bool, str]:
+    def execute_heal(
+        self, discord_id: int, max_hp: int, max_mp: int, cost: int
+    ) -> tuple[bool, str]:
         """Atomically heals a player and deducts gold."""
         player = self._col("players").find_one(
             {"discord_id": discord_id},
@@ -1515,11 +1646,24 @@ class DatabaseManager:
     # STAT UPGRADE (New methods for external call sites)
     # ============================================================
 
-    def execute_stat_upgrade(self, discord_id: int, new_vestige: int, new_hp: int, new_mp: int, stats_json_str: str):
+    def execute_stat_upgrade(
+        self,
+        discord_id: int,
+        new_vestige: int,
+        new_hp: int,
+        new_mp: int,
+        stats_json_str: str,
+    ):
         """Atomically applies a stat upgrade."""
         self._col("players").update_one(
             {"discord_id": discord_id},
-            {"$set": {"vestige_pool": new_vestige, "current_hp": new_hp, "current_mp": new_mp}},
+            {
+                "$set": {
+                    "vestige_pool": new_vestige,
+                    "current_hp": new_hp,
+                    "current_mp": new_mp,
+                }
+            },
         )
         self._col("stats").update_one(
             {"discord_id": discord_id},
@@ -1530,7 +1674,9 @@ class DatabaseManager:
     # SKILL TRAINER (New methods for external call sites)
     # ============================================================
 
-    def learn_skill(self, discord_id: int, skill_key: str, cost: int) -> tuple[bool, str]:
+    def learn_skill(
+        self, discord_id: int, skill_key: str, cost: int
+    ) -> tuple[bool, str]:
         """Atomically learns a new skill (deducts vestige, inserts skill)."""
         player = self._col("players").find_one(
             {"discord_id": discord_id},
@@ -1549,7 +1695,9 @@ class DatabaseManager:
         self.insert_player_skill(discord_id, skill_key)
         return True, "Skill Learned!"
 
-    def upgrade_skill(self, discord_id: int, skill_key: str, cost: int) -> tuple[bool, str, int]:
+    def upgrade_skill(
+        self, discord_id: int, skill_key: str, cost: int
+    ) -> tuple[bool, str, int]:
         """Atomically upgrades a skill (deducts vestige, increments level)."""
         ps = self.get_player_skill_row(discord_id, skill_key)
         if not ps:
@@ -1576,7 +1724,9 @@ class DatabaseManager:
     # ADMIN (New methods for external call sites)
     # ============================================================
 
-    def admin_grant(self, discord_id: int, exp: int = 0, aurum: int = 0, vestige: int = 0):
+    def admin_grant(
+        self, discord_id: int, exp: int = 0, aurum: int = 0, vestige: int = 0
+    ):
         """Admin resource grant."""
         increments = {}
         if exp:
@@ -1676,7 +1826,9 @@ class DatabaseManager:
 
     def get_titles(self, discord_id: int) -> list[str]:
         """Fetches all titles earned by the player."""
-        doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "titles": 1})
+        doc = self._col("players").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "titles": 1}
+        )
         return doc.get("titles", []) if doc else []
 
     def set_active_title(self, discord_id: int, title: str | None) -> bool:
@@ -1685,7 +1837,9 @@ class DatabaseManager:
         Returns True if successful, False if title not owned.
         """
         if title is None:
-            self._col("players").update_one({"discord_id": discord_id}, {"$set": {"active_title": None}})
+            self._col("players").update_one(
+                {"discord_id": discord_id}, {"$set": {"active_title": None}}
+            )
             return True
 
         # Check ownership
@@ -1693,12 +1847,16 @@ class DatabaseManager:
         if title not in titles:
             return False
 
-        self._col("players").update_one({"discord_id": discord_id}, {"$set": {"active_title": title}})
+        self._col("players").update_one(
+            {"discord_id": discord_id}, {"$set": {"active_title": title}}
+        )
         return True
 
     def get_active_title(self, discord_id: int) -> str | None:
         """Fetches the currently active title."""
-        doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "active_title": 1})
+        doc = self._col("players").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "active_title": 1}
+        )
         return doc.get("active_title") if doc else None
 
     # ============================================================
@@ -1743,7 +1901,9 @@ class DatabaseManager:
             {"$set": {"active": 0}},
         )
 
-    def update_tournament_score(self, discord_id: int, tournament_id: int, score_increment: int):
+    def update_tournament_score(
+        self, discord_id: int, tournament_id: int, score_increment: int
+    ):
         """Updates (increments) a player's score for a tournament."""
         self._col("tournament_scores").update_one(
             {"discord_id": discord_id, "tournament_id": tournament_id},
@@ -1751,7 +1911,9 @@ class DatabaseManager:
             upsert=True,
         )
 
-    def get_tournament_leaderboard(self, tournament_id: int, limit: int = 10) -> list[dict]:
+    def get_tournament_leaderboard(
+        self, tournament_id: int, limit: int = 10
+    ) -> list[dict]:
         """Fetches the top players for a tournament."""
         pipeline = [
             {"$match": {"tournament_id": tournament_id}},
