@@ -273,8 +273,8 @@ class AdventureSession:
             return self._build_result([msg], False, context)
         else:
             # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
-            self.logs.append(f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!")
-            return self._process_combat_turn(context, action="flee_failed")
+            fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
+            return self._process_combat_turn(context, action="flee_failed", prepend_logs=[fail_msg])
 
     # ======================================================================
     # AUTO COMBAT SEQUENCE
@@ -374,7 +374,9 @@ class AdventureSession:
     # MANUAL COMBAT TURN
     # ======================================================================
 
-    def _process_combat_turn(self, context: dict[str, Any] | None = None, action: str = "attack") -> dict[str, Any]:
+    def _process_combat_turn(
+        self, context: dict[str, Any] | None = None, action: str = "attack", prepend_logs: list = None
+    ) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
         """
@@ -392,6 +394,9 @@ class AdventureSession:
             context["vitals"]["current_mp"] = result.get("mp_current", context["vitals"]["current_mp"])
 
         turn_logs = result["phrases"]
+        if prepend_logs:
+            turn_logs = prepend_logs + turn_logs
+
         is_dead = False
 
         # Determine outcome
