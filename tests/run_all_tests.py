@@ -25,6 +25,7 @@ import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
+import test_onboarding_ux  # New Onboarding UX test
 import test_faction_system  # New Faction System tests
 import test_game_systems
 import test_quest_security  # New security test
@@ -121,6 +122,7 @@ def run_ux_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_exploration_view_ux)
     suite.addTests(loader.loadTestsFromModule(test_adventure_embeds))
+    suite.addTests(loader.loadTestsFromModule(test_onboarding_ux))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
