@@ -1,0 +1,747 @@
+[
+  {
+    "id": 1,
+    "title": "Culling the Slimes",
+    "tier": "F",
+    "quest_giver": "Farmer Tallen",
+    "location": "Willowcreek Outskirts",
+    "summary": "Slimes are devouring crops and farm tools.",
+    "description": "Moisture from the Broken Veil has thickened the forest air, spawning an abnormal number of Forest Slimes. Farmer Tallen\u2019s fields have become a slow-moving tide of gelatinous pests. He seeks someone willing to drive them back before planting season is ruined.",
+    "objectives": {
+      "defeat": {
+        "Verdant Slime": 5,
+        "Glimmer Slime": 5
+      }
+    },
+    "rewards": {
+      "exp": 250,
+      "aurum": 60,
+      "item": "Dewfall Tonic"
+    }
+  },
+  {
+    "id": 2,
+    "title": "Gathering Healing Herbs",
+    "tier": "F",
+    "quest_giver": "Herbalist Mirra",
+    "location": "Whispering Thicket",
+    "summary": "The local healer needs fresh medicinal plants.",
+    "description": "The Whispering Thicket grows herbs found nowhere else, especially Moonleaf\u2014gleaming silver leaves used to treat fevers. With monsters stirring, Mirra can\u2019t safely gather them herself. She requests an adventurer to harvest the plants before night-dew poisons their potency.",
+    "objectives": {
+      "gather": {
+        "Moonleaf Herb": 5
+      }
+    },
+    "rewards": {
+      "exp": 200,
+      "aurum": 45,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 3,
+    "title": "Lost Child of the Creek",
+    "tier": "F",
+    "quest_giver": "Guard Orlin",
+    "location": "Willowcreek",
+    "summary": "A villager\u2019s child wandered into the forest.",
+    "description": "A young girl, Lina, chased her pet sprite into the treeline and never returned. The local guard is stretched thin and needs someone swift to search the nearby clearings. Time is short\u2014nightfall brings predators hungrier than wolves.",
+    "objectives": {
+      "locate": "Lina",
+      "escort": "Lina"
+    },
+    "rewards": {
+      "exp": 300,
+      "aurum": 75
+    }
+  },
+  {
+    "id": 4,
+    "title": "A Pest Problem",
+    "tier": "F",
+    "quest_giver": "Supply Merchant Doran",
+    "location": "Forest Edge",
+    "summary": "Giant forest rats are tearing into supply crates.",
+    "description": "Doran\u2019s shipments have been gnawed open by oversized rodents infused with Veil-sickness. Their boldness grows daily, and his livelihood is at risk. Clear them out before he loses another week\u2019s worth of grain and cloth.",
+    "objectives": {
+      "defeat": {
+        "Goblin Grunt": 8
+      }
+    },
+    "rewards": {
+      "exp": 275,
+      "aurum": 65
+    }
+  },
+  {
+    "id": 5,
+    "title": "Timber Run",
+    "tier": "F",
+    "quest_giver": "Carpenter Elwin",
+    "location": "Lumberjack\u2019s Road",
+    "summary": "Deliver chopped timber to Willowcreek.",
+    "description": "Travelers fear the woodland paths at dusk, forcing Elwin\u2019s workers to abandon their supply of freshly cut lumber. The carpenter needs someone resilient enough to haul the materials before thieves or creatures steal them away.",
+    "objectives": {
+      "transport": {
+        "Timber Bundle": 1
+      }
+    },
+    "rewards": {
+      "exp": 150,
+      "aurum": 90
+    }
+  },
+  {
+    "id": 6,
+    "title": "Clear the Campsite",
+    "tier": "F",
+    "quest_giver": "Young Explorer Rima",
+    "location": "Eastwood Camp",
+    "summary": "Clear goblins from a campsite Rima wants to use.",
+    "description": "Rima, an overly enthusiastic explorer, set up camp deep in goblin-infested brush. Before she can proceed with her \u201cgrand expedition,\u201d she needs the area cleared of lurking scavenger goblins.",
+    "objectives": {
+      "defeat": {
+        "Goblin Grunt": 5
+      }
+    },
+    "rewards": {
+      "exp": 225,
+      "aurum": 50
+    }
+  },
+  {
+    "id": 7,
+    "title": "Strange Tracks",
+    "tier": "F",
+    "quest_giver": "Hunter Yorin",
+    "location": "North Ferntrail",
+    "summary": "Investigate unusual beast tracks near town.",
+    "description": "Claw marks and hoofprints twisted by corruption have appeared near the northern trail. Yorin suspects a malformed creature but needs confirmation from someone willing to venture deeper.",
+    "objectives": {
+      "examine": {
+        "Track Sites": 3
+      },
+      "report_to": "Hunter Yorin"
+    },
+    "rewards": {
+      "exp": 200,
+      "aurum": 45
+    }
+  },
+  {
+    "id": 8,
+    "title": "Lantern Delivery",
+    "tier": "F",
+    "quest_giver": "Shopkeeper Helia",
+    "location": "Willowcreek",
+    "summary": "Deliver lanterns to patrolling guards.",
+    "description": "With fog thickening earlier each day, sentries require new lanterns to maintain visibility. Highwaymen have grown bold at dusk, so the guards depend on timely supply delivery.",
+    "objectives": {
+      "deliver": {
+        "Lanterns": 3
+      }
+    },
+    "rewards": {
+      "exp": 150,
+      "aurum": 40
+    }
+  },
+  {
+    "id": 9,
+    "title": "A Meal for the Road",
+    "tier": "F",
+    "quest_giver": "Innkeeper Vero",
+    "location": "Cranelight Inn",
+    "summary": "Gather ingredients for travel rations.",
+    "description": "Vero\u2019s inn prepares provisions for those venturing into the forest. He needs fresh mushroom caps and forest berries, both of which grow near shallow cave mouths\u2014often watched by lurking slimes.",
+    "objectives": {
+      "collect": {
+        "Cavecap Mushroom": 4,
+        "Wild Berry": 3
+      }
+    },
+    "rewards": {
+      "exp": 220,
+      "aurum": 45,
+      "item": "Trailman's Ration"
+    }
+  },
+  {
+    "id": 10,
+    "title": "The Broken Snare",
+    "tier": "F",
+    "quest_giver": "Trapper Dane",
+    "location": "Southwood",
+    "summary": "Retrieve parts from damaged animal traps.",
+    "description": "Dane\u2019s metal snares were shattered, bent by something far stronger than wolves. He wishes to salvage what remains before it rusts or is stolen by goblins.",
+    "objectives": {
+      "retrieve": {
+        "Trap Springs": 3
+      }
+    },
+    "rewards": {
+      "exp": 180,
+      "aurum": 55
+    }
+  },
+  {
+    "id": 11,
+    "title": "Goblin Skirmishers",
+    "tier": "E",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Eastern Forest",
+    "summary": "Goblins are organizing raids.",
+    "description": "For the first time in seasons, goblins have formed war skirmishes. Their scouts have been spotted mapping forest paths\u2014an alarming sign of future raids. Rhea needs swift action before these pests grow bold enough to strike Willowcreek.",
+    "objectives": {
+      "defeat": {
+        "Goblin Scout": 7
+      },
+      "retrieve": {
+        "Map Fragment": 1
+      }
+    },
+    "rewards": {
+      "exp": 450,
+      "aurum": 120
+    }
+  },
+  {
+    "id": 12,
+    "title": "Venom in the Roots",
+    "tier": "E",
+    "quest_giver": "Apothecary Lune",
+    "location": "Deepgrove Roots",
+    "summary": "Collect venom samples from poisonous snakes.",
+    "description": "Strange serpents have slithered into the grove, their fangs dripping an iridescent toxin unseen since before the Sundering. Lune hopes to refine an antidote\u2014but only if someone brings her samples.",
+    "objectives": {
+      "collect": {
+        "Serpent Venom": 3
+      }
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 100,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 13,
+    "title": "Echoes in the Hollow",
+    "tier": "E",
+    "quest_giver": "Hermit Sorin",
+    "location": "Hollowtree Den",
+    "summary": "Investigate eerie whispers from a rotten tree cavern.",
+    "description": "Travelers claim that the Hollowtree whispers names, luring wanderers closer. Sorin suspects a Veil-born sprite nesting inside. He needs someone who won\u2019t be fooled by its illusions.",
+    "objectives": {
+      "investigate": "Hollowtree",
+      "defeat": {
+        "Burbling Sprite": 1
+      }
+    },
+    "rewards": {
+      "exp": 500,
+      "aurum": 140
+    }
+  },
+  {
+    "id": 14,
+    "title": "The Lumberjack\u2019s Wrath",
+    "tier": "E",
+    "quest_giver": "Lumberjack Bran",
+    "location": "Birchfall Path",
+    "summary": "Eliminate a territorial Treeling.",
+    "description": "A sentient sap-creature\u2014the Treeling\u2014has claimed Birchfall Path, harassing workers and smashing tools. Bran asks for aid before the creature\u2019s roots choke out the entire path.",
+    "objectives": {
+      "defeat": {
+        "Vineling": 1
+      }
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 180,
+      "item": "Elixir of Verdant Heart"
+    }
+  },
+  {
+    "id": 15,
+    "title": "Shadows Over the Water",
+    "tier": "E",
+    "quest_giver": "Fisher Amon",
+    "location": "Moonwater Shore",
+    "summary": "Water spirits are disturbing fishermen.",
+    "description": "Moonwater\u2019s surface shimmers even without sun, revealing restless Naiads that drag nets underwater. Amon fears someone will be taken next. He needs protection.",
+    "objectives": {
+      "defeat": {
+        "Fen Wisp": 3
+      }
+    },
+    "rewards": {
+      "exp": 420,
+      "aurum": 90
+    }
+  },
+  {
+    "id": 16,
+    "title": "Broken Idol Pieces",
+    "tier": "E",
+    "quest_giver": "Traveling Scholar Firren",
+    "location": "Mossdeep Trail",
+    "summary": "Recover fragments of an ancient forest idol.",
+    "description": "Goblins shattered a woodland idol to steal its gemstones. Firren wishes to reassemble the relic before its latent magic spills into the wild.",
+    "objectives": {
+      "retrieve": {
+        "Idol Fragments": 4
+      }
+    },
+    "rewards": {
+      "exp": 380,
+      "aurum": 130
+    }
+  },
+  {
+    "id": 17,
+    "title": "A Test of Aim",
+    "tier": "E",
+    "quest_giver": "Ranger Alyss",
+    "location": "Ranger Outpost",
+    "summary": "Practice combat against agile forest beasts.",
+    "description": "Alyss trains new recruits by sending them after Swift-tail Hares\u2014nimble creatures infused with faint forest magic. Catching them tests reflex and precision.",
+    "objectives": {
+      "defeat": {
+        "Gloam Hare": 5
+      }
+    },
+    "rewards": {
+      "exp": 350,
+      "aurum": 60,
+      "item": "Runner's Cordial"
+    }
+  },
+  {
+    "id": 18,
+    "title": "The Missing Courier",
+    "tier": "E",
+    "quest_giver": "Town Hall",
+    "location": "Northern Road",
+    "summary": "Find a courier who vanished en route to Willowcreek.",
+    "description": "A forest courier carrying urgent correspondence never arrived. Tracks suggest he was chased off-road by beasts. His satchel holds valuable village contracts.",
+    "objectives": {
+      "find": "Courier",
+      "retrieve": "Mail Satchel"
+    },
+    "rewards": {
+      "exp": 450,
+      "aurum": 100
+    }
+  },
+  {
+    "id": 19,
+    "title": "Spider Nest Purge",
+    "tier": "E",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Webwood",
+    "summary": "Destroy a growing spider nest.",
+    "description": "The Webwood\u2019s population of brood spiders has ballooned, stringing webs across traveler roads. Their venom weakens limbs, making escape impossible. Rhea requires an adventurer to thin their numbers.",
+    "objectives": {
+      "defeat": {
+        "Thicket Spider": 6
+      }
+    },
+    "rewards": {
+      "exp": 550,
+      "aurum": 150,
+      "item": "Panacea Root Paste"
+    }
+  },
+  {
+    "id": 20,
+    "title": "Mushroom Menace",
+    "tier": "E",
+    "quest_giver": "Gatherer Pim",
+    "location": "Sporebrush Patch",
+    "summary": "Defeat aggressive fungus creatures.",
+    "description": "Sporeshrooms have sprouted beyond their usual cycle, animated by warped forest mana. Pim\u2019s harvesting routes are blocked unless these lumbering fungi are cleared.",
+    "objectives": {
+      "defeat": {
+        "Sporeling": 4
+      }
+    },
+    "rewards": {
+      "exp": 500,
+      "aurum": 130
+    }
+  },
+  {
+    "id": 21,
+    "title": "The Goblin Lieutenant",
+    "tier": "D",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Ruined Camp",
+    "summary": "Take down a goblin commander.",
+    "description": "A cunning goblin lieutenant has unified several scattered tribes. His camp rings with stolen steel and crude banners. If left unchecked, an organized horde might rise.",
+    "objectives": {
+      "defeat": {
+        "Bramble Goblin": 1
+      }
+    },
+    "rewards": {
+      "exp": 800,
+      "aurum": 300,
+      "item": "Captains' Ale (Embolden)"
+    }
+  },
+  {
+    "id": 22,
+    "title": "Forest Spirit in Pain",
+    "tier": "D",
+    "quest_giver": "Druidess Leira",
+    "location": "Heartwood Glade",
+    "summary": "Aid a wounded forest spirit.",
+    "description": "A Heartwood Sprite has been corrupted by a splinter of Veil energy lodged in its body. Leira believes an adventurer with a steady hand can help remove it\u2014if they can survive its thrashing.",
+    "objectives": {
+      "subdue": "Wisp-Sentinel",
+      "remove": "Veil Splinter"
+    },
+    "rewards": {
+      "exp": 750,
+      "aurum": 250,
+      "item": "Sap of Renewal"
+    }
+  },
+  {
+    "id": 23,
+    "title": "Hunt the Moonfang Wolf",
+    "tier": "D",
+    "quest_giver": "Hunter Yorin",
+    "location": "Moonfang Den",
+    "summary": "Hunt a powerful forest wolf touched by moonlight.",
+    "description": "The Moonfang Wolf is a silver-coated predator that leads lesser wolves with eerie discipline. Yorin fears it will turn its pack upon the village unless someone challenges it.",
+    "objectives": {
+      "defeat": {
+        "Ridge Wolf": 1
+      }
+    },
+    "rewards": {
+      "exp": 900,
+      "aurum": 350,
+      "item": "Glade Salve Vial"
+    }
+  },
+  {
+    "id": 24,
+    "title": "Entangled Roots",
+    "tier": "D",
+    "quest_giver": "Woodsman Eddan",
+    "location": "Rootcoil Valley",
+    "summary": "Destroy corrupted root-beasts.",
+    "description": "Tanglesap Creatures\u2014animated roots\u2014have begun striking at loggers. Their claws are formed of hardened bark and their bodies pulse with sickly green glow.",
+    "objectives": {
+      "defeat": {
+        "Young Treant": 3
+      }
+    },
+    "rewards": {
+      "exp": 700,
+      "aurum": 200
+    }
+  },
+  {
+    "id": 25,
+    "title": "Signs of the First Boss (Thornhide Bear)",
+    "tier": "D",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Western Deepwood",
+    "summary": "Scout territory of the Thornhide Bear.",
+    "description": "Massive claw marks and uprooted trees mark the hunting grounds of Thornhide\u2014the first of the forest\u2019s three boss creatures. Before a slaying party mobilizes, Rhea needs precise scouting intel.",
+    "objectives": {
+      "survey": {
+        "Bear Signs": 3
+      },
+      "report_to": "Guard Captain Rhea"
+    },
+    "rewards": {
+      "exp": 650,
+      "aurum": 180
+    }
+  },
+  {
+    "id": 26,
+    "title": "A Merchant in Tears",
+    "tier": "D",
+    "quest_giver": "Merchant Salvi",
+    "location": "Bramble Road",
+    "summary": "Recover stolen trade goods.",
+    "description": "Bandit-goblins ambushed Salvi and fled into the thicket with his fabrics and spices. The merchant begs someone to reclaim the goods before the creatures burn or eat them.",
+    "objectives": {
+      "recover": {
+        "Trade Crates": 5
+      }
+    },
+    "rewards": {
+      "exp": 750,
+      "aurum": 250,
+      "item": "Lunaris Tonic"
+    }
+  },
+  {
+    "id": 27,
+    "title": "Cleanse the Shrine",
+    "tier": "D",
+    "quest_giver": "Shrine Keeper Mara",
+    "location": "Moonshadow Shrine",
+    "summary": "Purify a shrine corrupted by Veil energy.",
+    "description": "The Moonshadow Shrine\u2019s white stones have turned black-veined, its pool reflecting horrors instead of moonlight. Mara needs an adventurer to drive off the wraithlings haunting it.",
+    "objectives": {
+      "defeat": {
+        "Rookwood Shade": 5
+      },
+      "use": "Purification Amulet"
+    },
+    "rewards": {
+      "exp": 850,
+      "aurum": 280,
+      "item": "Wardkeeper's Vial"
+    }
+  },
+  {
+    "id": 28,
+    "title": "The Spider Matron",
+    "tier": "D",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Webwood Nest",
+    "summary": "Hunt the matriarch of the spider colony.",
+    "description": "The brood spiders answer to a single massive mother whose venom sacs can rot bark. Her growing brood threatens to spread beyond Webwood entirely.",
+    "objectives": {
+      "defeat": {
+        "Thicket Spider": 10
+      }
+    },
+    "rewards": {
+      "exp": 1000,
+      "aurum": 400,
+      "item": "Panacea Root Paste"
+    }
+  },
+  {
+    "id": 29,
+    "title": "Before the Storm",
+    "tier": "D",
+    "quest_giver": "Town Hall Council",
+    "location": "Willowcreek",
+    "summary": "Prepare the town for coming threats.",
+    "description": "The council fears an impending surge of monsters, driven outward by the forest bosses awakening. They require supplies gathered and warnings spread to outlying homes.",
+    "objectives": {
+      "deliver": {
+        "Warning Notices": 3
+      },
+      "bring": {
+        "Supply Sacks": 2
+      }
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 150
+    }
+  },
+  {
+    "id": 30,
+    "title": "The Whispering Oak",
+    "tier": "D",
+    "quest_giver": "Druidess Leira",
+    "location": "Whispering Oak Circle",
+    "summary": "Investigate a sacred tree murmuring with corrupted voices.",
+    "description": "The Whispering Oak, ancient guardian of the forest, has begun muttering in tones unlike any druidic language. Leira suspects an unseen parasite clinging to its bark\u2014one born of the Veil.",
+    "objectives": {
+      "inspect": "Oak",
+      "defeat": {
+        "Pine Wight": 1
+      }
+    },
+    "rewards": {
+      "exp": 950,
+      "aurum": 320,
+      "item": "Luck-Blessed Cordial"
+    }
+  },
+  {
+    "id": 31,
+    "title": "Storm Warning",
+    "tier": "C",
+    "quest_giver": "Weather-Watcher Jace",
+    "location": "The Shrouded Fen",
+    "summary": "Suppress the rising number of Stormlings.",
+    "description": "Stormlings are crackling with unusual intensity, threatening to spark wildfires despite the damp. Jace needs them thinned out before the static charge becomes a lightning storm.",
+    "objectives": {
+      "defeat": {
+        "Stormling": 8
+      }
+    },
+    "rewards": {
+      "exp": 1200,
+      "aurum": 350
+    }
+  },
+  {
+    "id": 32,
+    "title": "Mire Dredging",
+    "tier": "C",
+    "quest_giver": "Blacksmith Gorn",
+    "location": "The Shrouded Fen",
+    "summary": "Gather Iron Ore from the Fen.",
+    "description": "Gorn claims the iron found in the fen is tempered by the constant magical storms. He needs a fresh supply to forge weapons capable of piercing elite hides.",
+    "objectives": {
+      "gather": {
+        "Iron Ore": 6
+      }
+    },
+    "rewards": {
+      "exp": 1100,
+      "aurum": 400
+    }
+  },
+  {
+    "id": 33,
+    "title": "Shadows in the Mist",
+    "tier": "C",
+    "quest_giver": "Scout Valen",
+    "location": "The Shrouded Fen",
+    "summary": "Hunt the elusive Dusklings.",
+    "description": "Dusklings use the fog to ambush patrols. Valen needs an adventurer to turn the tables and hunt the hunters.",
+    "objectives": {
+      "defeat": {
+        "Duskling": 5
+      }
+    },
+    "rewards": {
+      "exp": 1300,
+      "aurum": 450
+    }
+  },
+  {
+    "id": 34,
+    "title": "The Lost Patrol",
+    "tier": "C",
+    "quest_giver": "Captain Rhea",
+    "location": "The Shrouded Fen",
+    "summary": "Locate the missing patrol unit.",
+    "description": "A squad sent to map the fen has gone silent. Rhea fears they've been led astray by wisps. Find them before the bog claims them forever.",
+    "objectives": {
+      "locate": "Missing Squad"
+    },
+    "rewards": {
+      "exp": 1250,
+      "aurum": 300
+    }
+  },
+  {
+    "id": 35,
+    "title": "Essence of Decay",
+    "tier": "C",
+    "quest_giver": "Alchemist Miral",
+    "location": "The Shrouded Fen",
+    "summary": "Defeat Mire Lurkers for their essence.",
+    "description": "The slime of a Mire Lurker is potent but volatile. Miral needs samples fresh from the source to stabilize her latest brew.",
+    "objectives": {
+      "defeat": {
+        "Mire Lurker": 6
+      }
+    },
+    "rewards": {
+      "exp": 1150,
+      "aurum": 380,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 36,
+    "title": "Revenant's Curse",
+    "tier": "C",
+    "quest_giver": "Priestess Elara",
+    "location": "The Shrouded Fen",
+    "summary": "Put Fen Revenants to rest.",
+    "description": "The restless dead in the fen are rising as Revenants. Elara asks you to grant them peace with steel and spell.",
+    "objectives": {
+      "defeat": {
+        "Fen Revenant": 4
+      }
+    },
+    "rewards": {
+      "exp": 1400,
+      "aurum": 500,
+      "item": "Dewfall Tonic"
+    }
+  },
+  {
+    "id": 37,
+    "title": "Ancient Wood Harvest",
+    "tier": "C",
+    "quest_giver": "Carpenter Elwin",
+    "location": "The Shrouded Fen",
+    "summary": "Gather Ancient Wood.",
+    "description": "The petrified wood of the fen is harder than stone. Elwin needs it for reinforcing the town gates.",
+    "objectives": {
+      "gather": {
+        "Ancient Wood": 5
+      }
+    },
+    "rewards": {
+      "exp": 1100,
+      "aurum": 420
+    }
+  },
+  {
+    "id": 38,
+    "title": "The Glade Empress",
+    "tier": "C",
+    "quest_giver": "Guildmaster Kael",
+    "location": "The Shrouded Fen",
+    "summary": "Slay the Glade Empress.",
+    "description": "The corrupted heart of the fen has manifested as the Glade Empress. Her rule spreads rot. End her reign.",
+    "objectives": {
+      "defeat": {
+        "Glade Empress": 1
+      }
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 1000,
+      "item": "Magic Stone (Large)"
+    }
+  },
+  {
+    "id": 39,
+    "title": "Survey the Ruins",
+    "tier": "C",
+    "quest_giver": "Historian Arin",
+    "location": "The Shrouded Fen",
+    "summary": "Survey the sunken ruins.",
+    "description": "Old ruins have surfaced in the mire. Arin needs a sketch of the inscriptions before they sink again.",
+    "objectives": {
+      "survey": {
+        "Sunken Inscriptions": 3
+      }
+    },
+    "rewards": {
+      "exp": 1200,
+      "aurum": 350
+    }
+  },
+  {
+    "id": 40,
+    "title": "Wisp Hunt",
+    "tier": "C",
+    "quest_giver": "Mage Lyra",
+    "location": "The Shrouded Fen",
+    "summary": "Disperse Wisp-Sentinels.",
+    "description": "The Wisp-Sentinels are coordinating the fen's defenses. Blind the enemy by removing their eyes.",
+    "objectives": {
+      "defeat": {
+        "Wisp-Sentinel": 3
+      }
+    },
+    "rewards": {
+      "exp": 1350,
+      "aurum": 450
+    }
+  }
+]
