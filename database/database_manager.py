@@ -1579,6 +1579,7 @@ class DatabaseManager:
             for sk in default_skill_keys
         ]
         if skill_docs:
+            # OPTIMIZATION: Use insert_many to perform a single DB round-trip instead of a loop.
             self._col("player_skills").insert_many(skill_docs)
 
         # Guild Membership
