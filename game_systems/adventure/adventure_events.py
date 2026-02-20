@@ -8,7 +8,7 @@ Optimized for performance and future biome expansion.
 import random
 
 import game_systems.data.emojis as E
-from game_systems.world_time import TimePhase
+from game_systems.world_time import TimePhase, Weather
 
 
 class AdventureEvents:
@@ -45,6 +45,48 @@ class AdventureEvents:
         "Something skitters nearby, unseen in the dark.",
         "The world is reduced to the small circle of your vision.",
     ]
+
+    # --- WEATHER-BASED ATMOSPHERE ---
+    ATMOSPHERE_WEATHER = {
+        Weather.RAIN: [
+            "Rain lashes against your armor, washing away the dust.",
+            "Mud sucks at your boots with every step.",
+            "The steady drum of rain drowns out distant sounds.",
+            "Water drips from the canopy, forming puddles on the path.",
+            "A cold rain chills you to the bone.",
+        ],
+        Weather.STORM: [
+            "Lightning splits the sky, briefly illuminating the darkness.",
+            "Thunder rolls like a war drum in the distance.",
+            "The wind howls, tearing at your cloak.",
+            "Trees groan under the force of the gale.",
+            "The storm rages, making travel difficult and dangerous.",
+        ],
+        Weather.FOG: [
+            "Thick fog rolls in, obscuring the path ahead.",
+            "Shapes move in the mist, just out of sight.",
+            "The world is reduced to a grey haze.",
+            "Sound is deadened by the heavy fog.",
+            "You feel lost in the swirling white vapor.",
+        ],
+        Weather.SNOW: [
+            "Snow crunch under your boots.",
+            "The world is silent and white.",
+            "Cold flakes melt on your skin.",
+            "Your breath mists in the freezing air.",
+        ],
+        Weather.ASH: [
+            "Grey ash falls like dirty snow.",
+            "The air tastes of sulfur and burning.",
+            "You cover your mouth to filter the choking dust.",
+            "Heat radiates from the ground beneath the ash.",
+        ],
+        Weather.CLEAR: [
+            "The sky is clear and open.",
+            "Visibility is good, allowing you to see far.",
+            "A gentle breeze stirs the air.",
+        ]
+    }
 
     # --- ATMOSPHERIC INTROS (New) ---
     ATMOSPHERE_FOREST = [
@@ -319,6 +361,7 @@ class AdventureEvents:
         class_name: str = "Adventurer",
         hp_percent: float = 1.0,
         time_phase: TimePhase = TimePhase.DAY,
+        weather: Weather = Weather.CLEAR,
     ) -> list:
         # Define the base message list
         base_logs = []
@@ -367,14 +410,21 @@ class AdventureEvents:
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 
-            # Time Phase Override (50% chance to override location flavor with time flavor)
-            # This makes the world feel dynamic regardless of location
-            if time_phase == TimePhase.NIGHT and random.random() < 0.5:
+            # Time Phase Override (30% chance)
+            if time_phase == TimePhase.NIGHT and random.random() < 0.3:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
-            elif time_phase == TimePhase.DAWN and random.random() < 0.5:
+            elif time_phase == TimePhase.DAWN and random.random() < 0.3:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
-            elif time_phase == TimePhase.DUSK and random.random() < 0.5:
+            elif time_phase == TimePhase.DUSK and random.random() < 0.3:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
+
+            # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
+            weather_chance = 0.3
+            if weather in (Weather.STORM, Weather.ASH):
+                weather_chance = 0.5
+
+            if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
 
             # Select and prepend
             atmospheric_line = random.choice(atmosphere_pool)

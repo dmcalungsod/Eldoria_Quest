@@ -17,7 +17,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.class_data import CLASSES
 from game_systems.data.materials import MATERIALS
-from game_systems.world_time import WorldTime
+from game_systems.world_time import WorldTime, Weather
 
 from .adventure_events import AdventureEvents
 
@@ -36,11 +36,12 @@ class EventHandler:
         location_id: str | None = None,
         regen_chance: int = 70,
         location_name: str | None = None,
+        weather: Weather = Weather.CLEAR,
     ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(context, location_id)
+                return self._perform_regeneration(context, location_id, weather)
             else:
                 return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
@@ -48,7 +49,9 @@ class EventHandler:
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 
-    def _perform_regeneration(self, context: dict[str, Any], location_id: str | None = None) -> dict[str, Any]:
+    def _perform_regeneration(
+        self, context: dict[str, Any], location_id: str | None = None, weather: Weather = Weather.CLEAR
+    ) -> dict[str, Any]:
         """
         Calculates and applies regeneration safely.
         Uses an atomic transaction to ensure HP/MP updates are consistent.
@@ -107,7 +110,7 @@ class EventHandler:
 
             # Build Log Messages
             base_logs = AdventureEvents.regeneration(
-                location_id, class_name, hp_percent, time_phase=current_phase
+                location_id, class_name, hp_percent, time_phase=current_phase, weather=weather
             )
             # Add newline to the first element for spacing
             if base_logs:
