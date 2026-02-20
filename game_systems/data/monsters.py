@@ -52,6 +52,31 @@ NAME_POOL = [
     "Nightbloom",
 ]
 
+def _get_monster_description(name, level, tier):
+    """Generates a lore-appropriate description based on monster type."""
+    if "Slime" in name:
+        return f"A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+    elif "Goblin" in name:
+        return f"A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    elif "Wolf" in name or "Hound" in name:
+        return f"A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    elif "Spider" in name:
+        return f"A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+    elif "Wisp" in name or "Shade" in name or "Duskling" in name or "Revenant" in name:
+        return f"A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    elif "Treant" in name or "Ent" in name or "Sapling" in name or "Vineling" in name or "Nightbloom" in name:
+        return f"The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    elif "Boar" in name or "Stag" in name or "Hare" in name or "Tortoise" in name:
+        return f"Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    elif "Sprite" in name:
+        return f"A small, malicious fey creature that delights in leading travelers to their doom."
+    elif "Urch" in name or "Crawler" in name or "Lurker" in name:
+        return f"A spiny, bottom-feeding scavenger that has grown to monstrous size."
+    elif "Boss" in tier or "King" in name or "Empress" in name:
+        return f"A massive, ancient entity that dominates its territory. Its very presence warps the air around it."
+    else:
+        return f"A creature of the Shattered Veil, prowling the wilds in search of prey."
+
 MONSTERS = {}
 for idx in range(1, 51):
     name = NAME_POOL[(idx - 1) % len(NAME_POOL)]
@@ -159,10 +184,7 @@ for idx in range(1, 51):
     elif any(x in name for x in ["Brute", "Sentinel", "King", "Empress"]):
         drops.append(("titan_shard", 10))
 
-    description = (
-        f"In the whispering groves of the Shattered Veil, the {name} prowls. "
-        f"At level {level} it is considered {tier.lower()} within the Adventurer's Dawn."
-    )
+    description = _get_monster_description(name, level, tier)
 
     MONSTERS[f"monster_{idx:03d}"] = {
         "id": idx,
