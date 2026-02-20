@@ -1,18 +1,17 @@
-import time
-import timeit
-import uuid
+import logging
 import os
 import sys
-import logging
+import time
 from unittest.mock import MagicMock
 
 # Add project root to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from database.database_manager import DatabaseManager
 
 # Configure minimal logging
 logging.basicConfig(level=logging.ERROR)
+
 
 def benchmark_create_player_synthetic():
     """
@@ -31,12 +30,12 @@ def benchmark_create_player_synthetic():
             return MagicMock()
 
         def insert_many(self, docs):
-            time.sleep(LATENCY_PER_OP) # One round trip for many
+            time.sleep(LATENCY_PER_OP)  # One round trip for many
             return MagicMock()
 
         def find_one(self, *args, **kwargs):
             time.sleep(LATENCY_PER_OP)
-            return None # Simulate not found
+            return None  # Simulate not found
 
         def update_one(self, *args, **kwargs):
             time.sleep(LATENCY_PER_OP)
@@ -111,31 +110,32 @@ def benchmark_create_player_synthetic():
             max_mp=max_mp,
             race=race,
             gender=gender,
-            default_skill_keys=default_skill_keys
+            default_skill_keys=default_skill_keys,
         )
 
     # --- Run Benchmarks ---
     iterations = 50
-    print(f"Benchmarking with {iterations} iterations (Simulated Latency: {LATENCY_PER_OP*1000}ms/op)...")
+    print(f"Benchmarking with {iterations} iterations (Simulated Latency: {LATENCY_PER_OP * 1000}ms/op)...")
 
     # Measure Loop
     start_time = time.time()
     for i in range(iterations):
         create_player_loop(1000 + i)
     loop_duration = time.time() - start_time
-    print(f"Loop implementation: {loop_duration:.4f} seconds ({loop_duration/iterations*1000:.2f} ms/op)")
+    print(f"Loop implementation: {loop_duration:.4f} seconds ({loop_duration / iterations * 1000:.2f} ms/op)")
 
     # Measure Batch
     start_time = time.time()
     for i in range(iterations):
         create_player_batch(2000 + i)
     batch_duration = time.time() - start_time
-    print(f"Batch implementation: {batch_duration:.4f} seconds ({batch_duration/iterations*1000:.2f} ms/op)")
+    print(f"Batch implementation: {batch_duration:.4f} seconds ({batch_duration / iterations * 1000:.2f} ms/op)")
 
     # Calculate improvement
     if loop_duration > 0:
         speedup = (loop_duration - batch_duration) / loop_duration * 100
         print(f"Improvement: {speedup:.2f}% faster")
+
 
 if __name__ == "__main__":
     benchmark_create_player_synthetic()

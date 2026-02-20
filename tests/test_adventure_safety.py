@@ -1,4 +1,3 @@
-
 import os
 import sys
 import unittest
@@ -29,14 +28,12 @@ class TestAdventureDataLoss(unittest.TestCase):
             "active": 1,
             "logs": "[]",
             "loot_collected": '{"iron_ore": 5}',
-            "active_monster_json": None
+            "active_monster_json": None,
         }
 
         # Mock player stats
         self.mock_db.get_player_stats_json.return_value = {}
-        self.mock_db.get_player.return_value = {
-            "level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000
-        }
+        self.mock_db.get_player.return_value = {"level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000}
 
         # Mock level values
         self.mock_db.get_player_field.return_value = 1
@@ -54,8 +51,8 @@ class TestAdventureDataLoss(unittest.TestCase):
         method_names = [c[0] for c in calls]
 
         try:
-            end_idx = method_names.index('end_adventure_session')
-            add_idx = method_names.index('add_inventory_items_bulk')
+            end_idx = method_names.index("end_adventure_session")
+            add_idx = method_names.index("add_inventory_items_bulk")
 
             if add_idx < end_idx:
                 print("SUCCESS: Items added before session ended.")
@@ -76,12 +73,10 @@ class TestAdventureDataLoss(unittest.TestCase):
             "active": 1,
             "logs": "[]",
             "loot_collected": '{"iron_ore": 5}',
-            "active_monster_json": None
+            "active_monster_json": None,
         }
         self.mock_db.get_player_stats_json.return_value = {}
-        self.mock_db.get_player.return_value = {
-            "level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000
-        }
+        self.mock_db.get_player.return_value = {"level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000}
         self.mock_db.get_player_field.return_value = 1
 
         # Make add_items_bulk raise an exception
@@ -129,5 +124,6 @@ class TestAdventureDataLoss(unittest.TestCase):
         self.mock_db.insert_adventure_session.assert_called_once()
         print("SUCCESS: Input validation passed.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

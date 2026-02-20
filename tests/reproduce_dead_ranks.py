@@ -21,8 +21,8 @@ class TestRankProgression(unittest.TestCase):
         self.mock_db.get_guild_member.return_value = {
             "rank": "S",
             "quests_completed": 100,  # Requirement: 500
-            "boss_kills": 0,          # Requirement: 20
-            "elite_kills": 0          # Requirement: 50
+            "boss_kills": 0,  # Requirement: 20
+            "elite_kills": 0,  # Requirement: 50
         }
 
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
@@ -33,7 +33,7 @@ class TestRankProgression(unittest.TestCase):
             "rank": "S",
             "quests_completed": 501,
             "boss_kills": 21,
-            "elite_kills": 51
+            "elite_kills": 51,
         }
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertTrue(eligible, "Rank S SHOULD be eligible with sufficient stats.")
@@ -46,8 +46,8 @@ class TestRankProgression(unittest.TestCase):
         self.mock_db.get_guild_member.return_value = {
             "rank": "SS",
             "quests_completed": 999,  # Requirement: 1000
-            "boss_kills": 49,         # Requirement: 50
-            "elite_kills": 99         # Requirement: 100
+            "boss_kills": 49,  # Requirement: 50
+            "elite_kills": 99,  # Requirement: 100
         }
 
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
@@ -58,11 +58,11 @@ class TestRankProgression(unittest.TestCase):
             "rank": "SS",
             "quests_completed": 1001,
             "boss_kills": 51,
-            "elite_kills": 101
+            "elite_kills": 101,
         }
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertTrue(eligible, "Rank SS SHOULD be eligible with sufficient stats.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

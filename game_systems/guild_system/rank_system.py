@@ -11,14 +11,27 @@ class RankSystem:
     # Static Configuration
     RANKS = {
         "F": {"title": "Initiate", "next_rank": "E", "requirements": {"quests_completed": 3, "normal_kills": 15}},
-        "E": {"title": "Novice", "next_rank": "D", "requirements": {"quests_completed": 10, "normal_kills": 50, "elite_kills": 5}},
+        "E": {
+            "title": "Novice",
+            "next_rank": "D",
+            "requirements": {"quests_completed": 10, "normal_kills": 50, "elite_kills": 5},
+        },
         "D": {
             "title": "Apprentice",
             "next_rank": "C",
-            "requirements": {"quests_completed": 20, "normal_kills": 150, "elite_kills": 20, "boss_kills": 1}},
-        "C": {"title": "Adept", "next_rank": "B", "requirements": {"quests_completed": 30, "normal_kills": 300, "elite_kills": 50, "boss_kills": 5}},
+            "requirements": {"quests_completed": 20, "normal_kills": 150, "elite_kills": 20, "boss_kills": 1},
+        },
+        "C": {
+            "title": "Adept",
+            "next_rank": "B",
+            "requirements": {"quests_completed": 30, "normal_kills": 300, "elite_kills": 50, "boss_kills": 5},
+        },
         "B": {"title": "Veteran", "next_rank": "A", "requirements": {"quests_completed": 40, "boss_kills": 10}},
-        "A": {"title": "Master", "next_rank": "S", "requirements": {"quests_completed": 50, "boss_kills": 20, "elite_kills": 80}},
+        "A": {
+            "title": "Master",
+            "next_rank": "S",
+            "requirements": {"quests_completed": 50, "boss_kills": 20, "elite_kills": 80},
+        },
         "S": {
             "title": "Elite",
             "next_rank": "SS",

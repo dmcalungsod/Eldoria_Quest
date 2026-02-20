@@ -12,6 +12,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: read
+  statuses: read
 
 jobs:
   build-and-test:
@@ -79,8 +81,5 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         PR_NUM=${{ github.event.pull_request.number }}
-        echo "Waiting for all checks to pass on PR #$PR_NUM..."
-        # Wait for ALL checks (CodeRabbit, GitGuardian, etc.) to complete
-        gh pr checks $PR_NUM --watch --fail-fast
-        echo "All checks passed. Merging PR #$PR_NUM..."
-        gh pr merge $PR_NUM --squash --delete-branch
+        # Use --auto to enable auto-merge when requirements are met
+        gh pr merge $PR_NUM --squash --auto --delete-branch

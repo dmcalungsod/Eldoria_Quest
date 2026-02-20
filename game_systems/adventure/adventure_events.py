@@ -276,9 +276,7 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
 
         # 3. Class-Specific Flavor: 30% chance
-        elif (
-            class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30
-        ):
+        elif class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
             base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
 
         # 4. Location-Specific Fallback

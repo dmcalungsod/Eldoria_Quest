@@ -30,6 +30,7 @@ QUEST_MILESTONES = {
     100: ("Legend", "Completed 100 Quests."),
 }
 
+
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
@@ -47,7 +48,7 @@ class AchievementSystem:
             field_map = {
                 "Normal": ("normal_kills", KILL_MILESTONES),
                 "Elite": ("elite_kills", ELITE_MILESTONES),
-                "Boss": ("boss_kills", BOSS_MILESTONES)
+                "Boss": ("boss_kills", BOSS_MILESTONES),
             }
 
             if kill_type not in field_map:

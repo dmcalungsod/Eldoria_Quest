@@ -7,6 +7,7 @@ mock_discord = MagicMock()
 sys.modules["discord"] = mock_discord
 sys.modules["discord.ui"] = MagicMock()
 
+
 # Define a Mock View class that captures add_item calls
 class MockView:
     def __init__(self, timeout=None):
@@ -16,6 +17,7 @@ class MockView:
     def add_item(self, item):
         self.items.append(item)
 
+
 # Capture Real Item if available
 RealItem = object
 if "discord.ui" in sys.modules:
@@ -23,6 +25,7 @@ if "discord.ui" in sys.modules:
         RealItem = sys.modules["discord.ui"].Item
     except AttributeError:
         pass
+
 
 class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
@@ -35,6 +38,7 @@ class MockButton(RealItem):
 
     def _is_v2(self):
         return False
+
 
 # Assign it to the mocked module
 sys.modules["discord.ui"].View = MockView
@@ -103,6 +107,7 @@ class TestAdventureUX(unittest.TestCase):
 
         except TypeError as e:
             print(f"Caught expected TypeError (not implemented yet): {e}")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,18 +12,15 @@ class TestConsumableRace(unittest.TestCase):
         self.db = DatabaseManager()
         self.db._client = MagicMock()
         self.db.db = MagicMock()
-        self.db._col = MagicMock() # This returns a mock collection when called with name
+        self.db._col = MagicMock()  # This returns a mock collection when called with name
 
         self.manager = ConsumableManager(self.db)
 
         # Patch CONSUMABLES to have a test item
-        self.patcher = patch("game_systems.items.consumable_manager.CONSUMABLES", {
-            "test_potion": {
-                "name": "Test Potion",
-                "type": "consumable",
-                "effect": {"heal": 50}
-            }
-        })
+        self.patcher = patch(
+            "game_systems.items.consumable_manager.CONSUMABLES",
+            {"test_potion": {"name": "Test Potion", "type": "consumable", "effect": {"heal": 50}}},
+        )
         self.mock_consumables = self.patcher.start()
 
     def tearDown(self):
@@ -37,24 +34,22 @@ class TestConsumableRace(unittest.TestCase):
         inv_id = 1
 
         # 1. get_inventory_item returns an item
-        self.db.get_inventory_item = MagicMock(return_value={
-            "id": inv_id,
-            "discord_id": discord_id,
-            "item_key": "test_potion",
-            "item_type": "consumable",
-            "count": 1,
-            "equipped": 0
-        })
+        self.db.get_inventory_item = MagicMock(
+            return_value={
+                "id": inv_id,
+                "discord_id": discord_id,
+                "item_key": "test_potion",
+                "item_type": "consumable",
+                "count": 1,
+                "equipped": 0,
+            }
+        )
 
         # 2. get_player_vitals and stats
-        self.db.get_player_vitals = MagicMock(return_value={
-            "current_hp": 10,
-            "current_mp": 10
-        })
-        self.db.get_player_stats_json = MagicMock(return_value={
-            "HP": {"base": 100, "bonus": 0},
-            "MP": {"base": 50, "bonus": 0}
-        })
+        self.db.get_player_vitals = MagicMock(return_value={"current_hp": 10, "current_mp": 10})
+        self.db.get_player_stats_json = MagicMock(
+            return_value={"HP": {"base": 100, "bonus": 0}, "MP": {"base": 50, "bonus": 0}}
+        )
 
         # 3. consume_item_atomic (New Method) should be called
         # We mock it to return True (success)
@@ -85,12 +80,9 @@ class TestConsumableRace(unittest.TestCase):
         discord_id = 123
         inv_id = 1
 
-        self.db.get_inventory_item = MagicMock(return_value={
-            "id": inv_id,
-            "item_key": "test_potion",
-            "item_type": "consumable",
-            "count": 1
-        })
+        self.db.get_inventory_item = MagicMock(
+            return_value={"id": inv_id, "item_key": "test_potion", "item_type": "consumable", "count": 1}
+        )
         self.db.get_player_vitals = MagicMock(return_value={"current_hp": 10, "current_mp": 10})
         self.db.get_player_stats_json = MagicMock(return_value={"HP": {"base": 100, "bonus": 0}})
 
@@ -112,6 +104,7 @@ class TestConsumableRace(unittest.TestCase):
 
         # Verify Refund
         self.db.increment_inventory_count.assert_called_once_with(inv_id, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

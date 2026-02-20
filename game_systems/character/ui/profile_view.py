@@ -111,9 +111,7 @@ class CharacterTabView(View):
         await interaction.response.defer()
 
         # Check for active session
-        session = await asyncio.to_thread(
-            self.db.get_active_adventure, self.interaction_user.id
-        )
+        session = await asyncio.to_thread(self.db.get_active_adventure, self.interaction_user.id)
         has_active_session = session is not None
 
         embed = discord.Embed(
@@ -124,9 +122,7 @@ class CharacterTabView(View):
             ),
             color=discord.Color.dark_teal(),
         )
-        view = AdventureView(
-            self.db, self.interaction_user, active_session=has_active_session
-        )
+        view = AdventureView(self.db, self.interaction_user, active_session=has_active_session)
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def status_callback(self, interaction: discord.Interaction):

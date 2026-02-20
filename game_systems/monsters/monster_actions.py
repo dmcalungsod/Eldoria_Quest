@@ -33,10 +33,7 @@ class MonsterAI:
                         return {"type": "skill", "skill": chosen}
 
             # 2. Offensive Skill Logic
-            offensive_skills = [
-                s for s in usable_skills
-                if s.get("heal_power", 0) == 0 and not s.get("buff_data")
-            ]
+            offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0 and not s.get("buff_data")]
 
             if offensive_skills:
                 # Base chance to use skill over normal attack
@@ -103,7 +100,7 @@ class MonsterAI:
             "stat": stat,
             "increase": increase,
             "duration": duration,
-            "name": buff_skill.get("name", "Unknown Buff")
+            "name": buff_skill.get("name", "Unknown Buff"),
         }
         monster_data["buffs"].append(buff_record)
 

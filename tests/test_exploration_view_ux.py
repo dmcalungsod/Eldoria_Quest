@@ -33,15 +33,19 @@ if "discord.ui" in sys.modules:
 sys.modules["discord"] = mock_discord
 sys.modules["discord.ui"] = MagicMock()
 
+
 # Mock View and Button
 class MockView:
     def __init__(self, timeout=None):
         self.children = []
         self.timeout = timeout
+
     def add_item(self, item):
         self.children.append(item)
+
     def clear_items(self):
         self.children.clear()
+
 
 class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
@@ -55,6 +59,7 @@ class MockButton(RealItem):
 
     def _is_v2(self):
         return False
+
 
 sys.modules["discord.ui"].View = MockView
 sys.modules["discord.ui"].Button = MockButton
@@ -93,10 +98,6 @@ class TestExplorationViewUX(unittest.TestCase):
         """Standard safe state: No monster, high HP."""
         vitals = {"current_hp": 100, "current_mp": 50}
 
-        # Instantiate with vitals as positional (assuming signature change) or kwarg
-        # Currently, if we pass vitals as positional, it will crash if __init__ isn't updated.
-        # So this test expects the FUTURE state of the code.
-
         view = ExplorationView(
             self.mock_db,
             self.mock_manager,
@@ -105,7 +106,8 @@ class TestExplorationViewUX(unittest.TestCase):
             self.mock_user,
             self.stats,
             vitals=vitals,
-            active_monster=None
+            active_monster=None,
+            class_id=1,
         )
 
         # Check Forward Button (index 0)
@@ -115,7 +117,7 @@ class TestExplorationViewUX(unittest.TestCase):
 
     def test_forward_button_danger(self):
         """Danger state: No monster, LOW HP (<30%)."""
-        vitals = {"current_hp": 20, "current_mp": 50} # 20/100 = 20%
+        vitals = {"current_hp": 20, "current_mp": 50}  # 20/100 = 20%
 
         view = ExplorationView(
             self.mock_db,
@@ -125,7 +127,8 @@ class TestExplorationViewUX(unittest.TestCase):
             self.mock_user,
             self.stats,
             vitals=vitals,
-            active_monster=None
+            active_monster=None,
+            class_id=1,
         )
 
         btn = view.children[0]
@@ -134,7 +137,7 @@ class TestExplorationViewUX(unittest.TestCase):
 
     def test_battle_state(self):
         """Battle state: Active monster overrides HP danger."""
-        vitals = {"current_hp": 10, "current_mp": 50} # 10% HP (Critical)
+        vitals = {"current_hp": 10, "current_mp": 50}  # 10% HP (Critical)
         monster = {"name": "Goblin", "hp": 50}
 
         view = ExplorationView(
@@ -145,13 +148,20 @@ class TestExplorationViewUX(unittest.TestCase):
             self.mock_user,
             self.stats,
             vitals=vitals,
-            active_monster=monster
+            active_monster=monster,
+            class_id=1,
         )
 
         # Updated: Now expects "Attack" button
         btn = view.children[0]
         self.assertEqual(btn.label, "Attack")
         self.assertEqual(btn.style, "danger")
+
+        # Check for Special Ability Button (should be last)
+        special_btn = view.children[-1]
+        self.assertEqual(special_btn.style, "primary")
+        self.assertTrue(hasattr(special_btn, "callback"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -39,7 +39,7 @@ class TestQuestSecurity(unittest.TestCase):
         mock_quests_col.find_one.return_value = {
             "id": s_rank_quest_id,
             "tier": "S",
-            "objectives": '{"slay": {"Dragon": 1}}'
+            "objectives": '{"slay": {"Dragon": 1}}',
         }
 
         # Mock Player Quests (Player has no quests)
@@ -56,5 +56,6 @@ class TestQuestSecurity(unittest.TestCase):
 
         self.assertFalse(result, "The security check should block this action.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

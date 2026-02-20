@@ -95,7 +95,7 @@ LOCATIONS = {
                 "monster_key": "monster_034",  # Glade Empress (Boss)
                 "weight": 5,
                 "min_level": 18,
-            }
+            },
         ],
         "description": "A mist-choked wetland where the veil is thin. Shadows move in the fog, and the ground hungers for the unwary.",
         "gatherables": [

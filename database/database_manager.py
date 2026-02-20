@@ -276,9 +276,7 @@ class DatabaseManager:
 
         # 5. Extract Player Row (remove joined fields)
         player_row = {
-            k: v
-            for k, v in data.items()
-            if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
+            k: v for k, v in data.items() if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
         }
 
         return {
@@ -662,18 +660,14 @@ class DatabaseManager:
                     "rarity": item["rarity"],
                     "slot": item.get("slot"),
                     "item_source_table": item.get("item_source_table"),
-                    "amount": 0
+                    "amount": 0,
                 }
             consolidated[key]["amount"] += item["amount"]
 
         # 2. Fetch all potentially relevant existing stacks in one query
         # We only care about matching keys for this user that are unequipped
         item_keys = [k[0] for k in consolidated.keys()]
-        query = {
-            "discord_id": discord_id,
-            "equipped": 0,
-            "item_key": {"$in": item_keys}
-        }
+        query = {"discord_id": discord_id, "equipped": 0, "item_key": {"$in": item_keys}}
         existing_docs = list(self._col("inventory").find(query))
 
         # Map existing docs for O(1) lookup
@@ -701,10 +695,7 @@ class DatabaseManager:
             count = len(new_items_data)
             # Atomically reserve a block of IDs
             counter_doc = self._col("counters").find_one_and_update(
-                {"_id": "inventory_id"},
-                {"$inc": {"seq": count}},
-                upsert=True,
-                return_document=True
+                {"_id": "inventory_id"}, {"$inc": {"seq": count}}, upsert=True, return_document=True
             )
             # The range reserved is [end_seq - count + 1, end_seq]
             end_seq = counter_doc["seq"]
@@ -712,18 +703,22 @@ class DatabaseManager:
 
             for i, item_data in enumerate(new_items_data):
                 new_id = start_seq + i
-                operations.append(InsertOne({
-                    "id": new_id,
-                    "discord_id": discord_id,
-                    "item_key": item_data["item_key"],
-                    "item_name": item_data["item_name"],
-                    "item_type": item_data["item_type"],
-                    "rarity": item_data["rarity"],
-                    "slot": item_data["slot"],
-                    "item_source_table": item_data["item_source_table"],
-                    "count": item_data["amount"],
-                    "equipped": 0
-                }))
+                operations.append(
+                    InsertOne(
+                        {
+                            "id": new_id,
+                            "discord_id": discord_id,
+                            "item_key": item_data["item_key"],
+                            "item_name": item_data["item_name"],
+                            "item_type": item_data["item_type"],
+                            "rarity": item_data["rarity"],
+                            "slot": item_data["slot"],
+                            "item_source_table": item_data["item_source_table"],
+                            "count": item_data["amount"],
+                            "equipped": 0,
+                        }
+                    )
+                )
 
         # 5. Execute
         if operations:
@@ -748,7 +743,7 @@ class DatabaseManager:
         result = self._col("inventory").find_one_and_update(
             {"id": inv_id, "count": {"$gte": amount}},
             {"$inc": {"count": -amount}},
-            return_document=True  # Return the new document
+            return_document=True,  # Return the new document
         )
 
         if result:
@@ -1287,9 +1282,7 @@ class DatabaseManager:
         Returns the new balance if successful, None if insufficient funds.
         """
         result = self._col("players").find_one_and_update(
-            {"discord_id": discord_id, "aurum": {"$gte": amount}},
-            {"$inc": {"aurum": -amount}},
-            return_document=True
+            {"discord_id": discord_id, "aurum": {"$gte": amount}}, {"$inc": {"aurum": -amount}}, return_document=True
         )
         return result["aurum"] if result else None
 
@@ -1421,14 +1414,14 @@ class DatabaseManager:
             {
                 "discord_id": discord_id,
                 "current_hp": player["current_hp"],
-                "aurum": {"$gte": actual_cost}  # Double-check balance
+                "aurum": {"$gte": actual_cost},  # Double-check balance
             },
             {
                 "$set": {
                     "current_hp": max_hp,
                     "current_mp": max_mp,
                 },
-                "$inc": {"aurum": -actual_cost}
+                "$inc": {"aurum": -actual_cost},
             },
         )
 
@@ -1602,10 +1595,7 @@ class DatabaseManager:
 
     def get_titles(self, discord_id: int) -> list[str]:
         """Fetches all titles earned by the player."""
-        doc = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "titles": 1}
-        )
+        doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "titles": 1})
         return doc.get("titles", []) if doc else []
 
     def set_active_title(self, discord_id: int, title: str | None) -> bool:
@@ -1614,10 +1604,7 @@ class DatabaseManager:
         Returns True if successful, False if title not owned.
         """
         if title is None:
-            self._col("players").update_one(
-                {"discord_id": discord_id},
-                {"$set": {"active_title": None}}
-            )
+            self._col("players").update_one({"discord_id": discord_id}, {"$set": {"active_title": None}})
             return True
 
         # Check ownership
@@ -1625,18 +1612,12 @@ class DatabaseManager:
         if title not in titles:
             return False
 
-        self._col("players").update_one(
-            {"discord_id": discord_id},
-            {"$set": {"active_title": title}}
-        )
+        self._col("players").update_one({"discord_id": discord_id}, {"$set": {"active_title": title}})
         return True
 
     def get_active_title(self, discord_id: int) -> str | None:
         """Fetches the currently active title."""
-        doc = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "active_title": 1}
-        )
+        doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "active_title": 1})
         return doc.get("active_title") if doc else None
 
     # ============================================================

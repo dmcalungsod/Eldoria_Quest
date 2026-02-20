@@ -57,22 +57,22 @@ class TestCraftingEquipment(unittest.TestCase):
         # Note: add_inventory_item args: discord_id, item_key, item_name, item_type, rarity, amount, slot, item_source_table
         self.mock_db.add_inventory_item.assert_called_with(
             self.discord_id,
-            "101", # str(db_id)
+            "101",  # str(db_id)
             "Rusted Shortsword",
             "equipment",
             "Common",
             1,
             "sword",
-            "equipment"
+            "equipment",
         )
 
     def test_craft_equipment_missing_material(self):
         recipe_id = "craft_rusted_sword"
         if recipe_id not in EQUIPMENT_RECIPES:
-             self.skipTest("Recipe not found")
+            self.skipTest("Recipe not found")
 
         self.mock_db.get_player.return_value = {"aurum": 1000}
-        self.mock_db.get_inventory_item_count.return_value = 0 # Missing mats
+        self.mock_db.get_inventory_item_count.return_value = 0  # Missing mats
 
         success, msg, item_data = self.system.craft_item(self.discord_id, recipe_id)
 
@@ -85,16 +85,23 @@ class TestCraftingEquipment(unittest.TestCase):
         for recipe_id, recipe in EQUIPMENT_RECIPES.items():
             # Check Output Key exists in EQUIPMENT_DATA
             output_key = recipe["output_key"]
-            self.assertIn(output_key, EQUIPMENT_DATA, f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA.")
+            self.assertIn(
+                output_key, EQUIPMENT_DATA, f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA."
+            )
 
             # Check Name matches EQUIPMENT_DATA name
             equip_name = EQUIPMENT_DATA[output_key]["name"]
             recipe_name = recipe["name"]
-            self.assertEqual(equip_name, recipe_name, f"Name mismatch for {recipe_id}. Recipe: '{recipe_name}', Equip: '{equip_name}'.")
+            self.assertEqual(
+                equip_name,
+                recipe_name,
+                f"Name mismatch for {recipe_id}. Recipe: '{recipe_name}', Equip: '{equip_name}'.",
+            )
 
             # Check Materials exist in MATERIALS
             for mat_key, amt in recipe["materials"].items():
                 self.assertIn(mat_key, MATERIALS, f"Material {mat_key} for {recipe_id} not found in MATERIALS.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -98,7 +98,7 @@ class TournamentCog(commands.Cog):
             embed = discord.Embed(
                 title=f"{E.VICTORY} No Active Tournament",
                 description="The guild hall is quiet. The next tournament will begin on Monday.",
-                color=discord.Color.dark_grey()
+                color=discord.Color.dark_grey(),
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
@@ -110,8 +110,8 @@ class TournamentCog(commands.Cog):
 
         embed = discord.Embed(
             title=f"{E.VICTORY} Active Tournament: {active['type'].replace('_', ' ').title()}",
-            description=f"Compete against your guildmates for glory and Aurum!",
-            color=discord.Color.gold()
+            description="Compete against your guildmates for glory and Aurum!",
+            color=discord.Color.gold(),
         )
         embed.add_field(name="Ends In", value=f"{days}d {hours}h", inline=True)
 
@@ -122,7 +122,9 @@ class TournamentCog(commands.Cog):
         embed.set_footer(text="Use /tournament_leaderboard to see top players.")
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="tournament_leaderboard", description="View the top participants in the current tournament.")
+    @app_commands.command(
+        name="tournament_leaderboard", description="View the top participants in the current tournament."
+    )
     async def tournament_leaderboard(self, interaction: discord.Interaction):
         """Displays the leaderboard for the active tournament."""
         active, leaders = self.system.get_leaderboard()
@@ -132,8 +134,7 @@ class TournamentCog(commands.Cog):
             return
 
         embed = discord.Embed(
-            title=f"{E.VICTORY} Leaderboard: {active['type'].replace('_', ' ').title()}",
-            color=discord.Color.gold()
+            title=f"{E.VICTORY} Leaderboard: {active['type'].replace('_', ' ').title()}", color=discord.Color.gold()
         )
 
         if not leaders:
@@ -141,7 +142,15 @@ class TournamentCog(commands.Cog):
         else:
             lines = []
             for entry in leaders:
-                rank_emoji = "🥇" if entry["rank"] == 1 else "🥈" if entry["rank"] == 2 else "🥉" if entry["rank"] == 3 else f"#{entry['rank']}"
+                rank_emoji = (
+                    "🥇"
+                    if entry["rank"] == 1
+                    else "🥈"
+                    if entry["rank"] == 2
+                    else "🥉"
+                    if entry["rank"] == 3
+                    else f"#{entry['rank']}"
+                )
                 name = entry.get("name", "Unknown")
                 score = entry["score"]
                 lines.append(f"{rank_emoji} **{name}**: {score} pts")
@@ -159,7 +168,9 @@ class TournamentCog(commands.Cog):
     async def admin_start(self, interaction: discord.Interaction, event_type: str = "monster_kills"):
         """Manually starts a tournament."""
         if event_type not in self.system.TOURNAMENT_TYPES:
-            await interaction.response.send_message(f"{E.ERROR} Invalid type. Options: {', '.join(self.system.TOURNAMENT_TYPES)}", ephemeral=True)
+            await interaction.response.send_message(
+                f"{E.ERROR} Invalid type. Options: {', '.join(self.system.TOURNAMENT_TYPES)}", ephemeral=True
+            )
             return
 
         # Force stop any existing

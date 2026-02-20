@@ -57,8 +57,14 @@ class QuestSystem:
 
             details = dict(row)
             try:
-                details["objectives"] = json.loads(details["objectives"]) if isinstance(details["objectives"], str) else details["objectives"]
-                details["rewards"] = json.loads(details["rewards"]) if isinstance(details["rewards"], str) else details["rewards"]
+                details["objectives"] = (
+                    json.loads(details["objectives"])
+                    if isinstance(details["objectives"], str)
+                    else details["objectives"]
+                )
+                details["rewards"] = (
+                    json.loads(details["rewards"]) if isinstance(details["rewards"], str) else details["rewards"]
+                )
             except json.JSONDecodeError:
                 details["objectives"] = {}
                 details["rewards"] = {}
@@ -141,7 +147,9 @@ class QuestSystem:
             # ----------------------
 
             try:
-                objectives = json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
+                objectives = (
+                    json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
+                )
             except json.JSONDecodeError:
                 return False
 

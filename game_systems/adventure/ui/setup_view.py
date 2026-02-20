@@ -130,12 +130,14 @@ class AdventureSetupView(View):
                 return
 
             # 2. Fetch data for the next view (Parallel)
-            vitals, session_row, stats_json = await asyncio.gather(
+            vitals, session_row, stats_json, player_data = await asyncio.gather(
                 asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
                 asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
                 asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id),
+                asyncio.to_thread(self.db.get_player, interaction.user.id),
             )
 
+            class_id = player_data["class_id"] if player_data else 1
             player_stats = PlayerStats.from_dict(stats_json)
 
             # 3. Initial Log
@@ -145,7 +147,9 @@ class AdventureSetupView(View):
             ]
 
             # 4. Build Embed
-            embed = AdventureEmbeds.build_exploration_embed(loc_id, initial_log, player_stats, vitals, active_monster=None)
+            embed = AdventureEmbeds.build_exploration_embed(
+                loc_id, initial_log, player_stats, vitals, active_monster=None
+            )
 
             # 5. Transition to Exploration View
             view = ExplorationView(
@@ -157,6 +161,7 @@ class AdventureSetupView(View):
                 player_stats,
                 vitals=vitals,
                 active_monster=None,
+                class_id=class_id,
             )
             await interaction.edit_original_response(embed=embed, view=view)
 

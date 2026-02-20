@@ -26,7 +26,7 @@ class TestInfirmaryRace(unittest.TestCase):
             "discord_id": 12345,
             "current_hp": 50,
             "current_mp": 10,
-            "aurum": 1000
+            "aurum": 1000,
         }
 
         # Mock update result to simulate success
@@ -65,7 +65,7 @@ class TestInfirmaryRace(unittest.TestCase):
             "discord_id": 12345,
             "current_hp": 50,
             "current_mp": 10,
-            "aurum": 1000
+            "aurum": 1000,
         }
 
         # Mock update result to simulate FAILURE (modified_count = 0)
@@ -80,6 +80,7 @@ class TestInfirmaryRace(unittest.TestCase):
         # Should return False because update failed
         self.assertFalse(result)
         self.assertEqual(msg, "Healing failed due to state change. Please try again.")
+
 
 if __name__ == "__main__":
     unittest.main()

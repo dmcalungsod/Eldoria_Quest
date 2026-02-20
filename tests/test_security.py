@@ -17,15 +17,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     import pymongo  # noqa: F401
 except ImportError:
-    sys.modules['pymongo'] = MagicMock()
-    sys.modules['pymongo.errors'] = MagicMock()
+    sys.modules["pymongo"] = MagicMock()
+    sys.modules["pymongo.errors"] = MagicMock()
 
 try:
     import discord  # noqa: F401
     import discord.ext  # noqa: F401
 except ImportError:
-    sys.modules['discord'] = MagicMock()
-    sys.modules['discord.ext'] = MagicMock()
+    sys.modules["discord"] = MagicMock()
+    sys.modules["discord.ext"] = MagicMock()
 
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.player.player_creator import PlayerCreator  # noqa: E402
@@ -55,7 +55,7 @@ class TestSecurity(unittest.TestCase):
         self.mock_db.create_player_full.assert_called()
         args, kwargs = self.mock_db.create_player_full.call_args
         # username is 2nd positional arg or keyword 'username'
-        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+        actual_name = kwargs.get("username", args[1] if len(args) > 1 else None)
 
         self.assertEqual(actual_name, expected_clean_name, "Markdown characters were not removed!")
 
@@ -76,7 +76,7 @@ class TestSecurity(unittest.TestCase):
 
         self.mock_db.create_player_full.assert_called()
         args, kwargs = self.mock_db.create_player_full.call_args
-        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+        actual_name = kwargs.get("username", args[1] if len(args) > 1 else None)
 
         # Assert no brackets or parens
         self.assertNotIn("[", actual_name)
@@ -102,7 +102,7 @@ class TestSecurity(unittest.TestCase):
 
         self.mock_db.create_player_full.assert_called()
         args, kwargs = self.mock_db.create_player_full.call_args
-        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+        actual_name = kwargs.get("username", args[1] if len(args) > 1 else None)
 
         self.assertEqual(len(actual_name), expected_len, "Name was not truncated!")
         self.assertEqual(actual_name, "A" * 32)
@@ -117,5 +117,5 @@ def run_all_tests():
     return result.wasSuccessful()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
