@@ -11,8 +11,8 @@ sys.path.append(os.getcwd())
 sys.modules["pymongo"] = MagicMock()
 
 # Now import
-from game_systems.adventure import adventure_session
-from game_systems.adventure.adventure_session import AdventureSession
+from game_systems.adventure import adventure_session  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
 
 
 class MockDatabaseManager:
