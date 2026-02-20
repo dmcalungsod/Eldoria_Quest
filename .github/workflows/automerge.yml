@@ -1,20 +1,16 @@
 name: Auto-merge eligible PRs
 
 on:
-  # Trigger on PR events that might make a PR mergeable
+  # Trigger AFTER the CI workflow completes (waits for build & test)
+  workflow_run:
+    workflows: ["Eldoria CI"]
+    types: [completed]
+  # Trigger when automerge label is added/removed (CI may have already passed)
   pull_request:
     types:
-      - opened
-      - synchronize
-      - reopened
       - labeled
       - unlabeled
       - ready_for_review
-  # Trigger when a check suite completes (e.g., CI tests pass)
-  check_suite:
-    types: [completed]
-  # Trigger when a commit status changes (for status-based checks)
-  status: {}
 
 jobs:
   automerge:
