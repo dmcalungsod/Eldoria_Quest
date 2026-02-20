@@ -743,5 +743,187 @@
       "exp": 1350,
       "aurum": 450
     }
+  },
+  {
+    "id": 41,
+    "title": "Glimmering Harvest",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Crystal Caverns Entrance",
+    "summary": "Collect crystals for lens crafting.",
+    "description": "Jolen requires high-quality Luminescent Crystals to craft lenses for the city's defenses. The ones found near the surface are too clouded, so you must venture deeper.",
+    "objectives": {
+      "collect": {
+        "Luminescent Crystal": 5
+      }
+    },
+    "rewards": {
+      "exp": 1800,
+      "aurum": 550
+    }
+  },
+  {
+    "id": 42,
+    "title": "Shattered Reflections",
+    "tier": "B",
+    "quest_giver": "Scout Mirin",
+    "location": "Crystal Caverns Deep",
+    "summary": "Clear out Prism Spiders blinding scouts.",
+    "description": "Prism Spiders are using the cavern's reflective surfaces to ambush scouts. Their numbers have grown too large for the advance team to handle safely.",
+    "objectives": {
+      "defeat": {
+        "Prism Spider": 5
+      }
+    },
+    "rewards": {
+      "exp": 1900,
+      "aurum": 580
+    }
+  },
+  {
+    "id": 43,
+    "title": "Construct of Old",
+    "tier": "B",
+    "quest_giver": "Historian Arin",
+    "location": "Crystal Caverns Ruins",
+    "summary": "Defeat Crystal Golems guarding ancient texts.",
+    "description": "Ancient texts lie within the deeper ruins of the cavern, but they are guarded by Crystal Golems\u2014automata that have not forgotten their orders after centuries.",
+    "objectives": {
+      "defeat": {
+        "Crystal Golem": 3
+      }
+    },
+    "rewards": {
+      "exp": 2100,
+      "aurum": 620
+    }
+  },
+  {
+    "id": 44,
+    "title": "Shadows in the Light",
+    "tier": "B",
+    "quest_giver": "Captain Rhea",
+    "location": "Crystal Caverns Upper",
+    "summary": "Obsidian Gargoyles are swooping on miners.",
+    "description": "Miners extracting mithril are being targeted by Obsidian Gargoyles. These beasts dive silently from the ceiling, making them a lethal threat to the operation.",
+    "objectives": {
+      "defeat": {
+        "Obsidian Gargoyle": 3
+      }
+    },
+    "rewards": {
+      "exp": 2200,
+      "aurum": 650
+    }
+  },
+  {
+    "id": 45,
+    "title": "Heart of the Cavern",
+    "tier": "B",
+    "quest_giver": "Guildmaster Kael",
+    "location": "Crystal Core",
+    "summary": "The Crystalline Guardian has awakened.",
+    "description": "Tremors from the Crystal Caverns suggest the Crystalline Guardian has stirred. If it is not subdued, the entire cavern system could collapse.",
+    "objectives": {
+      "defeat": {
+        "Crystalline Guardian": 1
+      }
+    },
+    "rewards": {
+      "exp": 3500,
+      "aurum": 1000,
+      "item": "Magic Stone (Large)"
+    }
+  },
+  {
+    "id": 46,
+    "title": "Obsidian Mining",
+    "tier": "A",
+    "quest_giver": "Blacksmith Gorn",
+    "location": "Molten Caldera Rim",
+    "summary": "Retrieve obsidian shards for masterwork weapons.",
+    "description": "Gorn needs Obsidian Shards tempered by the caldera's heat to forge weapons capable of piercing dragon scales. Only the bravest can gather them.",
+    "objectives": {
+      "collect": {
+        "Obsidian Shard": 5
+      }
+    },
+    "rewards": {
+      "exp": 3800,
+      "aurum": 1100
+    }
+  },
+  {
+    "id": 47,
+    "title": "Living Flame",
+    "tier": "A",
+    "quest_giver": "Mage Lyra",
+    "location": "Molten Flows",
+    "summary": "Study Fire Elementals.",
+    "description": "Lyra believes the Fire Elementals of the caldera hold the secret to a lost spell. She needs field data\u2014obtained by engaging them in combat.",
+    "objectives": {
+      "defeat": {
+        "Fire Elemental": 5
+      }
+    },
+    "rewards": {
+      "exp": 3900,
+      "aurum": 1150
+    }
+  },
+  {
+    "id": 48,
+    "title": "Magma Rising",
+    "tier": "A",
+    "quest_giver": "Captain Rhea",
+    "location": "Caldera Depths",
+    "summary": "Magma Golems are blocking the path.",
+    "description": "A lava flow has shifted, and Magma Golems have blocked the main descent path. They must be cleared for the expedition to continue.",
+    "objectives": {
+      "defeat": {
+        "Magma Golem": 4
+      }
+    },
+    "rewards": {
+      "exp": 4100,
+      "aurum": 1200
+    }
+  },
+  {
+    "id": 49,
+    "title": "Drake Hunt",
+    "tier": "A",
+    "quest_giver": "Hunter Yorin",
+    "location": "Drake's Perch",
+    "summary": "A Lava Drake has been spotting near the rim.",
+    "description": "A Lava Drake has claimed a perch dangerously close to the survey camp. Yorin needs a skilled hunter to bring the beast down before it roasts the tents.",
+    "objectives": {
+      "defeat": {
+        "Lava Drake": 2
+      }
+    },
+    "rewards": {
+      "exp": 4300,
+      "aurum": 1300
+    }
+  },
+  {
+    "id": 50,
+    "title": "Lord of Cinders",
+    "tier": "A",
+    "quest_giver": "Guildmaster Kael",
+    "location": "Heart of Fire",
+    "summary": "Ignis threatens to erupt the caldera.",
+    "description": "Ignis, Lord of Cinders, is gathering power at the caldera's heart. If his ritual completes, a volcanic eruption will consume everything. Stop him.",
+    "objectives": {
+      "defeat": {
+        "Ignis, Lord of Cinders": 1
+      }
+    },
+    "rewards": {
+      "exp": 6000,
+      "aurum": 2500,
+      "item": "Magic Stone (Flawless)"
+    }
   }
 ]
