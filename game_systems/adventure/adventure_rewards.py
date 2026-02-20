@@ -74,7 +74,9 @@ class AdventureRewards:
                     logs.append(f"\n{E.MEDAL} **PROMOTION SUCCESSFUL!**\nYou are now **Rank {promo_rank}**.")
 
             # 2. Loot & Quests
-            self._process_loot_and_quests(combat_result, quest_system, inventory_manager, session_loot, logs)
+            actual_drops = self._process_loot_and_quests(
+                combat_result, quest_system, inventory_manager, session_loot, logs
+            )
 
             # 3. Stat Growth
             self._process_stat_exp(battle_report, logs)
@@ -92,6 +94,12 @@ class AdventureRewards:
                 tournament.record_action(self.discord_id, "monster_kills", 1)
                 if tier == "Boss":
                     tournament.record_action(self.discord_id, "boss_kills", 1)
+
+                # Event: Spectral Tide
+                ectoplasm_count = actual_drops.count("ectoplasm")
+                if ectoplasm_count > 0:
+                    tournament.record_action(self.discord_id, "spectral_tide", ectoplasm_count)
+
             except Exception as e:
                 logger.error(f"Tournament hook error: {e}")
             # -----------------------
@@ -178,6 +186,8 @@ class AdventureRewards:
         # FIX: Pass only actual drops, not potential drops
         self._update_quests(quest_system, combat_result["monster_data"]["name"], actual_drops, logs)
 
+        return actual_drops
+
     def _update_quests(self, quest_system, monster_name, actual_drops, logs):
         updated = []
         quests = quest_system.get_player_quests(self.discord_id)
@@ -204,6 +214,8 @@ class AdventureRewards:
 
         if updated:
             logs.append(f"\n{E.QUEST_SCROLL} *Quest Updated: {', '.join(updated)}*")
+
+        return actual_drops
 
     def _calculate_growth(self, current_exp, gain, threshold):
         """Helper to calculate leveling progress."""

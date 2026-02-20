@@ -21,6 +21,7 @@ class TournamentSystem:
         "monster_kills",
         "quests_completed",
         "boss_kills",
+        "spectral_tide",
     ]
 
     def __init__(self, db_manager: DatabaseManager):
