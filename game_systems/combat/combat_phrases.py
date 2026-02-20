@@ -413,6 +413,85 @@ class CombatPhrases:
         ],
     )
 
+    # --- SKILL PHRASES (New) ---
+    SKILL_PHRASES = {
+        # --- WARRIOR ---
+        "power_strike": [
+            "You channel all your might into a single, devastating blow with **{skill_name}**!",
+            "Muscles straining, you deliver a bone-crushing **{skill_name}** to the {m_name}!",
+            "Your weapon glows with kinetic energy as **{skill_name}** impacts the target!",
+        ],
+        "cleave": [
+            "You swing your weapon in a massive arc, unleashing **{skill_name}**!",
+            "Your blade sings through the air, striking multiple foes with **{skill_name}**!",
+            "A wide sweep of steel clears the path—**{skill_name}** lands true!",
+        ],
+        "endure": [
+            "You grit your teeth and brace for impact, activating **{skill_name}**.",
+            "You steel your resolve, letting **{skill_name}** harden your defenses.",
+            "Adrenaline floods your veins as you prepare to withstand the onslaught.",
+        ],
+        # --- MAGE ---
+        "fireball": [
+            "You chant the ancient words, and a roaring **{skill_name}** erupts from your hands!",
+            "Flames coalesce into a sphere of destruction as you cast **{skill_name}**!",
+            "The air shimmers with heat before **{skill_name}** turns the {m_name} to ash!",
+        ],
+        "ice_lance": [
+            "Moisture in the air freezes instantly as you hurl an **{skill_name}**!",
+            "A jagged shard of ice forms at your command—**{skill_name}** strikes true!",
+            "You conjure a spear of permafrost, driving it into the {m_name}!",
+        ],
+        "mana_shield": [
+            "A shimmering barrier of pure energy surrounds you—**{skill_name}** is active.",
+            "You weave a protective shell of mana, invoking **{skill_name}**.",
+            "Arcane sigils flare around you, absorbing the next blow.",
+        ],
+        "explosion": [
+            "You unleash your ultimate power—**{skill_name}** obliterates everything in sight!",
+            "The world turns white as **{skill_name}** detonates with cataclysmic force!",
+            "Gravity itself seems to buckle as you channel **{skill_name}**!",
+        ],
+        # --- ROGUE ---
+        "double_strike": [
+            "Your blades become a blur as you execute a **{skill_name}**!",
+            "One strike high, one low—**{skill_name}** catches the {m_name} off guard!",
+            "You move faster than the eye can follow, landing two hits in a heartbeat!",
+        ],
+        "toxic_blade": [
+            "You coat your weapon in deadly venom and deliver a **{skill_name}**!",
+            "A green glint on your steel betrays the poison of **{skill_name}**.",
+            "The {m_name} hisses in pain as **{skill_name}** infects its blood!",
+        ],
+        # --- CLERIC ---
+        "heal": [
+            "You call upon divine grace, and **{skill_name}** closes your wounds.",
+            "A warm, golden light bathes you as **{skill_name}** restores your vitality.",
+            "Faith manifests as physical restoration—**{skill_name}** mends your flesh.",
+        ],
+        "smite": [
+            "Holy fire descends from the heavens! **{skill_name}** purges the wicked!",
+            "You channel the wrath of the gods into a searing **{skill_name}**!",
+            "Blinding light erupts as you judge the {m_name} with **{skill_name}**!",
+        ],
+        "blessing": [
+            "You recite a sacred prayer, granting a **{skill_name}** to bolster your strength.",
+            "Divine favor shines upon you as you invoke **{skill_name}**.",
+            "A halo of light forms above you, empowering your every move.",
+        ],
+        # --- RANGER ---
+        "true_shot": [
+            "You hold your breath, steady your aim, and loose a **{skill_name}**!",
+            "Your arrow flies with supernatural precision—a perfect **{skill_name}**!",
+            "Time seems to slow as you line up the kill shot with **{skill_name}**!",
+        ],
+        "multi_shot": [
+            "You nock multiple arrows at once and unleash a **{skill_name}**!",
+            "A rain of arrows darkens the sky as you use **{skill_name}**!",
+            "You fire in rapid succession, turning the air into a deadly volley!",
+        ],
+    }
+
     @staticmethod
     def opening(monster_data: dict) -> str:
         """Generates opening line."""
@@ -548,8 +627,15 @@ class CombatPhrases:
     def player_skill(player, monster, skill, damage, is_crit) -> str:
         m_name = str(monster.get("name", "the enemy"))
         skill_name = str(skill.get("name", "a skill"))
+        skill_key = skill.get("key_id", "")
         crit_text = " **(CRITICAL!)**" if is_crit else ""
 
+        # Check for specific skill phrases
+        if skill_key in CombatPhrases.SKILL_PHRASES:
+            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+            return f"{phrase.format(skill_name=skill_name, m_name=m_name)} (`{damage}` damage){crit_text}"
+
+        # Generic Fallback
         phrases = [
             f"You unleash **{skill_name}**! It crashes into the {m_name} for `{damage}` damage!{crit_text}",
             f"Focusing your strength, you invoke **{skill_name}**, striking the {m_name} for `{damage}` damage.{crit_text}",
@@ -560,7 +646,14 @@ class CombatPhrases:
     @staticmethod
     def player_heal(player, skill, heal_amount) -> str:
         skill_name = str(skill.get("name", "a healing spell"))
+        skill_key = skill.get("key_id", "")
 
+        # Check for specific skill phrases
+        if skill_key in CombatPhrases.SKILL_PHRASES:
+            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+            return f"{phrase.format(skill_name=skill_name)} (+`{heal_amount}` HP)"
+
+        # Generic Fallback
         phrases = [
             f"You invoke **{skill_name}**. Warmth floods your body, restoring `{heal_amount}` HP.",
             f"A whispered prayer— **{skill_name}** mends your wounds for `{heal_amount}` HP.",
@@ -571,7 +664,14 @@ class CombatPhrases:
     @staticmethod
     def player_buff(player, skill) -> str:
         skill_name = str(skill.get("name", "a buff"))
+        skill_key = skill.get("key_id", "")
 
+        # Check for specific skill phrases
+        if skill_key in CombatPhrases.SKILL_PHRASES:
+            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+            return f"{E.BUFF} {phrase.format(skill_name=skill_name)}"
+
+        # Generic Fallback
         phrases = [
             f"You channel power into **{skill_name}**, altering your state.",
             f"A moment of focus— **{skill_name}** takes hold.",
