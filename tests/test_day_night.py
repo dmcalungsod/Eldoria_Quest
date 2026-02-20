@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 # Mock pymongo before importing any app modules
 try:
-    import pymongo
+    import pymongo  # noqa: F401
 except ImportError:
     mock_pymongo = MagicMock()
     sys.modules["pymongo"] = mock_pymongo
