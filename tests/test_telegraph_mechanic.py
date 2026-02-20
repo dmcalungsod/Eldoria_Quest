@@ -10,10 +10,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
-from game_systems.combat.combat_engine import CombatEngine
-from game_systems.player.level_up import LevelUpSystem
-from game_systems.player.player_stats import PlayerStats
-from game_systems.monsters.monster_actions import MonsterAI
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
+from game_systems.player.level_up import LevelUpSystem  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from game_systems.monsters.monster_actions import MonsterAI  # noqa: E402
 
 
 class TestTelegraphMechanic(unittest.TestCase):
