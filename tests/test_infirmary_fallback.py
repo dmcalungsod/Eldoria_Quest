@@ -45,8 +45,9 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # --- IMPORT MODULE UNDER TEST ---
-from cogs.infirmary_cog import InfirmaryView
-from game_systems.player.player_stats import PlayerStats
+from cogs.infirmary_cog import InfirmaryView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestInfirmaryFallbackExploit(unittest.TestCase):
     def setUp(self):
