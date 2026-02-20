@@ -131,6 +131,33 @@ LOCATIONS = {
             ("magic_stone_medium", 30),
         ],
     },
+    "molten_caldera": {
+        "name": "The Molten Caldera",
+        "emoji": "🌋",
+        "min_rank": "A",
+        "level_req": 30,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_106", 30),  # Fire Elemental
+            ("monster_107", 30),  # Magma Golem
+            ("monster_108", 25),  # Ember Salamander
+            ("monster_109", 15),  # Lava Drake (Elite)
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_110",  # Ignis (Boss)
+                "weight": 5,
+                "min_level": 35,
+            }
+        ],
+        "description": "A churning lake of fire and obsidian. The heat alone is enough to kill the unprepared.",
+        "gatherables": [
+            ("obsidian_shard", 40),
+            ("fire_essence", 30),
+            ("magma_core", 20),
+            ("magic_stone_large", 10),
+        ],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",
