@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
 
-from database.database_manager import DatabaseManager
-from game_systems.crafting.crafting_system import CraftingSystem
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
 
 
 class TestDatabaseEnhancements(unittest.TestCase):

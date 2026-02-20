@@ -10,8 +10,9 @@ from unittest.mock import MagicMock
 # Mock pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
 
-import unittest
-from game_systems.crafting.crafting_system import CraftingSystem
+import unittest  # noqa: E402
+
+from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
 
 
 class TestCraftingDismantle(unittest.TestCase):
