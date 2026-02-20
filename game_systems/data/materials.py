@@ -199,4 +199,35 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 950,
     },
+    # --- The Void Sanctum Materials (Rank S) ---
+    "void_dust": {
+        "name": "Void Dust",
+        "description": "A pile of fine, dark dust that seems to absorb light.",
+        "rarity": "Common",
+        "value": 30,
+    },
+    "abyssal_shackle": {
+        "name": "Abyssal Shackle",
+        "description": "A broken chain link made of an unknown, cold metal.",
+        "rarity": "Common",
+        "value": 35,
+    },
+    "entropy_crystal": {
+        "name": "Entropy Crystal",
+        "description": "A crystal that constantly shifts its shape.",
+        "rarity": "Uncommon",
+        "value": 60,
+    },
+    "null_stone": {
+        "name": "Null Stone",
+        "description": "A heavy stone that feels like it weighs nothing.",
+        "rarity": "Rare",
+        "value": 250,
+    },
+    "void_heart": {
+        "name": "Void Heart",
+        "description": "A pulsating core of pure nothingness.",
+        "rarity": "Epic",
+        "value": 1500,
+    },
 }

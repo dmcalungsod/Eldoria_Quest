@@ -409,4 +409,81 @@ MONSTERS["monster_115"] = {
     "description": "An ancient giant clad in glacial armor, ruling the eternal winter.",
 }
 
+# --- THE VOID SANCTUM MONSTERS (Rank S) ---
+
+# 116: Void Stalker (Fast)
+MONSTERS["monster_116"] = {
+    "id": 116,
+    "name": "Void Stalker",
+    "level": 41,
+    "tier": "Normal",
+    "hp": 2800,
+    "atk": 160,
+    "def": 40,
+    "xp": 3500,
+    "drops": [("void_dust", 70), ("magic_stone_large", 40)],
+    "skills": [MONSTER_SKILLS["void_slash"], MONSTER_SKILLS["rapid_strike"]],
+    "description": "A silhouette that moves between shadows, striking with unseen blades.",
+}
+
+# 117: Abyssal Construct (Tank)
+MONSTERS["monster_117"] = {
+    "id": 117,
+    "name": "Abyssal Construct",
+    "level": 42,
+    "tier": "Normal",
+    "hp": 5000,
+    "atk": 130,
+    "def": 120,
+    "xp": 3800,
+    "drops": [("abyssal_shackle", 60), ("magic_stone_large", 50)],
+    "skills": [MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["crushing_slam"]],
+    "description": "Armor animated by a void spirit, relentless and unfeeling.",
+}
+
+# 118: Null Wisp (Magic)
+MONSTERS["monster_118"] = {
+    "id": 118,
+    "name": "Null Wisp",
+    "level": 41,
+    "tier": "Normal",
+    "hp": 2500,
+    "atk": 180,
+    "def": 30,
+    "xp": 3600,
+    "drops": [("entropy_crystal", 50), ("void_dust", 40)],
+    "skills": [MONSTER_SKILLS["entropy_wave"], MONSTER_SKILLS["prism_beam"]],
+    "description": "A sphere of anti-light that distorts the air around it.",
+}
+
+# 119: Entropy Drake (Elite)
+MONSTERS["monster_119"] = {
+    "id": 119,
+    "name": "Entropy Drake",
+    "level": 44,
+    "tier": "Elite",
+    "hp": 8500,
+    "atk": 200,
+    "def": 80,
+    "xp": 15000,
+    "drops": [("null_stone", 40), ("magic_stone_flawless", 30)],
+    "skills": [MONSTER_SKILLS["void_slash"], MONSTER_SKILLS["entropy_wave"]],
+    "description": "A twisted dragon whose scales seem to devour reality itself.",
+}
+
+# 120: Omega, The Void Heart (Boss)
+MONSTERS["monster_120"] = {
+    "id": 120,
+    "name": "Omega, The Void Heart",
+    "level": 45,
+    "tier": "Boss",
+    "hp": 25000,
+    "atk": 250,
+    "def": 150,
+    "xp": 50000,
+    "drops": [("void_heart", 100), ("magic_stone_flawless", 100), ("null_stone", 80)],
+    "skills": [MONSTER_SKILLS["annihilate"], MONSTER_SKILLS["entropy_wave"], MONSTER_SKILLS["regenerate"]],
+    "description": "The center of the void. To look upon it is to know the end.",
+}
+
 __all__ = ["MONSTERS"]

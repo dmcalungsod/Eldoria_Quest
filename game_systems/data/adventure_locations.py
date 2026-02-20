@@ -190,6 +190,33 @@ LOCATIONS = {
             ("magic_stone_medium", 30),
         ],
     },
+    "void_sanctum": {
+        "name": "The Void Sanctum",
+        "emoji": "⚫",
+        "min_rank": "S",
+        "level_req": 40,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_116", 30),  # Void Stalker
+            ("monster_118", 30),  # Null Wisp
+            ("monster_117", 25),  # Abyssal Construct
+            ("monster_119", 15),  # Entropy Drake
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_120",  # Omega (Boss)
+                "weight": 5,
+                "min_level": 44,
+            }
+        ],
+        "description": "A realm where reality frays and silence screams. The final frontier of the known world.",
+        "gatherables": [
+            ("void_dust", 40),
+            ("abyssal_shackle", 30),
+            ("entropy_crystal", 20),
+            ("magic_stone_flawless", 10),
+        ],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",
