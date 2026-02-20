@@ -1,6 +1,6 @@
+import importlib
 import sys
 import unittest
-import importlib
 from unittest.mock import MagicMock
 
 # 1. Mock Discord
@@ -40,6 +40,8 @@ class MockView:
         self.timeout = timeout
     def add_item(self, item):
         self.children.append(item)
+    def clear_items(self):
+        self.children.clear()
 
 class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
@@ -70,6 +72,7 @@ import os  # noqa: E402
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import game_systems.adventure.ui.exploration_view  # noqa: E402
+
 # Force reload to ensure it picks up the mocked discord module
 importlib.reload(game_systems.adventure.ui.exploration_view)
 from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
@@ -145,8 +148,9 @@ class TestExplorationViewUX(unittest.TestCase):
             active_monster=monster
         )
 
+        # Updated: Now expects "Attack" button
         btn = view.children[0]
-        self.assertEqual(btn.label, "Battle")
+        self.assertEqual(btn.label, "Attack")
         self.assertEqual(btn.style, "danger")
 
 if __name__ == "__main__":

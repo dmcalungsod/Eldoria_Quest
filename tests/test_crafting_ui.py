@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock
 
@@ -74,6 +74,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import View
 from game_systems.crafting.ui.crafting_view import CraftingView  # noqa: E402
+
 
 class TestCraftingUI(unittest.TestCase):
     def setUp(self):

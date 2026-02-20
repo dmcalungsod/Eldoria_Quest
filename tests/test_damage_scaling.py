@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import MagicMock
+
 from game_systems.combat.damage_formula import DamageFormula
 from game_systems.player.player_stats import PlayerStats
+
 
 class TestDamageScaling(unittest.TestCase):
     def setUp(self):

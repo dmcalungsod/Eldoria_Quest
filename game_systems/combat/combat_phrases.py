@@ -15,86 +15,410 @@ class CombatPhrases:
     Houses all static methods for generating thematic combat narration.
     """
 
+    # --- MONSTER OPENING PHRASES ---
+    OPENING_PHRASES = {
+        "Goblin": [
+            "A chittering {name} scrambles from the rocks, its crude blade trembling.",
+            "A {name} leaps into your path, eyes gleaming with malice.",
+            "A raspy snarl rings out— a {name} emerges, grinning.",
+            "A {name} darts from the shadows, clutching its jagged weapon.",
+            "A {name} clambers over broken stone, shrieking a challenge.",
+            "The stench of unwashed hides precedes a {name}, stepping into the light.",
+            "You hear a manic cackle as a {name} reveals itself.",
+        ],
+        "Slime": [
+            "A {name} gurgles from the damp soil, its form quivering.",
+            "The ground shivers as a {name} slides into view.",
+            "A {name} bubbles grotesquely, advancing slowly.",
+            "Moist air thickens as a {name} rises, dripping sludge.",
+            "A wet, slapping sound announces the arrival of a {name}.",
+            "The earth seems to dissolve as a {name} pools into a solid form.",
+        ],
+        "Wolf": [
+            "A {name} emerges, fangs bared and low growl rumbling.",
+            "You are being hunted— a {name} circles you.",
+            "Leaves scatter as a {name} lunges from cover.",
+            "A {name} prowls into the clearing, breath steaming.",
+            "Yellow eyes flash in the darkness—a {name} is upon you.",
+            "A mournful howl cuts the air, followed by the snap of twigs as a {name} appears.",
+        ],
+        "Hound": [
+            "A {name} emerges, fangs bared and low growl rumbling.",
+            "You are being hunted— a {name} circles you.",
+            "Leaves scatter as a {name} lunges from cover.",
+            "A {name} prowls into the clearing, breath steaming.",
+            "Yellow eyes flash in the darkness—a {name} is upon you.",
+            "A mournful howl cuts the air, followed by the snap of twigs as a {name} appears.",
+        ],
+        "Spider": [
+            "Eight legs skitter as a {name} descends from above.",
+            "A hulking {name} blocks your path, mandibles clacking.",
+            "Silk trembles overhead as a {name} lowers itself.",
+            "A {name} crawls forth, venom glistening on its fangs.",
+            "You brush against a sticky thread, and a {name} drops to investigate.",
+            "Many eyes watch you from the gloom—a {name} prepares to strike.",
+        ],
+        "Boar": [
+            "The undergrowth explodes as a {name} charges into view!",
+            "A massive {name} paws the ground, preparing to trample you.",
+            "Heavy hooves thunder against the earth—a {name} is attacking!",
+            "Snorting with aggression, a {name} lowers its head to strike.",
+            "Trees shake as a {name} crashes through the brush.",
+        ],
+        "Stag": [
+            "The undergrowth explodes as a {name} charges into view!",
+            "A massive {name} paws the ground, preparing to trample you.",
+            "Heavy hooves thunder against the earth—a {name} is attacking!",
+            "Snorting with aggression, a {name} lowers its head to strike.",
+            "Trees shake as a {name} crashes through the brush.",
+        ],
+        "Brute": [
+            "The undergrowth explodes as a {name} charges into view!",
+            "A massive {name} paws the ground, preparing to trample you.",
+            "Heavy hooves thunder against the earth—a {name} is attacking!",
+            "Snorting with aggression, a {name} lowers its head to strike.",
+            "Trees shake as a {name} crashes through the brush.",
+        ],
+        "Bear": [
+            "A {name} rises on its hind legs, roaring a challenge.",
+            "The ground shakes under the weight of a {name}.",
+            "A massive {name} lumbers into view, eyes locked on you.",
+        ],
+        "Treant": [
+            "A {name} creaks to life, detaching itself from the forest.",
+            "Roots snap and shift as a {name} lumbers toward you.",
+            "The trees themselves seem to turn against you—a {name} awakens.",
+            "A {name} rises from the earth, moss and bark forming a deadly shape.",
+            "Ancient wood groans as a {name} steps from the canopy.",
+        ],
+        "Ent": [
+            "A {name} creaks to life, detaching itself from the forest.",
+            "Roots snap and shift as a {name} lumbers toward you.",
+            "The trees themselves seem to turn against you—a {name} awakens.",
+            "A {name} rises from the earth, moss and bark forming a deadly shape.",
+            "Ancient wood groans as a {name} steps from the canopy.",
+        ],
+        "Vineling": [
+            "A {name} creaks to life, detaching itself from the forest.",
+            "Roots snap and shift as a {name} lumbers toward you.",
+            "The trees themselves seem to turn against you—a {name} awakens.",
+            "A {name} rises from the earth, moss and bark forming a deadly shape.",
+            "Ancient wood groans as a {name} steps from the canopy.",
+        ],
+        "Bramble": [
+            "A {name} creaks to life, detaching itself from the forest.",
+            "Roots snap and shift as a {name} lumbers toward you.",
+            "The trees themselves seem to turn against you—a {name} awakens.",
+            "A {name} rises from the earth, moss and bark forming a deadly shape.",
+            "Ancient wood groans as a {name} steps from the canopy.",
+        ],
+        "Sporeling": [
+            "A {name} creaks to life, detaching itself from the forest.",
+            "Roots snap and shift as a {name} lumbers toward you.",
+            "The trees themselves seem to turn against you—a {name} awakens.",
+            "A {name} rises from the earth, moss and bark forming a deadly shape.",
+            "Ancient wood groans as a {name} steps from the canopy.",
+        ],
+        "Wisp": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Shade": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Revenant": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Wight": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Stormling": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Duskling": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Sprite": [
+            "The temperature plummets as a {name} flickers into existence.",
+            "A spectral chill washes over you—a {name} drifts closer.",
+            "A {name} manifests from the gloom, eyes burning with cold light.",
+            "Ethereal silence falls, broken only by the hum of a {name}.",
+            "A ball of cold fire dances in the air—a {name} approaches.",
+        ],
+        "Crawler": [
+            "Damp earth churns as a {name} scuttles forth.",
+            "A {name} emerges from the muck, clicking its mandibles.",
+            "Something wet and many-legged moves in the shadows—a {name} appears.",
+            "The stench of rot heralds the arrival of a {name}.",
+            "Insects flee as a {name} drags itself into view.",
+        ],
+        "Urch": [
+            "Damp earth churns as a {name} scuttles forth.",
+            "A {name} emerges from the muck, clicking its mandibles.",
+            "Something wet and many-legged moves in the shadows—a {name} appears.",
+            "The stench of rot heralds the arrival of a {name}.",
+            "Insects flee as a {name} drags itself into view.",
+        ],
+        "Lurker": [
+            "Damp earth churns as a {name} scuttles forth.",
+            "A {name} emerges from the muck, clicking its mandibles.",
+            "Something wet and many-legged moves in the shadows—a {name} appears.",
+            "The stench of rot heralds the arrival of a {name}.",
+            "Insects flee as a {name} drags itself into view.",
+        ],
+        "Undead": [
+            "A {name} shambles forward, bones rattling with ancient hatred.",
+            "The grave soil shifts, revealing a {name}.",
+            "A hollow groan echoes as a {name} lurches toward you.",
+            "Death itself seems to cling to the {name} approaching you.",
+            "Empty sockets stare into your soul as a {name} advances.",
+        ],
+        "Skeleton": [
+            "A {name} shambles forward, bones rattling with ancient hatred.",
+            "The grave soil shifts, revealing a {name}.",
+            "A hollow groan echoes as a {name} lurches toward you.",
+            "Death itself seems to cling to the {name} approaching you.",
+            "Empty sockets stare into your soul as a {name} advances.",
+        ],
+        "Zombie": [
+            "A {name} shambles forward, bones rattling with ancient hatred.",
+            "The grave soil shifts, revealing a {name}.",
+            "A hollow groan echoes as a {name} lurches toward you.",
+            "Death itself seems to cling to the {name} approaching you.",
+            "Empty sockets stare into your soul as a {name} advances.",
+        ],
+    }
+
+    GENERIC_OPENING = [
+        "The air chills as a {name} emerges from the shadows.",
+        "A rustle in the undergrowth reveals a {name}, intent on violence.",
+        "From the gloom, a {name} steps forward.",
+        "A {name} materializes, eyes cold and unfeeling.",
+        "Something stirs in the dark—a {name} reveals itself.",
+        "The silence is broken by the approach of a {name}.",
+        "Your instincts scream danger as a {name} appears.",
+        "A {name} stands before you, ready to kill.",
+    ]
+
+    # --- MONSTER ATTACK PHRASES ---
+    # Structure: (Normal, Critical)
+    ATTACK_PHRASES = {
+        "Goblin": (
+            [
+                "The {name} stabs wildly, catching you for `{dmg}` damage!",
+                "The {name} lunges with a shriek, slashing for `{dmg}` damage!",
+                "A dirty blade finds a gap in your armor— `{dmg}` damage.",
+                "The {name} bites and claws, dealing `{dmg}` damage.",
+                "A jagged dagger scrapes across your skin— `{dmg}` damage.",
+            ],
+            [
+                "The {name}'s blade sinks deep into your side! `{dmg}` damage! **(CRITICAL!)**",
+                "A vicious strike to your ribs leaves you gasping! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} exploits your stumble with a brutal shank! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Slime": (
+            [
+                "The {name} slams into you with heavy force for `{dmg}` damage.",
+                "Acid splashes against your skin— `{dmg}` damage!",
+                "The {name} engulfs your limb momentarily, burning for `{dmg}` damage.",
+                "A pseudopod whips out, striking you for `{dmg}` damage.",
+                "The {name} surges forward, bludgeoning you for `{dmg}` damage.",
+            ],
+            [
+                "The {name} envelops you, its acid dissolving your armor! `{dmg}` damage! **(CRITICAL!)**",
+                "A massive surge of sludge crushes the breath from you! `{dmg}` damage! **(CRITICAL!)**",
+                "You are trapped in the {name}'s corrosive grip! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Wolf": (
+            [
+                "The {name} bites down savagely for `{dmg}` damage!",
+                "Claws rake your side, drawing blood— `{dmg}` damage.",
+                "Hot breath precedes a tearing snap of jaws— `{dmg}` damage.",
+                "The {name} leaps, knocking you back for `{dmg}` damage.",
+                "Fangs graze your arm— `{dmg}` damage.",
+            ],
+            [
+                "The {name}'s jaws lock onto your limb, tearing flesh! `{dmg}` damage! **(CRITICAL!)**",
+                "Claws shred through your defenses, leaving deep gouges! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} goes for the throat—you barely deflect it! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Hound": (
+            [
+                "The {name} bites down savagely for `{dmg}` damage!",
+                "Claws rake your side, drawing blood— `{dmg}` damage.",
+                "Hot breath precedes a tearing snap of jaws— `{dmg}` damage.",
+                "The {name} leaps, knocking you back for `{dmg}` damage.",
+                "Fangs graze your arm— `{dmg}` damage.",
+            ],
+            [
+                "The {name}'s jaws lock onto your limb, tearing flesh! `{dmg}` damage! **(CRITICAL!)**",
+                "Claws shred through your defenses, leaving deep gouges! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} goes for the throat—you barely deflect it! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Spider": (
+            [
+                "The {name} sinks its fangs into you for `{dmg}` damage!",
+                "A sharp leg pierces your defense— `{dmg}` damage.",
+                "Venom burns as the {name} strikes for `{dmg}` damage.",
+                "Webs entangle you as the {name} bites— `{dmg}` damage.",
+                "The {name} skitters past, slashing you for `{dmg}` damage.",
+            ],
+            [
+                "Venom floods your veins as the {name} lands a deep bite! `{dmg}` damage! **(CRITICAL!)**",
+                "A chitinous leg impales you, pinning you momentarily! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} strikes a nerve cluster—agony blinds you! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Boar": (
+            [
+                "The {name} swipes with massive force, dealing `{dmg}` damage!",
+                "You are thrown back by the {name}'s charge— `{dmg}` damage.",
+                "Bone-crushing weight slams into you for `{dmg}` damage.",
+                "The {name} gores you with brutal efficiency— `{dmg}` damage.",
+                "A tusk grazes your leg— `{dmg}` damage.",
+            ],
+            [
+                "The {name} tramples you, crushing ribs under its weight! `{dmg}` damage! **(CRITICAL!)**",
+                "A tusk pierces deep, lifting you off your feet! `{dmg}` damage! **(CRITICAL!)**",
+                "The impact of the charge shatters your guard! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Bear": (
+            [
+                "The {name} swipes with massive force, dealing `{dmg}` damage!",
+                "You are thrown back by the {name}'s charge— `{dmg}` damage.",
+                "Bone-crushing weight slams into you for `{dmg}` damage.",
+                "The {name} mauls you with brutal efficiency— `{dmg}` damage.",
+            ],
+            [
+                "The {name} crushes you in a bear hug, snapping bone! `{dmg}` damage! **(CRITICAL!)**",
+                "Massive claws tear through armor and flesh alike! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        "Treant": (
+            [
+                "A heavy branch bludgeons you for `{dmg}` damage!",
+                "Roots whip out, lashing your skin for `{dmg}` damage.",
+                "The {name} crushes you with the weight of old wood— `{dmg}` damage.",
+                "Thorns tear at your flesh as the {name} strikes for `{dmg}` damage.",
+                "The {name} swings a massive limb— `{dmg}` damage.",
+            ],
+            [
+                "A root constricts your chest, cracking ribs! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} brings a massive trunk down, flattening you! `{dmg}` damage! **(CRITICAL!)**",
+                "Thorns tear deep into muscle, leaving you bleeding! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        # Mapped types for Treant-like
+        "Ent": "Treant", "Vineling": "Treant", "Bramble": "Treant", "Sporeling": "Treant",
+
+        "Wisp": (
+            [
+                "A cold touch drains your vitality— `{dmg}` damage.",
+                "The {name} passes through your guard, chilling you for `{dmg}` damage!",
+                "Spectral energy flares, burning you with cold fire for `{dmg}` damage.",
+                "The {name} strikes with an otherworldly force— `{dmg}` damage.",
+                "Your breath freezes as the {name} touches you— `{dmg}` damage.",
+            ],
+            [
+                "The {name} passes straight through your heart—liquid ice fills your veins! `{dmg}` damage! **(CRITICAL!)**",
+                "Soul-flaying cold wracks your body! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} feeds directly on your life force! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        # Mapped types for Wisp-like
+        "Shade": "Wisp", "Revenant": "Wisp", "Wight": "Wisp", "Stormling": "Wisp", "Duskling": "Wisp", "Sprite": "Wisp",
+
+        "Crawler": (
+            [
+                "The {name} pinches you with serrated limbs for `{dmg}` damage!",
+                "Acidic slime burns your skin as the {name} strikes— `{dmg}` damage.",
+                "Mandibles snap shut on your arm— `{dmg}` damage.",
+                "The {name} swarms over your defenses, biting for `{dmg}` damage.",
+                "Sharp legs scratch and tear— `{dmg}` damage.",
+            ],
+            [
+                "The {name} burrows its mandibles into your flesh! `{dmg}` damage! **(CRITICAL!)**",
+                "Serrated limbs saw through your armor! `{dmg}` damage! **(CRITICAL!)**",
+                "Venom and acid overwhelm your senses! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        # Mapped types
+        "Urch": "Crawler", "Lurker": "Crawler",
+
+        "Undead": (
+            [
+                "A rotting fist slams into you for `{dmg}` damage!",
+                "Bones rattle as the {name} strikes— `{dmg}` damage.",
+                "A rusty weapon swings with unnatural strength, dealing `{dmg}` damage.",
+                "The {name} lurches forward, tearing at you for `{dmg}` damage.",
+                "Cold, dead fingers claw at your face— `{dmg}` damage.",
+            ],
+            [
+                "The {name}'s rusty blade finds a gap, infecting the wound! `{dmg}` damage! **(CRITICAL!)**",
+                "Unnatural strength shatters your block! `{dmg}` damage! **(CRITICAL!)**",
+                "The {name} tears a chunk of flesh away! `{dmg}` damage! **(CRITICAL!)**",
+            ]
+        ),
+        # Mapped types
+        "Skeleton": "Undead", "Zombie": "Undead",
+    }
+
+    GENERIC_ATTACK = (
+        [
+            "The {name} strikes you for `{dmg}` damage!",
+            "You brace too late— `{dmg}` damage from the {name}.",
+            "Pain flares as the {name} hits you for `{dmg}` damage.",
+            "The {name}'s attack connects with a sickening thud— `{dmg}` damage.",
+            "You reel from the {name}'s blow— `{dmg}` damage.",
+        ],
+        [
+            "A devastating blow sends you flying! `{dmg}` damage! **(CRITICAL!)**",
+            "The {name} hits you with overwhelming force! `{dmg}` damage! **(CRITICAL!)**",
+            "You are crushed under the {name}'s assault! `{dmg}` damage! **(CRITICAL!)**",
+        ]
+    )
+
     @staticmethod
     def opening(monster_data: dict) -> str:
         """Generates opening line."""
         name = str(monster_data.get("name", "Unknown Entity"))
 
-        if "Goblin" in name:
-            phrases = [
-                f"A chittering {name} scrambles from the rocks, its crude blade trembling.",
-                f"A {name} leaps into your path, eyes gleaming with malice.",
-                f"A raspy snarl rings out— a {name} emerges, grinning.",
-                f"A {name} darts from the shadows, clutching its jagged weapon.",
-                f"A {name} clambers over broken stone, shrieking a challenge.",
-            ]
-        elif "Slime" in name:
-            phrases = [
-                f"A {name} gurgles from the damp soil, its form quivering.",
-                f"The ground shivers as a {name} slides into view.",
-                f"A {name} bubbles grotesquely, advancing slowly.",
-                f"Moist air thickens as a {name} rises, dripping sludge.",
-            ]
-        elif "Wolf" in name or "Hound" in name:
-            phrases = [
-                f"A {name} emerges, fangs bared and low growl rumbling.",
-                f"You are being hunted— a {name} circles you.",
-                f"Leaves scatter as a {name} lunges from cover.",
-                f"A {name} prowls into the clearing, breath steaming.",
-            ]
-        elif "Spider" in name:
-            phrases = [
-                f"Eight legs skitter as a {name} descends from above.",
-                f"A hulking {name} blocks your path, mandibles clacking.",
-                f"Silk trembles overhead as a {name} lowers itself.",
-                f"A {name} crawls forth, venom glistening on its fangs.",
-            ]
-        elif "Boar" in name or "Stag" in name or "Brute" in name:
-            phrases = [
-                f"The undergrowth explodes as a {name} charges into view!",
-                f"A massive {name} paws the ground, preparing to trample you.",
-                f"Heavy hooves thunder against the earth—a {name} is attacking!",
-                f"Snorting with aggression, a {name} lowers its head to strike.",
-            ]
-        elif any(k in name for k in ["Treant", "Ent", "Vineling", "Bramble", "Sporeling"]):
-            phrases = [
-                f"A {name} creaks to life, detaching itself from the forest.",
-                f"Roots snap and shift as a {name} lumbers toward you.",
-                f"The trees themselves seem to turn against you—a {name} awakens.",
-                f"A {name} rises from the earth, moss and bark forming a deadly shape.",
-            ]
-        elif any(k in name for k in ["Wisp", "Shade", "Revenant", "Wight", "Stormling", "Duskling", "Sprite"]):
-            phrases = [
-                f"The temperature plummets as a {name} flickers into existence.",
-                f"A spectral chill washes over you—a {name} drifts closer.",
-                f"A {name} manifests from the gloom, eyes burning with cold light.",
-                f"Ethereal silence falls, broken only by the hum of a {name}.",
-            ]
-        elif any(k in name for k in ["Crawler", "Urch", "Lurker"]):
-            phrases = [
-                f"Damp earth churns as a {name} scuttles forth.",
-                f"A {name} emerges from the muck, clicking its mandibles.",
-                f"Something wet and many-legged moves in the shadows—a {name} appears.",
-                f"The stench of rot heralds the arrival of a {name}.",
-            ]
-        elif "Undead" in name or "Skeleton" in name or "Zombie" in name:
-            phrases = [
-                f"A {name} shambles forward, bones rattling with ancient hatred.",
-                f"The grave soil shifts, revealing a {name}.",
-                f"A hollow groan echoes as a {name} lurches toward you.",
-                f"Death itself seems to cling to the {name} approaching you.",
-            ]
-        else:
-            phrases = [
-                f"The air chills as a {name} emerges from the shadows.",
-                f"A rustle in the undergrowth reveals a {name}, intent on violence.",
-                f"From the gloom, a {name} steps forward.",
-                f"A {name} materializes, eyes cold and unfeeling.",
-                f"Something stirs in the dark—a {name} reveals itself.",
-                f"The silence is broken by the approach of a {name}.",
-            ]
+        # Check for specific keys in name
+        phrase_list = CombatPhrases.GENERIC_OPENING
+        for key, phrases in CombatPhrases.OPENING_PHRASES.items():
+            if key in name:
+                phrase_list = phrases
+                break
 
-        return f"**{random.choice(phrases)}**"
+        return f"**{random.choice(phrase_list).format(name=name)}**"
 
     @staticmethod
     def player_attack(
@@ -116,6 +440,7 @@ class CombatPhrases:
                     f"You put your entire weight behind the swing, shattering the {m_name}'s defense! {d_str}",
                     f"A thunderous impact! Your weapon crushes into the {m_name}. {d_str}",
                     f"You roar with effort, cleaving deep into the {m_name}'s flesh! {d_str}",
+                    f"You bash the {m_name} with your shield before delivering a fatal slash! {d_str}",
                 ]
             else:
                 pool = [
@@ -123,6 +448,7 @@ class CombatPhrases:
                     f"A heavy blow forces the {m_name} back. {d_str}",
                     f"Your blade bites into the {m_name}'s hide. {d_str}",
                     f"You drive your shoulder into the strike, hitting the {m_name}. {d_str}",
+                    f"You deflect an attack and counter with a solid hit. {d_str}",
                 ]
 
         # --- MAGE (ID 2) ---
@@ -132,6 +458,7 @@ class CombatPhrases:
                     f"The air screams as concentrated mana obliterates the {m_name}'s guard! {d_str}",
                     f"A blinding flash! Your spell consumes the {m_name} in raw power. {d_str}",
                     f"You unravel the {m_name}'s very essence with a surge of arcane force! {d_str}",
+                    f"Pure energy arcs from your fingers, turning the {m_name} into a conduit of pain! {d_str}",
                 ]
             else:
                 pool = [
@@ -139,6 +466,7 @@ class CombatPhrases:
                     f"A raw bolt of mana sears the {m_name}'s skin. {d_str}",
                     f"You conjure a burst of power, scorching the {m_name}. {d_str}",
                     f"The weave responds to your call, striking the {m_name}. {d_str}",
+                    f"You mutter a word of power, and the {m_name} recoils. {d_str}",
                 ]
 
         # --- ROGUE (ID 3) ---
@@ -148,6 +476,7 @@ class CombatPhrases:
                     f"Perfect execution! Your blade finds a vital artery on the {m_name}. {d_str}",
                     f"You vanish for a heartbeat, reappearing as your dagger sinks deep. {d_str}",
                     f"A spray of blood marks your precision strike on the {m_name}! {d_str}",
+                    f"You exploit a micro-second gap, driving your blade into the {m_name}'s weak point! {d_str}",
                 ]
             else:
                 pool = [
@@ -155,6 +484,7 @@ class CombatPhrases:
                     f"A silent, surgical strike lands true on the {m_name}. {d_str}",
                     f"A rapid feint leaves the {m_name} exposed to your blade. {d_str}",
                     f"You find a gap in the {m_name}'s armor. {d_str}",
+                    f"Quick as a viper, you slash the {m_name}. {d_str}",
                 ]
 
         # --- CLERIC (ID 4) ---
@@ -164,6 +494,7 @@ class CombatPhrases:
                     f"Divine judgment descends! The {m_name} reels from the holy impact. {d_str}",
                     f"Your weapon glows with blinding light, smiting the {m_name} where it stands! {d_str}",
                     f"Faith guides your hand into a devastating blow against the {m_name}! {d_str}",
+                    f"A halo of light erupts as you crush the {m_name} with sacred force! {d_str}",
                 ]
             else:
                 pool = [
@@ -171,6 +502,7 @@ class CombatPhrases:
                     f"Your weapon descends like judgment upon the {m_name}. {d_str}",
                     f"A flash of holy light accompanies your blow against the {m_name}. {d_str}",
                     f"You batter the {m_name} with the weight of your conviction. {d_str}",
+                    f"You chant a hymn of battle, your strike guided by faith. {d_str}",
                 ]
 
         # --- RANGER (ID 5) ---
@@ -180,6 +512,7 @@ class CombatPhrases:
                     f"A perfect shot! Your arrow pierces the {m_name}'s eye! {d_str}",
                     f"You loose the shaft before the {m_name} can blink—dead center! {d_str}",
                     f"The wind guides your aim into a lethal strike on the {m_name}! {d_str}",
+                    f"An impossible shot! You pin the {m_name} with a high-velocity arrow! {d_str}",
                 ]
             else:
                 pool = [
@@ -187,6 +520,7 @@ class CombatPhrases:
                     f"A well-placed shot strikes the {m_name}. {d_str}",
                     f"Your bow sings—the {m_name} recoils from the hit. {d_str}",
                     f"You loose an arrow, catching the {m_name} in the flank. {d_str}",
+                    f"You snap-fire a shot, hitting the {m_name} in stride. {d_str}",
                 ]
 
         # --- DEFAULT ---
@@ -243,78 +577,25 @@ class CombatPhrases:
     @staticmethod
     def monster_attack(monster, player, damage, is_crit) -> str:
         m_name = str(monster.get("name", "the creature"))
-        crit_text = " **(CRITICAL!)**" if is_crit else ""
 
-        # Specific Monster Types
-        if "Goblin" in m_name:
-            pool = [
-                f"The {m_name} stabs wildly, catching you for `{damage}` damage!{crit_text}",
-                f"The {m_name} lunges with a shriek, slashing for `{damage}` damage!{crit_text}",
-                f"A dirty blade finds a gap in your armor— `{damage}` damage.{crit_text}",
-            ]
-        elif "Slime" in m_name:
-            pool = [
-                f"The {m_name} slams into you with heavy force for `{damage}` damage.{crit_text}",
-                f"Acid splashes against your skin— `{damage}` damage!{crit_text}",
-                f"The {m_name} engulfs your limb momentarily, burning for `{damage}` damage.{crit_text}",
-            ]
-        elif "Wolf" in m_name or "Hound" in m_name:
-            pool = [
-                f"The {m_name} bites down savagely for `{damage}` damage!{crit_text}",
-                f"Claws rake your side, drawing blood— `{damage}` damage.{crit_text}",
-                f"Hot breath precedes a tearing snap of jaws— `{damage}` damage.{crit_text}",
-            ]
-        elif "Spider" in m_name:
-            pool = [
-                f"The {m_name} sinks its fangs into you for `{damage}` damage!{crit_text}",
-                f"A sharp leg pierces your defense— `{damage}` damage.{crit_text}",
-                f"Venom burns as the {m_name} strikes for `{damage}` damage.{crit_text}",
-            ]
-        elif "Bear" in m_name or "Boar" in m_name or "Stag" in m_name or "Brute" in m_name:
-            pool = [
-                f"The {m_name} swipes with massive force, dealing `{damage}` damage!{crit_text}",
-                f"You are thrown back by the {m_name}'s charge— `{damage}` damage.{crit_text}",
-                f"Bone-crushing weight slams into you for `{damage}` damage.{crit_text}",
-                f"The {m_name} gores you with brutal efficiency— `{damage}` damage.{crit_text}",
-            ]
-        elif any(k in m_name for k in ["Treant", "Ent", "Vineling", "Bramble", "Sporeling"]):
-            pool = [
-                f"A heavy branch bludgeons you for `{damage}` damage!{crit_text}",
-                f"Roots whip out, lashing your skin for `{damage}` damage.{crit_text}",
-                f"The {m_name} crushes you with the weight of old wood— `{damage}` damage.{crit_text}",
-                f"Thorns tear at your flesh as the {m_name} strikes for `{damage}` damage.{crit_text}",
-            ]
-        elif any(k in m_name for k in ["Wisp", "Shade", "Revenant", "Wight", "Stormling", "Duskling", "Sprite"]):
-            pool = [
-                f"A cold touch drains your vitality— `{damage}` damage.{crit_text}",
-                f"The {m_name} passes through your guard, chilling you for `{damage}` damage!{crit_text}",
-                f"Spectral energy flares, burning you with cold fire for `{damage}` damage.{crit_text}",
-                f"The {m_name} strikes with an otherworldly force— `{damage}` damage.{crit_text}",
-            ]
-        elif any(k in m_name for k in ["Crawler", "Urch", "Lurker"]):
-            pool = [
-                f"The {m_name} pinches you with serrated limbs for `{damage}` damage!{crit_text}",
-                f"Acidic slime burns your skin as the {m_name} strikes— `{damage}` damage.{crit_text}",
-                f"Mandibles snap shut on your arm— `{damage}` damage.{crit_text}",
-                f"The {m_name} swarms over your defenses, biting for `{damage}` damage.{crit_text}",
-            ]
-        elif "Undead" in m_name or "Skeleton" in m_name or "Zombie" in m_name:
-            pool = [
-                f"A rotting fist slams into you for `{damage}` damage!{crit_text}",
-                f"Bones rattle as the {m_name} strikes— `{damage}` damage.{crit_text}",
-                f"A rusty weapon swings with unnatural strength, dealing `{damage}` damage.{crit_text}",
-                f"The {m_name} lurches forward, tearing at you for `{damage}` damage.{crit_text}",
-            ]
-        else:
-            pool = [
-                f"The {m_name} strikes you for `{damage}` damage!{crit_text}",
-                f"You brace too late— `{damage}` damage from the {m_name}.{crit_text}",
-                f"Pain flares as the {m_name} hits you for `{damage}` damage.{crit_text}",
-                f"The {m_name}'s attack connects with a sickening thud— `{damage}` damage.{crit_text}",
-                f"You reel from the {m_name}'s blow— `{damage}` damage.{crit_text}",
-            ]
+        # 1. Resolve Family
+        family = None
+        for key in CombatPhrases.ATTACK_PHRASES:
+            if key in m_name:
+                family = CombatPhrases.ATTACK_PHRASES[key]
+                break
 
-        return random.choice(pool)
+        # Check for string mapping (e.g. "Ent" -> "Treant")
+        if isinstance(family, str):
+            family = CombatPhrases.ATTACK_PHRASES.get(family)
+
+        if not family:
+            family = CombatPhrases.GENERIC_ATTACK
+
+        # 2. Select Pool (Normal vs Crit)
+        pool = family[1] if is_crit else family[0]
+
+        return random.choice(pool).format(name=m_name, dmg=damage)
 
     @staticmethod
     def monster_skill(monster, player, skill_data, damage, is_crit) -> str:

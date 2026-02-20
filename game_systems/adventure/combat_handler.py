@@ -5,7 +5,6 @@ Manages combat initialization and turn resolution.
 Hardened: Syncs session XP to prevent duplicate level-up messages.
 """
 
-import json
 import logging
 import random
 from typing import Any
@@ -87,6 +86,7 @@ class CombatHandler:
         accumulated_exp: int = 0,
         context: dict[str, Any] | None = None,
         persist_vitals: bool = True,
+        action: str = "auto",
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
@@ -146,6 +146,7 @@ class CombatHandler:
                 player_class_id=p_row["class_id"],
                 active_boosts=boosts,
                 stats_dict=stats_dict,
+                action=action,
             )
 
             result = engine.run_combat_turn()

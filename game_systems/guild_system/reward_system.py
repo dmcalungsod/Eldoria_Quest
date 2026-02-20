@@ -10,6 +10,7 @@ import logging
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.achievement_system import AchievementSystem
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
@@ -22,6 +23,7 @@ class RewardSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
         self.inv_manager = InventoryManager(db_manager)
+        self.achievement_system = AchievementSystem(db_manager)
 
     def _get_consumable_data_by_name(self, item_name: str) -> tuple[str | None, dict | None]:
         """Helper to find a consumable's key_id and data by its display name."""
@@ -120,6 +122,11 @@ class RewardSystem:
                     f"The weight of your deeds settles into your spirit.\n"
                     f"You have ascended to **Level {level_system.level}**."
                 )
+
+            # Achievements
+            ach_msg = self.achievement_system.check_quest_achievements(discord_id)
+            if ach_msg:
+                summary += f"\n\n{ach_msg}"
 
             return summary
 

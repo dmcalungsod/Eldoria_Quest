@@ -52,8 +52,6 @@ sys.modules["discord.ui"].Item = object  # Base class for items if needed
 # We need to ensure we can import from game_systems
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
-import game_systems.adventure.ui.exploration_view  # noqa: E402
-from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 # FORCE RELOAD to ensure ExplorationView inherits from our MockView, not real View or previous mock
@@ -63,6 +61,9 @@ from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: 
 
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
     async def test_race_condition_double_click(self):
+        # Import here to avoid conflict with other tests mocking discord
+        from game_systems.adventure.ui.exploration_view import ExplorationView
+
         # Setup mocks
         mock_db = MagicMock(spec=DatabaseManager)
         mock_manager = MagicMock(spec=AdventureManager)

@@ -1,9 +1,10 @@
 
+import json
 import unittest
 from unittest.mock import MagicMock, patch
-import json
-import datetime
+
 from database.database_manager import DatabaseManager
+
 
 class TestDatabaseAggregation(unittest.TestCase):
     def setUp(self):
@@ -55,7 +56,8 @@ class TestDatabaseAggregation(unittest.TestCase):
             "current_mp": 50,
             "stats_docs": [{"stats_json": json.dumps({"STR": 10})}],
             "buffs": [{"name": "Might", "amount": 5}],
-            "player_skills": [{"skill_key": "fireball", "skill_level": 2}]
+            "player_skills": [{"skill_key": "fireball", "skill_level": 2}],
+            "active_session": [{"location_id": "forest"}]
         }]
 
         # aggregate returns a cursor, which is iterable.
@@ -99,6 +101,7 @@ class TestDatabaseAggregation(unittest.TestCase):
         self.assertNotIn("stats_docs", result["player"])
         self.assertNotIn("buffs", result["player"])
         self.assertNotIn("player_skills", result["player"])
+        self.assertNotIn("active_session", result["player"])
 
         # Check Stats
         self.assertEqual(result["stats"]["STR"], 10)
@@ -111,6 +114,10 @@ class TestDatabaseAggregation(unittest.TestCase):
         self.assertEqual(len(result["skills"]), 1)
         self.assertEqual(result["skills"][0]["name"], "Fireball")
         self.assertEqual(result["skills"][0]["skill_level"], 2)
+
+        # Check Active Session
+        self.assertIsNotNone(result.get("active_session"))
+        self.assertEqual(result["active_session"]["location_id"], "forest")
 
         # Verify Pipeline Structure (ensure _id projection prevents data leak)
         call_args = self.mock_db["players"].aggregate.call_args
@@ -131,6 +138,11 @@ class TestDatabaseAggregation(unittest.TestCase):
         skills_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "player_skills")
         skills_pipeline = skills_lookup["pipeline"]
         self.assertTrue(any("$project" in stage and stage["$project"] == {"_id": 0} for stage in skills_pipeline), "Skills lookup should project out _id")
+
+        # Check for active_session lookup projection
+        session_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "active_session")
+        session_pipeline = session_lookup["pipeline"]
+        self.assertTrue(any("$project" in stage and stage["$project"] == {"_id": 0} for stage in session_pipeline), "Session lookup should project out _id")
 
 if __name__ == "__main__":
     unittest.main()

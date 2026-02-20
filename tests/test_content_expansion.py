@@ -1,9 +1,11 @@
 
-import unittest
 import json
+import unittest
+
 from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.quest_data import ALL_QUESTS, QUESTS_C_TIER
 from game_systems.data.monsters import MONSTERS
+from game_systems.data.quest_data import ALL_QUESTS, QUESTS_C_TIER
+
 
 class TestContentExpansion(unittest.TestCase):
     def test_shrouded_fen_location(self):

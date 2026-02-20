@@ -23,6 +23,12 @@ class AdventureEvents:
         "Dust motes dance in a shaft of light that pierces the canopy.",
         "The undergrowth rustles with unseen life, watching your passage.",
         "Clouds drift overhead, casting fleeting shadows across your path.",
+        "A sudden gust shakes the treetops, sending a cascade of leaves spiraling down.",
+        "Moss-covered stones line the path, silent sentinels of a forgotten age.",
+        "The air is cool and still, heavy with the promise of rain.",
+        "Roots snake across the trail like the veins of the earth itself.",
+        "Somewhere nearby, a stream babbles, indifferent to your journey.",
+        "A ray of sun highlights a patch of wildflowers, a brief moment of beauty.",
     ]
 
     ATMOSPHERE_THICKET = [
@@ -32,6 +38,12 @@ class AdventureEvents:
         "A sudden chill drops the temperature, making your breath mist.",
         "Silence presses in, heavy and unnatural, broken only by your heartbeat.",
         "The light turns grey and sickly as the canopy thickens.",
+        "Thorns snag at your clothes, as if the forest itself is trying to hold you back.",
+        "The ground is soft and yielding, threatening to swallow your boots.",
+        "Strange, pale fungi grow in clusters, glowing faintly in the gloom.",
+        "A crow watches you from a dead branch, its eyes intelligent and cruel.",
+        "The wind whispers through the dry leaves, sounding almost like voices.",
+        "Shadows seem to detach themselves from the trees, moving just out of sight.",
     ]
 
     ATMOSPHERE_ROOTS = [
@@ -41,6 +53,27 @@ class AdventureEvents:
         "Shadows seem to lengthen and grasp at your boots.",
         "A low vibration thrums through the floor, as if the earth itself is groaning.",
         "The air is stale, heavy with the weight of the earth above.",
+        "Your footsteps echo loudly, alerting anything that might be listening.",
+        "Veins of unknown ore glitter in the darkness, tempting and treacherous.",
+        "A cold draft flows from a side passage, carrying the scent of deep water.",
+        "Roots break through the stone ceiling, hanging like paralyzed limbs.",
+        "The silence here is absolute, pressing against your ears.",
+        "Dust falls from above, a reminder of the crushing weight over your head.",
+    ]
+
+    ATMOSPHERE_CRYSTAL = [
+        "The cavern walls pulse with a soft, rhythmic blue light.",
+        "Your reflection is fractured into a thousand pieces by the crystal formations.",
+        "A low hum fills the air, resonating in your bones.",
+        "The ground is slick with condensation and crushed gemstones.",
+        "Clusters of crystals chime softly in the subterranean breeze.",
+        "Light refracts through the pillars, creating dazzling rainbows in the dark.",
+        "The air is cold and crisp, smelling of ozone and ancient stone.",
+        "Shadows here are sharp and jagged, cut by beams of luminescence.",
+        "You hear the skittering of many legs echoing off the glass-like walls.",
+        "A stalactite drips glowing fluid into a pool of still water.",
+        "The silence is broken only by the faint crackle of magical energy.",
+        "You feel watched by the very walls, as if the crystals have eyes.",
     ]
 
     ATMOSPHERE_ARENA = [
@@ -48,6 +81,10 @@ class AdventureEvents:
         "Sand crunches beneath your boots, stained with the history of violence.",
         "The metallic tang of blood hangs in the dry air.",
         "Sunlight glares off the stone walls, blinding and unforgiving.",
+        "Discarded weapons litter the edges of the pit, monuments to failure.",
+        "The gate grinds open with a sound like a beast's growl.",
+        "You feel the gaze of unseen spectators, hungry for spectacle.",
+        "Dust swirls in the center of the arena, forming fleeting shapes.",
     ]
 
     # --- REGENERATION PHRASES ---
@@ -82,6 +119,15 @@ class AdventureEvents:
         f"{E.CAVE} The darkness presses in. You steady your nerves before moving on.",
         f"{E.CAVE} Beneath the tangled roots, you find a dry spot to rest your aching legs.",
         f"{E.CAVE} Every shadow looks like a threat. You rest with one hand on your weapon.",
+    ]
+
+    REGEN_PHRASES_CRYSTAL = [
+        f"{E.CRYSTAL} You lean against a warm crystal pillar, letting its energy seep into you.",
+        f"{E.CRYSTAL} The blue light is soothing. You take a moment to clear your mind.",
+        f"{E.CRYSTAL} You find a safe alcove among the quartz and catch your breath.",
+        f"{E.CRYSTAL} The hum of the crystals resonates with your heartbeat, calming you.",
+        f"{E.CRYSTAL} You check your gear in the reflection of a massive gemstone.",
+        f"{E.CRYSTAL} The air is pure here. You breathe deeply, feeling your strength return.",
     ]
 
     REGEN_PHRASES_ARENA = [
@@ -240,6 +286,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
         elif location_id == "deepgrove_roots":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
+        elif location_id == "crystal_caverns":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
@@ -256,6 +304,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_THICKET
             elif location_id == "deepgrove_roots":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
+            elif location_id == "crystal_caverns":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 

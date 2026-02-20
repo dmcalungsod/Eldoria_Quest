@@ -44,6 +44,7 @@ class CombatEngine:
         player_class_id: int,
         active_boosts: dict = None,
         stats_dict: dict = None,
+        action: str = "auto",
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -53,6 +54,7 @@ class CombatEngine:
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
         active_boosts → Dict of active global boosts
         stats_dict → Cached dictionary of player stats to avoid property overhead
+        action -> Combat action ("attack", "defend", "flee_failed", "auto")
         """
         self.player = player
         self.monster = monster
@@ -75,6 +77,7 @@ class CombatEngine:
         self.active_boosts_dict = active_boosts or {}
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
+        self.action = action
 
     def run_combat_turn(self):
         """
@@ -103,65 +106,81 @@ class CombatEngine:
         logger.debug(f"Combat Turn Start: Player {self.player_hp} HP, Monster {self.monster_hp} HP")
 
         try:
+            player_defending = False
+
             # --- 1. PLAYER'S TURN ---
-            skill_decision = self._decide_player_skill()
-            use_skill = skill_decision["skill"]
+            if self.action == "defend":
+                player_defending = True
+                # Regenerate 5% MP
+                max_mp = self.stats_dict.get("MP", 100)  # Fallback if stats missing
+                regen = int(max_mp * 0.05)
+                self.player_mp = min(max_mp, self.player_mp + regen)
+                log.append(f"🛡️ **Defensive Stance:** You brace yourself, recovering {regen} MP!")
 
-            if use_skill:
-                skill = use_skill
-                mp_cost = skill.get("mp_cost", 0)
-                skill_level = skill.get("skill_level", 1)
-                skill_key = skill.get("key_id", "")
+            elif self.action == "flee_failed":
+                # Skip turn, vulnerable
+                log.append("You stumble, leaving yourself open to attack!")
 
-                self.player_mp = max(0, self.player_mp - mp_cost)
-                turn_report["skills_used"] = 1
-                turn_report["skill_key_used"] = skill_key
+            else:
+                # Normal Attack / Auto Logic
+                skill_decision = self._decide_player_skill()
+                use_skill = skill_decision["skill"]
 
-                if skill.get("heal_power", 0) > 0:
-                    # --- Healing Skill ---
-                    heal, new_hp, event_type = DamageFormula.player_heal(
-                        self.stats_dict, self.player_hp, skill, skill_level
-                    )
-                    self.player_hp = new_hp
-                    log.append(CombatPhrases.player_heal(self.player, skill, heal))
+                if use_skill:
+                    skill = use_skill
+                    mp_cost = skill.get("mp_cost", 0)
+                    skill_level = skill.get("skill_level", 1)
+                    skill_key = skill.get("key_id", "")
 
-                elif skill.get("buff_data"):
-                    # --- Buff/Utility Skill ---
-                    log.append(CombatPhrases.player_buff(self.player, skill))
+                    self.player_mp = max(0, self.player_mp - mp_cost)
+                    turn_report["skills_used"] = 1
+                    turn_report["skill_key_used"] = skill_key
 
+                    if skill.get("heal_power", 0) > 0:
+                        # --- Healing Skill ---
+                        heal, new_hp, event_type = DamageFormula.player_heal(
+                            self.stats_dict, self.player_hp, skill, skill_level
+                        )
+                        self.player_hp = new_hp
+                        log.append(CombatPhrases.player_heal(self.player, skill, heal))
+
+                    elif skill.get("buff_data"):
+                        # --- Buff/Utility Skill ---
+                        log.append(CombatPhrases.player_buff(self.player, skill))
+
+                    else:
+                        # --- Offensive Skill ---
+                        dmg, crit, event_type = DamageFormula.player_skill(
+                            self.stats_dict, self.monster, skill, skill_level
+                        )
+
+                        if event_type == "crit":
+                            turn_report["player_crit"] = 1
+
+                        # Tag damage type for stat growth
+                        self._tag_damage_type(skill_key, turn_report)
+
+                        self.monster_hp -= dmg
+                        log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
                 else:
-                    # --- Offensive Skill ---
-                    dmg, crit, event_type = DamageFormula.player_skill(
-                        self.stats_dict, self.monster, skill, skill_level
-                    )
+                    # --- Basic Attack ---
+                    dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
 
                     if event_type == "crit":
                         turn_report["player_crit"] = 1
 
-                    # Tag damage type for stat growth
-                    self._tag_damage_type(skill_key, turn_report)
+                    # Tag damage type based on class
+                    if self.player_class_id in [1, 4]:  # Warrior, Cleric -> Str
+                        turn_report["str_hits"] = 1
+                    elif self.player_class_id in [3, 5]:  # Rogue, Ranger -> Dex
+                        turn_report["dex_hits"] = 1
+                    elif self.player_class_id == 2:  # Mage -> Mag
+                        turn_report["mag_hits"] = 1
+                    else:
+                        turn_report["str_hits"] = 1
 
                     self.monster_hp -= dmg
-                    log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
-            else:
-                # --- Basic Attack ---
-                dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
-
-                if event_type == "crit":
-                    turn_report["player_crit"] = 1
-
-                # Tag damage type based on class
-                if self.player_class_id in [1, 4]:  # Warrior, Cleric -> Str
-                    turn_report["str_hits"] = 1
-                elif self.player_class_id in [3, 5]:  # Rogue, Ranger -> Dex
-                    turn_report["dex_hits"] = 1
-                elif self.player_class_id == 2:  # Mage -> Mag
-                    turn_report["mag_hits"] = 1
-                else:
-                    turn_report["str_hits"] = 1
-
-                self.monster_hp -= dmg
-                log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+                    log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
 
             # Check Monster Death
             if self.monster_hp <= 0:
@@ -177,10 +196,15 @@ class CombatEngine:
                 if event_type == "dodge":
                     turn_report["player_dodge"] = 1
                 else:
+                    if player_defending:
+                        dmg = int(dmg * 0.5)  # 50% damage reduction
+                        log.append(f"🛡️ Your defense absorbs the impact! ({dmg} dmg)")
+
                     turn_report["damage_taken"] = dmg
                     self.player_hp -= dmg
 
-                log.append(CombatPhrases.monster_attack(self.monster, self.player, dmg, crit))
+                    if not player_defending:
+                        log.append(CombatPhrases.monster_attack(self.monster, self.player, dmg, crit))
 
             elif action["type"] == "skill":
                 skill = action["skill"]
@@ -203,10 +227,15 @@ class CombatEngine:
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
                     else:
+                        if player_defending:
+                            dmg = int(dmg * 0.5)
+                            log.append(f"🛡️ Your defense mitigates the skill impact! ({dmg} dmg)")
+
                         turn_report["damage_taken"] = dmg
                         self.player_hp -= dmg
 
-                    log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
+                        if not player_defending:
+                            log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
 
             elif action["type"] == "buff":
                 buff = action["buff"]

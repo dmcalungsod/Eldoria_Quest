@@ -108,15 +108,18 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
             asyncio.to_thread(db.get_player_stats_json, discord_id),
             asyncio.to_thread(db.get_player_skills, discord_id),
             asyncio.to_thread(db.get_class, player["class_id"]),
+            asyncio.to_thread(db.get_active_title, discord_id),
         ]
         results = await asyncio.gather(*tasks)
 
-        guild_data, stats_json, skills, class_data = results
+        guild_data, stats_json, skills, class_data, active_title = results
         stats = PlayerStats.from_dict(stats_json)
         class_name = class_data["name"] if class_data else "Unknown"
 
+        title_display = f" *{active_title}*" if active_title else ""
+
         description = (
-            f"**Name:** {player['name']}\n"
+            f"**Name:** {player['name']}{title_display}\n"
             f"**Occupation:** Adventurer\n"
             f"**Class:** {class_name}\n\n"
             "*Registered with the Grand Archive of Astraeon. "

@@ -73,8 +73,11 @@ class AdventureManager:
             logger.error(f"Error fetching session for {discord_id}: {e}")
             return None
 
-    def simulate_adventure_step(self, discord_id: int) -> dict:
-        session_row = self.get_active_session(discord_id)
+    def simulate_adventure_step(self, discord_id: int, action: str = None) -> dict:
+        # OPTIMIZATION: Fetch session and context in a single DB round-trip
+        bundle = self.db.get_combat_context_bundle(discord_id)
+        session_row = bundle.get("active_session") if bundle else None
+
         if not session_row:
             return {
                 "sequence": [["Error: No active session found."]],
@@ -86,7 +89,7 @@ class AdventureManager:
 
         session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, session_row)
 
-        result = session.simulate_step()
+        result = session.simulate_step(context_bundle=bundle, action=action)
 
         if result.get("dead", False):
             self._handle_death_rewards(discord_id, session)
