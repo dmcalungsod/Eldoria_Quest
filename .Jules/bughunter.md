@@ -1,4 +1,4 @@
-## 2025-10-28 — Skill Upgrade Cost Bypass
+## 2025-02-18 — HP Overflow on Stat Reduction
 
-**Learning:** `SkillTrainerView._execute_upgrade` was using the `base_cost` of a skill directly from static data instead of scaling it based on the player's current skill level. This allowed high-level upgrades (which should cost exponentially more) to be purchased for the cheap Level 1 price.
-**Action:** Always verify that cost calculations involving scaling factors (like skill levels) are performed server-side using the current state from the database, rather than relying on static base values or client input. Added a specific test case to verify scaling logic.
+**Learning:** When player stats (Max HP/MP) are reduced (e.g., unequipping items), current HP/MP were not automatically clamped to the new maximums. This allowed players to "snapshot" high health pools from temporary gear.
+**Action:** Implemented a clamp check in `EquipmentManager.recalculate_player_stats` to verify `current_hp <= max_hp` after any stat update. Added `tests/test_hp_overflow.py` to prevent regression.
