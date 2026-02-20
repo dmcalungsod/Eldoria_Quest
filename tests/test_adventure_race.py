@@ -32,7 +32,7 @@ except ImportError:
             self.callback = None
 
         def _is_v2(self):
-            return True
+            return False
 
     sys.modules["discord.ui"].View = View
     sys.modules["discord.ui"].Button = Button

@@ -40,7 +40,7 @@ class MockButton:
         self.disabled = False
 
     def _is_v2(self):
-        return True
+        return False
 
 class MockSelect:
     def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, disabled=False, row=None, custom_id=None):

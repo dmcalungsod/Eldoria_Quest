@@ -20,7 +20,7 @@ class MockButton:
         self.label = label
 
     def _is_v2(self):
-        return True
+        return False
 
 discord = MagicMock()
 discord.ui.View = MockView
