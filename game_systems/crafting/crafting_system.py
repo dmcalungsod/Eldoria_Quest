@@ -5,6 +5,7 @@ Core logic for the Crafting / Alchemy system.
 """
 
 import logging
+import random
 
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
@@ -48,6 +49,24 @@ class CraftingSystem:
 
         return True, "Ready to craft."
 
+    def _roll_quality(self, base_rarity: str) -> str:
+        """Rolls for a quality upgrade (10% chance per tier)."""
+        tiers = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"]
+        try:
+            current_index = tiers.index(base_rarity)
+        except ValueError:
+            return base_rarity
+
+        # 10% chance to upgrade
+        if random.random() < 0.10:
+            if current_index + 1 < len(tiers):
+                current_index += 1
+                # Cascade: 10% chance for another upgrade
+                while random.random() < 0.10 and current_index + 1 < len(tiers):
+                    current_index += 1
+
+        return tiers[current_index]
+
     def craft_item(self, discord_id: int, recipe_id: str) -> tuple[bool, str, dict | None]:
         """
         Executes the crafting process safely.
@@ -79,6 +98,7 @@ class CraftingSystem:
 
             # 3. Add Output Item
             item_data = None
+            success_msg_extras = ""
 
             if recipe_type == "equipment":
                 # Equipment Crafting Logic
@@ -91,12 +111,30 @@ class CraftingSystem:
                 if not db_id:
                     return False, f"System Error: Equipment '{item_data['name']}' not found in database.", None
 
+                # --- QUALITY ROLL ---
+                base_rarity = item_data.get("rarity", "Common")
+                new_rarity = self._roll_quality(base_rarity)
+
+                final_name = item_data["name"]
+
+                if new_rarity != base_rarity:
+                    prefix_map = {
+                        "Uncommon": "Fine",
+                        "Rare": "Superior",
+                        "Epic": "Exquisite",
+                        "Legendary": "Masterwork",
+                        "Mythical": "Divine"
+                    }
+                    prefix = prefix_map.get(new_rarity, "Improved")
+                    final_name = f"{prefix} {final_name}"
+                    success_msg_extras = f"\n✨ **Critical Success!** Upgraded to **{new_rarity}**!"
+
                 self.db.add_inventory_item(
                     discord_id,
                     str(db_id),  # Key must be the ID string for equipment stats logic
-                    item_data["name"],
+                    final_name,
                     "equipment",
-                    item_data["rarity"],
+                    new_rarity,
                     output_amount,
                     item_data.get("slot"),
                     "equipment",  # Item source table
@@ -108,10 +146,12 @@ class CraftingSystem:
                 if not item_data:
                     return False, "System Error: Output item data missing.", None
 
+                final_name = item_data["name"]
+
                 self.db.add_inventory_item(
                     discord_id,
                     output_key,
-                    item_data["name"],
+                    final_name,
                     "consumable",
                     item_data["rarity"],
                     output_amount,
@@ -120,7 +160,7 @@ class CraftingSystem:
                 )
 
             logger.info(f"User {discord_id} crafted {output_amount}x {output_key}")
-            return True, f"Successfully crafted **{item_data['name']}** x{output_amount}!", item_data
+            return True, f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}", item_data
 
         except Exception as e:
             logger.error(f"Crafting system error for {discord_id}: {e}", exc_info=True)
@@ -171,8 +211,20 @@ class CraftingSystem:
         if item.get("equipped", 0) == 1:
             return False, "Cannot dismantle equipped items.", None
 
-        # 3. Calculate Rewards
-        rewards = self.get_dismantle_rewards(item["item_name"], item["rarity"])
+        # 3. Resolve Original Name (Handle prefixed quality items)
+        original_name = item["item_name"]
+        if item.get("item_source_table") == "equipment":
+            try:
+                # item_key for equipment is the ID
+                db_id = int(item["item_key"])
+                original_data = self.db.get_item_from_source_table("equipment", db_id)
+                if original_data:
+                    original_name = original_data["name"]
+            except Exception:
+                pass  # Fallback to stored name
+
+        # 4. Calculate Rewards
+        rewards = self.get_dismantle_rewards(original_name, item["rarity"])
         if not rewards:
             return False, "No materials could be salvaged.", None
 
