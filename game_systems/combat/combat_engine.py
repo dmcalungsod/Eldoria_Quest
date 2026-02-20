@@ -276,6 +276,44 @@ class CombatEngine:
                 MonsterAI.apply_buff(self.monster, buff)
                 log.append(CombatPhrases.monster_buff(self.monster, buff))
 
+            elif action["type"] == "telegraph":
+                skill = action["skill"]
+                self.monster["charged_skill"] = skill
+                log.append(
+                    f"⚠️ **{self.monster.get('name', 'Enemy')}** is gathering dark energy for **{skill.get('name', 'Unknown Skill')}**!"
+                )
+
+            elif action["type"] == "execute_charge":
+                skill = action["skill"]
+                # Remove charge state
+                self.monster.pop("charged_skill", None)
+
+                # Execute the charged skill (Always Offensive)
+                mp_cost = skill.get("mp_cost", 0)
+                self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
+
+                dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+
+                # Apply Stance Multiplier
+                if self.dmg_taken_mult != 1.0:
+                    dmg = int(dmg * self.dmg_taken_mult)
+
+                if event_type == "dodge":
+                    turn_report["player_dodge"] = 1
+                else:
+                    emoji = skill.get("emoji", "🔥")
+                    attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
+
+                    if player_defending:
+                        dmg = int(dmg * 0.5)
+                        log.append(f"{attack_msg} You brace against it! (`{dmg}` dmg)")
+
+                    turn_report["damage_taken"] = dmg
+                    self.player_hp -= dmg
+
+                    if not player_defending:
+                        log.append(f"{attack_msg} (`{dmg}` dmg)")
+
             # Check Player Death
             if self.player_hp <= 0:
                 logger.info("Combat End: Player defeated.")

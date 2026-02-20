@@ -93,9 +93,17 @@ class AdventureEmbeds:
             m_max = active_monster.get("max_hp", m_hp)  # Fallback
             bar = make_progress_bar(m_hp, m_max, length=12)
 
+            # Check for charged skill telegraph
+            charged_skill = active_monster.get("charged_skill")
+            if charged_skill:
+                warning = f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
+                val = f"**HP:** `{bar}` {m_hp}/{m_max}{warning}"
+            else:
+                val = f"**HP:** `{bar}` {m_hp}/{m_max}"
+
             embed.add_field(
                 name=f"VS. {active_monster.get('name', 'Enemy')}",
-                value=f"**HP:** `{bar}` {m_hp}/{m_max}",
+                value=val,
                 inline=True,
             )
 
