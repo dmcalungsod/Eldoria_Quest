@@ -176,6 +176,23 @@ class EquipmentManager:
 
             # 4. Save Updates
             self.db.update_player_stats(discord_id, stats.to_dict())
+
+            # 5. Clamp HP/MP if necessary (Avoid Overflow Exploit)
+            # Fetch current vitals to check if they exceed new max
+            vitals = self.db.get_player_vitals(discord_id)
+            if vitals:
+                current_hp = vitals.get("current_hp", 0)
+                current_mp = vitals.get("current_mp", 0)
+
+                new_hp = min(current_hp, stats.max_hp)
+                new_mp = min(current_mp, stats.max_mp)
+
+                if new_hp != current_hp or new_mp != current_mp:
+                    self.db.set_player_vitals(discord_id, new_hp, new_mp)
+                    logger.info(
+                        f"Clamped vitals for {discord_id}: HP {current_hp}->{new_hp}, MP {current_mp}->{new_mp}"
+                    )
+
             return stats
 
         except Exception as e:

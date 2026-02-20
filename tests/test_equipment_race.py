@@ -3,6 +3,13 @@ import os
 import sys
 import unittest
 from unittest.mock import MagicMock
+
+# Mock pymongo
+mock_pymongo = MagicMock()
+mock_pymongo.errors.DuplicateKeyError = Exception
+sys.modules["pymongo"] = mock_pymongo
+sys.modules["pymongo.errors"] = mock_pymongo.errors
+
 import pymongo.errors
 import time
 import threading
@@ -89,6 +96,18 @@ class MockDatabaseManager:
 
     def get_player_field(self, discord_id, field):
         return 1
+
+    def get_player(self, discord_id):
+        return {"level": 10, "class_id": 1}
+
+    def get_guild_rank(self, discord_id):
+        return "F"
+
+    def get_player_vitals(self, discord_id):
+        return {"current_hp": 100, "current_mp": 20}
+
+    def set_player_vitals(self, discord_id, hp, mp):
+        pass
 
     def _unequip_logic(self, discord_id, inv_id):
         self.set_item_equipped(inv_id, 0)
