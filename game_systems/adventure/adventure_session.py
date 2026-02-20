@@ -13,6 +13,7 @@ from typing import Any
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime, Weather
 
 # Subsystems
 from .adventure_rewards import AdventureRewards
@@ -197,13 +198,32 @@ class AdventureSession:
                 final_action = action if action else "attack"
                 return self._process_combat_turn(context, action=final_action)
 
+            # --- Weather System Check ---
+            weather = WorldTime.get_current_weather(self.location_id)
+
+            # Dynamic Combat Threshold based on Weather
+            # Base REGEN_CHANCE is 40 (meaning 60% combat).
+            # We want Storms to be more dangerous (Higher combat chance -> Lower Regen Chance).
+            regen_threshold = self.REGEN_CHANCE
+
+            if weather == Weather.STORM:
+                regen_threshold -= 10  # 30% Regen / 70% Combat
+            elif weather == Weather.FOG:
+                regen_threshold -= 5   # 35% Regen / 65% Combat
+            elif weather == Weather.CLEAR:
+                regen_threshold += 5   # 45% Regen / 55% Combat
+
             # --- 2. Trigger New Encounter ---
-            if random.randint(1, 100) > self.REGEN_CHANCE:
+            if random.randint(1, 100) > regen_threshold:
                 # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
                 player_level = context["player_row"].get("level", 1)
                 monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
 
                 if monster:
+                    # Prepend Weather Flavor to the encounter
+                    weather_flavor = WorldTime.get_weather_flavor(weather)
+                    phrase = f"{weather_flavor}\n{phrase}"
+
                     # Start new combat
                     self.active_monster = monster
                     self.logs.append(phrase)
@@ -224,6 +244,7 @@ class AdventureSession:
                 location_id=self.location_id,
                 regen_chance=70,
                 location_name=location_name,
+                weather=weather,
             )
             self.logs.extend(result["log"])
 
