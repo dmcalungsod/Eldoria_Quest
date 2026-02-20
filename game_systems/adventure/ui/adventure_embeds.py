@@ -100,6 +100,9 @@ class AdventureEmbeds:
             )
 
         # 6. Footer
-        embed.set_footer(text="Press Forward to continue • Field Pack to manage items")
+        if active_monster:
+            embed.set_footer(text="Choose your combat action • Field Pack to use items")
+        else:
+            embed.set_footer(text="Press Forward to continue • Field Pack to manage items")
 
         return embed
