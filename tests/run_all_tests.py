@@ -135,7 +135,14 @@ def main():
     race_passed = run_race_tests()
     all_passed = all_passed and race_passed
 
-    # 6. Integration Tests (Require MongoDB)
+    # 6. Game Systems Tests (Mock-based, always run)
+    print("\n" + "-" * 70)
+    print("RUNNING GAME SYSTEMS TESTS")
+    print("-" * 70)
+    game_passed = test_game_systems.run_all_tests()
+    all_passed = all_passed and game_passed
+
+    # 7. Integration Tests (Require MongoDB)
     if db_available:
         # Database tests are currently broken (legacy SQLite logic)
         # print("\n" + "-" * 70)
@@ -145,16 +152,8 @@ def main():
         # all_passed = all_passed and db_passed
         db_passed = True  # Placeholder
 
-        print("\n" + "-" * 70)
-        print("RUNNING GAME SYSTEMS TESTS")
-        print("-" * 70)
-        game_passed = test_game_systems.run_all_tests()
-        all_passed = all_passed and game_passed
-
     else:
-        print("\n⚠️  Skipping Integration Tests (Database, Game Systems, Legacy Security) - MongoDB unavailable.")
-        # Mark as passed if we intentionally skipped them to avoid breaking CI
-        # But we must ensure at least the new security test passed.
+        print("\n⚠️  Skipping Database Integration Tests - MongoDB unavailable.")
 
     print("\n" + "=" * 70)
     print("FINAL TEST SUMMARY")
@@ -164,12 +163,12 @@ def main():
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
     print(f"UX Tests: {'✓ PASSED' if ux_passed else '✗ FAILED'}")
     print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
+    print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
     if db_available:
         print(f"Database Tests: {'✓ PASSED' if db_passed else '✗ FAILED'}")
-        print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
     else:
-        print("Integration Tests: SKIPPED")
+        print("Database Tests: SKIPPED")
 
     print("\n" + ("=" * 70))
 

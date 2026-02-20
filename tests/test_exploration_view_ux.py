@@ -18,7 +18,9 @@ mock_discord.Color.dark_grey.return_value = "dark_grey"
 RealItem = object
 if "discord.ui" in sys.modules:
     try:
-        RealItem = sys.modules["discord.ui"].Item
+        candidate = sys.modules["discord.ui"].Item
+        if isinstance(candidate, type):
+            RealItem = candidate
     except AttributeError:
         pass
 

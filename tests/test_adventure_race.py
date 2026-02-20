@@ -1,14 +1,24 @@
 
 import asyncio
+import os
 import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock
+
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Mock Dependencies
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Mock discord if not available
 try:
     import discord
     from discord.ui import Button, View
     Item = discord.ui.Item
+    if not isinstance(Item, type):
+        raise ImportError("discord.ui.Item is not a type (likely mocked)")
 except (ImportError, AttributeError):
     # Create dummy classes for mocking
     mock_discord = MagicMock()

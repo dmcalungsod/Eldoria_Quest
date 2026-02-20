@@ -15,19 +15,24 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
 
     steps:
     # 1. Check out the code
     - name: Checkout Repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.head_ref }}
 
     # 2. Set up Python (Matching your replit environment)
     - name: Set up Python 3.10
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
-        python-version: "3.14"
+        python-version: "3.10"
         cache: 'pip'
 
     # 3. Install Dependencies
@@ -47,7 +52,7 @@ jobs:
 
     # 5. Commit Changes (Only if Ruff made fixes)
     - name: Commit Ruff Fixes
-      uses: stefanzweifel/git-auto-commit-action@v7
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "style: auto-fix code with Ruff"
         branch: ${{ github.head_ref }}
