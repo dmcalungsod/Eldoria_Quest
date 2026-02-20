@@ -1,12 +1,12 @@
-
 import sys
+import unittest
 from unittest.mock import MagicMock
 
 # Mock pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
 
-import unittest
-from game_systems.guild_system.rank_system import RankSystem
+from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
+
 
 class TestRankProgression(unittest.TestCase):
     def setUp(self):
@@ -20,9 +20,9 @@ class TestRankProgression(unittest.TestCase):
         # 1. Test Ineligibility (Low Stats)
         self.mock_db.get_guild_member.return_value = {
             "rank": "S",
-            "quests_completed": 100, # Requirement: 500
-            "boss_kills": 0,         # Requirement: 20
-            "elite_kills": 0         # Requirement: 50
+            "quests_completed": 100,  # Requirement: 500
+            "boss_kills": 0,          # Requirement: 20
+            "elite_kills": 0          # Requirement: 50
         }
 
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
@@ -45,9 +45,9 @@ class TestRankProgression(unittest.TestCase):
         # 1. Test Ineligibility (Low Stats)
         self.mock_db.get_guild_member.return_value = {
             "rank": "SS",
-            "quests_completed": 999, # Requirement: 1000
-            "boss_kills": 49,        # Requirement: 50
-            "elite_kills": 99        # Requirement: 100
+            "quests_completed": 999,  # Requirement: 1000
+            "boss_kills": 49,         # Requirement: 50
+            "elite_kills": 99         # Requirement: 100
         }
 
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
@@ -62,6 +62,7 @@ class TestRankProgression(unittest.TestCase):
         }
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertTrue(eligible, "Rank SS SHOULD be eligible with sufficient stats.")
+
 
 if __name__ == '__main__':
     unittest.main()
