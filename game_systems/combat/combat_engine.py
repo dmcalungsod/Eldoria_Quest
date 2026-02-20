@@ -35,6 +35,14 @@ class CombatEngine:
         "cleave": "str_hits",
     }
 
+    _CLASS_SPECIALS = {
+        1: {"name": "Cleave", "damage_mult": 1.5, "emoji": "🪓", "type": "str", "log": "You swing your weapon in a massive arc!"},
+        2: {"name": "Fireball", "damage_mult": 2.0, "emoji": "🔥", "type": "mag", "log": "You unleash a torrent of arcane fire!"},
+        3: {"name": "Backstab", "damage_mult": 1.4, "emoji": "🗡️", "type": "dex", "log": "You strike from the shadows with lethal precision!"},
+        4: {"name": "Smite", "damage_mult": 1.2, "emoji": "✨", "type": "mag", "heal": 20, "log": "Holy light descends to judge your foe and mend your wounds!"},
+        5: {"name": "Aimed Shot", "damage_mult": 1.5, "emoji": "🏹", "type": "dex", "crit_bonus": 50, "log": "You take a breath and loose a perfect shot!"}
+    }
+
     def __init__(
         self,
         player,
@@ -54,7 +62,7 @@ class CombatEngine:
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
         active_boosts → Dict of active global boosts
         stats_dict → Cached dictionary of player stats to avoid property overhead
-        action -> Combat action ("attack", "defend", "flee_failed", "auto")
+        action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
         """
         self.player = player
         self.monster = monster
@@ -120,6 +128,9 @@ class CombatEngine:
             elif self.action == "flee_failed":
                 # Skip turn, vulnerable
                 log.append("You stumble, leaving yourself open to attack!")
+
+            elif self.action == "special_ability":
+                self._resolve_special_ability(log, turn_report)
 
             else:
                 # Normal Attack / Auto Logic
@@ -271,6 +282,64 @@ class CombatEngine:
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
             }
+
+    def _resolve_special_ability(self, log, turn_report):
+        spec = self._CLASS_SPECIALS.get(self.player_class_id)
+        cost = 20
+
+        if not spec or self.player_mp < cost:
+            log.append("⚠️ **Focus Broken:** Not enough MP for special ability! You perform a hasty attack instead.")
+            # Fallback to normal attack
+            dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+            if event_type == "crit":
+                turn_report["player_crit"] = 1
+
+            # Tag basic attack
+            if self.player_class_id in [1, 4]: turn_report["str_hits"] = 1
+            elif self.player_class_id in [3, 5]: turn_report["dex_hits"] = 1
+            elif self.player_class_id == 2: turn_report["mag_hits"] = 1
+            else: turn_report["str_hits"] = 1
+
+            self.monster_hp -= dmg
+            log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+            return
+
+        # Deduct MP
+        self.player_mp -= cost
+        log.append(f"{spec['emoji']} **{spec['name']}**: {spec['log']}")
+
+        # Base Damage Calculation
+        base_dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+
+        # Apply Multiplier
+        dmg = int(base_dmg * spec["damage_mult"])
+
+        # Apply Special Effects
+        if spec.get("crit_bonus"):
+             if random.randint(1, 100) <= spec["crit_bonus"]:
+                 dmg = int(dmg * 1.5)
+                 crit = True
+                 event_type = "crit"
+
+        if spec.get("heal"):
+            heal_amount = spec["heal"] + int(self.player.level * 2)
+            max_hp = self.stats_dict.get("HP", self.player.stats.max_hp)
+            self.player_hp = min(max_hp, self.player_hp + heal_amount)
+            log.append(f"✨ You recover {heal_amount} HP!")
+
+        if event_type == "crit":
+            turn_report["player_crit"] = 1
+
+        # Tag damage type
+        if spec["type"] == "str":
+            turn_report["str_hits"] = 1
+        elif spec["type"] == "dex":
+            turn_report["dex_hits"] = 1
+        elif spec["type"] == "mag":
+            turn_report["mag_hits"] = 1
+
+        self.monster_hp -= dmg
+        log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
 
     def _tag_damage_type(self, skill_key, report):
         """Helper to categorize skill damage for stat growth."""

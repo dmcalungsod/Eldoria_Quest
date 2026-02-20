@@ -33,6 +33,8 @@ except (ImportError, AttributeError):
             self.children = []
         def add_item(self, item):
             self.children.append(item)
+        def clear_items(self):
+            self.children.clear()
 
     class Button(Item):
         def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None):
@@ -96,7 +98,8 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
             interaction_user=mock_user,
             player_stats=mock_stats,
             vitals={"current_hp": 100, "current_mp": 100},
-            active_monster=None
+            active_monster=None,
+            class_id=1
         )
 
         # Mock simulate_adventure_step to be slow

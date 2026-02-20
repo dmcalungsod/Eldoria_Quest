@@ -161,6 +161,8 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             stats = PlayerStats.from_dict(stats_json)
             vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
             session_row = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
+            player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+            class_id = player_data["class_id"] if player_data else 1
 
             import json
             active_monster = None
@@ -174,6 +176,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
                 player_stats=stats,
                 vitals=vitals,
                 active_monster=active_monster,
+                class_id=class_id,
             )
 
             # Build the exploration view and hand control over to the Adventure system

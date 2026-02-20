@@ -184,6 +184,9 @@ class AdventureSession:
                 if action == "defend":
                     return self._process_combat_turn(context, action="defend")
 
+                if action == "special_ability":
+                    return self._process_combat_turn(context, action="special_ability")
+
                 should_auto = self._check_auto_condition(context)
 
                 # If explicit attack or implicit auto, and eligible -> Auto

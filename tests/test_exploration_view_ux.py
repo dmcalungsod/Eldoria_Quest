@@ -93,10 +93,6 @@ class TestExplorationViewUX(unittest.TestCase):
         """Standard safe state: No monster, high HP."""
         vitals = {"current_hp": 100, "current_mp": 50}
 
-        # Instantiate with vitals as positional (assuming signature change) or kwarg
-        # Currently, if we pass vitals as positional, it will crash if __init__ isn't updated.
-        # So this test expects the FUTURE state of the code.
-
         view = ExplorationView(
             self.mock_db,
             self.mock_manager,
@@ -105,7 +101,8 @@ class TestExplorationViewUX(unittest.TestCase):
             self.mock_user,
             self.stats,
             vitals=vitals,
-            active_monster=None
+            active_monster=None,
+            class_id=1
         )
 
         # Check Forward Button (index 0)
@@ -125,7 +122,8 @@ class TestExplorationViewUX(unittest.TestCase):
             self.mock_user,
             self.stats,
             vitals=vitals,
-            active_monster=None
+            active_monster=None,
+            class_id=1
         )
 
         btn = view.children[0]
@@ -145,13 +143,19 @@ class TestExplorationViewUX(unittest.TestCase):
             self.mock_user,
             self.stats,
             vitals=vitals,
-            active_monster=monster
+            active_monster=monster,
+            class_id=1
         )
 
         # Updated: Now expects "Attack" button
         btn = view.children[0]
         self.assertEqual(btn.label, "Attack")
         self.assertEqual(btn.style, "danger")
+
+        # Check for Special Ability Button (should be last)
+        special_btn = view.children[-1]
+        self.assertEqual(special_btn.style, "primary")
+        self.assertTrue(hasattr(special_btn, "callback"))
 
 if __name__ == "__main__":
     unittest.main()

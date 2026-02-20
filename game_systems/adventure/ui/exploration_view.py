@@ -35,6 +35,7 @@ class ExplorationView(View):
         player_stats: PlayerStats,
         vitals: dict = None,
         active_monster: dict = None,
+        class_id: int = 1,
     ):
         super().__init__(timeout=300)  # 5 minutes
         self.db = db
@@ -46,6 +47,7 @@ class ExplorationView(View):
         self.vitals = vitals or {}
         self.inv_manager = InventoryManager(self.db)
         self.active_monster = active_monster
+        self.class_id = class_id
         self.processing = False
 
         # Button Setup
@@ -76,6 +78,21 @@ class ExplorationView(View):
             inv_btn = Button(label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack")
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
+
+            # 5. Special Ability (Class Specific)
+            # Mapping: 1=Warrior, 2=Mage, 3=Rogue, 4=Cleric, 5=Ranger
+            specials = {
+                1: {"label": "Cleave", "emoji": "🪓"},
+                2: {"label": "Fireball", "emoji": "🔥"},
+                3: {"label": "Backstab", "emoji": "🗡️"},
+                4: {"label": "Smite", "emoji": "✨"},
+                5: {"label": "Aimed Shot", "emoji": "🏹"},
+            }
+            spec = specials.get(self.class_id, {"label": "Special", "emoji": "⚡"})
+
+            special_btn = Button(label=spec["label"], style=discord.ButtonStyle.primary, emoji=spec["emoji"], row=1, custom_id="special")
+            special_btn.callback = self.action_special
+            self.add_item(special_btn)
 
         else:
             # --- EXPLORATION MODE ---
@@ -123,6 +140,9 @@ class ExplorationView(View):
 
     async def action_flee(self, interaction: discord.Interaction):
         await self._perform_simulation(interaction, action="flee")
+
+    async def action_special(self, interaction: discord.Interaction):
+        await self._perform_simulation(interaction, action="special_ability")
 
     async def _perform_simulation(self, interaction: discord.Interaction, action: str = None):
         if self.processing:
