@@ -15,14 +15,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock external dependencies for environments where they aren't installed
 try:
-    import pymongo
+    import pymongo  # noqa: F401
 except ImportError:
     sys.modules['pymongo'] = MagicMock()
     sys.modules['pymongo.errors'] = MagicMock()
 
 try:
-    import discord
-    import discord.ext
+    import discord  # noqa: F401
+    import discord.ext  # noqa: F401
 except ImportError:
     sys.modules['discord'] = MagicMock()
     sys.modules['discord.ext'] = MagicMock()
