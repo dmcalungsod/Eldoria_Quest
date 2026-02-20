@@ -71,13 +71,13 @@ class InfirmaryView(View):
         try:
             # SECURITY: Fetch fresh stats to avoid stale state exploits
             stats_json = self.db.get_player_stats_json(self.user.id)
-            if stats_json:
-                fresh_stats = PlayerStats.from_dict(stats_json)
-                max_hp = fresh_stats.max_hp
-                max_mp = fresh_stats.max_mp
-            else:
-                max_hp = self.stats.max_hp
-                max_mp = self.stats.max_mp
+            if not stats_json:
+                logger.error(f"Heal failed: Could not fetch stats for {self.user.id}")
+                return False, "System error: Could not fetch player stats."
+
+            fresh_stats = PlayerStats.from_dict(stats_json)
+            max_hp = fresh_stats.max_hp
+            max_mp = fresh_stats.max_mp
 
             # Delegate to DatabaseManager for atomic execution
             return self.db.execute_heal(self.user.id, max_hp, max_mp, cost=0)
