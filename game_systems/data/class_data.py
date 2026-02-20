@@ -44,6 +44,7 @@ CLASSES = {
         "stats": {"STR": 2, "END": 3, "DEX": 4, "AGI": 5, "MAG": 9, "LCK": 2},
         "allowed_slots": [
             "staff",
+            "wand",
             "tome",
             "orb",  # Weapons
             "hood",

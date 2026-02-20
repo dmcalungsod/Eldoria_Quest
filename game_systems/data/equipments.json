@@ -19,6 +19,28 @@
         },
         "description": "A thick, gnarled branch picked up from the forest floor. It hums faintly."
     },
+    "gen_wand_001": {
+        "name": "Apprentice Wand",
+        "slot": "wand",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "MAG": 2,
+            "MP": 5
+        },
+        "description": "A simple wooden wand carved with basic runes."
+    },
+    "gen_wand_005": {
+        "name": "Crystal Focus",
+        "slot": "wand",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "MAG": 15,
+            "MP": 20
+        },
+        "description": "A polished quartz crystal set in a silver handle."
+    },
     "gen_armor_001": {
         "name": "Tattered Tunic",
         "slot": "medium_armor",
