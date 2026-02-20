@@ -47,8 +47,10 @@ sys.modules["pymongo.collection"] = MagicMock()
 # -----------------------
 
 import unittest  # noqa: E402
-from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+
 from game_systems.character.ui.inventory_view import InventoryView  # noqa: E402
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+
 
 class TestEquipmentRestrictions(unittest.TestCase):
     def setUp(self):

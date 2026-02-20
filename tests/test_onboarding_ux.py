@@ -46,7 +46,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import the module under test
 try:
-    from cogs.onboarding_cog import GuildWelcomeView, CombatTutorialView  # noqa: E402
+    from cogs.onboarding_cog import CombatTutorialView, GuildWelcomeView  # noqa: E402
 except ImportError:
     # Fallback
     import importlib.util
