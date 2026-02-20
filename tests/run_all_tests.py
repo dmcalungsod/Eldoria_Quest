@@ -8,23 +8,20 @@ import os
 import sys
 import unittest
 
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
 import test_adventure_race  # New race condition test
+import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
 import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
-import test_crafting_expanded  # Expanded crafting tests
-import test_crafting_ui        # New Crafting UI tests
-import test_exploration_view_ux  # New UX test
-import test_adventure_race  # New race condition test
-import test_combat_actions  # New Combat Actions test
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 
 def check_mongodb_connection():

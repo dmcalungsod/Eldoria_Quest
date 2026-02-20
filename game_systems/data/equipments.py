@@ -43,7 +43,7 @@ def load_and_validate_equipments():
     data_path = Path(__file__).parent / "equipments.json"
 
     try:
-        with open(data_path, "r", encoding="utf-8") as f:
+        with open(data_path, encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError:
         logger.error(f"CRITICAL: equipments.json not found at {data_path}")
