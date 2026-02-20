@@ -7,7 +7,6 @@ Hardened to ensure atomic reward distribution.
 
 import json
 import logging
-import random
 from collections import defaultdict
 
 import game_systems.data.emojis as E
@@ -20,11 +19,11 @@ from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.tournament_system import TournamentSystem
 from game_systems.items.item_manager import item_manager
 from game_systems.player.player_stats import PlayerStats
+from game_systems.rewards.loot_calculator import LootCalculator
 
 logger = logging.getLogger("eldoria.rewards")
 
 # Configuration
-HIGH_RARITY_TIERS = {"Epic", "Legendary", "Mythical"}
 STAT_EXP_THRESHOLD = 100
 SKILL_EXP_THRESHOLD = 100
 SKILL_EXP_PER_USE = 2.5
@@ -133,21 +132,19 @@ class AdventureRewards:
 
         # Determine drops
         stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
-        luck_bonus = (stats.luck / 999) * 50.0
         loot_boost = combat_result.get("active_boosts", {}).get("loot_boost", 1.0)
 
-        # Material Drops
-        for drop_key, base_chance in combat_result.get("drops", []):
+        # Material Drops (via Centralized Calculator)
+        rolled_drops = LootCalculator.roll_drops(
+            combat_result.get("drops", []), stats.luck, loot_boost
+        )
+
+        for drop_key in rolled_drops:
+            self._add_loot_to_session(session_loot, drop_key, 1)
             mat = MATERIALS.get(drop_key, {})
             rarity = mat.get("rarity", "Common")
-            final_chance = base_chance * loot_boost
-            if rarity in HIGH_RARITY_TIERS:
-                final_chance += luck_bonus
-
-            if random.randint(1, 100) <= final_chance:
-                self._add_loot_to_session(session_loot, drop_key, 1)
-                loot_bundle[(mat.get("name", drop_key), rarity)] += 1
-                actual_drops.append(drop_key)
+            loot_bundle[(mat.get("name", drop_key), rarity)] += 1
+            actual_drops.append(drop_key)
 
         # Equipment Drops
         eq_list = item_manager.generate_monster_loot(combat_result["monster_data"])
