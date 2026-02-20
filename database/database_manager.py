@@ -588,6 +588,7 @@ class DatabaseManager:
                 "logs": "[]",
                 "loot_collected": "{}",
                 "active_monster_json": None,
+                "version": 1,
             }
         )
 
@@ -599,20 +600,40 @@ class DatabaseManager:
         )
 
     def update_adventure_session(
-        self, discord_id: int, logs: str, loot_collected: str, active: int, active_monster_json: str | None
-    ):
-        """Updates an active adventure session."""
-        self._col("adventure_sessions").update_one(
-            {"discord_id": discord_id, "active": 1},
+        self,
+        discord_id: int,
+        logs: str,
+        loot_collected: str,
+        active: int,
+        active_monster_json: str | None,
+        previous_version: int,
+    ) -> bool:
+        """
+        Updates an active adventure session with optimistic locking.
+        Returns True if successful, False if version mismatch (concurrent update).
+        Handles legacy sessions (missing version) by accepting {version: 1} OR {version: exists(False)}.
+        """
+        query = {"discord_id": discord_id, "active": 1}
+
+        if previous_version == 1:
+            # Match version 1 OR missing version field (legacy migration)
+            query["$or"] = [{"version": 1}, {"version": {"$exists": False}}]
+        else:
+            query["version"] = previous_version
+
+        result = self._col("adventure_sessions").update_one(
+            query,
             {
                 "$set": {
                     "logs": logs,
                     "loot_collected": loot_collected,
                     "active": active,
                     "active_monster_json": active_monster_json,
+                    "version": previous_version + 1,
                 }
             },
         )
+        return result.modified_count > 0
 
     def end_adventure_session(self, discord_id: int):
         """Marks all adventure sessions as inactive."""

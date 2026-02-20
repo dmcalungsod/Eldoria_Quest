@@ -276,6 +276,7 @@ class AdventureManager:
                     "logs": json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
                     "loot_collected": "{}",
                     "active_monster_json": json.dumps(active_monster),
+                    "version": 1,
                 }
             )
             return True

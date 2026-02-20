@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import existing test suites
 import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
+import test_adventure_session_concurrency  # New session concurrency test
 import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
@@ -135,6 +136,7 @@ def run_race_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_adventure_race)
+    suite.addTests(loader.loadTestsFromModule(test_adventure_session_concurrency))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
