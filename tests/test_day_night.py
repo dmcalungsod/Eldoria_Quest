@@ -8,7 +8,6 @@ except ImportError:
     mock_pymongo = MagicMock()
     sys.modules["pymongo"] = mock_pymongo
 
-import datetime
 import unittest
 from unittest.mock import patch
 
@@ -57,14 +56,10 @@ class TestDayNightCycle(unittest.TestCase):
         MONSTERS.update(self.original_monsters)
 
     def test_day_encounter(self):
-        # Patch the entire datetime module as imported in combat_handler
-        with patch("game_systems.adventure.combat_handler.datetime") as mock_datetime_module:
-            # Setup the mock structure
-            mock_dt_class = MagicMock()
-            mock_datetime_module.datetime = mock_dt_class
-
-            # Use a real datetime object for the return value
-            mock_dt_class.now.return_value = datetime.datetime(2023, 10, 27, 12, 0, 0)
+        # Patch WorldTime in combat_handler
+        with patch("game_systems.adventure.combat_handler.WorldTime") as MockWorldTime:
+            MockWorldTime.is_night.return_value = False
+            MockWorldTime.get_phase_flavor.return_value = "☀️ **Day**"
 
             monster, phrase = self.handler.initiate_combat(self.mock_location)
 
@@ -73,14 +68,12 @@ class TestDayNightCycle(unittest.TestCase):
             else:
                 self.fail("No monster returned")
 
-            self.assertNotIn("Nightfall", phrase)
+            self.assertIn("Day", phrase)
 
     def test_night_encounter(self):
-        with patch("game_systems.adventure.combat_handler.datetime") as mock_datetime_module:
-            mock_dt_class = MagicMock()
-            mock_datetime_module.datetime = mock_dt_class
-
-            mock_dt_class.now.return_value = datetime.datetime(2023, 10, 27, 22, 0, 0)
+        with patch("game_systems.adventure.combat_handler.WorldTime") as MockWorldTime:
+            MockWorldTime.is_night.return_value = True
+            MockWorldTime.get_phase_flavor.return_value = "🌑 **Night**"
 
             monster, phrase = self.handler.initiate_combat(self.mock_location)
 
@@ -89,16 +82,14 @@ class TestDayNightCycle(unittest.TestCase):
             else:
                 self.fail("No monster returned")
 
-            self.assertIn("Nightfall", phrase)
+            self.assertIn("Night", phrase)
 
     def test_night_encounter_fallback(self):
         location_no_night = {"name": "Sunny Plains", "monsters": [("monster_001", 100)], "conditional_monsters": []}
 
-        with patch("game_systems.adventure.combat_handler.datetime") as mock_datetime_module:
-            mock_dt_class = MagicMock()
-            mock_datetime_module.datetime = mock_dt_class
-
-            mock_dt_class.now.return_value = datetime.datetime(2023, 10, 27, 2, 0, 0)
+        with patch("game_systems.adventure.combat_handler.WorldTime") as MockWorldTime:
+            MockWorldTime.is_night.return_value = True
+            MockWorldTime.get_phase_flavor.return_value = "🌑 **Night**"
 
             monster, phrase = self.handler.initiate_combat(location_no_night)
 
@@ -107,7 +98,7 @@ class TestDayNightCycle(unittest.TestCase):
             else:
                 self.fail("No monster returned")
 
-            self.assertIn("Nightfall", phrase)
+            self.assertIn("Night", phrase)
 
 
 if __name__ == "__main__":

@@ -8,12 +8,43 @@ Optimized for performance and future biome expansion.
 import random
 
 import game_systems.data.emojis as E
+from game_systems.world_time import TimePhase
 
 
 class AdventureEvents:
     """
     Generates atmospheric narrative lines for Eldoria’s exploration system.
     """
+
+    # --- TIME-BASED ATMOSPHERE ---
+    ATMOSPHERE_DAWN = [
+        "The pale light of dawn reveals the path ahead.",
+        "Mist rises from the ground as the sun begins to climb.",
+        "The world wakes slowly, bathed in cold morning light.",
+        "Dew glistens on the leaves, fresh from the night.",
+        "Birds begin their morning chorus, piercing the silence.",
+        "The air is crisp and cold, promising a new day.",
+    ]
+
+    ATMOSPHERE_DUSK = [
+        "The sky turns purple and bruise-colored.",
+        "Daylight fades, leaving only grey shadows.",
+        "The horizon burns with the dying light of the sun.",
+        "Shadows lengthen, distorting the shapes of the trees.",
+        "A cool wind picks up, signaling the end of the day.",
+        "The first stars struggle to pierce the twilight gloom.",
+    ]
+
+    ATMOSPHERE_NIGHT = [
+        "The moon is hidden behind thick clouds.",
+        "Darkness presses in from all sides.",
+        "Strange sounds echo in the gloom.",
+        "You feel eyes watching you from the darkness.",
+        "The path is barely visible under the starlight.",
+        "A chill settles deep in your bones.",
+        "Something skitters nearby, unseen in the dark.",
+        "The world is reduced to the small circle of your vision.",
+    ]
 
     # --- ATMOSPHERIC INTROS (New) ---
     ATMOSPHERE_FOREST = [
@@ -287,6 +318,7 @@ class AdventureEvents:
         location_id: str | None = None,
         class_name: str = "Adventurer",
         hp_percent: float = 1.0,
+        time_phase: TimePhase = TimePhase.DAY,
     ) -> list:
         # Define the base message list
         base_logs = []
@@ -334,6 +366,15 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
+
+            # Time Phase Override (50% chance to override location flavor with time flavor)
+            # This makes the world feel dynamic regardless of location
+            if time_phase == TimePhase.NIGHT and random.random() < 0.5:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
+            elif time_phase == TimePhase.DAWN and random.random() < 0.5:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
+            elif time_phase == TimePhase.DUSK and random.random() < 0.5:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
 
             # Select and prepend
             atmospheric_line = random.choice(atmosphere_pool)
