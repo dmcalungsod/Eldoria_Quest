@@ -1,5 +1,5 @@
-## 2024-05-23 — Progression Wall in XP Curve
+## 2024-05-22 — Potion Economy Rebalance
 
-**Learning:** Systemic imbalance discovered where the default quadratic XP curve (`1000 * L^2`) combined with linear Monster XP rewards (`25 * L`) created an exponential grind wall. By level 20, players needed ~650 kills per level, making progression effectively impossible without engaging with thousands of battles. This violated the principle of "progression should feel earned, not impossible."
+**Learning:** Low-level potion prices (15 Aurum) created infinite sustain loops. Players could farm low-level monsters (Slimes/Goblins) and buy more healing than the damage they took, trivializing survival. This undermined the "Grim Survival" tone. Additionally, `hp_potion_2` was less efficient than `hp_potion_1`, discouraging progression.
 
-**Action:** Adjusted the XP curve formula to `200 * L^2 + 800 * L`. This significantly reduces the mid-to-late game requirement (e.g., Level 20 drops from ~390k to ~96k XP) while maintaining the early game pacing (Level 1 stays at 1000 XP). Future curve adjustments should always be simulated against average XP income sources (monsters/quests) to ensure the "time-to-level" metric remains within reasonable bounds (e.g., 50-150 encounters/quests per level).
+**Action:** Increased `hp_potion_1` to 40 Aurum and `hp_potion_2` to 90 Aurum. This makes `hp_potion_2` slightly more efficient (0.75 Aurum/HP) than `hp_potion_1` (0.8 Aurum/HP), encouraging upgrades. Simulation confirms Slime farming is now sustainable but tight (+2.8 HP/fight), while Goblin farming requires appropriate leveling to be profitable.

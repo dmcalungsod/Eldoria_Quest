@@ -24,15 +24,15 @@ from .ui_helpers import back_to_guild_hall_callback
 logger = logging.getLogger("eldoria.shop")
 
 SHOP_INVENTORY = {
-    "hp_potion_1": 15,
-    "mp_potion_1": 15,
-    "antidote_basic": 25,
-    "smoke_pellet": 30,
-    "food_ration": 10,
-    "hp_potion_2": 50,
-    "mp_potion_2": 50,
-    "strength_brew": 75,
-    "dex_elixir": 75,
+    "hp_potion_1": 40,
+    "mp_potion_1": 40,
+    "antidote_basic": 40,
+    "smoke_pellet": 45,
+    "food_ration": 15,
+    "hp_potion_2": 90,
+    "mp_potion_2": 90,
+    "strength_brew": 120,
+    "dex_elixir": 120,
 }
 
 
