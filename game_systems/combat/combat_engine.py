@@ -229,7 +229,7 @@ class CombatEngine:
                         log.append(f"🛡️ Your defense absorbs the impact! ({dmg} dmg)")
 
                     turn_report["damage_taken"] = dmg
-                    self.player_hp -= dmg
+                    self.player_hp = max(0, self.player_hp - dmg)
 
                     if not player_defending:
                         log.append(CombatPhrases.monster_attack(self.monster, self.player, dmg, crit))
@@ -264,7 +264,7 @@ class CombatEngine:
                             log.append(f"🛡️ Your defense mitigates the skill impact! ({dmg} dmg)")
 
                         turn_report["damage_taken"] = dmg
-                        self.player_hp -= dmg
+                        self.player_hp = max(0, self.player_hp - dmg)
 
                         if not player_defending:
                             log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
@@ -325,7 +325,7 @@ class CombatEngine:
             else:
                 turn_report["str_hits"] = 1
 
-            self.monster_hp -= dmg
+            self.monster_hp = max(0, self.monster_hp - dmg)
             log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
             return
 
@@ -367,7 +367,7 @@ class CombatEngine:
         elif spec["type"] == "mag":
             turn_report["mag_hits"] = 1
 
-        self.monster_hp -= dmg
+        self.monster_hp = max(0, self.monster_hp - dmg)
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
 
     def _execute_player_skill(self, skill, log, turn_report):
@@ -403,7 +403,7 @@ class CombatEngine:
             # Tag damage type for stat growth
             self._tag_damage_type(skill_key, turn_report)
 
-            self.monster_hp -= dmg
+            self.monster_hp = max(0, self.monster_hp - dmg)
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
 
     def _perform_basic_attack(self, log, turn_report):
@@ -427,7 +427,7 @@ class CombatEngine:
         else:
             turn_report["str_hits"] = 1
 
-        self.monster_hp -= dmg
+        self.monster_hp = max(0, self.monster_hp - dmg)
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
 
     def _tag_damage_type(self, skill_key, report):
