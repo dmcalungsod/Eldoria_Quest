@@ -17,6 +17,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.class_data import CLASSES
 from game_systems.data.materials import MATERIALS
+from game_systems.world_time import WorldTime
 
 from .adventure_events import AdventureEvents
 
@@ -101,8 +102,13 @@ class EventHandler:
             # Calculate HP Percent for Narrative
             hp_percent = new_hp / max(stats.max_hp, 1)
 
+            # Get Time Phase for atmosphere
+            current_phase = WorldTime.get_current_phase()
+
             # Build Log Messages
-            base_logs = AdventureEvents.regeneration(location_id, class_name, hp_percent)
+            base_logs = AdventureEvents.regeneration(
+                location_id, class_name, hp_percent, time_phase=current_phase
+            )
             # Add newline to the first element for spacing
             if base_logs:
                 base_logs[0] = f"\n{base_logs[0]}"

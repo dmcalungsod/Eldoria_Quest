@@ -47,6 +47,12 @@ LOCATIONS = {
             ("monster_006", 20),  # Forest Wolf Pup
             ("monster_008", 10),  # Thicket Spider
         ],
+        "night_monsters": [
+            ("monster_008", 40),  # Thicket Spider (Nocturnal hunter)
+            ("monster_005", 20),  # Bramble Goblin
+            ("monster_006", 20),  # Forest Wolf Pup
+            ("monster_010", 20),  # Briar Hound (Roams at night)
+        ],
         "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs.",
         "gatherables": [
             ("medicinal_herb", 40),

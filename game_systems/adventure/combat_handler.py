@@ -5,7 +5,6 @@ Manages combat initialization and turn resolution.
 Hardened: Syncs session XP to prevent duplicate level-up messages.
 """
 
-import datetime
 import logging
 import random
 from typing import Any
@@ -16,6 +15,7 @@ from game_systems.combat.combat_phrases import CombatPhrases
 from game_systems.data.monsters import MONSTERS
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.combat")
 
@@ -33,9 +33,7 @@ class CombatHandler:
         """
         try:
             # 1. Day/Night Cycle Check
-            now = datetime.datetime.now()
-            hour = now.hour
-            is_night = hour < 6 or hour >= 20
+            is_night = WorldTime.is_night()
 
             # Select Pool
             if is_night and "night_monsters" in location:
@@ -83,8 +81,9 @@ class CombatHandler:
 
             phrase = CombatPhrases.opening(active_monster)
 
-            if is_night:
-                phrase = f"🌑 **Nightfall** - {phrase}"
+            # Prepend Time Phase Flavor
+            time_flavor = WorldTime.get_phase_flavor()
+            phrase = f"{time_flavor}\n{phrase}"
 
             return active_monster, phrase
 
