@@ -2,49 +2,53 @@
 import asyncio
 import sys
 import unittest
+import importlib
 from unittest.mock import AsyncMock, MagicMock
 
-# Mock discord if not available
-try:
-    import discord
-    from discord.ui import Button, View
-    Item = discord.ui.Item
-except (ImportError, AttributeError):
-    # Create dummy classes for mocking
-    mock_discord = MagicMock()
-    sys.modules["discord"] = mock_discord
-    sys.modules["discord.ui"] = MagicMock()
+# 1. Force Clean Slate
+if "discord" in sys.modules:
+    del sys.modules["discord"]
+if "discord.ui" in sys.modules:
+    del sys.modules["discord.ui"]
 
-    Item = object
+# 2. Create fresh mocks
+mock_discord = MagicMock()
+sys.modules["discord"] = mock_discord
+sys.modules["discord.ui"] = MagicMock()
 
-    # Mock Button and View specifically to allow inheritance
-    class View:
-        def __init__(self, timeout=None):
-            self.children = []
-        def add_item(self, item):
-            self.children.append(item)
+# Define mock classes explicitly (don't inherit from Mock/Item to avoid pollution)
+class MockView:
+    def __init__(self, timeout=None):
+        self.children = []
+    def add_item(self, item):
+        self.children.append(item)
 
-    class Button(Item):
-        def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None):
-            self.label = label
-            self.style = style
-            self.emoji = emoji
-            self.row = row
-            self.custom_id = custom_id
-            self.disabled = False
-            self.callback = None
+class MockButton:
+    def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None):
+        self.label = label
+        self.style = style
+        self.emoji = emoji
+        self.row = row
+        self.custom_id = custom_id
+        self.disabled = False
+        self.callback = None
 
-        def _is_v2(self):
-            return False
+    def _is_v2(self):
+        return False
 
-    sys.modules["discord.ui"].View = View
-    sys.modules["discord.ui"].Button = Button
-    discord = mock_discord
+sys.modules["discord.ui"].View = MockView
+sys.modules["discord.ui"].Button = MockButton
+discord = mock_discord
 
 # Now import the code under test
-# We need to ensure we can import from game_systems
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
+import game_systems.adventure.ui.exploration_view
+# FORCE RELOAD to pick up the MockButton class
+importlib.reload(game_systems.adventure.ui.exploration_view)
 from game_systems.adventure.ui.exploration_view import ExplorationView
 from game_systems.player.player_stats import PlayerStats
 
@@ -73,9 +77,6 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         interaction2.edit_original_response = AsyncMock()
 
         # Create view
-        # We need to mock _setup_buttons calling _get_button_state
-        # Or just let it run if mocks are sufficient
-
         view = ExplorationView(
             db=mock_db,
             manager=mock_manager,
@@ -88,27 +89,11 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         )
 
         # Mock simulate_adventure_step to be slow
-        async def slow_simulation(*args, **kwargs):
-            await asyncio.sleep(0.1)
-            return {
-                "sequence": [["You step forward."]],
-                "dead": False,
-                "vitals": {"current_hp": 100, "current_mp": 100},
-                "player_stats": None,
-                "active_monster": None
-            }
+        # We need to make sure the side_effect is thread-safe or simply use a delay.
 
-        # Patch asyncio.to_thread to run our slow simulation
-        # Because the view calls asyncio.to_thread(self.manager.simulate_adventure_step, ...)
-
-        # We also need to patch asyncio.sleep inside explore_callback so the animation loop doesn't take forever
-        # But we WANT the simulation to be slow to prove the race.
-
-        # The view uses asyncio.to_thread. In test environment, this runs in a thread.
-        # We can just mock manager.simulate_adventure_step, but since it's called via to_thread,
-        # we need to make sure the side_effect is thread-safe or simply use a delay.
-
-        mock_manager.simulate_adventure_step.side_effect = lambda *args: {
+        # We will wrap the manager method to include a delay
+        # Just use a return_value first to ensure structure is correct
+        base_return = {
                 "sequence": [["You step forward."]],
                 "dead": False,
                 "vitals": {"current_hp": 100, "current_mp": 100},
@@ -116,15 +101,10 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
                 "active_monster": None
         }
 
-        # To ensure the race condition, we need the first call to pause AFTER checking any lock (if present)
-        # and BEFORE the operation completes.
-
-        # We will wrap the manager method to include a delay
-        original_side_effect = mock_manager.simulate_adventure_step.side_effect
         def delayed_side_effect(*args, **kwargs):
             import time
             time.sleep(0.1) # Sync sleep to block the thread
-            return original_side_effect(*args, **kwargs)
+            return base_return
 
         mock_manager.simulate_adventure_step.side_effect = delayed_side_effect
 

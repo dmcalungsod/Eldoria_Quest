@@ -55,6 +55,11 @@ class ExplorationView(View):
         # Dynamic Forward Button
         label, style, emoji = self._get_button_state()
         self.forward_btn = Button(label=label, style=style, emoji=emoji, row=0, custom_id="forward")
+
+        # DEBUG: Print type of button
+        # print(f"DEBUG: Button type is {type(self.forward_btn)}")
+        # print(f"DEBUG: Button value is {self.forward_btn}")
+
         self.forward_btn.callback = self.explore_callback
         self.add_item(self.forward_btn)
 

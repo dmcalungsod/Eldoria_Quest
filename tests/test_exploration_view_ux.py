@@ -3,35 +3,21 @@ import unittest
 import importlib
 from unittest.mock import MagicMock
 
-# 1. Mock Discord
-# We need to aggressively patch discord BEFORE importing anything that uses it
+# 1. Create fresh mocks
 mock_discord = MagicMock()
-mock_discord.ButtonStyle.success = "success"
-mock_discord.ButtonStyle.danger = "danger"
-mock_discord.ButtonStyle.secondary = "secondary"
-mock_discord.ButtonStyle.primary = "primary"
+
+class MockButtonStyle:
+    danger = "danger"
+    success = "success"
+    secondary = "secondary"
+    primary = "primary"
+
+mock_discord.ButtonStyle = MockButtonStyle
 mock_discord.Color.dark_red.return_value = "dark_red"
 mock_discord.Color.dark_green.return_value = "dark_green"
 mock_discord.Color.dark_grey.return_value = "dark_grey"
 
-# Capture Real Item if available (for inheritance compatibility)
-RealItem = object
-if "discord.ui" in sys.modules:
-    try:
-        RealItem = sys.modules["discord.ui"].Item
-    except AttributeError:
-        pass
-
-# Forcefully remove discord if it's already loaded to ensure mocks take precedence
-if "discord" in sys.modules:
-    del sys.modules["discord"]
-if "discord.ui" in sys.modules:
-    del sys.modules["discord.ui"]
-
-sys.modules["discord"] = mock_discord
-sys.modules["discord.ui"] = MagicMock()
-
-# Mock View and Button
+# Define mock classes explicitly
 class MockView:
     def __init__(self, timeout=None):
         self.children = []
@@ -39,7 +25,7 @@ class MockView:
     def add_item(self, item):
         self.children.append(item)
 
-class MockButton(RealItem):
+class MockButton:
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
         self.label = label
         self.style = style
@@ -52,25 +38,34 @@ class MockButton(RealItem):
     def _is_v2(self):
         return False
 
-sys.modules["discord.ui"].View = MockView
-sys.modules["discord.ui"].Button = MockButton
+mock_discord.ui = MagicMock()
+mock_discord.ui.View = MockView
+mock_discord.ui.Button = MockButton
 
-# 2. Mock Dependencies
+# 2. Mock Dependencies in sys.modules
+sys.modules["discord"] = mock_discord
+sys.modules["discord.ui"] = mock_discord.ui
 sys.modules["pymongo"] = MagicMock()
 sys.modules["cogs"] = MagicMock()
 sys.modules["cogs.ui_helpers"] = MagicMock()
-# We don't want to mock ExplorationView, but we do want to mock AdventureEmbeds
 sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
 
-# 3. Add path and Import
-import os  # noqa: E402
-
+# 3. Import and Patch
+import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import game_systems.adventure.ui.exploration_view  # noqa: E402
-# Force reload to ensure it picks up the mocked discord module
-importlib.reload(game_systems.adventure.ui.exploration_view)
-from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
+# Import module
+import game_systems.adventure.ui.exploration_view as ev_module
+# Reload to ensure fresh start
+importlib.reload(ev_module)
+
+# PATCH DIRECTLY ON THE IMPORTED MODULE
+ev_module.discord = mock_discord
+# Also patch Button/View if they were imported via 'from ... import'
+ev_module.Button = MockButton
+ev_module.View = MockView
+
+from game_systems.adventure.ui.exploration_view import ExplorationView
 
 
 class TestExplorationViewUX(unittest.TestCase):
@@ -87,10 +82,6 @@ class TestExplorationViewUX(unittest.TestCase):
     def test_forward_button_safe(self):
         """Standard safe state: No monster, high HP."""
         vitals = {"current_hp": 100, "current_mp": 50}
-
-        # Instantiate with vitals as positional (assuming signature change) or kwarg
-        # Currently, if we pass vitals as positional, it will crash if __init__ isn't updated.
-        # So this test expects the FUTURE state of the code.
 
         view = ExplorationView(
             self.mock_db,
