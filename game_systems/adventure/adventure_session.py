@@ -87,14 +87,16 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_session_context(self) -> dict[str, Any] | None:
+    def _fetch_session_context(self, bundle: dict | None = None) -> dict[str, Any] | None:
         """
         Fetches all necessary data for the adventure step (combat or non-combat) in a single batch.
         Returns None if critical data (vitals) is missing.
         """
         try:
             # OPTIMIZED: Use single transaction to fetch all data
-            bundle = self.db.get_combat_context_bundle(self.discord_id)
+            if bundle is None:
+                bundle = self.db.get_combat_context_bundle(self.discord_id)
+
             if not bundle:
                 return None
 
@@ -157,7 +159,7 @@ class AdventureSession:
         except Exception:
             return False
 
-    def simulate_step(self) -> dict[str, Any]:
+    def simulate_step(self, context_bundle: dict | None = None) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
         Returns: { "sequence": List[List[str]], "dead": bool, "vitals": dict, "player_stats": PlayerStats, "active_monster": dict }
@@ -170,7 +172,7 @@ class AdventureSession:
             # --- 0. Pre-fetch Context (Optimized) ---
             # We fetch context ONCE at the start for both combat and non-combat.
             # This ensures Active Buffs are always available and reduces N+1 queries.
-            context = self._fetch_session_context()
+            context = self._fetch_session_context(context_bundle)
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
 
