@@ -35,6 +35,7 @@ class TestCraftingEquipment(unittest.TestCase):
         mock_col = MagicMock()
         self.mock_db._col.return_value = mock_col
         mock_col.find_one.return_value = {"id": 101}
+        self.mock_db.get_equipment_id_by_name.return_value = 101
 
         # Execute
         success, msg, item_data = self.system.craft_item(self.discord_id, recipe_id)
