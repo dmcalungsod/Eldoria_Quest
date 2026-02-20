@@ -49,6 +49,9 @@ sys.modules["discord.ui"] = discord.ui
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
+# --- MOCK PYMONGO ---
+sys.modules["pymongo"] = MagicMock()
+
 # --- IMPORT MODULE UNDER TEST ---
 from cogs.infirmary_cog import InfirmaryView  # noqa: E402
 from database.database_manager import DatabaseManager  # noqa: E402
