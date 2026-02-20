@@ -14,6 +14,7 @@ import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.materials import MATERIALS
+from game_systems.achievement_system import AchievementSystem
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.items.item_manager import item_manager
 from game_systems.player.player_stats import PlayerStats
@@ -50,6 +51,7 @@ class AdventureRewards:
         self.db = db
         self.discord_id = discord_id
         self.rank_system = RankSystem(db)
+        self.achievement_system = AchievementSystem(db)
 
     def process_victory(self, battle_report, report_list, combat_result, quest_system, inventory_manager, session_loot):
         """
@@ -78,7 +80,13 @@ class AdventureRewards:
             self._process_skill_exp(report_list, logs)
 
             # 5. Kill Counters
-            self._increment_kill_counter(monster_data.get("tier"))
+            tier = monster_data.get("tier")
+            self._increment_kill_counter(tier)
+
+            # 6. Achievements
+            ach_msg = self.achievement_system.check_kill_achievements(self.discord_id, tier)
+            if ach_msg:
+                logs.append(f"\n{ach_msg}")
 
         except Exception as e:
             logger.error(f"Reward processing failed for {self.discord_id}: {e}", exc_info=True)
