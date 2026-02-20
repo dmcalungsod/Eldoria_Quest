@@ -53,10 +53,10 @@ except (ImportError, AttributeError):
 
 # Now import the code under test
 # We need to ensure we can import from game_systems
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_manager import AdventureManager
-from game_systems.adventure.ui.exploration_view import ExplorationView
-from game_systems.player.player_stats import PlayerStats
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
+from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
