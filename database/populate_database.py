@@ -203,15 +203,15 @@ def insert_quests(db):
     for q in quest_data.ALL_QUESTS:
         quests.append(
             {
-                "id": q[0],
-                "title": q[1],
-                "tier": q[2],
-                "quest_giver": q[3],
-                "location": q[4],
-                "summary": q[5],
-                "description": q[6],
-                "objectives": q[7],
-                "rewards": q[8],
+                "id": q["id"],
+                "title": q["title"],
+                "tier": q["tier"],
+                "quest_giver": q["quest_giver"],
+                "location": q["location"],
+                "summary": q["summary"],
+                "description": q["description"],
+                "objectives": q["objectives"],
+                "rewards": q["rewards"],
             }
         )
     _upsert_many(db["quests"], "id", quests)
