@@ -17,6 +17,10 @@ LOCATIONS = {
             ("monster_002", 40),  # Glimmer Slime
             ("monster_003", 20),  # Goblin Grunt
         ],
+        "night_monsters": [
+            ("monster_003", 60),  # Goblin Grunt (More active at night)
+            ("monster_007", 40),  # Hollow Spiderling (Nocturnal)
+        ],
         # --- NEW: High level spawn for stronger players ---
         "conditional_monsters": [
             {

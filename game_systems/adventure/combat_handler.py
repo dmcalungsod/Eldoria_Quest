@@ -5,6 +5,7 @@ Manages combat initialization and turn resolution.
 Hardened: Syncs session XP to prevent duplicate level-up messages.
 """
 
+import datetime
 import logging
 import random
 from typing import Any
@@ -31,8 +32,16 @@ class CombatHandler:
         Selects a monster and prepares the combat session.
         """
         try:
-            # 1. Base Pool
-            monster_pool = list(location.get("monsters", []))
+            # 1. Day/Night Cycle Check
+            now = datetime.datetime.now()
+            hour = now.hour
+            is_night = hour < 6 or hour >= 20
+
+            # Select Pool
+            if is_night and "night_monsters" in location:
+                monster_pool = list(location["night_monsters"])
+            else:
+                monster_pool = list(location.get("monsters", []))
 
             # 2. Conditional Spawns (Level Check)
             conditionals = location.get("conditional_monsters", [])
@@ -73,6 +82,10 @@ class CombatHandler:
             }
 
             phrase = CombatPhrases.opening(active_monster)
+
+            if is_night:
+                phrase = f"🌑 **Nightfall** - {phrase}"
+
             return active_monster, phrase
 
         except Exception as e:
