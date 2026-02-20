@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Auto-merge PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,8 +38,7 @@ jobs:
           echo "$PR_LIST" | jq -r '.[] | .number' | while read pr_number; do
             if [ "$pr_number" != "null" ] && [ -n "$pr_number" ]; then
               echo "Merging PR #$pr_number..."
-              # Attempt merge. If it fails (e.g. conflicts, other checks), it will log error but continue
-              gh pr merge "$pr_number" --merge || echo "Failed to merge PR #$pr_number"
+              gh pr merge "$pr_number" --squash || echo "Failed to merge PR #$pr_number"
             fi
           done
 
