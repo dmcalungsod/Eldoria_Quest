@@ -91,10 +91,11 @@ sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
 # 3. Add path and Import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import game_systems.adventure.ui.exploration_view
+import game_systems.adventure.ui.exploration_view  # noqa: E402
+
 importlib.reload(game_systems.adventure.ui.exploration_view)
-from game_systems.adventure.ui.exploration_view import ExplorationView
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestDoSPrevention(unittest.TestCase):
     def setUp(self):
