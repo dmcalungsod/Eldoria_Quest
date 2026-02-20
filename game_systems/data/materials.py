@@ -118,6 +118,37 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 25,
     },
+    # --- The Sunken Grotto Materials (Rank C) ---
+    "coral_fragment": {
+        "name": "Coral Fragment",
+        "description": "A piece of colorful, hardened coral.",
+        "rarity": "Common",
+        "value": 12,
+    },
+    "bioluminescent_scale": {
+        "name": "Bioluminescent Scale",
+        "description": "A fish scale that glows faintly in the dark.",
+        "rarity": "Uncommon",
+        "value": 30,
+    },
+    "pearl": {
+        "name": "Pearl",
+        "description": "A lustrous sphere formed inside a giant clam.",
+        "rarity": "Rare",
+        "value": 120,
+    },
+    "siren_voice_box": {
+        "name": "Siren Voice Box",
+        "description": "An organ that can mimic any sound.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "abyssal_pearl": {
+        "name": "Abyssal Pearl",
+        "description": "A pearl as black as the depths, radiating cold energy.",
+        "rarity": "Epic",
+        "value": 800,
+    },
     # --- RARE CRAFTING MATERIALS ---
     "shadow_essence": {
         "name": "Shadow Essence",

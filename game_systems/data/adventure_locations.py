@@ -111,6 +111,33 @@ LOCATIONS = {
             ("magic_stone_medium", 20),
         ],
     },
+    "sunken_grotto": {
+        "name": "The Sunken Grotto",
+        "emoji": "🌊",
+        "min_rank": "C",
+        "level_req": 18,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_121", 30),  # Coral Golem
+            ("monster_122", 30),  # Abyssal Eel
+            ("monster_123", 25),  # Tide Siren
+            ("monster_124", 15),  # Deep Crawler
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_125",  # Leviathan (Boss)
+                "weight": 5,
+                "min_level": 23,
+            }
+        ],
+        "description": "A submerged cavern network lit by bioluminescence. The water here is deep and cold.",
+        "gatherables": [
+            ("coral_fragment", 40),
+            ("pearl", 30),
+            ("magic_stone_medium", 20),
+            ("bioluminescent_scale", 10),
+        ],
+    },
     "crystal_caverns": {
         "name": "The Crystal Caverns",
         "emoji": "💎",

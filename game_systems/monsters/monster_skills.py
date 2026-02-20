@@ -97,6 +97,39 @@ MONSTER_SKILLS = {
         "type": "magical",
         "desc_key": "magic",
     },
+    # Water / Aquatic Skills
+    "water_jet": {
+        "key_id": "water_jet",
+        "name": "Water Jet",
+        "power": 1.4,
+        "mp_cost": 6,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "tidal_wave": {
+        "key_id": "tidal_wave",
+        "name": "Tidal Wave",
+        "power": 1.7,
+        "mp_cost": 10,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "bubble_beam": {
+        "key_id": "bubble_beam",
+        "name": "Bubble Beam",
+        "power": 1.2,
+        "mp_cost": 5,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "crushing_depths": {
+        "key_id": "crushing_depths",
+        "name": "Crushing Depths",
+        "power": 1.8,
+        "mp_cost": 12,
+        "type": "physical",
+        "desc_key": "special_hit",
+    },
     # Healing
     "mend": {
         "key_id": "mend",

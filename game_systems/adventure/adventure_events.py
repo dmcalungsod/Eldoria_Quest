@@ -175,6 +175,17 @@ class AdventureEvents:
         "Jagged obsidian formations loom like black teeth against the glow.",
     ]
 
+    ATMOSPHERE_GROTTO = [
+        "The sound of dripping water echoes endlessly in the dark.",
+        "Bioluminescent algae paints the walls in soft, eerie blues.",
+        "The air is damp and smells of salt and ancient stone.",
+        "You hear the distant crash of subterranean waves.",
+        "Slick, wet stone makes every step treacherous.",
+        "Strange, pale fish dart away from your light.",
+        "The pressure of the earth above feels immense.",
+        "A cold mist rises from the dark pools around you.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -234,6 +245,15 @@ class AdventureEvents:
         f"{E.VOLCANO} Shielded by a large boulder, you escape the worst of the heat.",
         f"{E.VOLCANO} You check your gear for heat damage while catching your breath.",
         f"{E.VOLCANO} The rhythmic pulsing of the earth lulls you into a brief trance.",
+    ]
+
+    REGEN_PHRASES_GROTTO = [
+        f"{E.OCEAN} You find a dry ledge above the water and rest.",
+        f"{E.OCEAN} The rhythmic sound of waves calms your nerves.",
+        f"{E.OCEAN} You wring out your soaked cloak and take a breath.",
+        f"{E.OCEAN} The bioluminescence is soothing. You watch the lights drift.",
+        f"{E.OCEAN} You splash cold cave water on your face to stay alert.",
+        f"{E.OCEAN} Huddled away from the damp, you check your weapons for rust.",
     ]
 
     REGEN_LOW_HP = [
@@ -387,6 +407,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
         elif location_id == "molten_caldera":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_MAGMA)]
+        elif location_id == "sunken_grotto":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_GROTTO)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
@@ -407,6 +429,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
             elif location_id == "molten_caldera":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
+            elif location_id == "sunken_grotto":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_GROTTO
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 
