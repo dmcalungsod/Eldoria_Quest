@@ -1538,15 +1538,17 @@ class DatabaseManager:
         )
 
         # Default Skills
-        for sk in default_skill_keys:
-            self._col("player_skills").insert_one(
-                {
-                    "discord_id": discord_id,
-                    "skill_key": sk,
-                    "skill_level": 1,
-                    "skill_exp": 0.0,
-                }
-            )
+        skill_docs = [
+            {
+                "discord_id": discord_id,
+                "skill_key": sk,
+                "skill_level": 1,
+                "skill_exp": 0.0,
+            }
+            for sk in default_skill_keys
+        ]
+        if skill_docs:
+            self._col("player_skills").insert_many(skill_docs)
 
         # Guild Membership
         self.insert_guild_member(discord_id)

@@ -8,11 +8,14 @@ from unittest.mock import AsyncMock, MagicMock
 try:
     import discord
     from discord.ui import Button, View
-except ImportError:
+    Item = discord.ui.Item
+except (ImportError, AttributeError):
     # Create dummy classes for mocking
     mock_discord = MagicMock()
     sys.modules["discord"] = mock_discord
     sys.modules["discord.ui"] = MagicMock()
+
+    Item = object
 
     # Mock Button and View specifically to allow inheritance
     class View:
@@ -21,7 +24,7 @@ except ImportError:
         def add_item(self, item):
             self.children.append(item)
 
-    class Button:
+    class Button(Item):
         def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None):
             self.label = label
             self.style = style
@@ -30,6 +33,9 @@ except ImportError:
             self.custom_id = custom_id
             self.disabled = False
             self.callback = None
+
+        def _is_v2(self):
+            return False
 
     sys.modules["discord.ui"].View = View
     sys.modules["discord.ui"].Button = Button

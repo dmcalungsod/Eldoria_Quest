@@ -16,7 +16,15 @@ class MockView:
     def add_item(self, item):
         self.items.append(item)
 
-class MockButton:
+# Capture Real Item if available
+RealItem = object
+if "discord.ui" in sys.modules:
+    try:
+        RealItem = sys.modules["discord.ui"].Item
+    except AttributeError:
+        pass
+
+class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
         self.label = label
         self.style = style
@@ -24,6 +32,9 @@ class MockButton:
         self.emoji = emoji
         self.row = row
         self.callback = None
+
+    def _is_v2(self):
+        return False
 
 # Assign it to the mocked module
 sys.modules["discord.ui"].View = MockView
