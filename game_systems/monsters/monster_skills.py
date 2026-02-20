@@ -114,4 +114,29 @@ MONSTER_SKILLS = {
         "type": "heal",
         "desc_key": "heal",
     },
+    # Void / Entropy Skills (Rank S)
+    "void_slash": {
+        "key_id": "void_slash",
+        "name": "Void Slash",
+        "power": 1.6,
+        "mp_cost": 8,
+        "type": "physical",
+        "desc_key": "special_hit",
+    },
+    "entropy_wave": {
+        "key_id": "entropy_wave",
+        "name": "Entropy Wave",
+        "power": 2.0,
+        "mp_cost": 15,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "annihilate": {
+        "key_id": "annihilate",
+        "name": "Annihilate",
+        "power": 2.5,
+        "mp_cost": 25,
+        "type": "magical",
+        "desc_key": "magic",
+    },
 }
