@@ -12,7 +12,7 @@ import discord
 from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
-from cogs.ui_helpers import back_to_profile_callback
+from cogs.ui_helpers import back_to_profile_callback, get_player_or_error
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.data.adventure_locations import LOCATIONS
@@ -119,6 +119,10 @@ class AdventureSetupView(View):
             )
             return
 
+        # Validate player before starting adventure
+        if not await get_player_or_error(interaction, self.db):
+            return
+
         await interaction.response.defer()
 
         try:
@@ -129,17 +133,20 @@ class AdventureSetupView(View):
                 await interaction.followup.send("Failed to start adventure. Please try again.", ephemeral=True)
                 return
 
-            # 2. Fetch data for the next view (Parallel)
-            vitals, session_row, stats_json, player_data, skills = await asyncio.gather(
-                asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
-                asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
-                asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id),
-                asyncio.to_thread(self.db.get_player, interaction.user.id),
-                asyncio.to_thread(self.db.get_combat_skills, interaction.user.id),
-            )
+            # 2. Fetch all necessary context in one query (Optimization)
+            bundle = await asyncio.to_thread(self.db.get_combat_context_bundle, interaction.user.id)
+            if not bundle:
+                await interaction.followup.send("Error loading combat context.", ephemeral=True)
+                return
 
-            class_id = player_data["class_id"] if player_data else 1
-            player_stats = PlayerStats.from_dict(stats_json)
+            player_data = bundle["player"]
+            vitals = {"current_hp": player_data["current_hp"], "current_mp": player_data["current_mp"]}
+            session_row = bundle["active_session"]
+            stats_data = bundle["stats"]
+            skills = bundle["skills"]
+
+            class_id = player_data["class_id"]
+            player_stats = PlayerStats.from_dict(stats_data)
 
             # 3. Initial Log
             initial_log = [
