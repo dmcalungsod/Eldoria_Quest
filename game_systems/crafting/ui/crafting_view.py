@@ -32,7 +32,7 @@ class CraftingView(View):
         self.crafting_system = CraftingSystem(self.db)
         self.status_msg = status_msg
         self.last_success = True
-        self.category = category  # "consumable" or "equipment"
+        self.category = category  # "consumable", "equipment", or "dismantle"
 
         # Back Button placeholder (re-attached via set_back_button)
         self.back_button = Button(label="Back", style=discord.ButtonStyle.secondary, custom_id="back_crafting", row=2)
@@ -64,13 +64,62 @@ class CraftingView(View):
             custom_id="cat_equipment",
             row=0,
         )
+        btn_dismantle = Button(
+            label="Dismantle",
+            style=discord.ButtonStyle.danger if self.category == "dismantle" else discord.ButtonStyle.secondary,
+            custom_id="cat_dismantle",
+            row=0,
+        )
 
         btn_cons.callback = self.category_cons_callback
         btn_equip.callback = self.category_equip_callback
+        btn_dismantle.callback = self.category_dismantle_callback
 
         self.add_item(btn_cons)
         self.add_item(btn_equip)
+        self.add_item(btn_dismantle)
 
+        # Row 1: Select Menu
+        if self.category == "dismantle":
+            self._setup_dismantle_select()
+        else:
+            self._setup_recipe_select()
+
+    def _setup_dismantle_select(self):
+        # Fetch unequipped equipment
+        items = self.db.get_inventory_items(self.interaction_user.id, item_type="equipment", equipped=0)
+
+        if not items:
+            select = Select(
+                placeholder="No equipment to dismantle.",
+                min_values=1,
+                max_values=1,
+                row=1,
+                disabled=True,
+            )
+            select.add_option(label="Empty", value="empty")
+            self.add_item(select)
+            return
+
+        select = Select(placeholder="Select item to dismantle...", min_values=1, max_values=1, row=1)
+
+        # Sort by rarity or name? Rarity then Name.
+        # Rarity order helper?
+        rarity_rank = {"Common": 1, "Uncommon": 2, "Rare": 3, "Epic": 4, "Legendary": 5, "Mythical": 6}
+        items.sort(key=lambda x: (rarity_rank.get(x.get("rarity", "Common"), 0), x.get("item_name", "")))
+
+        for item in items[:25]:
+            inv_id = str(item["id"])
+            label = f"{item['item_name']} ({item['rarity']})"
+            desc = "Dismantle for materials..."
+            emoji = E.HAMMER if hasattr(E, "HAMMER") else "🔨"
+
+            select.add_option(label=label, value=inv_id, description=desc, emoji=emoji)
+
+        select.callback = self.dismantle_select_callback
+        self.add_item(select)
+
+    def _setup_recipe_select(self):
         # Row 1: Recipe Dropdown
         all_recipes = self.crafting_system.get_recipes(self.interaction_user.id)
         filtered_recipes = {}
@@ -138,6 +187,9 @@ class CraftingView(View):
     async def category_equip_callback(self, interaction: discord.Interaction):
         await self._switch_category(interaction, "equipment")
 
+    async def category_dismantle_callback(self, interaction: discord.Interaction):
+        await self._switch_category(interaction, "dismantle")
+
     async def _switch_category(self, interaction: discord.Interaction, category: str):
         if self.category == category:
             await interaction.response.defer()
@@ -168,6 +220,29 @@ class CraftingView(View):
         embed = new_view.build_embed()
         await interaction.edit_original_response(embed=embed, view=new_view)
 
+    async def dismantle_select_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        # Parse int ID
+        try:
+            inv_id = int(interaction.data["values"][0])
+        except ValueError:
+            await interaction.followup.send("Invalid selection.", ephemeral=True)
+            return
+
+        # Execute Dismantle
+        success, msg, rewards = await asyncio.to_thread(
+            self.crafting_system.dismantle_item, self.interaction_user.id, inv_id
+        )
+
+        # Refresh View
+        new_view = CraftingView(self.db, self.interaction_user, status_msg=msg, category=self.category)
+        new_view.last_success = success
+        # Re-attach back button
+        new_view.set_back_button(self.back_button.callback, self.back_button.label)
+
+        embed = new_view.build_embed()
+        await interaction.edit_original_response(embed=embed, view=new_view)
+
     def build_embed(self):
         color = discord.Color.purple()
         if self.status_msg and not self.last_success:
@@ -175,11 +250,19 @@ class CraftingView(View):
         elif self.status_msg and self.last_success:
             color = discord.Color.green()
 
-        cat_title = "Consumables" if self.category == "consumable" else "Equipment"
+        if self.category == "consumable":
+            cat_title = "Consumables"
+            desc = "Bubbling cauldrons and drying herbs fill the air.\nSelect a recipe to brew potions."
+        elif self.category == "equipment":
+            cat_title = "Equipment"
+            desc = "The forge is hot and the anvil rings.\nSelect a recipe to forge new gear."
+        else:
+            cat_title = "Dismantling"
+            desc = "Salvage materials from your unwanted equipment.\n**Warning:** Dismantled items are destroyed forever."
+
         embed = discord.Embed(
             title=f"⚗️ Alchemist's Workbench — {cat_title}",
-            description="Bubbling cauldrons and drying herbs fill the air with strange scents.\n"
-            "Select a recipe to combine your materials into potions or equipment.",
+            description=desc,
             color=color,
         )
 

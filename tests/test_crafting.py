@@ -15,6 +15,9 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+
 from database.database_manager import DatabaseManager
 from game_systems.crafting.crafting_system import CraftingSystem
 
