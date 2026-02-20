@@ -130,11 +130,12 @@ class AdventureSetupView(View):
                 return
 
             # 2. Fetch data for the next view (Parallel)
-            vitals, session_row, stats_json, player_data = await asyncio.gather(
+            vitals, session_row, stats_json, player_data, skills = await asyncio.gather(
                 asyncio.to_thread(self.db.get_player_vitals, interaction.user.id),
                 asyncio.to_thread(self.manager.get_active_session, interaction.user.id),
                 asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id),
                 asyncio.to_thread(self.db.get_player, interaction.user.id),
+                asyncio.to_thread(self.db.get_combat_skills, interaction.user.id),
             )
 
             class_id = player_data["class_id"] if player_data else 1
@@ -162,6 +163,7 @@ class AdventureSetupView(View):
                 vitals=vitals,
                 active_monster=None,
                 class_id=class_id,
+                skills=skills,
             )
             await interaction.edit_original_response(embed=embed, view=view)
 

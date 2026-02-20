@@ -164,66 +164,33 @@ class CombatEngine:
             elif self.action == "special_ability":
                 self._resolve_special_ability(log, turn_report)
 
+            elif self.action.startswith("skill:"):
+                # Explicit Skill Usage
+                skill_key = self.action.split(":", 1)[1]
+                use_skill = next((s for s in self.player_skills if s.get("key_id") == skill_key), None)
+
+                if not use_skill:
+                    log.append(f"⚠️ **Skill Failed:** You try to use a skill you don't know ({skill_key}).")
+                    self._perform_basic_attack(log, turn_report)
+                else:
+                    mp_cost = use_skill.get("mp_cost", 0)
+                    if self.player_mp < mp_cost:
+                        log.append(
+                            f"⚠️ **Not enough MP:** You need {mp_cost} MP to use {use_skill.get('name', 'this skill')}."
+                        )
+                        self._perform_basic_attack(log, turn_report)
+                    else:
+                        self._execute_player_skill(use_skill, log, turn_report)
+
             else:
                 # Normal Attack / Auto Logic
                 skill_decision = self._decide_player_skill()
                 use_skill = skill_decision["skill"]
 
                 if use_skill:
-                    skill = use_skill
-                    mp_cost = skill.get("mp_cost", 0)
-                    skill_level = skill.get("skill_level", 1)
-                    skill_key = skill.get("key_id", "")
-
-                    self.player_mp = max(0, self.player_mp - mp_cost)
-                    turn_report["skills_used"] = 1
-                    turn_report["skill_key_used"] = skill_key
-
-                    if skill.get("heal_power", 0) > 0:
-                        # --- Healing Skill ---
-                        heal, new_hp, event_type = DamageFormula.player_heal(
-                            self.stats_dict, self.player_hp, skill, skill_level
-                        )
-                        self.player_hp = new_hp
-                        log.append(CombatPhrases.player_heal(self.player, skill, heal))
-
-                    elif skill.get("buff_data"):
-                        # --- Buff/Utility Skill ---
-                        log.append(CombatPhrases.player_buff(self.player, skill))
-
-                    else:
-                        # --- Offensive Skill ---
-                        dmg, crit, event_type = DamageFormula.player_skill(
-                            self.stats_dict, self.monster, skill, skill_level
-                        )
-
-                        if event_type == "crit":
-                            turn_report["player_crit"] = 1
-
-                        # Tag damage type for stat growth
-                        self._tag_damage_type(skill_key, turn_report)
-
-                        self.monster_hp -= dmg
-                        log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
+                    self._execute_player_skill(use_skill, log, turn_report)
                 else:
-                    # --- Basic Attack ---
-                    dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
-
-                    if event_type == "crit":
-                        turn_report["player_crit"] = 1
-
-                    # Tag damage type based on class
-                    if self.player_class_id in [1, 4]:  # Warrior, Cleric -> Str
-                        turn_report["str_hits"] = 1
-                    elif self.player_class_id in [3, 5]:  # Rogue, Ranger -> Dex
-                        turn_report["dex_hits"] = 1
-                    elif self.player_class_id == 2:  # Mage -> Mag
-                        turn_report["mag_hits"] = 1
-                    else:
-                        turn_report["str_hits"] = 1
-
-                    self.monster_hp -= dmg
-                    log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+                    self._perform_basic_attack(log, turn_report)
 
             # Check Monster Death
             if self.monster_hp <= 0:
@@ -373,6 +340,58 @@ class CombatEngine:
             turn_report["dex_hits"] = 1
         elif spec["type"] == "mag":
             turn_report["mag_hits"] = 1
+
+        self.monster_hp -= dmg
+        log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+
+    def _execute_player_skill(self, skill, log, turn_report):
+        mp_cost = skill.get("mp_cost", 0)
+        skill_level = skill.get("skill_level", 1)
+        skill_key = skill.get("key_id", "")
+
+        self.player_mp = max(0, self.player_mp - mp_cost)
+        turn_report["skills_used"] = 1
+        turn_report["skill_key_used"] = skill_key
+
+        if skill.get("heal_power", 0) > 0:
+            # --- Healing Skill ---
+            heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
+            self.player_hp = new_hp
+            log.append(CombatPhrases.player_heal(self.player, skill, heal))
+
+        elif skill.get("buff_data"):
+            # --- Buff/Utility Skill ---
+            log.append(CombatPhrases.player_buff(self.player, skill))
+
+        else:
+            # --- Offensive Skill ---
+            dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, self.monster, skill, skill_level)
+
+            if event_type == "crit":
+                turn_report["player_crit"] = 1
+
+            # Tag damage type for stat growth
+            self._tag_damage_type(skill_key, turn_report)
+
+            self.monster_hp -= dmg
+            log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
+
+    def _perform_basic_attack(self, log, turn_report):
+        # --- Basic Attack ---
+        dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+
+        if event_type == "crit":
+            turn_report["player_crit"] = 1
+
+        # Tag damage type based on class
+        if self.player_class_id in [1, 4]:  # Warrior, Cleric -> Str
+            turn_report["str_hits"] = 1
+        elif self.player_class_id in [3, 5]:  # Rogue, Ranger -> Dex
+            turn_report["dex_hits"] = 1
+        elif self.player_class_id == 2:  # Mage -> Mag
+            turn_report["mag_hits"] = 1
+        else:
+            turn_report["str_hits"] = 1
 
         self.monster_hp -= dmg
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))

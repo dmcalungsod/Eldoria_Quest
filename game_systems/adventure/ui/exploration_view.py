@@ -10,7 +10,7 @@ import json
 import logging
 
 import discord
-from discord.ui import Button, View
+from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
@@ -36,6 +36,7 @@ class ExplorationView(View):
         vitals: dict = None,
         active_monster: dict = None,
         class_id: int = 1,
+        skills: list = None,
     ):
         super().__init__(timeout=300)  # 5 minutes
         self.db = db
@@ -48,6 +49,7 @@ class ExplorationView(View):
         self.inv_manager = InventoryManager(self.db)
         self.active_monster = active_monster
         self.class_id = class_id
+        self.skills = skills or []
         self.processing = False
 
         # Button Setup
@@ -102,6 +104,41 @@ class ExplorationView(View):
             special_btn.callback = self.action_special
             self.add_item(special_btn)
 
+            # 6. Skill Select (Row 2)
+            if self.skills:
+                options = []
+                for s in self.skills:
+                    # Determine emoji based on type
+                    s_type = s.get("type", "Active")
+                    emoji = "✨" if s_type == "Active" else "⚡"  # Placeholder logic
+                    if "Heal" in s.get("name", ""):
+                        emoji = "💚"
+
+                    desc = f"MP: {s.get('mp_cost', 0)} | Lv.{s.get('skill_level', 1)}"
+                    options.append(
+                        discord.SelectOption(
+                            label=s.get("name", "Unknown Skill"),
+                            value=s.get("key_id"),
+                            description=desc,
+                            emoji=emoji,
+                        )
+                    )
+
+                # Discord allows max 25 options
+                options = options[:25]
+
+                if options:
+                    skill_select = Select(
+                        placeholder="Select a Skill...",
+                        min_values=1,
+                        max_values=1,
+                        options=options,
+                        row=2,
+                        custom_id="skill_select",
+                    )
+                    skill_select.callback = self.action_skill
+                    self.add_item(skill_select)
+
         else:
             # --- EXPLORATION MODE ---
 
@@ -155,6 +192,11 @@ class ExplorationView(View):
 
     async def action_special(self, interaction: discord.Interaction):
         await self._perform_simulation(interaction, action="special_ability")
+
+    async def action_skill(self, interaction: discord.Interaction):
+        # Retrieve selected skill key
+        selected_skill = interaction.data["values"][0]
+        await self._perform_simulation(interaction, action=f"skill:{selected_skill}")
 
     async def _perform_simulation(self, interaction: discord.Interaction, action: str = None):
         if self.processing:
@@ -261,6 +303,7 @@ class ExplorationView(View):
             vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
             self.vitals = vitals or {}
             session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
+            self.skills = await asyncio.to_thread(self.db.get_combat_skills, self.interaction_user.id)
 
             # Update monster state from session
             if session and session.get("active_monster_json"):
