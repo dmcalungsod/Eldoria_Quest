@@ -10,14 +10,16 @@ mock_pymongo.errors.DuplicateKeyError = Exception
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-import pymongo.errors
-import time
-import threading
+import threading  # noqa: E402
+import time  # noqa: E402
+
+import pymongo.errors  # noqa: E402
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.items.equipment_manager import EquipmentManager
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+
 
 class MockDatabaseManager:
     def __init__(self):

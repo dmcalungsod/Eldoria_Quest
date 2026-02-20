@@ -1,8 +1,8 @@
+import json
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock
-import sys
-import os
-import json
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,8 +13,9 @@ mock_pymongo.errors.DuplicateKeyError = Exception
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.player.player_stats import PlayerStats
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class MockDatabaseManager:
     def __init__(self):

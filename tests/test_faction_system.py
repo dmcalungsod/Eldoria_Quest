@@ -1,12 +1,12 @@
-import unittest
-from unittest.mock import MagicMock, call
-
 # Mock pymongo before importing anything that uses it
 import sys
+import unittest
+from unittest.mock import MagicMock
+
 sys.modules["pymongo"] = MagicMock()
 
 from game_systems.guild_system.faction_system import FactionSystem  # noqa: E402
-from game_systems.data.factions import FACTIONS  # noqa: E402
+
 
 class TestFactionSystem(unittest.TestCase):
     def setUp(self):
