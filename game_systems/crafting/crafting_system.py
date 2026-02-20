@@ -10,6 +10,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
+from game_systems.data.materials import MATERIALS
 from game_systems.data.recipes import RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
@@ -124,3 +125,93 @@ class CraftingSystem:
         except Exception as e:
             logger.error(f"Crafting system error for {discord_id}: {e}", exc_info=True)
             return False, "An error occurred during crafting.", None
+
+    def get_dismantle_rewards(self, item_name: str, rarity: str) -> dict[str, int]:
+        """
+        Calculates materials returned from dismantling an item.
+        Prioritizes recipe data, falls back to rarity-based scrap.
+        """
+        # 1. Check Recipes
+        for recipe in EQUIPMENT_RECIPES.values():
+            if recipe["name"] == item_name:
+                rewards = {}
+                for mat_key, amount in recipe.get("materials", {}).items():
+                    # Refund 50% (rounded down, min 1)
+                    refund = max(1, int(amount * 0.5))
+                    rewards[mat_key] = refund
+                return rewards
+
+        # 2. Fallback by Rarity
+        fallback_map = {
+            "Common": "iron_ore",
+            "Uncommon": "magic_stone_medium",
+            "Rare": "mithril_ore",
+            "Epic": "titan_shard",
+            "Legendary": "celestial_dust",
+            "Mythical": "celestial_dust",
+        }
+        # Default to iron_ore if rarity unknown
+        mat_key = fallback_map.get(rarity, "iron_ore")
+        return {mat_key: 1}
+
+    def dismantle_item(self, discord_id: int, inv_id: int) -> tuple[bool, str, dict | None]:
+        """
+        Dismantles a specific inventory item into materials.
+        Returns: (Success, Message, RewardsDict)
+        """
+        # 1. Fetch Item
+        item = self.db.get_inventory_item_by_id(inv_id, discord_id)
+        if not item:
+            return False, "Item not found in inventory.", None
+
+        # 2. Validate
+        if item.get("item_type") != "equipment":
+            return False, "Only equipment can be dismantled.", None
+
+        if item.get("equipped", 0) == 1:
+            return False, "Cannot dismantle equipped items.", None
+
+        # 3. Calculate Rewards
+        rewards = self.get_dismantle_rewards(item["item_name"], item["rarity"])
+        if not rewards:
+            return False, "No materials could be salvaged.", None
+
+        try:
+            # 4. Remove Item (Atomic consume of 1)
+            if not self.db.consume_item_atomic(inv_id, 1):
+                return False, "Failed to consume item (ghost item?).", None
+
+            # 5. Add Materials
+            items_to_add = []
+            for mat_key, amount in rewards.items():
+                mat_data = MATERIALS.get(mat_key)
+                if not mat_data:
+                    # Fallback if material key invalid (shouldn't happen with correct data)
+                    continue
+
+                items_to_add.append(
+                    {
+                        "item_key": mat_key,
+                        "item_name": mat_data["name"],
+                        "item_type": "material",
+                        "rarity": mat_data["rarity"],
+                        "amount": amount,
+                    }
+                )
+
+            if items_to_add:
+                self.db.add_inventory_items_bulk(discord_id, items_to_add)
+
+            # Format Message
+            reward_strs = []
+            for mat_key, amount in rewards.items():
+                m_name = MATERIALS.get(mat_key, {}).get("name", mat_key)
+                reward_strs.append(f"{m_name} x{amount}")
+
+            msg = f"Dismantled **{item['item_name']}** and salvaged: {', '.join(reward_strs)}"
+            logger.info(f"User {discord_id} dismantled {inv_id} for {rewards}")
+            return True, msg, rewards
+
+        except Exception as e:
+            logger.error(f"Dismantle error for {discord_id}: {e}", exc_info=True)
+            return False, "An error occurred during dismantling.", None
