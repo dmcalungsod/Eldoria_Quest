@@ -82,5 +82,5 @@ jobs:
       run: |
         PR_NUM=${{ github.event.pull_request.number }}
         echo "Enabling auto-merge for PR #$PR_NUM..."
-        git fetch origin main
-        gh pr merge $PR_NUM --squash --auto
+        git fetch origin "${{ github.base_ref }}"
+        gh pr merge $PR_NUM --squash --auto --delete-branch
