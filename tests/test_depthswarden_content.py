@@ -1,10 +1,11 @@
 
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Mock pymongo before importing game systems
 from unittest.mock import MagicMock
+
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.database"] = MagicMock()
@@ -12,10 +13,11 @@ sys.modules["pymongo.database"] = MagicMock()
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.monsters import MONSTERS
-from game_systems.data.materials import MATERIALS
-from game_systems.monsters.monster_skills import MONSTER_SKILLS
+from game_systems.data.adventure_locations import LOCATIONS  # noqa: E402
+from game_systems.data.materials import MATERIALS  # noqa: E402
+from game_systems.data.monsters import MONSTERS  # noqa: E402
+from game_systems.monsters.monster_skills import MONSTER_SKILLS  # noqa: E402
+
 
 class TestDepthsWardenContent(unittest.TestCase):
     def test_void_sanctum_exists(self):
