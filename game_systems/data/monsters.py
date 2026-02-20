@@ -255,4 +255,81 @@ MONSTERS["monster_105"] = {
     "description": "The heart of the caverns, a massive entity of living light and stone.",
 }
 
+# --- MOLTEN CALDERA MONSTERS (Rank A) ---
+
+# 106: Fire Elemental (Magic)
+MONSTERS["monster_106"] = {
+    "id": 106,
+    "name": "Fire Elemental",
+    "level": 30,
+    "tier": "Normal",
+    "hp": 1000,
+    "atk": 90,
+    "def": 20,
+    "xp": 900,
+    "drops": [("fire_essence", 60), ("magic_stone_medium", 40)],
+    "skills": [MONSTER_SKILLS["ember"], MONSTER_SKILLS["flame_breath"]],
+    "description": "A living pillar of flame that scorches the air around it.",
+}
+
+# 107: Magma Golem (Tank)
+MONSTERS["monster_107"] = {
+    "id": 107,
+    "name": "Magma Golem",
+    "level": 32,
+    "tier": "Normal",
+    "hp": 1500,
+    "atk": 70,
+    "def": 80,
+    "xp": 950,
+    "drops": [("obsidian_shard", 70), ("magma_core", 25)],
+    "skills": [MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["regenerate"]],
+    "description": "Molten rock given form, its steps shake the ground.",
+}
+
+# 108: Ember Salamander (Fast)
+MONSTERS["monster_108"] = {
+    "id": 108,
+    "name": "Ember Salamander",
+    "level": 31,
+    "tier": "Normal",
+    "hp": 900,
+    "atk": 100,
+    "def": 30,
+    "xp": 925,
+    "drops": [("obsidian_shard", 50), ("fire_essence", 40)],
+    "skills": [MONSTER_SKILLS["rapid_strike"], MONSTER_SKILLS["vicious_bite"]],
+    "description": "A quick, lizard-like creature that scurries through lava pools.",
+}
+
+# 109: Lava Drake (Elite)
+MONSTERS["monster_109"] = {
+    "id": 109,
+    "name": "Lava Drake",
+    "level": 34,
+    "tier": "Elite",
+    "hp": 2500,
+    "atk": 120,
+    "def": 50,
+    "xp": 3500,
+    "drops": [("dragon_scale", 40), ("magic_stone_large", 60)],
+    "skills": [MONSTER_SKILLS["flame_breath"], MONSTER_SKILLS["crushing_slam"]],
+    "description": "A lesser dragon with scales like cooled volcanic rock.",
+}
+
+# 110: Ignis, Lord of Cinders (Boss)
+MONSTERS["monster_110"] = {
+    "id": 110,
+    "name": "Ignis, Lord of Cinders",
+    "level": 35,
+    "tier": "Boss",
+    "hp": 8000,
+    "atk": 150,
+    "def": 90,
+    "xp": 12000,
+    "drops": [("magic_stone_flawless", 100), ("magma_core", 100), ("dragon_scale", 50)],
+    "skills": [MONSTER_SKILLS["flame_breath"], MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["ember"]],
+    "description": "An ancient spirit of fire, clad in armor of obsidian and hate.",
+}
+
 __all__ = ["MONSTERS"]

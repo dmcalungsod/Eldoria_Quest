@@ -87,6 +87,21 @@ class AdventureEvents:
         "Dust swirls in the center of the arena, forming fleeting shapes.",
     ]
 
+    ATMOSPHERE_MAGMA = [
+        "The ground trembles beneath your feet, and cracks hiss with steam.",
+        "Waves of heat distort the air, making the distant peaks shimmer.",
+        "A geyser of magma erupts nearby, raining molten droplets.",
+        "The smell of sulfur and burning rock is overpowering.",
+        "Ash falls gently like grey snow, coating your armor.",
+        "Lava flows sluggishly in rivers of fire, illuminating the dark rock.",
+        "The roar of the volcano is a constant, low-frequency rumble.",
+        "Sparks dance in the updrafts, fleeting and dangerous.",
+        "You feel the intense heat radiating through the soles of your boots.",
+        "Shadows flicker wildly as the magma bubbles and bursts.",
+        "The air is dry and searing, parching your throat with every breath.",
+        "Jagged obsidian formations loom like black teeth against the glow.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -137,6 +152,15 @@ class AdventureEvents:
         f"{E.SWORDS} Amidst the dust and blood, you find a second wind.",
         f"{E.SWORDS} You tighten your grip, letting the adrenaline fade just enough to think clearly.",
         f"{E.SWORDS} The arena is unforgiving. You use this moment to steel your resolve.",
+    ]
+
+    REGEN_PHRASES_MAGMA = [
+        f"{E.VOLCANO} You find a shelf of cool rock away from the lava flow and rest.",
+        f"{E.VOLCANO} The heat is exhausting. You drink deeply from your waterskin.",
+        f"{E.VOLCANO} You wipe soot from your eyes and take a moment to breathe.",
+        f"{E.VOLCANO} Shielded by a large boulder, you escape the worst of the heat.",
+        f"{E.VOLCANO} You check your gear for heat damage while catching your breath.",
+        f"{E.VOLCANO} The rhythmic pulsing of the earth lulls you into a brief trance.",
     ]
 
     REGEN_LOW_HP = [
@@ -286,6 +310,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
         elif location_id == "crystal_caverns":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
+        elif location_id == "molten_caldera":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_MAGMA)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
@@ -304,6 +330,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
             elif location_id == "crystal_caverns":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
+            elif location_id == "molten_caldera":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 

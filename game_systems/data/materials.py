@@ -149,4 +149,29 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1000,
     },
+    # --- Molten Caldera Materials ---
+    "obsidian_shard": {
+        "name": "Obsidian Shard",
+        "description": "A razor-sharp shard of volcanic glass.",
+        "rarity": "Common",
+        "value": 20,
+    },
+    "fire_essence": {
+        "name": "Fire Essence",
+        "description": "A flickering mote of elemental fire.",
+        "rarity": "Uncommon",
+        "value": 55,
+    },
+    "magma_core": {
+        "name": "Magma Core",
+        "description": "The cooling heart of a magma construct.",
+        "rarity": "Rare",
+        "value": 200,
+    },
+    "dragon_scale": {
+        "name": "Dragon Scale",
+        "description": "A scale from a Lava Drake, hot to the touch.",
+        "rarity": "Epic",
+        "value": 1100,
+    },
 }
