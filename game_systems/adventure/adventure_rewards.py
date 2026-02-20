@@ -15,6 +15,7 @@ from database.database_manager import DatabaseManager
 from game_systems.achievement_system import AchievementSystem
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.materials import MATERIALS
+from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.tournament_system import TournamentSystem
 from game_systems.items.item_manager import item_manager
@@ -53,6 +54,7 @@ class AdventureRewards:
         self.discord_id = discord_id
         self.rank_system = RankSystem(db)
         self.achievement_system = AchievementSystem(db)
+        self.faction_system = FactionSystem(db)
 
     def process_victory(self, battle_report, report_list, combat_result, quest_system, inventory_manager, session_loot):
         """
@@ -98,6 +100,13 @@ class AdventureRewards:
             ach_msg = self.achievement_system.check_kill_achievements(self.discord_id, tier)
             if ach_msg:
                 logs.append(f"\n{ach_msg}")
+
+            # 7. Faction Reputation
+            faction_logs = self.faction_system.grant_reputation_for_kill(
+                self.discord_id, combat_result.get("monster_data", {})
+            )
+            if faction_logs:
+                logs.append("\n" + "\n".join(faction_logs))
 
         except Exception as e:
             logger.error(f"Reward processing failed for {self.discord_id}: {e}", exc_info=True)

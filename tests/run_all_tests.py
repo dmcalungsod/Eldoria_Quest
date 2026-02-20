@@ -25,6 +25,7 @@ import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
+import test_faction_system  # New Faction System tests
 import test_game_systems
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
@@ -55,6 +56,18 @@ def run_quest_security_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_quest_security)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
+def run_faction_tests():
+    """Runs the faction system tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING FACTION SYSTEM TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_faction_system)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -204,7 +217,11 @@ def main():
     tournament_passed = run_tournament_tests()
     all_passed = all_passed and tournament_passed
 
-    # 8. Game Systems Tests (Mock-based, always run)
+    # 8. Faction Tests (Mock-based, always run)
+    faction_passed = run_faction_tests()
+    all_passed = all_passed and faction_passed
+
+    # 9. Game Systems Tests (Mock-based, always run)
     # 7. Game Systems Tests (Mock-based, always run)
     print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
@@ -236,6 +253,7 @@ def main():
     print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
     print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
     print(f"Tournament System Tests: {'✓ PASSED' if tournament_passed else '✗ FAILED'}")
+    print(f"Faction System Tests: {'✓ PASSED' if faction_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
     if db_available:

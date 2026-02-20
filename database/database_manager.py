@@ -422,6 +422,66 @@ class DatabaseManager:
         return {"name": player["name"], "rank": guild["rank"], "join_date": guild["join_date"]}
 
     # ============================================================
+    # FACTION SYSTEM (New methods for Factions)
+    # ============================================================
+
+    def get_player_faction_data(self, discord_id: int) -> dict | None:
+        """Fetches the player's faction membership (faction_id, reputation)."""
+        return self._col("player_factions").find_one({"discord_id": discord_id}, {"_id": 0})
+
+    def set_player_faction(self, discord_id: int, faction_id: str):
+        """Sets the player's faction, resetting reputation to 0 if changing."""
+        self._col("player_factions").update_one(
+            {"discord_id": discord_id},
+            {
+                "$set": {
+                    "faction_id": faction_id,
+                    "reputation": 0,
+                    "join_date": datetime.datetime.now().isoformat(),
+                }
+            },
+            upsert=True,
+        )
+
+    def leave_faction(self, discord_id: int):
+        """Removes the player from their current faction."""
+        self._col("player_factions").delete_one({"discord_id": discord_id})
+
+    def update_faction_reputation(self, discord_id: int, amount: int) -> int:
+        """Updates (increments) faction reputation. Returns new total."""
+        result = self._col("player_factions").find_one_and_update(
+            {"discord_id": discord_id},
+            {"$inc": {"reputation": amount}},
+            return_document=True,
+        )
+        return result["reputation"] if result else 0
+
+    def get_faction_leaderboard(self, faction_id: str, limit: int = 10) -> list[dict]:
+        """Fetches top players for a specific faction."""
+        pipeline = [
+            {"$match": {"faction_id": faction_id}},
+            {"$sort": {"reputation": -1}},
+            {"$limit": limit},
+            {
+                "$lookup": {
+                    "from": "players",
+                    "localField": "discord_id",
+                    "foreignField": "discord_id",
+                    "as": "player_info",
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "discord_id": 1,
+                    "reputation": 1,
+                    "name": {"$arrayElemAt": ["$player_info.name", 0]},
+                }
+            },
+        ]
+        return list(self._col("player_factions").aggregate(pipeline))
+
+    # ============================================================
     # GLOBAL SYSTEMS (Boosts)
     # ============================================================
 
