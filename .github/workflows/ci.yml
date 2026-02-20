@@ -81,5 +81,5 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         PR_NUM=${{ github.event.pull_request.number }}
-        # Use --auto to enable auto-merge when requirements are met
-        gh pr merge $PR_NUM --squash --auto --delete-branch
+        echo "Enabling auto-merge for PR #$PR_NUM..."
+        gh pr merge $PR_NUM --squash --auto
