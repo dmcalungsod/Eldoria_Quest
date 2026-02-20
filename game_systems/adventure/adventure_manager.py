@@ -11,7 +11,7 @@ import logging
 
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.emojis import COMBAT
+from game_systems.data.emojis import COMBAT, AURUM, SKULL
 from game_systems.data.materials import MATERIALS
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
@@ -94,13 +94,54 @@ class AdventureManager:
         result = session.simulate_step(context_bundle=bundle, action=action)
 
         if result.get("dead", False):
-            self._handle_death_rewards(discord_id, session)
+            loss_msg = self._handle_death_rewards(discord_id, session)
+            if loss_msg:
+                # Append to the last frame of the sequence
+                if result["sequence"]:
+                    last_frame = result["sequence"][-1]
+                    last_frame.append(loss_msg)
 
         return result
 
-    def _handle_death_rewards(self, discord_id, session):
-        """Extracts partial rewards on death."""
+    def _handle_death_rewards(self, discord_id, session) -> str | None:
+        """Extracts partial rewards on death and returns a loss report."""
+        loss_report = []
         try:
+            # 1. Clean Session Loot (Prevent EXP/Aurum items)
+            session.loot.pop("exp", None)
+            session.loot.pop("aurum", None)
+
+            # 2. Aurum Penalty (10%)
+            current_aurum = self.db.get_player_field(discord_id, "aurum") or 0
+            aurum_loss = int(current_aurum * 0.10)
+            if aurum_loss > 0:
+                self.db.deduct_aurum(discord_id, aurum_loss)
+                loss_report.append(f"• -{aurum_loss} {AURUM} (Lost)")
+
+            # 3. Material Penalty (50% of gathered loot)
+            material_losses = []
+            keys_to_remove = []
+
+            for item_key, count in session.loot.items():
+                kept_amount = int(count * 0.5)
+                lost_amount = count - kept_amount
+
+                if lost_amount > 0:
+                    mat = MATERIALS.get(item_key)
+                    name = mat["name"] if mat else item_key
+                    material_losses.append(f"• -{lost_amount}x {name}")
+
+                if kept_amount > 0:
+                    session.loot[item_key] = kept_amount
+                else:
+                    keys_to_remove.append(item_key)
+
+            for k in keys_to_remove:
+                del session.loot[k]
+
+            if material_losses:
+                loss_report.extend(material_losses)
+
             stats_json = self.db.get_player_stats_json(discord_id)
             p_stats = PlayerStats.from_dict(stats_json)
 
@@ -120,8 +161,13 @@ class AdventureManager:
 
             self.db.end_adventure_session(discord_id)
 
+            if loss_report:
+                return "\n" + SKULL + " **Losses Incurred:**\n" + "\n".join(loss_report)
+            return None
+
         except Exception as e:
             logger.error(f"Error handling death for {discord_id}: {e}")
+            return None
 
     def end_adventure(self, discord_id: int) -> dict | None:
         try:
