@@ -79,7 +79,28 @@ class CombatHandler:
                 "skills": list(template.get("skills", [])),
             }
 
+            # --- EVENT: SPECTRAL TIDE ---
+            try:
+                active_tourney = self.db.get_active_tournament()
+                if active_tourney and active_tourney["type"] == "spectral_tide":
+                    # 20% Chance for Spectral variant
+                    if random.random() < 0.20:
+                        active_monster["name"] = f"Spectral {active_monster['name']}"
+                        active_monster["HP"] = int(active_monster["HP"] * 1.2)
+                        active_monster["max_hp"] = int(active_monster["max_hp"] * 1.2)
+                        active_monster["ATK"] = int(active_monster["ATK"] * 1.2)
+                        # Guaranteed Ectoplasm drop
+                        active_monster["drops"].append(("ectoplasm", 100))
+                        active_monster["is_spectral"] = True
+            except Exception as e:
+                logger.error(f"Event check failed: {e}")
+            # ----------------------------
+
             phrase = CombatPhrases.opening(active_monster)
+
+            # Prepend Spectral Flavor
+            if active_monster.get("is_spectral"):
+                phrase = f"👻 **The air turns grave-cold!** A spectral entity manifests!\n{phrase}"
 
             # Prepend Time Phase Flavor
             time_flavor = WorldTime.get_phase_flavor()

@@ -37,6 +37,13 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 750,  # Up from 500
     },
+    # --- Event Materials ---
+    "ectoplasm": {
+        "name": "Ectoplasm",
+        "description": "A glowing, viscous substance left by spectral entities.",
+        "rarity": "Uncommon",
+        "value": 50,
+    },
     # --- Forest Zone Drops ---
     "goblin_ear": {
         "name": "Goblin Ear",
