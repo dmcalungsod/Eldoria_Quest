@@ -6,13 +6,13 @@ UI for managing titles and achievements.
 
 import asyncio
 import logging
+
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ui import View, Select
+from discord.ui import Select, View
 
 from database.database_manager import DatabaseManager
-import game_systems.data.emojis as E
 
 logger = logging.getLogger("eldoria.chronicles")
 

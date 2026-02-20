@@ -1,9 +1,9 @@
 
-import unittest
-from unittest.mock import MagicMock, patch
 import json
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Add repo root to path
 sys.path.append(os.getcwd())

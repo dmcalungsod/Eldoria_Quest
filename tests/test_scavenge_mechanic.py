@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.adventure_events import AdventureEvents  # noqa: E402
 from game_systems.adventure.event_handler import EventHandler  # noqa: E402
-from game_systems.player.player_stats import PlayerStats # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestDeadTurns(unittest.TestCase):
