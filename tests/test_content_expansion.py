@@ -29,8 +29,8 @@ class TestContentExpansion(unittest.TestCase):
         self.assertTrue(len(QUESTS_C_TIER) > 0, "QUESTS_C_TIER is empty")
 
         # Check if they are in ALL_QUESTS
-        c_ids = [q[0] for q in QUESTS_C_TIER]
-        all_ids = [q[0] for q in ALL_QUESTS]
+        c_ids = [q["id"] for q in QUESTS_C_TIER]
+        all_ids = [q["id"] for q in ALL_QUESTS]
         for qid in c_ids:
             self.assertIn(qid, all_ids, f"Quest ID {qid} not in ALL_QUESTS")
 
@@ -39,9 +39,8 @@ class TestContentExpansion(unittest.TestCase):
         monster_names = {m["name"] for m in MONSTERS.values()}
 
         for q in QUESTS_C_TIER:
-            title = q[1]
-            objectives_json = q[7]
-            objectives = json.loads(objectives_json)
+            title = q["title"]
+            objectives = q["objectives"]
 
             if "defeat" in objectives:
                 targets = objectives["defeat"]
@@ -53,8 +52,8 @@ class TestContentExpansion(unittest.TestCase):
         fen_name = LOCATIONS["shrouded_fen"]["name"]
 
         for q in QUESTS_C_TIER:
-            location = q[4]
-            self.assertEqual(location, fen_name, f"Quest '{q[1]}' has incorrect location '{location}'. Expected '{fen_name}'")
+            location = q["location"]
+            self.assertEqual(location, fen_name, f"Quest '{q['title']}' has incorrect location '{location}'. Expected '{fen_name}'")
 
 if __name__ == '__main__':
     unittest.main()
