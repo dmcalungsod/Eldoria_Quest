@@ -13,8 +13,22 @@ from unittest.mock import MagicMock
 # Add root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
-from game_systems.player.player_creator import PlayerCreator
+# Mock external dependencies for environments where they aren't installed
+try:
+    import pymongo  # noqa: F401
+except ImportError:
+    sys.modules['pymongo'] = MagicMock()
+    sys.modules['pymongo.errors'] = MagicMock()
+
+try:
+    import discord  # noqa: F401
+    import discord.ext  # noqa: F401
+except ImportError:
+    sys.modules['discord'] = MagicMock()
+    sys.modules['discord.ext'] = MagicMock()
+
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.player.player_creator import PlayerCreator  # noqa: E402
 
 
 class TestSecurity(unittest.TestCase):
@@ -33,7 +47,7 @@ class TestSecurity(unittest.TestCase):
         self.mock_db.player_exists.return_value = False
         self.mock_db.get_default_skill_keys.return_value = []
 
-        success, msg = self.creator.create_player(discord_id, dirty_name, 1) # 1 is a valid class_id
+        success, msg = self.creator.create_player(discord_id, dirty_name, 1)  # 1 is a valid class_id
 
         self.assertTrue(success, f"Player creation failed: {msg}")
 
@@ -44,6 +58,34 @@ class TestSecurity(unittest.TestCase):
         actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
 
         self.assertEqual(actual_name, expected_clean_name, "Markdown characters were not removed!")
+
+    def test_link_sanitization(self):
+        """Test that link markdown characters are removed from username."""
+        discord_id = 12345
+        dirty_name = "[Click Me](http://evil.com)"
+
+        # Expected: brackets and parentheses removed
+        expected_clean_name = "Click Mehttp://evil.com"
+
+        self.mock_db.player_exists.return_value = False
+        self.mock_db.get_default_skill_keys.return_value = []
+
+        success, msg = self.creator.create_player(discord_id, dirty_name, 1)
+
+        self.assertTrue(success, f"Player creation failed: {msg}")
+
+        self.mock_db.create_player_full.assert_called()
+        args, kwargs = self.mock_db.create_player_full.call_args
+        actual_name = kwargs.get('username', args[1] if len(args) > 1 else None)
+
+        # Assert no brackets or parens
+        self.assertNotIn("[", actual_name)
+        self.assertNotIn("]", actual_name)
+        self.assertNotIn("(", actual_name)
+        self.assertNotIn(")", actual_name)
+
+        # Also check exact match to confirm behavior
+        self.assertEqual(actual_name, expected_clean_name)
 
     def test_zalgo_and_length(self):
         """Test that name is truncated to 32 chars."""
@@ -65,6 +107,7 @@ class TestSecurity(unittest.TestCase):
         self.assertEqual(len(actual_name), expected_len, "Name was not truncated!")
         self.assertEqual(actual_name, "A" * 32)
 
+
 def run_all_tests():
     """Run the security test suite manually."""
     loader = unittest.TestLoader()
@@ -72,6 +115,7 @@ def run_all_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 if __name__ == '__main__':
     unittest.main()

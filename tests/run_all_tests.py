@@ -8,8 +8,13 @@ import os
 import sys
 import unittest
 
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+try:
+    from pymongo import MongoClient
+    from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+except ImportError:
+    MongoClient = None
+    ConnectionFailure = None
+    ServerSelectionTimeoutError = None
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -22,12 +27,17 @@ import test_exploration_view_ux  # New UX test
 import test_adventure_embeds  # New Embed test
 import test_game_systems
 import test_quest_security  # New security test
+import test_security  # General security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_tournament_system  # New Tournament System tests
 
 
 def check_mongodb_connection():
     """Checks if MongoDB is reachable at localhost:27017."""
+    if MongoClient is None:
+        print("⚠ MongoDB driver (pymongo) not installed. Skipping integration tests.")
+        return False
+
     try:
         client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)
         client.admin.command('ping')
@@ -44,6 +54,17 @@ def run_quest_security_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_quest_security)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+def run_general_security_tests():
+    """Runs the general security tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING GENERAL SECURITY TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_security)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -146,6 +167,10 @@ def main():
     quest_passed = run_quest_security_tests()
     all_passed = all_passed and quest_passed
 
+    # 1.5. General Security Tests
+    general_sec_passed = run_general_security_tests()
+    all_passed = all_passed and general_sec_passed
+
     # 2. Scavenge Mechanic Tests (Mock-based, always run)
     scavenge_passed = run_scavenge_tests()
     all_passed = all_passed and scavenge_passed
@@ -195,6 +220,7 @@ def main():
     print("FINAL TEST SUMMARY")
     print("=" * 70)
     print(f"Quest Security Tests: {'✓ PASSED' if quest_passed else '✗ FAILED'}")
+    print(f"General Security Tests: {'✓ PASSED' if general_sec_passed else '✗ FAILED'}")
     print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")
     print(f"UX Tests: {'✓ PASSED' if ux_passed else '✗ FAILED'}")
