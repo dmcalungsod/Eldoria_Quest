@@ -332,4 +332,81 @@ MONSTERS["monster_110"] = {
     "description": "An ancient spirit of fire, clad in armor of obsidian and hate.",
 }
 
+# --- FROSTFALL EXPANSE MONSTERS (Rank A) ---
+
+# 111: Frost Wolf (Fast)
+MONSTERS["monster_111"] = {
+    "id": 111,
+    "name": "Frost Wolf",
+    "level": 26,
+    "tier": "Normal",
+    "hp": 850,
+    "atk": 85,
+    "def": 25,
+    "xp": 800,
+    "drops": [("winter_wolf_pelt", 60), ("magic_stone_medium", 30)],
+    "skills": [MONSTER_SKILLS["vicious_bite"], MONSTER_SKILLS["rapid_strike"]],
+    "description": "Its white fur blends perfectly with the snow, hiding its deadly intent.",
+}
+
+# 112: Ice Golem (Tank)
+MONSTERS["monster_112"] = {
+    "id": 112,
+    "name": "Ice Golem",
+    "level": 27,
+    "tier": "Normal",
+    "hp": 1400,
+    "atk": 65,
+    "def": 70,
+    "xp": 850,
+    "drops": [("frost_crystal", 70), ("ice_core", 20)],
+    "skills": [MONSTER_SKILLS["heavy_blow"], MONSTER_SKILLS["ice_shard"]],
+    "description": "A construct of animate permafrost, slow but relentless.",
+}
+
+# 113: Chill Wisp (Magic)
+MONSTERS["monster_113"] = {
+    "id": 113,
+    "name": "Chill Wisp",
+    "level": 26,
+    "tier": "Normal",
+    "hp": 750,
+    "atk": 95,
+    "def": 15,
+    "xp": 820,
+    "drops": [("magic_stone_medium", 80), ("frost_crystal", 40)],
+    "skills": [MONSTER_SKILLS["ice_shard"], MONSTER_SKILLS["frost_breath"]],
+    "description": "A flickering spirit of cold light that saps warmth from the air.",
+}
+
+# 114: Glacial Drake (Elite)
+MONSTERS["monster_114"] = {
+    "id": 114,
+    "name": "Glacial Drake",
+    "level": 28,
+    "tier": "Elite",
+    "hp": 2200,
+    "atk": 110,
+    "def": 45,
+    "xp": 3000,
+    "drops": [("frozen_scale", 30), ("magic_stone_large", 50)],
+    "skills": [MONSTER_SKILLS["frost_breath"], MONSTER_SKILLS["vicious_bite"]],
+    "description": "A winged predator with scales of blue ice, hunting the frozen wastes.",
+}
+
+# 115: Cryon, the Frozen King (Boss)
+MONSTERS["monster_115"] = {
+    "id": 115,
+    "name": "Cryon, the Frozen King",
+    "level": 29,
+    "tier": "Boss",
+    "hp": 7000,
+    "atk": 135,
+    "def": 80,
+    "xp": 10000,
+    "drops": [("magic_stone_flawless", 100), ("ice_core", 100), ("frozen_scale", 50)],
+    "skills": [MONSTER_SKILLS["glacial_roar"], MONSTER_SKILLS["frost_breath"], MONSTER_SKILLS["heavy_blow"]],
+    "description": "An ancient giant clad in glacial armor, ruling the eternal winter.",
+}
+
 __all__ = ["MONSTERS"]
