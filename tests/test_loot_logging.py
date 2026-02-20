@@ -1,6 +1,6 @@
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
 
 # Mock pymongo before importing anything that uses it
 mock_pymongo = MagicMock()
@@ -8,7 +8,7 @@ sys.modules["pymongo"] = mock_pymongo
 
 # Now import the modules
 from game_systems.adventure.adventure_rewards import AdventureRewards  # noqa: E402
-from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestLootLoss(unittest.TestCase):
     def setUp(self):

@@ -1,15 +1,17 @@
 import json
-import unittest
 import os
-from game_systems.data.monsters import MONSTERS
+import unittest
+
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.materials import MATERIALS
+from game_systems.data.monsters import MONSTERS
+
 
 class TestSunkenGrottoQuests(unittest.TestCase):
     def setUp(self):
         # Load quests.json
         quests_path = os.path.join(os.path.dirname(__file__), "../game_systems/data/quests.json")
-        with open(quests_path, "r", encoding="utf-8") as f:
+        with open(quests_path, encoding="utf-8") as f:
             self.quests = json.load(f)
 
         # Map Quest ID to Quest Object

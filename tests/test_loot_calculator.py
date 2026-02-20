@@ -6,6 +6,7 @@ Verifies the drop rate calculation and RNG.
 
 import unittest
 from unittest.mock import patch
+
 from game_systems.rewards.loot_calculator import LootCalculator
 
 

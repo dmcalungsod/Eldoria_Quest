@@ -1,8 +1,8 @@
+import importlib
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, AsyncMock, patch
-import importlib
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

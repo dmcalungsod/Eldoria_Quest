@@ -6,8 +6,9 @@ Verifies the functionality of the dynamic weather system.
 
 import datetime
 from unittest.mock import patch
-import pytest
-from game_systems.world_time import WorldTime, Weather, LOCATION_WEATHER_WEIGHTS
+
+from game_systems.world_time import Weather, WorldTime
+
 
 class TestWeatherSystem:
     def test_weather_enum_exists(self):
