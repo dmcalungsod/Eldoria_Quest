@@ -24,9 +24,9 @@ jobs:
     steps:
     # 1. Check out the code
     - name: Checkout Repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
-        ref: ${{ github.head_ref }}
+        ref: ${{ github.head_ref || github.ref }}
 
     # 2. Set up Python (Matching your replit environment)
     - name: Set up Python 3.10
@@ -42,16 +42,18 @@ jobs:
         pip install ruff pytest pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # 4. Auto-Fix Code (The "Self-Healing" Step)
+    # 4. Auto-Fix Code (The "Self-Healing" Step) — PR only to prevent infinite loops
     - name: Run Ruff (Fix & Format)
+      if: github.event_name == 'pull_request'
       run: |
         # Fix import sorting and lint errors
         ruff check . --fix
         # Format code (spacing, quotes)
         ruff format .
 
-    # 5. Commit Changes (Only if Ruff made fixes)
+    # 5. Commit Changes (Only if Ruff made fixes — PR only)
     - name: Commit Ruff Fixes
+      if: github.event_name == 'pull_request'
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "style: auto-fix code with Ruff"
@@ -62,8 +64,9 @@ jobs:
     - name: Run Eldoria Test Suite
       env:
         # Mock secrets so tests don't fail on missing env vars
-        DISCORD_BOT_TOKEN: "mock_token_for_testing" 
+        DISCORD_BOT_TOKEN: "mock_token_for_testing"
         GUILD_ID: "123456789"
+        MONGO_URI: "mongodb://localhost:27017"
       run: |
         # We use your existing test runner which handles DB creation/cleanup
         python tests/run_all_tests.py
