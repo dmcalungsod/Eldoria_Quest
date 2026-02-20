@@ -14,6 +14,14 @@ mock_discord.Color.dark_red.return_value = "dark_red"
 mock_discord.Color.dark_green.return_value = "dark_green"
 mock_discord.Color.dark_grey.return_value = "dark_grey"
 
+# Capture Real Item if available (for inheritance compatibility)
+RealItem = object
+if "discord.ui" in sys.modules:
+    try:
+        RealItem = sys.modules["discord.ui"].Item
+    except AttributeError:
+        pass
+
 # Forcefully remove discord if it's already loaded to ensure mocks take precedence
 if "discord" in sys.modules:
     del sys.modules["discord"]
@@ -31,7 +39,7 @@ class MockView:
     def add_item(self, item):
         self.children.append(item)
 
-class MockButton:
+class MockButton(RealItem):
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
         self.label = label
         self.style = style
