@@ -182,9 +182,16 @@ class SkillTrainerView(View):
             if not skill_data:
                 return False, "Invalid skill.", 0
 
-            base_cost = skill_data["upgrade_cost"]
+            # SECURITY: Fetch current level from DB to prevent cost manipulation
+            ps = self.db.get_player_skill_row(self.interaction_user.id, skill_key)
+            if not ps:
+                return False, "Skill not learned.", 0
 
-            return self.db.upgrade_skill(self.interaction_user.id, skill_key, base_cost)
+            current_level = ps["skill_level"]
+            base_cost = skill_data["upgrade_cost"]
+            scaled_cost = get_upgrade_cost(base_cost, current_level)
+
+            return self.db.upgrade_skill(self.interaction_user.id, skill_key, scaled_cost)
         except Exception as e:
             logger.error(f"Upgrade skill error: {e}")
             return False, "System error.", 0
