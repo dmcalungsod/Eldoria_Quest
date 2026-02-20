@@ -182,10 +182,15 @@ class TestExplorationViewUX(unittest.TestCase):
         self.assertEqual(btn.label, "Attack")
         self.assertEqual(btn.style, "danger")
 
-        # Check for Special Ability Button (should be last)
-        special_btn = view.children[-1]
+        # Check for Special Ability Button
+        # Items: Attack, Defend, Flee, Pack, Special, Stance Select
+        special_btn = view.children[4]
         self.assertEqual(special_btn.style, "primary")
         self.assertTrue(hasattr(special_btn, "callback"))
+
+        # Check for Stance Select (should be last now)
+        stance_select = view.children[-1]
+        self.assertEqual(stance_select.custom_id, "stance_select")
 
     def test_battle_state_with_skills(self):
         """Battle state: Active monster + Skills = Select Menu."""
@@ -209,7 +214,8 @@ class TestExplorationViewUX(unittest.TestCase):
             skills=skills,
         )
 
-        # Check for Select Menu (should be last)
+        # Check for Skill Select Menu (should be last)
+        # Items: Attack, Defend, Flee, Pack, Special, Stance Select, Skill Select
         select_menu = view.children[-1]
         self.assertEqual(select_menu.custom_id, "skill_select")
         self.assertEqual(len(select_menu.options), 2)
@@ -217,6 +223,10 @@ class TestExplorationViewUX(unittest.TestCase):
         self.assertEqual(select_menu.options[0].emoji, "✨")
         self.assertEqual(select_menu.options[1].label, "Heal")
         self.assertEqual(select_menu.options[1].emoji, "💚")
+
+        # Check for Stance Select (should be second to last)
+        stance_select = view.children[-2]
+        self.assertEqual(stance_select.custom_id, "stance_select")
 
 
 if __name__ == "__main__":

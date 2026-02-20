@@ -181,6 +181,16 @@ class AdventureSession:
 
             # --- 1. Continue Combat ---
             if self.active_monster:
+                if action and action.startswith("set_stance:"):
+                    stance = action.split(":", 1)[1]
+                    self.active_monster["player_stance"] = stance
+                    msg = f"You shift into an **{stance.capitalize()}** stance!"
+                    self.logs.append(msg)
+                    self.save_state()
+                    # Return immediate result to update UI without processing turn
+                    # We wrap the msg in a list to match sequence format [[msg]]
+                    return self._build_result([[msg]], False, context)
+
                 if action == "flee":
                     return self._attempt_flee(context)
 
@@ -328,10 +338,16 @@ class AdventureSession:
         # vitals are in context and updated in loop
 
         # Max 8 turns to avoid infinite loops
+        stance = self.active_monster.get("player_stance", "balanced")
         for _ in range(8):
             # FIX: Pass session XP
             result = self.combat.resolve_turn(
-                self.active_monster, report, current_session_exp, context=context, persist_vitals=False
+                self.active_monster,
+                report,
+                current_session_exp,
+                context=context,
+                persist_vitals=False,
+                stance=stance,
             )
             turn_reports.append(result.get("turn_report", {}))
 
@@ -405,10 +421,18 @@ class AdventureSession:
         """
         report = self.combat.create_empty_battle_report()
 
+        # Extract Stance
+        stance = self.active_monster.get("player_stance", "balanced")
+
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
         result = self.combat.resolve_turn(
-            self.active_monster, report, current_session_exp, context=context, action=action
+            self.active_monster,
+            report,
+            current_session_exp,
+            context=context,
+            action=action,
+            stance=stance,
         )
 
         # Update context vitals from combat result

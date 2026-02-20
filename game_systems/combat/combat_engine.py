@@ -85,6 +85,7 @@ class CombatEngine:
         active_boosts: dict = None,
         stats_dict: dict = None,
         action: str = "auto",
+        player_stance: str = "balanced",
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -95,6 +96,7 @@ class CombatEngine:
         active_boosts → Dict of active global boosts
         stats_dict → Cached dictionary of player stats to avoid property overhead
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
+        player_stance -> "aggressive", "balanced", or "defensive"
         """
         self.player = player
         self.monster = monster
@@ -118,6 +120,18 @@ class CombatEngine:
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
         self.action = action
+
+        # Stance Logic
+        self.player_stance = player_stance
+        self.dmg_dealt_mult = 1.0
+        self.dmg_taken_mult = 1.0
+
+        if self.player_stance == "aggressive":
+            self.dmg_dealt_mult = 1.2
+            self.dmg_taken_mult = 1.2
+        elif self.player_stance == "defensive":
+            self.dmg_dealt_mult = 0.8
+            self.dmg_taken_mult = 0.8
 
     def run_combat_turn(self):
         """
@@ -203,6 +217,10 @@ class CombatEngine:
             if action["type"] == "attack":
                 dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.stats_dict)
 
+                # Apply Stance Multiplier
+                if self.dmg_taken_mult != 1.0:
+                    dmg = int(dmg * self.dmg_taken_mult)
+
                 if event_type == "dodge":
                     turn_report["player_dodge"] = 1
                 else:
@@ -233,6 +251,10 @@ class CombatEngine:
                 else:
                     # --- Monster Offensive Skill ---
                     dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+
+                    # Apply Stance Multiplier
+                    if self.dmg_taken_mult != 1.0:
+                        dmg = int(dmg * self.dmg_taken_mult)
 
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
@@ -317,6 +339,10 @@ class CombatEngine:
         # Apply Multiplier
         dmg = int(base_dmg * spec["damage_mult"])
 
+        # Apply Stance Multiplier
+        if self.dmg_dealt_mult != 1.0:
+            dmg = int(dmg * self.dmg_dealt_mult)
+
         # Apply Special Effects
         if spec.get("crit_bonus"):
             if random.randint(1, 100) <= spec["crit_bonus"]:
@@ -367,6 +393,10 @@ class CombatEngine:
             # --- Offensive Skill ---
             dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, self.monster, skill, skill_level)
 
+            # Apply Stance Multiplier
+            if self.dmg_dealt_mult != 1.0:
+                dmg = int(dmg * self.dmg_dealt_mult)
+
             if event_type == "crit":
                 turn_report["player_crit"] = 1
 
@@ -379,6 +409,10 @@ class CombatEngine:
     def _perform_basic_attack(self, log, turn_report):
         # --- Basic Attack ---
         dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+
+        # Apply Stance Multiplier
+        if self.dmg_dealt_mult != 1.0:
+            dmg = int(dmg * self.dmg_dealt_mult)
 
         if event_type == "crit":
             turn_report["player_crit"] = 1

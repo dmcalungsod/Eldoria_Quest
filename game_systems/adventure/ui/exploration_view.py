@@ -80,14 +80,14 @@ class ExplorationView(View):
             flee_btn.callback = self.action_flee
             self.add_item(flee_btn)
 
-            # 4. Pack (New Row)
+            # 4. Pack (Row 1)
             inv_btn = Button(
                 label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack"
             )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
 
-            # 5. Special Ability (Class Specific)
+            # 5. Special Ability (Class Specific, Row 1)
             # Mapping: 1=Warrior, 2=Mage, 3=Rogue, 4=Cleric, 5=Ranger
             specials = {
                 1: {"label": "Cleave", "emoji": "🪓"},
@@ -104,7 +104,42 @@ class ExplorationView(View):
             special_btn.callback = self.action_special
             self.add_item(special_btn)
 
-            # 6. Skill Select (Row 2)
+            # 6. Stance Select (Row 2)
+            stance_options = [
+                discord.SelectOption(
+                    label="Aggressive",
+                    value="aggressive",
+                    description="⚔️ +20% Dmg / +20% Taken",
+                    emoji="⚔️",
+                    default=self.active_monster.get("player_stance", "balanced") == "aggressive",
+                ),
+                discord.SelectOption(
+                    label="Balanced",
+                    value="balanced",
+                    description="⚖️ Standard Combat",
+                    emoji="⚖️",
+                    default=self.active_monster.get("player_stance", "balanced") == "balanced",
+                ),
+                discord.SelectOption(
+                    label="Defensive",
+                    value="defensive",
+                    description="🛡️ -20% Dmg / -20% Taken",
+                    emoji="🛡️",
+                    default=self.active_monster.get("player_stance", "balanced") == "defensive",
+                ),
+            ]
+            stance_select = Select(
+                placeholder="Select Combat Stance...",
+                min_values=1,
+                max_values=1,
+                options=stance_options,
+                row=2,
+                custom_id="stance_select",
+            )
+            stance_select.callback = self.action_stance
+            self.add_item(stance_select)
+
+            # 7. Skill Select (Row 3)
             if self.skills:
                 options = []
                 for s in self.skills:
@@ -133,7 +168,7 @@ class ExplorationView(View):
                         min_values=1,
                         max_values=1,
                         options=options,
-                        row=2,
+                        row=3,
                         custom_id="skill_select",
                     )
                     skill_select.callback = self.action_skill
@@ -192,6 +227,10 @@ class ExplorationView(View):
 
     async def action_special(self, interaction: discord.Interaction):
         await self._perform_simulation(interaction, action="special_ability")
+
+    async def action_stance(self, interaction: discord.Interaction):
+        selected_stance = interaction.data["values"][0]
+        await self._perform_simulation(interaction, action=f"set_stance:{selected_stance}")
 
     async def action_skill(self, interaction: discord.Interaction):
         # Retrieve selected skill key

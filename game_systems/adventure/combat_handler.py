@@ -120,6 +120,7 @@ class CombatHandler:
         context: dict[str, Any] | None = None,
         persist_vitals: bool = True,
         action: str = "auto",
+        stance: str = "balanced",
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
@@ -127,6 +128,7 @@ class CombatHandler:
             accumulated_exp: XP earned in this session but not yet saved to DB.
             context: Optional pre-fetched data to avoid DB calls.
             persist_vitals: Whether to write HP/MP to DB immediately.
+            stance: Player's current combat stance (aggressive, balanced, defensive).
         """
         try:
             # 1. Load Data
@@ -180,6 +182,7 @@ class CombatHandler:
                 active_boosts=boosts,
                 stats_dict=stats_dict,
                 action=action,
+                player_stance=stance,
             )
 
             result = engine.run_combat_turn()
