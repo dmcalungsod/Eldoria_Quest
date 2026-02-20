@@ -20,8 +20,16 @@ class RankSystem:
         "C": {"title": "Adept", "next_rank": "B", "requirements": {"quests_completed": 80, "boss_kills": 1}},
         "B": {"title": "Veteran", "next_rank": "A", "requirements": {"quests_completed": 150, "boss_kills": 5}},
         "A": {"title": "Master", "next_rank": "S", "requirements": {"quests_completed": 300, "boss_kills": 10}},
-        "S": {"title": "Elite", "next_rank": "SS", "requirements": {}},
-        "SS": {"title": "Paragon", "next_rank": "SSS", "requirements": {}},
+        "S": {
+            "title": "Elite",
+            "next_rank": "SS",
+            "requirements": {"quests_completed": 500, "boss_kills": 20, "elite_kills": 50},
+        },
+        "SS": {
+            "title": "Paragon",
+            "next_rank": "SSS",
+            "requirements": {"quests_completed": 1000, "boss_kills": 50, "elite_kills": 100},
+        },
         "SSS": {"title": "Mythic", "next_rank": None, "requirements": {}},
     }
 
