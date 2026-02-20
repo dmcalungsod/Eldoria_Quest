@@ -1,14 +1,24 @@
 
 import asyncio
+import os
 import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock
+
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Mock Dependencies
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Mock discord if not available
 try:
     import discord
     from discord.ui import Button, View
     Item = discord.ui.Item
+    if not isinstance(Item, type):
+        raise ImportError("discord.ui.Item is not a type (likely mocked)")
 except (ImportError, AttributeError):
     # Create dummy classes for mocking
     mock_discord = MagicMock()
@@ -43,10 +53,10 @@ except (ImportError, AttributeError):
 
 # Now import the code under test
 # We need to ensure we can import from game_systems
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_manager import AdventureManager
-from game_systems.adventure.ui.exploration_view import ExplorationView
-from game_systems.player.player_stats import PlayerStats
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
+from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
