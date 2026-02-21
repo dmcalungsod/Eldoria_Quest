@@ -16,7 +16,9 @@ import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.class_data import CLASSES
+from game_systems.data.factions import FACTIONS
 from game_systems.data.materials import MATERIALS
+from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.world_time import WorldTime, Weather
 
 from .adventure_events import AdventureEvents
@@ -29,6 +31,7 @@ class EventHandler:
         self.db = db
         self.quest_system = quest_system
         self.discord_id = discord_id
+        self.faction_system = FactionSystem(db)
 
     def resolve_non_combat(
         self,
@@ -39,7 +42,7 @@ class EventHandler:
         weather: Weather = Weather.CLEAR,
         event_type: str | None = None,
     ) -> dict[str, Any]:
-        """Decides between Regen or Quest Event."""
+        """Decides between Regen, Faction Encounter, or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
                 return self._perform_regeneration(
@@ -47,6 +50,15 @@ class EventHandler:
                 )
             else:
                 return self._perform_quest_event(context, location_name, location_id)
+                return self._perform_regeneration(context, location_id, weather)
+
+            # 10% Chance for Faction Encounter
+            if random.randint(1, 100) <= 10:
+                result = self._perform_faction_encounter(context)
+                if result:
+                    return result
+
+            return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
             logger.error(
                 f"Event resolution error for {self.discord_id}: {e}", exc_info=True
@@ -145,6 +157,99 @@ class EventHandler:
                 "log": ["*You try to rest, but something feels wrong.*"],
                 "dead": False,
             }
+
+    def _perform_faction_encounter(self, context: dict[str, Any]) -> dict[str, Any] | None:
+        """
+        Attempts to trigger a faction-related encounter.
+        """
+        try:
+            # Pick a random faction to encounter
+            # Weighting: 50% chance to meet own faction (if in one), 50% random
+            player_faction_data = self.faction_system.get_player_faction(self.discord_id)
+            player_faction_id = player_faction_data["faction_id"] if player_faction_data else None
+
+            target_faction_id = None
+            if player_faction_id and random.random() < 0.5:
+                target_faction_id = player_faction_id
+            else:
+                target_faction_id = random.choice(list(FACTIONS.keys()))
+
+            faction_def = FACTIONS.get(target_faction_id)
+            if not faction_def or "encounters" not in faction_def:
+                return None
+
+            encounter = random.choice(faction_def["encounters"])
+            base_text = encounter["text"]
+            logs = [f"\n{faction_def['emoji']} {base_text}"]
+            loot = {}
+
+            if player_faction_id == target_faction_id:
+                # Member Reward
+                reward = encounter.get("reward_member", {})
+                if reward.get("text"):
+                    logs.append(f"*{reward['text']}*")
+
+                if reward.get("rep"):
+                    rep_logs = self.faction_system.grant_reputation(self.discord_id, reward["rep"], source="Faction Encounter")
+                    logs.extend(rep_logs)
+
+                if reward.get("type") == "item":
+                    key = reward["key"]
+                    amount = reward.get("amount", 1)
+                    loot[key] = amount
+                    # Handled by AdventureSession processing 'loot' dict
+                    item_name = MATERIALS.get(key, {}).get("name", key.replace("_", " ").title())
+                    logs.append(f"{E.ITEM_BOX} Received: **{item_name}** x{amount}")
+
+                elif reward.get("type") == "buff":
+                    # Simple buff application (e.g. Stamina = Heal)
+                    # For MVP, we treat stamina/mana_regen as direct restore or ignore complex buffs
+                    key = reward["key"]
+                    if key == "stamina" or key == "mana_regen":
+                         # Restore some HP/MP
+                        vitals = context["vitals"]
+                        stats = context["player_stats"]
+                        heal = int(stats.max_hp * 0.1)
+                        mana = int(stats.max_mp * 0.1)
+                        new_hp = min(vitals["current_hp"] + heal, stats.max_hp)
+                        new_mp = min(vitals["current_mp"] + mana, stats.max_mp)
+                        self.db.set_player_vitals(self.discord_id, new_hp, new_mp)
+                        context["vitals"]["current_hp"] = new_hp
+                        context["vitals"]["current_mp"] = new_mp
+                        logs.append(f"You feel refreshed. (+{heal} HP, +{mana} MP)")
+
+            else:
+                # Non-Member Interaction
+                reward = encounter.get("reward_non_member", {})
+                if reward.get("text"):
+                    logs.append(f"*{reward['text']}*")
+
+                if reward.get("type") == "xp":
+                    amount = reward.get("amount", 10)
+                    loot["exp"] = amount
+                    logs.append(f"+{amount} EXP")
+                elif reward.get("type") == "hp":
+                    amount = reward.get("amount", 10)
+                    vitals = context["vitals"]
+                    stats = context["player_stats"]
+                    new_hp = min(vitals["current_hp"] + amount, stats.max_hp)
+                    self.db.set_player_vitals(self.discord_id, new_hp, vitals["current_mp"])
+                    context["vitals"]["current_hp"] = new_hp
+                    logs.append(f"Restored {amount} HP.")
+                elif reward.get("type") == "mp":
+                    amount = reward.get("amount", 10)
+                    vitals = context["vitals"]
+                    stats = context["player_stats"]
+                    new_mp = min(vitals["current_mp"] + amount, stats.max_mp)
+                    self.db.set_player_vitals(self.discord_id, vitals["current_hp"], new_mp)
+                    context["vitals"]["current_mp"] = new_mp
+                    logs.append(f"Restored {amount} MP.")
+
+            return {"log": logs, "dead": False, "loot": loot}
+
+        except Exception as e:
+            logger.error(f"Faction encounter error for {self.discord_id}: {e}")
+            return None
 
     def _perform_quest_event(
         self,

@@ -305,14 +305,22 @@ class CombatEngine:
                     attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
 
                     if player_defending:
-                        dmg = int(dmg * 0.5)
-                        log.append(f"{attack_msg} You brace against it! (`{dmg}` dmg)")
+                        # SUPER DEFENSE for predicted attacks (Perfect Guard)
+                        dmg = int(dmg * 0.3)  # 70% damage reduction!
+
+                        # Reward: MP Restore for successful guard (10% Max MP)
+                        max_mp = self.stats_dict.get("MP", 100)
+                        mp_restore = int(max_mp * 0.10)
+                        self.player_mp = min(max_mp, self.player_mp + mp_restore)
+
+                        log.append(
+                            f"{attack_msg} You anticipated the blow! **Perfect Guard!** (`{dmg}` dmg, +{mp_restore} MP)"
+                        )
+                    else:
+                        log.append(f"{attack_msg} (`{dmg}` dmg)")
 
                     turn_report["damage_taken"] = dmg
                     self.player_hp -= dmg
-
-                    if not player_defending:
-                        log.append(f"{attack_msg} (`{dmg}` dmg)")
 
             # Check Player Death
             if self.player_hp <= 0:
