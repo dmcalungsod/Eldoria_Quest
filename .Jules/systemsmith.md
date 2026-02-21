@@ -7,3 +7,8 @@
 
 **Learning:** `AdventureRewards` used a linear additive formula for Luck bonuses (`base_chance + luck_bonus`), which could push drop rates over 100% or multiply rare drop rates by 50x at max stats, breaking the economy.
 **Action:** Always implement stat-based scaling (like Luck or Crit) using multiplicative formulas (`base * (1 + bonus)`) to preserve the rarity curve and prevent trivializing high-tier content.
+
+## 2025-05-18 — Restore HP on Level Up
+
+**Learning:** Players were not receiving full HP restoration upon leveling up, unlike MP which was restored. This created an inconsistency and felt unrewarding.
+**Action:** Updated `AdventureManager._grant_rewards_internal` to restore `current_hp` to `max_hp` when `leveled_up` is True. This ensures a fresh start for the new level.

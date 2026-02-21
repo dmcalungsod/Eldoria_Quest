@@ -265,9 +265,10 @@ class AdventureManager:
         current_hp = p_row["current_hp"]
         saved_hp = 1 if current_hp <= 0 else current_hp
 
-        # FIX: Only restore MP on level up, otherwise preserve current MP
-        # Prevents "free healing" exploit by ending adventure
+        # FIX: Restore HP/MP on level up, otherwise preserve current values
+        # Prevents "free healing" exploit by ending adventure without leveling
         target_mp = level_sys.stats.max_mp if leveled_up else p_row["current_mp"]
+        target_hp = level_sys.stats.max_hp if leveled_up else saved_hp
 
         self.db.update_player_mixed(
             session.discord_id,
@@ -275,7 +276,7 @@ class AdventureManager:
                 "level": level_sys.level,
                 "experience": level_sys.exp,
                 "exp_to_next": level_sys.exp_to_next,
-                "current_hp": saved_hp,
+                "current_hp": target_hp,
                 "current_mp": target_mp,
             },
             inc_fields={"vestige_pool": total_exp},
