@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from typing import Any
 
 from pymongo import InsertOne, MongoClient, UpdateOne
+from pymongo.errors import DuplicateKeyError
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")
@@ -1678,22 +1679,38 @@ class DatabaseManager:
         self, discord_id: int, skill_key: str, cost: int
     ) -> tuple[bool, str]:
         """Atomically learns a new skill (deducts vestige, inserts skill)."""
-        player = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "vestige_pool": 1},
-        )
-        if not player or player["vestige_pool"] < cost:
-            return False, "Insufficient Vestige."
-
         if self.player_has_skill(discord_id, skill_key):
             return False, "Skill already learned."
 
-        self._col("players").update_one(
-            {"discord_id": discord_id},
+        # 1. Optimistic Deduction (Atomic Check & Update)
+        result = self._col("players").update_one(
+            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}},
             {"$inc": {"vestige_pool": -cost}},
         )
-        self.insert_player_skill(discord_id, skill_key)
-        return True, "Skill Learned!"
+
+        if result.modified_count == 0:
+            return False, "Insufficient Vestige."
+
+        # 2. Insert Skill
+        try:
+            self.insert_player_skill(discord_id, skill_key)
+            return True, "Skill Learned!"
+        except DuplicateKeyError:
+            # Race condition: Skill was learned concurrently or check failed
+            # REFUND VESTIGE
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"vestige_pool": cost}},
+            )
+            return False, "Skill already learned (refunded)."
+        except Exception as e:
+            # Catch-all for other errors to ensure refund
+            logger.error(f"Error learning skill: {e}")
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"vestige_pool": cost}},
+            )
+            return False, "System error (refunded)."
 
     def upgrade_skill(
         self, discord_id: int, skill_key: str, cost: int
@@ -1705,20 +1722,40 @@ class DatabaseManager:
 
         current_level = ps["skill_level"]
 
-        player = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "vestige_pool": 1},
-        )
-        if not player or player["vestige_pool"] < cost:
-            return False, "Insufficient Vestige.", current_level
-
-        new_level = current_level + 1
-        self._col("players").update_one(
-            {"discord_id": discord_id},
+        # 1. Optimistic Deduction (Atomic Check & Update)
+        result = self._col("players").update_one(
+            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}},
             {"$inc": {"vestige_pool": -cost}},
         )
-        self.update_player_skill(discord_id, skill_key, skill_level=new_level)
-        return True, "Skill Upgraded!", new_level
+
+        if result.modified_count == 0:
+            return False, "Insufficient Vestige.", current_level
+
+        # 2. Update Skill Level (Atomic Check on Level)
+        # Verify that the level hasn't changed since we calculated the cost
+        skill_res = self._col("player_skills").update_one(
+            {
+                "discord_id": discord_id,
+                "skill_key": skill_key,
+                "skill_level": current_level,
+            },
+            {"$inc": {"skill_level": 1}},
+        )
+
+        if skill_res.modified_count == 0:
+            # Race condition: Level changed concurrently
+            # REFUND VESTIGE
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"vestige_pool": cost}},
+            )
+            return (
+                False,
+                "Skill level changed during transaction. Please try again.",
+                current_level,
+            )
+
+        return True, "Skill Upgraded!", current_level + 1
 
     # ============================================================
     # ADMIN (New methods for external call sites)
