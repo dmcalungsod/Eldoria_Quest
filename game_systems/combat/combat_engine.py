@@ -22,17 +22,14 @@ logger = logging.getLogger("eldoria.combat_engine")
 class CombatEngine:
     PLAYER_SKILL_CHANCE = 40  # 40% chance to use a skill if possible
 
-    _SKILL_DAMAGE_MAP = {
-        "fireball": "mag_hits",
-        "explosion": "mag_hits",
-        "ice_lance": "mag_hits",
-        "smite": "mag_hits",
-        "true_shot": "dex_hits",
-        "multi_shot": "dex_hits",
-        "double_strike": "dex_hits",
-        "toxic_blade": "dex_hits",
-        "power_strike": "str_hits",
-        "cleave": "str_hits",
+    _STAT_HIT_MAP = {
+        "STR": "str_hits",
+        "DEX": "dex_hits",
+        "AGI": "dex_hits",
+        "MAG": "mag_hits",
+        "INT": "mag_hits",
+        "END": "str_hits",
+        "LCK": "mag_hits",
     }
 
     _CLASS_SPECIALS = {
@@ -155,6 +152,7 @@ class CombatEngine:
             "damage_taken": 0,
             "skills_used": 0,
             "skill_key_used": None,
+            "hits_taken": 0,
         }
 
         logger.debug(f"Combat Turn Start: Player {self.player_hp} HP, Monster {self.monster_hp} HP")
@@ -224,6 +222,7 @@ class CombatEngine:
                 if event_type == "dodge":
                     turn_report["player_dodge"] = 1
                 else:
+                    turn_report["hits_taken"] = 1
                     if player_defending:
                         dmg = int(dmg * 0.5)  # 50% damage reduction
                         log.append(f"🛡️ Your defense absorbs the impact! ({dmg} dmg)")
@@ -259,6 +258,7 @@ class CombatEngine:
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
                     else:
+                        turn_report["hits_taken"] = 1
                         if player_defending:
                             dmg = int(dmg * 0.5)
                             log.append(f"🛡️ Your defense mitigates the skill impact! ({dmg} dmg)")
@@ -301,6 +301,7 @@ class CombatEngine:
                 if event_type == "dodge":
                     turn_report["player_dodge"] = 1
                 else:
+                    turn_report["hits_taken"] = 1
                     emoji = skill.get("emoji", "🔥")
                     attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
 
@@ -439,7 +440,7 @@ class CombatEngine:
                 turn_report["player_crit"] = 1
 
             # Tag damage type for stat growth
-            self._tag_damage_type(skill_key, turn_report)
+            self._tag_damage_type(skill, turn_report)
 
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
@@ -468,9 +469,11 @@ class CombatEngine:
         self.monster_hp -= dmg
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
 
-    def _tag_damage_type(self, skill_key, report):
+    def _tag_damage_type(self, skill, report):
         """Helper to categorize skill damage for stat growth."""
-        report[self._SKILL_DAMAGE_MAP.get(skill_key, "str_hits")] = 1
+        stat = skill.get("scaling_stat", "STR").upper()
+        hit_key = self._STAT_HIT_MAP.get(stat, "str_hits")
+        report[hit_key] = 1
 
     def _decide_player_skill(self) -> dict:
         """
