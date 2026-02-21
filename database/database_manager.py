@@ -58,6 +58,9 @@ class DatabaseManager:
         self._boost_cache: list[dict] = []
         self._boost_cache_time: float = 0.0
 
+        self._world_event_cache: dict | None = None
+        self._world_event_cache_time: float = 0.0
+
         logger.info(f"Connected to MongoDB: {self._db_name}")
         self._initialized = True
 
@@ -2000,11 +2003,25 @@ class DatabaseManager:
     # ============================================================
 
     def get_active_world_event(self) -> dict | None:
-        """Fetches the current active world event."""
-        return self._col("world_events").find_one(
-            {"active": 1},
-            {"_id": 0},
-        )
+        """Fetches the current active world event (Cached for 60s)."""
+        now_ts = time.time()
+        if now_ts - self._world_event_cache_time < 60:
+            return (
+                self._world_event_cache.copy() if self._world_event_cache else None
+            )
+
+        try:
+            self._world_event_cache = self._col("world_events").find_one(
+                {"active": 1},
+                {"_id": 0},
+            )
+            self._world_event_cache_time = now_ts
+            return (
+                self._world_event_cache.copy() if self._world_event_cache else None
+            )
+        except Exception as e:
+            logger.error(f"Error fetching active world event: {e}")
+            return None
 
     def set_active_world_event(
         self, event_type: str, start_time: str, end_time: str, data: dict | None = None
@@ -2024,6 +2041,7 @@ class DatabaseManager:
                 "active": 1,
             }
         )
+        self._world_event_cache_time = 0.0  # Invalidate cache
 
     def end_active_world_event(self):
         """Marks all active world events as inactive."""
@@ -2031,3 +2049,4 @@ class DatabaseManager:
             {"active": 1},
             {"$set": {"active": 0}},
         )
+        self._world_event_cache_time = 0.0  # Invalidate cache
