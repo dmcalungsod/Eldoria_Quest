@@ -11,8 +11,8 @@ sys.modules["pymongo.MongoClient"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_manager import AdventureManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 
 
 class TestAdventureDataLoss(unittest.TestCase):

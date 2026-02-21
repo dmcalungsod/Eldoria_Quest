@@ -11,8 +11,9 @@ sys.modules["pymongo.UpdateOne"] = MagicMock()
 sys.modules["pymongo.InsertOne"] = MagicMock()
 
 # Now we can import
-from database.database_manager import DatabaseManager
-from game_systems.items.inventory_manager import InventoryManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.items.inventory_manager import InventoryManager  # noqa: E402
+
 
 class TestRealismInventory(unittest.TestCase):
     def setUp(self):
@@ -25,9 +26,12 @@ class TestRealismInventory(unittest.TestCase):
         self.counters_col = MagicMock()
 
         def col_side_effect(name):
-            if name == "inventory": return self.inventory_col
-            if name == "players": return self.players_col
-            if name == "counters": return self.counters_col
+            if name == "inventory":
+                return self.inventory_col
+            if name == "players":
+                return self.players_col
+            if name == "counters":
+                return self.counters_col
             return MagicMock()
 
         self.db._col.side_effect = col_side_effect
