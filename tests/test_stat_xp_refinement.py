@@ -1,7 +1,11 @@
 
+import os
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
+
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock pymongo before importing anything that uses it
 mock_pymongo = MagicMock()
@@ -43,8 +47,8 @@ class TestStatXPRefinement(unittest.TestCase):
             action="defend"  # Force defend to ensure no dodge/crit randomness interference
         )
 
-        # Mock monster attack to always hit
-        with patch("game_systems.combat.damage_formula.DamageFormula.monster_attack") as mock_attack:
+        # Mock monster attack to always hit (patching where it is used)
+        with patch("game_systems.combat.combat_engine.DamageFormula.monster_attack") as mock_attack:
             mock_attack.return_value = (10, False, "hit") # dmg, crit, event_type
 
             # Force monster to attack
