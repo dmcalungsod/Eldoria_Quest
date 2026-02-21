@@ -53,16 +53,21 @@ class TestDamageScaling(unittest.TestCase):
             self.assertTrue(30 <= dmg <= 50, f"Expected damage around 40, got {dmg}")
 
     def test_dynamic_scaling_factor(self):
-        # Mock skill with high factor
-        skill_heavy = {
-            "key_id": "heavy_hit",
-            "scaling_stat": "STR",
-            "scaling_factor": 5.0,  # 10 * 5 = 50
-            "power_multiplier": 1.0,
-        }
+        # Mock random to ensure consistent damage (no crits, variance 1.0)
+        import unittest.mock
+        with unittest.mock.patch("random.uniform", return_value=1.0), \
+             unittest.mock.patch("random.random", return_value=0.5):
 
-        dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_heavy, 1)
-        self.assertTrue(40 <= dmg <= 60, f"Expected damage around 50, got {dmg}")
+            # Mock skill with high factor
+            skill_heavy = {
+                "key_id": "heavy_hit",
+                "scaling_stat": "STR",
+                "scaling_factor": 5.0,  # 10 * 5 = 50
+                "power_multiplier": 1.0,
+            }
+
+            dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_heavy, 1)
+            self.assertTrue(48 <= dmg <= 52, f"Expected damage around 50, got {dmg}")
 
     def test_player_heal_max_hp_logic(self):
         # Test healing cap and max_hp consistency
