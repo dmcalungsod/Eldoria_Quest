@@ -1,7 +1,6 @@
-import unittest
-from unittest.mock import MagicMock, patch, ANY
 import sys
-import math
+import unittest
+from unittest.mock import MagicMock, patch
 
 # Mock sys.modules for pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
@@ -10,7 +9,8 @@ sys.modules["pymongo.MongoClient"] = MagicMock()
 sys.modules["pymongo.UpdateOne"] = MagicMock()
 sys.modules["pymongo.InsertOne"] = MagicMock()
 
-from database.database_manager import DatabaseManager, MAX_STACK_CONSUMABLE, MAX_STACK_MATERIAL, MAX_STACK_EQUIPMENT
+from database.database_manager import MAX_STACK_CONSUMABLE, DatabaseManager  # noqa: E402
+
 
 class TestStackLimits(unittest.TestCase):
     def setUp(self):
