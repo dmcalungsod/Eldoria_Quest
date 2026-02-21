@@ -208,6 +208,17 @@ class AdventureEvents:
         "The shadows seem to bleed into the light.",
     ]
 
+    ATMOSPHERE_HARVEST = [
+        "Golden light floods the forest, warming the earth.",
+        "The scent of ripe fruit and blooming flowers fills the air.",
+        "Nature seems to be celebrating, with life bursting from every corner.",
+        "A gentle breeze carries the sweet smell of harvest.",
+        "The world feels vibrant and alive, teeming with bounty.",
+        "You spot colorful ribbons tied to the trees, marking the festival.",
+        "The sun shines brighter, promising good fortune.",
+        "Leaves rustle with a joyous energy.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -472,6 +483,8 @@ class AdventureEvents:
             # Event Override (High Priority)
             if event_type == "blood_moon":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
+            elif event_type == "harvest_festival":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_HARVEST
 
             # Time Phase Override (30% chance)
             elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
