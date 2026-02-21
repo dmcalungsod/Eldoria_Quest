@@ -9,8 +9,8 @@ sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = MagicMock()
 
 # Now import the modules under test
-from game_systems.adventure.adventure_rewards import STAT_EXP_GAINS
-from game_systems.combat.combat_engine import CombatEngine
+from game_systems.adventure.adventure_rewards import STAT_EXP_GAINS  # noqa: E402
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
 
 
 class TestStatXPRefinement(unittest.TestCase):
