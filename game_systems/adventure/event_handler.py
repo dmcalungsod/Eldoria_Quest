@@ -77,13 +77,14 @@ class EventHandler:
                 }
 
             # Calculate Regen Amounts with Caps (Prevent infinite scaling)
-            # Base: 50% of Stat
-            raw_hp_regen = int(stats.endurance * 0.5) + 1
-            raw_mp_regen = int(stats.magic * 0.5) + 1
+            # Equilibrium Fix: Reduced from 0.5 to 0.25 to prevent linear runaway scaling
+            # Base: 25% of Stat
+            raw_hp_regen = int(stats.endurance * 0.25) + 1
+            raw_mp_regen = int(stats.magic * 0.25) + 1
 
-            # Cap: 10% of Max HP/MP per step
-            max_hp_regen = max(1, int(stats.max_hp * 0.10))
-            max_mp_regen = max(1, int(stats.max_mp * 0.10))
+            # Cap: 5% of Max HP/MP per step (Strict Cap)
+            max_hp_regen = max(1, int(stats.max_hp * 0.05))
+            max_mp_regen = max(1, int(stats.max_mp * 0.05))
 
             hp_regen = min(raw_hp_regen, max_hp_regen)
             mp_regen = min(raw_mp_regen, max_mp_regen)

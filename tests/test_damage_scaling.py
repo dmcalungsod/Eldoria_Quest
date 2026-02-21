@@ -1,4 +1,10 @@
+import os
+import sys
 import unittest
+from unittest.mock import patch
+
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.combat.damage_formula import DamageFormula
 from game_systems.player.player_stats import PlayerStats
