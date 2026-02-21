@@ -101,7 +101,8 @@ class InventoryView(View):
         for item in items:
             val = str(item["id"])
             if item["item_type"] == "equipment":
-                label = f"{item['item_name']} ({item['slot']})"
+                slot_name = self.eq_manager.get_slot_display_name(item["slot"])
+                label = f"{item['item_name']} ({slot_name})"
                 if item.get("equipped"):
                     unequip_opts.append(discord.SelectOption(label=label, value=val, emoji="🛡️"))
                 else:
@@ -115,7 +116,7 @@ class InventoryView(View):
                     # Also check slot restrictions
                     if can_equip and item["slot"] not in allowed_slots:
                         can_equip = False
-                        reason = f"Class restricted ({item['slot']})"
+                        reason = f"Class restricted ({slot_name})"
 
                     if can_equip:
                         equip_opts.append(discord.SelectOption(label=label, value=val, emoji="⚔️"))
