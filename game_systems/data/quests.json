@@ -1112,5 +1112,74 @@
       "aurum": 1500,
       "item": "Magic Stone (Large)"
     }
+  },
+  {
+    "id": 61,
+    "title": "The Missing Ledger",
+    "tier": "F",
+    "quest_giver": "Clerk Elara",
+    "location": "Willowcreek Outskirts",
+    "summary": "Retrieve a lost Guild ledger from slimes.",
+    "description": "Elara fled from a slime ambush and dropped a vital ledger. If the Guildmaster finds out, she's doomed. Retrace her steps and find the evidence before it's digested.",
+    "objectives": {
+      "locate": "Torn Page",
+      "examine": "Slime Trails",
+      "defeat": {
+        "Verdant Slime": 5
+      }
+    },
+    "rewards": {
+      "exp": 300,
+      "aurum": 60,
+      "item": "Dewfall Tonic"
+    }
+  },
+  {
+    "id": 62,
+    "title": "The Shadowed Trail",
+    "tier": "E",
+    "quest_giver": "Scout Valen",
+    "location": "Whispering Thicket",
+    "summary": "Investigate a goblin camp for clues.",
+    "description": "The torn page revealed goblin codes. Valen suspects a spy ring. Find their camp in the Thicket and gather intelligence.",
+    "objectives": {
+      "examine": "Abandoned Camp",
+      "gather": {
+        "Moonleaf Herb": 3
+      },
+      "defeat": {
+        "Goblin Scout": 5
+      }
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 80
+    },
+    "prerequisites": [
+      61
+    ]
+  },
+  {
+    "id": 63,
+    "title": "The Truth Revealed",
+    "tier": "E",
+    "quest_giver": "Captain Rhea",
+    "location": "Whispering Thicket",
+    "summary": "Confront the goblin lieutenant.",
+    "description": "The trail leads to 'Needle-Tooth', a goblin lieutenant holding the rest of the ledger. Recover it to expose the traitor.",
+    "objectives": {
+      "defeat": {
+        "Bramble Goblin": 1
+      },
+      "retrieve": "Decoded Ledger"
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 150,
+      "item": "Small Signet Seal"
+    },
+    "prerequisites": [
+      62
+    ]
   }
 ]

@@ -1174,6 +1174,14 @@ class DatabaseManager:
         )
         return {d["quest_id"] for d in docs}
 
+    def get_player_completed_quest_ids(self, discord_id: int) -> set[int]:
+        """Fetches all COMPLETED quest IDs for a player."""
+        docs = self._col("player_quests").find(
+            {"discord_id": discord_id, "status": "completed"},
+            {"_id": 0, "quest_id": 1},
+        )
+        return {d["quest_id"] for d in docs}
+
     def get_player_quests_joined(self, discord_id: int) -> list[dict]:
         """Fetches in-progress quests with quest details."""
         pq_docs = list(
