@@ -142,8 +142,9 @@ class DamageFormula:
 
         attack_power = monster.get("ATK", 10)
         end = DamageFormula._get_stat(player_stats, "END")
+        flat_def = DamageFormula._get_stat(player_stats, "DEF")
 
-        defense = calculate_tiered_bonus(end, 1.5)
+        defense = calculate_tiered_bonus(end, 1.5) + flat_def
         defense_reduction = defense * (0.3 + (0.2 * min(1, defense / 100)))
 
         base_damage = max(0, attack_power - defense_reduction)
