@@ -50,7 +50,9 @@ class TestCraftingDismantle(unittest.TestCase):
 
     def test_dismantle_item_not_equipment(self):
         self.mock_db.get_inventory_item_by_id.return_value = {
-            "item_name": "Potion", "item_type": "consumable", "equipped": 0
+            "item_name": "Potion",
+            "item_type": "consumable",
+            "equipped": 0,
         }
         success, msg, _ = self.system.dismantle_item(self.discord_id, self.inv_id)
         self.assertFalse(success)
@@ -58,7 +60,9 @@ class TestCraftingDismantle(unittest.TestCase):
 
     def test_dismantle_item_equipped(self):
         self.mock_db.get_inventory_item_by_id.return_value = {
-            "item_name": "Sword", "item_type": "equipment", "equipped": 1
+            "item_name": "Sword",
+            "item_type": "equipment",
+            "equipped": 1,
         }
         success, msg, _ = self.system.dismantle_item(self.discord_id, self.inv_id)
         self.assertFalse(success)
@@ -70,7 +74,7 @@ class TestCraftingDismantle(unittest.TestCase):
             "item_name": "Rusted Shortsword",
             "item_type": "equipment",
             "equipped": 0,
-            "rarity": "Common"
+            "rarity": "Common",
         }
         # Setup consume success
         self.mock_db.consume_item_atomic.return_value = True
@@ -96,6 +100,7 @@ class TestCraftingDismantle(unittest.TestCase):
         keys = [i["item_key"] for i in items]
         self.assertIn("iron_ore", keys)
         self.assertIn("wolf_fang", keys)
+
 
 if __name__ == "__main__":
     unittest.main()

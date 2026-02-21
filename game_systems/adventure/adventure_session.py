@@ -14,7 +14,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import WorldTime, Weather
+from game_systems.world_time import Weather, WorldTime
 
 # Subsystems
 from .adventure_rewards import AdventureRewards
@@ -64,19 +64,13 @@ class AdventureSession:
                 self.logs = []
 
             try:
-                self.loot = (
-                    json.loads(row_data["loot_collected"])
-                    if row_data["loot_collected"]
-                    else {}
-                )
+                self.loot = json.loads(row_data["loot_collected"]) if row_data["loot_collected"] else {}
             except json.JSONDecodeError:
                 self.loot = {}
 
             try:
                 self.active_monster = (
-                    json.loads(row_data["active_monster_json"])
-                    if row_data["active_monster_json"]
-                    else None
+                    json.loads(row_data["active_monster_json"]) if row_data["active_monster_json"] else None
                 )
             except json.JSONDecodeError:
                 self.active_monster = None
@@ -88,16 +82,12 @@ class AdventureSession:
             self.location_id = None
             self.version = 1
 
-    def _build_result(
-        self, sequence: list, dead: bool, context: dict | None
-    ) -> dict[str, Any]:
+    def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
         """Helper to build the standardized result dictionary."""
         return {
             "sequence": sequence,
             "dead": dead,
-            "vitals": (
-                context["vitals"] if context else {"current_hp": 0, "current_mp": 0}
-            ),
+            "vitals": (context["vitals"] if context else {"current_hp": 0, "current_mp": 0}),
             "player_stats": context["player_stats"] if context else None,
             "active_monster": self.active_monster,
         }
@@ -106,9 +96,7 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_session_context(
-        self, bundle: dict | None = None
-    ) -> dict[str, Any] | None:
+    def _fetch_session_context(self, bundle: dict | None = None) -> dict[str, Any] | None:
         """
         Fetches all necessary data for the adventure step (combat or non-combat) in a single batch.
         Returns None if critical data (vitals) is missing.
@@ -184,18 +172,14 @@ class AdventureSession:
             # Ensure max_hp is at least 1
             if "stats_dict" in context:
                 # Fallback to player_stats.max_hp if key missing
-                max_hp = max(
-                    context["stats_dict"].get("HP", context["player_stats"].max_hp), 1
-                )
+                max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
             else:
                 max_hp = max(context["player_stats"].max_hp, 1)
             return (current_hp / max_hp) >= 0.30
         except Exception:
             return False
 
-    def simulate_step(
-        self, context_bundle: dict | None = None, action: str = None
-    ) -> dict[str, Any]:
+    def simulate_step(self, context_bundle: dict | None = None, action: str = None) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
         Returns: { "sequence": List[List[str]], "dead": bool, "vitals": dict, "player_stats": PlayerStats, "active_monster": dict }
@@ -210,9 +194,7 @@ class AdventureSession:
             # This ensures Active Buffs are always available and reduces N+1 queries.
             context = self._fetch_session_context(context_bundle)
             if not context:
-                return self._build_result(
-                    [["Error: Failed to load player data."]], False, None
-                )
+                return self._build_result([["Error: Failed to load player data."]], False, None)
 
             # --- 1. Continue Combat ---
             if self.active_monster:
@@ -264,9 +246,7 @@ class AdventureSession:
             if random.randint(1, 100) > regen_threshold:
                 # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
                 player_level = context["player_row"].get("level", 1)
-                monster, phrase = self.combat.initiate_combat(
-                    location, player_level=player_level
-                )
+                monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
 
                 if monster:
                     # Prepend Weather Flavor to the encounter
@@ -342,28 +322,20 @@ class AdventureSession:
         if roll <= chance:
             # Success
             self.active_monster = None
-            msg = [
-                f"🏃 **You fled!** (Chance: {chance}%) - You escape into the shadows."
-            ]
+            msg = [f"🏃 **You fled!** (Chance: {chance}%) - You escape into the shadows."]
             self.logs.extend(msg)
             self.save_state()
             return self._build_result([msg], False, context)
         else:
             # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
-            fail_msg = (
-                f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
-            )
-            return self._process_combat_turn(
-                context, action="flee_failed", prepend_logs=[fail_msg]
-            )
+            fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
+            return self._process_combat_turn(context, action="flee_failed", prepend_logs=[fail_msg])
 
     # ======================================================================
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(
-        self, context: dict[str, Any] | None = None
-    ) -> dict[str, Any]:
+    def _resolve_auto_combat(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """
@@ -410,15 +382,9 @@ class AdventureSession:
                 sequence.append(result["phrases"])
 
             # Safety: Drop to manual if HP is too low
-            max_hp = (
-                stats_dict.get("HP", player_stats.max_hp)
-                if stats_dict
-                else player_stats.max_hp
-            )
+            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
             if result["hp_current"] / max(max_hp, 1) < 0.30:
-                sequence.append(
-                    ["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."]
-                )
+                sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
                 break
 
             if result.get("winner") == "monster":
@@ -500,12 +466,8 @@ class AdventureSession:
 
         # Update context vitals from combat result
         if context:
-            context["vitals"]["current_hp"] = result.get(
-                "hp_current", context["vitals"]["current_hp"]
-            )
-            context["vitals"]["current_mp"] = result.get(
-                "mp_current", context["vitals"]["current_mp"]
-            )
+            context["vitals"]["current_hp"] = result.get("hp_current", context["vitals"]["current_hp"])
+            context["vitals"]["current_mp"] = result.get("mp_current", context["vitals"]["current_mp"])
 
         turn_logs = result["phrases"]
         if prepend_logs:
@@ -561,13 +523,9 @@ class AdventureSession:
                 previous_version=self.version,
             )
             if not success:
-                raise RuntimeError(
-                    "Adventure session state conflict (optimistic lock failed)."
-                )
+                raise RuntimeError("Adventure session state conflict (optimistic lock failed).")
             self.version += 1
 
         except Exception as e:
-            logger.error(
-                f"[AdventureSession] Failed to save state for {self.discord_id}: {e}"
-            )
+            logger.error(f"[AdventureSession] Failed to save state for {self.discord_id}: {e}")
             raise e  # Re-raise so simulate_step handles it as a System Error

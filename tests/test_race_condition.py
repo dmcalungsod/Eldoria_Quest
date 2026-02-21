@@ -9,6 +9,7 @@ import os
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
+
 from pymongo.errors import DuplicateKeyError
 
 # Add repo root to path
@@ -94,21 +95,17 @@ class TestRaceCondition(unittest.TestCase):
         # Verify calls
         # 1. Deduction
         self.mock_db.players.update_one.assert_any_call(
-            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}},
-            {"$inc": {"vestige_pool": -cost}}
+            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}}, {"$inc": {"vestige_pool": -cost}}
         )
 
         # 2. Attempted Upgrade with specific level check
         self.mock_db.player_skills.update_one.assert_called_with(
             {"discord_id": discord_id, "skill_key": skill_key, "skill_level": current_level},
-            {"$inc": {"skill_level": 1}}
+            {"$inc": {"skill_level": 1}},
         )
 
         # 3. Refund
-        self.mock_db.players.update_one.assert_any_call(
-            {"discord_id": discord_id},
-            {"$inc": {"vestige_pool": cost}}
-        )
+        self.mock_db.players.update_one.assert_any_call({"discord_id": discord_id}, {"$inc": {"vestige_pool": cost}})
 
     def test_learn_skill_concurrent_duplicate_refunds_vestige(self):
         """
@@ -144,23 +141,20 @@ class TestRaceCondition(unittest.TestCase):
 
         # VERIFY
         self.assertFalse(success, "Learn should fail if duplicate key error")
-        self.assertIn("already learned", msg) # Or whatever message we choose for concurrent duplicate
+        self.assertIn("already learned", msg)  # Or whatever message we choose for concurrent duplicate
 
         # Verify calls
         # 1. Deduction
         self.mock_db.players.update_one.assert_any_call(
-            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}},
-            {"$inc": {"vestige_pool": -cost}}
+            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}}, {"$inc": {"vestige_pool": -cost}}
         )
 
         # 2. Insertion Attempt
         self.mock_db.player_skills.insert_one.assert_called()
 
         # 3. Refund
-        self.mock_db.players.update_one.assert_any_call(
-            {"discord_id": discord_id},
-            {"$inc": {"vestige_pool": cost}}
-        )
+        self.mock_db.players.update_one.assert_any_call({"discord_id": discord_id}, {"$inc": {"vestige_pool": cost}})
+
 
 if __name__ == "__main__":
     unittest.main()

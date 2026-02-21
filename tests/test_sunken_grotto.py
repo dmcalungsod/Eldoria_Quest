@@ -1,10 +1,12 @@
 import unittest
+
 from game_systems.adventure.adventure_events import AdventureEvents
 from game_systems.data import emojis as E
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.materials import MATERIALS
 from game_systems.data.monsters import MONSTERS
 from game_systems.monsters.monster_skills import MONSTER_SKILLS
+
 
 class TestSunkenGrotto(unittest.TestCase):
     def test_location_exists(self):
@@ -62,6 +64,7 @@ class TestSunkenGrotto(unittest.TestCase):
         # Check that grotto atmosphere is eventually picked (probabilistic)
         # We won't loop forever, just check existence of logic via code inspection or simple call
         # Mocking would be better but simple existence check is okay for this scope.
+
 
 if __name__ == "__main__":
     unittest.main()

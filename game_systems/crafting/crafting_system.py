@@ -123,7 +123,7 @@ class CraftingSystem:
                         "Rare": "Superior",
                         "Epic": "Exquisite",
                         "Legendary": "Masterwork",
-                        "Mythical": "Divine"
+                        "Mythical": "Divine",
                     }
                     prefix = prefix_map.get(new_rarity, "Improved")
                     final_name = f"{prefix} {final_name}"

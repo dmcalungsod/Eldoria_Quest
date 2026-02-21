@@ -15,6 +15,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
 
+
 class TestRankSystem(unittest.TestCase):
     def setUp(self):
         self.mock_db = MagicMock()
@@ -25,19 +26,31 @@ class TestRankSystem(unittest.TestCase):
 
         # Case 1: Not enough quests
         self.mock_db.get_guild_member.return_value = {
-            "rank": "F", "quests_completed": 2, "normal_kills": 30, "elite_kills": 0, "boss_kills": 0
+            "rank": "F",
+            "quests_completed": 2,
+            "normal_kills": 30,
+            "elite_kills": 0,
+            "boss_kills": 0,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
         # Case 2: Not enough kills (Overlap scenario check)
         self.mock_db.get_guild_member.return_value = {
-            "rank": "F", "quests_completed": 3, "normal_kills": 18, "elite_kills": 0, "boss_kills": 0
+            "rank": "F",
+            "quests_completed": 3,
+            "normal_kills": 18,
+            "elite_kills": 0,
+            "boss_kills": 0,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
         # Case 3: Meets requirements
         self.mock_db.get_guild_member.return_value = {
-            "rank": "F", "quests_completed": 3, "normal_kills": 25, "elite_kills": 0, "boss_kills": 0
+            "rank": "F",
+            "quests_completed": 3,
+            "normal_kills": 25,
+            "elite_kills": 0,
+            "boss_kills": 0,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
@@ -46,19 +59,31 @@ class TestRankSystem(unittest.TestCase):
 
         # Case 1: Not enough kills
         self.mock_db.get_guild_member.return_value = {
-            "rank": "E", "quests_completed": 10, "normal_kills": 60, "elite_kills": 5, "boss_kills": 0
+            "rank": "E",
+            "quests_completed": 10,
+            "normal_kills": 60,
+            "elite_kills": 5,
+            "boss_kills": 0,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
         # Case 2: Not enough elite kills
         self.mock_db.get_guild_member.return_value = {
-            "rank": "E", "quests_completed": 10, "normal_kills": 80, "elite_kills": 4, "boss_kills": 0
+            "rank": "E",
+            "quests_completed": 10,
+            "normal_kills": 80,
+            "elite_kills": 4,
+            "boss_kills": 0,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
         # Case 3: Meets requirements
         self.mock_db.get_guild_member.return_value = {
-            "rank": "E", "quests_completed": 10, "normal_kills": 80, "elite_kills": 5, "boss_kills": 0
+            "rank": "E",
+            "quests_completed": 10,
+            "normal_kills": 80,
+            "elite_kills": 5,
+            "boss_kills": 0,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
@@ -67,15 +92,24 @@ class TestRankSystem(unittest.TestCase):
 
         # Case 1: Not enough kills
         self.mock_db.get_guild_member.return_value = {
-            "rank": "D", "quests_completed": 20, "normal_kills": 200, "elite_kills": 20, "boss_kills": 1
+            "rank": "D",
+            "quests_completed": 20,
+            "normal_kills": 200,
+            "elite_kills": 20,
+            "boss_kills": 1,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
         # Case 2: Meets requirements
         self.mock_db.get_guild_member.return_value = {
-            "rank": "D", "quests_completed": 20, "normal_kills": 250, "elite_kills": 20, "boss_kills": 1
+            "rank": "D",
+            "quests_completed": 20,
+            "normal_kills": 250,
+            "elite_kills": 20,
+            "boss_kills": 1,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

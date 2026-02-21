@@ -1,38 +1,13 @@
+import importlib
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-# 1. Mock Dependencies First
-sys.modules["pymongo"] = MagicMock()
-# Mock cogs just in case
-sys.modules["cogs"] = MagicMock()
-sys.modules["cogs.ui_helpers"] = MagicMock()
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# 2. Mock Discord
-mock_discord = MagicMock()
-mock_discord.ButtonStyle.primary = "primary"
-mock_discord.ButtonStyle.secondary = "secondary"
-mock_discord.ButtonStyle.success = "success"
-mock_discord.ButtonStyle.danger = "danger"
-mock_discord.Color.purple.return_value = "purple"
-mock_discord.Color.green.return_value = "green"
-mock_discord.Color.red.return_value = "red"
-
-# Capture Real Item if available
-RealItem = object
-if "discord.ui" in sys.modules:
-    try:
-        candidate = sys.modules["discord.ui"].Item
-        if isinstance(candidate, type):
-            RealItem = candidate
-    except AttributeError:
-        pass
-
-sys.modules["discord"] = mock_discord
-
-
-# Mock UI Components
+# Helper Mocks
 class MockView:
     def __init__(self, timeout=None):
         self.children = []
@@ -42,7 +17,7 @@ class MockView:
         self.children.append(item)
 
 
-class MockButton(RealItem):
+class MockButton:
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
         self.label = label
         self.style = style
@@ -70,21 +45,46 @@ class MockSelect:
         self.options.append({"label": label, "value": value, "description": description, "emoji": emoji})
 
 
-mock_ui = MagicMock()
-mock_ui.View = MockView
-mock_ui.Button = MockButton
-mock_ui.Select = MockSelect
-sys.modules["discord.ui"] = mock_ui
-
-# Add repo root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import View
-from game_systems.crafting.ui.crafting_view import CraftingView  # noqa: E402
-
-
 class TestCraftingUI(unittest.TestCase):
     def setUp(self):
+        # Patch sys.modules
+        self.modules_patcher = patch.dict(sys.modules)
+        self.modules_patcher.start()
+
+        # Mock Pymongo
+        mock_pymongo = MagicMock()
+        mock_pymongo.errors = MagicMock()
+        sys.modules["pymongo"] = mock_pymongo
+        sys.modules["pymongo.errors"] = mock_pymongo.errors
+
+        # Mock Discord
+        mock_discord = MagicMock()
+        mock_discord.ButtonStyle.primary = "primary"
+        mock_discord.ButtonStyle.secondary = "secondary"
+        mock_discord.ButtonStyle.success = "success"
+        mock_discord.ButtonStyle.danger = "danger"
+        mock_discord.Color.purple.return_value = "purple"
+        mock_discord.Color.green.return_value = "green"
+        mock_discord.Color.red.return_value = "red"
+
+        mock_ui = MagicMock()
+        mock_ui.View = MockView
+        mock_ui.Button = MockButton
+        mock_ui.Select = MockSelect
+
+        sys.modules["discord"] = mock_discord
+        sys.modules["discord.ui"] = mock_ui
+
+        # Mock other dependencies
+        sys.modules["cogs"] = MagicMock()
+        sys.modules["cogs.ui_helpers"] = MagicMock()
+
+        # Import module under test
+        import game_systems.crafting.ui.crafting_view
+        importlib.reload(game_systems.crafting.ui.crafting_view)
+
+        self.CraftingView = game_systems.crafting.ui.crafting_view.CraftingView
+
         self.mock_db = MagicMock()
         self.mock_user = MagicMock()
         self.mock_user.id = 12345
@@ -108,9 +108,12 @@ class TestCraftingUI(unittest.TestCase):
         self.MockCraftingSystemClass.return_value = self.mock_crafting_system
         self.addCleanup(patcher.stop)
 
+    def tearDown(self):
+        self.modules_patcher.stop()
+
     def test_default_category_consumable(self):
         """Test that default view shows consumable recipes only."""
-        view = CraftingView(self.mock_db, self.mock_user)
+        view = self.CraftingView(self.mock_db, self.mock_user)
 
         # Check Buttons (Row 0)
         btn_cons = view.children[0]
@@ -136,7 +139,7 @@ class TestCraftingUI(unittest.TestCase):
 
     def test_category_equipment(self):
         """Test initialization with equipment category."""
-        view = CraftingView(self.mock_db, self.mock_user, category="equipment")
+        view = self.CraftingView(self.mock_db, self.mock_user, category="equipment")
 
         # Check Buttons
         btn_cons = view.children[0]

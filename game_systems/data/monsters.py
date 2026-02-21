@@ -8,9 +8,11 @@ Monsters are defined by ID, name, level, stats, drops, and skills.
 import json
 import logging
 from pathlib import Path
+
 from game_systems.monsters.monster_skills import MONSTER_SKILLS
 
 logger = logging.getLogger("eldoria.data")
+
 
 def load_monsters():
     """
@@ -52,12 +54,13 @@ def load_monsters():
         # Convert drops back to tuples for backward compatibility
         # JSON loads as list of lists: [["item_id", chance], ...]
         if "drops" in monster_data:
-             monster_data["drops"] = [tuple(d) for d in monster_data["drops"]]
+            monster_data["drops"] = [tuple(d) for d in monster_data["drops"]]
 
         validated_monsters[key] = monster_data
 
     logger.info(f"Loaded {len(validated_monsters)} monsters from {data_path.name}")
     return validated_monsters
+
 
 MONSTERS = load_monsters()
 

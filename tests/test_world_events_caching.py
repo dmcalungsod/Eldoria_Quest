@@ -33,6 +33,7 @@ class TestWorldEventCaching(unittest.TestCase):
         # Bridge collection access
         def get_collection(name):
             return getattr(self.mock_db, name)
+
         self.mock_db.__getitem__.side_effect = get_collection
 
         self.db = DatabaseManager()
@@ -117,6 +118,7 @@ class TestWorldEventCaching(unittest.TestCase):
         # The second fetch should NOT have the mutation
         self.assertNotIn("mutated", event2)
         self.assertNotEqual(event1, event2)
+
 
 if __name__ == "__main__":
     unittest.main()

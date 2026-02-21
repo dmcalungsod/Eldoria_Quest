@@ -1,23 +1,11 @@
+import importlib
 import os
 import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# --- FIX: Cleanup conflicting mocks from other tests ---
-if "cogs" in sys.modules and isinstance(sys.modules["cogs"], MagicMock):
-    del sys.modules["cogs"]
-if "cogs.onboarding_cog" in sys.modules:
-    del sys.modules["cogs.onboarding_cog"]
-
-# Mock discord before importing cogs.onboarding_cog
-sys.modules["discord"] = MagicMock()
-sys.modules["discord.ui"] = MagicMock()
-sys.modules["discord.ext"] = MagicMock()
-sys.modules["discord.ext.commands"] = MagicMock()
-
-# Mock PyMongo so real DatabaseManager doesn't explode
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock View for inheritance
 class MockView:
@@ -34,43 +22,53 @@ class MockView:
     async def interaction_check(self, interaction):
         return True
 
-sys.modules["discord.ui"].View = MockView
-sys.modules["discord.ui"].Button = MagicMock()
-sys.modules["discord.ButtonStyle"] = MagicMock()
-
-# Add repo root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Do NOT mock database.database_manager directly to avoid breaking other tests
-# sys.modules["database.database_manager"] = MagicMock()
-
-# Import the module under test
-try:
-    from cogs.onboarding_cog import CombatTutorialView, GuildWelcomeView  # noqa: E402
-except ImportError:
-    # Fallback
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("cogs.onboarding_cog", "cogs/onboarding_cog.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["cogs.onboarding_cog"] = module
-    spec.loader.exec_module(module)
-    GuildWelcomeView = module.GuildWelcomeView
-    CombatTutorialView = module.CombatTutorialView
-
-
 class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        # Patch sys.modules
+        self.modules_patcher = patch.dict(sys.modules)
+        self.modules_patcher.start()
+
+        # Mock discord
+        mock_discord = MagicMock()
+        mock_discord.ui.View = MockView
+        mock_discord.ui.Button = MagicMock()
+        mock_discord.ButtonStyle = MagicMock()
+        mock_discord.ext = MagicMock()
+        mock_discord.ext.commands = MagicMock()
+
+        sys.modules["discord"] = mock_discord
+        sys.modules["discord.ui"] = mock_discord.ui
+        sys.modules["discord.ext"] = mock_discord.ext
+        sys.modules["discord.ext.commands"] = mock_discord.ext.commands
+
+        # Mock PyMongo
+        mock_pymongo = MagicMock()
+        mock_pymongo.errors = MagicMock()
+        sys.modules["pymongo"] = mock_pymongo
+        sys.modules["pymongo.errors"] = mock_pymongo.errors
+
+        # Import modules under test
+        import cogs.onboarding_cog
+        importlib.reload(cogs.onboarding_cog)
+
+        self.GuildWelcomeView = cogs.onboarding_cog.GuildWelcomeView
+        self.CombatTutorialView = cogs.onboarding_cog.CombatTutorialView
+
+    def tearDown(self):
+        self.modules_patcher.stop()
+
     async def test_guild_welcome_view_init(self):
         """Test that GuildWelcomeView initializes with correct buttons."""
         db = MagicMock()
         user = MagicMock()
-        view = GuildWelcomeView(db, user)
-        self.assertIsInstance(view, GuildWelcomeView)
+        view = self.GuildWelcomeView(db, user)
+        self.assertIsInstance(view, self.GuildWelcomeView)
 
     async def test_combat_tutorial_flow(self):
         """Test the state transitions of the combat tutorial."""
         db = MagicMock()
         user = MagicMock()
-        view = CombatTutorialView(db, user)
+        view = self.CombatTutorialView(db, user)
 
         # Initial state: Step 0
         self.assertEqual(view.step, 0)
@@ -97,6 +95,7 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         with patch("cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock) as mock_transition:
             await view.complete_callback(interaction, MagicMock())
             mock_transition.assert_called_with(interaction, db, user)
+
 
 if __name__ == "__main__":
     unittest.main()

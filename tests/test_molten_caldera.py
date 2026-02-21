@@ -47,5 +47,6 @@ class TestMoltenCaldera(unittest.TestCase):
         self.assertTrue(len(AdventureEvents.ATMOSPHERE_MAGMA) > 0)
         self.assertTrue(len(AdventureEvents.REGEN_PHRASES_MAGMA) > 0)
 
+
 if __name__ == "__main__":
     unittest.main()
