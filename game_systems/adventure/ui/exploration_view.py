@@ -19,6 +19,8 @@ from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.player_stats import PlayerStats
 
+from game_systems.data.adventure_locations import LOCATIONS
+
 from .adventure_embeds import AdventureEmbeds
 
 logger = logging.getLogger("eldoria.ui.exploration")
@@ -383,11 +385,21 @@ class ExplorationView(View):
             await interaction.response.defer()
             summary = await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
 
-            if summary and summary.get("failed_items"):
-                failed_names = sorted(list(set(f["item_name"] for f in summary["failed_items"])))
-                msg = f"{E.ERROR} **Inventory Full:** You had to leave behind: {', '.join(failed_names)}"
-                await interaction.followup.send(msg, ephemeral=True)
+            if summary:
+                # UX Upgrade: Show Mission Report instead of silent return
+                loc_name = LOCATIONS.get(self.location_id, {}).get("name", "Unknown Zone")
+                embed = AdventureEmbeds.build_summary_embed(summary, loc_name)
 
-            await back_to_profile_callback(interaction, is_new_message=False)
+                # Configure view for Summary Mode
+                self.clear_items()
+                btn_return = Button(label="Return to Profile", style=discord.ButtonStyle.primary, emoji="👤")
+                btn_return.callback = back_to_profile_callback
+                self.add_item(btn_return)
+
+                await interaction.edit_original_response(embed=embed, view=self)
+            else:
+                # Fallback if summary failed (e.g. no active session)
+                await back_to_profile_callback(interaction, is_new_message=False)
+
         finally:
             self.processing = False
