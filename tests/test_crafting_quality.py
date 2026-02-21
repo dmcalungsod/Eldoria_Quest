@@ -114,10 +114,6 @@ class TestCraftingQuality(unittest.TestCase):
         }
         self.mock_db.get_equipped_items.return_value = [inventory_item]
 
-        # Mock vitals and skills to prevent MagicMock comparison errors
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
-        self.mock_db.get_all_player_skills.return_value = []
-
         # Run recalculation
         stats = self.equipment_manager.recalculate_player_stats(self.discord_id)
 

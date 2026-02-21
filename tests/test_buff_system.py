@@ -1,93 +1,101 @@
+import os
 import time
 import unittest
-from unittest.mock import MagicMock
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.combat_handler import CombatHandler
 from game_systems.items.consumable_manager import ConsumableManager
 from game_systems.player.player_stats import PlayerStats
 
+TEST_DB = "test_buffs.db"
+
 
 class TestBuffSystem(unittest.TestCase):
     def setUp(self):
-        self.mock_db = MagicMock(spec=DatabaseManager)
-        self.discord_id = 12345
+        if os.path.exists(TEST_DB):
+            os.remove(TEST_DB)
 
-        # Default player data
-        self.mock_db.get_player.return_value = {
-            "discord_id": self.discord_id,
-            "name": "TestHero",
-            "class_id": 1,
-            "level": 1,
-        }
-        self.mock_db.get_player_field.return_value = 1  # class_id
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
-        self.mock_db.get_player_stats_json.return_value = {
-            "STR": {"base": 10, "bonus": 0},
-            "END": {"base": 10, "bonus": 0},
-            "DEX": {"base": 10, "bonus": 0},
-            "AGI": {"base": 10, "bonus": 0},
-            "MAG": {"base": 10, "bonus": 0},
-            "LCK": {"base": 10, "bonus": 0},
-        }
+        # Initialize DB
+        self.db = DatabaseManager(TEST_DB)
+        with self.db.get_connection() as conn:
+            # Create minimal schema
+            conn.executescript("""
+            CREATE TABLE IF NOT EXISTS players (discord_id INTEGER PRIMARY KEY, name TEXT, class_id INTEGER, level INTEGER, experience INTEGER, exp_to_next INTEGER, current_hp INTEGER, current_mp INTEGER, vestige_pool INTEGER, aurum INTEGER, race TEXT, gender TEXT);
+            CREATE TABLE IF NOT EXISTS stats (discord_id INTEGER PRIMARY KEY, stats_json TEXT);
+            CREATE TABLE IF NOT EXISTS inventory (id INTEGER PRIMARY KEY AUTOINCREMENT, discord_id INTEGER, item_key TEXT, item_name TEXT, item_type TEXT, count INTEGER, rarity TEXT, slot TEXT, item_source_table TEXT, equipped INTEGER);
+            CREATE TABLE IF NOT EXISTS active_buffs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                discord_id INTEGER,
+                buff_id TEXT,
+                name TEXT,
+                stat TEXT,
+                amount REAL,
+                end_time TEXT
+            );
+            CREATE TABLE IF NOT EXISTS player_skills (id INTEGER PRIMARY KEY, discord_id INTEGER, skill_key TEXT, skill_level INTEGER, skill_exp REAL);
+            CREATE TABLE IF NOT EXISTS skills (key_id TEXT PRIMARY KEY, type TEXT, name TEXT, mp_cost INTEGER, power_multiplier REAL, heal_power INTEGER, buff_data TEXT);
+            CREATE TABLE IF NOT EXISTS global_boosts (boost_key TEXT PRIMARY KEY, multiplier REAL, end_time TEXT);
+            CREATE TABLE IF NOT EXISTS classes (id INTEGER PRIMARY KEY, name TEXT, description TEXT);
+            """)
+
+            # Insert a class
+            conn.execute("INSERT INTO classes (id, name, description) VALUES (1, 'Warrior', 'Strong')")
+
+        self.discord_id = 12345
+        self.db.create_player(self.discord_id, "TestHero", 1, {"STR": 10, "END": 10}, 100, 50)
+
+    def tearDown(self):
+        if os.path.exists(TEST_DB):
+            os.remove(TEST_DB)
 
     def test_buff_lifecycle(self):
-        """Tests that buffs are added, retrieved, expire, and cleaned up."""
-        buff_record = {
-            "discord_id": self.discord_id,
-            "buff_id": "test_buff",
-            "name": "Test Buff",
-            "stat": "STR",
-            "amount": 5,
-            "end_time": time.time() + 2,
-        }
+        # Add buff
+        self.db.add_active_buff(self.discord_id, "test_buff", "Test Buff", "STR", 5, 2)
 
-        # Initially: buffs returned
-        self.mock_db.get_active_buffs.return_value = [buff_record]
-        buffs = self.mock_db.get_active_buffs(self.discord_id)
+        buffs = self.db.get_active_buffs(self.discord_id)
         self.assertEqual(len(buffs), 1)
         self.assertEqual(buffs[0]["stat"], "STR")
         self.assertEqual(buffs[0]["amount"], 5)
 
-        # After expiry: no buffs
-        self.mock_db.get_active_buffs.return_value = []
-        buffs = self.mock_db.get_active_buffs(self.discord_id)
+        # Wait for expiry
+        time.sleep(2.1)
+
+        # Should still return empty if filtered by time
+        buffs = self.db.get_active_buffs(self.discord_id)
         self.assertEqual(len(buffs), 0)
 
-        # Clean expired
-        self.mock_db.clear_expired_buffs(self.discord_id)
-        self.mock_db.clear_expired_buffs.assert_called_with(self.discord_id)
+        # Clean
+        self.db.clear_expired_buffs(self.discord_id)
+
+        with self.db.get_connection() as conn:
+            count = conn.execute("SELECT count(*) FROM active_buffs").fetchone()[0]
+            self.assertEqual(count, 0)
 
     def test_consumable_buff_application(self):
-        """Tests that using a consumable item applies the correct buff."""
-        # Mock inventory item lookup
-        self.mock_db.get_inventory_item.return_value = {
-            "id": 1,
-            "discord_id": self.discord_id,
-            "item_key": "strength_brew",
-            "item_name": "Brew",
-            "item_type": "consumable",
-            "count": 1,
-        }
+        # Insert a buff item into inventory
+        # "strength_brew" has STR+3, 120s
+        with self.db.get_connection() as conn:
+            conn.execute(
+                "INSERT INTO inventory (discord_id, item_key, item_name, item_type, count) VALUES (?, ?, ?, ?, ?)",
+                (self.discord_id, "strength_brew", "Brew", "consumable", 1),
+            )
+            inv_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
-        cm = ConsumableManager(self.mock_db)
-        success, msg = cm.use_item(self.discord_id, 1)
+        cm = ConsumableManager(self.db)
+        success, msg = cm.use_item(self.discord_id, inv_id)
 
         self.assertTrue(success)
         self.assertIn("Buffs applied", msg)
         self.assertIn("STR +3", msg)
 
-        # Verify buff was added
-        self.mock_db.add_active_buff.assert_called()
-        call_args = self.mock_db.add_active_buff.call_args
-        self.assertEqual(call_args[0][2], "Captains' Ale (Embolden)")  # name
-        self.assertEqual(call_args[0][3], "STR")  # stat
-        self.assertEqual(call_args[0][4], 3)  # amount
+        buffs = self.db.get_active_buffs(self.discord_id)
+        self.assertEqual(len(buffs), 1)
+        self.assertEqual(buffs[0]["stat"], "STR")
+        self.assertEqual(buffs[0]["amount"], 3)
 
     def test_combat_handler_applies_buff(self):
-        """Tests that CombatHandler applies active buffs to player stats."""
-        # Add buff
-        self.mock_db.add_active_buff(self.discord_id, "buff_1", "Strong", "STR", 50, 3600)
+        # Add buff manually
+        self.db.add_active_buff(self.discord_id, "buff_1", "Strong", "STR", 50, 3600)
 
         # Monkeypatch PlayerStats.add_bonus_stat to verify call
         original_add_bonus = PlayerStats.add_bonus_stat
@@ -100,15 +108,10 @@ class TestBuffSystem(unittest.TestCase):
         PlayerStats.add_bonus_stat = mock_add_bonus
 
         try:
-            ch = CombatHandler(self.mock_db, self.discord_id)
+            ch = CombatHandler(self.db, self.discord_id)
 
             # Need valid vitals
-            self.mock_db.set_player_vitals(self.discord_id, 100, 50)
-
-            # Mock get_active_buffs to return our buff
-            self.mock_db.get_active_buffs.return_value = [
-                {"buff_id": "buff_1", "name": "Strong", "stat": "STR", "amount": 50.0, "end_time": time.time() + 3600}
-            ]
+            self.db.set_player_vitals(self.discord_id, 100, 50)
 
             # We call resolve_turn with a dummy monster
             monster = {"HP": 10, "ATK": 1, "DEF": 0, "name": "Dummy", "skills": [], "drops": []}
