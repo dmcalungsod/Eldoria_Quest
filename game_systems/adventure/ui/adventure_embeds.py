@@ -6,6 +6,7 @@ Hardened: Robust JSON parsing and layout stability.
 """
 
 import logging
+import random
 
 import discord
 
@@ -13,6 +14,7 @@ import game_systems.data.emojis as E
 from cogs.ui_helpers import get_health_status_emoji, make_progress_bar
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import get_rarity_ansi
+from game_systems.data.narrative_data import MISSION_FLAVOR_TEXT, OUTCOME_FLAVOR_TEXT
 from game_systems.player.player_stats import PlayerStats
 from game_systems.world_time import WorldTime
 
@@ -122,9 +124,11 @@ class AdventureEmbeds:
         return embed
 
     @staticmethod
-    def build_summary_embed(summary: dict, location_name: str) -> discord.Embed:
+    def build_summary_embed(summary: dict, location_id: str) -> discord.Embed:
         """Constructs the mission report embed."""
         s = summary
+        loc_data = LOCATIONS.get(location_id, {})
+        location_name = loc_data.get("name", "Unknown Zone")
 
         # 1. Title & Color
         if s.get("leveled_up"):
@@ -132,8 +136,19 @@ class AdventureEmbeds:
         else:
             title, color = f"{E.VICTORY} Expedition Complete: {location_name}", discord.Color.dark_green()
 
+        # 2. Determine Flavor Text
+        if s.get("leveled_up"):
+            flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["level_up"])
+        else:
+            # Try to get location-specific flavor
+            loc_flavors = MISSION_FLAVOR_TEXT.get(location_id)
+            if loc_flavors:
+                flavor_text = random.choice(loc_flavors)
+            else:
+                flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["default"])
+
         embed = discord.Embed(
-            title=title, description="*You return from the wilds, weary but burdened with spoils.*", color=color
+            title=title, description=f"*{flavor_text}*", color=color
         )
 
         # 2. Rewards

@@ -386,8 +386,7 @@ class ExplorationView(View):
 
             if summary:
                 # UX Upgrade: Show Mission Report instead of silent return
-                loc_name = LOCATIONS.get(self.location_id, {}).get("name", "Unknown Zone")
-                embed = AdventureEmbeds.build_summary_embed(summary, loc_name)
+                embed = AdventureEmbeds.build_summary_embed(summary, self.location_id)
 
                 # Configure view for Summary Mode
                 self.clear_items()
