@@ -93,7 +93,6 @@ class TestOptimisticLocking(unittest.TestCase):
         # Configure Mock DB
         self.mock_db.get_player_field.return_value = 100
         self.mock_db.get_player_stats_row.return_value = self.mock_stats_row
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
 
         # Instantiate View
         # Note: StatusUpdateView calls self._get_class_starting_stats which uses CLASSES constant

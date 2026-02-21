@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
@@ -13,8 +13,7 @@ class TestCraftingEquipment(unittest.TestCase):
         self.system = CraftingSystem(self.mock_db)
         self.discord_id = 12345
 
-    @patch("random.random", return_value=0.99)  # Prevent quality upgrade roll
-    def test_craft_equipment_success(self, mock_rng):
+    def test_craft_equipment_success(self):
         # Setup recipe
         # We assume "craft_rusted_sword" exists in EQUIPMENT_RECIPES
         recipe_id = "craft_rusted_sword"

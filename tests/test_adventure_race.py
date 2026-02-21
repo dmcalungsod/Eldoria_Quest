@@ -1,36 +1,62 @@
-"""
-Test for race-condition on double-click in ExplorationView.
-
-The test verifies that rapid concurrent calls to ``explore_callback``
-are guarded by the ``processing`` flag so that only one simulation
-runs at a time.
-"""
-
 import asyncio
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# -----------------------------------------------------------
-# Module-level mocks — kept minimal to avoid polluting other
-# tests.  pymongo + discord are mocked so game_systems imports
-# resolve without a running database or Discord gateway.
-# -----------------------------------------------------------
-if "pymongo" not in sys.modules or not hasattr(sys.modules["pymongo"], "__version__"):
-    sys.modules.setdefault("pymongo", MagicMock())
-    sys.modules.setdefault("pymongo.errors", MagicMock())
+# Mock Dependencies
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
-if "discord" not in sys.modules or not hasattr(sys.modules["discord"], "__version__"):
-    _mock_discord = MagicMock()
-    sys.modules.setdefault("discord", _mock_discord)
-    sys.modules.setdefault("discord.ui", _mock_discord.ui)
-    sys.modules.setdefault("discord.ext", MagicMock())
-    sys.modules.setdefault("discord.ext.commands", MagicMock())
+# Mock discord if not available
+try:
+    import discord
+    from discord.ui import Button, View
 
+    Item = discord.ui.Item
+    if not isinstance(Item, type):
+        raise ImportError("discord.ui.Item is not a type (likely mocked)")
+except (ImportError, AttributeError):
+    # Create dummy classes for mocking
+    mock_discord = MagicMock()
+    sys.modules["discord"] = mock_discord
+    sys.modules["discord.ui"] = MagicMock()
+
+    Item = object
+
+    # Mock Button and View specifically to allow inheritance
+    class View:
+        def __init__(self, timeout=None):
+            self.children = []
+
+        def add_item(self, item):
+            self.children.append(item)
+
+        def clear_items(self):
+            self.children.clear()
+
+    class Button(Item):
+        def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None):
+            self.label = label
+            self.style = style
+            self.emoji = emoji
+            self.row = row
+            self.custom_id = custom_id
+            self.disabled = False
+            self.callback = None
+
+        def _is_v2(self):
+            return False
+
+    sys.modules["discord.ui"].View = View
+    sys.modules["discord.ui"].Button = Button
+    discord = mock_discord
+
+# Now import the code under test
+# We need to ensure we can import from game_systems
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
@@ -38,22 +64,20 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
     async def test_race_condition_double_click(self):
-        import importlib
-        import game_systems.adventure.ui.exploration_view as ev_module
+        # Import here to avoid conflict with other tests mocking discord
+        from game_systems.adventure.ui.exploration_view import ExplorationView
 
-        # Force reload so ExplorationView picks up our mocks (View, Button, Select)
-        importlib.reload(ev_module)
-        ExplorationView = ev_module.ExplorationView
-
-        # --- Setup mocks ---
+        # Setup mocks
         mock_db = MagicMock(spec=DatabaseManager)
         mock_manager = MagicMock(spec=AdventureManager)
         mock_user = MagicMock()
         mock_user.id = 12345
 
+        # Mock player stats
         mock_stats = MagicMock(spec=PlayerStats)
         mock_stats.max_hp = 100
 
+        # Mock interactions
         interaction1 = MagicMock()
         interaction1.user = mock_user
         interaction1.response = AsyncMock()
@@ -64,61 +88,85 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         interaction2.response = AsyncMock()
         interaction2.edit_original_response = AsyncMock()
 
-        # Patch _update_view_state to no-op — the test is about the
-        # race-condition guard in explore_callback, not the UI buttons.
-        # This avoids issues with discord.ui.Button being a MagicMock
-        # when the module was first imported by another test file.
-        with patch.object(ExplorationView, "_update_view_state"):
-            view = ExplorationView(
-                db=mock_db,
-                manager=mock_manager,
-                location_id="test_loc",
-                log=[],
-                interaction_user=mock_user,
-                player_stats=mock_stats,
-                vitals={"current_hp": 100, "current_mp": 100},
-                active_monster=None,
-                class_id=1,
-            )
+        # Create view
+        # We need to mock _setup_buttons calling _get_button_state
+        # Or just let it run if mocks are sufficient
 
-        # --- Part 1: Verify both callbacks can run (no guard) ---
-        call_count = 0
+        view = ExplorationView(
+            db=mock_db,
+            manager=mock_manager,
+            location_id="test_loc",
+            log=[],
+            interaction_user=mock_user,
+            player_stats=mock_stats,
+            vitals={"current_hp": 100, "current_mp": 100},
+            active_monster=None,
+            class_id=1,
+        )
 
-        async def mock_perform_simulation(interaction, action=None):
-            nonlocal call_count
-            call_count += 1
+        # Mock simulate_adventure_step to be slow
+        async def slow_simulation(*args, **kwargs):
             await asyncio.sleep(0.1)
+            return {
+                "sequence": [["You step forward."]],
+                "dead": False,
+                "vitals": {"current_hp": 100, "current_mp": 100},
+                "player_stats": None,
+                "active_monster": None,
+            }
 
-        view._perform_simulation = mock_perform_simulation
+        # Patch asyncio.to_thread to run our slow simulation
+        # Because the view calls asyncio.to_thread(self.manager.simulate_adventure_step, ...)
 
+        # We also need to patch asyncio.sleep inside explore_callback so the animation loop doesn't take forever
+        # But we WANT the simulation to be slow to prove the race.
+
+        # The view uses asyncio.to_thread. In test environment, this runs in a thread.
+        # We can just mock manager.simulate_adventure_step, but since it's called via to_thread,
+        # we need to make sure the side_effect is thread-safe or simply use a delay.
+
+        mock_manager.simulate_adventure_step.side_effect = lambda *args: {
+            "sequence": [["You step forward."]],
+            "dead": False,
+            "vitals": {"current_hp": 100, "current_mp": 100},
+            "player_stats": None,
+            "active_monster": None,
+        }
+
+        # To ensure the race condition, we need the first call to pause AFTER checking any lock (if present)
+        # and BEFORE the operation completes.
+
+        # We will wrap the manager method to include a delay
+        original_side_effect = mock_manager.simulate_adventure_step.side_effect
+
+        def delayed_side_effect(*args, **kwargs):
+            import time
+
+            time.sleep(0.1)  # Sync sleep to block the thread
+            return original_side_effect(*args, **kwargs)
+
+        mock_manager.simulate_adventure_step.side_effect = delayed_side_effect
+
+        # We need to mock interaction.response.defer to yield control
+        async def slow_defer():
+            await asyncio.sleep(0.05)
+
+        interaction1.response.defer.side_effect = slow_defer
+        interaction2.response.defer.side_effect = slow_defer
+
+        # Execute two callbacks concurrently
         task1 = asyncio.create_task(view.explore_callback(interaction1))
         task2 = asyncio.create_task(view.explore_callback(interaction2))
+
         await asyncio.gather(task1, task2)
 
-        # --- Part 2: Test the REAL guard ---
-        view.processing = False
-        sim_count = 0
+        # Verification
+        # If fixed, call_count should be 1. If broken, it's 2.
+        print(f"Call count: {mock_manager.simulate_adventure_step.call_count}")
 
-        async def guarded_simulation(interaction, action=None):
-            nonlocal sim_count
-            if view.processing:
-                await interaction.response.send_message("Please wait...", ephemeral=True)
-                return
-            view.processing = True
-            sim_count += 1
-            await asyncio.sleep(0.1)
-            view.processing = False
-
-        view._perform_simulation = guarded_simulation
-
-        task1 = asyncio.create_task(view.explore_callback(interaction1))
-        await asyncio.sleep(0.01)  # Let task1 set processing=True first
-        task2 = asyncio.create_task(view.explore_callback(interaction2))
-        await asyncio.gather(task1, task2)
-
-        # Assertion: second call should be rejected by processing guard
+        # Assertion: Should be 1
         self.assertEqual(
-            sim_count,
+            mock_manager.simulate_adventure_step.call_count,
             1,
             "Simulation called more than once! Race condition detected.",
         )
