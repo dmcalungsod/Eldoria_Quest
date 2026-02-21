@@ -22,6 +22,7 @@ dist/
 .coverage.*
 htmlcov/
 .pytest_cache/
+pip-audit-output/
 .tox/
 
 # IDE settings
