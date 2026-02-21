@@ -1731,7 +1731,7 @@ class DatabaseManager:
     # ============================================================
 
     def purchase_item(
-        self, discord_id: int, item_key: str, item_data: dict, price: int
+        self, discord_id: int, item_key: str, item_data: dict, price: int, item_type: str = "consumable"
     ) -> tuple[bool, Any, int]:
         """Atomic purchase: deducts gold and adds item. Includes refund on failure."""
         # 1. Atomic Deduction
@@ -1745,7 +1745,7 @@ class DatabaseManager:
                 discord_id,
                 item_key,
                 item_data["name"],
-                "consumable",
+                item_type,
                 item_data["rarity"],
                 1,
             )

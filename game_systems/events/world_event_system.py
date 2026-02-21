@@ -19,6 +19,7 @@ class WorldEventSystem:
     BLOOD_MOON = "blood_moon"
     CELESTIAL_CONVERGENCE = "celestial_convergence"
     VOID_INCURSION = "void_incursion"
+    MYSTIC_MERCHANT = "mystic_merchant"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -47,6 +48,13 @@ class WorldEventSystem:
                 "loot_boost": 1.2,
                 "exp_boost": 2.0,
                 "monster_buff": 1.5,
+            },
+        },
+        MYSTIC_MERCHANT: {
+            "name": "The Void Trader",
+            "description": "A mysterious merchant from the Void has appeared, selling rare and exotic goods. Use `/merchant` to view his wares.",
+            "modifiers": {
+                "luck_boost": 1.2,  # Slightly increases luck
             },
         },
     }
