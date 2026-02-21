@@ -1333,6 +1333,25 @@ class DatabaseManager:
                 {"$set": fields},
             )
 
+    def update_player_mixed(
+        self,
+        discord_id: int,
+        set_fields: dict[str, Any] | None = None,
+        inc_fields: dict[str, Any] | None = None,
+    ):
+        """Updates player fields with both $set and $inc in a single operation."""
+        update: dict[str, Any] = {}
+        if set_fields:
+            update["$set"] = set_fields
+        if inc_fields:
+            update["$inc"] = inc_fields
+
+        if update:
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                update,
+            )
+
     def increment_player_fields(self, discord_id: int, **fields):
         """Generic player field increment (e.g., aurum, experience, vestige_pool)."""
         if fields:

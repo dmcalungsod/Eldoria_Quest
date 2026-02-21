@@ -262,15 +262,17 @@ class AdventureManager:
         # Prevents "free healing" exploit by ending adventure
         target_mp = level_sys.stats.max_mp if leveled_up else p_row["current_mp"]
 
-        self.db.update_player_fields(
+        self.db.update_player_mixed(
             session.discord_id,
-            level=level_sys.level,
-            experience=level_sys.exp,
-            exp_to_next=level_sys.exp_to_next,
-            current_hp=saved_hp,
-            current_mp=target_mp,
+            set_fields={
+                "level": level_sys.level,
+                "experience": level_sys.exp,
+                "exp_to_next": level_sys.exp_to_next,
+                "current_hp": saved_hp,
+                "current_mp": target_mp,
+            },
+            inc_fields={"vestige_pool": total_exp},
         )
-        self.db.increment_player_fields(session.discord_id, vestige_pool=total_exp)
 
         items_awarded = []
         for item_key, count in session.loot.items():
