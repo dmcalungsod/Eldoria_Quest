@@ -43,7 +43,6 @@ sys.modules["discord.ui"] = mock_discord.ui
 # --- MOCKING PYMONGO ---
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 # -----------------------
 

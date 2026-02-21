@@ -18,7 +18,6 @@ try:
     import pymongo  # noqa: F401
 except ImportError:
     sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
     sys.modules["pymongo.errors"] = MagicMock()
 
 try:

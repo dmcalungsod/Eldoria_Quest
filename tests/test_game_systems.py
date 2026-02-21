@@ -16,7 +16,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Mock external dependencies for environments where they aren't installed
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 sys.modules["discord.ext"] = MagicMock()
 

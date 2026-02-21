@@ -2,8 +2,8 @@ import os
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
+
 sys.path.append(os.getcwd())
-import importlib
 
 class TestMerchantEvent(unittest.TestCase):
     def setUp(self):
@@ -27,9 +27,9 @@ class TestMerchantEvent(unittest.TestCase):
         # To be safe, we import them here.
         # Note: We rely on the fact that these modules handle imports at top-level.
         try:
+            import cogs.merchant_cog
             import database.database_manager
             import game_systems.events.world_event_system
-            import cogs.merchant_cog
 
             # Force reload if they were already imported to ensure they pick up the mocks?
             # Reloading might be risky if other tests depend on the original versions.

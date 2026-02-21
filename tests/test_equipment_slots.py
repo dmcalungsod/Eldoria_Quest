@@ -5,7 +5,6 @@ from unittest.mock import MagicMock
 # Mock pymongo before importing modules that use it
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 

@@ -18,7 +18,6 @@ sys.modules["discord.ext.commands"] = MagicMock()
 # Mock PyMongo so real DatabaseManager doesn't explode
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
 
 # Mock View for inheritance
 class MockView:
