@@ -15,8 +15,6 @@ class LootCalculator:
     Handles drop rate calculations and RNG rolls.
     """
 
-    HIGH_RARITY_TIERS = {"Epic", "Legendary", "Mythical"}
-
     @staticmethod
     def calculate_drop_chance(base_chance: float, rarity: str, luck: int, loot_boost: float = 1.0) -> float:
         """
@@ -37,10 +35,9 @@ class LootCalculator:
         # Luck scaling (Multiplicative)
         # Formula: 1 + (Luck / 1000)
         # Example: 0 Luck -> 1.0x, 500 Luck -> 1.5x, 1000 Luck -> 2.0x
-        # Only applies to High Rarity items to preserve their value while rewarding high Luck stats.
-        if rarity in LootCalculator.HIGH_RARITY_TIERS:
-            luck_factor = 1.0 + (max(0, luck) / 1000.0)
-            multiplier *= luck_factor
+        # Now applies to ALL rarities to support material-driven economy.
+        luck_factor = 1.0 + (max(0, luck) / 1000.0)
+        multiplier *= luck_factor
 
         final_chance = base_chance * multiplier
 
