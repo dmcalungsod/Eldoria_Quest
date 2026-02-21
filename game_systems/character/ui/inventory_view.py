@@ -121,10 +121,13 @@ class InventoryView(View):
                         equip_opts.append(discord.SelectOption(label=label, value=val, emoji="⚔️"))
                     else:
                         # Greyed-out / Locked UI
-                        locked_label = f"🔒 {label[:80]}"  # Truncate to ensure fit
+                        locked_label = f"🔒 {label[:80]}" # Truncate to ensure fit
                         equip_opts.append(
                             discord.SelectOption(
-                                label=locked_label, value=val, emoji="🚫", description=f"Cannot Equip: {reason}"
+                                label=locked_label,
+                                value=val,
+                                emoji="🚫",
+                                description=f"Cannot Equip: {reason}"
                             )
                         )
 

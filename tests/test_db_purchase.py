@@ -1,4 +1,3 @@
-import importlib
 import os
 import sys
 import unittest
@@ -6,30 +5,21 @@ from unittest.mock import MagicMock, patch
 
 sys.path.append(os.getcwd())
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+
+# Mock Discord and dependencies
+mock_discord = MagicMock()
+sys.modules["discord"] = mock_discord
+sys.modules["discord.ext"] = MagicMock()
+sys.modules["discord.ui"] = MagicMock()
+
+from database.database_manager import DatabaseManager  # noqa: E402
+
+
 class TestShopTransactionFailure(unittest.TestCase):
     def setUp(self):
-        # Patch sys.modules
-        self.modules_patcher = patch.dict(sys.modules)
-        self.modules_patcher.start()
-
-        # Mock Pymongo
-        mock_pymongo = MagicMock()
-        mock_pymongo.errors = MagicMock()
-        sys.modules["pymongo"] = mock_pymongo
-        sys.modules["pymongo.errors"] = mock_pymongo.errors
-
-        # Mock Discord
-        mock_discord = MagicMock()
-        sys.modules["discord"] = mock_discord
-        sys.modules["discord.ext"] = MagicMock()
-        sys.modules["discord.ui"] = MagicMock()
-
-        # Import module under test
-        import database.database_manager
-        importlib.reload(database.database_manager)
-
-        self.DatabaseManager = database.database_manager.DatabaseManager
-
         # Mock MongoClient
         self.mock_client = MagicMock()
         self.mock_db = MagicMock()
@@ -49,14 +39,12 @@ class TestShopTransactionFailure(unittest.TestCase):
         self.patcher.start()
 
         # Reset Singleton
-        self.DatabaseManager._instance = None
-        self.db = self.DatabaseManager()
+        DatabaseManager._instance = None
+        self.db = DatabaseManager()
 
     def tearDown(self):
         self.patcher.stop()
-        self.modules_patcher.stop()
-        if hasattr(self, 'DatabaseManager'):
-             self.DatabaseManager._instance = None
+        DatabaseManager._instance = None
 
     def test_purchase_item_refunds_on_inventory_failure(self):
         """
@@ -71,7 +59,7 @@ class TestShopTransactionFailure(unittest.TestCase):
         # 1. Mock deduct_aurum to SUCCEED
         # Note: We assign it to the instance directly
         # The real method calls find_one_and_update
-        self.db.deduct_aurum = MagicMock(return_value=50)  # Assuming new balance 50
+        self.db.deduct_aurum = MagicMock(return_value=50) # Assuming new balance 50
 
         # 2. Mock inventory failure
         # In the FIXED version, we expect add_inventory_item to be called.
@@ -99,9 +87,9 @@ class TestShopTransactionFailure(unittest.TestCase):
         try:
             success, result, new_aurum = self.db.purchase_item(user_id, item_key, item_data, price)
         except Exception:
-            # If it raises exception instead of returning failure, catch it
-            success = False
-            result = "Exception"
+             # If it raises exception instead of returning failure, catch it
+             success = False
+             result = "Exception"
 
         # 4. Verify Failure
         self.assertFalse(success, "Purchase should fail if inventory add fails")
@@ -124,7 +112,6 @@ class TestShopTransactionFailure(unittest.TestCase):
                 break
 
         self.assertTrue(refund_called, "Gold should be refunded on inventory failure")
-
 
 if __name__ == "__main__":
     unittest.main()

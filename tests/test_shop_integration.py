@@ -9,15 +9,10 @@ sys.path.append(os.getcwd())
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-
 # Mock View
 class MockView:
-    def __init__(self, timeout=None):
-        pass
-
-    def add_item(self, item):
-        pass
-
+    def __init__(self, timeout=None): pass
+    def add_item(self, item): pass
 
 # Mock Discord
 mock_discord = MagicMock()
@@ -43,7 +38,7 @@ class TestShopViewIntegration(unittest.TestCase):
         view = ShopView(mock_db, mock_user, current_aurum)
 
         item_key = "hp_potion_1"
-        price = SHOP_INVENTORY[item_key]  # 40
+        price = SHOP_INVENTORY[item_key] # 40
 
         # Mock purchase_item return: (success, item_data, new_balance)
         mock_db.purchase_item.return_value = (True, {"name": "Test Potion"}, 960)
@@ -69,7 +64,7 @@ class TestShopViewIntegration(unittest.TestCase):
         view = ShopView(mock_db, mock_user, current_aurum)
 
         item_key = "hp_potion_1"
-        price = SHOP_INVENTORY[item_key]  # 40
+        price = SHOP_INVENTORY[item_key] # 40
 
         # Mock purchase_item return: (failure, msg, 0)
         mock_db.purchase_item.return_value = (False, "Insufficient Aurum.", 0)
@@ -80,7 +75,6 @@ class TestShopViewIntegration(unittest.TestCase):
         self.assertFalse(success)
         self.assertEqual(result, "Insufficient Aurum.")
         self.assertEqual(new_aurum, 0)
-
 
 if __name__ == "__main__":
     unittest.main()

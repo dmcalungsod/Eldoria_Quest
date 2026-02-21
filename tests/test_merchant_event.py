@@ -1,6 +1,6 @@
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Mock dependencies BEFORE importing modules that use them
 sys.modules["pymongo"] = MagicMock()
@@ -10,11 +10,12 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ui"] = MagicMock()
 sys.modules["discord.app_commands"] = MagicMock()
 
-from database.database_manager import DatabaseManager
-from game_systems.events.world_event_system import WorldEventSystem
 # Mocking cogs/ui_helpers.py might be tricky if it imports something else
 # But let's try importing MERCHANT_INVENTORY from cogs.merchant_cog
-from cogs.merchant_cog import MERCHANT_INVENTORY
+from cogs.merchant_cog import MERCHANT_INVENTORY  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
+
 
 class TestMerchantEvent(unittest.TestCase):
     def setUp(self):

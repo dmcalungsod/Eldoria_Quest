@@ -7,33 +7,27 @@ from unittest.mock import AsyncMock, MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
 class TestUIValidation(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         # Patch sys.modules to mock discord and pymongo
-        self.modules_patcher = patch.dict(
-            sys.modules,
-            {
-                "discord": MagicMock(),
-                "discord.ui": MagicMock(),
-                "discord.ext": MagicMock(),
-                "discord.ext.commands": MagicMock(),
-                "pymongo": MagicMock(),
-                "pymongo.errors": MagicMock(),
-                "pymongo.MongoClient": MagicMock(),
-            },
-        )
+        self.modules_patcher = patch.dict(sys.modules, {
+            "discord": MagicMock(),
+            "discord.ui": MagicMock(),
+            "discord.ext": MagicMock(),
+            "discord.ext.commands": MagicMock(),
+            "pymongo": MagicMock(),
+            "pymongo.errors": MagicMock(),
+            "pymongo.MongoClient": MagicMock(),
+        })
         self.modules_patcher.start()
 
         # Import/Reload modules to ensure they use the mocks
         # We need to ensure database.database_manager is loaded/reloaded with mocked pymongo
         import database.database_manager
-
         importlib.reload(database.database_manager)
 
         # We need to ensure cogs.ui_helpers is loaded/reloaded with mocked discord
         import cogs.ui_helpers
-
         importlib.reload(cogs.ui_helpers)
 
         self.get_player_or_error = cogs.ui_helpers.get_player_or_error
@@ -95,7 +89,6 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
 
         self.assertIsNone(result)
         self.interaction.response.send_message.assert_called_with("Custom Error", ephemeral=True)
-
 
 if __name__ == "__main__":
     unittest.main()

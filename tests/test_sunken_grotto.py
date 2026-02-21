@@ -65,6 +65,5 @@ class TestSunkenGrotto(unittest.TestCase):
         # We won't loop forever, just check existence of logic via code inspection or simple call
         # Mocking would be better but simple existence check is okay for this scope.
 
-
 if __name__ == "__main__":
     unittest.main()

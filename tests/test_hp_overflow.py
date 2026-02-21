@@ -20,35 +20,22 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 class MockDatabaseManager:
     def __init__(self):
         self.players = {
-            123: {
-                "discord_id": 123,
-                "current_hp": 250,
-                "current_mp": 50,
-                "class_id": 1,
-                "level": 10,
-                "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}',
-                "aurum": 100,
-            }
+            123: {"discord_id": 123, "current_hp": 250, "current_mp": 50, "class_id": 1, "level": 10, "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}', "aurum": 100}
         }
         self.stats = {
             123: {"discord_id": 123, "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}'}
         }
         self.inventory = {
             1: {
-                "id": 1,
-                "discord_id": 123,
-                "item_key": "1",
-                "item_name": "Helmet",
-                "item_type": "equipment",
-                "slot": "Head",
-                "rarity": "Common",
-                "equipped": 1,
-                "str_bonus": 0,
-                "end_bonus": 10,  # +10 END
-                "item_source_table": "equipment",
+                "id": 1, "discord_id": 123, "item_key": "1", "item_name": "Helmet",
+                "item_type": "equipment", "slot": "Head", "rarity": "Common", "equipped": 1,
+                "str_bonus": 0, "end_bonus": 10, # +10 END
+                "item_source_table": "equipment"
             }
         }
-        self.equipment_data = {1: {"id": 1, "end_bonus": 10, "rarity": "Common", "level_req": 1}}
+        self.equipment_data = {
+            1: {"id": 1, "end_bonus": 10, "rarity": "Common", "level_req": 1}
+        }
 
     def get_player(self, discord_id):
         return self.players.get(discord_id)
@@ -92,12 +79,10 @@ class MockDatabaseManager:
     def _col(self, name):
         # Mock collection for item lookup
         m = MagicMock()
-
         def find_one(query, projection=None):
             if name == "equipment":
                 return self.equipment_data.get(int(query.get("id")))
             return None
-
         m.find_one.side_effect = find_one
 
         # Add update_one mock
@@ -120,7 +105,6 @@ class MockDatabaseManager:
 
     def get_player_field(self, discord_id, field):
         return self.players.get(discord_id, {}).get(field)
-
 
 class TestHPOverflow(unittest.TestCase):
     def test_hp_clamp_on_unequip(self):
@@ -151,8 +135,8 @@ class TestHPOverflow(unittest.TestCase):
         fresh_stats_json = db.get_player_stats_json(123)
         fresh_stats = PlayerStats.from_dict(fresh_stats_json)
 
-        self.assertEqual(fresh_stats.endurance, 10)  # Base 10, Bonus 0
-        self.assertEqual(fresh_stats.max_hp, 150)  # 50 + 10*10
+        self.assertEqual(fresh_stats.endurance, 10) # Base 10, Bonus 0
+        self.assertEqual(fresh_stats.max_hp, 150) # 50 + 10*10
 
         # Verify Current HP is clamped
         current_hp = db.players[123]["current_hp"]
@@ -160,7 +144,6 @@ class TestHPOverflow(unittest.TestCase):
 
         # BUG: Current HP is likely still 250 because unequip_item doesn't clamp
         self.assertLessEqual(current_hp, 150, f"HP Overflow! Current: {current_hp}, Max allowed: 150")
-
 
 if __name__ == "__main__":
     unittest.main()

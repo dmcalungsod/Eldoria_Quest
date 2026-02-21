@@ -12,7 +12,7 @@ from typing import Any
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ui import Button, Select, View
+from discord.ui import Select, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager

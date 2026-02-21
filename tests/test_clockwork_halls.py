@@ -65,6 +65,5 @@ class TestClockworkHalls(unittest.TestCase):
         # Test that we can possibly get a clockwork phrase (mocking random would be better but this is a sanity check)
         # We check if the regeneration method runs without error for the new location
 
-
 if __name__ == "__main__":
     unittest.main()

@@ -23,9 +23,7 @@ class TestCraftingQuality(unittest.TestCase):
 
         # Mock Equipment Data lookup
         self.mock_db.get_equipment_id_by_name.return_value = 101
-        self.mock_db.get_player.return_value = {
-            "class_id": 1
-        }  # For allowed slots check if needed, though mostly for crafting
+        self.mock_db.get_player.return_value = {"class_id": 1} # For allowed slots check if needed, though mostly for crafting
 
     @patch("random.random")
     def test_roll_quality_upgrade(self, mock_random):
@@ -51,28 +49,22 @@ class TestCraftingQuality(unittest.TestCase):
         new_rarity = self.crafting._roll_quality("Common")
         self.assertEqual(new_rarity, "Rare")
 
-    @patch(
-        "game_systems.crafting.crafting_system.EQUIPMENT_DATA",
-        {
-            "gen_sword_001": {
-                "name": "Rusted Sword",
-                "rarity": "Common",
-                "slot": "sword",
-                "stats_bonus": {"STR": 10},
-            }
-        },
-    )
-    @patch(
-        "game_systems.crafting.crafting_system.EQUIPMENT_RECIPES",
-        {
-            "craft_rusted_sword": {
-                "output_key": "gen_sword_001",
-                "type": "equipment",
-                "cost": 10,
-                "materials": {"iron_ore": 1},
-            }
-        },
-    )
+    @patch("game_systems.crafting.crafting_system.EQUIPMENT_DATA", {
+        "gen_sword_001": {
+            "name": "Rusted Sword",
+            "rarity": "Common",
+            "slot": "sword",
+            "stats_bonus": {"STR": 10},
+        }
+    })
+    @patch("game_systems.crafting.crafting_system.EQUIPMENT_RECIPES", {
+        "craft_rusted_sword": {
+            "output_key": "gen_sword_001",
+            "type": "equipment",
+            "cost": 10,
+            "materials": {"iron_ore": 1}
+        }
+    })
     @patch("random.random")
     def test_craft_item_quality_upgrade(self, mock_random):
         # Setup checks
@@ -93,8 +85,8 @@ class TestCraftingQuality(unittest.TestCase):
         self.mock_db.add_inventory_item.assert_called()
         args = self.mock_db.add_inventory_item.call_args[0]
         # args: (discord_id, item_key, item_name, item_type, rarity, amount, slot, source)
-        self.assertEqual(args[2], "Fine Rusted Sword")  # Name prefixed
-        self.assertEqual(args[4], "Uncommon")  # Rarity updated
+        self.assertEqual(args[2], "Fine Rusted Sword") # Name prefixed
+        self.assertEqual(args[4], "Uncommon") # Rarity updated
 
     def test_equipment_manager_quality_scaling(self):
         # Setup static data
@@ -104,13 +96,13 @@ class TestCraftingQuality(unittest.TestCase):
             "str_bonus": 10,
         }
         self.mock_db._col.return_value.find_one.return_value = static_item
-        self.mock_db.get_player_stats_json.return_value = {}  # Empty stats
+        self.mock_db.get_player_stats_json.return_value = {} # Empty stats
 
         # Setup inventory item (Upgraded to Uncommon)
         inventory_item = {
             "item_key": "101",
             "item_source_table": "equipment",
-            "rarity": "Uncommon",  # Higher than base
+            "rarity": "Uncommon", # Higher than base
         }
         self.mock_db.get_equipped_items.return_value = [inventory_item]
 
@@ -126,38 +118,36 @@ class TestCraftingQuality(unittest.TestCase):
         # Inventory item has prefixed name
         inv_item = {
             "id": 1,
-            "item_key": "101",  # ID of Rusted Sword
+            "item_key": "101", # ID of Rusted Sword
             "item_name": "Fine Rusted Sword",
             "item_type": "equipment",
             "rarity": "Uncommon",
             "equipped": 0,
-            "item_source_table": "equipment",
+            "item_source_table": "equipment"
         }
         self.mock_db.get_inventory_item_by_id.return_value = inv_item
 
         # Static data has original name
-        self.mock_db.get_item_from_source_table.return_value = {"name": "Rusted Sword"}
+        self.mock_db.get_item_from_source_table.return_value = {
+            "name": "Rusted Sword"
+        }
 
         # Mock consume
         self.mock_db.consume_item_atomic.return_value = True
 
         # Recipe exists for "Rusted Sword"
-        with patch(
-            "game_systems.crafting.crafting_system.EQUIPMENT_RECIPES",
-            {
-                "craft_rusted_sword": {
-                    "name": "Rusted Sword",
-                    "materials": {"iron_ore": 2},  # Return 1
-                }
-            },
-        ):
+        with patch("game_systems.crafting.crafting_system.EQUIPMENT_RECIPES", {
+            "craft_rusted_sword": {
+                "name": "Rusted Sword",
+                "materials": {"iron_ore": 2} # Return 1
+            }
+        }):
             success, msg, rewards = self.crafting.dismantle_item(self.discord_id, 1)
 
             self.assertTrue(success)
             self.assertEqual(rewards.get("iron_ore"), 1)
             # Should have used ID lookup to find original name "Rusted Sword"
             self.mock_db.get_item_from_source_table.assert_called_with("equipment", 101)
-
 
 if __name__ == "__main__":
     unittest.main()

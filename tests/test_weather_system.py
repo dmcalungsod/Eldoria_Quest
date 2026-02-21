@@ -81,9 +81,8 @@ class TestWeatherSystem:
                 mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, i % 24, 0, 0)
 
                 weather = WorldTime.get_current_weather(location_id)
-                assert weather in [Weather.CLEAR, Weather.ASH, Weather.STORM], (
+                assert weather in [Weather.CLEAR, Weather.ASH, Weather.STORM], \
                     f"Molten Caldera had unexpected weather: {weather}"
-                )
 
     def test_weather_flavor(self):
         """Ensure flavor text returns strings."""

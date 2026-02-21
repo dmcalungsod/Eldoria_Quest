@@ -40,17 +40,19 @@ class TestRealismInventory(unittest.TestCase):
 
     def test_inventory_limit_logic(self):
         # 1. Mock DB to report 20 slots
-        with patch.object(self.db, "get_inventory_slot_count", return_value=20):
+        with patch.object(self.db, 'get_inventory_slot_count', return_value=20):
             # 2. Try adding new unique item
-            with patch.object(self.db, "find_stackable_item", return_value=None):
-                success = self.inv_manager.add_item(self.discord_id, "new_item", "New Item", "material", "Common", 1)
+            with patch.object(self.db, 'find_stackable_item', return_value=None):
+                success = self.inv_manager.add_item(
+                    self.discord_id, "new_item", "New Item", "material", "Common", 1
+                )
                 self.assertFalse(success, "Should fail when inventory is full")
 
         # 3. Mock DB to report 19 slots
-        with patch.object(self.db, "get_inventory_slot_count", return_value=19):
-            with patch.object(self.db, "find_stackable_item", return_value=None):
-                # Should succeed
-                with patch.object(self.db, "_next_inventory_id", return_value=999):
+        with patch.object(self.db, 'get_inventory_slot_count', return_value=19):
+            with patch.object(self.db, 'find_stackable_item', return_value=None):
+                 # Should succeed
+                 with patch.object(self.db, '_next_inventory_id', return_value=999):
                     success = self.inv_manager.add_item(
                         self.discord_id, "new_item_2", "New Item 2", "material", "Common", 1
                     )
@@ -58,29 +60,11 @@ class TestRealismInventory(unittest.TestCase):
 
     def test_add_items_bulk_limit(self):
         # Mock 18 slots used (MAX=20)
-        with patch.object(self.db, "get_inventory_slot_count", return_value=18):
+        with patch.object(self.db, 'get_inventory_slot_count', return_value=18):
             items = [
-                {
-                    "item_key": "k1",
-                    "rarity": "Common",
-                    "amount": 1,
-                    "item_name": "I1",
-                    "item_type": "material",
-                },  # New (19)
-                {
-                    "item_key": "k2",
-                    "rarity": "Common",
-                    "amount": 1,
-                    "item_name": "I2",
-                    "item_type": "material",
-                },  # New (20)
-                {
-                    "item_key": "k3",
-                    "rarity": "Common",
-                    "amount": 1,
-                    "item_name": "I3",
-                    "item_type": "material",
-                },  # New (Fail)
+                {"item_key": "k1", "rarity": "Common", "amount": 1, "item_name": "I1", "item_type": "material"}, # New (19)
+                {"item_key": "k2", "rarity": "Common", "amount": 1, "item_name": "I2", "item_type": "material"}, # New (20)
+                {"item_key": "k3", "rarity": "Common", "amount": 1, "item_name": "I3", "item_type": "material"}, # New (Fail)
             ]
 
             # Mock find (existing stacks) to return empty
@@ -99,10 +83,10 @@ class TestRealismInventory(unittest.TestCase):
 
     def test_purchase_item_full(self):
         # Mock full inventory
-        with patch.object(self.db, "get_inventory_slot_count", return_value=20):
-            with patch.object(self.db, "find_stackable_item", return_value=None):
+        with patch.object(self.db, 'get_inventory_slot_count', return_value=20):
+            with patch.object(self.db, 'find_stackable_item', return_value=None):
                 # Mock balance check
-                with patch.object(self.db, "deduct_aurum", return_value=100):
+                with patch.object(self.db, 'deduct_aurum', return_value=100):
                     # Mock refund
                     self.players_col.update_one = MagicMock()
 
@@ -112,8 +96,7 @@ class TestRealismInventory(unittest.TestCase):
 
                     self.assertFalse(success)
                     self.assertEqual(msg, "Inventory Full.")
-                    self.assertEqual(bal, 110)  # 100 + 10 Refunded
+                    self.assertEqual(bal, 110) # 100 + 10 Refunded
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

@@ -1,3 +1,4 @@
+
 import os
 import sys
 import unittest
@@ -47,7 +48,6 @@ class TestDepthsWardenContent(unittest.TestCase):
         new_skills = ["void_slash", "entropy_wave", "annihilate"]
         for skill in new_skills:
             self.assertIn(skill, MONSTER_SKILLS)
-
 
 if __name__ == "__main__":
     unittest.main()

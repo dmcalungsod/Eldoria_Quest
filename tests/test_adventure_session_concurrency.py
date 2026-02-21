@@ -54,7 +54,9 @@ class MockDatabaseManager:
     def get_active_world_event(self):
         return None
 
-    def update_adventure_session(self, discord_id, logs, loot_collected, active, active_monster_json, previous_version):
+    def update_adventure_session(
+        self, discord_id, logs, loot_collected, active, active_monster_json, previous_version
+    ):
         if discord_id not in self.sessions:
             return False
 
@@ -64,7 +66,7 @@ class MockDatabaseManager:
 
         # Simulate MongoDB logic:
         # If previous_version is 1, we match if "version" is 1 OR if "version" is missing.
-        current_ver = current.get("version")  # None if missing
+        current_ver = current.get("version") # None if missing
 
         match = False
         if previous_version == 1:
@@ -77,16 +79,14 @@ class MockDatabaseManager:
         if not match:
             return False
 
-        self.sessions[discord_id].update(
-            {
-                "discord_id": discord_id,
-                "active": active,
-                "logs": logs,
-                "loot_collected": loot_collected,
-                "active_monster_json": active_monster_json,
-                "version": previous_version + 1,
-            }
-        )
+        self.sessions[discord_id].update({
+            "discord_id": discord_id,
+            "active": active,
+            "logs": logs,
+            "loot_collected": loot_collected,
+            "active_monster_json": active_monster_json,
+            "version": previous_version + 1,
+        })
         return True
 
     def get_player_stats_json(self, discord_id):
@@ -106,9 +106,7 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
         self.user_id = 123
 
         # Patch LOCATIONS to ensure simulate_step proceeds
-        self.locations_patcher = patch.dict(
-            adventure_session.LOCATIONS, {"loc_1": {"name": "Test Location", "monsters": []}}
-        )
+        self.locations_patcher = patch.dict(adventure_session.LOCATIONS, {"loc_1": {"name": "Test Location", "monsters": []}})
         self.locations_patcher.start()
 
         # Setup initial active session
@@ -121,7 +119,7 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
             "xp": 10,
             "drops": [],
             "atk": 10,
-            "def": 0,
+            "def": 0
         }
 
         # Create session manually in "DB"
@@ -162,7 +160,7 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
                 "mp_current": 50,
                 "monster_hp": 90,
                 "turn_report": {},
-                "active_boosts": {},
+                "active_boosts": {}
             }
 
         session_a.combat.resolve_turn = MagicMock(side_effect=side_effect_combat)
@@ -188,10 +186,8 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
         # Verify B failed with System Error
         logs_b = result_b.get("sequence", [])
         combined_logs = "".join([str(x) for x in logs_b])
-        self.assertTrue(
-            "System Error" in combined_logs or "conflict" in combined_logs,
-            f"Expected error in logs, got: {combined_logs}",
-        )
+        self.assertTrue("System Error" in combined_logs or "conflict" in combined_logs,
+                        f"Expected error in logs, got: {combined_logs}")
 
         # Verify A's version incremented
         self.assertEqual(session_data.get("version"), 2)
@@ -224,17 +220,15 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
         self.assertEqual(session.version, 1)
 
         # Mock side effect
-        session.combat.resolve_turn = MagicMock(
-            return_value={
-                "winner": None,
-                "phrases": ["Migrated!"],
-                "hp_current": 100,
-                "mp_current": 50,
-                "monster_hp": 90,
-                "turn_report": {},
-                "active_boosts": {},
-            }
-        )
+        session.combat.resolve_turn = MagicMock(return_value={
+            "winner": None,
+            "phrases": ["Migrated!"],
+            "hp_current": 100,
+            "mp_current": 50,
+            "monster_hp": 90,
+            "turn_report": {},
+            "active_boosts": {}
+        })
 
         # Execute Step
         result = session.simulate_step(context_bundle=bundle, action="attack")

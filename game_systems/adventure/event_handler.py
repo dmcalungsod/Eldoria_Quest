@@ -42,11 +42,15 @@ class EventHandler:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(context, location_id, weather, event_type)
+                return self._perform_regeneration(
+                    context, location_id, weather, event_type
+                )
             else:
                 return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
-            logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Event resolution error for {self.discord_id}: {e}", exc_info=True
+            )
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 

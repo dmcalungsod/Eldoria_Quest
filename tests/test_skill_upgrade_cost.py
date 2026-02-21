@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-
 # --- MOCK DISCORD ---
 class MockView:
     def __init__(self, timeout=180):
@@ -36,7 +35,6 @@ class MockButton(RealItem):
     def _is_v2(self):
         return False
 
-
 class MockSelect(RealItem):
     def __init__(self, placeholder=None, min_values=1, max_values=1, row=None, disabled=False):
         self.callback = None
@@ -45,7 +43,6 @@ class MockSelect(RealItem):
 
     def add_option(self, label, value, description=None, emoji=None):
         self.options.append((label, value))
-
 
 discord = MagicMock()
 discord.ui.View = MockView
@@ -73,25 +70,26 @@ class TestSkillUpgradeCost(unittest.TestCase):
         self.user.id = 12345
         self.player_data = {"vestige_pool": 10000, "class_id": 1}
 
-    @patch(
-        "cogs.skill_trainer_cog.SKILLS",
-        {
-            "test_skill": {
-                "key_id": "test_skill",
-                "name": "Test Skill",
-                "upgrade_cost": 10,  # Base cost
-                "class_id": 1,
-                "learn_cost": 100,
-            }
-        },
-    )
+    @patch("cogs.skill_trainer_cog.SKILLS", {
+        "test_skill": {
+            "key_id": "test_skill",
+            "name": "Test Skill",
+            "upgrade_cost": 10,  # Base cost
+            "class_id": 1,
+            "learn_cost": 100
+        }
+    })
     def test_upgrade_cost_calculation(self):
         # 1. Setup: User has 'test_skill' at Level 10
         # This mocks _get_player_skills_sync used in __init__
-        self.mock_db.get_all_player_skills.return_value = [{"skill_key": "test_skill", "skill_level": 10}]
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": "test_skill", "skill_level": 10}
+        ]
 
         # This mocks get_player_skill_row which SHOULD be used in _execute_upgrade (but currently isn't)
-        self.mock_db.get_player_skill_row.return_value = {"skill_key": "test_skill", "skill_level": 10}
+        self.mock_db.get_player_skill_row.return_value = {
+            "skill_key": "test_skill", "skill_level": 10
+        }
 
         view = SkillTrainerView(self.mock_db, self.user, self.player_data)
 
@@ -114,7 +112,6 @@ class TestSkillUpgradeCost(unittest.TestCase):
         print(f"[TEST] Scaled Cost (Target): {scaled_cost}")
 
         self.assertEqual(called_cost, scaled_cost, f"Cost should be scaled to {scaled_cost}, got {called_cost}")
-
 
 if __name__ == "__main__":
     unittest.main()

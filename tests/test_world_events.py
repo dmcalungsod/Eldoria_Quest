@@ -27,7 +27,9 @@ class TestWorldEventSystem(unittest.TestCase):
         self.assertEqual(args[0], "blood_moon")
 
     def test_get_current_event_active(self):
-        future_time = (datetime.datetime.now() + datetime.timedelta(hours=1)).isoformat()
+        future_time = (
+            datetime.datetime.now() + datetime.timedelta(hours=1)
+        ).isoformat()
         self.mock_db.get_active_world_event.return_value = {
             "type": "blood_moon",
             "start_time": datetime.datetime.now().isoformat(),
@@ -45,7 +47,9 @@ class TestWorldEventSystem(unittest.TestCase):
         past_time = (datetime.datetime.now() - datetime.timedelta(hours=1)).isoformat()
         self.mock_db.get_active_world_event.return_value = {
             "type": "blood_moon",
-            "start_time": (datetime.datetime.now() - datetime.timedelta(hours=2)).isoformat(),
+            "start_time": (
+                datetime.datetime.now() - datetime.timedelta(hours=2)
+            ).isoformat(),
             "end_time": past_time,
             "active": 1,
         }
@@ -55,7 +59,9 @@ class TestWorldEventSystem(unittest.TestCase):
         self.mock_db.end_active_world_event.assert_called_once()
 
     def test_get_modifiers(self):
-        future_time = (datetime.datetime.now() + datetime.timedelta(hours=1)).isoformat()
+        future_time = (
+            datetime.datetime.now() + datetime.timedelta(hours=1)
+        ).isoformat()
         self.mock_db.get_active_world_event.return_value = {
             "type": "celestial_convergence",
             "end_time": future_time,
