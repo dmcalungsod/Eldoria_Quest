@@ -61,11 +61,12 @@ sys.modules["discord.ui"] = discord.ui
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
-# Mock pymongo
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
+# --- IMPORT MODULE UNDER TEST (force reload to pick up our mocks) ---
+import importlib
+import cogs.skill_trainer_cog as _stc_mod
 
-# --- IMPORT MODULE UNDER TEST ---
+importlib.reload(_stc_mod)
+
 from cogs.skill_trainer_cog import SkillTrainerView, get_upgrade_cost  # noqa: E402
 from database.database_manager import DatabaseManager  # noqa: E402
 
@@ -98,6 +99,9 @@ class TestSkillUpgradeCost(unittest.TestCase):
         self.mock_db.get_player_skill_row.return_value = {"skill_key": "test_skill", "skill_level": 10}
 
         view = SkillTrainerView(self.mock_db, self.user, self.player_data)
+
+        # Mock upgrade_skill to return a proper tuple
+        self.mock_db.upgrade_skill.return_value = (True, "Upgraded!", 11)
 
         # 2. Execute Upgrade
         # _execute_upgrade is called with the skill key

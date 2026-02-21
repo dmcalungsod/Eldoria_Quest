@@ -83,8 +83,10 @@ class TestRealismInventory(unittest.TestCase):
                 },  # New (Fail)
             ]
 
-            # Mock find (existing stacks) to return empty
-            self.inventory_col.find.return_value = []
+            # Mock find (existing stacks) to return empty with sort() chain support
+            mock_cursor = MagicMock()
+            mock_cursor.sort.return_value = []
+            self.inventory_col.find.return_value = mock_cursor
 
             # Mock bulk_write
             self.inventory_col.bulk_write.return_value = MagicMock()

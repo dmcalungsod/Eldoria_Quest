@@ -4,9 +4,15 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 
-# Mock pymongo
+# Mock pymongo with a real DuplicateKeyError exception class
 mock_pymongo = MagicMock()
-mock_pymongo.errors.DuplicateKeyError = Exception
+
+
+class _DuplicateKeyError(Exception):
+    pass
+
+
+mock_pymongo.errors.DuplicateKeyError = _DuplicateKeyError
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
@@ -17,6 +23,12 @@ import pymongo.errors  # noqa: E402
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Force reload so equipment_manager picks up our mock_pymongo
+import importlib  # noqa: E402
+import game_systems.items.equipment_manager as _em_mod  # noqa: E402
+
+importlib.reload(_em_mod)
 
 from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 

@@ -92,24 +92,27 @@ class TestDatabaseManager(unittest.TestCase):
         self.assertIn("stats_json", args[1]["$set"])
 
     def test_add_inventory_item(self):
-        # Mock counters collection response for _next_inventory_id
+        # Mock counters collection response for new stack ID
         self.mock_db.counters.find_one_and_update.return_value = {"seq": 100}
 
-        # Mock finding an existing item (return None to simulate new item)
-        self.mock_db.inventory.find_one.return_value = None
+        # Mock find_stackable_item to return None (no existing stack)
+        with (
+            patch.object(self.db, "find_stackable_item", return_value=None),
+            patch.object(self.db, "get_inventory_slot_count", return_value=0),
+        ):
+            self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
 
-        self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
-
-        # Verify it tries to find existing item first
-        self.assertTrue(self.mock_db.inventory.find_one.called)
-        # Verify it inserts new item
-        self.assertTrue(self.mock_db.inventory.insert_one.called)
+        # Verify it inserts new item(s)
+        self.assertTrue(self.mock_db.inventory.insert_many.called or self.mock_db.inventory.insert_one.called)
 
     def test_add_inventory_item_stacking(self):
-        # Mock finding an existing item
-        self.mock_db.inventory.find_one.return_value = {"id": 50, "count": 2}
-
-        self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
+        # Mock finding an existing item with space
+        existing_item = {"id": 50, "count": 2}
+        with (
+            patch.object(self.db, "find_stackable_item", return_value=existing_item),
+            patch.object(self.db, "get_inventory_slot_count", return_value=1),
+        ):
+            self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
 
         # Verify it updates existing item
         self.mock_db.inventory.update_one.assert_called_with({"id": 50}, {"$inc": {"count": 5}})

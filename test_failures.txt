@@ -1,0 +1,57 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\MercurixOxide\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Downloads\Github Projects\Eldoria_Quest
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+tests/test_adventure_race.py::TestExplorationViewRace::test_race_condition_double_click FAILED [ 11%]
+tests/test_buff_system.py::TestBuffSystem::test_buff_lifecycle PASSED    [ 22%]
+tests/test_buff_system.py::TestBuffSystem::test_combat_handler_applies_buff PASSED [ 33%]
+tests/test_buff_system.py::TestBuffSystem::test_consumable_buff_application FAILED [ 44%]
+tests/test_equipment_race.py::TestEquipmentRaceMock::test_race_condition PASSED [ 55%]
+tests/test_race_condition.py::TestRaceCondition::test_learn_skill_concurrent_duplicate_refunds_vestige PASSED [ 66%]
+tests/test_skill_exploit.py::TestSkillExploit::test_exploit_learn_free_skill PASSED [ 77%]
+tests/test_skill_exploit.py::TestSkillExploit::test_exploit_upgrade_free_skill PASSED [ 88%]
+tests/test_skill_upgrade_cost.py::TestSkillUpgradeCost::test_upgrade_cost_calculation PASSED [100%]
+
+================================== FAILURES ===================================
+__________ TestExplorationViewRace.test_race_condition_double_click ___________
+tests\test_adventure_race.py:95: in test_race_condition_double_click
+    view = ExplorationView(
+game_systems\adventure\ui\exploration_view.py:56: in __init__
+    self._update_view_state()
+game_systems\adventure\ui\exploration_view.py:194: in _update_view_state
+    inv_btn = Button(
+C:\Users\MercurixOxide\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:1169: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\MercurixOxide\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:1173: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\MercurixOxide\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:1230: in _execute_mock_call
+    result = next(effect)
+             ^^^^^^^^^^^^
+E   StopIteration
+
+The above exception was the direct cause of the following exception:
+C:\Users\MercurixOxide\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\MercurixOxide\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+E   RuntimeError: coroutine raised StopIteration
+_______________ TestBuffSystem.test_consumable_buff_application _______________
+tests\test_buff_system.py:83: in test_consumable_buff_application
+    self.assertEqual(call_args[0][2], "Strength Brew")  # name
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: "Captains' Ale (Embolden)" != 'Strength Brew'
+E   - Captains' Ale (Embolden)
+E   + Strength Brew
+=========================== short test summary info ===========================
+FAILED tests/test_adventure_race.py::TestExplorationViewRace::test_race_condition_double_click - RuntimeError: coroutine raised StopIteration
+FAILED tests/test_buff_system.py::TestBuffSystem::test_consumable_buff_application - AssertionError: "Captains' Ale (Embolden)" != 'Strength Brew'
+- Captains' Ale (Embolden)
++ Strength Brew
+========================= 2 failed, 7 passed in 2.38s =========================

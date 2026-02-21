@@ -37,6 +37,10 @@ class TestStatDuplication(unittest.TestCase):
 
         self.mock_db.get_player_field.return_value = 1  # class_id
 
+        # Prevent MagicMock comparison errors in recalculate_player_stats
+        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+        self.mock_db.get_all_player_skills.return_value = []
+
         # 3. First Recalculation
         stats1 = self.equipment_manager.recalculate_player_stats(123)
 
