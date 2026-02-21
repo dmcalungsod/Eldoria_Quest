@@ -20,6 +20,18 @@ from .adventure_rewards import AdventureRewards
 from .combat_handler import CombatHandler
 from .event_handler import EventHandler
 
+# Constants for Dynamic Weather Effects
+WEATHER_DMG_PCT = {
+    Weather.ASH: 0.05,  # 5% Max HP
+    Weather.STORM: 0.03,  # 3% Max HP
+    Weather.SNOW: 0.03,  # 3% Max HP
+}
+
+WEATHER_FLEE_PENALTY = {
+    Weather.FOG: 20,  # -20% Chance
+    Weather.STORM: 10,  # -10% Chance
+}
+
 logger = logging.getLogger("eldoria.session")
 
 
@@ -179,6 +191,9 @@ class AdventureSession:
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
 
+            # Determine Weather Early
+            weather = WorldTime.get_current_weather(self.location_id)
+
             # --- 1. Continue Combat ---
             if self.active_monster:
                 if action and action.startswith("set_stance:"):
@@ -192,7 +207,7 @@ class AdventureSession:
                     return self._build_result([[msg]], False, context)
 
                 if action == "flee":
-                    return self._attempt_flee(context)
+                    return self._attempt_flee(context, weather)
 
                 if action == "defend":
                     return self._process_combat_turn(context, action="defend")
@@ -210,8 +225,16 @@ class AdventureSession:
                 final_action = action if action else "attack"
                 return self._process_combat_turn(context, action=final_action)
 
-            # --- Weather System Check ---
-            weather = WorldTime.get_current_weather(self.location_id)
+            # --- Weather Environmental Effects (Exploration Only) ---
+            # Apply damage if exploring in harsh weather
+            env_logs, died = self._apply_environmental_effects(context, weather)
+            if env_logs:
+                self.logs.extend(env_logs)
+                # Ensure context vitals are up to date for return (handled in _apply)
+
+            if died:
+                # Return immediately if weather kills the player
+                return self._build_result([env_logs], True, context)
 
             # Dynamic Combat Threshold based on Weather
             # Base REGEN_CHANCE is 40 (meaning 60% combat).
@@ -240,13 +263,13 @@ class AdventureSession:
                     self.active_monster = monster
                     self.logs.append(phrase)
                     self.save_state()
-                    return self._build_result([[phrase]], False, context)
+                    return self._build_result([env_logs + [phrase]], False, context)
 
                 # Location has no monster this tick
                 msg = phrase or "The path is clear for now."
                 self.logs.append(msg)
                 self.save_state()
-                return self._build_result([[msg]], False, context)
+                return self._build_result([env_logs + [msg]], False, context)
 
             # --- 3. Non-Combat Event ---
             location_name = location.get("name")
@@ -272,13 +295,56 @@ class AdventureSession:
             if "vitals" in result:
                 context["vitals"] = result["vitals"]
 
-            return self._build_result([result["log"]], False, context)
+            return self._build_result([env_logs + result["log"]], False, context)
 
         except Exception as e:
             logger.error(f"Simulation error for {self.discord_id}: {e}", exc_info=True)
             return self._build_result([["*An ominous force interrupts your journey (System Error).*"]], False, None)
 
-    def _attempt_flee(self, context: dict[str, Any]) -> dict[str, Any]:
+    def _apply_environmental_effects(self, context: dict[str, Any], weather: Weather) -> tuple[list[str], bool]:
+        """
+        Applies environmental damage based on weather.
+        Returns: (logs, is_dead)
+        """
+        dmg_pct = WEATHER_DMG_PCT.get(weather, 0)
+        if dmg_pct <= 0:
+            return [], False
+
+        # Calculate Damage
+        # Use Max HP from context or fallback
+        max_hp = 100
+        if context.get("player_stats"):
+            max_hp = context["player_stats"].max_hp
+
+        damage = int(max_hp * dmg_pct)
+        damage = max(1, damage)  # Minimum 1 damage
+
+        # Apply to vitals
+        current_hp = context["vitals"]["current_hp"]
+        new_hp = max(0, current_hp - damage)
+        context["vitals"]["current_hp"] = new_hp
+
+        # Persist immediately
+        self.db.set_player_vitals(
+            self.discord_id, new_hp, context["vitals"]["current_mp"]
+        )
+
+        # Flavor Text
+        logs = []
+        if weather == Weather.ASH:
+            logs.append(f"🌋 **Ash Storm** - The searing heat burns your skin! (-{damage} HP)")
+        elif weather == Weather.STORM:
+            logs.append(f"⛈️ **Storm** - Hail and debris batter you! (-{damage} HP)")
+        elif weather == Weather.SNOW:
+            logs.append(f"❄️ **Blizzard** - The freezing wind bites! (-{damage} HP)")
+
+        is_dead = new_hp <= 0
+        if is_dead:
+            logs.append("\n💀 **You have succumbed to the elements.**")
+
+        return logs, is_dead
+
+    def _attempt_flee(self, context: dict[str, Any], weather: Weather = Weather.CLEAR) -> dict[str, Any]:
         """
         Calculates flee chance based on Agility vs Monster Level.
         """
@@ -295,6 +361,10 @@ class AdventureSession:
         bonus = (agi - monster_level) * 2
         chance = max(10, min(90, 50 + bonus))
 
+        # Apply Weather Penalty
+        penalty = WEATHER_FLEE_PENALTY.get(weather, 0)
+        chance = max(5, chance - penalty)
+
         roll = random.randint(1, 100)
 
         if roll <= chance:
@@ -306,7 +376,13 @@ class AdventureSession:
             return self._build_result([msg], False, context)
         else:
             # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
-            fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
+            flavor = ""
+            if weather == Weather.FOG:
+                flavor = "\nThe fog obscures your path..."
+            elif weather == Weather.STORM:
+                flavor = "\nThe storm hinders your escape..."
+
+            fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%){flavor} - The enemy corners you!"
             return self._process_combat_turn(context, action="flee_failed", prepend_logs=[fail_msg])
 
     # ======================================================================
