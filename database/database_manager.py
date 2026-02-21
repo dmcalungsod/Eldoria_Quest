@@ -2031,6 +2031,40 @@ class DatabaseManager:
         return doc.get("active_title") if doc else None
 
     # ============================================================
+    # EXPLORATION STATS (New methods for external call sites)
+    # ============================================================
+
+    def update_exploration_stats(self, discord_id: int, location_id: str):
+        """
+        Updates exploration stats: unique locations visited and total expeditions.
+        """
+        self._col("stats").update_one(
+            {"discord_id": discord_id},
+            {
+                "$addToSet": {"unique_locations": location_id},
+                "$inc": {"total_expeditions": 1},
+            },
+            upsert=True,
+        )
+
+    def get_exploration_stats(self, discord_id: int) -> dict:
+        """
+        Fetches exploration stats (unique_locations, total_expeditions).
+        Returns defaults if not present.
+        """
+        doc = self._col("stats").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "unique_locations": 1, "total_expeditions": 1},
+        )
+        if not doc:
+            return {"unique_locations": [], "total_expeditions": 0}
+
+        return {
+            "unique_locations": doc.get("unique_locations", []),
+            "total_expeditions": doc.get("total_expeditions", 0),
+        }
+
+    # ============================================================
     # TOURNAMENTS (New methods for external call sites)
     # ============================================================
 
