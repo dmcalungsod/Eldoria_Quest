@@ -20,3 +20,27 @@ Chosen "Major Content Expansion" over "New Class" or "Skill Tree Expansion".
 **Next Steps:**
 - Monitor implementation by Tactician (Environment Mechanics) and GameForge (Assets).
 - Consider a future class "Cryomancer" or "Survivor" that utilizes this zone's mechanics specifically.
+
+## Class Design: The Alchemist
+
+**Design Choice:**
+New Class: Alchemist (Survivor/Pragmatist).
+
+**Reasoning:**
+- The "Frostfall Expanse" design suggested a "Survivor" class.
+- The current class roster lacks a "Debuffer/Controller" or "Item Specialist".
+- Fits the "Material-driven survival" theme perfectly.
+- Forces the implementation of Player Debuffs in `CombatEngine`, which benefits all future designs.
+
+**Theme Alignment:**
+- Grim, scientific, desperate. "While mages study stars, I study dirt."
+- Uses monster parts, reinforcing the core gameplay loop (Kill -> Loot -> Use).
+
+**Integration Notes:**
+- **CombatEngine Limitation Identified**: Player skills currently lack `debuff` support (only Monsters use it via `MonsterAI`). This is a critical gap.
+- **Solution**: Explicitly requested `Tactician` to add `debuff` parsing for player skills.
+- **GameForge**: Needs new weapon types or re-skinned daggers ("Scalpels").
+
+**Next Steps:**
+- Coordinate with Tactician to unlock the `debuff` mechanic.
+- Once implemented, verify "Acid Flask" applies "Defense Down".
