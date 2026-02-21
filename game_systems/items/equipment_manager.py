@@ -10,7 +10,7 @@ import math
 
 import pymongo.errors
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager, MAX_STACK_EQUIPMENT
 from game_systems.data.class_data import CLASSES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.skills_data import SKILLS
@@ -337,6 +337,7 @@ class EquipmentManager:
             item["rarity"],
             item.get("slot"),
             item.get("item_source_table"),
+            max_stack=MAX_STACK_EQUIPMENT,
         )
 
         if stack:

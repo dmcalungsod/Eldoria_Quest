@@ -34,6 +34,7 @@ import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_security  # General security test
 import test_tournament_system  # New Tournament System tests
 import test_dos_prevention  # New DoS prevention tests
+import test_stack_limits  # New Stack Limits tests
 
 
 def check_mongodb_connection():
@@ -169,6 +170,18 @@ def run_tournament_tests():
     return result.wasSuccessful()
 
 
+def run_stack_limit_tests():
+    """Runs the stack limit tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING STACK LIMIT TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_stack_limits)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -224,6 +237,10 @@ def main():
     tournament_passed = run_tournament_tests()
     all_passed = all_passed and tournament_passed
 
+    # 7.5. Stack Limit Tests (Mock-based, always run)
+    stack_passed = run_stack_limit_tests()
+    all_passed = all_passed and stack_passed
+
     # 8. Faction Tests (Mock-based, always run)
     faction_passed = run_faction_tests()
     all_passed = all_passed and faction_passed
@@ -260,6 +277,7 @@ def main():
     print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
     print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
     print(f"Tournament System Tests: {'✓ PASSED' if tournament_passed else '✗ FAILED'}")
+    print(f"Stack Limit Tests: {'✓ PASSED' if stack_passed else '✗ FAILED'}")
     print(f"Faction System Tests: {'✓ PASSED' if faction_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 

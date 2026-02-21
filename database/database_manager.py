@@ -25,6 +25,10 @@ DEFAULT_MONGO_URI = "mongodb://localhost:27017"
 DEFAULT_DB_NAME = "eldoria_quest"
 
 MAX_INVENTORY_SLOTS = 20
+MAX_STACK_CONSUMABLE = 20
+MAX_STACK_MATERIAL = 99
+MAX_STACK_EQUIPMENT = 1
+MAX_STACK_DEFAULT = 10
 
 
 class DatabaseManager:
@@ -728,6 +732,7 @@ class DatabaseManager:
         slot: str | None = None,
         item_source_table: str | None = None,
         equipped: int = 0,
+        max_stack: int | None = None,
     ) -> dict | None:
         """Finds an existing unequipped stack to merge into."""
         query = {
@@ -738,6 +743,9 @@ class DatabaseManager:
             "item_source_table": item_source_table,
             "equipped": equipped,
         }
+        if max_stack is not None:
+            query["count"] = {"$lt": max_stack}
+
         return self._col("inventory").find_one(query, {"_id": 0})
 
     def add_inventory_item(
@@ -752,37 +760,86 @@ class DatabaseManager:
         item_source_table: str | None = None,
     ) -> bool:
         """Adds an item to inventory with stack merging. Returns True if successful, False if full."""
-        existing = self.find_stackable_item(
-            discord_id, item_key, rarity, slot, item_source_table
-        )
-        if existing:
-            self._col("inventory").update_one(
-                {"id": existing["id"]},
-                {"$inc": {"count": amount}},
-            )
-            return True
+        # Determine Max Stack
+        if item_type == "consumable":
+            max_stack = MAX_STACK_CONSUMABLE
+        elif item_type == "material":
+            max_stack = MAX_STACK_MATERIAL
+        elif item_type == "equipment":
+            max_stack = MAX_STACK_EQUIPMENT
         else:
-            # Check capacity for new slot
+            max_stack = MAX_STACK_DEFAULT
+
+        # 1. Try to merge into an existing stack that has space
+        existing = self.find_stackable_item(
+            discord_id,
+            item_key,
+            rarity,
+            slot,
+            item_source_table,
+            max_stack=max_stack,
+        )
+
+        amount_to_add_to_stack = 0
+        if existing:
+            space = max(0, max_stack - existing["count"])
+            amount_to_add_to_stack = min(amount, space)
+
+        remainder = amount - amount_to_add_to_stack
+        needed_new_slots = 0
+        if remainder > 0:
+            needed_new_slots = math.ceil(remainder / max_stack)
+
+        # 2. Check Capacity
+        if needed_new_slots > 0:
             current_slots = self.get_inventory_slot_count(discord_id)
-            if current_slots >= MAX_INVENTORY_SLOTS:
+            available_slots = max(0, MAX_INVENTORY_SLOTS - current_slots)
+            if needed_new_slots > available_slots:
                 return False
 
-            new_id = self._next_inventory_id()
-            self._col("inventory").insert_one(
-                {
-                    "id": new_id,
-                    "discord_id": discord_id,
-                    "item_key": item_key,
-                    "item_name": item_name,
-                    "item_type": item_type,
-                    "rarity": rarity,
-                    "slot": slot,
-                    "item_source_table": item_source_table,
-                    "count": amount,
-                    "equipped": 0,
-                }
+        # 3. Apply Updates
+        if amount_to_add_to_stack > 0 and existing:
+            self._col("inventory").update_one(
+                {"id": existing["id"]},
+                {"$inc": {"count": amount_to_add_to_stack}},
             )
-            return True
+
+        if remainder > 0:
+            # Insert new stacks
+            # Reserve IDs in bulk
+            counter_doc = self._col("counters").find_one_and_update(
+                {"_id": "inventory_id"},
+                {"$inc": {"seq": needed_new_slots}},
+                upsert=True,
+                return_document=True,
+            )
+            end_seq = counter_doc["seq"]
+            start_seq = end_seq - needed_new_slots + 1
+
+            new_docs = []
+            current_remainder = remainder
+            for i in range(needed_new_slots):
+                stack_amount = min(current_remainder, max_stack)
+                new_docs.append(
+                    {
+                        "id": start_seq + i,
+                        "discord_id": discord_id,
+                        "item_key": item_key,
+                        "item_name": item_name,
+                        "item_type": item_type,
+                        "rarity": rarity,
+                        "slot": slot,
+                        "item_source_table": item_source_table,
+                        "count": stack_amount,
+                        "equipped": 0,
+                    }
+                )
+                current_remainder -= stack_amount
+
+            if new_docs:
+                self._col("inventory").insert_many(new_docs)
+
+        return True
 
     def add_inventory_items_bulk(self, discord_id: int, items: list[dict]) -> list[dict]:
         """
@@ -815,18 +872,18 @@ class DatabaseManager:
                 }
             consolidated[key]["amount"] += item["amount"]
 
-        # 2. Fetch all potentially relevant existing stacks in one query
-        # We only care about matching keys for this user that are unequipped
+        # 2. Fetch all relevant existing stacks
         item_keys = [k[0] for k in consolidated.keys()]
         query = {
             "discord_id": discord_id,
             "equipped": 0,
             "item_key": {"$in": item_keys},
         }
-        existing_docs = list(self._col("inventory").find(query))
+        # Fetch existing stacks, sort by count descending (fill almost full stacks first? No, actually sort by count ASC to fill small stacks first)
+        # Sort doesn't strictly matter for correctness, just efficiency.
+        existing_docs = list(self._col("inventory").find(query).sort("count", 1))
 
-        # Map existing docs for O(1) lookup
-        # Key must match the consolidation key
+        # Map existing docs: key -> list of docs
         existing_map = {}
         for doc in existing_docs:
             key = (
@@ -835,48 +892,89 @@ class DatabaseManager:
                 doc.get("slot"),
                 doc.get("item_source_table"),
             )
-            existing_map[key] = doc
+            if key not in existing_map:
+                existing_map[key] = []
+            existing_map[key].append(doc)
 
         operations = []
         new_items_data = []
-
-        # 3. Prepare Bulk Operations
-        for key, item_data in consolidated.items():
-            if key in existing_map:
-                # Update existing stack
-                doc_id = existing_map[key]["id"]
-                operations.append(
-                    UpdateOne({"id": doc_id}, {"$inc": {"count": item_data["amount"]}})
-                )
-            else:
-                # Queue for insertion
-                new_items_data.append(item_data)
-
-        # 4. Check Capacity for New Items
         failed_items = []
-        if new_items_data:
-            current_slots = self.get_inventory_slot_count(discord_id)
-            available = max(0, MAX_INVENTORY_SLOTS - current_slots)
 
-            if len(new_items_data) > available:
-                # Add only what fits
-                fitting = new_items_data[:available]
-                # Track failures
-                for fail in new_items_data[available:]:
-                    failed_items.append(fail)
-                new_items_data = fitting
+        current_slots = self.get_inventory_slot_count(discord_id)
+        available_slots = max(0, MAX_INVENTORY_SLOTS - current_slots)
 
-        # 5. Generate IDs for new items in a single batch
+        # 3. Process each consolidated item group
+        for key, item_data in consolidated.items():
+            amount = item_data["amount"]
+            item_type = item_data["item_type"]
+
+            # Determine Max Stack
+            if item_type == "consumable":
+                max_stack = MAX_STACK_CONSUMABLE
+            elif item_type == "material":
+                max_stack = MAX_STACK_MATERIAL
+            elif item_type == "equipment":
+                max_stack = MAX_STACK_EQUIPMENT
+            else:
+                max_stack = MAX_STACK_DEFAULT
+
+            # A. Fill Existing Stacks
+            existing_stacks = existing_map.get(key, [])
+            for stack in existing_stacks:
+                if amount <= 0:
+                    break
+
+                current_count = stack["count"]
+                space = max(0, max_stack - current_count)
+
+                if space > 0:
+                    add_to_stack = min(amount, space)
+                    operations.append(
+                        UpdateOne({"id": stack["id"]}, {"$inc": {"count": add_to_stack}})
+                    )
+                    amount -= add_to_stack
+
+            # B. Create New Stacks for Remainder
+            if amount > 0:
+                needed_stacks = math.ceil(amount / max_stack)
+
+                if needed_stacks <= available_slots:
+                    # Queue inserts
+                    available_slots -= needed_stacks
+
+                    # Prepare data (will assign IDs later)
+                    current_remainder = amount
+                    for _ in range(needed_stacks):
+                        stack_amount = min(current_remainder, max_stack)
+                        new_items_data.append({
+                            "item_key": item_data["item_key"],
+                            "item_name": item_data["item_name"],
+                            "item_type": item_data["item_type"],
+                            "rarity": item_data["rarity"],
+                            "slot": item_data.get("slot"),
+                            "item_source_table": item_data.get("item_source_table"),
+                            "amount": stack_amount,
+                        })
+                        current_remainder -= stack_amount
+                else:
+                    # FAILED - Not enough slots
+                    # Note: We return the REMAINDER as failed. The parts filled into existing stacks are kept.
+                    failed_items.append({
+                        "item_key": item_data["item_key"],
+                        "item_name": item_data["item_name"],
+                        "amount": amount,
+                        "reason": "Inventory Full"
+                    })
+
+        # 4. Generate IDs for new items
         if new_items_data:
             count = len(new_items_data)
-            # Atomically reserve a block of IDs
             counter_doc = self._col("counters").find_one_and_update(
                 {"_id": "inventory_id"},
                 {"$inc": {"seq": count}},
                 upsert=True,
                 return_document=True,
             )
-            # The range reserved is [end_seq - count + 1, end_seq]
             end_seq = counter_doc["seq"]
             start_seq = end_seq - count + 1
 
@@ -899,7 +997,7 @@ class DatabaseManager:
                     )
                 )
 
-        # 6. Execute
+        # 5. Execute
         if operations:
             self._col("inventory").bulk_write(operations)
             logger.info(
