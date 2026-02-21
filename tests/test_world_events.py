@@ -10,6 +10,7 @@ sys.path.append(os.getcwd())
 # Mock pymongo BEFORE importing DatabaseManager
 mock_pymongo = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
+sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 
