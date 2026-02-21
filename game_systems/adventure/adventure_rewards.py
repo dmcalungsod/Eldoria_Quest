@@ -41,9 +41,9 @@ STAT_EXP_GAINS = {
     "str_exp": lambda br: br.get("str_hits", 0) * 0.5,
     "dex_exp": lambda br: (br.get("dex_hits", 0) * 0.5) + (br.get("player_crit", 0) * 2.0),
     "agi_exp": lambda br: br.get("player_dodge", 0) * 1.5,
-    "end_exp": lambda br: br.get("damage_taken", 0) * 0.2,
+    "end_exp": lambda br: (br.get("hits_taken", 0) * 1.0) + (br.get("damage_taken", 0) * 0.1),
     "mag_exp": lambda br: br.get("mag_hits", 0) * 1.0,
-    "lck_exp": lambda br: 0.5,
+    "lck_exp": lambda br: 0.5 + (br.get("player_crit", 0) * 0.5) + (br.get("player_dodge", 0) * 0.5),
 }
 
 
