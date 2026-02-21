@@ -1,7 +1,7 @@
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Mock pymongo BEFORE importing modules that use it
 sys.modules["pymongo"] = MagicMock()
@@ -11,8 +11,9 @@ sys.modules["pymongo.MongoClient"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.guild_system.advisor import GuildAdvisor
-from game_systems.player.player_stats import PlayerStats
+from game_systems.guild_system.advisor import GuildAdvisor  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestGuildAdvisor(unittest.TestCase):
     def setUp(self):
