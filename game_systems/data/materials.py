@@ -44,6 +44,12 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 50,
     },
+    "blood_shard": {
+        "name": "Blood Shard",
+        "description": "A jagged crystal pulsing with a crimson light. It feels warm to the touch.",
+        "rarity": "Rare",
+        "value": 200,
+    },
     # --- Forest Zone Drops ---
     "goblin_ear": {
         "name": "Goblin Ear",

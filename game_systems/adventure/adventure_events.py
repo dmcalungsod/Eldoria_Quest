@@ -85,7 +85,7 @@ class AdventureEvents:
             "The sky is clear and open.",
             "Visibility is good, allowing you to see far.",
             "A gentle breeze stirs the air.",
-        ]
+        ],
     }
 
     # --- ATMOSPHERIC INTROS (New) ---
@@ -184,6 +184,17 @@ class AdventureEvents:
         "Strange, pale fish dart away from your light.",
         "The pressure of the earth above feels immense.",
         "A cold mist rises from the dark pools around you.",
+    ]
+
+    ATMOSPHERE_BLOOD_MOON = [
+        "The moon is a crimson eye, watching your every move.",
+        "The light is sickly red, casting long, bloody shadows.",
+        "A low, rhythmic thrumming fills the air, like a giant heart.",
+        "The stars are drowned out by the blood-red glow.",
+        "Monsters howl in the distance, their voices twisted by madness.",
+        "The air smells of iron and old blood.",
+        "You feel a strange energy coursing through the land.",
+        "The shadows seem to bleed into the light.",
     ]
 
     # --- REGENERATION PHRASES ---
@@ -382,6 +393,7 @@ class AdventureEvents:
         hp_percent: float = 1.0,
         time_phase: TimePhase = TimePhase.DAY,
         weather: Weather = Weather.CLEAR,
+        event_type: str | None = None,
     ) -> list:
         # Define the base message list
         base_logs = []
@@ -395,7 +407,9 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
 
         # 3. Class-Specific Flavor: 30% chance
-        elif class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
+        elif (
+            class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30
+        ):
             base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
 
         # 4. Location-Specific Fallback
@@ -434,8 +448,12 @@ class AdventureEvents:
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 
+            # Event Override (High Priority)
+            if event_type == "blood_moon":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
+
             # Time Phase Override (30% chance)
-            if time_phase == TimePhase.NIGHT and random.random() < 0.3:
+            elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
             elif time_phase == TimePhase.DAWN and random.random() < 0.3:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
@@ -447,7 +465,10 @@ class AdventureEvents:
             if weather in (Weather.STORM, Weather.ASH):
                 weather_chance = 0.5
 
-            if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+            if (
+                weather in AdventureEvents.ATMOSPHERE_WEATHER
+                and random.random() < weather_chance
+            ):
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
 
             # Select and prepend
