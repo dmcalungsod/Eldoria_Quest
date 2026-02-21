@@ -13,6 +13,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
+from game_systems.achievement_system import AchievementSystem
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
@@ -239,6 +240,21 @@ class AdventureManager:
 
             if failed_items:
                 summary["failed_items"] = failed_items
+
+            # --- EXPLORATION ACHIEVEMENTS ---
+            try:
+                # 1. Update Stats
+                self.db.update_exploration_stats(discord_id, row.get("location_id", "unknown"))
+
+                # 2. Check Achievements
+                ach_system = AchievementSystem(self.db)
+                new_title_msg = ach_system.check_exploration_achievements(discord_id)
+                if new_title_msg:
+                    summary["new_titles"] = new_title_msg
+            except Exception as e:
+                logger.error(
+                    f"Error checking exploration achievements for {discord_id}: {e}", exc_info=True
+                )
 
             # End session ONLY after items are safely added
             self.db.end_adventure_session(discord_id)

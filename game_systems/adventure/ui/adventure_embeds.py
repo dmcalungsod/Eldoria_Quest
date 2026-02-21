@@ -173,5 +173,9 @@ class AdventureEmbeds:
             names = sorted(list(set(f["item_name"] for f in failed)))
             embed.add_field(name=f"{E.WARNING} Lost Items (Full Pack)", value=", ".join(names), inline=False)
 
+        # 6. Achievements
+        if new_titles := s.get("new_titles"):
+            embed.add_field(name="🏆 Achievements Unlocked", value=new_titles, inline=False)
+
         embed.set_footer(text="Your journey is recorded in the archives.")
         return embed

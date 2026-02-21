@@ -83,6 +83,18 @@ GROUP_MILESTONES = {
     },
 }
 
+EXPLORATION_MILESTONES = {
+    10: ("Pathfinder", "Survived 10 Expeditions."),
+    50: ("Trailblazer", "Survived 50 Expeditions."),
+    100: ("Voyager", "Survived 100 Expeditions."),
+}
+
+LOCATION_MILESTONES = {
+    5: ("Scout", "Discovered 5 unique locations."),
+    10: ("Cartographer", "Discovered 10 unique locations."),
+    12: ("World-Walker", "Discovered all known locations."),
+}
+
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -219,4 +231,43 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking group achievements for {discord_id}: {e}")
+            return None
+
+    def check_exploration_achievements(self, discord_id: int) -> str | None:
+        """
+        Checks if the player has reached exploration or location milestones.
+        Returns a success message if a new title is awarded, else None.
+        """
+        try:
+            stats = self.db.get_exploration_stats(discord_id)
+            unique_locations = stats.get("unique_locations", [])
+            total_expeditions = stats.get("total_expeditions", 0)
+
+            newly_awarded = []
+
+            # Check Expedition Counts
+            for count, (title, desc) in EXPLORATION_MILESTONES.items():
+                if total_expeditions >= count:
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
+            # Check Unique Locations
+            loc_count = len(unique_locations)
+            for count, (title, desc) in LOCATION_MILESTONES.items():
+                if loc_count >= count:
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
+            if newly_awarded:
+                if len(newly_awarded) == 1:
+                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
+                else:
+                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Error checking exploration achievements for {discord_id}: {e}")
             return None
