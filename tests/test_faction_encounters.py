@@ -57,7 +57,7 @@ class TestFactionEncounters(unittest.TestCase):
             self.assertIsNotNone(result)
             self.assertIn("log", result)
             # Check for item box or log message
-            self.assertTrue(any("Received:" in l for l in result["log"]))
+            self.assertTrue(any("Received:" in log_line for log_line in result["log"]))
 
             # Verify Reputation Grant
             self.handler.faction_system.grant_reputation.assert_called_with(

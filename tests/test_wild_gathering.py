@@ -9,11 +9,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Mock pymongo before importing anything that uses it
 sys.modules["pymongo"] = MagicMock()
 
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.adventure.event_handler import EventHandler
-from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import Weather
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.adventure.event_handler import EventHandler  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from game_systems.world_time import Weather  # noqa: E402
 
 
 class TestWildGathering(unittest.TestCase):
