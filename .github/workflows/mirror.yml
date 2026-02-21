@@ -15,4 +15,4 @@ jobs:
 
       - name: Push mirror
         run: |
-          git push --mirror https://dmcalungsod:${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot.git
+          git push --mirror https://${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot.git
