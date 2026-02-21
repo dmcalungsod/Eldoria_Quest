@@ -84,6 +84,11 @@ def create_tables(db=None):
     db["inventory"].create_index(
         [("discord_id", ASCENDING), ("item_key", ASCENDING), ("rarity", ASCENDING), ("equipped", ASCENDING)]
     )
+    db["inventory"].create_index(
+        [("discord_id", ASCENDING), ("slot", ASCENDING)],
+        unique=True,
+        partialFilterExpression={"equipped": 1},
+    )
 
     # --- adventure_sessions ---
     db["adventure_sessions"].create_index("discord_id", unique=True)

@@ -19,20 +19,20 @@ from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.items.inventory_manager import InventoryManager
 
-from .ui_helpers import back_to_guild_hall_callback
+from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
 logger = logging.getLogger("eldoria.shop")
 
 SHOP_INVENTORY = {
-    "hp_potion_1": 15,
-    "mp_potion_1": 15,
-    "antidote_basic": 25,
-    "smoke_pellet": 30,
-    "food_ration": 10,
-    "hp_potion_2": 50,
-    "mp_potion_2": 50,
-    "strength_brew": 75,
-    "dex_elixir": 75,
+    "hp_potion_1": 40,
+    "mp_potion_1": 40,
+    "antidote_basic": 40,
+    "smoke_pellet": 45,
+    "food_ration": 15,
+    "hp_potion_2": 90,
+    "mp_potion_2": 90,
+    "strength_brew": 120,
+    "dex_elixir": 120,
 }
 
 
@@ -116,29 +116,25 @@ class ShopView(View):
             if not item_data:
                 return (False, "Item data missing.", 0)
 
-            # 1. Atomic Deduction
-            new_aurum = self.db.deduct_aurum(self.interaction_user.id, price)
-            if new_aurum is None:
-                return (False, "Insufficient Aurum.", 0)
-
-            # 2. Add item to inventory
-            self.db.add_inventory_item(
-                self.interaction_user.id,
-                item_key,
-                item_data["name"],
-                "consumable",
-                item_data["rarity"],
-                1,
+            # Delegate to DatabaseManager for atomic execution with refund support
+            success, result, new_balance = self.db.purchase_item(
+                self.interaction_user.id, item_key, item_data, price
             )
 
-            logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
-            return (True, item_data, new_aurum)
+            if success:
+                logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
+
+            return (success, result, new_balance)
 
         except Exception as e:
             logger.error(f"Purchase error: {e}", exc_info=True)
             return (False, "System error.", 0)
 
     async def purchase_item_callback(self, interaction: discord.Interaction):
+        # Validate player existence first
+        if not await get_player_or_error(interaction, self.db):
+            return
+
         await interaction.response.defer()
 
         # Vulnerability Fix: Ignore client-provided price

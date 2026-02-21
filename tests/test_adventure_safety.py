@@ -3,11 +3,16 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["pymongo.MongoClient"] = MagicMock()
+
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_manager import AdventureManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 
 
 class TestAdventureDataLoss(unittest.TestCase):
@@ -33,7 +38,13 @@ class TestAdventureDataLoss(unittest.TestCase):
 
         # Mock player stats
         self.mock_db.get_player_stats_json.return_value = {}
-        self.mock_db.get_player.return_value = {"level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000}
+        self.mock_db.get_player.return_value = {
+            "level": 1,
+            "experience": 0,
+            "current_hp": 10,
+            "current_mp": 10,
+            "exp_to_next": 1000,
+        }
 
         # Mock level values
         self.mock_db.get_player_field.return_value = 1
@@ -41,7 +52,14 @@ class TestAdventureDataLoss(unittest.TestCase):
         # Mock database methods to track call order
         manager_mock = MagicMock()
         self.mock_db.end_adventure_session.side_effect = manager_mock.end_adventure_session
-        self.mock_db.add_inventory_items_bulk.side_effect = manager_mock.add_inventory_items_bulk
+
+        # Configure add_inventory_items_bulk to return empty list (no failures)
+        # We use side_effect to track the call on manager_mock, but also return []
+        def add_items_side_effect(*args, **kwargs):
+            manager_mock.add_inventory_items_bulk(*args, **kwargs)
+            return []
+
+        self.mock_db.add_inventory_items_bulk.side_effect = add_items_side_effect
 
         # Run end_adventure
         self.manager.end_adventure(discord_id)
@@ -76,7 +94,13 @@ class TestAdventureDataLoss(unittest.TestCase):
             "active_monster_json": None,
         }
         self.mock_db.get_player_stats_json.return_value = {}
-        self.mock_db.get_player.return_value = {"level": 1, "experience": 0, "current_hp": 10, "exp_to_next": 1000}
+        self.mock_db.get_player.return_value = {
+            "level": 1,
+            "experience": 0,
+            "current_hp": 10,
+            "current_mp": 10,
+            "exp_to_next": 1000,
+        }
         self.mock_db.get_player_field.return_value = 1
 
         # Make add_items_bulk raise an exception

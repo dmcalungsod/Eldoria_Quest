@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from typing import Any
 
 from pymongo import InsertOne, MongoClient, UpdateOne
+from pymongo.errors import DuplicateKeyError
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")
@@ -22,6 +23,12 @@ logger = logging.getLogger("eldoria.db")
 # Default fallback — overridden by env var
 DEFAULT_MONGO_URI = "mongodb://localhost:27017"
 DEFAULT_DB_NAME = "eldoria_quest"
+
+MAX_INVENTORY_SLOTS = 20
+MAX_STACK_CONSUMABLE = 20
+MAX_STACK_MATERIAL = 99
+MAX_STACK_EQUIPMENT = 1
+MAX_STACK_DEFAULT = 10
 
 
 class DatabaseManager:
@@ -56,6 +63,9 @@ class DatabaseManager:
         self._skill_cache: dict[str, dict] = {}  # Cache for skill definitions
         self._boost_cache: list[dict] = []
         self._boost_cache_time: float = 0.0
+
+        self._world_event_cache: dict | None = None
+        self._world_event_cache_time: float = 0.0
 
         logger.info(f"Connected to MongoDB: {self._db_name}")
         self._initialized = True
@@ -100,7 +110,10 @@ class DatabaseManager:
 
     def player_exists(self, discord_id: int) -> bool:
         """Checks if a player profile exists."""
-        return self._col("players").find_one({"discord_id": discord_id}, {"_id": 1}) is not None
+        return (
+            self._col("players").find_one({"discord_id": discord_id}, {"_id": 1})
+            is not None
+        )
 
     def create_player(
         self,
@@ -276,7 +289,9 @@ class DatabaseManager:
 
         # 5. Extract Player Row (remove joined fields)
         player_row = {
-            k: v for k, v in data.items() if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
+            k: v
+            for k, v in data.items()
+            if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
         }
 
         return {
@@ -293,7 +308,9 @@ class DatabaseManager:
 
     def get_player_stats_json(self, discord_id: int) -> dict[str, Any]:
         """Fetches and parses the JSON stats block."""
-        row = self._col("stats").find_one({"discord_id": discord_id}, {"_id": 0, "stats_json": 1})
+        row = self._col("stats").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "stats_json": 1}
+        )
         if not row or not row.get("stats_json"):
             return {}
         try:
@@ -328,7 +345,9 @@ class DatabaseManager:
             {"$set": {"current_hp": hp, "current_mp": mp}},
         )
 
-    def update_player_level_data(self, discord_id: int, level: int, exp: int, exp_to_next: int):
+    def update_player_level_data(
+        self, discord_id: int, level: int, exp: int, exp_to_next: int
+    ):
         """Updates level and experience values."""
         self._col("players").update_one(
             {"discord_id": discord_id},
@@ -411,15 +430,87 @@ class DatabaseManager:
 
     def get_guild_member_data(self, discord_id: int) -> dict | None:
         """Fetches guild membership details (Rank, Points)."""
-        return self._col("guild_members").find_one({"discord_id": discord_id}, {"_id": 0})
+        return self._col("guild_members").find_one(
+            {"discord_id": discord_id}, {"_id": 0}
+        )
 
     def get_guild_card_data(self, discord_id: int) -> dict | None:
         """Fetches data specifically for the Guild Card UI."""
-        player = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "name": 1})
-        guild = self._col("guild_members").find_one({"discord_id": discord_id}, {"_id": 0, "rank": 1, "join_date": 1})
+        player = self._col("players").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "name": 1}
+        )
+        guild = self._col("guild_members").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "rank": 1, "join_date": 1}
+        )
         if not player or not guild:
             return None
-        return {"name": player["name"], "rank": guild["rank"], "join_date": guild["join_date"]}
+        return {
+            "name": player["name"],
+            "rank": guild["rank"],
+            "join_date": guild["join_date"],
+        }
+
+    # ============================================================
+    # FACTION SYSTEM (New methods for Factions)
+    # ============================================================
+
+    def get_player_faction_data(self, discord_id: int) -> dict | None:
+        """Fetches the player's faction membership (faction_id, reputation)."""
+        return self._col("player_factions").find_one(
+            {"discord_id": discord_id}, {"_id": 0}
+        )
+
+    def set_player_faction(self, discord_id: int, faction_id: str):
+        """Sets the player's faction, resetting reputation to 0 if changing."""
+        self._col("player_factions").update_one(
+            {"discord_id": discord_id},
+            {
+                "$set": {
+                    "faction_id": faction_id,
+                    "reputation": 0,
+                    "join_date": datetime.datetime.now().isoformat(),
+                }
+            },
+            upsert=True,
+        )
+
+    def leave_faction(self, discord_id: int):
+        """Removes the player from their current faction."""
+        self._col("player_factions").delete_one({"discord_id": discord_id})
+
+    def update_faction_reputation(self, discord_id: int, amount: int) -> int:
+        """Updates (increments) faction reputation. Returns new total."""
+        result = self._col("player_factions").find_one_and_update(
+            {"discord_id": discord_id},
+            {"$inc": {"reputation": amount}},
+            return_document=True,
+        )
+        return result["reputation"] if result else 0
+
+    def get_faction_leaderboard(self, faction_id: str, limit: int = 10) -> list[dict]:
+        """Fetches top players for a specific faction."""
+        pipeline = [
+            {"$match": {"faction_id": faction_id}},
+            {"$sort": {"reputation": -1}},
+            {"$limit": limit},
+            {
+                "$lookup": {
+                    "from": "players",
+                    "localField": "discord_id",
+                    "foreignField": "discord_id",
+                    "as": "player_info",
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "discord_id": 1,
+                    "reputation": 1,
+                    "name": {"$arrayElemAt": ["$player_info.name", 0]},
+                }
+            },
+        ]
+        return list(self._col("player_factions").aggregate(pipeline))
 
     # ============================================================
     # GLOBAL SYSTEMS (Boosts)
@@ -450,14 +541,24 @@ class DatabaseManager:
         Sets a global boost (e.g., exp_boost, loot_boost).
         Updates the record if it already exists (upsert).
         """
-        end_time = (datetime.datetime.now() + datetime.timedelta(hours=duration_hours)).isoformat()
+        end_time = (
+            datetime.datetime.now() + datetime.timedelta(hours=duration_hours)
+        ).isoformat()
         self._col("global_boosts").update_one(
             {"boost_key": key},
-            {"$set": {"boost_key": key, "multiplier": multiplier, "end_time": end_time}},
+            {
+                "$set": {
+                    "boost_key": key,
+                    "multiplier": multiplier,
+                    "end_time": end_time,
+                }
+            },
             upsert=True,
         )
         self._boost_cache_time = 0.0  # Invalidate cache
-        logger.info(f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h")
+        logger.info(
+            f"Global Boost Activated: {key} x{multiplier} for {duration_hours}h"
+        )
 
     def clear_global_boosts(self):
         """Removes all active global boosts."""
@@ -469,9 +570,19 @@ class DatabaseManager:
     # ACTIVE BUFFS
     # ============================================================
 
-    def add_active_buff(self, discord_id: int, buff_id: str, name: str, stat: str, amount: float, duration_s: int):
+    def add_active_buff(
+        self,
+        discord_id: int,
+        buff_id: str,
+        name: str,
+        stat: str,
+        amount: float,
+        duration_s: int,
+    ):
         """Adds a buff to the player."""
-        end_time = (datetime.datetime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
+        end_time = (
+            datetime.datetime.now() + datetime.timedelta(seconds=duration_s)
+        ).isoformat()
         self._col("active_buffs").insert_one(
             {
                 "discord_id": discord_id,
@@ -512,7 +623,12 @@ class DatabaseManager:
         self._col("adventure_sessions").delete_many(query)
 
     def insert_adventure_session(
-        self, discord_id: int, location_id: str, start_time: str, end_time: str, duration_minutes: int
+        self,
+        discord_id: int,
+        location_id: str,
+        start_time: str,
+        end_time: str,
+        duration_minutes: int,
     ):
         """Creates a new adventure session."""
         # Remove any existing sessions first (replace behavior)
@@ -528,6 +644,7 @@ class DatabaseManager:
                 "logs": "[]",
                 "loot_collected": "{}",
                 "active_monster_json": None,
+                "version": 1,
             }
         )
 
@@ -539,20 +656,40 @@ class DatabaseManager:
         )
 
     def update_adventure_session(
-        self, discord_id: int, logs: str, loot_collected: str, active: int, active_monster_json: str | None
-    ):
-        """Updates an active adventure session."""
-        self._col("adventure_sessions").update_one(
-            {"discord_id": discord_id, "active": 1},
+        self,
+        discord_id: int,
+        logs: str,
+        loot_collected: str,
+        active: int,
+        active_monster_json: str | None,
+        previous_version: int,
+    ) -> bool:
+        """
+        Updates an active adventure session with optimistic locking.
+        Returns True if successful, False if version mismatch (concurrent update).
+        Handles legacy sessions (missing version) by accepting {version: 1} OR {version: exists(False)}.
+        """
+        query = {"discord_id": discord_id, "active": 1}
+
+        if previous_version == 1:
+            # Match version 1 OR missing version field (legacy migration)
+            query["$or"] = [{"version": 1}, {"version": {"$exists": False}}]
+        else:
+            query["version"] = previous_version
+
+        result = self._col("adventure_sessions").update_one(
+            query,
             {
                 "$set": {
                     "logs": logs,
                     "loot_collected": loot_collected,
                     "active": active,
                     "active_monster_json": active_monster_json,
+                    "version": previous_version + 1,
                 }
             },
         )
+        return result.modified_count > 0
 
     def end_adventure_session(self, discord_id: int):
         """Marks all adventure sessions as inactive."""
@@ -564,6 +701,10 @@ class DatabaseManager:
     # ============================================================
     # INVENTORY (New methods for external call sites)
     # ============================================================
+
+    def get_inventory_slot_count(self, discord_id: int) -> int:
+        """Counts the number of distinct item slots (documents) used."""
+        return self._col("inventory").count_documents({"discord_id": discord_id})
 
     def get_inventory_items(
         self, discord_id: int, item_type: str | None = None, equipped: int | None = None
@@ -591,6 +732,7 @@ class DatabaseManager:
         slot: str | None = None,
         item_source_table: str | None = None,
         equipped: int = 0,
+        max_stack: int | None = None,
     ) -> dict | None:
         """Finds an existing unequipped stack to merge into."""
         query = {
@@ -601,6 +743,9 @@ class DatabaseManager:
             "item_source_table": item_source_table,
             "equipped": equipped,
         }
+        if max_stack is not None:
+            query["count"] = {"$lt": max_stack}
+
         return self._col("inventory").find_one(query, {"_id": 0})
 
     def add_inventory_item(
@@ -613,45 +758,108 @@ class DatabaseManager:
         amount: int = 1,
         slot: str | None = None,
         item_source_table: str | None = None,
-    ):
-        """Adds an item to inventory with stack merging."""
-        existing = self.find_stackable_item(discord_id, item_key, rarity, slot, item_source_table)
+    ) -> bool:
+        """Adds an item to inventory with stack merging. Returns True if successful, False if full."""
+        # Determine Max Stack
+        if item_type == "consumable":
+            max_stack = MAX_STACK_CONSUMABLE
+        elif item_type == "material":
+            max_stack = MAX_STACK_MATERIAL
+        elif item_type == "equipment":
+            max_stack = MAX_STACK_EQUIPMENT
+        else:
+            max_stack = MAX_STACK_DEFAULT
+
+        # 1. Try to merge into an existing stack that has space
+        existing = self.find_stackable_item(
+            discord_id,
+            item_key,
+            rarity,
+            slot,
+            item_source_table,
+            max_stack=max_stack,
+        )
+
+        amount_to_add_to_stack = 0
         if existing:
+            space = max(0, max_stack - existing["count"])
+            amount_to_add_to_stack = min(amount, space)
+
+        remainder = amount - amount_to_add_to_stack
+        needed_new_slots = 0
+        if remainder > 0:
+            needed_new_slots = math.ceil(remainder / max_stack)
+
+        # 2. Check Capacity
+        if needed_new_slots > 0:
+            current_slots = self.get_inventory_slot_count(discord_id)
+            available_slots = max(0, MAX_INVENTORY_SLOTS - current_slots)
+            if needed_new_slots > available_slots:
+                return False
+
+        # 3. Apply Updates
+        if amount_to_add_to_stack > 0 and existing:
             self._col("inventory").update_one(
                 {"id": existing["id"]},
-                {"$inc": {"count": amount}},
-            )
-        else:
-            new_id = self._next_inventory_id()
-            self._col("inventory").insert_one(
-                {
-                    "id": new_id,
-                    "discord_id": discord_id,
-                    "item_key": item_key,
-                    "item_name": item_name,
-                    "item_type": item_type,
-                    "rarity": rarity,
-                    "slot": slot,
-                    "item_source_table": item_source_table,
-                    "count": amount,
-                    "equipped": 0,
-                }
+                {"$inc": {"count": amount_to_add_to_stack}},
             )
 
-    def add_inventory_items_bulk(self, discord_id: int, items: list[dict]):
+        if remainder > 0:
+            # Insert new stacks
+            # Reserve IDs in bulk
+            counter_doc = self._col("counters").find_one_and_update(
+                {"_id": "inventory_id"},
+                {"$inc": {"seq": needed_new_slots}},
+                upsert=True,
+                return_document=True,
+            )
+            end_seq = counter_doc["seq"]
+            start_seq = end_seq - needed_new_slots + 1
+
+            new_docs = []
+            current_remainder = remainder
+            for i in range(needed_new_slots):
+                stack_amount = min(current_remainder, max_stack)
+                new_docs.append(
+                    {
+                        "id": start_seq + i,
+                        "discord_id": discord_id,
+                        "item_key": item_key,
+                        "item_name": item_name,
+                        "item_type": item_type,
+                        "rarity": rarity,
+                        "slot": slot,
+                        "item_source_table": item_source_table,
+                        "count": stack_amount,
+                        "equipped": 0,
+                    }
+                )
+                current_remainder -= stack_amount
+
+            if new_docs:
+                self._col("inventory").insert_many(new_docs)
+
+        return True
+
+    def add_inventory_items_bulk(self, discord_id: int, items: list[dict]) -> list[dict]:
         """
         Efficiently adds multiple items to inventory.
         Handles stacking and bulk insertion to reduce DB round-trips.
-        items: list of dicts with keys: item_key, item_name, item_type, rarity, amount, [slot], [item_source_table]
+        Returns a list of items that could NOT be added due to slot limits.
         """
         if not items:
-            return
+            return []
 
         # 1. Consolidate items to minimize operations
         consolidated = {}
         for item in items:
             # Key matches find_stackable_item logic: (item_key, rarity, slot, item_source_table)
-            key = (item["item_key"], item["rarity"], item.get("slot"), item.get("item_source_table"))
+            key = (
+                item["item_key"],
+                item["rarity"],
+                item.get("slot"),
+                item.get("item_source_table"),
+            )
             if key not in consolidated:
                 consolidated[key] = {
                     "item_key": item["item_key"],
@@ -664,40 +872,109 @@ class DatabaseManager:
                 }
             consolidated[key]["amount"] += item["amount"]
 
-        # 2. Fetch all potentially relevant existing stacks in one query
-        # We only care about matching keys for this user that are unequipped
+        # 2. Fetch all relevant existing stacks
         item_keys = [k[0] for k in consolidated.keys()]
-        query = {"discord_id": discord_id, "equipped": 0, "item_key": {"$in": item_keys}}
-        existing_docs = list(self._col("inventory").find(query))
+        query = {
+            "discord_id": discord_id,
+            "equipped": 0,
+            "item_key": {"$in": item_keys},
+        }
+        # Fetch existing stacks, sort by count descending (fill almost full stacks first? No, actually sort by count ASC to fill small stacks first)
+        # Sort doesn't strictly matter for correctness, just efficiency.
+        existing_docs = list(self._col("inventory").find(query).sort("count", 1))
 
-        # Map existing docs for O(1) lookup
-        # Key must match the consolidation key
+        # Map existing docs: key -> list of docs
         existing_map = {}
         for doc in existing_docs:
-            key = (doc["item_key"], doc["rarity"], doc.get("slot"), doc.get("item_source_table"))
-            existing_map[key] = doc
+            key = (
+                doc["item_key"],
+                doc["rarity"],
+                doc.get("slot"),
+                doc.get("item_source_table"),
+            )
+            if key not in existing_map:
+                existing_map[key] = []
+            existing_map[key].append(doc)
 
         operations = []
         new_items_data = []
+        failed_items = []
 
-        # 3. Prepare Bulk Operations
+        current_slots = self.get_inventory_slot_count(discord_id)
+        available_slots = max(0, MAX_INVENTORY_SLOTS - current_slots)
+
+        # 3. Process each consolidated item group
         for key, item_data in consolidated.items():
-            if key in existing_map:
-                # Update existing stack
-                doc_id = existing_map[key]["id"]
-                operations.append(UpdateOne({"id": doc_id}, {"$inc": {"count": item_data["amount"]}}))
-            else:
-                # Queue for insertion
-                new_items_data.append(item_data)
+            amount = item_data["amount"]
+            item_type = item_data["item_type"]
 
-        # 4. Generate IDs for new items in a single batch
+            # Determine Max Stack
+            if item_type == "consumable":
+                max_stack = MAX_STACK_CONSUMABLE
+            elif item_type == "material":
+                max_stack = MAX_STACK_MATERIAL
+            elif item_type == "equipment":
+                max_stack = MAX_STACK_EQUIPMENT
+            else:
+                max_stack = MAX_STACK_DEFAULT
+
+            # A. Fill Existing Stacks
+            existing_stacks = existing_map.get(key, [])
+            for stack in existing_stacks:
+                if amount <= 0:
+                    break
+
+                current_count = stack["count"]
+                space = max(0, max_stack - current_count)
+
+                if space > 0:
+                    add_to_stack = min(amount, space)
+                    operations.append(
+                        UpdateOne({"id": stack["id"]}, {"$inc": {"count": add_to_stack}})
+                    )
+                    amount -= add_to_stack
+
+            # B. Create New Stacks for Remainder
+            if amount > 0:
+                needed_stacks = math.ceil(amount / max_stack)
+
+                if needed_stacks <= available_slots:
+                    # Queue inserts
+                    available_slots -= needed_stacks
+
+                    # Prepare data (will assign IDs later)
+                    current_remainder = amount
+                    for _ in range(needed_stacks):
+                        stack_amount = min(current_remainder, max_stack)
+                        new_items_data.append({
+                            "item_key": item_data["item_key"],
+                            "item_name": item_data["item_name"],
+                            "item_type": item_data["item_type"],
+                            "rarity": item_data["rarity"],
+                            "slot": item_data.get("slot"),
+                            "item_source_table": item_data.get("item_source_table"),
+                            "amount": stack_amount,
+                        })
+                        current_remainder -= stack_amount
+                else:
+                    # FAILED - Not enough slots
+                    # Note: We return the REMAINDER as failed. The parts filled into existing stacks are kept.
+                    failed_items.append({
+                        "item_key": item_data["item_key"],
+                        "item_name": item_data["item_name"],
+                        "amount": amount,
+                        "reason": "Inventory Full"
+                    })
+
+        # 4. Generate IDs for new items
         if new_items_data:
             count = len(new_items_data)
-            # Atomically reserve a block of IDs
             counter_doc = self._col("counters").find_one_and_update(
-                {"_id": "inventory_id"}, {"$inc": {"seq": count}}, upsert=True, return_document=True
+                {"_id": "inventory_id"},
+                {"$inc": {"seq": count}},
+                upsert=True,
+                return_document=True,
             )
-            # The range reserved is [end_seq - count + 1, end_seq]
             end_seq = counter_doc["seq"]
             start_seq = end_seq - count + 1
 
@@ -723,7 +1000,11 @@ class DatabaseManager:
         # 5. Execute
         if operations:
             self._col("inventory").bulk_write(operations)
-            logger.info(f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}")
+            logger.info(
+                f"Bulk added items for {discord_id}. Failures: {len(failed_items)}"
+            )
+
+        return failed_items
 
     def get_inventory_item_count(self, discord_id: int, item_key: str) -> int:
         """Returns the total count of an item across all stacks."""
@@ -754,7 +1035,9 @@ class DatabaseManager:
             return True
         return False
 
-    def remove_inventory_item(self, discord_id: int, item_key: str, amount: int = 1) -> bool:
+    def remove_inventory_item(
+        self, discord_id: int, item_key: str, amount: int = 1
+    ) -> bool:
         """
         Removes items from inventory. Prioritizes unequipped stacks.
         Returns True if successful, False if insufficient quantity.
@@ -787,7 +1070,9 @@ class DatabaseManager:
             if remove_from_stack == stack["count"]:
                 self._col("inventory").delete_one({"id": stack["id"]})
             else:
-                self._col("inventory").update_one({"id": stack["id"]}, {"$inc": {"count": -remove_from_stack}})
+                self._col("inventory").update_one(
+                    {"id": stack["id"]}, {"$inc": {"count": -remove_from_stack}}
+                )
 
             remaining_to_remove -= remove_from_stack
 
@@ -805,7 +1090,9 @@ class DatabaseManager:
 
     def update_inventory_count(self, inv_id: int, new_count: int):
         """Updates item count."""
-        self._col("inventory").update_one({"id": inv_id}, {"$set": {"count": new_count}})
+        self._col("inventory").update_one(
+            {"id": inv_id}, {"$set": {"count": new_count}}
+        )
 
     def increment_inventory_count(self, inv_id: int, amount: int = 1):
         """Increments item count."""
@@ -821,11 +1108,15 @@ class DatabaseManager:
 
     def delete_inventory_by_type(self, discord_id: int, item_type: str):
         """Deletes all inventory items of a specific type for a player."""
-        self._col("inventory").delete_many({"discord_id": discord_id, "item_type": item_type})
+        self._col("inventory").delete_many(
+            {"discord_id": discord_id, "item_type": item_type}
+        )
 
     def set_item_equipped(self, inv_id: int, equipped: int):
         """Sets the equipped status of an inventory item."""
-        self._col("inventory").update_one({"id": inv_id}, {"$set": {"equipped": equipped}})
+        self._col("inventory").update_one(
+            {"id": inv_id}, {"$set": {"equipped": equipped}}
+        )
 
     def get_equipped_in_slot(self, discord_id: int, slot: str) -> dict | None:
         """Finds the currently equipped item in a specific slot."""
@@ -851,6 +1142,33 @@ class DatabaseManager:
                 "equipped": 1,
             }
         )
+
+    def split_stack_to_equipped(self, discord_id: int, source_inv_id: int, item: dict) -> bool:
+        """
+        Atomically splits 1 item from a stack and inserts it as a new EQUIPPED item.
+        Handles failures via compensation (refund).
+        """
+        # 1. Decrement Source Stack (Atomic Check & Update)
+        result = self._col("inventory").update_one(
+            {"id": source_inv_id, "count": {"$gt": 1}},
+            {"$inc": {"count": -1}}
+        )
+
+        if result.modified_count == 0:
+            return False
+
+        try:
+            # 2. Insert New Equipped Item
+            self.insert_equipped_split(discord_id, item)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to split stack {source_inv_id} for {discord_id}: {e}")
+            # 3. Compensation: Refund the item
+            self._col("inventory").update_one(
+                {"id": source_inv_id},
+                {"$inc": {"count": 1}}
+            )
+            return False
 
     # ============================================================
     # EQUIPMENT DATA (New methods for external call sites)
@@ -932,10 +1250,14 @@ class DatabaseManager:
 
     def get_quest_objectives(self, quest_id: int) -> str | None:
         """Fetches raw objectives JSON string for a quest."""
-        doc = self._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1})
+        doc = self._col("quests").find_one(
+            {"id": quest_id}, {"_id": 0, "objectives": 1}
+        )
         return doc["objectives"] if doc else None
 
-    def insert_player_quest(self, discord_id: int, quest_id: int, status: str, progress: str):
+    def insert_player_quest(
+        self, discord_id: int, quest_id: int, status: str, progress: str
+    ):
         """Inserts a new player quest record."""
         self._col("player_quests").insert_one(
             {
@@ -961,7 +1283,9 @@ class DatabaseManager:
             {"$set": {"progress": progress}},
         )
 
-    def get_player_quest_with_objectives(self, discord_id: int, quest_id: int) -> dict | None:
+    def get_player_quest_with_objectives(
+        self, discord_id: int, quest_id: int
+    ) -> dict | None:
         """Fetches a player quest with quest objectives (for completion check)."""
         pq = self._col("player_quests").find_one(
             {"discord_id": discord_id, "quest_id": quest_id, "status": "in_progress"},
@@ -969,7 +1293,9 @@ class DatabaseManager:
         )
         if not pq:
             return None
-        quest = self._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1})
+        quest = self._col("quests").find_one(
+            {"id": quest_id}, {"_id": 0, "objectives": 1}
+        )
         if not quest:
             return None
         return {"progress": pq["progress"], "objectives": quest["objectives"]}
@@ -1017,7 +1343,13 @@ class DatabaseManager:
 
     def increment_guild_stat(self, discord_id: int, field: str, amount: int = 1):
         """Increments a guild member stat field (merit_points, quests_completed, kills)."""
-        valid_fields = {"merit_points", "quests_completed", "normal_kills", "elite_kills", "boss_kills"}
+        valid_fields = {
+            "merit_points",
+            "quests_completed",
+            "normal_kills",
+            "elite_kills",
+            "boss_kills",
+        }
         if field not in valid_fields:
             return
         self._col("guild_members").update_one(
@@ -1042,7 +1374,9 @@ class DatabaseManager:
         )
         return [d["key_id"] for d in docs]
 
-    def insert_player_skill(self, discord_id: int, skill_key: str, skill_level: int = 1):
+    def insert_player_skill(
+        self, discord_id: int, skill_key: str, skill_level: int = 1
+    ):
         """Inserts a new player skill."""
         self._col("player_skills").insert_one(
             {
@@ -1071,7 +1405,11 @@ class DatabaseManager:
         )
 
     def update_player_skill(
-        self, discord_id: int, skill_key: str, skill_level: int | None = None, skill_exp: float | None = None
+        self,
+        discord_id: int,
+        skill_key: str,
+        skill_level: int | None = None,
+        skill_exp: float | None = None,
     ):
         """Updates skill level and/or exp."""
         update: dict[str, Any] = {}
@@ -1152,6 +1490,25 @@ class DatabaseManager:
                 {"$set": fields},
             )
 
+    def update_player_mixed(
+        self,
+        discord_id: int,
+        set_fields: dict[str, Any] | None = None,
+        inc_fields: dict[str, Any] | None = None,
+    ):
+        """Updates player fields with both $set and $inc in a single operation."""
+        update: dict[str, Any] = {}
+        if set_fields:
+            update["$set"] = set_fields
+        if inc_fields:
+            update["$inc"] = inc_fields
+
+        if update:
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                update,
+            )
+
     def increment_player_fields(self, discord_id: int, **fields):
         """Generic player field increment (e.g., aurum, experience, vestige_pool)."""
         if fields:
@@ -1175,7 +1532,9 @@ class DatabaseManager:
             {"$set": {field: value}},
         )
 
-    def update_player_vestige_and_vitals(self, discord_id: int, vestige: int, hp: int, mp: int):
+    def update_player_vestige_and_vitals(
+        self, discord_id: int, vestige: int, hp: int, mp: int
+    ):
         """Atomically updates vestige_pool, current_hp, and current_mp."""
         self._col("players").update_one(
             {"discord_id": discord_id},
@@ -1230,6 +1589,26 @@ class DatabaseManager:
         if kill_type in valid:
             self.increment_guild_stat(discord_id, kill_type, amount)
 
+    def increment_specific_monster_kill(
+        self, discord_id: int, monster_name: str, amount: int = 1
+    ):
+        """Increments a specific monster kill count in the stats record."""
+        # Sanitize name for MongoDB field key (remove dots and $)
+        safe_name = monster_name.replace(".", "").replace("$", "")
+        self._col("stats").update_one(
+            {"discord_id": discord_id},
+            {"$inc": {f"monster_kills.{safe_name}": amount}},
+            upsert=True,
+        )
+
+    def get_specific_monster_kills(self, discord_id: int) -> dict[str, int]:
+        """Fetches the dictionary of specific monster kills."""
+        doc = self._col("stats").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "monster_kills": 1},
+        )
+        return doc.get("monster_kills", {}) if doc else {}
+
     # ============================================================
     # REWARD SYSTEM (New methods for external call sites)
     # ============================================================
@@ -1282,7 +1661,9 @@ class DatabaseManager:
         Returns the new balance if successful, None if insufficient funds.
         """
         result = self._col("players").find_one_and_update(
-            {"discord_id": discord_id, "aurum": {"$gte": amount}}, {"$inc": {"aurum": -amount}}, return_document=True
+            {"discord_id": discord_id, "aurum": {"$gte": amount}},
+            {"$inc": {"aurum": -amount}},
+            return_document=True,
         )
         return result["aurum"] if result else None
 
@@ -1293,7 +1674,9 @@ class DatabaseManager:
             {"$inc": {"vestige_pool": amount}},
         )
 
-    def update_player_stats_optimistic(self, discord_id: int, old_json_str: str, new_stats_data: dict) -> bool:
+    def update_player_stats_optimistic(
+        self, discord_id: int, old_json_str: str, new_stats_data: dict
+    ) -> bool:
         """
         Updates player stats only if the current stats_json matches old_json_str.
         Prevents Lost Updates due to race conditions.
@@ -1347,48 +1730,57 @@ class DatabaseManager:
     # SHOP (New methods for external call sites)
     # ============================================================
 
-    def purchase_item(self, discord_id: int, item_key: str, item_data: dict, price: int) -> tuple[bool, Any, int]:
-        """Atomic purchase: deducts gold and adds item."""
+    def purchase_item(
+        self, discord_id: int, item_key: str, item_data: dict, price: int
+    ) -> tuple[bool, Any, int]:
+        """Atomic purchase: deducts gold and adds item. Includes refund on failure."""
         # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
         if new_aurum is None:
             return (False, "Insufficient Aurum.", 0)
 
-        # 2. Add item to inventory
-        existing = self._col("inventory").find_one(
-            {
-                "discord_id": discord_id,
-                "item_key": item_key,
-                "rarity": item_data["rarity"],
-                "equipped": 0,
-            }
-        )
-        if existing:
-            self._col("inventory").update_one({"id": existing["id"]}, {"$inc": {"count": 1}})
-        else:
-            new_id = self._next_inventory_id()
-            self._col("inventory").insert_one(
-                {
-                    "id": new_id,
-                    "discord_id": discord_id,
-                    "item_key": item_key,
-                    "item_name": item_data["name"],
-                    "item_type": "consumable",
-                    "rarity": item_data["rarity"],
-                    "slot": None,
-                    "item_source_table": None,
-                    "count": 1,
-                    "equipped": 0,
-                }
+        # 2. Add item to inventory with Refund Logic
+        try:
+            success = self.add_inventory_item(
+                discord_id,
+                item_key,
+                item_data["name"],
+                "consumable",
+                item_data["rarity"],
+                1,
             )
 
-        return (True, item_data, new_aurum)
+            if success:
+                return (True, item_data, new_aurum)
+            else:
+                # Inventory Full -> Refund
+                self._col("players").update_one(
+                    {"discord_id": discord_id},
+                    {"$inc": {"aurum": price}},
+                )
+                refunded_balance = new_aurum + price
+                return (False, "Inventory Full.", refunded_balance)
+
+        except Exception as e:
+            logger.error(f"Purchase failed for {discord_id}, refunding {price}: {e}")
+
+            # REFUND
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"aurum": price}},
+            )
+            # Re-calculate balance manually since we refunded
+            refunded_balance = new_aurum + price
+
+            return (False, "System error (refunded).", refunded_balance)
 
     # ============================================================
     # INFIRMARY (New methods for external call sites)
     # ============================================================
 
-    def execute_heal(self, discord_id: int, max_hp: int, max_mp: int, cost: int) -> tuple[bool, str]:
+    def execute_heal(
+        self, discord_id: int, max_hp: int, max_mp: int, cost: int
+    ) -> tuple[bool, str]:
         """Atomically heals a player and deducts gold."""
         player = self._col("players").find_one(
             {"discord_id": discord_id},
@@ -1397,13 +1789,20 @@ class DatabaseManager:
         if not player:
             return False, "Player not found."
 
-        missing = max(0, max_hp - player["current_hp"])
-        if missing == 0 and player["current_mp"] >= max_mp:
+        missing_hp = max(0, max_hp - player["current_hp"])
+        missing_mp = max(0, max_mp - player["current_mp"])
+
+        if missing_hp == 0 and missing_mp == 0:
             return False, "You are already healthy."
 
         # Recalculate cost from fresh data
         # Use math.ceil for consistent rounding (aligns with InfirmaryCog)
-        actual_cost = max(1, math.ceil(missing * 0.5)) if missing > 0 else 0
+        # Cost is 0.5 Aurum per missing point (HP or MP)
+        total_missing = missing_hp + missing_mp
+        if total_missing > 0:
+            actual_cost = max(1, math.ceil(total_missing * 0.5))
+        else:
+            actual_cost = 0
 
         if player["aurum"] < actual_cost:
             return False, "Insufficient funds."
@@ -1434,11 +1833,24 @@ class DatabaseManager:
     # STAT UPGRADE (New methods for external call sites)
     # ============================================================
 
-    def execute_stat_upgrade(self, discord_id: int, new_vestige: int, new_hp: int, new_mp: int, stats_json_str: str):
+    def execute_stat_upgrade(
+        self,
+        discord_id: int,
+        new_vestige: int,
+        new_hp: int,
+        new_mp: int,
+        stats_json_str: str,
+    ):
         """Atomically applies a stat upgrade."""
         self._col("players").update_one(
             {"discord_id": discord_id},
-            {"$set": {"vestige_pool": new_vestige, "current_hp": new_hp, "current_mp": new_mp}},
+            {
+                "$set": {
+                    "vestige_pool": new_vestige,
+                    "current_hp": new_hp,
+                    "current_mp": new_mp,
+                }
+            },
         )
         self._col("stats").update_one(
             {"discord_id": discord_id},
@@ -1449,26 +1861,46 @@ class DatabaseManager:
     # SKILL TRAINER (New methods for external call sites)
     # ============================================================
 
-    def learn_skill(self, discord_id: int, skill_key: str, cost: int) -> tuple[bool, str]:
+    def learn_skill(
+        self, discord_id: int, skill_key: str, cost: int
+    ) -> tuple[bool, str]:
         """Atomically learns a new skill (deducts vestige, inserts skill)."""
-        player = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "vestige_pool": 1},
-        )
-        if not player or player["vestige_pool"] < cost:
-            return False, "Insufficient Vestige."
-
         if self.player_has_skill(discord_id, skill_key):
             return False, "Skill already learned."
 
-        self._col("players").update_one(
-            {"discord_id": discord_id},
+        # 1. Optimistic Deduction (Atomic Check & Update)
+        result = self._col("players").update_one(
+            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}},
             {"$inc": {"vestige_pool": -cost}},
         )
-        self.insert_player_skill(discord_id, skill_key)
-        return True, "Skill Learned!"
 
-    def upgrade_skill(self, discord_id: int, skill_key: str, cost: int) -> tuple[bool, str, int]:
+        if result.modified_count == 0:
+            return False, "Insufficient Vestige."
+
+        # 2. Insert Skill
+        try:
+            self.insert_player_skill(discord_id, skill_key)
+            return True, "Skill Learned!"
+        except DuplicateKeyError:
+            # Race condition: Skill was learned concurrently or check failed
+            # REFUND VESTIGE
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"vestige_pool": cost}},
+            )
+            return False, "Skill already learned (refunded)."
+        except Exception as e:
+            # Catch-all for other errors to ensure refund
+            logger.error(f"Error learning skill: {e}")
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"vestige_pool": cost}},
+            )
+            return False, "System error (refunded)."
+
+    def upgrade_skill(
+        self, discord_id: int, skill_key: str, cost: int
+    ) -> tuple[bool, str, int]:
         """Atomically upgrades a skill (deducts vestige, increments level)."""
         ps = self.get_player_skill_row(discord_id, skill_key)
         if not ps:
@@ -1476,26 +1908,48 @@ class DatabaseManager:
 
         current_level = ps["skill_level"]
 
-        player = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "vestige_pool": 1},
-        )
-        if not player or player["vestige_pool"] < cost:
-            return False, "Insufficient Vestige.", current_level
-
-        new_level = current_level + 1
-        self._col("players").update_one(
-            {"discord_id": discord_id},
+        # 1. Optimistic Deduction (Atomic Check & Update)
+        result = self._col("players").update_one(
+            {"discord_id": discord_id, "vestige_pool": {"$gte": cost}},
             {"$inc": {"vestige_pool": -cost}},
         )
-        self.update_player_skill(discord_id, skill_key, skill_level=new_level)
-        return True, "Skill Upgraded!", new_level
+
+        if result.modified_count == 0:
+            return False, "Insufficient Vestige.", current_level
+
+        # 2. Update Skill Level (Atomic Check on Level)
+        # Verify that the level hasn't changed since we calculated the cost
+        skill_res = self._col("player_skills").update_one(
+            {
+                "discord_id": discord_id,
+                "skill_key": skill_key,
+                "skill_level": current_level,
+            },
+            {"$inc": {"skill_level": 1}},
+        )
+
+        if skill_res.modified_count == 0:
+            # Race condition: Level changed concurrently
+            # REFUND VESTIGE
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"vestige_pool": cost}},
+            )
+            return (
+                False,
+                "Skill level changed during transaction. Please try again.",
+                current_level,
+            )
+
+        return True, "Skill Upgraded!", current_level + 1
 
     # ============================================================
     # ADMIN (New methods for external call sites)
     # ============================================================
 
-    def admin_grant(self, discord_id: int, exp: int = 0, aurum: int = 0, vestige: int = 0):
+    def admin_grant(
+        self, discord_id: int, exp: int = 0, aurum: int = 0, vestige: int = 0
+    ):
         """Admin resource grant."""
         increments = {}
         if exp:
@@ -1595,7 +2049,9 @@ class DatabaseManager:
 
     def get_titles(self, discord_id: int) -> list[str]:
         """Fetches all titles earned by the player."""
-        doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "titles": 1})
+        doc = self._col("players").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "titles": 1}
+        )
         return doc.get("titles", []) if doc else []
 
     def set_active_title(self, discord_id: int, title: str | None) -> bool:
@@ -1604,7 +2060,9 @@ class DatabaseManager:
         Returns True if successful, False if title not owned.
         """
         if title is None:
-            self._col("players").update_one({"discord_id": discord_id}, {"$set": {"active_title": None}})
+            self._col("players").update_one(
+                {"discord_id": discord_id}, {"$set": {"active_title": None}}
+            )
             return True
 
         # Check ownership
@@ -1612,12 +2070,16 @@ class DatabaseManager:
         if title not in titles:
             return False
 
-        self._col("players").update_one({"discord_id": discord_id}, {"$set": {"active_title": title}})
+        self._col("players").update_one(
+            {"discord_id": discord_id}, {"$set": {"active_title": title}}
+        )
         return True
 
     def get_active_title(self, discord_id: int) -> str | None:
         """Fetches the currently active title."""
-        doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0, "active_title": 1})
+        doc = self._col("players").find_one(
+            {"discord_id": discord_id}, {"_id": 0, "active_title": 1}
+        )
         return doc.get("active_title") if doc else None
 
     # ============================================================
@@ -1662,7 +2124,9 @@ class DatabaseManager:
             {"$set": {"active": 0}},
         )
 
-    def update_tournament_score(self, discord_id: int, tournament_id: int, score_increment: int):
+    def update_tournament_score(
+        self, discord_id: int, tournament_id: int, score_increment: int
+    ):
         """Updates (increments) a player's score for a tournament."""
         self._col("tournament_scores").update_one(
             {"discord_id": discord_id, "tournament_id": tournament_id},
@@ -1670,7 +2134,9 @@ class DatabaseManager:
             upsert=True,
         )
 
-    def get_tournament_leaderboard(self, tournament_id: int, limit: int = 10) -> list[dict]:
+    def get_tournament_leaderboard(
+        self, tournament_id: int, limit: int = 10
+    ) -> list[dict]:
         """Fetches the top players for a tournament."""
         pipeline = [
             {"$match": {"tournament_id": tournament_id}},
@@ -1702,3 +2168,56 @@ class DatabaseManager:
             {"_id": 0, "score": 1},
         )
         return doc["score"] if doc else 0
+
+    # ============================================================
+    # WORLD EVENTS
+    # ============================================================
+
+    def get_active_world_event(self) -> dict | None:
+        """Fetches the current active world event (Cached for 60s)."""
+        now_ts = time.time()
+        if now_ts - self._world_event_cache_time < 60:
+            return (
+                self._world_event_cache.copy() if self._world_event_cache else None
+            )
+
+        try:
+            self._world_event_cache = self._col("world_events").find_one(
+                {"active": 1},
+                {"_id": 0},
+            )
+            self._world_event_cache_time = now_ts
+            return (
+                self._world_event_cache.copy() if self._world_event_cache else None
+            )
+        except Exception as e:
+            logger.error(f"Error fetching active world event: {e}")
+            return None
+
+    def set_active_world_event(
+        self, event_type: str, start_time: str, end_time: str, data: dict | None = None
+    ):
+        """
+        Sets the active world event.
+        Ensures only one event is active by deactivating others first.
+        """
+        self.end_active_world_event()
+
+        self._col("world_events").insert_one(
+            {
+                "type": event_type,
+                "start_time": start_time,
+                "end_time": end_time,
+                "data": data or {},
+                "active": 1,
+            }
+        )
+        self._world_event_cache_time = 0.0  # Invalidate cache
+
+    def end_active_world_event(self):
+        """Marks all active world events as inactive."""
+        self._col("world_events").update_many(
+            {"active": 1},
+            {"$set": {"active": 0}},
+        )
+        self._world_event_cache_time = 0.0  # Invalidate cache

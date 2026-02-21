@@ -1,0 +1,2085 @@
+{
+    "monster_001": {
+        "id": 1,
+        "name": "Verdant Slime",
+        "level": 1,
+        "tier": "Normal",
+        "hp": 117,
+        "atk": 7,
+        "def": 2,
+        "xp": 30,
+        "drops": [
+            [
+                "magic_stone_fragment",
+                75
+            ],
+            [
+                "slime_gel",
+                40
+            ]
+        ],
+        "skills": [
+            "mend",
+            "poison_spit"
+        ],
+        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+    },
+    "monster_002": {
+        "id": 2,
+        "name": "Glimmer Slime",
+        "level": 2,
+        "tier": "Normal",
+        "hp": 147,
+        "atk": 9,
+        "def": 3,
+        "xp": 60,
+        "drops": [
+            [
+                "magic_stone_fragment",
+                75
+            ],
+            [
+                "slime_gel",
+                40
+            ]
+        ],
+        "skills": [
+            "mend",
+            "poison_spit"
+        ],
+        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+    },
+    "monster_003": {
+        "id": 3,
+        "name": "Goblin Grunt",
+        "level": 2,
+        "tier": "Normal",
+        "hp": 147,
+        "atk": 9,
+        "def": 3,
+        "xp": 60,
+        "drops": [
+            [
+                "magic_stone_fragment",
+                75
+            ],
+            [
+                "goblin_ear",
+                35
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    },
+    "monster_004": {
+        "id": 4,
+        "name": "Goblin Scout",
+        "level": 3,
+        "tier": "Normal",
+        "hp": 177,
+        "atk": 11,
+        "def": 4,
+        "xp": 90,
+        "drops": [
+            [
+                "magic_stone_fragment",
+                75
+            ],
+            [
+                "goblin_ear",
+                35
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    },
+    "monster_005": {
+        "id": 5,
+        "name": "Bramble Goblin",
+        "level": 3,
+        "tier": "Normal",
+        "hp": 177,
+        "atk": 11,
+        "def": 4,
+        "xp": 90,
+        "drops": [
+            [
+                "magic_stone_fragment",
+                75
+            ],
+            [
+                "goblin_ear",
+                35
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    },
+    "monster_006": {
+        "id": 6,
+        "name": "Forest Wolf Pup",
+        "level": 4,
+        "tier": "Normal",
+        "hp": 207,
+        "atk": 13,
+        "def": 5,
+        "xp": 120,
+        "drops": [
+            [
+                "magic_stone_fragment",
+                75
+            ],
+            [
+                "wolf_fang",
+                25
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    },
+    "monster_007": {
+        "id": 7,
+        "name": "Hollow Spiderling",
+        "level": 5,
+        "tier": "Elite",
+        "hp": 380,
+        "atk": 22,
+        "def": 9,
+        "xp": 500,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "spider_silk",
+                30
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+    },
+    "monster_008": {
+        "id": 8,
+        "name": "Thicket Spider",
+        "level": 5,
+        "tier": "Normal",
+        "hp": 237,
+        "atk": 15,
+        "def": 6,
+        "xp": 150,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "spider_silk",
+                30
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+    },
+    "monster_009": {
+        "id": 9,
+        "name": "Fen Wisp",
+        "level": 6,
+        "tier": "Normal",
+        "hp": 267,
+        "atk": 17,
+        "def": 7,
+        "xp": 180,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "ember"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_010": {
+        "id": 10,
+        "name": "Briar Hound",
+        "level": 6,
+        "tier": "Normal",
+        "hp": 267,
+        "atk": 17,
+        "def": 7,
+        "xp": 180,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    },
+    "monster_011": {
+        "id": 11,
+        "name": "Mossback Tortoise",
+        "level": 7,
+        "tier": "Normal",
+        "hp": 297,
+        "atk": 19,
+        "def": 8,
+        "xp": 210,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    },
+    "monster_012": {
+        "id": 12,
+        "name": "Vineling",
+        "level": 8,
+        "tier": "Normal",
+        "hp": 327,
+        "atk": 21,
+        "def": 9,
+        "xp": 240,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    },
+    "monster_013": {
+        "id": 13,
+        "name": "Burbling Sprite",
+        "level": 8,
+        "tier": "Normal",
+        "hp": 327,
+        "atk": 21,
+        "def": 9,
+        "xp": 240,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "A small, malicious fey creature that delights in leading travelers to their doom."
+    },
+    "monster_014": {
+        "id": 14,
+        "name": "Rookwood Shade",
+        "level": 9,
+        "tier": "Elite",
+        "hp": 572,
+        "atk": 34,
+        "def": 15,
+        "xp": 900,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "ember"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_015": {
+        "id": 15,
+        "name": "Gloam Hare",
+        "level": 9,
+        "tier": "Normal",
+        "hp": 357,
+        "atk": 23,
+        "def": 10,
+        "xp": 270,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "rapid_strike"
+        ],
+        "description": "Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    },
+    "monster_016": {
+        "id": 16,
+        "name": "Young Treant",
+        "level": 10,
+        "tier": "Normal",
+        "hp": 387,
+        "atk": 25,
+        "def": 11,
+        "xp": 300,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "treant_branch",
+                15
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "regenerate"
+        ],
+        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    },
+    "monster_017": {
+        "id": 17,
+        "name": "Feral Stag",
+        "level": 11,
+        "tier": "Boss",
+        "hp": 2004,
+        "atk": 67,
+        "def": 24,
+        "xp": 4125,
+        "drops": [
+            [
+                "magic_stone_large",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                25
+            ],
+            [
+                "boss_talon",
+                100
+            ],
+            [
+                "celestial_dust",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "flame_breath",
+            "regenerate"
+        ],
+        "description": "Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    },
+    "monster_018": {
+        "id": 18,
+        "name": "Sapling Ent",
+        "level": 11,
+        "tier": "Normal",
+        "hp": 417,
+        "atk": 27,
+        "def": 12,
+        "xp": 330,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "regenerate"
+        ],
+        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    },
+    "monster_019": {
+        "id": 19,
+        "name": "Ragged Urch",
+        "level": 12,
+        "tier": "Normal",
+        "hp": 447,
+        "atk": 29,
+        "def": 13,
+        "xp": 360,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A spiny, bottom-feeding scavenger that has grown to monstrous size."
+    },
+    "monster_020": {
+        "id": 20,
+        "name": "Ravaged Boar",
+        "level": 12,
+        "tier": "Normal",
+        "hp": 447,
+        "atk": 29,
+        "def": 13,
+        "xp": 360,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "boar_meat",
+                40
+            ],
+            [
+                "boar_tusk",
+                25
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    },
+    "monster_021": {
+        "id": 21,
+        "name": "Pine Wight",
+        "level": 13,
+        "tier": "Elite",
+        "hp": 764,
+        "atk": 46,
+        "def": 21,
+        "xp": 1300,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A creature of the Shattered Veil, prowling the wilds in search of prey."
+    },
+    "monster_022": {
+        "id": 22,
+        "name": "Marsh Crawler",
+        "level": 14,
+        "tier": "Normal",
+        "hp": 507,
+        "atk": 33,
+        "def": 15,
+        "xp": 420,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A spiny, bottom-feeding scavenger that has grown to monstrous size."
+    },
+    "monster_023": {
+        "id": 23,
+        "name": "Sporeling",
+        "level": 14,
+        "tier": "Normal",
+        "hp": 507,
+        "atk": 33,
+        "def": 15,
+        "xp": 420,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A creature of the Shattered Veil, prowling the wilds in search of prey."
+    },
+    "monster_024": {
+        "id": 24,
+        "name": "Ridge Wolf",
+        "level": 15,
+        "tier": "Normal",
+        "hp": 537,
+        "atk": 35,
+        "def": 16,
+        "xp": 450,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "wolf_fang",
+                25
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    },
+    "monster_025": {
+        "id": 25,
+        "name": "Stormling",
+        "level": 15,
+        "tier": "Normal",
+        "hp": 537,
+        "atk": 35,
+        "def": 16,
+        "xp": 450,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A creature of the Shattered Veil, prowling the wilds in search of prey."
+    },
+    "monster_026": {
+        "id": 26,
+        "name": "Thornback Boar",
+        "level": 16,
+        "tier": "Normal",
+        "hp": 567,
+        "atk": 37,
+        "def": 17,
+        "xp": 480,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "boar_meat",
+                40
+            ],
+            [
+                "boar_tusk",
+                25
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    },
+    "monster_027": {
+        "id": 27,
+        "name": "Mire Lurker",
+        "level": 17,
+        "tier": "Normal",
+        "hp": 597,
+        "atk": 39,
+        "def": 18,
+        "xp": 510,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A spiny, bottom-feeding scavenger that has grown to monstrous size."
+    },
+    "monster_028": {
+        "id": 28,
+        "name": "Duskling",
+        "level": 17,
+        "tier": "Elite",
+        "hp": 956,
+        "atk": 58,
+        "def": 27,
+        "xp": 1700,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_029": {
+        "id": 29,
+        "name": "Wisp-Sentinel",
+        "level": 18,
+        "tier": "Elite",
+        "hp": 1004,
+        "atk": 61,
+        "def": 28,
+        "xp": 1800,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "ember"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_030": {
+        "id": 30,
+        "name": "Gnarled Brute",
+        "level": 18,
+        "tier": "Elite",
+        "hp": 1004,
+        "atk": 61,
+        "def": 28,
+        "xp": 1800,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "titan_shard",
+                10
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A creature of the Shattered Veil, prowling the wilds in search of prey."
+    },
+    "monster_031": {
+        "id": 31,
+        "name": "Shade Warden",
+        "level": 19,
+        "tier": "Elite",
+        "hp": 1052,
+        "atk": 64,
+        "def": 30,
+        "xp": 1900,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "ember"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_032": {
+        "id": 32,
+        "name": "Fen Revenant",
+        "level": 20,
+        "tier": "Elite",
+        "hp": 1100,
+        "atk": 67,
+        "def": 31,
+        "xp": 2000,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_033": {
+        "id": 33,
+        "name": "Bramble King",
+        "level": 20,
+        "tier": "Elite",
+        "hp": 1100,
+        "atk": 67,
+        "def": 31,
+        "xp": 2000,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "titan_shard",
+                10
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "flame_breath",
+            "regenerate"
+        ],
+        "description": "A massive, ancient entity that dominates its territory. Its very presence warps the air around it."
+    },
+    "monster_034": {
+        "id": 34,
+        "name": "Glade Empress",
+        "level": 21,
+        "tier": "Boss",
+        "hp": 3444,
+        "atk": 117,
+        "def": 44,
+        "xp": 7875,
+        "drops": [
+            [
+                "magic_stone_large",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                25
+            ],
+            [
+                "boss_talon",
+                100
+            ],
+            [
+                "celestial_dust",
+                15
+            ],
+            [
+                "titan_shard",
+                10
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "flame_breath",
+            "regenerate"
+        ],
+        "description": "A massive, ancient entity that dominates its territory. Its very presence warps the air around it."
+    },
+    "monster_035": {
+        "id": 35,
+        "name": "Sylvan Herald",
+        "level": 21,
+        "tier": "Elite",
+        "hp": 1148,
+        "atk": 70,
+        "def": 33,
+        "xp": 2100,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A creature of the Shattered Veil, prowling the wilds in search of prey."
+    },
+    "monster_036": {
+        "id": 36,
+        "name": "Elder Treant",
+        "level": 22,
+        "tier": "Elite",
+        "hp": 1196,
+        "atk": 73,
+        "def": 34,
+        "xp": 2200,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "treant_branch",
+                15
+            ],
+            [
+                "ironwood_heart",
+                20
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "regenerate"
+        ],
+        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    },
+    "monster_037": {
+        "id": 37,
+        "name": "Abyssal Wolf",
+        "level": 23,
+        "tier": "Elite",
+        "hp": 1244,
+        "atk": 76,
+        "def": 36,
+        "xp": 2300,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "wolf_fang",
+                25
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    },
+    "monster_038": {
+        "id": 38,
+        "name": "Blight Stag",
+        "level": 23,
+        "tier": "Elite",
+        "hp": 1244,
+        "atk": 76,
+        "def": 36,
+        "xp": 2300,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "Once a natural beast, now warped by the leaking energies of the Broken Veil."
+    },
+    "monster_039": {
+        "id": 39,
+        "name": "Wretched Entling",
+        "level": 24,
+        "tier": "Elite",
+        "hp": 1292,
+        "atk": 79,
+        "def": 37,
+        "xp": 2400,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "regenerate"
+        ],
+        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    },
+    "monster_040": {
+        "id": 40,
+        "name": "Nightbloom",
+        "level": 24,
+        "tier": "Elite",
+        "hp": 1292,
+        "atk": 79,
+        "def": 37,
+        "xp": 2400,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+    },
+    "monster_041": {
+        "id": 41,
+        "name": "Verdant Slime",
+        "level": 25,
+        "tier": "Elite",
+        "hp": 1340,
+        "atk": 82,
+        "def": 39,
+        "xp": 2500,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "slime_gel",
+                40
+            ]
+        ],
+        "skills": [
+            "mend",
+            "poison_spit"
+        ],
+        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+    },
+    "monster_042": {
+        "id": 42,
+        "name": "Glimmer Slime",
+        "level": 26,
+        "tier": "Elite",
+        "hp": 1388,
+        "atk": 85,
+        "def": 40,
+        "xp": 2600,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "slime_gel",
+                40
+            ]
+        ],
+        "skills": [
+            "mend",
+            "poison_spit"
+        ],
+        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+    },
+    "monster_043": {
+        "id": 43,
+        "name": "Goblin Grunt",
+        "level": 26,
+        "tier": "Elite",
+        "hp": 1388,
+        "atk": 85,
+        "def": 40,
+        "xp": 2600,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "goblin_ear",
+                35
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "heavy_blow"
+        ],
+        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    },
+    "monster_044": {
+        "id": 44,
+        "name": "Goblin Scout",
+        "level": 27,
+        "tier": "Elite",
+        "hp": 1436,
+        "atk": 88,
+        "def": 42,
+        "xp": 2700,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "goblin_ear",
+                35
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "heavy_blow"
+        ],
+        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    },
+    "monster_045": {
+        "id": 45,
+        "name": "Bramble Goblin",
+        "level": 27,
+        "tier": "Elite",
+        "hp": 1436,
+        "atk": 88,
+        "def": 42,
+        "xp": 2700,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "goblin_ear",
+                35
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "heavy_blow"
+        ],
+        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+    },
+    "monster_046": {
+        "id": 46,
+        "name": "Forest Wolf Pup",
+        "level": 28,
+        "tier": "Elite",
+        "hp": 1484,
+        "atk": 91,
+        "def": 43,
+        "xp": 2800,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "wolf_fang",
+                25
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    },
+    "monster_047": {
+        "id": 47,
+        "name": "Hollow Spiderling",
+        "level": 29,
+        "tier": "Elite",
+        "hp": 1532,
+        "atk": 94,
+        "def": 45,
+        "xp": 2900,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "spider_silk",
+                30
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+    },
+    "monster_048": {
+        "id": 48,
+        "name": "Thicket Spider",
+        "level": 29,
+        "tier": "Elite",
+        "hp": 1532,
+        "atk": 94,
+        "def": 45,
+        "xp": 2900,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "spider_silk",
+                30
+            ]
+        ],
+        "skills": [
+            "heavy_blow"
+        ],
+        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+    },
+    "monster_049": {
+        "id": 49,
+        "name": "Fen Wisp",
+        "level": 30,
+        "tier": "Elite",
+        "hp": 1580,
+        "atk": 97,
+        "def": 46,
+        "xp": 3000,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "magic_stone_large",
+                15
+            ],
+            [
+                "shadow_essence",
+                15
+            ]
+        ],
+        "skills": [
+            "ember"
+        ],
+        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+    },
+    "monster_050": {
+        "id": 50,
+        "name": "Briar Hound",
+        "level": 30,
+        "tier": "Boss",
+        "hp": 4740,
+        "atk": 162,
+        "def": 62,
+        "xp": 11250,
+        "drops": [
+            [
+                "magic_stone_large",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                25
+            ],
+            [
+                "boss_talon",
+                100
+            ],
+            [
+                "celestial_dust",
+                15
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+    },
+    "monster_101": {
+        "id": 101,
+        "name": "Crystal Golem",
+        "level": 22,
+        "tier": "Normal",
+        "hp": 700,
+        "atk": 50,
+        "def": 35,
+        "xp": 550,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "luminescent_crystal",
+                40
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crystal_shard"
+        ],
+        "description": "A lumbering construct of jagged quartz, ancient and unyielding."
+    },
+    "monster_102": {
+        "id": 102,
+        "name": "Prism Spider",
+        "level": 20,
+        "tier": "Normal",
+        "hp": 450,
+        "atk": 60,
+        "def": 15,
+        "xp": 500,
+        "drops": [
+            [
+                "spider_silk",
+                50
+            ],
+            [
+                "luminescent_crystal",
+                30
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "crystal_shard"
+        ],
+        "description": "Its translucent carapace makes it hard to track in the shimmering light."
+    },
+    "monster_103": {
+        "id": 103,
+        "name": "Shard Wisp",
+        "level": 21,
+        "tier": "Normal",
+        "hp": 400,
+        "atk": 70,
+        "def": 10,
+        "xp": 525,
+        "drops": [
+            [
+                "magic_stone_medium",
+                90
+            ],
+            [
+                "mithril_ore",
+                20
+            ]
+        ],
+        "skills": [
+            "prism_beam",
+            "ember"
+        ],
+        "description": "A floating orb of condensed mana and light."
+    },
+    "monster_104": {
+        "id": 104,
+        "name": "Obsidian Gargoyle",
+        "level": 23,
+        "tier": "Elite",
+        "hp": 1200,
+        "atk": 80,
+        "def": 40,
+        "xp": 2000,
+        "drops": [
+            [
+                "magic_stone_large",
+                50
+            ],
+            [
+                "mithril_ore",
+                40
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "flame_breath"
+        ],
+        "description": "Carved from volcanic glass, it swoops down with crushing weight."
+    },
+    "monster_105": {
+        "id": 105,
+        "name": "Crystalline Guardian",
+        "level": 25,
+        "tier": "Boss",
+        "hp": 5000,
+        "atk": 110,
+        "def": 60,
+        "xp": 8000,
+        "drops": [
+            [
+                "magic_stone_flawless",
+                100
+            ],
+            [
+                "crystal_heart",
+                100
+            ],
+            [
+                "mithril_ore",
+                50
+            ]
+        ],
+        "skills": [
+            "prism_beam",
+            "crystal_shard",
+            "regenerate"
+        ],
+        "description": "The heart of the caverns, a massive entity of living light and stone."
+    },
+    "monster_106": {
+        "id": 106,
+        "name": "Fire Elemental",
+        "level": 30,
+        "tier": "Normal",
+        "hp": 1000,
+        "atk": 90,
+        "def": 20,
+        "xp": 900,
+        "drops": [
+            [
+                "fire_essence",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "ember",
+            "flame_breath"
+        ],
+        "description": "A living pillar of flame that scorches the air around it."
+    },
+    "monster_107": {
+        "id": 107,
+        "name": "Magma Golem",
+        "level": 32,
+        "tier": "Normal",
+        "hp": 1500,
+        "atk": 70,
+        "def": 80,
+        "xp": 950,
+        "drops": [
+            [
+                "obsidian_shard",
+                70
+            ],
+            [
+                "magma_core",
+                25
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "regenerate"
+        ],
+        "description": "Molten rock given form, its steps shake the ground."
+    },
+    "monster_108": {
+        "id": 108,
+        "name": "Ember Salamander",
+        "level": 31,
+        "tier": "Normal",
+        "hp": 900,
+        "atk": 100,
+        "def": 30,
+        "xp": 925,
+        "drops": [
+            [
+                "obsidian_shard",
+                50
+            ],
+            [
+                "fire_essence",
+                40
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "vicious_bite"
+        ],
+        "description": "A quick, lizard-like creature that scurries through lava pools."
+    },
+    "monster_109": {
+        "id": 109,
+        "name": "Lava Drake",
+        "level": 34,
+        "tier": "Elite",
+        "hp": 2500,
+        "atk": 120,
+        "def": 50,
+        "xp": 3500,
+        "drops": [
+            [
+                "dragon_scale",
+                40
+            ],
+            [
+                "magic_stone_large",
+                60
+            ]
+        ],
+        "skills": [
+            "flame_breath",
+            "crushing_slam"
+        ],
+        "description": "A lesser dragon with scales like cooled volcanic rock."
+    },
+    "monster_110": {
+        "id": 110,
+        "name": "Ignis, Lord of Cinders",
+        "level": 35,
+        "tier": "Boss",
+        "hp": 8000,
+        "atk": 150,
+        "def": 90,
+        "xp": 12000,
+        "drops": [
+            [
+                "magic_stone_flawless",
+                100
+            ],
+            [
+                "magma_core",
+                100
+            ],
+            [
+                "dragon_scale",
+                50
+            ]
+        ],
+        "skills": [
+            "flame_breath",
+            "heavy_blow",
+            "ember"
+        ],
+        "description": "An ancient spirit of fire, clad in armor of obsidian and hate."
+    },
+    "monster_111": {
+        "id": 111,
+        "name": "Frost Wolf",
+        "level": 26,
+        "tier": "Normal",
+        "hp": 850,
+        "atk": 85,
+        "def": 25,
+        "xp": 800,
+        "drops": [
+            [
+                "winter_wolf_pelt",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "Its white fur blends perfectly with the snow, hiding its deadly intent."
+    },
+    "monster_112": {
+        "id": 112,
+        "name": "Ice Golem",
+        "level": 27,
+        "tier": "Normal",
+        "hp": 1400,
+        "atk": 65,
+        "def": 70,
+        "xp": 850,
+        "drops": [
+            [
+                "frost_crystal",
+                70
+            ],
+            [
+                "ice_core",
+                20
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "ice_shard"
+        ],
+        "description": "A construct of animate permafrost, slow but relentless."
+    },
+    "monster_113": {
+        "id": 113,
+        "name": "Chill Wisp",
+        "level": 26,
+        "tier": "Normal",
+        "hp": 750,
+        "atk": 95,
+        "def": 15,
+        "xp": 820,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "frost_crystal",
+                40
+            ]
+        ],
+        "skills": [
+            "ice_shard",
+            "frost_breath"
+        ],
+        "description": "A flickering spirit of cold light that saps warmth from the air."
+    },
+    "monster_114": {
+        "id": 114,
+        "name": "Glacial Drake",
+        "level": 28,
+        "tier": "Elite",
+        "hp": 2200,
+        "atk": 110,
+        "def": 45,
+        "xp": 3000,
+        "drops": [
+            [
+                "frozen_scale",
+                30
+            ],
+            [
+                "magic_stone_large",
+                50
+            ]
+        ],
+        "skills": [
+            "frost_breath",
+            "vicious_bite"
+        ],
+        "description": "A winged predator with scales of blue ice, hunting the frozen wastes."
+    },
+    "monster_115": {
+        "id": 115,
+        "name": "Cryon, the Frozen King",
+        "level": 29,
+        "tier": "Boss",
+        "hp": 7000,
+        "atk": 135,
+        "def": 80,
+        "xp": 10000,
+        "drops": [
+            [
+                "magic_stone_flawless",
+                100
+            ],
+            [
+                "ice_core",
+                100
+            ],
+            [
+                "frozen_scale",
+                50
+            ]
+        ],
+        "skills": [
+            "glacial_roar",
+            "frost_breath",
+            "heavy_blow"
+        ],
+        "description": "An ancient giant clad in glacial armor, ruling the eternal winter."
+    },
+    "monster_116": {
+        "id": 116,
+        "name": "Void Stalker",
+        "level": 41,
+        "tier": "Normal",
+        "hp": 2800,
+        "atk": 160,
+        "def": 40,
+        "xp": 3500,
+        "drops": [
+            [
+                "void_dust",
+                70
+            ],
+            [
+                "magic_stone_large",
+                40
+            ]
+        ],
+        "skills": [
+            "void_slash",
+            "rapid_strike"
+        ],
+        "description": "A silhouette that moves between shadows, striking with unseen blades."
+    },
+    "monster_117": {
+        "id": 117,
+        "name": "Abyssal Construct",
+        "level": 42,
+        "tier": "Normal",
+        "hp": 5000,
+        "atk": 130,
+        "def": 120,
+        "xp": 3800,
+        "drops": [
+            [
+                "abyssal_shackle",
+                60
+            ],
+            [
+                "magic_stone_large",
+                50
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crushing_slam"
+        ],
+        "description": "Armor animated by a void spirit, relentless and unfeeling."
+    },
+    "monster_118": {
+        "id": 118,
+        "name": "Null Wisp",
+        "level": 41,
+        "tier": "Normal",
+        "hp": 2500,
+        "atk": 180,
+        "def": 30,
+        "xp": 3600,
+        "drops": [
+            [
+                "entropy_crystal",
+                50
+            ],
+            [
+                "void_dust",
+                40
+            ]
+        ],
+        "skills": [
+            "entropy_wave",
+            "prism_beam"
+        ],
+        "description": "A sphere of anti-light that distorts the air around it."
+    },
+    "monster_119": {
+        "id": 119,
+        "name": "Entropy Drake",
+        "level": 44,
+        "tier": "Elite",
+        "hp": 8500,
+        "atk": 200,
+        "def": 80,
+        "xp": 15000,
+        "drops": [
+            [
+                "null_stone",
+                40
+            ],
+            [
+                "magic_stone_flawless",
+                30
+            ]
+        ],
+        "skills": [
+            "void_slash",
+            "entropy_wave"
+        ],
+        "description": "A twisted dragon whose scales seem to devour reality itself."
+    },
+    "monster_120": {
+        "id": 120,
+        "name": "Omega, The Void Heart",
+        "level": 45,
+        "tier": "Boss",
+        "hp": 25000,
+        "atk": 250,
+        "def": 150,
+        "xp": 50000,
+        "drops": [
+            [
+                "void_heart",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                100
+            ],
+            [
+                "null_stone",
+                80
+            ]
+        ],
+        "skills": [
+            "annihilate",
+            "entropy_wave",
+            "regenerate"
+        ],
+        "description": "The center of the void. To look upon it is to know the end."
+    },
+    "monster_121": {
+        "id": 121,
+        "name": "Coral Golem",
+        "level": 18,
+        "tier": "Normal",
+        "hp": 550,
+        "atk": 45,
+        "def": 30,
+        "xp": 450,
+        "drops": [
+            [
+                "coral_fragment",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                20
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crushing_depths"
+        ],
+        "description": "A walking reef of sharp coral and sea-stone, animated by ancient magic."
+    },
+    "monster_122": {
+        "id": 122,
+        "name": "Abyssal Eel",
+        "level": 19,
+        "tier": "Normal",
+        "hp": 380,
+        "atk": 55,
+        "def": 10,
+        "xp": 420,
+        "drops": [
+            [
+                "bioluminescent_scale",
+                40
+            ],
+            [
+                "magic_stone_small",
+                50
+            ]
+        ],
+        "skills": [
+            "water_jet",
+            "rapid_strike"
+        ],
+        "description": "A serpent of the deep that moves with terrifying speed."
+    },
+    "monster_123": {
+        "id": 123,
+        "name": "Tide Siren",
+        "level": 19,
+        "tier": "Normal",
+        "hp": 350,
+        "atk": 60,
+        "def": 12,
+        "xp": 440,
+        "drops": [
+            [
+                "siren_voice_box",
+                25
+            ],
+            [
+                "pearl",
+                10
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ]
+        ],
+        "skills": [
+            "bubble_beam",
+            "mend"
+        ],
+        "description": "Its song is beautiful, but its intent is deadly."
+    },
+    "monster_124": {
+        "id": 124,
+        "name": "Deep Crawler",
+        "level": 21,
+        "tier": "Elite",
+        "hp": 1100,
+        "atk": 75,
+        "def": 45,
+        "xp": 1800,
+        "drops": [
+            [
+                "coral_fragment",
+                50
+            ],
+            [
+                "bioluminescent_scale",
+                40
+            ]
+        ],
+        "skills": [
+            "crushing_depths",
+            "tidal_wave"
+        ],
+        "description": "A massive crustacean with armor thick enough to turn blades."
+    },
+    "monster_125": {
+        "id": 125,
+        "name": "Leviathan",
+        "level": 23,
+        "tier": "Boss",
+        "hp": 4000,
+        "atk": 100,
+        "def": 55,
+        "xp": 7000,
+        "drops": [
+            [
+                "abyssal_pearl",
+                100
+            ],
+            [
+                "magic_stone_large",
+                50
+            ],
+            [
+                "siren_voice_box",
+                50
+            ]
+        ],
+        "skills": [
+            "tidal_wave",
+            "water_jet",
+            "regenerate"
+        ],
+        "description": "The king of the sunken depths. It swallows light and hope alike."
+    },
+    "monster_126": {
+        "id": 126,
+        "name": "Cogwork Spider",
+        "level": 22,
+        "tier": "Normal",
+        "hp": 480,
+        "atk": 55,
+        "def": 30,
+        "xp": 500,
+        "drops": [
+            [
+                "brass_gear",
+                60
+            ],
+            [
+                "spring_coil",
+                40
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "steam_vent"
+        ],
+        "description": "A mechanical arachnid that skitters across the metal floor with unnerving precision."
+    },
+    "monster_127": {
+        "id": 127,
+        "name": "Brass Golem",
+        "level": 23,
+        "tier": "Normal",
+        "hp": 750,
+        "atk": 65,
+        "def": 45,
+        "xp": 550,
+        "drops": [
+            [
+                "brass_gear",
+                60
+            ],
+            [
+                "copper_wire",
+                40
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crushing_slam"
+        ],
+        "description": "A heavy construct of polished brass, powered by a glowing steam core."
+    },
+    "monster_128": {
+        "id": 128,
+        "name": "Steam Wisp",
+        "level": 22,
+        "tier": "Normal",
+        "hp": 450,
+        "atk": 70,
+        "def": 10,
+        "xp": 520,
+        "drops": [
+            [
+                "magic_stone_medium",
+                70
+            ],
+            [
+                "copper_wire",
+                30
+            ]
+        ],
+        "skills": [
+            "steam_vent",
+            "ember"
+        ],
+        "description": "A sentient cloud of superheated steam and mana."
+    },
+    "monster_129": {
+        "id": 129,
+        "name": "Automaton Knight",
+        "level": 24,
+        "tier": "Elite",
+        "hp": 1300,
+        "atk": 85,
+        "def": 55,
+        "xp": 1800,
+        "drops": [
+            [
+                "steam_core",
+                40
+            ],
+            [
+                "brass_gear",
+                50
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "rapid_strike"
+        ],
+        "description": "An ancient war machine programmed to defend the halls for eternity."
+    },
+    "monster_130": {
+        "id": 130,
+        "name": "The Gear Warden",
+        "level": 26,
+        "tier": "Boss",
+        "hp": 5500,
+        "atk": 120,
+        "def": 70,
+        "xp": 8500,
+        "drops": [
+            [
+                "clockwork_heart",
+                100
+            ],
+            [
+                "steam_core",
+                80
+            ],
+            [
+                "mithril_ore",
+                50
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "steam_vent",
+            "regenerate"
+        ],
+        "description": "The massive central processing unit of the Clockwork Halls, armed and dangerous."
+    }
+}

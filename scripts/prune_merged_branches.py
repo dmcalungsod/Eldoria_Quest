@@ -1,7 +1,8 @@
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+
 
 def run_command(command_list):
     try:

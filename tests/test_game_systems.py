@@ -211,20 +211,25 @@ class TestGameSystems(unittest.TestCase):
 
             manager.end_adventure(discord_id)
 
-            # Check preservation
-            args, kwargs = self.mock_db.update_player_fields.call_args
-            self.assertEqual(kwargs["current_mp"], 10, "MP should be preserved")
+            # Check preservation using update_player_mixed
+            # Args: (discord_id,) Kwargs: {set_fields: {...}, inc_fields: {...}}
+            args, kwargs = self.mock_db.update_player_mixed.call_args
+            set_fields = kwargs.get("set_fields")
+            self.assertIsNotNone(set_fields)
+            self.assertEqual(set_fields["current_mp"], 10, "MP should be preserved")
 
             # NOW TEST LEVEL UP CASE
             # Reset Mock
-            self.mock_db.update_player_fields.reset_mock()
+            self.mock_db.update_player_mixed.reset_mock()
             session.loot = {"exp": 200}  # Level up
             player_row["experience"] = 90
 
             manager.end_adventure(discord_id)
 
-            args, kwargs = self.mock_db.update_player_fields.call_args
-            self.assertEqual(kwargs["current_mp"], stats.max_mp, "MP should reset on level up")
+            args, kwargs = self.mock_db.update_player_mixed.call_args
+            set_fields = kwargs.get("set_fields")
+            self.assertIsNotNone(set_fields)
+            self.assertEqual(set_fields["current_mp"], stats.max_mp, "MP should reset on level up")
 
 
 def run_all_tests():

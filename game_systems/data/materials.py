@@ -9,33 +9,46 @@ MATERIALS = {
     # --- Magic Stones (Core Income) ---
     "magic_stone_fragment": {
         "name": "Magic Stone Fragment",
-        "description": "A tiny, impure shard of mana.",
+        "description": "A tiny, impure shard of crystallized mana.",
         "rarity": "Common",
-        "value": 5,  # Up from 2
+        "value": 8,  # Up from 5
     },
     "magic_stone_small": {
         "name": "Magic Stone (Small)",
-        "description": "A small, cloudy stone from a low-level monster.",
+        "description": "A small, cloudy stone of mana harvested from a low-level monster.",
         "rarity": "Common",
         "value": 15,  # Up from 8
     },
     "magic_stone_medium": {
         "name": "Magic Stone (Medium)",
-        "description": "A decent-sized stone with a faint pulse.",
+        "description": "A decent-sized stone pulsating with the energy of the Veil.",
         "rarity": "Uncommon",
         "value": 50,  # Up from 30
     },
     "magic_stone_large": {
         "name": "Magic Stone (Large)",
-        "description": "A heavy, fist-sized stone that hums with power.",
+        "description": "A heavy, fist-sized stone that hums with the raw power of the Sundering.",
         "rarity": "Rare",
         "value": 180,  # Up from 120
     },
     "magic_stone_flawless": {
         "name": "Magic Stone (Flawless)",
-        "description": "A brilliant, pure crystal of condensed mana.",
+        "description": "A brilliant, pure crystal of condensed mana. The lifeblood of Astraeon.",
         "rarity": "Epic",
         "value": 750,  # Up from 500
+    },
+    # --- Event Materials ---
+    "ectoplasm": {
+        "name": "Ectoplasm",
+        "description": "A glowing, viscous substance left by spectral entities.",
+        "rarity": "Uncommon",
+        "value": 50,
+    },
+    "blood_shard": {
+        "name": "Blood Shard",
+        "description": "A jagged crystal pulsing with a crimson light. It feels warm to the touch.",
+        "rarity": "Rare",
+        "value": 200,
     },
     # --- Forest Zone Drops ---
     "goblin_ear": {
@@ -111,6 +124,37 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 25,
     },
+    # --- The Sunken Grotto Materials (Rank C) ---
+    "coral_fragment": {
+        "name": "Coral Fragment",
+        "description": "A piece of colorful, hardened coral.",
+        "rarity": "Common",
+        "value": 12,
+    },
+    "bioluminescent_scale": {
+        "name": "Bioluminescent Scale",
+        "description": "A fish scale that glows faintly in the dark.",
+        "rarity": "Uncommon",
+        "value": 30,
+    },
+    "pearl": {
+        "name": "Pearl",
+        "description": "A lustrous sphere formed inside a giant clam.",
+        "rarity": "Rare",
+        "value": 120,
+    },
+    "siren_voice_box": {
+        "name": "Siren Voice Box",
+        "description": "An organ that can mimic any sound.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "abyssal_pearl": {
+        "name": "Abyssal Pearl",
+        "description": "A pearl as black as the depths, radiating cold energy.",
+        "rarity": "Epic",
+        "value": 800,
+    },
     # --- RARE CRAFTING MATERIALS ---
     "shadow_essence": {
         "name": "Shadow Essence",
@@ -145,8 +189,120 @@ MATERIALS = {
     },
     "celestial_dust": {
         "name": "Celestial Dust",
-        "description": "Glimmering dust that falls from the stars.",
+        "description": "Glimmering dust that falls from the cracks in the sky, cold as the Void.",
         "rarity": "Epic",
         "value": 1000,
+    },
+    # --- Clockwork Halls Materials (Rank B) ---
+    "brass_gear": {
+        "name": "Brass Gear",
+        "description": "A precisely machined gear that still spins on its own.",
+        "rarity": "Common",
+        "value": 15,
+    },
+    "copper_wire": {
+        "name": "Copper Wire",
+        "description": "A coil of conductive wire.",
+        "rarity": "Common",
+        "value": 18,
+    },
+    "spring_coil": {
+        "name": "Spring Coil",
+        "description": "A tense spring ready to snap.",
+        "rarity": "Common",
+        "value": 12,
+    },
+    "steam_core": {
+        "name": "Steam Core",
+        "description": "A canister of pressurized steam and mana.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "clockwork_heart": {
+        "name": "Clockwork Heart",
+        "description": "The complex engine of a master automaton.",
+        "rarity": "Epic",
+        "value": 850,
+    },
+    # --- Molten Caldera Materials ---
+    "obsidian_shard": {
+        "name": "Obsidian Shard",
+        "description": "A razor-sharp shard of volcanic glass.",
+        "rarity": "Common",
+        "value": 20,
+    },
+    "fire_essence": {
+        "name": "Fire Essence",
+        "description": "A flickering mote of elemental fire.",
+        "rarity": "Uncommon",
+        "value": 55,
+    },
+    "magma_core": {
+        "name": "Magma Core",
+        "description": "The cooling heart of a magma construct.",
+        "rarity": "Rare",
+        "value": 200,
+    },
+    "dragon_scale": {
+        "name": "Dragon Scale",
+        "description": "A scale from a Lava Drake, hot to the touch.",
+        "rarity": "Epic",
+        "value": 1100,
+    },
+    # --- Frostfall Expanse Materials ---
+    "frost_crystal": {
+        "name": "Frost Crystal",
+        "description": "A shard of ice that never melts.",
+        "rarity": "Uncommon",
+        "value": 45,
+    },
+    "winter_wolf_pelt": {
+        "name": "Winter Wolf Pelt",
+        "description": "Thick white fur, warm enough to survive the tundra.",
+        "rarity": "Common",
+        "value": 25,
+    },
+    "ice_core": {
+        "name": "Ice Core",
+        "description": "The frozen heart of an ice construct.",
+        "rarity": "Rare",
+        "value": 180,
+    },
+    "frozen_scale": {
+        "name": "Frozen Scale",
+        "description": "A scale radiating intense cold.",
+        "rarity": "Epic",
+        "value": 950,
+    },
+    # --- The Void Sanctum Materials (Rank S) ---
+    "void_dust": {
+        "name": "Void Dust",
+        "description": "A pile of fine, dark dust that drinks the light around it.",
+        "rarity": "Common",
+        "value": 30,
+    },
+    "abyssal_shackle": {
+        "name": "Abyssal Shackle",
+        "description": "A broken chain link made of an unknown, cold metal.",
+        "rarity": "Common",
+        "value": 35,
+    },
+    "entropy_crystal": {
+        "name": "Entropy Crystal",
+        "description": "A crystal that constantly shifts its shape.",
+        "rarity": "Uncommon",
+        "value": 60,
+    },
+    "null_stone": {
+        "name": "Null Stone",
+        "description": "A heavy stone that feels like it weighs nothing. A paradox of the Void.",
+        "rarity": "Rare",
+        "value": 250,
+    },
+    "void_heart": {
+        "name": "Void Heart",
+        "description": "A pulsating core of pure nothingness. It hungers for the light.",
+        "rarity": "Epic",
+        "value": 1500,
     },
 }

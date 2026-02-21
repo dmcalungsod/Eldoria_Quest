@@ -21,15 +21,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import existing test suites
 import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
+import test_adventure_session_concurrency  # New session concurrency test
 import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 import test_exploration_view_ux  # New UX test
+import test_faction_system  # New Faction System tests
 import test_game_systems
+import test_onboarding_ux  # New Onboarding UX test
 import test_quest_security  # New security test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_security  # General security test
 import test_tournament_system  # New Tournament System tests
+import test_dos_prevention  # New DoS prevention tests
+import test_stack_limits  # New Stack Limits tests
 
 
 def check_mongodb_connection():
@@ -60,6 +65,18 @@ def run_quest_security_tests():
     return result.wasSuccessful()
 
 
+def run_faction_tests():
+    """Runs the faction system tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING FACTION SYSTEM TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_faction_system)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
 def run_general_security_tests():
     """Runs the general security tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -67,6 +84,8 @@ def run_general_security_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_security)
+    # Add DoS prevention tests to the general security suite
+    suite.addTests(loader.loadTestsFromModule(test_dos_prevention))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -108,6 +127,7 @@ def run_ux_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_exploration_view_ux)
     suite.addTests(loader.loadTestsFromModule(test_adventure_embeds))
+    suite.addTests(loader.loadTestsFromModule(test_onboarding_ux))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -120,6 +140,7 @@ def run_race_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_adventure_race)
+    suite.addTests(loader.loadTestsFromModule(test_adventure_session_concurrency))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -144,6 +165,18 @@ def run_tournament_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_tournament_system)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
+def run_stack_limit_tests():
+    """Runs the stack limit tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING STACK LIMIT TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_stack_limits)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -204,7 +237,15 @@ def main():
     tournament_passed = run_tournament_tests()
     all_passed = all_passed and tournament_passed
 
-    # 8. Game Systems Tests (Mock-based, always run)
+    # 7.5. Stack Limit Tests (Mock-based, always run)
+    stack_passed = run_stack_limit_tests()
+    all_passed = all_passed and stack_passed
+
+    # 8. Faction Tests (Mock-based, always run)
+    faction_passed = run_faction_tests()
+    all_passed = all_passed and faction_passed
+
+    # 9. Game Systems Tests (Mock-based, always run)
     # 7. Game Systems Tests (Mock-based, always run)
     print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
@@ -236,6 +277,8 @@ def main():
     print(f"Race Condition Tests: {'✓ PASSED' if race_passed else '✗ FAILED'}")
     print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
     print(f"Tournament System Tests: {'✓ PASSED' if tournament_passed else '✗ FAILED'}")
+    print(f"Stack Limit Tests: {'✓ PASSED' if stack_passed else '✗ FAILED'}")
+    print(f"Faction System Tests: {'✓ PASSED' if faction_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
     if db_available:

@@ -61,8 +61,33 @@ class MockButton(RealItem):
         return False
 
 
+class MockSelect(RealItem):
+    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+        self.placeholder = placeholder
+        self.min_values = min_values
+        self.max_values = max_values
+        self.options = options
+        self.row = row
+        self.custom_id = custom_id
+        self.callback = None
+        self.disabled = False
+        self.values = []
+
+
+class MockSelectOption:
+    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+        self.label = label
+        self.value = value
+        self.description = description
+        self.emoji = emoji
+        self.default = default
+
+
+mock_discord.SelectOption = MockSelectOption
+
 sys.modules["discord.ui"].View = MockView
 sys.modules["discord.ui"].Button = MockButton
+sys.modules["discord.ui"].Select = MockSelect
 
 # 2. Mock Dependencies
 sys.modules["pymongo"] = MagicMock()
@@ -157,10 +182,51 @@ class TestExplorationViewUX(unittest.TestCase):
         self.assertEqual(btn.label, "Attack")
         self.assertEqual(btn.style, "danger")
 
-        # Check for Special Ability Button (should be last)
-        special_btn = view.children[-1]
+        # Check for Special Ability Button
+        # Items: Attack, Defend, Flee, Pack, Special, Stance Select
+        special_btn = view.children[4]
         self.assertEqual(special_btn.style, "primary")
         self.assertTrue(hasattr(special_btn, "callback"))
+
+        # Check for Stance Select (should be last now)
+        stance_select = view.children[-1]
+        self.assertEqual(stance_select.custom_id, "stance_select")
+
+    def test_battle_state_with_skills(self):
+        """Battle state: Active monster + Skills = Select Menu."""
+        vitals = {"current_hp": 100, "current_mp": 50}
+        monster = {"name": "Goblin", "hp": 50}
+        skills = [
+            {"name": "Fireball", "key_id": "fireball", "type": "Active", "mp_cost": 10},
+            {"name": "Heal", "key_id": "heal", "type": "Active", "mp_cost": 5},
+        ]
+
+        view = ExplorationView(
+            self.mock_db,
+            self.mock_manager,
+            "loc_1",
+            [],
+            self.mock_user,
+            self.stats,
+            vitals=vitals,
+            active_monster=monster,
+            class_id=1,
+            skills=skills,
+        )
+
+        # Check for Skill Select Menu (should be last)
+        # Items: Attack, Defend, Flee, Pack, Special, Stance Select, Skill Select
+        select_menu = view.children[-1]
+        self.assertEqual(select_menu.custom_id, "skill_select")
+        self.assertEqual(len(select_menu.options), 2)
+        self.assertEqual(select_menu.options[0].label, "Fireball")
+        self.assertEqual(select_menu.options[0].emoji, "✨")
+        self.assertEqual(select_menu.options[1].label, "Heal")
+        self.assertEqual(select_menu.options[1].emoji, "💚")
+
+        # Check for Stance Select (should be second to last)
+        stance_select = view.children[-2]
+        self.assertEqual(stance_select.custom_id, "stance_select")
 
 
 if __name__ == "__main__":

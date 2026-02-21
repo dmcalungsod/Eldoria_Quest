@@ -10,10 +10,14 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
 
 
 class TestDatabaseManager(unittest.TestCase):
@@ -127,6 +131,34 @@ class TestDatabaseManager(unittest.TestCase):
         new_balance = self.db.deduct_aurum(12345, 1000)
 
         self.assertIsNone(new_balance)
+
+    def test_update_player_mixed(self):
+        # Test mixed update
+        self.db.update_player_mixed(
+            12345,
+            set_fields={"level": 2},
+            inc_fields={"exp": 100},
+        )
+
+        # Verify update_one call structure
+        self.mock_db.players.update_one.assert_called_with(
+            {"discord_id": 12345},
+            {"$set": {"level": 2}, "$inc": {"exp": 100}},
+        )
+
+        # Test set only
+        self.db.update_player_mixed(12345, set_fields={"level": 3})
+        self.mock_db.players.update_one.assert_called_with(
+            {"discord_id": 12345},
+            {"$set": {"level": 3}},
+        )
+
+        # Test inc only
+        self.db.update_player_mixed(12345, inc_fields={"exp": 50})
+        self.mock_db.players.update_one.assert_called_with(
+            {"discord_id": 12345},
+            {"$inc": {"exp": 50}},
+        )
 
 
 def run_all_tests():

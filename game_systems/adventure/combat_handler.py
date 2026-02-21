@@ -5,7 +5,6 @@ Manages combat initialization and turn resolution.
 Hardened: Syncs session XP to prevent duplicate level-up messages.
 """
 
-import datetime
 import logging
 import random
 from typing import Any
@@ -14,8 +13,10 @@ from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.combat_phrases import CombatPhrases
 from game_systems.data.monsters import MONSTERS
+from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.combat")
 
@@ -33,9 +34,7 @@ class CombatHandler:
         """
         try:
             # 1. Day/Night Cycle Check
-            now = datetime.datetime.now()
-            hour = now.hour
-            is_night = hour < 6 or hour >= 20
+            is_night = WorldTime.is_night()
 
             # Select Pool
             if is_night and "night_monsters" in location:
@@ -48,7 +47,9 @@ class CombatHandler:
             if conditionals:
                 # OPTIMIZATION: Use passed level if available, otherwise fetch from DB
                 if player_level is None:
-                    player_level = self.db.get_player_field(self.discord_id, "level") or 1
+                    player_level = (
+                        self.db.get_player_field(self.discord_id, "level") or 1
+                    )
 
                 for cond in conditionals:
                     if player_level >= cond.get("min_level", 1):
@@ -81,15 +82,80 @@ class CombatHandler:
                 "skills": list(template.get("skills", [])),
             }
 
+            # --- WORLD EVENT HOOK ---
+            try:
+                event_system = WorldEventSystem(self.db)
+                event = event_system.get_current_event()
+
+                if event:
+                    modifiers = event.get("modifiers", {})
+
+                    # 1. Apply Stat Buffs
+                    buff_mult = modifiers.get("monster_buff", 1.0)
+                    if buff_mult > 1.0:
+                        active_monster["HP"] = int(active_monster["HP"] * buff_mult)
+                        active_monster["max_hp"] = int(
+                            active_monster["max_hp"] * buff_mult
+                        )
+                        active_monster["ATK"] = int(active_monster["ATK"] * buff_mult)
+
+                    # 2. Event Specific Flavor
+                    if event["type"] == WorldEventSystem.BLOOD_MOON:
+                        # 30% chance for Blood-Crazed prefix
+                        if random.random() < 0.30:
+                            active_monster["name"] = (
+                                f"Blood-Crazed {active_monster['name']}"
+                            )
+                            active_monster["xp"] = int(active_monster["xp"] * 1.5)
+                            # Add Blood Shard drop (30% chance)
+                            # drops is a list of tuples (key, chance)
+                            # We create a new list to avoid modifying the template's list in memory cache if it was shared
+                            # (Though strictly speaking, template["drops"] is usually a tuple or list, and we copied it above?)
+                            # Wait, above: "drops": template.get("drops", [])
+                            # If template["drops"] is a list, it might be a reference.
+                            # But looking at monste data, it's usually defined as a tuple of tuples or list of tuples.
+                            # Safe copy:
+                            active_monster["drops"] = list(active_monster["drops"])
+                            active_monster["drops"].append(("blood_shard", 30))
+                            active_monster["is_blood_crazed"] = True
+
+            except Exception as e:
+                logger.error(f"World event check failed: {e}")
+            # ------------------------
+
+            # --- EVENT: SPECTRAL TIDE ---
+            try:
+                active_tourney = self.db.get_active_tournament()
+                if active_tourney and active_tourney["type"] == "spectral_tide":
+                    # 20% Chance for Spectral variant
+                    if random.random() < 0.20:
+                        active_monster["name"] = f"Spectral {active_monster['name']}"
+                        active_monster["HP"] = int(active_monster["HP"] * 1.2)
+                        active_monster["max_hp"] = int(active_monster["max_hp"] * 1.2)
+                        active_monster["ATK"] = int(active_monster["ATK"] * 1.2)
+                        # Guaranteed Ectoplasm drop
+                        active_monster["drops"].append(("ectoplasm", 100))
+                        active_monster["is_spectral"] = True
+            except Exception as e:
+                logger.error(f"Event check failed: {e}")
+            # ----------------------------
+
             phrase = CombatPhrases.opening(active_monster)
 
-            if is_night:
-                phrase = f"🌑 **Nightfall** - {phrase}"
+            # Prepend Spectral Flavor
+            if active_monster.get("is_spectral"):
+                phrase = f"👻 **The air turns grave-cold!** A spectral entity manifests!\n{phrase}"
+
+            # Prepend Time Phase Flavor
+            time_flavor = WorldTime.get_phase_flavor()
+            phrase = f"{time_flavor}\n{phrase}"
 
             return active_monster, phrase
 
         except Exception as e:
-            logger.error(f"Combat init failed for {self.discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Combat init failed for {self.discord_id}: {e}", exc_info=True
+            )
             return None, "An error occurred while tracking the enemy."
 
     def resolve_turn(
@@ -100,6 +166,7 @@ class CombatHandler:
         context: dict[str, Any] | None = None,
         persist_vitals: bool = True,
         action: str = "auto",
+        stance: str = "balanced",
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
@@ -107,6 +174,7 @@ class CombatHandler:
             accumulated_exp: XP earned in this session but not yet saved to DB.
             context: Optional pre-fetched data to avoid DB calls.
             persist_vitals: Whether to write HP/MP to DB immediately.
+            stance: Player's current combat stance (aggressive, balanced, defensive).
         """
         try:
             # 1. Load Data
@@ -142,7 +210,9 @@ class CombatHandler:
                 boosts = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
 
             # 3. Setup Wrappers & Fast-Forward State
-            player_wrapper = LevelUpSystem(player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"])
+            player_wrapper = LevelUpSystem(
+                player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"]
+            )
 
             # Apply session XP so leveling logic is up to date
             if accumulated_exp > 0:
@@ -160,6 +230,7 @@ class CombatHandler:
                 active_boosts=boosts,
                 stats_dict=stats_dict,
                 action=action,
+                player_stance=stance,
             )
 
             result = engine.run_combat_turn()
@@ -167,7 +238,9 @@ class CombatHandler:
             # 5. Persist State (Vitals & Monster HP)
             # We update vitals immediately so if bot crashes, HP loss is saved
             if persist_vitals:
-                self.db.set_player_vitals(self.discord_id, result["hp_current"], result["mp_current"])
+                self.db.set_player_vitals(
+                    self.discord_id, result["hp_current"], result["mp_current"]
+                )
             active_monster["HP"] = result["monster_hp"]
 
             # 6. Update Report

@@ -59,7 +59,7 @@ class CombatEngine:
         },
         4: {
             "name": "Smite",
-            "damage_mult": 1.2,
+            "damage_mult": 0.8,
             "emoji": "✨",
             "type": "mag",
             "heal": 20,
@@ -85,6 +85,7 @@ class CombatEngine:
         active_boosts: dict = None,
         stats_dict: dict = None,
         action: str = "auto",
+        player_stance: str = "balanced",
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -95,6 +96,7 @@ class CombatEngine:
         active_boosts → Dict of active global boosts
         stats_dict → Cached dictionary of player stats to avoid property overhead
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
+        player_stance -> "aggressive", "balanced", or "defensive"
         """
         self.player = player
         self.monster = monster
@@ -118,6 +120,18 @@ class CombatEngine:
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
         self.action = action
+
+        # Stance Logic
+        self.player_stance = player_stance
+        self.dmg_dealt_mult = 1.0
+        self.dmg_taken_mult = 1.0
+
+        if self.player_stance == "aggressive":
+            self.dmg_dealt_mult = 1.2
+            self.dmg_taken_mult = 1.2
+        elif self.player_stance == "defensive":
+            self.dmg_dealt_mult = 0.8
+            self.dmg_taken_mult = 0.8
 
     def run_combat_turn(self):
         """
@@ -164,66 +178,33 @@ class CombatEngine:
             elif self.action == "special_ability":
                 self._resolve_special_ability(log, turn_report)
 
+            elif self.action.startswith("skill:"):
+                # Explicit Skill Usage
+                skill_key = self.action.split(":", 1)[1]
+                use_skill = next((s for s in self.player_skills if s.get("key_id") == skill_key), None)
+
+                if not use_skill:
+                    log.append(f"⚠️ **Skill Failed:** You try to use a skill you don't know ({skill_key}).")
+                    self._perform_basic_attack(log, turn_report)
+                else:
+                    mp_cost = use_skill.get("mp_cost", 0)
+                    if self.player_mp < mp_cost:
+                        log.append(
+                            f"⚠️ **Not enough MP:** You need {mp_cost} MP to use {use_skill.get('name', 'this skill')}."
+                        )
+                        self._perform_basic_attack(log, turn_report)
+                    else:
+                        self._execute_player_skill(use_skill, log, turn_report)
+
             else:
                 # Normal Attack / Auto Logic
                 skill_decision = self._decide_player_skill()
                 use_skill = skill_decision["skill"]
 
                 if use_skill:
-                    skill = use_skill
-                    mp_cost = skill.get("mp_cost", 0)
-                    skill_level = skill.get("skill_level", 1)
-                    skill_key = skill.get("key_id", "")
-
-                    self.player_mp = max(0, self.player_mp - mp_cost)
-                    turn_report["skills_used"] = 1
-                    turn_report["skill_key_used"] = skill_key
-
-                    if skill.get("heal_power", 0) > 0:
-                        # --- Healing Skill ---
-                        heal, new_hp, event_type = DamageFormula.player_heal(
-                            self.stats_dict, self.player_hp, skill, skill_level
-                        )
-                        self.player_hp = new_hp
-                        log.append(CombatPhrases.player_heal(self.player, skill, heal))
-
-                    elif skill.get("buff_data"):
-                        # --- Buff/Utility Skill ---
-                        log.append(CombatPhrases.player_buff(self.player, skill))
-
-                    else:
-                        # --- Offensive Skill ---
-                        dmg, crit, event_type = DamageFormula.player_skill(
-                            self.stats_dict, self.monster, skill, skill_level
-                        )
-
-                        if event_type == "crit":
-                            turn_report["player_crit"] = 1
-
-                        # Tag damage type for stat growth
-                        self._tag_damage_type(skill_key, turn_report)
-
-                        self.monster_hp -= dmg
-                        log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
+                    self._execute_player_skill(use_skill, log, turn_report)
                 else:
-                    # --- Basic Attack ---
-                    dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
-
-                    if event_type == "crit":
-                        turn_report["player_crit"] = 1
-
-                    # Tag damage type based on class
-                    if self.player_class_id in [1, 4]:  # Warrior, Cleric -> Str
-                        turn_report["str_hits"] = 1
-                    elif self.player_class_id in [3, 5]:  # Rogue, Ranger -> Dex
-                        turn_report["dex_hits"] = 1
-                    elif self.player_class_id == 2:  # Mage -> Mag
-                        turn_report["mag_hits"] = 1
-                    else:
-                        turn_report["str_hits"] = 1
-
-                    self.monster_hp -= dmg
-                    log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+                    self._perform_basic_attack(log, turn_report)
 
             # Check Monster Death
             if self.monster_hp <= 0:
@@ -235,6 +216,10 @@ class CombatEngine:
 
             if action["type"] == "attack":
                 dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.stats_dict)
+
+                # Apply Stance Multiplier
+                if self.dmg_taken_mult != 1.0:
+                    dmg = int(dmg * self.dmg_taken_mult)
 
                 if event_type == "dodge":
                     turn_report["player_dodge"] = 1
@@ -267,6 +252,10 @@ class CombatEngine:
                     # --- Monster Offensive Skill ---
                     dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
 
+                    # Apply Stance Multiplier
+                    if self.dmg_taken_mult != 1.0:
+                        dmg = int(dmg * self.dmg_taken_mult)
+
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
                     else:
@@ -286,6 +275,44 @@ class CombatEngine:
                 self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
                 MonsterAI.apply_buff(self.monster, buff)
                 log.append(CombatPhrases.monster_buff(self.monster, buff))
+
+            elif action["type"] == "telegraph":
+                skill = action["skill"]
+                self.monster["charged_skill"] = skill
+                log.append(
+                    f"⚠️ **{self.monster.get('name', 'Enemy')}** is gathering dark energy for **{skill.get('name', 'Unknown Skill')}**!"
+                )
+
+            elif action["type"] == "execute_charge":
+                skill = action["skill"]
+                # Remove charge state
+                self.monster.pop("charged_skill", None)
+
+                # Execute the charged skill (Always Offensive)
+                mp_cost = skill.get("mp_cost", 0)
+                self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
+
+                dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+
+                # Apply Stance Multiplier
+                if self.dmg_taken_mult != 1.0:
+                    dmg = int(dmg * self.dmg_taken_mult)
+
+                if event_type == "dodge":
+                    turn_report["player_dodge"] = 1
+                else:
+                    emoji = skill.get("emoji", "🔥")
+                    attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
+
+                    if player_defending:
+                        dmg = int(dmg * 0.5)
+                        log.append(f"{attack_msg} You brace against it! (`{dmg}` dmg)")
+
+                    turn_report["damage_taken"] = dmg
+                    self.player_hp -= dmg
+
+                    if not player_defending:
+                        log.append(f"{attack_msg} (`{dmg}` dmg)")
 
             # Check Player Death
             if self.player_hp <= 0:
@@ -350,6 +377,10 @@ class CombatEngine:
         # Apply Multiplier
         dmg = int(base_dmg * spec["damage_mult"])
 
+        # Apply Stance Multiplier
+        if self.dmg_dealt_mult != 1.0:
+            dmg = int(dmg * self.dmg_dealt_mult)
+
         # Apply Special Effects
         if spec.get("crit_bonus"):
             if random.randint(1, 100) <= spec["crit_bonus"]:
@@ -373,6 +404,66 @@ class CombatEngine:
             turn_report["dex_hits"] = 1
         elif spec["type"] == "mag":
             turn_report["mag_hits"] = 1
+
+        self.monster_hp -= dmg
+        log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+
+    def _execute_player_skill(self, skill, log, turn_report):
+        mp_cost = skill.get("mp_cost", 0)
+        skill_level = skill.get("skill_level", 1)
+        skill_key = skill.get("key_id", "")
+
+        self.player_mp = max(0, self.player_mp - mp_cost)
+        turn_report["skills_used"] = 1
+        turn_report["skill_key_used"] = skill_key
+
+        if skill.get("heal_power", 0) > 0:
+            # --- Healing Skill ---
+            heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
+            self.player_hp = new_hp
+            log.append(CombatPhrases.player_heal(self.player, skill, heal))
+
+        elif skill.get("buff_data"):
+            # --- Buff/Utility Skill ---
+            log.append(CombatPhrases.player_buff(self.player, skill))
+
+        else:
+            # --- Offensive Skill ---
+            dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, self.monster, skill, skill_level)
+
+            # Apply Stance Multiplier
+            if self.dmg_dealt_mult != 1.0:
+                dmg = int(dmg * self.dmg_dealt_mult)
+
+            if event_type == "crit":
+                turn_report["player_crit"] = 1
+
+            # Tag damage type for stat growth
+            self._tag_damage_type(skill_key, turn_report)
+
+            self.monster_hp -= dmg
+            log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
+
+    def _perform_basic_attack(self, log, turn_report):
+        # --- Basic Attack ---
+        dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+
+        # Apply Stance Multiplier
+        if self.dmg_dealt_mult != 1.0:
+            dmg = int(dmg * self.dmg_dealt_mult)
+
+        if event_type == "crit":
+            turn_report["player_crit"] = 1
+
+        # Tag damage type based on class
+        if self.player_class_id in [1, 4]:  # Warrior, Cleric -> Str
+            turn_report["str_hits"] = 1
+        elif self.player_class_id in [3, 5]:  # Rogue, Ranger -> Dex
+            turn_report["dex_hits"] = 1
+        elif self.player_class_id == 2:  # Mage -> Mag
+            turn_report["mag_hits"] = 1
+        else:
+            turn_report["str_hits"] = 1
 
         self.monster_hp -= dmg
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))

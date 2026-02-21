@@ -19,6 +19,28 @@
         },
         "description": "A thick, gnarled branch picked up from the forest floor. It hums faintly."
     },
+    "gen_wand_001": {
+        "name": "Apprentice Wand",
+        "slot": "wand",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "MAG": 2,
+            "MP": 5
+        },
+        "description": "A simple wooden wand carved with basic runes."
+    },
+    "gen_wand_005": {
+        "name": "Crystal Focus",
+        "slot": "wand",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "MAG": 15,
+            "MP": 20
+        },
+        "description": "A polished quartz crystal set in a silver handle."
+    },
     "gen_armor_001": {
         "name": "Tattered Tunic",
         "slot": "medium_armor",
@@ -142,6 +164,7 @@
         "slot": "sword",
         "rarity": "Epic",
         "level_req": 20,
+        "rank_restriction": "B",
         "stats_bonus": {
             "STR": 45,
             "DEX": 15
@@ -164,6 +187,7 @@
         "slot": "staff",
         "rarity": "Epic",
         "level_req": 20,
+        "rank_restriction": "B",
         "stats_bonus": {
             "MAG": 50,
             "MP": 75
@@ -186,6 +210,7 @@
         "slot": "sword",
         "rarity": "Legendary",
         "level_req": 35,
+        "rank_restriction": "A",
         "stats_bonus": {
             "STR": 110,
             "DEX": 30
@@ -197,6 +222,7 @@
         "slot": "staff",
         "rarity": "Legendary",
         "level_req": 35,
+        "rank_restriction": "A",
         "stats_bonus": {
             "MAG": 120,
             "MP": 150
@@ -208,6 +234,7 @@
         "slot": "heavy_armor",
         "rarity": "Legendary",
         "level_req": 35,
+        "rank_restriction": "A",
         "stats_bonus": {
             "END": 100,
             "STR": 40
@@ -230,6 +257,7 @@
         "slot": "sword",
         "rarity": "Mythical",
         "level_req": 50,
+        "rank_restriction": "S",
         "stats_bonus": {
             "STR": 200,
             "DEX": 75
@@ -241,6 +269,7 @@
         "slot": "staff",
         "rarity": "Mythical",
         "level_req": 50,
+        "rank_restriction": "S",
         "stats_bonus": {
             "MAG": 225,
             "MP": 250
@@ -252,6 +281,7 @@
         "slot": "heavy_armor",
         "rarity": "Mythical",
         "level_req": 50,
+        "rank_restriction": "S",
         "stats_bonus": {
             "END": 200,
             "STR": 75
@@ -268,5 +298,84 @@
             "MAG": 15
         },
         "description": "Hums with the echo of a forgotten god."
+    },
+    "gen_sword_molten": {
+        "name": "Molten Greatsword",
+        "slot": "greatsword",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "STR": 25,
+            "DEX": 10
+        },
+        "description": "A heavy blade that glows with the heat of the caldera."
+    },
+    "gen_dagger_molten": {
+        "name": "Obsidian Dagger",
+        "slot": "dagger",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "DEX": 28,
+            "AGI": 8
+        },
+        "description": "A jagged dagger carved from volcanic glass. Exceptionally sharp."
+    },
+    "gen_robe_molten": {
+        "name": "Magma-Infused Robes",
+        "slot": "robe",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "MAG": 30,
+            "END": 10
+        },
+        "description": "Robes woven with fire essence, warm to the touch."
+    },
+    "gen_heavyarmor_molten": {
+        "name": "Drake Scale Mail",
+        "slot": "heavy_armor",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "END": 35,
+            "STR": 10
+        },
+        "description": "Armor crafted from the heat-resistant scales of a Lava Drake."
+    },
+    "gen_accessory_molten": {
+        "name": "Heart of the Volcano",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 25,
+        "stats_bonus": {
+            "LCK": 25,
+            "MAG": 15
+        },
+        "description": "A pulsating magma core set in gold. It beats in time with your heart."
+    },
+    "acc_warrior_ring": {
+        "name": "Ring of Iron Will",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "class_restrictions": ["Warrior"],
+        "stats_bonus": {
+            "STR": 5,
+            "END": 5
+        },
+        "description": "A heavy iron band inscribed with the code of the shield-bearer."
+    },
+    "acc_mage_ring": {
+        "name": "Ring of Arcane Focus",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "class_restrictions": ["Mage"],
+        "stats_bonus": {
+            "MAG": 8,
+            "MP": 20
+        },
+        "description": "A delicate silver ring that hums when near ley lines."
     }
 }

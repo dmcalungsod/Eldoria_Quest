@@ -17,6 +17,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.class_data import CLASSES
 from game_systems.data.materials import MATERIALS
+from game_systems.world_time import WorldTime, Weather
 
 from .adventure_events import AdventureEvents
 
@@ -35,19 +36,31 @@ class EventHandler:
         location_id: str | None = None,
         regen_chance: int = 70,
         location_name: str | None = None,
+        weather: Weather = Weather.CLEAR,
+        event_type: str | None = None,
     ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(context, location_id)
+                return self._perform_regeneration(
+                    context, location_id, weather, event_type
+                )
             else:
                 return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
-            logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Event resolution error for {self.discord_id}: {e}", exc_info=True
+            )
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 
-    def _perform_regeneration(self, context: dict[str, Any], location_id: str | None = None) -> dict[str, Any]:
+    def _perform_regeneration(
+        self,
+        context: dict[str, Any],
+        location_id: str | None = None,
+        weather: Weather = Weather.CLEAR,
+        event_type: str | None = None,
+    ) -> dict[str, Any]:
         """
         Calculates and applies regeneration safely.
         Uses an atomic transaction to ensure HP/MP updates are consistent.
@@ -60,25 +73,24 @@ class EventHandler:
             current_hp = vitals["current_hp"]
             current_mp = vitals["current_mp"]
 
-            # If already full, trigger SURGE (High-chance gather)
+            # If already full, prevent SURGE exploit (infinite farming)
             if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
-                # Log the surge flavor text
-                surge_msg = f"\n{AdventureEvents.surge_event()}"
+                return {
+                    "log": ["\n**You are already fully rested.** The moment of peace passes."],
+                    "dead": False,
+                }
 
-                # Chain into gathering with +25% bonus
-                result = self._perform_wild_gathering(context, location_id, bonus_chance=25)
+            # Calculate Regen Amounts with Caps (Prevent infinite scaling)
+            # Base: 50% of Stat
+            raw_hp_regen = int(stats.endurance * 0.5) + 1
+            raw_mp_regen = int(stats.magic * 0.5) + 1
 
-                # Prepend the surge message to the gathering log
-                if result.get("log"):
-                    result["log"].insert(0, surge_msg)
-                else:
-                    result["log"] = [surge_msg]
+            # Cap: 10% of Max HP/MP per step
+            max_hp_regen = max(1, int(stats.max_hp * 0.10))
+            max_mp_regen = max(1, int(stats.max_mp * 0.10))
 
-                return result
-
-            # Calculate Regen Amounts
-            hp_regen = max(1, int(stats.endurance * 0.5) + 1)
-            mp_regen = max(1, int(stats.magic * 0.5) + 1)
+            hp_regen = min(raw_hp_regen, max_hp_regen)
+            mp_regen = min(raw_mp_regen, max_mp_regen)
 
             new_hp = min(current_hp + hp_regen, stats.max_hp)
             new_mp = min(current_mp + mp_regen, stats.max_mp)
@@ -101,8 +113,18 @@ class EventHandler:
             # Calculate HP Percent for Narrative
             hp_percent = new_hp / max(stats.max_hp, 1)
 
+            # Get Time Phase for atmosphere
+            current_phase = WorldTime.get_current_phase()
+
             # Build Log Messages
-            base_logs = AdventureEvents.regeneration(location_id, class_name, hp_percent)
+            base_logs = AdventureEvents.regeneration(
+                location_id,
+                class_name,
+                hp_percent,
+                time_phase=current_phase,
+                weather=weather,
+                event_type=event_type,
+            )
             # Add newline to the first element for spacing
             if base_logs:
                 base_logs[0] = f"\n{base_logs[0]}"
@@ -116,10 +138,16 @@ class EventHandler:
 
         except Exception as e:
             logger.error(f"Regen error for {self.discord_id}: {e}")
-            return {"log": ["*You try to rest, but something feels wrong.*"], "dead": False}
+            return {
+                "log": ["*You try to rest, but something feels wrong.*"],
+                "dead": False,
+            }
 
     def _perform_quest_event(
-        self, context: dict[str, Any], location_name: str | None, location_id: str | None
+        self,
+        context: dict[str, Any],
+        location_name: str | None,
+        location_id: str | None,
     ) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
@@ -127,7 +155,15 @@ class EventHandler:
         """
         try:
             active_quests = self.quest_system.get_player_quests(self.discord_id)
-            event_types = ["gather", "locate", "examine", "survey", "escort", "retrieve", "deliver"]
+            event_types = [
+                "gather",
+                "locate",
+                "examine",
+                "survey",
+                "escort",
+                "retrieve",
+                "deliver",
+            ]
 
             for quest in active_quests:
                 # SECURITY: Validate Quest Location
@@ -156,7 +192,10 @@ class EventHandler:
                                 if success:
                                     event_text = f"\n{AdventureEvents.quest_event(obj_type, task)}"
                                     return {
-                                        "log": [event_text, f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*"],
+                                        "log": [
+                                            event_text,
+                                            f"{E.QUEST_SCROLL} *Quest Updated: {quest['title']}*",
+                                        ],
                                         "dead": False,
                                     }
 
@@ -182,7 +221,11 @@ class EventHandler:
         # If no gatherables defined, fallback to general pool (or empty)
         if not gatherables:
             # Fallback for old compatibility or empty zones
-            gatherables = [("medicinal_herb", 50), ("iron_ore", 20), ("ancient_wood", 10)]
+            gatherables = [
+                ("medicinal_herb", 50),
+                ("iron_ore", 20),
+                ("ancient_wood", 10),
+            ]
 
         # 35% Base Chance + Bonus
         base_chance = 35 + bonus_chance

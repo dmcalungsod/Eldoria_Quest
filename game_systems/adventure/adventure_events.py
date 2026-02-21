@@ -8,12 +8,85 @@ Optimized for performance and future biome expansion.
 import random
 
 import game_systems.data.emojis as E
+from game_systems.world_time import TimePhase, Weather
 
 
 class AdventureEvents:
     """
     Generates atmospheric narrative lines for Eldoria’s exploration system.
     """
+
+    # --- TIME-BASED ATMOSPHERE ---
+    ATMOSPHERE_DAWN = [
+        "The pale light of dawn reveals the path ahead.",
+        "Mist rises from the ground as the sun begins to climb.",
+        "The world wakes slowly, bathed in cold morning light.",
+        "Dew glistens on the leaves, fresh from the night.",
+        "Birds begin their morning chorus, piercing the silence.",
+        "The air is crisp and cold, promising a new day.",
+    ]
+
+    ATMOSPHERE_DUSK = [
+        "The sky turns purple and bruise-colored.",
+        "Daylight fades, leaving only grey shadows.",
+        "The horizon burns with the dying light of the sun.",
+        "Shadows lengthen, distorting the shapes of the trees.",
+        "A cool wind picks up, signaling the end of the day.",
+        "The first stars struggle to pierce the twilight gloom.",
+    ]
+
+    ATMOSPHERE_NIGHT = [
+        "The moon is hidden behind thick clouds.",
+        "Darkness presses in from all sides.",
+        "Strange sounds echo in the gloom.",
+        "You feel eyes watching you from the darkness.",
+        "The path is barely visible under the starlight.",
+        "A chill settles deep in your bones.",
+        "Something skitters nearby, unseen in the dark.",
+        "The world is reduced to the small circle of your vision.",
+    ]
+
+    # --- WEATHER-BASED ATMOSPHERE ---
+    ATMOSPHERE_WEATHER = {
+        Weather.RAIN: [
+            "Rain lashes against your armor, washing away the dust.",
+            "Mud sucks at your boots with every step.",
+            "The steady drum of rain drowns out distant sounds.",
+            "Water drips from the canopy, forming puddles on the path.",
+            "A cold rain chills you to the bone.",
+        ],
+        Weather.STORM: [
+            "Lightning splits the sky, briefly illuminating the darkness.",
+            "Thunder rolls like a war drum in the distance.",
+            "The wind howls, tearing at your cloak.",
+            "Trees groan under the force of the gale.",
+            "The storm rages, making travel difficult and dangerous.",
+        ],
+        Weather.FOG: [
+            "Thick fog rolls in, obscuring the path ahead.",
+            "Shapes move in the mist, just out of sight.",
+            "The world is reduced to a grey haze.",
+            "Sound is deadened by the heavy fog.",
+            "You feel lost in the swirling white vapor.",
+        ],
+        Weather.SNOW: [
+            "Snow crunch under your boots.",
+            "The world is silent and white.",
+            "Cold flakes melt on your skin.",
+            "Your breath mists in the freezing air.",
+        ],
+        Weather.ASH: [
+            "Grey ash falls like dirty snow.",
+            "The air tastes of sulfur and burning.",
+            "You cover your mouth to filter the choking dust.",
+            "Heat radiates from the ground beneath the ash.",
+        ],
+        Weather.CLEAR: [
+            "The sky is clear and open.",
+            "Visibility is good, allowing you to see far.",
+            "A gentle breeze stirs the air.",
+        ],
+    }
 
     # --- ATMOSPHERIC INTROS (New) ---
     ATMOSPHERE_FOREST = [
@@ -87,6 +160,54 @@ class AdventureEvents:
         "Dust swirls in the center of the arena, forming fleeting shapes.",
     ]
 
+    ATMOSPHERE_MAGMA = [
+        "The ground trembles beneath your feet, and cracks hiss with steam.",
+        "Waves of heat distort the air, making the distant peaks shimmer.",
+        "A geyser of magma erupts nearby, raining molten droplets.",
+        "The smell of sulfur and burning rock is overpowering.",
+        "Ash falls gently like grey snow, coating your armor.",
+        "Lava flows sluggishly in rivers of fire, illuminating the dark rock.",
+        "The roar of the volcano is a constant, low-frequency rumble.",
+        "Sparks dance in the updrafts, fleeting and dangerous.",
+        "You feel the intense heat radiating through the soles of your boots.",
+        "Shadows flicker wildly as the magma bubbles and bursts.",
+        "The air is dry and searing, parching your throat with every breath.",
+        "Jagged obsidian formations loom like black teeth against the glow.",
+    ]
+
+    ATMOSPHERE_GROTTO = [
+        "The sound of dripping water echoes endlessly in the dark.",
+        "Bioluminescent algae paints the walls in soft, eerie blues.",
+        "The air is damp and smells of salt and ancient stone.",
+        "You hear the distant crash of subterranean waves.",
+        "Slick, wet stone makes every step treacherous.",
+        "Strange, pale fish dart away from your light.",
+        "The pressure of the earth above feels immense.",
+        "A cold mist rises from the dark pools around you.",
+    ]
+
+    ATMOSPHERE_CLOCKWORK = [
+        "The sound of grinding gears echoes through the halls.",
+        "Steam hisses from a broken pipe, obscuring your vision.",
+        "The rhythmic ticking of a thousand clocks fills the air.",
+        "Brass automatons stand frozen in the alcoves, watching.",
+        "The air smells of oil and ozone.",
+        "A sudden clang makes you jump.",
+        "Pistons drive massive machinery in the distance.",
+        "The floor vibrates with the energy of the ancient engine.",
+    ]
+
+    ATMOSPHERE_BLOOD_MOON = [
+        "The moon is a crimson eye, watching your every move.",
+        "The light is sickly red, casting long, bloody shadows.",
+        "A low, rhythmic thrumming fills the air, like a giant heart.",
+        "The stars are drowned out by the blood-red glow.",
+        "Monsters howl in the distance, their voices twisted by madness.",
+        "The air smells of iron and old blood.",
+        "You feel a strange energy coursing through the land.",
+        "The shadows seem to bleed into the light.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -137,6 +258,32 @@ class AdventureEvents:
         f"{E.SWORDS} Amidst the dust and blood, you find a second wind.",
         f"{E.SWORDS} You tighten your grip, letting the adrenaline fade just enough to think clearly.",
         f"{E.SWORDS} The arena is unforgiving. You use this moment to steel your resolve.",
+    ]
+
+    REGEN_PHRASES_MAGMA = [
+        f"{E.VOLCANO} You find a shelf of cool rock away from the lava flow and rest.",
+        f"{E.VOLCANO} The heat is exhausting. You drink deeply from your waterskin.",
+        f"{E.VOLCANO} You wipe soot from your eyes and take a moment to breathe.",
+        f"{E.VOLCANO} Shielded by a large boulder, you escape the worst of the heat.",
+        f"{E.VOLCANO} You check your gear for heat damage while catching your breath.",
+        f"{E.VOLCANO} The rhythmic pulsing of the earth lulls you into a brief trance.",
+    ]
+
+    REGEN_PHRASES_GROTTO = [
+        f"{E.OCEAN} You find a dry ledge above the water and rest.",
+        f"{E.OCEAN} The rhythmic sound of waves calms your nerves.",
+        f"{E.OCEAN} You wring out your soaked cloak and take a breath.",
+        f"{E.OCEAN} The bioluminescence is soothing. You watch the lights drift.",
+        f"{E.OCEAN} You splash cold cave water on your face to stay alert.",
+        f"{E.OCEAN} Huddled away from the damp, you check your weapons for rust.",
+    ]
+
+    REGEN_PHRASES_CLOCKWORK = [
+        f"{E.GEAR} You find a quiet corner away from the moving parts and rest.",
+        f"{E.GEAR} The rhythmic ticking helps you focus your breathing.",
+        f"{E.GEAR} You adjust your gear while the steam clears.",
+        f"{E.GEAR} Huddled behind a brass pillar, you take a moment.",
+        f"{E.GEAR} You watch the mesmerizing rotation of the gears and calm your mind.",
     ]
 
     REGEN_LOW_HP = [
@@ -263,6 +410,9 @@ class AdventureEvents:
         location_id: str | None = None,
         class_name: str = "Adventurer",
         hp_percent: float = 1.0,
+        time_phase: TimePhase = TimePhase.DAY,
+        weather: Weather = Weather.CLEAR,
+        event_type: str | None = None,
     ) -> list:
         # Define the base message list
         base_logs = []
@@ -276,7 +426,9 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
 
         # 3. Class-Specific Flavor: 30% chance
-        elif class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
+        elif (
+            class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30
+        ):
             base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
 
         # 4. Location-Specific Fallback
@@ -286,6 +438,12 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
         elif location_id == "crystal_caverns":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
+        elif location_id == "molten_caldera":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_MAGMA)]
+        elif location_id == "sunken_grotto":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_GROTTO)]
+        elif location_id == "clockwork_halls":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CLOCKWORK)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
@@ -304,8 +462,37 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
             elif location_id == "crystal_caverns":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
+            elif location_id == "molten_caldera":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
+            elif location_id == "sunken_grotto":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_GROTTO
+            elif location_id == "clockwork_halls":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_CLOCKWORK
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
+
+            # Event Override (High Priority)
+            if event_type == "blood_moon":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
+
+            # Time Phase Override (30% chance)
+            elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
+            elif time_phase == TimePhase.DAWN and random.random() < 0.3:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
+            elif time_phase == TimePhase.DUSK and random.random() < 0.3:
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
+
+            # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
+            weather_chance = 0.3
+            if weather in (Weather.STORM, Weather.ASH):
+                weather_chance = 0.5
+
+            if (
+                weather in AdventureEvents.ATMOSPHERE_WEATHER
+                and random.random() < weather_chance
+            ):
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
 
             # Select and prepend
             atmospheric_line = random.choice(atmosphere_pool)

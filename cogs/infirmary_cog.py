@@ -23,8 +23,9 @@ from .ui_helpers import back_to_guild_hall_callback, make_progress_bar
 logger = logging.getLogger("eldoria.infirmary")
 
 
-def infirmary_cost(missing_hp: int) -> int:
-    return max(1, math.ceil(missing_hp * 0.5)) if missing_hp > 0 else 0
+def infirmary_cost(missing_hp: int, missing_mp: int) -> int:
+    total_missing = missing_hp + missing_mp
+    return max(1, math.ceil(total_missing * 0.5)) if total_missing > 0 else 0
 
 
 class InfirmaryView(View):
@@ -39,7 +40,7 @@ class InfirmaryView(View):
         current_mp = self.p_data["current_mp"]
         self.missing_hp = max(0, stats.max_hp - current_hp)
         self.missing_mp = max(0, stats.max_mp - current_mp)
-        self.cost = infirmary_cost(self.missing_hp)
+        self.cost = infirmary_cost(self.missing_hp, self.missing_mp)
 
         # Heal Button
         disabled = self.missing_hp <= 0 and self.missing_mp <= 0
@@ -71,13 +72,13 @@ class InfirmaryView(View):
         try:
             # SECURITY: Fetch fresh stats to avoid stale state exploits
             stats_json = self.db.get_player_stats_json(self.user.id)
-            if stats_json:
-                fresh_stats = PlayerStats.from_dict(stats_json)
-                max_hp = fresh_stats.max_hp
-                max_mp = fresh_stats.max_mp
-            else:
-                max_hp = self.stats.max_hp
-                max_mp = self.stats.max_mp
+            if not stats_json:
+                logger.error(f"Heal failed: Could not fetch stats for {self.user.id}")
+                return False, "System error: Could not fetch player stats."
+
+            fresh_stats = PlayerStats.from_dict(stats_json)
+            max_hp = fresh_stats.max_hp
+            max_mp = fresh_stats.max_mp
 
             # Delegate to DatabaseManager for atomic execution
             return self.db.execute_heal(self.user.id, max_hp, max_mp, cost=0)
@@ -107,7 +108,8 @@ class InfirmaryView(View):
     def build_infirmary_embed(p_data, stats, msg=None, success=True) -> discord.Embed:
         p = dict(p_data) if not isinstance(p_data, dict) else p_data
         hp_miss = max(0, stats.max_hp - p["current_hp"])
-        cost = infirmary_cost(hp_miss)
+        mp_miss = max(0, stats.max_mp - p["current_mp"])
+        cost = infirmary_cost(hp_miss, mp_miss)
 
         hp_bar = make_progress_bar(p["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(p["current_mp"], stats.max_mp)
@@ -123,8 +125,11 @@ class InfirmaryView(View):
             f"> {E.AURUM} **Aurum:** {p['aurum']}\n\n"
         )
 
-        if hp_miss > 0:
-            description += f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP)."
+        if hp_miss > 0 or mp_miss > 0:
+            description += (
+                f"A full course of treatment will cost **{cost} {E.AURUM}** "
+                "(0.5 Aurum per missing HP/MP)."
+            )
         else:
             description += "You stand in peak condition; no treatment is required."
 

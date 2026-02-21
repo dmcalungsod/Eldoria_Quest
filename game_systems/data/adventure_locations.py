@@ -47,6 +47,12 @@ LOCATIONS = {
             ("monster_006", 20),  # Forest Wolf Pup
             ("monster_008", 10),  # Thicket Spider
         ],
+        "night_monsters": [
+            ("monster_008", 40),  # Thicket Spider (Nocturnal hunter)
+            ("monster_005", 20),  # Bramble Goblin
+            ("monster_006", 20),  # Forest Wolf Pup
+            ("monster_010", 20),  # Briar Hound (Roams at night)
+        ],
         "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs.",
         "gatherables": [
             ("medicinal_herb", 40),
@@ -105,6 +111,33 @@ LOCATIONS = {
             ("magic_stone_medium", 20),
         ],
     },
+    "sunken_grotto": {
+        "name": "The Sunken Grotto",
+        "emoji": "🌊",
+        "min_rank": "C",
+        "level_req": 18,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_121", 30),  # Coral Golem
+            ("monster_122", 30),  # Abyssal Eel
+            ("monster_123", 25),  # Tide Siren
+            ("monster_124", 15),  # Deep Crawler
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_125",  # Leviathan (Boss)
+                "weight": 5,
+                "min_level": 23,
+            }
+        ],
+        "description": "A submerged cavern network lit by bioluminescence. The water here is deep and cold.",
+        "gatherables": [
+            ("coral_fragment", 40),
+            ("pearl", 30),
+            ("magic_stone_medium", 20),
+            ("bioluminescent_scale", 10),
+        ],
+    },
     "crystal_caverns": {
         "name": "The Crystal Caverns",
         "emoji": "💎",
@@ -129,6 +162,113 @@ LOCATIONS = {
             ("luminescent_crystal", 40),
             ("mithril_ore", 30),
             ("magic_stone_medium", 30),
+        ],
+    },
+    "clockwork_halls": {
+        "name": "The Clockwork Halls",
+        "emoji": "⚙️",
+        "min_rank": "B",
+        "level_req": 22,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_126", 30),  # Cogwork Spider
+            ("monster_127", 30),  # Brass Golem
+            ("monster_128", 25),  # Steam Wisp
+            ("monster_129", 15),  # Automaton Knight
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_130",  # The Gear Warden
+                "weight": 5,
+                "min_level": 26,
+            }
+        ],
+        "description": "A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.",
+        "gatherables": [
+            ("brass_gear", 40),
+            ("copper_wire", 30),
+            ("spring_coil", 20),
+            ("magic_stone_medium", 10),
+        ],
+    },
+    "molten_caldera": {
+        "name": "The Molten Caldera",
+        "emoji": "🌋",
+        "min_rank": "A",
+        "level_req": 30,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_106", 30),  # Fire Elemental
+            ("monster_107", 30),  # Magma Golem
+            ("monster_108", 25),  # Ember Salamander
+            ("monster_109", 15),  # Lava Drake (Elite)
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_110",  # Ignis (Boss)
+                "weight": 5,
+                "min_level": 35,
+            }
+        ],
+        "description": "A churning lake of fire and obsidian. The heat alone is enough to kill the unprepared.",
+        "gatherables": [
+            ("obsidian_shard", 40),
+            ("fire_essence", 30),
+            ("magma_core", 20),
+            ("magic_stone_large", 10),
+        ],
+    },
+    "frostfall_expanse": {
+        "name": "The Frostfall Expanse",
+        "emoji": "❄️",
+        "min_rank": "A",
+        "level_req": 25,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_111", 30),  # Frost Wolf
+            ("monster_112", 25),  # Ice Golem
+            ("monster_113", 30),  # Chill Wisp
+            ("monster_114", 15),  # Glacial Drake
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_115",  # Cryon
+                "weight": 5,
+                "min_level": 29,
+            }
+        ],
+        "description": "A frozen wasteland where the wind cuts like a knife and only the strong survive.",
+        "gatherables": [
+            ("frost_crystal", 40),
+            ("winter_wolf_pelt", 30),
+            ("magic_stone_medium", 30),
+        ],
+    },
+    "void_sanctum": {
+        "name": "The Void Sanctum",
+        "emoji": "⚫",
+        "min_rank": "S",
+        "level_req": 40,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_116", 30),  # Void Stalker
+            ("monster_118", 30),  # Null Wisp
+            ("monster_117", 25),  # Abyssal Construct
+            ("monster_119", 15),  # Entropy Drake
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_120",  # Omega (Boss)
+                "weight": 5,
+                "min_level": 44,
+            }
+        ],
+        "description": "A realm where reality frays and silence screams. The final frontier of the known world.",
+        "gatherables": [
+            ("void_dust", 40),
+            ("abyssal_shackle", 30),
+            ("entropy_crystal", 20),
+            ("magic_stone_flawless", 10),
         ],
     },
     "guild_arena": {

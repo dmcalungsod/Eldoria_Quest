@@ -10,7 +10,7 @@ import json
 import logging
 
 import discord
-from discord.ui import Button, View
+from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
@@ -36,6 +36,7 @@ class ExplorationView(View):
         vitals: dict = None,
         active_monster: dict = None,
         class_id: int = 1,
+        skills: list = None,
     ):
         super().__init__(timeout=300)  # 5 minutes
         self.db = db
@@ -48,6 +49,7 @@ class ExplorationView(View):
         self.inv_manager = InventoryManager(self.db)
         self.active_monster = active_monster
         self.class_id = class_id
+        self.skills = skills or []
         self.processing = False
 
         # Button Setup
@@ -78,14 +80,14 @@ class ExplorationView(View):
             flee_btn.callback = self.action_flee
             self.add_item(flee_btn)
 
-            # 4. Pack (New Row)
+            # 4. Pack (Row 1)
             inv_btn = Button(
                 label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack"
             )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
 
-            # 5. Special Ability (Class Specific)
+            # 5. Special Ability (Class Specific, Row 1)
             # Mapping: 1=Warrior, 2=Mage, 3=Rogue, 4=Cleric, 5=Ranger
             specials = {
                 1: {"label": "Cleave", "emoji": "🪓"},
@@ -101,6 +103,76 @@ class ExplorationView(View):
             )
             special_btn.callback = self.action_special
             self.add_item(special_btn)
+
+            # 6. Stance Select (Row 2)
+            stance_options = [
+                discord.SelectOption(
+                    label="Aggressive",
+                    value="aggressive",
+                    description="⚔️ +20% Dmg / +20% Taken",
+                    emoji="⚔️",
+                    default=self.active_monster.get("player_stance", "balanced") == "aggressive",
+                ),
+                discord.SelectOption(
+                    label="Balanced",
+                    value="balanced",
+                    description="⚖️ Standard Combat",
+                    emoji="⚖️",
+                    default=self.active_monster.get("player_stance", "balanced") == "balanced",
+                ),
+                discord.SelectOption(
+                    label="Defensive",
+                    value="defensive",
+                    description="🛡️ -20% Dmg / -20% Taken",
+                    emoji="🛡️",
+                    default=self.active_monster.get("player_stance", "balanced") == "defensive",
+                ),
+            ]
+            stance_select = Select(
+                placeholder="Select Combat Stance...",
+                min_values=1,
+                max_values=1,
+                options=stance_options,
+                row=2,
+                custom_id="stance_select",
+            )
+            stance_select.callback = self.action_stance
+            self.add_item(stance_select)
+
+            # 7. Skill Select (Row 3)
+            if self.skills:
+                options = []
+                for s in self.skills:
+                    # Determine emoji based on type
+                    s_type = s.get("type", "Active")
+                    emoji = "✨" if s_type == "Active" else "⚡"  # Placeholder logic
+                    if "Heal" in s.get("name", ""):
+                        emoji = "💚"
+
+                    desc = f"MP: {s.get('mp_cost', 0)} | Lv.{s.get('skill_level', 1)}"
+                    options.append(
+                        discord.SelectOption(
+                            label=s.get("name", "Unknown Skill"),
+                            value=s.get("key_id"),
+                            description=desc,
+                            emoji=emoji,
+                        )
+                    )
+
+                # Discord allows max 25 options
+                options = options[:25]
+
+                if options:
+                    skill_select = Select(
+                        placeholder="Select a Skill...",
+                        min_values=1,
+                        max_values=1,
+                        options=options,
+                        row=3,
+                        custom_id="skill_select",
+                    )
+                    skill_select.callback = self.action_skill
+                    self.add_item(skill_select)
 
         else:
             # --- EXPLORATION MODE ---
@@ -156,9 +228,24 @@ class ExplorationView(View):
     async def action_special(self, interaction: discord.Interaction):
         await self._perform_simulation(interaction, action="special_ability")
 
+    async def action_stance(self, interaction: discord.Interaction):
+        selected_stance = interaction.data["values"][0]
+        await self._perform_simulation(interaction, action=f"set_stance:{selected_stance}")
+
+    async def action_skill(self, interaction: discord.Interaction):
+        # Retrieve selected skill key
+        selected_skill = interaction.data["values"][0]
+        await self._perform_simulation(interaction, action=f"skill:{selected_skill}")
+
     async def _perform_simulation(self, interaction: discord.Interaction, action: str = None):
         if self.processing:
             await interaction.response.send_message("Please wait...", ephemeral=True)
+            return
+
+        # --- SECURITY FIX: DoS Protection ---
+        if action and len(action) > 64:
+            logger.warning(f"DoS Attempt: Action too long from {self.interaction_user.id}: {action[:20]}...")
+            await interaction.response.send_message("Invalid action data.", ephemeral=True)
             return
 
         self.processing = True
@@ -261,6 +348,7 @@ class ExplorationView(View):
             vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
             self.vitals = vitals or {}
             session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
+            self.skills = await asyncio.to_thread(self.db.get_combat_skills, self.interaction_user.id)
 
             # Update monster state from session
             if session and session.get("active_monster_json"):
@@ -293,7 +381,13 @@ class ExplorationView(View):
         self.processing = True
         try:
             await interaction.response.defer()
-            await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
+            summary = await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
+
+            if summary and summary.get("failed_items"):
+                failed_names = sorted(list(set(f["item_name"] for f in summary["failed_items"])))
+                msg = f"{E.ERROR} **Inventory Full:** You had to leave behind: {', '.join(failed_names)}"
+                await interaction.followup.send(msg, ephemeral=True)
+
             await back_to_profile_callback(interaction, is_new_message=False)
         finally:
             self.processing = False

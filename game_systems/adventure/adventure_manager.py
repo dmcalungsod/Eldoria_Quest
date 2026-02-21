@@ -11,8 +11,9 @@ import logging
 
 from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.emojis import COMBAT
+from game_systems.data.emojis import COMBAT, AURUM, SKULL
 from game_systems.data.materials import MATERIALS
+from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
@@ -29,6 +30,7 @@ class AdventureManager:
         self.bot = bot
         self.inventory_manager = InventoryManager(self.db)
         self.quest_system = QuestSystem(self.db)
+        self.faction_system = FactionSystem(self.db)
 
     def start_adventure(self, discord_id: int, location_id: str, duration_minutes: int) -> bool:
         # --- SECURITY FIX: Input Validation ---
@@ -92,13 +94,54 @@ class AdventureManager:
         result = session.simulate_step(context_bundle=bundle, action=action)
 
         if result.get("dead", False):
-            self._handle_death_rewards(discord_id, session)
+            loss_msg = self._handle_death_rewards(discord_id, session)
+            if loss_msg:
+                # Append to the last frame of the sequence
+                if result["sequence"]:
+                    last_frame = result["sequence"][-1]
+                    last_frame.append(loss_msg)
 
         return result
 
-    def _handle_death_rewards(self, discord_id, session):
-        """Extracts partial rewards on death."""
+    def _handle_death_rewards(self, discord_id, session) -> str | None:
+        """Extracts partial rewards on death and returns a loss report."""
+        loss_report = []
         try:
+            # 1. Clean Session Loot (Prevent EXP/Aurum items)
+            session.loot.pop("exp", None)
+            session.loot.pop("aurum", None)
+
+            # 2. Aurum Penalty (10%)
+            current_aurum = self.db.get_player_field(discord_id, "aurum") or 0
+            aurum_loss = int(current_aurum * 0.10)
+            if aurum_loss > 0:
+                self.db.deduct_aurum(discord_id, aurum_loss)
+                loss_report.append(f"• -{aurum_loss} {AURUM} (Lost)")
+
+            # 3. Material Penalty (50% of gathered loot)
+            material_losses = []
+            keys_to_remove = []
+
+            for item_key, count in session.loot.items():
+                kept_amount = int(count * 0.5)
+                lost_amount = count - kept_amount
+
+                if lost_amount > 0:
+                    mat = MATERIALS.get(item_key)
+                    name = mat["name"] if mat else item_key
+                    material_losses.append(f"• -{lost_amount}x {name}")
+
+                if kept_amount > 0:
+                    session.loot[item_key] = kept_amount
+                else:
+                    keys_to_remove.append(item_key)
+
+            for k in keys_to_remove:
+                del session.loot[k]
+
+            if material_losses:
+                loss_report.extend(material_losses)
+
             stats_json = self.db.get_player_stats_json(discord_id)
             p_stats = PlayerStats.from_dict(stats_json)
 
@@ -114,12 +157,21 @@ class AdventureManager:
                 }
                 for item in items
             ]
-            self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+
+            if failed_items:
+                failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
+                loss_report.append(f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}")
 
             self.db.end_adventure_session(discord_id)
 
+            if loss_report:
+                return "\n" + SKULL + " **Losses Incurred:**\n" + "\n".join(loss_report)
+            return None
+
         except Exception as e:
             logger.error(f"Error handling death for {discord_id}: {e}")
+            return None
 
     def end_adventure(self, discord_id: int) -> dict | None:
         try:
@@ -148,6 +200,21 @@ class AdventureManager:
             # Capture state after rewards
             new_level = self.db.get_player_field(discord_id, "level")
 
+            # --- FACTION REPUTATION ---
+            duration_min = row.get("duration_minutes", 0)
+            # If duration is -1, calculate actual time elapsed
+            if duration_min == -1:
+                start_dt = datetime.datetime.fromisoformat(row["start_time"])
+                duration_min = int((datetime.datetime.now() - start_dt).total_seconds() / 60)
+
+            # Ensure non-negative duration
+            duration_min = max(0, duration_min)
+
+            faction_logs = self.faction_system.grant_reputation_for_adventure(
+                discord_id, duration_min, row.get("location_id")
+            )
+            # --------------------------
+
             summary = {
                 "loot": items_to_add,
                 "xp_gained": total_exp,
@@ -155,6 +222,7 @@ class AdventureManager:
                 "old_level": old_level,
                 "new_level": new_level,
                 "leveled_up": new_level > old_level,
+                "faction_logs": faction_logs,
             }
 
             bulk_items = [
@@ -167,7 +235,10 @@ class AdventureManager:
                 }
                 for item in items_to_add
             ]
-            self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+
+            if failed_items:
+                summary["failed_items"] = failed_items
 
             # End session ONLY after items are safely added
             self.db.end_adventure_session(discord_id)
@@ -198,15 +269,17 @@ class AdventureManager:
         # Prevents "free healing" exploit by ending adventure
         target_mp = level_sys.stats.max_mp if leveled_up else p_row["current_mp"]
 
-        self.db.update_player_fields(
+        self.db.update_player_mixed(
             session.discord_id,
-            level=level_sys.level,
-            experience=level_sys.exp,
-            exp_to_next=level_sys.exp_to_next,
-            current_hp=saved_hp,
-            current_mp=target_mp,
+            set_fields={
+                "level": level_sys.level,
+                "experience": level_sys.exp,
+                "exp_to_next": level_sys.exp_to_next,
+                "current_hp": saved_hp,
+                "current_mp": target_mp,
+            },
+            inc_fields={"vestige_pool": total_exp},
         )
-        self.db.increment_player_fields(session.discord_id, vestige_pool=total_exp)
 
         items_awarded = []
         for item_key, count in session.loot.items():
@@ -258,6 +331,7 @@ class AdventureManager:
                     "logs": json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
                     "loot_collected": "{}",
                     "active_monster_json": json.dumps(active_monster),
+                    "version": 1,
                 }
             )
             return True

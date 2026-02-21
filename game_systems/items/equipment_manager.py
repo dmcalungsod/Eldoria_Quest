@@ -8,8 +8,11 @@ Hardened: Atomic equipment swaps via MongoDB DatabaseManager methods.
 import logging
 import math
 
-from database.database_manager import DatabaseManager
+import pymongo.errors
+
+from database.database_manager import DatabaseManager, MAX_STACK_EQUIPMENT
 from game_systems.data.class_data import CLASSES
+from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.skills_data import SKILLS
 from game_systems.player.player_stats import PlayerStats
 
@@ -19,6 +22,18 @@ logger = logging.getLogger("eldoria.equipment")
 class EquipmentManager:
     VALID_TABLES = {"equipment", "class_equipment"}
 
+    RANK_VALUES = {
+        "F": 1,
+        "E": 2,
+        "D": 3,
+        "C": 4,
+        "B": 5,
+        "A": 6,
+        "S": 7,
+        "SS": 8,
+        "SSS": 9,
+    }
+
     STAT_MAP = {
         "str_bonus": "STR",
         "end_bonus": "END",
@@ -27,6 +42,30 @@ class EquipmentManager:
         "mag_bonus": "MAG",
         "lck_bonus": "LCK",
     }
+
+    # Quality Multipliers (Relative to Common=1.0)
+    QUALITY_MULTIPLIERS = {
+        "Common": 1.0,
+        "Uncommon": 1.1,
+        "Rare": 1.25,
+        "Epic": 1.5,
+        "Legendary": 2.0,
+        "Mythical": 3.0,
+    }
+
+    RARITY_TIERS = {
+        "Common": 1,
+        "Uncommon": 2,
+        "Rare": 3,
+        "Epic": 4,
+        "Legendary": 5,
+        "Mythical": 6,
+    }
+
+    # Slot Groups for Conflict Resolution
+    TWO_HANDED_SLOTS = {"greatsword", "bow", "staff"}
+    OFF_HAND_SLOTS = {"shield", "orb", "tome", "quiver", "offhand_dagger"}
+    MAIN_HAND_SLOTS = {"sword", "mace", "dagger", "wand"}
 
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
@@ -41,6 +80,32 @@ class EquipmentManager:
             if data["id"] == class_id:
                 return data.get("allowed_slots", [])
         return []
+
+    def check_requirements(self, item_data: dict, player_data: dict) -> tuple[bool, str | None]:
+        """
+        Validates if a player can equip an item based on Level, Rank, and Class.
+        player_data must contain: 'level', 'rank' (from guild), 'class_name'.
+        """
+        # 1. Level Requirement
+        req_level = item_data.get("level_req", 1)
+        if player_data.get("level", 1) < req_level:
+            return False, f"Req: Lvl {req_level}"
+
+        # 2. Rank Requirement
+        req_rank = item_data.get("rank_restriction")
+        if req_rank:
+            p_rank = player_data.get("rank", "F")
+            if self.RANK_VALUES.get(p_rank, 1) < self.RANK_VALUES.get(req_rank, 1):
+                return False, f"Req: Rank {req_rank}"
+
+        # 3. Class Restriction
+        allowed_classes = item_data.get("class_restrictions")
+        if allowed_classes:
+            p_class = player_data.get("class_name")
+            if not p_class or p_class not in allowed_classes:
+                return False, f"Class Restricted: {', '.join(allowed_classes)}"
+
+        return True, None
 
     def recalculate_player_stats(self, discord_id: int) -> PlayerStats:
         """
@@ -67,9 +132,26 @@ class EquipmentManager:
 
                 item_data = self.db._col(table).find_one({"id": int(item["item_key"])}, {"_id": 0})
                 if item_data:
+                    # Calculate Quality Scaling
+                    base_rarity = item_data.get("rarity", "Common")
+                    current_rarity = item.get("rarity", base_rarity)
+
+                    base_tier = self.RARITY_TIERS.get(base_rarity, 1)
+                    current_tier = self.RARITY_TIERS.get(current_rarity, 1)
+
+                    multiplier = 1.0
+                    if current_tier > base_tier:
+                        base_mult = self.QUALITY_MULTIPLIERS.get(base_rarity, 1.0)
+                        curr_mult = self.QUALITY_MULTIPLIERS.get(current_rarity, 1.0)
+                        if base_mult > 0:
+                            multiplier = curr_mult / base_mult
+
                     for col, stat_name in self.STAT_MAP.items():
                         if col in item_data and item_data[col]:
-                            stats.add_bonus_stat(stat_name, item_data[col])
+                            base_val = item_data[col]
+                            # Apply multiplier and round up
+                            final_val = math.ceil(base_val * multiplier)
+                            stats.add_bonus_stat(stat_name, final_val)
 
             # 3. Apply Passive Skill Bonuses
             player_skills = self.db.get_all_player_skills(discord_id)
@@ -99,6 +181,23 @@ class EquipmentManager:
 
             # 4. Save Updates
             self.db.update_player_stats(discord_id, stats.to_dict())
+
+            # 5. Clamp HP/MP if necessary (Avoid Overflow Exploit)
+            # Fetch current vitals to check if they exceed new max
+            vitals = self.db.get_player_vitals(discord_id)
+            if vitals:
+                current_hp = vitals.get("current_hp", 0)
+                current_mp = vitals.get("current_mp", 0)
+
+                new_hp = min(current_hp, stats.max_hp)
+                new_mp = min(current_mp, stats.max_mp)
+
+                if new_hp != current_hp or new_mp != current_mp:
+                    self.db.set_player_vitals(discord_id, new_hp, new_mp)
+                    logger.info(
+                        f"Clamped vitals for {discord_id}: HP {current_hp}->{new_hp}, MP {current_mp}->{new_mp}"
+                    )
+
             return stats
 
         except Exception as e:
@@ -120,46 +219,94 @@ class EquipmentManager:
             if item.get("equipped") == 1:
                 return False, "Already equipped."
 
-            # Validate Class Permissions
+            # Fetch player data for validation
+            player = self.db.get_player(discord_id)
+            if not player:
+                return False, "Player not found."
+
+            # Fetch rank and class
+            guild_rank = self.db.get_guild_rank(discord_id) or "F"
+
+            # Resolve Class Name
+            class_id = player.get("class_id")
+            class_name = next((k for k, v in CLASSES.items() if v["id"] == class_id), None)
+
+            player_data = {
+                "level": player.get("level", 1),
+                "rank": guild_rank,
+                "class_name": class_name,
+            }
+
+            # Fetch full item static data for requirements
+            # Try EQUIPMENT_DATA first (in-memory)
+            static_data = EQUIPMENT_DATA.get(item["item_key"])
+
+            # Fallback to DB lookup if not in static dict (e.g. dynamic items)
+            if not static_data and item.get("item_source_table"):
+                # Note: get_item_from_source_table uses ID (int), but item_key is usually string in JSON
+                # However, inventory 'item_key' matches 'key' in JSON.
+                # DB lookup usually expects 'id'.
+                # Let's rely on item_key matching JSON keys for now as primary method.
+                pass
+
+            # Merge inventory data over static data (in case of dynamic overrides)
+            full_item_data = (static_data or {}).copy()
+            full_item_data.update(item)
+
+            # 1. Validate Requirements (Level, Rank)
+            can_equip, reason = self.check_requirements(full_item_data, player_data)
+            if not can_equip:
+                return False, f"Cannot equip: {reason}"
+
+            # 2. Validate Class Permissions (Slots)
             allowed = self._get_player_allowed_slots(discord_id)
             if item["slot"] not in allowed:
                 return False, f"Your class cannot equip {item['slot']} items."
 
-            # Check for existing equipped item in that slot
-            existing = self.db.get_equipped_in_slot(discord_id, item["slot"])
-            if existing:
-                self._unequip_logic(discord_id, existing["id"])
+            # Resolve Slot Conflicts (Two-Handed / Main Hand / Off Hand)
+            conflicts_msg = ""
+            slots_to_check = set()
+            target_slot = item["slot"]
+
+            if target_slot in self.TWO_HANDED_SLOTS:
+                slots_to_check.update(self.MAIN_HAND_SLOTS)
+                slots_to_check.update(self.OFF_HAND_SLOTS)
+                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            elif target_slot in self.MAIN_HAND_SLOTS:
+                slots_to_check.update(self.MAIN_HAND_SLOTS)
+                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            elif target_slot in self.OFF_HAND_SLOTS:
+                slots_to_check.update(self.OFF_HAND_SLOTS)
+                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            else:
+                # Normal armor/accessory slot - just check self
+                slots_to_check.add(target_slot)
+
+            # Find and unequip conflicting items
+            equipped_items = self.db.get_equipped_items(discord_id)
+            for eq_item in equipped_items:
+                eq_slot = eq_item.get("slot")
+                if eq_slot in slots_to_check:
+                    try:
+                        self._unequip_logic(discord_id, eq_item["id"])
+                        conflicts_msg += f" (Unequipped {eq_item['item_name']})"
+                    except Exception as e:
+                        logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
 
             # Equip the new item
             if item.get("count", 1) > 1:
-                # Split stack: Decrement old stack, insert new equipped single
-                self.db.decrement_inventory_count(inventory_db_id)
-                self.db.add_inventory_item(
-                    discord_id,
-                    item["item_key"],
-                    item["item_name"],
-                    item["item_type"],
-                    item["rarity"],
-                    1,
-                    item.get("slot"),
-                    item.get("item_source_table"),
-                )
-                # Mark the new item as equipped
-                new_item = self.db.find_stackable_item(
-                    discord_id,
-                    item["item_key"],
-                    item["rarity"],
-                    item.get("slot"),
-                    item.get("item_source_table"),
-                )
-                if new_item:
-                    self.db.set_item_equipped(new_item["id"], 1)
+                # Split stack safely with compensation
+                if not self.db.split_stack_to_equipped(discord_id, inventory_db_id, item):
+                    return False, "Failed to process equipment split. Please try again."
             else:
-                self.db.set_item_equipped(inventory_db_id, 1)
+                try:
+                    self.db.set_item_equipped(inventory_db_id, 1)
+                except pymongo.errors.DuplicateKeyError:
+                    return False, "Equipment slot update conflict."
 
             # Recalculate stats
             self.recalculate_player_stats(discord_id)
-            return True, "Item equipped."
+            return True, f"Item equipped.{conflicts_msg}"
 
         except Exception as e:
             logger.error(f"Equip error: {e}", exc_info=True)
@@ -190,6 +337,7 @@ class EquipmentManager:
             item["rarity"],
             item.get("slot"),
             item.get("item_source_table"),
+            max_stack=MAX_STACK_EQUIPMENT,
         )
 
         if stack:

@@ -1,7 +1,7 @@
 """
 cogs/onboarding_cog.py
 
-Character creation flow.
+Character creation flow and New Player Onboarding.
 Hardened against race conditions.
 Atmosphere: Dark Fantasy Narrative Restored.
 """
@@ -23,6 +23,37 @@ from game_systems.player.player_creator import PlayerCreator
 from .ui_helpers import back_to_profile_callback
 
 logger = logging.getLogger("eldoria.onboarding")
+
+
+async def transition_to_guild_lobby(interaction: discord.Interaction, db: DatabaseManager, user: discord.User):
+    """Helper to transition to the Guild Lobby, avoiding circular imports."""
+    from game_systems.guild_system.ui.lobby_view import GuildLobbyView
+
+    card = await asyncio.to_thread(db.get_guild_card_data, user.id)
+    if not card:
+        await interaction.followup.send("You are not a guild member.", ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        title="🏰 Adventurer’s Guild Hall",
+        description=(
+            f"*The receptionist nods as you approach.*\n\n"
+            f"**{card['name']} — Rank {card['rank']}**\n"
+            "*“How may the Guild assist you today, Adventurer?”*"
+        ),
+        color=discord.Color.dark_gold(),
+    )
+
+    embed.add_field(name="📜 Quest Board", value="Review available contracts and report successes.", inline=False)
+    embed.add_field(
+        name="⚙️ Guild Services", value="Access the Shop, Exchange, Infirmary, or Training Grounds.", inline=False
+    )
+
+    view = GuildLobbyView(db, user)
+    if not interaction.response.is_done():
+        await interaction.response.edit_message(embed=embed, view=view)
+    else:
+        await interaction.edit_original_response(embed=embed, view=view)
 
 
 class StartMenuView(View):
@@ -123,9 +154,145 @@ class CharacterMenuView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user.id
 
-    @discord.ui.button(label="Enter Guild Hall", style=discord.ButtonStyle.success)
-    async def enter_btn(self, interaction: discord.Interaction, button: Button):
-        await back_to_profile_callback(interaction, is_new_message=False)
+    @discord.ui.button(label="Approach Guild Clerk", style=discord.ButtonStyle.success)
+    async def approach_clerk(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+
+        embed = discord.Embed(
+            title="The Adventurer's Guild: Reception",
+            description=(
+                "The Guild Clerk looks up from a stack of parchment, adjusting her spectacles.\n\n"
+                "*\"Name? Class? Ah, yes. Fresh blood. Welcome to the Guild, Initiate.\"*\n\n"
+                "She stamps a document and slides a heavy iron badge across the counter.\n\n"
+                "*\"We handle the paperwork; you handle the monsters. Simple, yes? "
+                "But before I let you loose in the dungeon, let's see if you know which end of the weapon to hold.\"*"
+            ),
+            color=discord.Color.dark_teal()
+        )
+        embed.set_footer(text="Complete the combat training to receive a starter kit.")
+
+        view = GuildWelcomeView(self.db, self.user)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+
+class GuildWelcomeView(View):
+    def __init__(self, db, user):
+        super().__init__(timeout=300)
+        self.db = db
+        self.user = user
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user.id == self.user.id
+
+    @discord.ui.button(label="⚔️ Prove Yourself (Tutorial)", style=discord.ButtonStyle.primary)
+    async def start_training(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+
+        view = CombatTutorialView(self.db, self.user)
+        embed = discord.Embed(
+            title="⚔️ Combat Training: The Straw Knight",
+            description=(
+                "You step into the training ring. The sawdust floor crunches beneath your boots.\n\n"
+                "A **Straw Dummy** stands before you. It mocks you with its silence and drawn-on angry eyebrows.\n\n"
+                "**Action:** Strike the dummy to begin."
+            ),
+            color=discord.Color.red()
+        )
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    @discord.ui.button(label="⏩ I know what I'm doing (Skip)", style=discord.ButtonStyle.secondary)
+    async def skip_to_lobby(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+        await transition_to_guild_lobby(interaction, self.db, self.user)
+
+
+class CombatTutorialView(View):
+    def __init__(self, db, user, step=0):
+        super().__init__(timeout=300)
+        self.db = db
+        self.user = user
+        self.step = step
+        self._update_buttons()
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user.id == self.user.id
+
+    def _update_buttons(self):
+        self.clear_items()
+
+        if self.step == 0:
+            btn = Button(label="⚔️ Attack", style=discord.ButtonStyle.danger, custom_id="tut_attack")
+            btn.callback = self.attack_callback
+            self.add_item(btn)
+        elif self.step == 1:
+            btn = Button(label="🛡️ Defend", style=discord.ButtonStyle.primary, custom_id="tut_defend")
+            btn.callback = self.defend_callback
+            self.add_item(btn)
+        elif self.step == 2:
+            btn = Button(label="⚔️ Finish It", style=discord.ButtonStyle.danger, custom_id="tut_finish")
+            btn.callback = self.finish_callback
+            self.add_item(btn)
+        elif self.step == 3:
+            btn = Button(label="🏆 Claim Badge & Enter Guild", style=discord.ButtonStyle.success, custom_id="tut_complete")
+            btn.callback = self.complete_callback
+            self.add_item(btn)
+
+    async def attack_callback(self, interaction: discord.Interaction, button: Button):
+        self.step = 1
+        self._update_buttons()
+
+        embed = interaction.message.embeds[0]
+        embed.description = (
+            "**You strike the dummy!** Straw flies everywhere.\n"
+            f"{E.PLAYER_ATTACK} **-5 HP**\n\n"
+            "The dummy wobbles menacingly. It looks like it's winding up for a counter-wobble!\n\n"
+            "**Action:** Prepare your defense!"
+        )
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def defend_callback(self, interaction: discord.Interaction, button: Button):
+        self.step = 2
+        self._update_buttons()
+
+        embed = interaction.message.embeds[0]
+        embed.description = (
+            "**You raise your guard.**\n"
+            f"{E.SHIELD} **Block Success!**\n\n"
+            "The dummy tips over and bonks harmlessly against your defense. **0 Damage.**\n"
+            "Now, while it's off balance—finish it!"
+        )
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def finish_callback(self, interaction: discord.Interaction, button: Button):
+        self.step = 3
+        self._update_buttons()
+
+        embed = interaction.message.embeds[0]
+        embed.title = "🏆 Training Complete!"
+        embed.description = (
+            "**CRITICAL HIT!**\n"
+            "With a mighty blow, the straw dummy explodes into a cloud of hay.\n\n"
+            "The Clerk nods slowly. *\"Not bad. You didn't trip, at least.\"*\n\n"
+            "You are ready for the real thing."
+        )
+        embed.color = discord.Color.gold()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def complete_callback(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+
+        # Grant a small reward - Minor Potions (simulated logic, just calling add item)
+        # We assume potion_minor exists. If not, it fails silently or logs error, but we should be safe.
+        # "potion_minor" | "Minor Health Potion" | "consumable" | "Common"
+        try:
+             await asyncio.to_thread(
+                 self.db.add_inventory_item,
+                 self.user.id, "potion_minor", "Minor Health Potion", "consumable", "Common", 3
+             )
+        except Exception as e:
+            logger.error(f"Failed to grant tutorial reward: {e}")
+
+        await transition_to_guild_lobby(interaction, self.db, self.user)
 
 
 class OnboardingCog(commands.Cog):
