@@ -1,10 +1,14 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Mock pymongo before import
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_session import AdventureSession
@@ -118,7 +122,12 @@ class TestWildGathering(unittest.TestCase):
 
                 # Check call args
                 session.events.resolve_non_combat.assert_called_with(
-                    context=self.context, location_id="test_forest", regen_chance=70, location_name="Forest"
+                    context=self.context,
+                    location_id="test_forest",
+                    regen_chance=70,
+                    location_name="Forest",
+                    weather=ANY,
+                    event_type=ANY,
                 )
 
 

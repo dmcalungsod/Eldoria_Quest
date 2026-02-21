@@ -1,4 +1,5 @@
 import asyncio
+import importlib
 import os
 import sys
 import unittest
@@ -65,7 +66,11 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
     async def test_race_condition_double_click(self):
         # Import here to avoid conflict with other tests mocking discord
-        from game_systems.adventure.ui.exploration_view import ExplorationView
+        import game_systems.adventure.ui.exploration_view
+
+        # Ensure we have the real module, not a mock
+        importlib.reload(game_systems.adventure.ui.exploration_view)
+        ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
 
         # Setup mocks
         mock_db = MagicMock(spec=DatabaseManager)
