@@ -10,12 +10,19 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-from pymongo.errors import DuplicateKeyError
-
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
+
+# Create a real DuplicateKeyError class for mocking
+class DuplicateKeyError(Exception):
+    pass
+
+
+import database.database_manager as _dbm  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
+
+_dbm.DuplicateKeyError = DuplicateKeyError
 
 
 class TestRaceCondition(unittest.TestCase):
@@ -145,7 +152,7 @@ class TestRaceCondition(unittest.TestCase):
 
         # VERIFY
         self.assertFalse(success, "Learn should fail if duplicate key error")
-        self.assertIn("already learned", msg) # Or whatever message we choose for concurrent duplicate
+        self.assertIn("refunded", msg)  # The duplicate key path returns "System error (refunded)."
 
         # Verify calls
         # 1. Deduction
