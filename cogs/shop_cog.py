@@ -116,23 +116,15 @@ class ShopView(View):
             if not item_data:
                 return (False, "Item data missing.", 0)
 
-            # 1. Atomic Deduction
-            new_aurum = self.db.deduct_aurum(self.interaction_user.id, price)
-            if new_aurum is None:
-                return (False, "Insufficient Aurum.", 0)
-
-            # 2. Add item to inventory
-            self.db.add_inventory_item(
-                self.interaction_user.id,
-                item_key,
-                item_data["name"],
-                "consumable",
-                item_data["rarity"],
-                1,
+            # Delegate to DatabaseManager for atomic execution with refund support
+            success, result, new_balance = self.db.purchase_item(
+                self.interaction_user.id, item_key, item_data, price
             )
 
-            logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
-            return (True, item_data, new_aurum)
+            if success:
+                logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
+
+            return (success, result, new_balance)
 
         except Exception as e:
             logger.error(f"Purchase error: {e}", exc_info=True)
