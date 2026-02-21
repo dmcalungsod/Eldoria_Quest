@@ -1691,13 +1691,20 @@ class DatabaseManager:
         if not player:
             return False, "Player not found."
 
-        missing = max(0, max_hp - player["current_hp"])
-        if missing == 0 and player["current_mp"] >= max_mp:
+        missing_hp = max(0, max_hp - player["current_hp"])
+        missing_mp = max(0, max_mp - player["current_mp"])
+
+        if missing_hp == 0 and missing_mp == 0:
             return False, "You are already healthy."
 
         # Recalculate cost from fresh data
         # Use math.ceil for consistent rounding (aligns with InfirmaryCog)
-        actual_cost = max(1, math.ceil(missing * 0.5)) if missing > 0 else 0
+        # Cost is 0.5 Aurum per missing point (HP or MP)
+        total_missing = missing_hp + missing_mp
+        if total_missing > 0:
+            actual_cost = max(1, math.ceil(total_missing * 0.5))
+        else:
+            actual_cost = 0
 
         if player["aurum"] < actual_cost:
             return False, "Insufficient funds."
