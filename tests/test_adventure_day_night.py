@@ -1,5 +1,9 @@
+import os
 import sys
 from unittest.mock import MagicMock, patch
+
+# Add repo root to path
+sys.path.append(os.getcwd())
 
 # Mock pymongo before importing any app modules
 try:
@@ -105,7 +109,10 @@ class TestAdventureDayNight(unittest.TestCase):
                         # Verify Damage (20 * 0.8 = 16)
                         expected_hp = 100 - 16
                         self.assertEqual(self.mock_context["vitals"]["current_hp"], expected_hp)
-                        self.mock_db.set_player_vitals.assert_called_with(123456789, expected_hp, 50)
+                        # Verify atomic delta update is used
+                        self.mock_db.update_player_vitals_delta.assert_called_with(
+                            123456789, -16, 0, 100, 50
+                        )
 
     def test_night_no_ambush(self):
         """Nighttime encounter chance failure should not ambush."""
