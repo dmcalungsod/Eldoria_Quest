@@ -7,3 +7,8 @@
 
 **Learning:** `DatabaseManager.execute_heal` calculated cost solely based on missing HP (`missing = max(0, max_hp - player["current_hp"])`), but the update operation set both HP and MP to their maximums. This allowed players with full HP but empty MP to restore MP for free, violating the game's scarcity economy.
 **Action:** Ensure cost calculations account for *all* restored resources. Modified `execute_heal` to include missing MP in the cost formula (0.5 Aurum per point) and updated `InfirmaryView` to reflect this. Added `tests/test_infirmary_exploit.py` to prevent regression.
+
+## 2025-10-30 — Shop Stale State
+
+**Learning:** `ShopView` relied on cached `current_aurum` in its state to update the UI after a purchase attempt. If a player's balance changed externally (e.g., spent elsewhere) while the shop was open, a failed purchase would still display the old (stale) balance, confusing the user.
+**Action:** Implemented the "Refetch Critical Data" pattern. `ShopView` now explicitly fetches fresh player data from the database after every transaction attempt (successful or not) to ensure the UI reflects the true server state. Added `tests/test_shop_stale_state.py` to verify this behavior.
