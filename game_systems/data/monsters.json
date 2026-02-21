@@ -47,7 +47,7 @@
             "mend",
             "poison_spit"
         ],
-        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+        "description": "A translucent slime that refracts light. It hides in sunbeams to ambush prey."
     },
     "monster_003": {
         "id": 3,
@@ -95,7 +95,7 @@
         "skills": [
             "rapid_strike"
         ],
-        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+        "description": "Faster and more cunning than its kin, it marks targets for the main raiding party."
     },
     "monster_005": {
         "id": 5,
@@ -119,7 +119,7 @@
         "skills": [
             "rapid_strike"
         ],
-        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+        "description": "Its skin has hardened into bark-like armor, allowing it to blend perfectly with the twisted undergrowth."
     },
     "monster_006": {
         "id": 6,
@@ -196,7 +196,7 @@
         "skills": [
             "rapid_strike"
         ],
-        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+        "description": "A silent hunter that drops from the canopy. Its venom dissolves armor as easily as flesh."
     },
     "monster_009": {
         "id": 9,
@@ -241,7 +241,7 @@
             "vicious_bite",
             "rapid_strike"
         ],
-        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+        "description": "A massive canine with thorns protruding from its mange-ridden hide."
     },
     "monster_011": {
         "id": 11,
@@ -374,7 +374,7 @@
             "crushing_slam",
             "regenerate"
         ],
-        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+        "description": "A sapling given hateful life. It lashes out with branches that are hard as iron."
     },
     "monster_017": {
         "id": 17,
@@ -429,7 +429,7 @@
             "crushing_slam",
             "regenerate"
         ],
-        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+        "description": "Small but relentless, this animated plant swarm seeks to bury intruders in living soil."
     },
     "monster_019": {
         "id": 19,
@@ -570,7 +570,7 @@
             "vicious_bite",
             "rapid_strike"
         ],
-        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+        "description": "A wolf adapted to the rocky slopes, its howl chills the blood of even seasoned travelers."
     },
     "monster_025": {
         "id": 25,
@@ -666,7 +666,7 @@
         "skills": [
             "heavy_blow"
         ],
-        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+        "description": "A shadow that peels away from the darkness to strike. It fears the light of the crystals."
     },
     "monster_029": {
         "id": 29,
@@ -694,7 +694,7 @@
         "skills": [
             "ember"
         ],
-        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+        "description": "A floating eye of burning mana that alerts nearby monsters to intruders."
     },
     "monster_030": {
         "id": 30,
@@ -750,7 +750,7 @@
         "skills": [
             "ember"
         ],
-        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+        "description": "An armored spirit that guards the boundaries of the Veil, striking down all who trespass."
     },
     "monster_032": {
         "id": 32,
@@ -778,7 +778,7 @@
         "skills": [
             "heavy_blow"
         ],
-        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+        "description": "A drowned corpse animated by swamp magic, eternally seeking to drag others into the muck."
     },
     "monster_033": {
         "id": 33,
@@ -870,7 +870,7 @@
         "skills": [
             "heavy_blow"
         ],
-        "description": "A creature of the Shattered Veil, prowling the wilds in search of prey."
+        "description": "A ghostly figure that mimics the cries of lost children to lure travelers off the path."
     },
     "monster_036": {
         "id": 36,
@@ -903,7 +903,7 @@
             "crushing_slam",
             "regenerate"
         ],
-        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+        "description": "An ancient giant of the woods, its heartwood corrupted by centuries of Veil exposure."
     },
     "monster_037": {
         "id": 37,
@@ -932,7 +932,7 @@
             "vicious_bite",
             "rapid_strike"
         ],
-        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+        "description": "A creature of nightmares, its fur absorbs light and its bite inflicts a creeping cold."
     },
     "monster_038": {
         "id": 38,
@@ -981,7 +981,7 @@
             "crushing_slam",
             "regenerate"
         ],
-        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+        "description": "A twisted mockery of life, leaking poisonous sap from its cracked bark."
     },
     "monster_040": {
         "id": 40,
@@ -1005,7 +1005,7 @@
         "skills": [
             "heavy_blow"
         ],
-        "description": "The forest itself, awakened by dark magic and twisted into a guardian of rot."
+        "description": "A beautiful but deadly flower that releases paralytic pollen when approached."
     },
     "monster_041": {
         "id": 41,
@@ -1034,7 +1034,7 @@
             "mend",
             "poison_spit"
         ],
-        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+        "description": "A massive convergence of lesser slimes. Its acidic touch melts steel in seconds."
     },
     "monster_042": {
         "id": 42,
@@ -1063,7 +1063,7 @@
             "mend",
             "poison_spit"
         ],
-        "description": "A gelatinous mass of corrupted mana. It digests anything it touches, leaving only clean bone."
+        "description": "Radiating a blinding light, this slime disorients its victims before consuming them."
     },
     "monster_043": {
         "id": 43,
@@ -1092,7 +1092,7 @@
             "rapid_strike",
             "heavy_blow"
         ],
-        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+        "description": "A battle-scarred goblin veteran, wielding stolen weapons with deadly proficiency."
     },
     "monster_044": {
         "id": 44,
@@ -1121,7 +1121,7 @@
             "rapid_strike",
             "heavy_blow"
         ],
-        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+        "description": "A master tracker that never loses its quarry. It strikes from the shadows with lethal precision."
     },
     "monster_045": {
         "id": 45,
@@ -1150,7 +1150,7 @@
             "rapid_strike",
             "heavy_blow"
         ],
-        "description": "A stunted, vicious scavenger born from the Sundering. It covets shiny objects and fresh meat."
+        "description": "Covered in iron-hard thorns, this goblin is a walking fortress of the forest."
     },
     "monster_046": {
         "id": 46,
@@ -1179,7 +1179,7 @@
             "vicious_bite",
             "rapid_strike"
         ],
-        "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
+        "description": "The alpha of the litter, grown to monstrous size and cunning."
     },
     "monster_047": {
         "id": 47,
@@ -1207,7 +1207,7 @@
         "skills": [
             "heavy_blow"
         ],
-        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+        "description": "A broodmother in the making, its webs are nearly invisible and unbreakable."
     },
     "monster_048": {
         "id": 48,
@@ -1235,7 +1235,7 @@
         "skills": [
             "heavy_blow"
         ],
-        "description": "A multi-legged horror that spins webs of sticky, mana-infused silk to entrap the unwary."
+        "description": "An ancient arachnid that has feasted on mana stones, granting it terrifying speed."
     },
     "monster_049": {
         "id": 49,
@@ -1263,7 +1263,7 @@
         "skills": [
             "ember"
         ],
-        "description": "A flickering remnant of a soul lost to the Void, now seeking warmth to steal."
+        "description": "A coalesced storm of soul-energy, burning with a cold and hungry fire."
     },
     "monster_050": {
         "id": 50,

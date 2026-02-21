@@ -52,10 +52,12 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 2.  **Whispering Thicket (Rank E):** Dense, dark woods where sunlight fails. Home to pack hunters (wolves, spiders).
 3.  **Deepgrove Roots (Rank D):** The corrupted heart of the forest. Twisted roots, rot, and ancient treants.
 4.  **The Shrouded Fen (Rank C):** A wetland choked by magical fog. Spirits and drowned things lurk here.
-5.  **The Crystal Caverns (Rank B):** Subterranean tunnels filled with glowing, sharp crystals and ancient constructs.
-6.  **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
-7.  **The Frostfall Expanse (Rank A):** A frozen wasteland of eternal winter.
-8.  **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
+5.  **The Sunken Grotto (Rank C):** A submerged cavern network lit by bioluminescence. The water here is deep and cold.
+6.  **The Crystal Caverns (Rank B):** Subterranean tunnels filled with glowing, sharp crystals and ancient constructs.
+7.  **The Clockwork Halls (Rank B):** A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.
+8.  **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
+9.  **The Frostfall Expanse (Rank A):** A frozen wasteland of eternal winter.
+10. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
 
 ---
 
