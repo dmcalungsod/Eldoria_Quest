@@ -100,6 +100,7 @@ class TestWildGathering(unittest.TestCase):
 
     def test_adventure_session_integration(self):
         """Test that AdventureSession passes location_id correctly."""
+        from unittest.mock import ANY
 
         session = AdventureSession(self.db, self.quest_system, self.inventory_manager, self.discord_id)
         session.events = MagicMock()
@@ -116,9 +117,14 @@ class TestWildGathering(unittest.TestCase):
             with patch("random.randint", return_value=10):
                 session.simulate_step()
 
-                # Check call args
+                # Check call args (weather and event_type are now passed by simulate_step)
                 session.events.resolve_non_combat.assert_called_with(
-                    context=self.context, location_id="test_forest", regen_chance=70, location_name="Forest"
+                    context=self.context,
+                    location_id="test_forest",
+                    regen_chance=70,
+                    location_name="Forest",
+                    weather=ANY,
+                    event_type=ANY,
                 )
 
 
