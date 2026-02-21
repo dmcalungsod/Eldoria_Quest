@@ -44,3 +44,30 @@
 ### 📝 Notes
 - "The" is avoided for most names, except "The Frostfall Expanse" (Location) and "The Glacial Rift" (Feature).
 - Names emphasize the harsh, survival aspect ("Grim", "Blighted", "Hollow").
+
+## 2026-02-21 — The Alchemist Class
+
+**Request:** Proactive (based on Architect's Design for Alchemist Class)
+**Context:** Grim Science, Medical Horror, Pragmatism.
+**Tone:** Clinical, archaic, desperate. Avoid "Magic" terms.
+
+### 📜 Generated Names
+
+#### 🧪 Skills (Flavor Upgrades)
+1.  **Vitriol Phial** (Acid Flask) – Emphasizes the chemical burn.
+2.  **Cauterize** (Field Triage) – Implies pain and necessity.
+3.  **Fulminating Flask** (Volatile Brew) – Archaic term for explosive compounds.
+4.  **Quicksilver Blood** (Adrenal Injector) – Suggests unnatural speed and toxicity.
+5.  **Vulture's Eye** (Scavenger's Intuition) – Fits the scavenger theme.
+
+#### 🗡️ Weapons
+1.  **Obsidian Lancet** – Sharper than steel, fragile but deadly.
+2.  **Bone-Saw Dagger** – Brutal utility.
+3.  **Injector Blade** – Weaponized medicine.
+
+#### 🏷️ Titles
+1.  **Scavenger** -> **Mixologist** -> **Apothecary** -> **Chirurgeon** -> **Transmuter**
+
+### 📝 Notes
+- "Potion" is too generic/fantasy. Use "Phial", "Draught", "Serum".
+- Names should sound like they belong in a field hospital or a lab, not a wizard's tower.
