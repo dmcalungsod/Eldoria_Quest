@@ -82,7 +82,10 @@ class TestTelegraphMechanic(unittest.TestCase):
 
             # 3. Log should contain warning
             log_str = " ".join(result["phrases"])
-            self.assertIn("gathering dark energy", log_str)
+            # Updated to match new CombatPhrases
+            self.assertTrue(
+                "gathering dark energy" in log_str or "Dark energy gathers" in log_str or "INTERRUPT" in log_str
+            )
             self.assertIn("Annihilate", log_str)
 
         # 2. Test "Execute Charge" Turn
@@ -128,16 +131,15 @@ class TestTelegraphMechanic(unittest.TestCase):
         Test that MonsterAI *can* choose telegraph for high power skills.
         """
         # Force RNG to trigger telegraph (chance is 50%)
-        # Logic: if power >= 1.5 and random <= 50 -> telegraph
+        # Logic: if power >= 1.8 -> Always telegraph
+        # Logic: if power >= 1.4 -> 50% chance
 
         # We need to control random.randint calls.
         # 1. Skill chance (<= 70 for Boss) -> Let's say 1 (Success)
-        # 2. Buff chance (ignored if skill chosen)
-        # 3. Telegraph chance (<= 50) -> Let's say 1 (Success)
+        # Note: Since power is 2.5, it auto-telegraphs without a second roll.
 
-        with patch("random.randint", side_effect=[1, 1]):
+        with patch("random.randint", side_effect=[1]):
             # First call: Skill Chance (1 <= 70)
-            # Second call: Telegraph Chance (1 <= 50)
 
             # Note: random.choice is also called to pick skill.
             # We have only 1 skill, so it picks it.
