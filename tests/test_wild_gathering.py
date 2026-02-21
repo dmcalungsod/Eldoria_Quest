@@ -10,10 +10,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.adventure.event_handler import EventHandler
-from game_systems.player.player_stats import PlayerStats
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.adventure.event_handler import EventHandler  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestWildGathering(unittest.TestCase):
