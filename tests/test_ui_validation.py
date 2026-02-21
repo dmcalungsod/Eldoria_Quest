@@ -16,6 +16,8 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
             "discord.ext": MagicMock(),
             "discord.ext.commands": MagicMock(),
             "pymongo": MagicMock(),
+            "pymongo.errors": MagicMock(),
+            "pymongo.MongoClient": MagicMock(),
         })
         self.modules_patcher.start()
 

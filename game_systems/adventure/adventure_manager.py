@@ -157,7 +157,11 @@ class AdventureManager:
                 }
                 for item in items
             ]
-            self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+
+            if failed_items:
+                failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
+                loss_report.append(f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}")
 
             self.db.end_adventure_session(discord_id)
 
@@ -231,7 +235,10 @@ class AdventureManager:
                 }
                 for item in items_to_add
             ]
-            self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+
+            if failed_items:
+                summary["failed_items"] = failed_items
 
             # End session ONLY after items are safely added
             self.db.end_adventure_session(discord_id)

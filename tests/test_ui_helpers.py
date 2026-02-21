@@ -9,6 +9,11 @@ sys.modules["discord.ui"] = MagicMock()
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["pymongo.MongoClient"] = MagicMock()
+
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
