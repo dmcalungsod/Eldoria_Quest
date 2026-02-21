@@ -24,8 +24,9 @@ logger = logging.getLogger("eldoria.infirmary")
 
 
 def infirmary_cost(missing_hp: int, missing_mp: int) -> int:
-    total_missing = missing_hp + missing_mp
-    return max(1, math.ceil(total_missing * 0.5)) if total_missing > 0 else 0
+    if missing_hp <= 0 and missing_mp <= 0:
+        return 0
+    return max(1, math.ceil(missing_hp * 2.0 + missing_mp * 3.0))
 
 
 class InfirmaryView(View):
@@ -114,10 +115,27 @@ class InfirmaryView(View):
         hp_bar = make_progress_bar(p["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(p["current_mp"], stats.max_mp)
 
+        # Dynamic Description based on Health
+        hp_percent = p["current_hp"] / max(stats.max_hp, 1)
+        if hp_percent < 0.3:
+            flavor = (
+                "The healers rush to your side, their faces grave. Blood soaks your gear, and your "
+                "breath comes in ragged gasps. 'Stabilize them, now!' someone shouts."
+            )
+        elif hp_percent < 0.7:
+            flavor = (
+                "You limp to a cot, wincing as a Healer inspects your wounds. 'Deep cuts,' they mutter, "
+                "reaching for a jar of stinging salve. 'This will not be pleasant.'"
+            )
+        else:
+            flavor = (
+                "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
+                "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
+                "but genuine."
+            )
+
         description = (
-            "Soft green lanternlight fills the chamber as a Guild Healer works calmly among "
-            "rows of treated bandages and tinctures. Their craft is precise — compassion measured, "
-            "but genuine.\n\n"
+            f"{flavor}\n\n"
             "**Condition**\n"
             f"> {E.HP} **HP:** `{hp_bar}` {p['current_hp']} / {stats.max_hp}\n"
             f"> {E.MP} **MP:** `{mp_bar}` {p['current_mp']} / {stats.max_mp}\n\n"
@@ -126,7 +144,10 @@ class InfirmaryView(View):
         )
 
         if hp_miss > 0 or mp_miss > 0:
-            description += f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP/MP)."
+            description += (
+                f"A full course of treatment will cost **{cost} {E.AURUM}**.\n"
+                "*Rates: 2.0 Aurum per HP, 3.0 Aurum per MP (Magic is taxing).*"
+            )
         else:
             description += "You stand in peak condition; no treatment is required."
 

@@ -25,8 +25,8 @@ DEFAULT_MONGO_URI = "mongodb://localhost:27017"
 DEFAULT_DB_NAME = "eldoria_quest"
 
 MAX_INVENTORY_SLOTS = 20
-MAX_STACK_CONSUMABLE = 20
-MAX_STACK_MATERIAL = 99
+MAX_STACK_CONSUMABLE = 5
+MAX_STACK_MATERIAL = 50
 MAX_STACK_EQUIPMENT = 1
 MAX_STACK_DEFAULT = 10
 
@@ -1759,10 +1759,10 @@ class DatabaseManager:
 
         # Recalculate cost from fresh data
         # Use math.ceil for consistent rounding (aligns with InfirmaryCog)
-        # Cost is 0.5 Aurum per missing point (HP or MP)
-        total_missing = missing_hp + missing_mp
-        if total_missing > 0:
-            actual_cost = max(1, math.ceil(total_missing * 0.5))
+        # Cost is 2.0 Aurum per missing HP, 3.0 Aurum per missing MP
+        # Magic is biologically taxing to restore.
+        if missing_hp > 0 or missing_mp > 0:
+            actual_cost = max(1, math.ceil(missing_hp * 2.0 + missing_mp * 3.0))
         else:
             actual_cost = 0
 
