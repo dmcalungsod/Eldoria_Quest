@@ -14,6 +14,7 @@ from cogs.ui_helpers import get_health_status_emoji, make_progress_bar
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.ui.embeds")
 
@@ -108,7 +109,11 @@ class AdventureEmbeds:
                 inline=True,
             )
 
-        # 6. Footer
+        # 6. World Time Field
+        time_flavor = WorldTime.get_phase_flavor()
+        embed.add_field(name="🕒 World Time", value=time_flavor, inline=False)
+
+        # 7. Footer
         if active_monster:
             embed.set_footer(text="Choose your combat action • Field Pack to use items")
         else:
