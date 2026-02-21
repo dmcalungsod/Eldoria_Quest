@@ -1557,43 +1557,36 @@ class DatabaseManager:
     def purchase_item(
         self, discord_id: int, item_key: str, item_data: dict, price: int
     ) -> tuple[bool, Any, int]:
-        """Atomic purchase: deducts gold and adds item."""
+        """Atomic purchase: deducts gold and adds item. Includes refund on failure."""
         # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
         if new_aurum is None:
             return (False, "Insufficient Aurum.", 0)
 
-        # 2. Add item to inventory
-        existing = self._col("inventory").find_one(
-            {
-                "discord_id": discord_id,
-                "item_key": item_key,
-                "rarity": item_data["rarity"],
-                "equipped": 0,
-            }
-        )
-        if existing:
-            self._col("inventory").update_one(
-                {"id": existing["id"]}, {"$inc": {"count": 1}}
+        # 2. Add item to inventory with Refund Logic
+        try:
+            self.add_inventory_item(
+                discord_id,
+                item_key,
+                item_data["name"],
+                "consumable",
+                item_data["rarity"],
+                1,
             )
-        else:
-            new_id = self._next_inventory_id()
-            self._col("inventory").insert_one(
-                {
-                    "id": new_id,
-                    "discord_id": discord_id,
-                    "item_key": item_key,
-                    "item_name": item_data["name"],
-                    "item_type": "consumable",
-                    "rarity": item_data["rarity"],
-                    "slot": None,
-                    "item_source_table": None,
-                    "count": 1,
-                    "equipped": 0,
-                }
-            )
+            return (True, item_data, new_aurum)
 
-        return (True, item_data, new_aurum)
+        except Exception as e:
+            logger.error(f"Purchase failed for {discord_id}, refunding {price}: {e}")
+
+            # REFUND
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$inc": {"aurum": price}},
+            )
+            # Re-calculate balance manually since we refunded
+            refunded_balance = new_aurum + price
+
+            return (False, "System error (refunded).", refunded_balance)
 
     # ============================================================
     # INFIRMARY (New methods for external call sites)
