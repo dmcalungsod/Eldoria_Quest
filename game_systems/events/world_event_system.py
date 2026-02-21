@@ -19,6 +19,7 @@ class WorldEventSystem:
     BLOOD_MOON = "blood_moon"
     CELESTIAL_CONVERGENCE = "celestial_convergence"
     VOID_INCURSION = "void_incursion"
+    HARVEST_FESTIVAL = "harvest_festival"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -47,6 +48,16 @@ class WorldEventSystem:
                 "loot_boost": 1.2,
                 "exp_boost": 2.0,
                 "monster_buff": 1.5,
+            },
+        },
+        HARVEST_FESTIVAL: {
+            "name": "Grand Harvest Festival",
+            "description": "The fields are golden and nature's bounty overflows. Gathering yields are doubled!",
+            "modifiers": {
+                "loot_boost": 1.2,
+                "exp_boost": 1.1,
+                "monster_buff": 1.0,
+                "gathering_boost": 2.0,
             },
         },
     }
