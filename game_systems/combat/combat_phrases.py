@@ -725,6 +725,40 @@ class CombatPhrases:
         return random.choice(phrases)
 
     @staticmethod
+    def telegraph_warning(monster, skill) -> str:
+        m_name = str(monster.get("name", "the creature"))
+        skill_name = str(skill.get("name", "Unknown Attack"))
+        skill_type = skill.get("type", "physical")
+
+        # Magic types -> Interrupt (Attack)
+        if skill_type in ["magical", "fire", "ice", "poison", "water", "wind", "earth", "dark", "holy"]:
+            hint = "**INTERRUPT** (Attack!)"
+            phrases = [
+                f"⚠️ The {m_name} begins chanting **{skill_name}**! {hint}",
+                f"⚠️ Dark energy gathers for **{skill_name}** around the {m_name}! {hint}",
+                f"⚠️ The {m_name} focuses to cast **{skill_name}**! {hint}",
+            ]
+        # Physical types -> Parry (Defend)
+        else:
+            hint = "**PARRY** (Defend!)"
+            phrases = [
+                f"⚠️ The {m_name} winds up for a massive **{skill_name}**! {hint}",
+                f"⚠️ The {m_name} roars and prepares to crush you with **{skill_name}**! {hint}",
+                f"⚠️ The {m_name} takes a heavy stance for **{skill_name}**! {hint}",
+            ]
+        return random.choice(phrases)
+
+    @staticmethod
+    def counter_success(monster, skill, counter_type) -> str:
+        m_name = str(monster.get("name", "the creature"))
+        skill_name = str(skill.get("name", "attack"))
+
+        if counter_type == "interrupt":
+            return f"⚡ **INTERRUPTED!** You strike the {m_name} while it channels **{skill_name}**! (CRITICAL HIT + STUN)"
+        else:
+            return f"🛡️ **PARRIED!** You deflect the {m_name}'s **{skill_name}** perfectly! (REFLECT DAMAGE + STUN)"
+
+    @staticmethod
     def player_victory(monster, exp, gold, leveled_up, new_level) -> str:
         m_name = str(monster.get("name", "the enemy"))
 
