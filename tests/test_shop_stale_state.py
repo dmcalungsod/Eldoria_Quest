@@ -1,8 +1,17 @@
+import os
 import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# Mock discord and database before importing shop_cog
+# Align sys.path
+sys.path.append(os.getcwd())
+
+# Mock dependencies BEFORE importing ShopView
+# We mock pymongo so DatabaseManager can be imported safely
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+
+# Mock discord and discord.ui
 mock_discord = MagicMock()
 mock_ui = MagicMock()
 
@@ -23,9 +32,9 @@ sys.modules["discord"] = mock_discord
 sys.modules["discord.ui"] = mock_ui
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
-sys.modules["database.database_manager"] = MagicMock()
 
-sys.path.append(".")
+# DO NOT mock database.database_manager directly, as other tests need the real module.
+# ShopView imports DatabaseManager class, so we let it import the real class (which uses mocked pymongo).
 
 # Now import the class under test
 from cogs.shop_cog import ShopView  # noqa: E402
@@ -40,6 +49,7 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         initial_aurum = 100
 
         # Create view with 100 aurum (stale state)
+        # We pass a mock DB instance, so ShopView uses that instance.
         view = ShopView(mock_db, mock_user, initial_aurum)
 
         # Mock interaction
