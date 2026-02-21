@@ -1,7 +1,7 @@
-import sys
-import os
-import unittest
 import importlib
+import os
+import sys
+import unittest
 from unittest.mock import MagicMock, patch
 
 # Add repo root to path
@@ -35,9 +35,14 @@ class TestGuildLobbyView(unittest.TestCase):
         sys.modules["pymongo"] = MagicMock()
         sys.modules["pymongo.errors"] = MagicMock()
 
+        # Reload components first to ensure ViewFactory picks up the mocked Button
+        import game_systems.guild_system.ui.components
+        importlib.reload(game_systems.guild_system.ui.components)
+
         # Import target module
         import game_systems.guild_system.ui.lobby_view
         importlib.reload(game_systems.guild_system.ui.lobby_view)
+
         self.lobby_module = game_systems.guild_system.ui.lobby_view
         self.GuildLobbyView = self.lobby_module.GuildLobbyView
 
