@@ -62,8 +62,8 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # --- IMPORT MODULE UNDER TEST (force reload to pick up our mocks) ---
-import importlib
-import cogs.skill_trainer_cog as _stc_mod
+import importlib  # noqa: E402
+import cogs.skill_trainer_cog as _stc_mod  # noqa: E402
 
 importlib.reload(_stc_mod)
 

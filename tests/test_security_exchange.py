@@ -15,8 +15,8 @@ sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo_errors
 
 # Now import modules under test
-from game_systems.guild_system.guild_exchange import GuildExchange
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.guild_system.guild_exchange import GuildExchange  # noqa: E402
 
 class TestGuildExchangeSecurity(unittest.TestCase):
     def setUp(self):
