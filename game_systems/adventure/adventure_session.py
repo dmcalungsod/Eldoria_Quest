@@ -272,7 +272,14 @@ class AdventureSession:
                         current_hp = context["vitals"]["current_hp"]
                         new_hp = max(0, current_hp - damage)
                         context["vitals"]["current_hp"] = new_hp
-                        self.db.set_player_vitals(self.discord_id, new_hp, context["vitals"]["current_mp"])
+
+                        # Use Delta Update
+                        max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
+                        max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+
+                        self.db.update_player_vitals_delta(
+                            self.discord_id, -damage, 0, max_hp, max_mp
+                        )
 
                         phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
@@ -382,6 +389,9 @@ class AdventureSession:
         stats_dict = context.get("stats_dict")
         # vitals are in context and updated in loop
 
+        initial_hp = context["vitals"]["current_hp"]
+        initial_mp = context["vitals"]["current_mp"]
+
         # Max 8 turns to avoid infinite loops
         stance = self.active_monster.get("player_stance", "balanced")
         for _ in range(8):
@@ -420,11 +430,15 @@ class AdventureSession:
                 self.active_monster = None
                 break
 
-        # Save final vitals
-        self.db.set_player_vitals(
-            self.discord_id,
-            context["vitals"]["current_hp"],
-            context["vitals"]["current_mp"],
+        # Save final vitals via Delta
+        delta_hp = context["vitals"]["current_hp"] - initial_hp
+        delta_mp = context["vitals"]["current_mp"] - initial_mp
+
+        max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
+        max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
+
+        self.db.update_player_vitals_delta(
+            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
         )
 
         # Final Results Block

@@ -338,6 +338,27 @@ class DatabaseManager:
             {"$set": {"current_hp": hp, "current_mp": mp}},
         )
 
+    def update_player_vitals_delta(
+        self, discord_id: int, hp_delta: int, mp_delta: int, max_hp: int, max_mp: int
+    ):
+        """
+        Updates HP/MP by a delta, clamping to [0, max].
+        Uses MongoDB aggregation pipeline in update for atomicity.
+        """
+        pipeline = [
+            {
+                "$set": {
+                    "current_hp": {
+                        "$min": [max_hp, {"$max": [0, {"$add": ["$current_hp", hp_delta]}]}]
+                    },
+                    "current_mp": {
+                        "$min": [max_mp, {"$max": [0, {"$add": ["$current_mp", mp_delta]}]}]
+                    },
+                }
+            }
+        ]
+        self._col("players").update_one({"discord_id": discord_id}, pipeline)
+
     def update_player_level_data(self, discord_id: int, level: int, exp: int, exp_to_next: int):
         """Updates level and experience values."""
         self._col("players").update_one(
