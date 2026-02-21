@@ -54,13 +54,9 @@ class MonsterAI:
                     chosen = random.choice(offensive_skills)
 
                     # --- TELEGRAPH LOGIC ---
-                    # High power skills (>= 1.5) have a chance to be telegraphed.
-                    # Ultra-Heavy attacks (>= 2.0) are ALWAYS telegraphed to allow counterplay.
+                    # High power skills (>= 1.5) have a 50% chance to be telegraphed first.
+                    # This gives players a warning and a chance to defend.
                     power = float(chosen.get("power", 1.0))
-
-                    if power >= 2.0:
-                        return {"type": "telegraph", "skill": chosen}
-
                     if power >= 1.5 and random.randint(1, 100) <= 50:
                         return {"type": "telegraph", "skill": chosen}
 

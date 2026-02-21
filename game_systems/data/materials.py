@@ -274,23 +274,4 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1500,
     },
-    # --- Faction Materials ---
-    "map_fragment": {
-        "name": "Map Fragment",
-        "description": "A scrap of parchment detailing a section of the dungeon.",
-        "rarity": "Common",
-        "value": 10,
-    },
-    "whetstone": {
-        "name": "Whetstone",
-        "description": "A smooth stone used for sharpening blades on the go.",
-        "rarity": "Common",
-        "value": 10,
-    },
-    "research_notes": {
-        "name": "Research Notes",
-        "description": "Scrawled observations about the dungeon's ecology and magic.",
-        "rarity": "Common",
-        "value": 10,
-    },
 }
