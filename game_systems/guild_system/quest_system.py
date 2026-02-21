@@ -40,27 +40,11 @@ class QuestSystem:
             quests = list(
                 self.db._col("quests").find(
                     {"tier": {"$in": allowed_tiers}},
-                    {"_id": 0, "id": 1, "title": 1, "tier": 1, "summary": 1, "prerequisites": 1},
+                    {"_id": 0, "id": 1, "title": 1, "tier": 1, "summary": 1},
                 )
             )
 
-            available = []
-            completed_ids = self.db.get_player_completed_quest_ids(discord_id)
-
-            for q in quests:
-                if q["id"] in taken_ids:
-                    continue
-
-                prereqs = q.get("prerequisites", [])
-                if not isinstance(prereqs, list):
-                    prereqs = []
-
-                if prereqs and not all(pid in completed_ids for pid in prereqs):
-                    continue
-
-                available.append(q)
-
-            return available
+            return [q for q in quests if q["id"] not in taken_ids]
         except Exception as e:
             logger.error(f"Error fetching quests for {discord_id}: {e}", exc_info=True)
             return []

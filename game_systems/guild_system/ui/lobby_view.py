@@ -4,20 +4,23 @@ The main entry point for the Guild Hall.
 Hardened: Async loading and circular import protection.
 """
 
+import asyncio
 import discord
 from discord.ui import View
 
 from cogs.ui_helpers import back_to_profile_callback
 from database.database_manager import DatabaseManager
+from game_systems.guild_system.advisor import GuildAdvisor
 
 from .components import EmbedBuilder, GuildViewMixin, ViewFactory
 
 
 class GuildLobbyView(View, GuildViewMixin):
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User):
+    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, rank: str = "F"):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
+        self.rank = rank
         self._setup_buttons()
 
     def _setup_buttons(self):
@@ -47,6 +50,19 @@ class GuildLobbyView(View, GuildViewMixin):
             )
         )
 
+        # New Player Advisor Button (Rank F and E only)
+        if self.rank in ["F", "E"]:
+            self.add_item(
+                ViewFactory.create_button(
+                    "Advisor",
+                    discord.ButtonStyle.secondary,
+                    "lobby_advisor",
+                    "🗣️",
+                    1,
+                    callback=self._advisor_callback,
+                )
+            )
+
     async def _quests_btn_callback(self, interaction: discord.Interaction):
         from .quests_menu import QuestsMenuView
 
@@ -60,3 +76,15 @@ class GuildLobbyView(View, GuildViewMixin):
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
         await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
+
+    async def _advisor_callback(self, interaction: discord.Interaction):
+        advisor = GuildAdvisor(self.db, self.interaction_user.id)
+        # Run blocking DB calls in a thread
+        advice = await asyncio.to_thread(advisor.get_advice)
+
+        embed = discord.Embed(
+            title="🗣️ Guild Advisor",
+            description=f"*An old veteran leans against a pillar, eyeing you up and down.*\n\n“{advice}”",
+            color=discord.Color.light_grey(),
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
