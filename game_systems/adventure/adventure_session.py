@@ -15,6 +15,11 @@ from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
 from game_systems.world_time import WorldTime, Weather
 
+# Subsystems
+from .adventure_rewards import AdventureRewards
+from .combat_handler import CombatHandler
+from .event_handler import EventHandler
+
 # Constants for Dynamic Weather Effects
 WEATHER_DMG_PCT = {
     Weather.ASH: 0.05,  # 5% Max HP
@@ -26,11 +31,6 @@ WEATHER_FLEE_PENALTY = {
     Weather.FOG: 20,  # -20% Chance
     Weather.STORM: 10,  # -10% Chance
 }
-
-# Subsystems
-from .adventure_rewards import AdventureRewards
-from .combat_handler import CombatHandler
-from .event_handler import EventHandler
 
 logger = logging.getLogger("eldoria.session")
 

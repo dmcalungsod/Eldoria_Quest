@@ -4,11 +4,11 @@ from unittest.mock import MagicMock
 # Mock pymongo globally BEFORE any other imports
 sys.modules["pymongo"] = MagicMock()
 
-import unittest
-from unittest.mock import patch
-from game_systems.adventure.adventure_session import AdventureSession, WEATHER_DMG_PCT, WEATHER_FLEE_PENALTY
-from game_systems.world_time import Weather
-from game_systems.player.player_stats import PlayerStats
+import unittest  # noqa: E402
+from unittest.mock import patch  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession, WEATHER_DMG_PCT, WEATHER_FLEE_PENALTY  # noqa: E402
+from game_systems.world_time import Weather  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestWeatherEffects(unittest.TestCase):
     def setUp(self):
@@ -51,9 +51,16 @@ class TestWeatherEffects(unittest.TestCase):
         self.session = AdventureSession(self.mock_db, self.mock_quest, self.mock_inv, self.discord_id, self.context_bundle["active_session"])
 
     @patch("game_systems.adventure.adventure_session.WorldTime")
-    def test_ash_storm_damage(self, MockWorldTime):
+    @patch("game_systems.adventure.adventure_session.random.randint")
+    def test_ash_storm_damage(self, mock_randint, MockWorldTime):
         """Verify Ash Storm deals damage and logs it."""
         MockWorldTime.get_current_weather.return_value = Weather.ASH
+
+        # Force combat (roll > 40) so we avoid non-combat regen logic obscuring damage
+        mock_randint.return_value = 99
+
+        # Mock combat init to return a dummy monster immediately
+        self.session.combat.initiate_combat = MagicMock(return_value=({"name": "TestMob", "level": 1}, "A monster appears!"))
 
         # Initial HP
         initial_hp = self.context_bundle["player"]["current_hp"]
