@@ -50,7 +50,7 @@ class MockSelect(RealItem):
 discord = MagicMock()
 discord.ui.View = MockView
 discord.ui.Button = MockButton
-discord.ui.Select = MockSelect
+discord.ui.Select = MagicMock(side_effect=lambda *args, **kwargs: MockSelect(*args, **kwargs))
 discord.ButtonStyle = MagicMock()
 discord.User = MagicMock()
 discord.Embed = MagicMock()
@@ -60,6 +60,10 @@ sys.modules["discord"] = discord
 sys.modules["discord.ui"] = discord.ui
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
+
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # --- IMPORT MODULE UNDER TEST ---
 from cogs.skill_trainer_cog import SkillTrainerView, get_upgrade_cost  # noqa: E402
