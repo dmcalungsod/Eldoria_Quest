@@ -244,9 +244,20 @@ class EventHandler:
                 if random.random() < 0.20:
                     quantity += 1
 
+                # Apply Gathering Boost (e.g., Harvest Festival)
+                boosts = context.get("active_boosts", {})
+                gathering_mult = boosts.get("gathering_boost", 1.0)
+                if gathering_mult > 1.0:
+                    quantity = int(quantity * gathering_mult)
+                    # Ensure at least 1 if multiplier somehow reduces it (unlikely but safe)
+                    quantity = max(1, quantity)
+
                 name = mat_data["name"]
                 # Format name with quantity if > 1
                 display_name = f"{name} (x{quantity})" if quantity > 1 else name
+
+                if gathering_mult > 1.0:
+                    display_name += f" {E.BUFF} (Bonus)"
 
                 event_text = f"\n{AdventureEvents.wild_gather_event(display_name)}"
                 return {

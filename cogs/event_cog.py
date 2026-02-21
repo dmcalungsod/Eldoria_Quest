@@ -37,13 +37,29 @@ class EventCog(commands.Cog):
         """
         Runs every hour to check event status.
         - Ends expired events.
+        - Starts seasonal events.
         """
         try:
             # get_current_event automatically handles expiration
             active = self.system.get_current_event()
-            # If we wanted to announce transitions automatically, we'd need to track state.
-            # For now, we rely on the command or manual expiration.
-            pass
+
+            # --- Seasonal Event Check ---
+            if not active:
+                now = datetime.datetime.now()
+
+                # Grand Harvest Festival: Oct 1st - Oct 7th
+                # Only auto-start on Oct 1st (to avoid spamming starts if manually ended)
+                if now.month == 10 and now.day == 1 and now.hour == 12:
+                    success = self.system.start_event(WorldEventSystem.HARVEST_FESTIVAL, 24 * 7)
+                    if success:
+                        config = self.system.EVENT_CONFIGS[WorldEventSystem.HARVEST_FESTIVAL]
+                        await self._announce(
+                            f"🍂 **SEASONAL EVENT STARTED!** 🍂\n\n"
+                            f"**{config['name']}**\n"
+                            f"{config['description']}\n\n"
+                            f"Gathering yields are doubled for the next week! 🌾"
+                        )
+                        logger.info("Auto-started Harvest Festival.")
 
         except Exception as e:
             logger.error(f"Error in event cycle: {e}", exc_info=True)
