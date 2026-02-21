@@ -12,14 +12,16 @@ from game_systems.rewards.loot_calculator import LootCalculator
 
 class TestLootCalculator(unittest.TestCase):
     def test_calculate_drop_chance_common(self):
-        # Common item: No Luck scaling (multiplier only from boost)
+        # Common item: Luck scaling applies (now enabled for all)
         base = 10.0
         rarity = "Common"
-        luck = 999
+        luck = 1000
         boost = 1.0
 
+        # Formula: 1 + (1000/1000) = 2.0x
+        # 10 * 2.0 = 20.0
         chance = LootCalculator.calculate_drop_chance(base, rarity, luck, boost)
-        self.assertEqual(chance, 10.0)
+        self.assertEqual(chance, 20.0)
 
     def test_calculate_drop_chance_epic(self):
         # Epic item: Luck scaling applies
