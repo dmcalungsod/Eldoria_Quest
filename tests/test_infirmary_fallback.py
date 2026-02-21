@@ -8,6 +8,7 @@ sys.path.append(os.getcwd())
 
 # --- MOCK PYMONGO ---
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # --- MOCK DISCORD ---
 # We need to mock discord module before importing cogs

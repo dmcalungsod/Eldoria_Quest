@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 # Mock pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
 

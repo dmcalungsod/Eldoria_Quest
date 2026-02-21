@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import MagicMock
 
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.database"] = MagicMock()
 

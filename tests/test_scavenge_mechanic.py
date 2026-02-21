@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 # Mock pymongo BEFORE any imports
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Adjust path to import game modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

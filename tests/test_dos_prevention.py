@@ -84,6 +84,7 @@ sys.modules["discord.ui"].Select = MockSelect
 
 # 2. Mock Dependencies
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["cogs"] = MagicMock()
 sys.modules["cogs.ui_helpers"] = MagicMock()
 sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()

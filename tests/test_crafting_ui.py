@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 
 # 1. Mock Dependencies First
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 # Mock cogs just in case
 sys.modules["cogs"] = MagicMock()
 sys.modules["cogs.ui_helpers"] = MagicMock()

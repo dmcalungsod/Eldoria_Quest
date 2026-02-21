@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 # Mock sys.modules for pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.MongoClient"] = MagicMock()
 sys.modules["pymongo.UpdateOne"] = MagicMock()
 sys.modules["pymongo.InsertOne"] = MagicMock()

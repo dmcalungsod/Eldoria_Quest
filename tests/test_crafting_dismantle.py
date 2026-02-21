@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 
 # Mock pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 import unittest  # noqa: E402
 

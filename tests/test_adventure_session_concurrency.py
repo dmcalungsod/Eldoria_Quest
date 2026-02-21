@@ -9,6 +9,7 @@ sys.path.append(os.getcwd())
 
 # MOCK PYMONGO BEFORE IMPORT
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Now import
 from game_systems.adventure import adventure_session  # noqa: E402

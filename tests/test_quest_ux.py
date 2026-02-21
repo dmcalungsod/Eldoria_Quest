@@ -12,6 +12,7 @@ sys.modules["discord.ext.commands"] = MagicMock()
 
 # Mock pymongo BEFORE importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 
 # Setup View and Button mocks

@@ -91,6 +91,7 @@ sys.modules["discord.ui"].Select = MockSelect
 
 # 2. Mock Dependencies
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["cogs"] = MagicMock()
 sys.modules["cogs.ui_helpers"] = MagicMock()
 # We don't want to mock ExplorationView, but we do want to mock AdventureEmbeds

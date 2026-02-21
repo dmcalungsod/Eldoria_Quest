@@ -56,6 +56,7 @@ sys.modules["game_systems.adventure.ui.setup_view"] = MagicMock()
 
 # Mock pymongo to avoid DB connection attempts if DatabaseManager is instantiated
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 import os  # noqa: E402
 

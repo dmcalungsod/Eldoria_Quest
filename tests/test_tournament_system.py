@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # This is required because the pytest environment does not have pymongo installed,
 # and DatabaseManager imports it at the module level.
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.guild_system.tournament_system import TournamentSystem  # noqa: E402
 

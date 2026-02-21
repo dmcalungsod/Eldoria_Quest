@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock external dependencies
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
 from game_systems.combat.combat_engine import CombatEngine  # noqa: E402

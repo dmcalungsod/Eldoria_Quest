@@ -8,6 +8,7 @@ sys.path.append(os.getcwd())
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Mock View
 class MockView:

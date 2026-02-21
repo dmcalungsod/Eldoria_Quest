@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock dependencies before import
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
