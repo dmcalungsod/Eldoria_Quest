@@ -42,17 +42,17 @@ The game blends:
 - All Aurum is earned by selling these resources at the **Guild Exchange**.
 - Every expedition is a risk; profit is never guaranteed.
 
-### 🖥️ ONE UI Policy (Strict)
+### ⏳ Strategic Time Management
 
-- **Single Persistent Interface:** The game operates entirely within a single message per session.
-- **Non-Ephemeral:** No hidden/ephemeral messages. All state changes are visible and persistent.
-- **Non-Branching:** The bot **never** sends a new message to reply to a button click. All interactions **edit the existing message** to update the UI state.
+- **Respect Your Time:** The game shifts from manual grinding to strategic management.
+- **Real-Time Expeditions:** Dispatch your character on adventures that resolve in real-time (30m - 24h).
+- **Asynchronous Progression:** Your adventurer works while you do.
 
 ### 🜃 Narrative-Focused Immersion
 
-- Exploration is **manual**, deliberate, and turn-based.
-- Every action is narrated with thematic, class-aware writing.
-- HP/MP persist between encounters — recovery is scarce and meaningful.
+- **Comprehensive Mission Reports:** Instead of spamming chat with turn-by-turn logs, you receive a detailed, literary summary of your journey upon return.
+- **Deep Strategy:** Success depends on preparation (supplies, gear) and risk assessment, not button mashing.
+- **Persistent State:** HP/MP and injuries persist between expeditions.
 
 ---
 
@@ -60,39 +60,35 @@ The game blends:
 
 1. **Begin** — Use `/start` to join the Adventurer’s Guild and receive your Guild Card.
 
-2. **Prepare** — Manage equipment, inspect your Ledger, and ready yourself.
+2. **Prepare** — Manage equipment, inspect your Ledger, and stock up on Supplies (Rations, Torches).
 
-3. **Press Forward** — Choose a location and advance through it step by step:
+3. **Dispatch** — Use `/adventure` to choose a destination and duration:
+   - **Quick (30m):** Low risk, reliable resources.
+   - **Long (8h+):** High risk, deep dungeon loot.
 
-   - **Combat (60%)** — Auto-resolved encounters narrated turn-by-turn.
-   - **Regeneration (40%)** — Short rests where you recover HP/MP.
+4. **Wait** — Your character explores the wilds in real-time. You are free to do other things.
 
-4. **Field Pack** — Access inventory mid-expedition to equip items or use consumables.
+5. **Report** — When the timer ends, receive a **Mission Report** detailing battles, loot found, and injuries sustained.
 
-5. **Return to Astraeon** — Recover fully, sell materials, and tally your gains.
-
-6. **Advance** — Earn Aurum, complete quests, and rise through Guild Ranks (F → SSS).
+6. **Advance** — Return to Astraeon to heal, craft with new materials, and rise through Guild Ranks.
 
 ---
 
 # 🧩 **Major Features**
 
-- **Strict ONE UI Architecture:** No chat spam; seamless message editing.
-- Manual, button-driven exploration
-- Turn-by-turn combat playback with suspense timing
-- Auto-skill combat AI (class-aware)
-- Real HP/MP persistence (no natural regeneration)
-- Full equipment + consumable system
-- Inventory access during expeditions
-- Guild Ranks with structured promotion
-- Quest Board + passive quest progression
+- **Timeweaver Auto-Adventure System:** Asynchronous, time-based exploration.
+- **Detailed Mission Reports:** Immersive summaries of off-screen combat and events.
+- **Risk vs. Reward Scheduling:** Choose between safe, short trips or dangerous, long expeditions.
+- **Strategic Supply Management:** Equip Rations and Torches to survive longer journeys.
+- **Real HP/MP Persistence:** Injuries matter and require recovery.
+- **Full Economy:** Crafting, Trading, and Guild Exchange.
+- **One UI Architecture:** Clean, persistent interface without chat spam.
 
 ---
 
 # 🗂️ **Project Structure**
 
 ```
-
 eldoria-bot/
 ├─ main.py                          # Bot entry point
 ├─ README.md
@@ -101,7 +97,7 @@ eldoria-bot/
 ├─ cogs/
 │   ├─ onboarding_cog.py            # /start, character creation
 │   ├─ character_cog.py             # Profile, Ledger, Inventory, Skills UI
-│   ├─ adventure_cog.py             # Main adventure controller
+│   ├─ adventure_cog.py             # Auto-Adventure Controller
 │   ├─ guild_hub_cog.py             # Guild Hall, Rank Up, Exchange
 │   ├─ quest_hub_cog.py             # Quest Board & Quest Log UI
 │   ├─ shop_cog.py                  # Guild Shop UI
@@ -116,12 +112,12 @@ eldoria-bot/
 │   └─ populate_database.py
 │
 ├─ game_systems/
-│   ├─ adventure/                   # Exploration system
+│   ├─ adventure/                   # Adventure system
 │   │   ├─ ui/                      # Adventure UI views
 │   │   ├─ adventure_manager.py
 │   │   ├─ adventure_session.py
 │   │   ├─ adventure_rewards.py
-│   │   ├─ combat_handler.py
+│   │   ├─ combat_handler.py        # Resolution engine logic
 │   │   └─ event_handler.py
 │   │
 │   ├─ combat/                      # Combat engine core
@@ -141,7 +137,6 @@ eldoria-bot/
 │   │
 │   └─ player/                      # Player stats, leveling, skills, etc.
 │       └─ (player modules...)
-
 ```
 
 ---
