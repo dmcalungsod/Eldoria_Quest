@@ -117,9 +117,7 @@ class ShopView(View):
                 return (False, "Item data missing.", 0)
 
             # Delegate to DatabaseManager for atomic execution with refund support
-            success, result, new_balance = self.db.purchase_item(
-                self.interaction_user.id, item_key, item_data, price
-            )
+            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, price)
 
             if success:
                 logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")

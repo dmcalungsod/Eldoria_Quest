@@ -23,10 +23,10 @@ from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 
 class MockDatabaseManager:
     def __init__(self):
-        self.inventory = {} # id -> item
-        self.unique_constraint = set() # (discord_id, slot) where equipped=1
-        self.enforce_constraint = True # Toggle to simulate DB fix
-        self.barrier = threading.Barrier(2) # Synchronize 2 threads
+        self.inventory = {}  # id -> item
+        self.unique_constraint = set()  # (discord_id, slot) where equipped=1
+        self.enforce_constraint = True  # Toggle to simulate DB fix
+        self.barrier = threading.Barrier(2)  # Synchronize 2 threads
 
     def get_inventory_item(self, discord_id, inv_id):
         return self.inventory.get(inv_id)
@@ -85,7 +85,9 @@ class MockDatabaseManager:
         pass
 
     def get_equipped_items(self, discord_id):
-        return [item for item in self.inventory.values() if item["discord_id"] == discord_id and item.get("equipped") == 1]
+        return [
+            item for item in self.inventory.values() if item["discord_id"] == discord_id and item.get("equipped") == 1
+        ]
 
     def update_player_stats(self, *args):
         pass
@@ -121,8 +123,26 @@ class TestEquipmentRaceMock(unittest.IsolatedAsyncioTestCase):
         db = MockDatabaseManager()
         # Initial State
         db.inventory = {
-            101: {"id": 101, "discord_id": 12345, "item_type": "equipment", "slot": "Head", "equipped": 0, "item_key": "101", "rarity": "Common", "item_name": "Helm A"},
-            102: {"id": 102, "discord_id": 12345, "item_type": "equipment", "slot": "Head", "equipped": 0, "item_key": "102", "rarity": "Common", "item_name": "Helm B"}
+            101: {
+                "id": 101,
+                "discord_id": 12345,
+                "item_type": "equipment",
+                "slot": "Head",
+                "equipped": 0,
+                "item_key": "101",
+                "rarity": "Common",
+                "item_name": "Helm A",
+            },
+            102: {
+                "id": 102,
+                "discord_id": 12345,
+                "item_type": "equipment",
+                "slot": "Head",
+                "equipped": 0,
+                "item_key": "102",
+                "rarity": "Common",
+                "item_name": "Helm B",
+            },
         }
 
         manager = EquipmentManager(db)
@@ -152,6 +172,7 @@ class TestEquipmentRaceMock(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(successes), 1)
         self.assertEqual(len(failures), 1)
         self.assertIn("Equipment slot update conflict", failures[0][1])
+
 
 if __name__ == "__main__":
     unittest.main()

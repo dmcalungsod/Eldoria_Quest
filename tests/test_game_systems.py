@@ -5,6 +5,7 @@ Tests combat, inventory, and player progression systems.
 SAFE: Uses mocked DatabaseManager, never touches production data.
 """
 
+import importlib
 import os
 import sys
 import unittest
@@ -13,31 +14,63 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock external dependencies for environments where they aren't installed
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["discord"] = MagicMock()
-sys.modules["discord.ext"] = MagicMock()
-
-from database.database_manager import DatabaseManager  # noqa: E402
-from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
-from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
-from game_systems.combat.damage_formula import DamageFormula  # noqa: E402
-from game_systems.items.inventory_manager import InventoryManager  # noqa: E402
-from game_systems.player.level_up import LevelUpSystem  # noqa: E402
-from game_systems.player.player_stats import PlayerStats  # noqa: E402
-
-
 class TestGameSystems(unittest.TestCase):
     def setUp(self):
-        # Mock DatabaseManager
-        self.mock_db = MagicMock(spec=DatabaseManager)
+        # Patch sys.modules
+        self.modules_patcher = patch.dict(sys.modules)
+        self.modules_patcher.start()
+
+        # Mock Pymongo
+        mock_pymongo = MagicMock()
+        mock_pymongo.errors = MagicMock()
+        sys.modules["pymongo"] = mock_pymongo
+        sys.modules["pymongo.errors"] = mock_pymongo.errors
+
+        # Mock Discord
+        mock_discord = MagicMock()
+        sys.modules["discord"] = mock_discord
+        sys.modules["discord.ext"] = MagicMock()
+
+        # Import modules under test
+        import database.database_manager
+        importlib.reload(database.database_manager)
+        self.DatabaseManager = database.database_manager.DatabaseManager
+
+        import game_systems.adventure.adventure_manager
+        importlib.reload(game_systems.adventure.adventure_manager)
+        self.AdventureManager = game_systems.adventure.adventure_manager.AdventureManager
+
+        import game_systems.combat.combat_engine
+        importlib.reload(game_systems.combat.combat_engine)
+        self.CombatEngine = game_systems.combat.combat_engine.CombatEngine
+
+        import game_systems.combat.damage_formula
+        importlib.reload(game_systems.combat.damage_formula)
+        self.DamageFormula = game_systems.combat.damage_formula.DamageFormula
+
+        import game_systems.items.inventory_manager
+        importlib.reload(game_systems.items.inventory_manager)
+        self.InventoryManager = game_systems.items.inventory_manager.InventoryManager
+
+        import game_systems.player.level_up
+        importlib.reload(game_systems.player.level_up)
+        self.LevelUpSystem = game_systems.player.level_up.LevelUpSystem
+
+        import game_systems.player.player_stats
+        importlib.reload(game_systems.player.player_stats)
+        self.PlayerStats = game_systems.player.player_stats.PlayerStats
+
+        # Setup test objects
+        self.mock_db = MagicMock(spec=self.DatabaseManager)
         self.mock_db.player_exists.return_value = True
         self.mock_bot = MagicMock()
 
+    def tearDown(self):
+        self.modules_patcher.stop()
+
     def test_player_stats(self):
         """Test PlayerStats class."""
-        stats = PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
+        stats = self.PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
 
         self.assertEqual(stats.strength, 15)
         self.assertEqual(stats.endurance, 12)
@@ -48,7 +81,7 @@ class TestGameSystems(unittest.TestCase):
 
         # Test Serialization
         stats_dict = stats.to_dict()
-        restored_stats = PlayerStats.from_dict(stats_dict)
+        restored_stats = self.PlayerStats.from_dict(stats_dict)
         self.assertEqual(restored_stats.strength, 20)
 
     def test_tiered_bonus_calculation(self):
@@ -79,7 +112,7 @@ class TestGameSystems(unittest.TestCase):
 
     def test_inventory_system(self):
         """Test inventory operations logic."""
-        inv_manager = InventoryManager(self.mock_db)
+        inv_manager = self.InventoryManager(self.mock_db)
         discord_id = 12345
 
         # Test adding item
@@ -109,7 +142,7 @@ class TestGameSystems(unittest.TestCase):
 
     def test_damage_formulas(self):
         """Test damage calculation formulas."""
-        player_stats = PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
+        player_stats = self.PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
         monster = {"DEF": 5, "Level": 1}
 
         # Use mock for randomness to make tests deterministic if needed,
@@ -117,7 +150,7 @@ class TestGameSystems(unittest.TestCase):
 
         # Mocking random for critical hit check
         with patch("random.random", return_value=0.5):  # No crit
-            damage, crit, _ = DamageFormula.player_attack(player_stats, monster)
+            damage, crit, _ = self.DamageFormula.player_attack(player_stats, monster)
             self.assertIsInstance(damage, int)
             self.assertFalse(crit)
 
@@ -133,11 +166,11 @@ class TestGameSystems(unittest.TestCase):
         self.mock_db.get_player_stats_json.return_value = stats_json
 
         # Manually create stats object since DB mock returns string
-        stats = PlayerStats(str_base=10)
+        stats = self.PlayerStats(str_base=10)
 
         # Create a mock player wrapper (LevelUpSystem)
         # We need to mock this because CombatEngine uses it extensively
-        player_wrapper = MagicMock(spec=LevelUpSystem)
+        player_wrapper = MagicMock(spec=self.LevelUpSystem)
         player_wrapper.stats = stats
         player_wrapper.level = 5
         player_wrapper.hp_current = 100
@@ -145,7 +178,7 @@ class TestGameSystems(unittest.TestCase):
 
         test_monster = {"name": "Test Goblin", "HP": 50, "ATK": 10, "DEF": 5, "DEX": 8, "MAG": 0, "Level": 1, "EXP": 20}
 
-        engine = CombatEngine(
+        engine = self.CombatEngine(
             player=player_wrapper, monster=test_monster, player_skills=[], player_mp=30, player_class_id=1
         )
 
@@ -159,9 +192,9 @@ class TestGameSystems(unittest.TestCase):
     def test_level_up_system(self):
         """Test level-up logic."""
         discord_id = 12345
-        stats = PlayerStats(str_base=10)
+        stats = self.PlayerStats(str_base=10)
 
-        level_system = LevelUpSystem(stats=stats, level=1, exp=0, exp_to_next=100)
+        level_system = self.LevelUpSystem(stats=stats, level=1, exp=0, exp_to_next=100)
 
         # Test adding EXP
         level_system.add_exp(50)
@@ -175,7 +208,7 @@ class TestGameSystems(unittest.TestCase):
     def test_adventure_mp_persistence(self):
         """Test that MP is preserved after adventure unless leveled up."""
         discord_id = 12345
-        manager = AdventureManager(self.mock_db, self.mock_bot)
+        manager = self.AdventureManager(self.mock_db, self.mock_bot)
 
         # Setup Player & Stats
         player_row = {
@@ -188,7 +221,7 @@ class TestGameSystems(unittest.TestCase):
             "vestige_pool": 0,
             "aurum": 0,
         }
-        stats = PlayerStats(mag_base=10)  # Max MP > 10
+        stats = self.PlayerStats(mag_base=10)  # Max MP > 10
 
         # Mocks
         self.mock_db.get_player.return_value = player_row
@@ -230,15 +263,6 @@ class TestGameSystems(unittest.TestCase):
             set_fields = kwargs.get("set_fields")
             self.assertIsNotNone(set_fields)
             self.assertEqual(set_fields["current_mp"], stats.max_mp, "MP should reset on level up")
-
-
-def run_all_tests():
-    """Runs the test suite for run_all_tests.py integration."""
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestGameSystems)
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    return result.wasSuccessful()
 
 
 if __name__ == "__main__":

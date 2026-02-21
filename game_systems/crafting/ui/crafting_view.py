@@ -258,7 +258,9 @@ class CraftingView(View):
             desc = "The forge is hot and the anvil rings.\nSelect a recipe to forge new gear."
         else:
             cat_title = "Dismantling"
-            desc = "Salvage materials from your unwanted equipment.\n**Warning:** Dismantled items are destroyed forever."
+            desc = (
+                "Salvage materials from your unwanted equipment.\n**Warning:** Dismantled items are destroyed forever."
+            )
 
         embed = discord.Embed(
             title=f"⚗️ Alchemist's Workbench — {cat_title}",

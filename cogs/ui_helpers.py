@@ -13,7 +13,7 @@ import logging
 import discord
 
 import game_systems.data.emojis as E
-from database.database_manager import DatabaseManager, MAX_INVENTORY_SLOTS
+from database.database_manager import MAX_INVENTORY_SLOTS, DatabaseManager
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.player.player_stats import PlayerStats
 

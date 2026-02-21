@@ -32,21 +32,15 @@ class FactionCog(commands.Cog):
 
         for fid, data in FACTIONS.items():
             name = f"{data['emoji']} {data['name']}"
-            desc = data['description']
+            desc = data["description"]
             interests = ", ".join(data.get("interests", {}).keys()).replace("_", " ").title()
 
-            embed.add_field(
-                name=name,
-                value=f"{desc}\n*Interests: {interests}*",
-                inline=False
-            )
+            embed.add_field(name=name, value=f"{desc}\n*Interests: {interests}*", inline=False)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @faction_group.command(name="join", description="Join a faction.")
-    @app_commands.choices(faction=[
-        app_commands.Choice(name=data["name"], value=fid) for fid, data in FACTIONS.items()
-    ])
+    @app_commands.choices(faction=[app_commands.Choice(name=data["name"], value=fid) for fid, data in FACTIONS.items()])
     async def join_faction(self, interaction: discord.Interaction, faction: app_commands.Choice[str]):
         """Joins a selected faction."""
         success, msg = self.faction_system.join_faction(interaction.user.id, faction.value)
@@ -58,13 +52,13 @@ class FactionCog(commands.Cog):
         data = self.faction_system.get_player_faction(interaction.user.id)
 
         if not data:
-            await interaction.response.send_message("You are not in a faction. Use `/faction list` to see options.", ephemeral=True)
+            await interaction.response.send_message(
+                "You are not in a faction. Use `/faction list` to see options.", ephemeral=True
+            )
             return
 
         embed = discord.Embed(
-            title=f"{data['emoji']} {data['name']}",
-            description=data['description'],
-            color=discord.Color.green()
+            title=f"{data['emoji']} {data['name']}", description=data["description"], color=discord.Color.green()
         )
 
         embed.add_field(name="Rank", value=f"{data['rank_title']} (Tier {data['rank_tier']})", inline=True)
