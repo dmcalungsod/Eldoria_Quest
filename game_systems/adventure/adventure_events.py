@@ -186,6 +186,17 @@ class AdventureEvents:
         "A cold mist rises from the dark pools around you.",
     ]
 
+    ATMOSPHERE_CLOCKWORK = [
+        "The sound of grinding gears echoes through the halls.",
+        "Steam hisses from a broken pipe, obscuring your vision.",
+        "The rhythmic ticking of a thousand clocks fills the air.",
+        "Brass automatons stand frozen in the alcoves, watching.",
+        "The air smells of oil and ozone.",
+        "A sudden clang makes you jump.",
+        "Pistons drive massive machinery in the distance.",
+        "The floor vibrates with the energy of the ancient engine.",
+    ]
+
     ATMOSPHERE_BLOOD_MOON = [
         "The moon is a crimson eye, watching your every move.",
         "The light is sickly red, casting long, bloody shadows.",
@@ -265,6 +276,14 @@ class AdventureEvents:
         f"{E.OCEAN} The bioluminescence is soothing. You watch the lights drift.",
         f"{E.OCEAN} You splash cold cave water on your face to stay alert.",
         f"{E.OCEAN} Huddled away from the damp, you check your weapons for rust.",
+    ]
+
+    REGEN_PHRASES_CLOCKWORK = [
+        f"{E.GEAR} You find a quiet corner away from the moving parts and rest.",
+        f"{E.GEAR} The rhythmic ticking helps you focus your breathing.",
+        f"{E.GEAR} You adjust your gear while the steam clears.",
+        f"{E.GEAR} Huddled behind a brass pillar, you take a moment.",
+        f"{E.GEAR} You watch the mesmerizing rotation of the gears and calm your mind.",
     ]
 
     REGEN_LOW_HP = [
@@ -423,6 +442,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_MAGMA)]
         elif location_id == "sunken_grotto":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_GROTTO)]
+        elif location_id == "clockwork_halls":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CLOCKWORK)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
 
@@ -445,6 +466,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
             elif location_id == "sunken_grotto":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_GROTTO
+            elif location_id == "clockwork_halls":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_CLOCKWORK
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
 

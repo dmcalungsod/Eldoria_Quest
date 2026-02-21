@@ -97,6 +97,15 @@ MONSTER_SKILLS = {
         "type": "magical",
         "desc_key": "magic",
     },
+    # Clockwork / Steam Skills
+    "steam_vent": {
+        "key_id": "steam_vent",
+        "name": "Steam Vent",
+        "power": 1.5,
+        "mp_cost": 8,
+        "type": "magical",
+        "desc_key": "magic",
+    },
     # Water / Aquatic Skills
     "water_jet": {
         "key_id": "water_jet",

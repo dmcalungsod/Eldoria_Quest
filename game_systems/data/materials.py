@@ -193,6 +193,37 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1000,
     },
+    # --- Clockwork Halls Materials (Rank B) ---
+    "brass_gear": {
+        "name": "Brass Gear",
+        "description": "A precisely machined gear that still spins on its own.",
+        "rarity": "Common",
+        "value": 15,
+    },
+    "copper_wire": {
+        "name": "Copper Wire",
+        "description": "A coil of conductive wire.",
+        "rarity": "Common",
+        "value": 18,
+    },
+    "spring_coil": {
+        "name": "Spring Coil",
+        "description": "A tense spring ready to snap.",
+        "rarity": "Common",
+        "value": 12,
+    },
+    "steam_core": {
+        "name": "Steam Core",
+        "description": "A canister of pressurized steam and mana.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "clockwork_heart": {
+        "name": "Clockwork Heart",
+        "description": "The complex engine of a master automaton.",
+        "rarity": "Epic",
+        "value": 850,
+    },
     # --- Molten Caldera Materials ---
     "obsidian_shard": {
         "name": "Obsidian Shard",
