@@ -305,4 +305,35 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1500,
     },
+    # --- Refined Materials ---
+    "iron_ingot": {
+        "name": "Iron Ingot",
+        "description": "A solid bar of refined iron, ready for the forge.",
+        "rarity": "Common",
+        "value": 40,
+    },
+    "steel_ingot": {
+        "name": "Steel Ingot",
+        "description": "An alloy of iron and carbon, harder and more durable.",
+        "rarity": "Uncommon",
+        "value": 70,
+    },
+    "refined_magic_stone": {
+        "name": "Refined Magic Stone",
+        "description": "A pure, cut stone that hums with stable mana.",
+        "rarity": "Uncommon",
+        "value": 45,
+    },
+    "cured_leather": {
+        "name": "Cured Leather",
+        "description": "Tough, treated leather suitable for armor.",
+        "rarity": "Common",
+        "value": 30,
+    },
+    "hardwood_plank": {
+        "name": "Hardwood Plank",
+        "description": "A smooth, sturdy plank of ancient wood.",
+        "rarity": "Uncommon",
+        "value": 80,
+    },
 }

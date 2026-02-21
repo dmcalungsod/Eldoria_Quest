@@ -140,6 +140,25 @@ class CraftingSystem:
                     "equipment",  # Item source table
                 )
 
+            elif recipe_type == "material":
+                # Material Refinement Logic
+                item_data = MATERIALS.get(output_key)
+                if not item_data:
+                    return False, "System Error: Output material data missing.", None
+
+                final_name = item_data["name"]
+
+                self.db.add_inventory_item(
+                    discord_id,
+                    output_key,
+                    final_name,
+                    "material",
+                    item_data["rarity"],
+                    output_amount,
+                    None,
+                    None,
+                )
+
             else:
                 # Consumable Logic
                 item_data = CONSUMABLES.get(output_key)
