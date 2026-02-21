@@ -147,7 +147,16 @@ class StatusUpdateView(View):
                 return False, "Insufficient Vestige.", 0
 
             # Apply Upgrade Locally
+            old_max_hp = current_stats.max_hp
+            old_max_mp = current_stats.max_mp
+
             current_stats.add_base_stat(stat, amount)
+
+            new_max_hp = current_stats.max_hp
+            new_max_mp = current_stats.max_mp
+
+            hp_gain = new_max_hp - old_max_hp
+            mp_gain = new_max_mp - old_max_mp
 
             # Phase 2: Update Stats with Optimistic Lock
             # If the JSON string in DB has changed since we read it, this returns False
@@ -157,9 +166,17 @@ class StatusUpdateView(View):
                 logger.warning(f"Optimistic lock failed for user {self.user.id} upgrading {stat}")
                 return False, "System busy (Race Condition). Try again.", 0
 
-            # Phase 3: Update Derived Vitals (Max HP/MP)
-            # This is safe to run after; if it fails, only HP/MP caps are slightly stale
-            self.db.update_player_vitals(self.user.id, current_stats.max_hp, current_stats.max_mp)
+            # Phase 3: Update Vitals (Only add the GAIN, do not full heal)
+            # We fetch current vitals fresh to ensure accuracy
+            current_vitals = self.db.get_player_vitals(self.user.id)
+            if current_vitals:
+                current_hp = current_vitals["current_hp"]
+                current_mp = current_vitals["current_mp"]
+
+                new_current_hp = min(new_max_hp, current_hp + hp_gain)
+                new_current_mp = min(new_max_mp, current_mp + mp_gain)
+
+                self.db.update_player_vitals(self.user.id, new_current_hp, new_current_mp)
 
             return True, "", vestige - total_cost
         except Exception as e:

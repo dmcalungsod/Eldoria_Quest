@@ -59,7 +59,7 @@ class CombatEngine:
         },
         4: {
             "name": "Smite",
-            "damage_mult": 1.2,
+            "damage_mult": 0.8,
             "emoji": "✨",
             "type": "mag",
             "heal": 20,
