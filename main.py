@@ -10,6 +10,7 @@ import os
 import sys
 
 import discord
+from aiohttp import web
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -61,6 +62,24 @@ def init_db():
         sys.exit(1)
 
 
+# --- Health Check Server (for Render Web Service) ---
+async def health_handler(request):
+    """Returns 200 OK for Render's health check."""
+    return web.Response(text="OK")
+
+
+async def start_health_server():
+    """Starts a lightweight HTTP server on Render's PORT."""
+    app = web.Application()
+    app.router.add_get("/", health_handler)
+    port = int(os.getenv("PORT", 10000))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    logger.info(f"Health check server started on port {port}")
+
+
 # --- Bot Class ---
 class EldoriaBot(commands.Bot):
     def __init__(self):
@@ -73,7 +92,9 @@ class EldoriaBot(commands.Bot):
         )
 
     async def setup_hook(self):
-        """Loads Cogs and Syncs Commands."""
+        """Loads Cogs, Syncs Commands, and starts health check server."""
+        # Start health check server for Render
+        await start_health_server()
         logger.info("Loading Cogs...")
         cogs_dir = os.path.join(ROOT_DIR, "cogs")
 
