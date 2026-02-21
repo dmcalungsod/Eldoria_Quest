@@ -1,7 +1,7 @@
-import unittest
-from unittest.mock import MagicMock, patch
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Mock pymongo before importing anything that uses it
 sys.modules["pymongo"] = MagicMock()
@@ -10,7 +10,8 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add root to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from game_systems.guild_system.quest_system import QuestSystem
+from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
+
 
 class TestQuestPrerequisites(unittest.TestCase):
     def setUp(self):
@@ -66,6 +67,7 @@ class TestQuestPrerequisites(unittest.TestCase):
         available = self.quest_system.get_available_quests(discord_id)
         available_ids = [q["id"] for q in available]
         self.assertEqual(available_ids, [3], f"Case 3 Failed. Got: {available_ids}")
+
 
 if __name__ == "__main__":
     unittest.main()
