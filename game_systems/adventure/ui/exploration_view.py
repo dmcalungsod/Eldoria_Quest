@@ -142,17 +142,29 @@ class ExplorationView(View):
             # 7. Skill Select (Row 3)
             if self.skills:
                 options = []
+                current_mp = self.vitals.get("current_mp", 0)
+
                 for s in self.skills:
+                    cost = s.get("mp_cost", 0)
+
                     # Determine emoji based on type
                     s_type = s.get("type", "Active")
                     emoji = "✨" if s_type == "Active" else "⚡"  # Placeholder logic
                     if "Heal" in s.get("name", ""):
                         emoji = "💚"
 
-                    desc = f"MP: {s.get('mp_cost', 0)} | Lv.{s.get('skill_level', 1)}"
+                    label = s.get("name", "Unknown Skill")
+                    desc = f"MP: {cost} | Lv.{s.get('skill_level', 1)}"
+
+                    # UX: Check Affordability
+                    if current_mp < cost:
+                        emoji = E.LOCKED
+                        label = f"[Low MP] {label}"
+                        desc += " | Not enough Mana!"
+
                     options.append(
                         discord.SelectOption(
-                            label=s.get("name", "Unknown Skill"),
+                            label=label,
                             value=s.get("key_id"),
                             description=desc,
                             emoji=emoji,
@@ -235,6 +247,19 @@ class ExplorationView(View):
     async def action_skill(self, interaction: discord.Interaction):
         # Retrieve selected skill key
         selected_skill = interaction.data["values"][0]
+
+        # UX: Validate MP Cost locally before simulation
+        skill = next((s for s in self.skills if s.get("key_id") == selected_skill), None)
+        if skill:
+            cost = skill.get("mp_cost", 0)
+            current_mp = self.vitals.get("current_mp", 0)
+            if current_mp < cost:
+                await interaction.response.send_message(
+                    f"⚠️ **Not enough Mana!**\nRequires **{cost} MP**, but you have **{current_mp} MP**.",
+                    ephemeral=True,
+                )
+                return
+
         await self._perform_simulation(interaction, action=f"skill:{selected_skill}")
 
     async def _perform_simulation(self, interaction: discord.Interaction, action: str = None):
