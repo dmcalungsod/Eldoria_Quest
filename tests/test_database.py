@@ -115,7 +115,9 @@ class TestDatabaseManager(unittest.TestCase):
             self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
 
         # Verify it updates existing item
-        self.mock_db.inventory.update_one.assert_called_with({"id": 50}, {"$inc": {"count": 5}})
+        # Max stack is 5. Existing 2. Adding 5.
+        # Should fill by 3 (2+3=5) and create new stack of 2.
+        self.mock_db.inventory.update_one.assert_called_with({"id": 50}, {"$inc": {"count": 3}})
 
     def test_deduct_aurum(self):
         # Mock successful deduction
