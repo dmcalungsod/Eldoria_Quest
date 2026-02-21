@@ -13,7 +13,7 @@ mock_pymongo = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.guild_system.rank_system import RankSystem
+from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
 
 class TestRankSystem(unittest.TestCase):
     def setUp(self):
