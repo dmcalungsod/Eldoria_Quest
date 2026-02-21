@@ -16,8 +16,8 @@ sys.modules["pymongo.errors"] = mock_pymongo_errors
 sys.modules["discord"] = MagicMock()
 
 # Now import the modules under test
-from game_systems.items.equipment_manager import EquipmentManager
-from database.database_manager import DatabaseManager
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
 
 class TestStackEquipBug(unittest.TestCase):
     def setUp(self):
