@@ -140,12 +140,17 @@ class ShopView(View):
 
         success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key)
 
+        # SECURITY FIX: Always fetch fresh stats to prevent stale state.
+        # This prevents the UI from showing incorrect balance if it changed externally.
+        fresh_player = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        current_aurum = fresh_player["aurum"] if fresh_player else 0
+
         embed = discord.Embed(
             title="🛒 Guild Supply Depot",
             description=(
                 "Within the Adventurer's Guild, this modest counter distributes "
                 "the essentials needed for survival beyond the safety of its walls.\n\n"
-                f"You currently hold **{new_aurum if success else self.current_aurum} {E.AURUM}**."
+                f"You currently hold **{current_aurum} {E.AURUM}**."
             ),
             color=discord.Color.green() if success else discord.Color.red(),
         )
@@ -153,7 +158,7 @@ class ShopView(View):
         msg = f"{E.CHECK} Secured **1x {result['name']}**." if success else f"{E.ERROR} {result}"
         embed.add_field(name="Transaction Receipt", value=msg)
 
-        new_view = ShopView(self.db, self.interaction_user, new_aurum if success else self.current_aurum)
+        new_view = ShopView(self.db, self.interaction_user, current_aurum)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=new_view)
