@@ -73,27 +73,24 @@ class EventHandler:
             current_hp = vitals["current_hp"]
             current_mp = vitals["current_mp"]
 
-            # If already full, trigger SURGE (High-chance gather)
+            # If already full, prevent SURGE exploit (infinite farming)
             if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
-                # Log the surge flavor text
-                surge_msg = f"\n{AdventureEvents.surge_event()}"
+                return {
+                    "log": ["\n**You are already fully rested.** The moment of peace passes."],
+                    "dead": False,
+                }
 
-                # Chain into gathering with +25% bonus
-                result = self._perform_wild_gathering(
-                    context, location_id, bonus_chance=25
-                )
+            # Calculate Regen Amounts with Caps (Prevent infinite scaling)
+            # Base: 50% of Stat
+            raw_hp_regen = int(stats.endurance * 0.5) + 1
+            raw_mp_regen = int(stats.magic * 0.5) + 1
 
-                # Prepend the surge message to the gathering log
-                if result.get("log"):
-                    result["log"].insert(0, surge_msg)
-                else:
-                    result["log"] = [surge_msg]
+            # Cap: 10% of Max HP/MP per step
+            max_hp_regen = max(1, int(stats.max_hp * 0.10))
+            max_mp_regen = max(1, int(stats.max_mp * 0.10))
 
-                return result
-
-            # Calculate Regen Amounts
-            hp_regen = max(1, int(stats.endurance * 0.5) + 1)
-            mp_regen = max(1, int(stats.magic * 0.5) + 1)
+            hp_regen = min(raw_hp_regen, max_hp_regen)
+            mp_regen = min(raw_mp_regen, max_mp_regen)
 
             new_hp = min(current_hp + hp_regen, stats.max_hp)
             new_mp = min(current_mp + mp_regen, stats.max_mp)

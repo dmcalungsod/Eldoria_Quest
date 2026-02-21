@@ -48,44 +48,49 @@ class TestDeadTurns(unittest.TestCase):
             "player_row": {"class_id": 1},
         }
 
-    def test_surge_replaces_dead_turn(self):
-        """Test that full HP/MP now triggers SURGE (gathering attempt) instead of 'no event'."""
-        # Force regen path
-        with patch("random.randint") as mock_randint:
-            # 1: random.randint(1,100) <= regen_chance (100) -> Enter regen
-            # 1: random.randint(1,100) <= base_chance (35+25=60) -> Successful Gather
-            mock_randint.side_effect = [1, 1]
+    def test_full_rest_prevention(self):
+        """Test that full HP/MP now returns 'Already Rested' message instead of SURGE."""
+        # Force regen path by high regen_chance
+        result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
 
-            with patch("random.choices", return_value=["medicinal_herb"]):
-                result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
-
-        # Should have SURGE message
+        # Should have "Already Rested" message
         log_str = "\n".join(result["log"])
-        self.assertTrue(any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES))
-        # Should have loot
-        self.assertIn("loot", result)
-        self.assertIn("medicinal_herb", result["loot"])
+        self.assertIn("already fully rested", log_str)
+        # Should NOT have loot
+        self.assertNotIn("loot", result)
 
-    def test_scavenge_fallback(self):
-        """Test that failed gathering (from Surge or otherwise) results in Scavenge."""
-        # Case 1: Surge -> Failed Gather -> Scavenge
+    def test_scavenge_fallback_on_failed_gather(self):
+        """Test that failed gathering (from exploration fallback) results in Scavenge."""
+        # Ensure regen fails so we fall back to Quest -> Wild Gather
+        # Or just pass regen_chance=0
         self.mock_quest_system.get_player_quests.return_value = []
 
         with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
             # Sequence:
-            # 1. Regen check: 1 (success)
-            # 2. Gather check: 100 (fail > 60)
+            # 1. Regen check: 100 (fail, since we pass regen_chance=0 to be sure, but let's assume standard flow)
+            # Actually, let's just use regen_chance=0 to skip regen logic entirely.
+            # 2. Gather check: 99 (fail > 35 base chance)
             # 3. Scavenge amount (Aurum): 5
             # random.random for scavenge type: 0.1 (< 0.5 -> Aurum)
 
-            mock_randint.side_effect = [1, 100, 5]
+            # Note: resolve_non_combat calls random.randint(1, 100) for regen check.
+            # If we pass regen_chance=0, it skips regen.
+            # Then it calls _perform_quest_event -> _perform_wild_gathering.
+            # _perform_wild_gathering calls random.randint(1, 100) for gather chance.
+
+            # Side effect: [gather_roll, scavenge_amount]
+            # Wait, resolve_non_combat calls randint once for regen check.
+            # So side effect: [regen_roll, gather_roll, scavenge_amount]
+
+            mock_randint.side_effect = [100, 99, 5]
             mock_random.return_value = 0.1
 
-            result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
+            # Ensure regen_chance allows failing regen check
+            result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=50)
 
-        # Should have SURGE message
+        # Should NOT have SURGE message
         log_str = "\n".join(result["log"])
-        self.assertTrue(any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES))
+        self.assertFalse(any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES))
 
         # Should have Aurum Scavenge message
         self.assertTrue("Aurum" in log_str)
@@ -96,16 +101,13 @@ class TestDeadTurns(unittest.TestCase):
         self.assertEqual(result["loot"]["aurum"], 5)
 
     def test_direct_wild_gather_scavenge(self):
-        """Test failed gathering from normal exploration (not surge) triggers Scavenge."""
+        """Test failed gathering from normal exploration triggers Scavenge."""
         self.mock_quest_system.get_player_quests.return_value = []
-
-        # Set NOT full HP/MP so we don't accidentally surge if regen logic was wrong
-        # But here we pass regen_chance=0 so we skip regen anyway.
 
         with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
             # Sequence:
-            # 1. Regen check: 99 (fail, assuming chance < 100, let's pass regen_chance=0)
-            # 2. Gather check: 99 (fail > 35)
+            # 1. Regen check: 99 (fail)
+            # 2. Gather check: 99 (fail)
             # 3. Scavenge amount (XP): 10
             # random.random for scavenge type: 0.6 (> 0.5 -> XP)
 
