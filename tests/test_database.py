@@ -128,6 +128,34 @@ class TestDatabaseManager(unittest.TestCase):
 
         self.assertIsNone(new_balance)
 
+    def test_update_player_mixed(self):
+        # Test mixed update
+        self.db.update_player_mixed(
+            12345,
+            set_fields={"level": 2},
+            inc_fields={"exp": 100},
+        )
+
+        # Verify update_one call structure
+        self.mock_db.players.update_one.assert_called_with(
+            {"discord_id": 12345},
+            {"$set": {"level": 2}, "$inc": {"exp": 100}},
+        )
+
+        # Test set only
+        self.db.update_player_mixed(12345, set_fields={"level": 3})
+        self.mock_db.players.update_one.assert_called_with(
+            {"discord_id": 12345},
+            {"$set": {"level": 3}},
+        )
+
+        # Test inc only
+        self.db.update_player_mixed(12345, inc_fields={"exp": 50})
+        self.mock_db.players.update_one.assert_called_with(
+            {"discord_id": 12345},
+            {"$inc": {"exp": 50}},
+        )
+
 
 def run_all_tests():
     """Runs the test suite for run_all_tests.py integration."""
