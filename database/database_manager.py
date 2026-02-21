@@ -1013,6 +1013,33 @@ class DatabaseManager:
             }
         )
 
+    def split_stack_to_equipped(self, discord_id: int, source_inv_id: int, item: dict) -> bool:
+        """
+        Atomically splits 1 item from a stack and inserts it as a new EQUIPPED item.
+        Handles failures via compensation (refund).
+        """
+        # 1. Decrement Source Stack (Atomic Check & Update)
+        result = self._col("inventory").update_one(
+            {"id": source_inv_id, "count": {"$gt": 1}},
+            {"$inc": {"count": -1}}
+        )
+
+        if result.modified_count == 0:
+            return False
+
+        try:
+            # 2. Insert New Equipped Item
+            self.insert_equipped_split(discord_id, item)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to split stack {source_inv_id} for {discord_id}: {e}")
+            # 3. Compensation: Refund the item
+            self._col("inventory").update_one(
+                {"id": source_inv_id},
+                {"$inc": {"count": 1}}
+            )
+            return False
+
     # ============================================================
     # EQUIPMENT DATA (New methods for external call sites)
     # ============================================================
