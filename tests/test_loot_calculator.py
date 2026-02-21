@@ -6,11 +6,11 @@ Verifies the drop rate calculation and RNG.
 
 import unittest
 from unittest.mock import patch
+
 from game_systems.rewards.loot_calculator import LootCalculator
 
 
 class TestLootCalculator(unittest.TestCase):
-
     def test_calculate_drop_chance_common(self):
         # Common item: No Luck scaling (multiplier only from boost)
         base = 10.0
@@ -60,7 +60,7 @@ class TestLootCalculator(unittest.TestCase):
         base = 60.0
         rarity = "Common"
         luck = 0
-        boost = 2.0 # 120%
+        boost = 2.0  # 120%
 
         chance = LootCalculator.calculate_drop_chance(base, rarity, luck, boost)
         self.assertEqual(chance, 100.0)
@@ -90,6 +90,7 @@ class TestLootCalculator(unittest.TestCase):
 
         result = LootCalculator.roll_drops(drops, luck, boost)
         self.assertEqual(result, [])
+
 
 if __name__ == "__main__":
     unittest.main()

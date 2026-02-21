@@ -1,6 +1,6 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -11,6 +11,7 @@ from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.materials import MATERIALS
 from game_systems.data.monsters import MONSTERS
 from game_systems.monsters.monster_skills import MONSTER_SKILLS
+
 
 class TestClockworkHalls(unittest.TestCase):
     def test_location_exists(self):
@@ -63,6 +64,7 @@ class TestClockworkHalls(unittest.TestCase):
 
         # Test that we can possibly get a clockwork phrase (mocking random would be better but this is a sanity check)
         # We check if the regeneration method runs without error for the new location
+
 
 if __name__ == "__main__":
     unittest.main()

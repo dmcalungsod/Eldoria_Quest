@@ -8,7 +8,7 @@ Hardened against duplication bugs and concurrency issues.
 import logging
 from typing import Any
 
-from database.database_manager import DatabaseManager, MAX_INVENTORY_SLOTS
+from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.items")
 

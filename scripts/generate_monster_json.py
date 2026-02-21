@@ -1,7 +1,7 @@
-import sys
 import json
-import os
 import logging
+import os
+import sys
 
 # Add repo root to path so we can import game_systems
 sys.path.append(os.getcwd())
@@ -10,6 +10,7 @@ from game_systems.data.monsters import MONSTERS
 
 logger = logging.getLogger("eldoria.data.export")
 logging.basicConfig(level=logging.INFO)
+
 
 def export_monsters():
     json_monsters = {}
@@ -38,6 +39,7 @@ def export_monsters():
         logger.info(f"Successfully exported {len(json_monsters)} monsters to {output_path}")
     except Exception as e:
         logger.error(f"Failed to export monsters: {e}")
+
 
 if __name__ == "__main__":
     export_monsters()

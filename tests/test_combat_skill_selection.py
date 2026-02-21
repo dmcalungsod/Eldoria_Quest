@@ -173,5 +173,6 @@ class TestCombatSkillSelection(unittest.TestCase):
         log_str = "".join([str(p) for p in result["phrases"]])
         self.assertIn("Skill Failed", log_str, "Log should warn about unknown skill")
 
+
 if __name__ == "__main__":
     unittest.main()

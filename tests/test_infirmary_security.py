@@ -1,12 +1,13 @@
+import importlib
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 sys.path.append(os.getcwd())
 
 
-# --- MOCK DISCORD ---
+# Helper Mocks
 class MockView:
     def __init__(self, timeout=180):
         pass
@@ -18,16 +19,7 @@ class MockView:
         pass
 
 
-# Capture Real Item if available
-RealItem = object
-if "discord.ui" in sys.modules:
-    try:
-        RealItem = sys.modules["discord.ui"].Item
-    except AttributeError:
-        pass
-
-
-class MockButton(RealItem):
+class MockButton:
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
         self.callback = None
         self.label = label
@@ -35,39 +27,47 @@ class MockButton(RealItem):
     def _is_v2(self):
         return False
 
-
-discord = MagicMock()
-discord.ui.View = MockView
-discord.ui.Button = MockButton
-discord.ButtonStyle = MagicMock()
-discord.User = MagicMock()
-discord.Embed = MagicMock()
-discord.Color = MagicMock()
-
-sys.modules["discord"] = discord
-sys.modules["discord.ui"] = discord.ui
-sys.modules["discord.ext"] = MagicMock()
-sys.modules["discord.ext.commands"] = MagicMock()
-
-# --- MOCK PYMONGO ---
-pymongo = MagicMock()
-pymongo.errors = MagicMock()
-pymongo.errors.DuplicateKeyError = Exception
-sys.modules["pymongo"] = pymongo
-sys.modules["pymongo.errors"] = pymongo.errors
-
-# --- IMPORT MODULE UNDER TEST ---
-from cogs.infirmary_cog import InfirmaryView  # noqa: E402
-from database.database_manager import DatabaseManager  # noqa: E402
-from game_systems.player.player_stats import PlayerStats  # noqa: E402
-
-
 class TestInfirmaryStateIssue(unittest.TestCase):
     def setUp(self):
-        # Mock DatabaseManager
-        self.mock_db = MagicMock(spec=DatabaseManager)
+        # Patch sys.modules
+        self.modules_patcher = patch.dict(sys.modules)
+        self.modules_patcher.start()
 
-        # Setup User
+        # Mock Discord
+        mock_discord = MagicMock()
+        mock_discord.ui.View = MockView
+        mock_discord.ui.Button = MockButton
+        mock_discord.ButtonStyle = MagicMock()
+        mock_discord.User = MagicMock()
+        mock_discord.Embed = MagicMock()
+        mock_discord.Color = MagicMock()
+
+        sys.modules["discord"] = mock_discord
+        sys.modules["discord.ui"] = mock_discord.ui
+        sys.modules["discord.ext"] = MagicMock()
+        sys.modules["discord.ext.commands"] = MagicMock()
+
+        # Mock Pymongo
+        mock_pymongo = MagicMock()
+        mock_pymongo.errors = MagicMock()
+        mock_pymongo.errors.DuplicateKeyError = Exception # Preserve original mock behavior
+
+        sys.modules["pymongo"] = mock_pymongo
+        sys.modules["pymongo.errors"] = mock_pymongo.errors
+
+        # Import module under test
+        import cogs.infirmary_cog
+        importlib.reload(cogs.infirmary_cog)
+        self.InfirmaryView = cogs.infirmary_cog.InfirmaryView
+
+        from database.database_manager import DatabaseManager
+        self.DatabaseManager = DatabaseManager
+
+        from game_systems.player.player_stats import PlayerStats
+        self.PlayerStats = PlayerStats
+
+        # Setup test objects
+        self.mock_db = MagicMock(spec=self.DatabaseManager)
         self.user = MagicMock()
         self.user.id = 12345
 
@@ -76,7 +76,10 @@ class TestInfirmaryStateIssue(unittest.TestCase):
 
         # Initial Stats (Max HP 150 based on base stats logic in PlayerStats)
         # PlayerStats(str_base=10, end_base=10) -> HP = 50 + (10 * 10) = 150
-        self.initial_stats = PlayerStats(str_base=10, end_base=10)
+        self.initial_stats = self.PlayerStats(str_base=10, end_base=10)
+
+    def tearDown(self):
+        self.modules_patcher.stop()
 
     def test_stale_stats_healing(self):
         """
@@ -88,7 +91,7 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         """
 
         # 1. Initialize View with initial stats (Max HP 150)
-        view = InfirmaryView(self.mock_db, self.user, self.initial_p_data, self.initial_stats)
+        view = self.InfirmaryView(self.mock_db, self.user, self.initial_p_data, self.initial_stats)
 
         old_max_hp = self.initial_stats.max_hp  # 150
         new_max_hp = 200  # Simulated new Max HP in DB
@@ -100,7 +103,7 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         self.mock_db.get_player_field.return_value = 1000  # Aurum
 
         # Mock get_player_stats_json to return FRESH stats (Max HP 200)
-        fresh_stats = PlayerStats(str_base=10, end_base=15)  # END 15 -> HP 200
+        fresh_stats = self.PlayerStats(str_base=10, end_base=15)  # END 15 -> HP 200
         self.mock_db.get_player_stats_json.return_value = fresh_stats.to_dict()
 
         # 3. Call _execute_heal
@@ -114,15 +117,6 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         self.assertEqual(
             args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)"
         )
-
-
-def run_all_tests():
-    """Run the infirmary security test suite manually."""
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestInfirmaryStateIssue)
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    return result.wasSuccessful()
 
 
 if __name__ == "__main__":

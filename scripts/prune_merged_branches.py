@@ -7,18 +7,14 @@ from datetime import datetime, timedelta, timezone
 def run_command(command_list):
     try:
         # Use shell=False and pass list for safety
-        result = subprocess.run(
-            command_list,
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        result = subprocess.run(command_list, capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         # Avoid printing full command if it contains secrets (though here it's just branch names)
         # But for debugging, print stderr
         print(f"Error running command: {e.stderr}")
         return None
+
 
 def main():
     days_threshold = 3
@@ -38,7 +34,17 @@ def main():
     # Get merged PRs (limit 100 should be sufficient for regular cleanup)
     # We fetch enough fields to determine branch and merge time.
     prs_json = run_command(
-        ["gh", "pr", "list", "--state", "merged", "--json", "number,headRefName,mergedAt,headRepository", "--limit", "100"]
+        [
+            "gh",
+            "pr",
+            "list",
+            "--state",
+            "merged",
+            "--json",
+            "number,headRefName,mergedAt,headRepository",
+            "--limit",
+            "100",
+        ]
     )
 
     if not prs_json:
@@ -82,8 +88,7 @@ def main():
 
         # Check if branch still exists
         branch_check = subprocess.run(
-            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"],
-            capture_output=True
+            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"], capture_output=True
         )
 
         if branch_check.returncode != 0:
@@ -94,16 +99,13 @@ def main():
 
         # Delete the branch
         delete_cmd = ["gh", "api", "--method", "DELETE", f"repos/{current_repo}/git/refs/heads/{head_ref}"]
-        delete_result = subprocess.run(
-            delete_cmd,
-            capture_output=True,
-            text=True
-        )
+        delete_result = subprocess.run(delete_cmd, capture_output=True, text=True)
 
         if delete_result.returncode == 0:
             print(f"Successfully deleted branch '{head_ref}'.")
         else:
             print(f"Failed to delete branch '{head_ref}': {delete_result.stderr.strip()}")
+
 
 if __name__ == "__main__":
     main()

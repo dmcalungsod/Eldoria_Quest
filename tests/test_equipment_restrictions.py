@@ -4,26 +4,33 @@ from unittest.mock import MagicMock, patch
 # --- MOCKING DISCORD ---
 mock_discord = MagicMock()
 
+
 class MockView:
     def __init__(self, timeout=None):
         self.timeout = timeout
         self.children = []
+
     def add_item(self, item):
         self.children.append(item)
 
+
 mock_discord.ui.View = MockView
+
 
 class MockSelect(MagicMock):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.options = []
         self.disabled = False
+
     def add_option(self, label, value, **kwargs):
         # We need to simulate add_option behavior if used, though _set_options assigns list directly
         pass
 
+
 mock_discord.ui.Select = MockSelect
 mock_discord.ui.Button = MagicMock
+
 
 class MockSelectOption:
     def __init__(self, label, value, emoji=None, description=None, default=False):
@@ -32,6 +39,7 @@ class MockSelectOption:
         self.emoji = emoji
         self.description = description
         self.default = default
+
 
 mock_discord.SelectOption = MockSelectOption
 mock_discord.ButtonStyle = MagicMock()
@@ -106,7 +114,7 @@ class TestEquipmentRestrictions(unittest.TestCase):
             "item_type": "equipment",
             "slot": "sword",
             "equipped": 0,
-            "name": "Test Sword"
+            "name": "Test Sword",
         }
 
         # Mock Player (Level too low)
@@ -117,16 +125,17 @@ class TestEquipmentRestrictions(unittest.TestCase):
         self.mock_db.get_player_field.return_value = 1
 
         # Patch EQUIPMENT_DATA in the module where it's used
-        with patch("game_systems.items.equipment_manager.EQUIPMENT_DATA", {
-            "test_sword": {"level_req": 50, "slot": "sword", "name": "Test Sword"}
-        }):
+        with patch(
+            "game_systems.items.equipment_manager.EQUIPMENT_DATA",
+            {"test_sword": {"level_req": 50, "slot": "sword", "name": "Test Sword"}},
+        ):
             success, msg = self.eq_manager.equip_item(discord_id, inv_id)
 
         self.assertFalse(success)
         self.assertIn("Req: Lvl 50", msg)
 
     @patch("game_systems.character.ui.inventory_view.InventoryManager")
-    @patch("game_systems.character.ui.inventory_view.EquipmentManager") # This patches the CLASS
+    @patch("game_systems.character.ui.inventory_view.EquipmentManager")  # This patches the CLASS
     def test_inventory_view_ui_logic(self, MockEqManagerClass, MockInvManagerClass):
         # Setup mocks
         mock_user = MagicMock()
@@ -135,7 +144,14 @@ class TestEquipmentRestrictions(unittest.TestCase):
         # Mock Inventory Items
         mock_inv = MockInvManagerClass.return_value
         mock_inv.get_inventory.return_value = [
-            {"id": 1, "item_type": "equipment", "item_name": "God Sword", "slot": "sword", "equipped": 0, "item_key": "god_sword"}
+            {
+                "id": 1,
+                "item_type": "equipment",
+                "item_name": "God Sword",
+                "slot": "sword",
+                "equipped": 0,
+                "item_key": "god_sword",
+            }
         ]
 
         # Mock DB
@@ -153,7 +169,7 @@ class TestEquipmentRestrictions(unittest.TestCase):
 
         # Also need to patch EQUIPMENT_DATA in inventory_view to avoid KeyErrors or empty dicts
         with patch("game_systems.character.ui.inventory_view.EQUIPMENT_DATA", {"god_sword": {"level_req": 99}}):
-             view = InventoryView(self.mock_db, mock_user, None)
+            view = InventoryView(self.mock_db, mock_user, None)
 
         # Check Dropdown Options
         # view.equip_select is a MockSelect instance (from our discord mock)

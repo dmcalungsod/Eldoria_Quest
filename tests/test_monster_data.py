@@ -1,12 +1,13 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Add repo root to path
 sys.path.append(os.getcwd())
 
 from game_systems.data.monsters import MONSTERS
 from game_systems.monsters.monster_skills import MONSTER_SKILLS
+
 
 class TestMonsterData(unittest.TestCase):
     def test_monsters_loaded(self):
@@ -55,6 +56,7 @@ class TestMonsterData(unittest.TestCase):
             drop = drops[0]
             self.assertIsInstance(drop, tuple)
             self.assertEqual(len(drop), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
