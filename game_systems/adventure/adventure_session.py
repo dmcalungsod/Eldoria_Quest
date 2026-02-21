@@ -14,7 +14,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import Weather, WorldTime
+from game_systems.world_time import TimePhase, Weather, WorldTime
 
 # Subsystems
 from .adventure_rewards import AdventureRewards
@@ -227,20 +227,28 @@ class AdventureSession:
                 final_action = action if action else "attack"
                 return self._process_combat_turn(context, action=final_action)
 
-            # --- Weather System Check ---
+            # --- Weather & Time System Check ---
             weather = WorldTime.get_current_weather(self.location_id)
+            time_phase = WorldTime.get_current_phase()
 
-            # Dynamic Combat Threshold based on Weather
+            # Dynamic Combat Threshold based on Weather and Time
             # Base REGEN_CHANCE is 40 (meaning 60% combat).
-            # We want Storms to be more dangerous (Higher combat chance -> Lower Regen Chance).
+            # We want Storms/Night to be more dangerous (Higher combat chance -> Lower Regen Chance).
             regen_threshold = self.REGEN_CHANCE
 
+            # Weather Modifiers
             if weather == Weather.STORM:
                 regen_threshold -= 10  # 30% Regen / 70% Combat
             elif weather == Weather.FOG:
                 regen_threshold -= 5  # 35% Regen / 65% Combat
             elif weather == Weather.CLEAR:
                 regen_threshold += 5  # 45% Regen / 55% Combat
+
+            # Time Modifiers
+            if time_phase == TimePhase.NIGHT:
+                regen_threshold -= 10  # Night is dangerous (+10% Combat Chance)
+            elif time_phase == TimePhase.DAY:
+                regen_threshold += 5  # Day is safer (-5% Combat Chance)
 
             # --- 2. Trigger New Encounter ---
             if random.randint(1, 100) > regen_threshold:
@@ -252,6 +260,21 @@ class AdventureSession:
                     # Prepend Weather Flavor to the encounter
                     weather_flavor = WorldTime.get_weather_flavor(weather)
                     phrase = f"{weather_flavor}\n{phrase}"
+
+                    # --- NIGHT AMBUSH MECHANIC ---
+                    # 20% Chance for monsters to strike first at night
+                    if time_phase == TimePhase.NIGHT and random.random() < 0.20:
+                        monster_atk = monster.get("ATK", 10)
+                        damage = int(monster_atk * 0.8)  # 80% ATK damage
+                        damage = max(1, damage)  # Minimum 1 damage
+
+                        # Apply damage immediately
+                        current_hp = context["vitals"]["current_hp"]
+                        new_hp = max(0, current_hp - damage)
+                        context["vitals"]["current_hp"] = new_hp
+                        self.db.set_player_vitals(self.discord_id, new_hp, context["vitals"]["current_mp"])
+
+                        phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
                     # Start new combat
                     self.active_monster = monster

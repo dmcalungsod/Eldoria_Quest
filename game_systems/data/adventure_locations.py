@@ -72,6 +72,11 @@ LOCATIONS = {
             ("monster_017", 15),  # Feral Stag (Boss-like)
             ("monster_020", 20),  # Ravaged Boar
         ],
+        "night_monsters": [
+            ("monster_010", 40),  # Briar Hound (More active at night)
+            ("monster_020", 40),  # Ravaged Boar
+            ("monster_016", 20),
+        ],
         "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot.",
         "gatherables": [
             ("ancient_wood", 50),
@@ -90,6 +95,11 @@ LOCATIONS = {
             ("monster_023", 20),  # Sporeling
             ("monster_025", 20),  # Stormling
             ("monster_027", 15),  # Mire Lurker
+        ],
+        "night_monsters": [
+            ("monster_027", 50),  # Mire Lurker (Lurks in darkness)
+            ("monster_022", 30),  # Marsh Crawler
+            ("monster_025", 20),
         ],
         "conditional_monsters": [
             {
@@ -123,6 +133,11 @@ LOCATIONS = {
             ("monster_123", 25),  # Tide Siren
             ("monster_124", 15),  # Deep Crawler
         ],
+        "night_monsters": [
+            ("monster_122", 40),  # Abyssal Eel
+            ("monster_124", 40),  # Deep Crawler (Comes out in dark)
+            ("monster_123", 20),
+        ],
         "conditional_monsters": [
             {
                 "monster_key": "monster_125",  # Leviathan (Boss)
@@ -150,6 +165,11 @@ LOCATIONS = {
             ("monster_103", 25),  # Shard Wisp
             ("monster_104", 15),  # Obsidian Gargoyle
         ],
+        "night_monsters": [
+            ("monster_104", 40),  # Obsidian Gargoyle (Blends with dark)
+            ("monster_103", 30),  # Shard Wisp
+            ("monster_102", 30),
+        ],
         "conditional_monsters": [
             {
                 "monster_key": "monster_105",  # Crystalline Guardian (Boss)
@@ -175,6 +195,11 @@ LOCATIONS = {
             ("monster_127", 30),  # Brass Golem
             ("monster_128", 25),  # Steam Wisp
             ("monster_129", 15),  # Automaton Knight
+        ],
+        "night_monsters": [
+            ("monster_126", 40),  # Cogwork Spider
+            ("monster_128", 40),  # Steam Wisp
+            ("monster_129", 20),
         ],
         "conditional_monsters": [
             {
@@ -203,6 +228,11 @@ LOCATIONS = {
             ("monster_108", 25),  # Ember Salamander
             ("monster_109", 15),  # Lava Drake (Elite)
         ],
+        "night_monsters": [
+            ("monster_108", 40),  # Ember Salamander
+            ("monster_109", 30),  # Lava Drake
+            ("monster_106", 30),
+        ],
         "conditional_monsters": [
             {
                 "monster_key": "monster_110",  # Ignis (Boss)
@@ -230,6 +260,11 @@ LOCATIONS = {
             ("monster_113", 30),  # Chill Wisp
             ("monster_114", 15),  # Glacial Drake
         ],
+        "night_monsters": [
+            ("monster_111", 40),  # Frost Wolf (Hunts at night)
+            ("monster_113", 30),  # Chill Wisp
+            ("monster_114", 30),  # Glacial Drake
+        ],
         "conditional_monsters": [
             {
                 "monster_key": "monster_115",  # Cryon
@@ -255,6 +290,11 @@ LOCATIONS = {
             ("monster_118", 30),  # Null Wisp
             ("monster_117", 25),  # Abyssal Construct
             ("monster_119", 15),  # Entropy Drake
+        ],
+        "night_monsters": [
+            ("monster_116", 50),  # Void Stalker
+            ("monster_119", 30),  # Entropy Drake
+            ("monster_118", 20),
         ],
         "conditional_monsters": [
             {
