@@ -72,6 +72,7 @@ class PlayerStats:
             "AGI": StatBlock(base=agi_base),
             "MAG": StatBlock(base=mag_base),
             "LCK": StatBlock(base=lck_base),
+            "DEF": StatBlock(base=0),  # Bonus/Item stat only
         }
 
     # --- Total stat properties ---
@@ -98,6 +99,10 @@ class PlayerStats:
     @property
     def luck(self) -> int:
         return self._stats["LCK"].total
+
+    @property
+    def defense(self) -> int:
+        return self._stats["DEF"].total
 
     # --- Derived stats ---
     @property
@@ -175,6 +180,7 @@ class PlayerStats:
             "AGI": self.agility,
             "MAG": self.magic,
             "LCK": self.luck,
+            "DEF": self.defense,
             "HP": self.max_hp,
             "MP": self.max_mp,
         }

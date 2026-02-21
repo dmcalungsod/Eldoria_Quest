@@ -123,7 +123,7 @@ CONSUMABLES = {
         "id": "resist_elixir",
         "name": "Wardkeeper's Vial",
         "type": "buff",
-        "effect": {"damage_res": 5, "duration_s": 120},
+        "effect": {"DEF": 5, "duration_s": 120},
         "rarity": "Rare",
         "description": "Hums faintly; pushes away the keen edges of harm.",
     },
