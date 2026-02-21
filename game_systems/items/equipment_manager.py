@@ -295,31 +295,9 @@ class EquipmentManager:
 
             # Equip the new item
             if item.get("count", 1) > 1:
-                # Split stack: Decrement old stack, insert new equipped single
-                self.db.decrement_inventory_count(inventory_db_id)
-                self.db.add_inventory_item(
-                    discord_id,
-                    item["item_key"],
-                    item["item_name"],
-                    item["item_type"],
-                    item["rarity"],
-                    1,
-                    item.get("slot"),
-                    item.get("item_source_table"),
-                )
-                # Mark the new item as equipped
-                new_item = self.db.find_stackable_item(
-                    discord_id,
-                    item["item_key"],
-                    item["rarity"],
-                    item.get("slot"),
-                    item.get("item_source_table"),
-                )
-                if new_item:
-                    try:
-                        self.db.set_item_equipped(new_item["id"], 1)
-                    except pymongo.errors.DuplicateKeyError:
-                        return False, "Equipment slot update conflict."
+                # Split stack safely with compensation
+                if not self.db.split_stack_to_equipped(discord_id, inventory_db_id, item):
+                    return False, "Failed to process equipment split. Please try again."
             else:
                 try:
                     self.db.set_item_equipped(inventory_db_id, 1)
