@@ -226,7 +226,7 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
             name="⚙️ Guild Services", value="Access the Shop, Exchange, Infirmary, or Training Grounds.", inline=False
         )
 
-        view = GuildLobbyView(db, interaction.user)
+        view = GuildLobbyView(db, interaction.user, rank=card["rank"])
         await interaction.edit_original_response(embed=embed, view=view)
 
     except Exception as e:

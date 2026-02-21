@@ -49,7 +49,7 @@ async def transition_to_guild_lobby(interaction: discord.Interaction, db: Databa
         name="⚙️ Guild Services", value="Access the Shop, Exchange, Infirmary, or Training Grounds.", inline=False
     )
 
-    view = GuildLobbyView(db, user)
+    view = GuildLobbyView(db, user, rank=card["rank"])
     if not interaction.response.is_done():
         await interaction.response.edit_message(embed=embed, view=view)
     else:
