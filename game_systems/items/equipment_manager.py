@@ -67,8 +67,35 @@ class EquipmentManager:
     OFF_HAND_SLOTS = {"shield", "orb", "tome", "quiver", "offhand_dagger"}
     MAIN_HAND_SLOTS = {"sword", "mace", "dagger", "wand"}
 
+    # Armor Groups (Standardized Slots)
+    HEAD_SLOTS = {"helm", "leather_cap", "hood", "miter", "leather_hood"}
+    BODY_SLOTS = {"heavy_armor", "medium_armor", "rogue_armor", "robe", "vestments"}
+    HAND_SLOTS = {"heavy_gloves", "medium_gloves", "gloves"}
+    LEG_SLOTS = {"heavy_legs", "medium_legs", "legs"}
+    FOOT_SLOTS = {"heavy_boots", "medium_boots", "boots"}
+
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
+
+    def get_slot_display_name(self, slot: str) -> str:
+        """Returns a user-friendly name for the equipment slot/group."""
+        if slot in self.HEAD_SLOTS:
+            return "Head"
+        if slot in self.BODY_SLOTS:
+            return "Body"
+        if slot in self.HAND_SLOTS:
+            return "Hands"
+        if slot in self.LEG_SLOTS:
+            return "Legs"
+        if slot in self.FOOT_SLOTS:
+            return "Feet"
+        if slot in self.MAIN_HAND_SLOTS:
+            return "Main Hand"
+        if slot in self.OFF_HAND_SLOTS:
+            return "Off Hand"
+        if slot in self.TWO_HANDED_SLOTS:
+            return "Two-Handed"
+        return slot.replace("_", " ").title()
 
     def _get_player_allowed_slots(self, discord_id: int) -> list:
         """Fetches allowed equipment slots for the player's class."""
@@ -278,6 +305,19 @@ class EquipmentManager:
             elif target_slot in self.OFF_HAND_SLOTS:
                 slots_to_check.update(self.OFF_HAND_SLOTS)
                 slots_to_check.update(self.TWO_HANDED_SLOTS)
+
+            # Check Armor Groups
+            elif target_slot in self.HEAD_SLOTS:
+                slots_to_check.update(self.HEAD_SLOTS)
+            elif target_slot in self.BODY_SLOTS:
+                slots_to_check.update(self.BODY_SLOTS)
+            elif target_slot in self.HAND_SLOTS:
+                slots_to_check.update(self.HAND_SLOTS)
+            elif target_slot in self.LEG_SLOTS:
+                slots_to_check.update(self.LEG_SLOTS)
+            elif target_slot in self.FOOT_SLOTS:
+                slots_to_check.update(self.FOOT_SLOTS)
+
             else:
                 # Normal armor/accessory slot - just check self
                 slots_to_check.add(target_slot)
