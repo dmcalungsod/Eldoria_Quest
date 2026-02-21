@@ -22,6 +22,18 @@ FACTIONS = {
             "gathering": 1.2,
             "monster_types": ["Beast", "Plant"],
         },
+        "encounters": [
+            {
+                "text": "You encounter a **Pathfinder Scout** sketching a map of the area. They look up and nod.",
+                "reward_member": {"type": "item", "key": "map_fragment", "amount": 1, "rep": 15},
+                "reward_non_member": {"type": "xp", "amount": 25, "text": "They share a safe route with you."}
+            },
+            {
+                "text": "A **Pathfinder Camp** is set up in a safe alcove. The fire is warm.",
+                "reward_member": {"type": "buff", "key": "stamina", "rep": 10, "text": "You share a meal and rest."},
+                "reward_non_member": {"type": "hp", "amount": 20, "text": "They offer you some dried meat."}
+            }
+        ],
     },
     "iron_vanguard": {
         "name": "The Iron Vanguard",
@@ -39,6 +51,18 @@ FACTIONS = {
             "elite_kills": 1.5,
             "monster_types": ["Undead", "Construct"],
         },
+        "encounters": [
+            {
+                "text": "An **Iron Vanguard Sentinel** stands guard over a defeated beast.",
+                "reward_member": {"type": "item", "key": "whetstone", "amount": 1, "rep": 15},
+                "reward_non_member": {"type": "xp", "amount": 25, "text": "They warn you of dangers ahead."}
+            },
+            {
+                "text": "You find a **Vanguard Supply Cache** left for patrols.",
+                "reward_member": {"type": "item", "key": "food_ration", "amount": 2, "rep": 10},
+                "reward_non_member": {"type": "xp", "amount": 10, "text": "It is locked, but you admire the craftsmanship."}
+            }
+        ],
     },
     "arcane_assembly": {
         "name": "The Arcane Assembly",
@@ -56,5 +80,17 @@ FACTIONS = {
             "collecting": 1.2,
             "monster_types": ["Elemental", "Demon"],
         },
+        "encounters": [
+            {
+                "text": "A **Researcher of the Assembly** is examining a glowing rune on the wall.",
+                "reward_member": {"type": "item", "key": "research_notes", "amount": 1, "rep": 15},
+                "reward_non_member": {"type": "xp", "amount": 25, "text": "They mutter about ley lines as you pass."}
+            },
+            {
+                "text": "You stumble upon a floating **Mana Crystal** monitored by the Assembly.",
+                "reward_member": {"type": "buff", "key": "mana_regen", "rep": 10, "text": "You attune yourself to its energy."},
+                "reward_non_member": {"type": "mp", "amount": 20, "text": "The energy restores a bit of your focus."}
+            }
+        ],
     },
 }
