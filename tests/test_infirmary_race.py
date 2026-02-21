@@ -36,6 +36,8 @@ class TestInfirmaryRace(unittest.TestCase):
 
         # Call execute_heal
         # Target: 150 HP (Missing 100). Cost should be 50 (0.5 * 100)
+        # Target: 50 MP (Missing 40). Cost should be 20 (0.5 * 40)
+        # Total Cost: 70
         result, msg = self.db.execute_heal(12345, max_hp=150, max_mp=50, cost=0)
 
         self.assertTrue(result)
@@ -51,7 +53,7 @@ class TestInfirmaryRace(unittest.TestCase):
 
         # 2. Verify Atomic Increment: Update should use $inc for aurum
         self.assertIn("$inc", update_op, "Update should use $inc for atomic balance deduction")
-        self.assertEqual(update_op["$inc"]["aurum"], -50, "Should deduct 50 aurum")
+        self.assertEqual(update_op["$inc"]["aurum"], -70, "Should deduct 70 aurum")
 
         # 3. Verify Vitals Set: Update should use $set for HP/MP
         self.assertIn("$set", update_op)
