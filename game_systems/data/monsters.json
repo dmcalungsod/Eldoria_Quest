@@ -1951,5 +1951,135 @@
             "regenerate"
         ],
         "description": "The king of the sunken depths. It swallows light and hope alike."
+    },
+    "monster_126": {
+        "id": 126,
+        "name": "Cogwork Spider",
+        "level": 22,
+        "tier": "Normal",
+        "hp": 480,
+        "atk": 55,
+        "def": 30,
+        "xp": 500,
+        "drops": [
+            [
+                "brass_gear",
+                60
+            ],
+            [
+                "spring_coil",
+                40
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "steam_vent"
+        ],
+        "description": "A mechanical arachnid that skitters across the metal floor with unnerving precision."
+    },
+    "monster_127": {
+        "id": 127,
+        "name": "Brass Golem",
+        "level": 23,
+        "tier": "Normal",
+        "hp": 750,
+        "atk": 65,
+        "def": 45,
+        "xp": 550,
+        "drops": [
+            [
+                "brass_gear",
+                60
+            ],
+            [
+                "copper_wire",
+                40
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crushing_slam"
+        ],
+        "description": "A heavy construct of polished brass, powered by a glowing steam core."
+    },
+    "monster_128": {
+        "id": 128,
+        "name": "Steam Wisp",
+        "level": 22,
+        "tier": "Normal",
+        "hp": 450,
+        "atk": 70,
+        "def": 10,
+        "xp": 520,
+        "drops": [
+            [
+                "magic_stone_medium",
+                70
+            ],
+            [
+                "copper_wire",
+                30
+            ]
+        ],
+        "skills": [
+            "steam_vent",
+            "ember"
+        ],
+        "description": "A sentient cloud of superheated steam and mana."
+    },
+    "monster_129": {
+        "id": 129,
+        "name": "Automaton Knight",
+        "level": 24,
+        "tier": "Elite",
+        "hp": 1300,
+        "atk": 85,
+        "def": 55,
+        "xp": 1800,
+        "drops": [
+            [
+                "steam_core",
+                40
+            ],
+            [
+                "brass_gear",
+                50
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "rapid_strike"
+        ],
+        "description": "An ancient war machine programmed to defend the halls for eternity."
+    },
+    "monster_130": {
+        "id": 130,
+        "name": "The Gear Warden",
+        "level": 26,
+        "tier": "Boss",
+        "hp": 5500,
+        "atk": 120,
+        "def": 70,
+        "xp": 8500,
+        "drops": [
+            [
+                "clockwork_heart",
+                100
+            ],
+            [
+                "steam_core",
+                80
+            ],
+            [
+                "mithril_ore",
+                50
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "steam_vent",
+            "regenerate"
+        ],
+        "description": "The massive central processing unit of the Clockwork Halls, armed and dangerous."
     }
 }

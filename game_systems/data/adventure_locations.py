@@ -164,6 +164,33 @@ LOCATIONS = {
             ("magic_stone_medium", 30),
         ],
     },
+    "clockwork_halls": {
+        "name": "The Clockwork Halls",
+        "emoji": "⚙️",
+        "min_rank": "B",
+        "level_req": 22,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_126", 30),  # Cogwork Spider
+            ("monster_127", 30),  # Brass Golem
+            ("monster_128", 25),  # Steam Wisp
+            ("monster_129", 15),  # Automaton Knight
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_130",  # The Gear Warden
+                "weight": 5,
+                "min_level": 26,
+            }
+        ],
+        "description": "A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.",
+        "gatherables": [
+            ("brass_gear", 40),
+            ("copper_wire", 30),
+            ("spring_coil", 20),
+            ("magic_stone_medium", 10),
+        ],
+    },
     "molten_caldera": {
         "name": "The Molten Caldera",
         "emoji": "🌋",
