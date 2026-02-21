@@ -12,9 +12,9 @@ from enum import Enum
 
 
 class TimePhase(Enum):
-    DAWN = "Dawn"  # 05:00 - 07:59
-    DAY = "Day"  # 08:00 - 17:59
-    DUSK = "Dusk"  # 18:00 - 20:59
+    DAWN = "Dawn"    # 05:00 - 07:59
+    DAY = "Day"      # 08:00 - 17:59
+    DUSK = "Dusk"    # 18:00 - 20:59
     NIGHT = "Night"  # 21:00 - 04:59
 
 
@@ -30,6 +30,7 @@ class Weather(Enum):
 LOCATION_WEATHER_WEIGHTS = {
     # Default: Mostly clear, some rain/fog/storm
     "default": [(Weather.CLEAR, 60), (Weather.RAIN, 20), (Weather.FOG, 10), (Weather.STORM, 10)],
+
     # Specific Locations
     "molten_caldera": [(Weather.CLEAR, 50), (Weather.ASH, 40), (Weather.STORM, 10)],  # Storm = Firestorm
     "shrouded_fen": [(Weather.FOG, 50), (Weather.RAIN, 30), (Weather.CLEAR, 20)],

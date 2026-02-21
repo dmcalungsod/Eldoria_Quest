@@ -44,7 +44,9 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 0
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-        success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 25)
+        success = self.db.add_inventory_item(
+            self.discord_id, "hp_potion", "Potion", "consumable", "Common", 25
+        )
 
         self.assertTrue(success)
 
@@ -72,11 +74,15 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 1
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-        success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 10)
+        success = self.db.add_inventory_item(
+            self.discord_id, "hp_potion", "Potion", "consumable", "Common", 10
+        )
 
         self.assertTrue(success)
 
-        self.inventory_col.update_one.assert_called_with({"id": 10}, {"$inc": {"count": 5}})
+        self.inventory_col.update_one.assert_called_with(
+            {"id": 10}, {"$inc": {"count": 5}}
+        )
 
         self.inventory_col.insert_many.assert_called_once()
         inserted_docs = self.inventory_col.insert_many.call_args[0][0]
@@ -92,7 +98,9 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.find_one.return_value = None
         self.inventory_col.count_documents.return_value = 19
 
-        success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 25)
+        success = self.db.add_inventory_item(
+            self.discord_id, "hp_potion", "Potion", "consumable", "Common", 25
+        )
 
         self.assertFalse(success)
         self.inventory_col.insert_many.assert_not_called()
@@ -106,7 +114,9 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 0
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-        success = self.db.add_inventory_item(self.discord_id, "sword", "Sword", "equipment", "Common", 2)
+        success = self.db.add_inventory_item(
+            self.discord_id, "sword", "Sword", "equipment", "Common", 2
+        )
 
         self.assertTrue(success)
 
@@ -116,31 +126,29 @@ class TestStackLimits(unittest.TestCase):
         self.assertEqual(inserted_docs[0]["count"], 1)
         self.assertEqual(inserted_docs[1]["count"], 1)
 
-    @patch("database.database_manager.UpdateOne")
-    @patch("database.database_manager.InsertOne")
+    @patch('database.database_manager.UpdateOne')
+    @patch('database.database_manager.InsertOne')
     def test_bulk_add_distribution(self, MockInsertOne, MockUpdateOne):
         # Scenario: Bulk add 30 potions. Existing stack of 10. MAX=20.
         # Total 40. Existing(10) -> Full(20). New(20).
 
-        items = [
-            {
-                "item_key": "hp_potion",
-                "item_name": "Potion",
-                "item_type": "consumable",
-                "rarity": "Common",
-                "amount": 30,
-            }
-        ]
+        items = [{
+            "item_key": "hp_potion",
+            "item_name": "Potion",
+            "item_type": "consumable",
+            "rarity": "Common",
+            "amount": 30
+        }]
 
         # Mock find returning existing stack
         existing_doc = {"id": 50, "count": 10, "item_key": "hp_potion", "rarity": "Common", "equipped": 0}
 
         # Mock find().sort() chain
         cursor = MagicMock()
-        cursor.sort.return_value = [existing_doc]  # Sort ASC by count
+        cursor.sort.return_value = [existing_doc] # Sort ASC by count
         self.inventory_col.find.return_value = cursor
 
-        self.inventory_col.count_documents.return_value = 1  # 1 slot used
+        self.inventory_col.count_documents.return_value = 1 # 1 slot used
         self.counters_col.find_one_and_update.return_value = {"seq": 200}
 
         failed = self.db.add_inventory_items_bulk(self.discord_id, items)
@@ -160,6 +168,5 @@ class TestStackLimits(unittest.TestCase):
         self.assertEqual(doc["count"], 20)
         self.assertEqual(doc["item_key"], "hp_potion")
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

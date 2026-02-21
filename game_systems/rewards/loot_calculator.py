@@ -5,7 +5,9 @@ Centralized drop chance calculation.
 Replaces additive luck scaling with multiplicative scaling for better balance.
 """
 
+import math
 import random
+from typing import List, Tuple
 
 from game_systems.data.materials import MATERIALS
 
@@ -48,7 +50,7 @@ class LootCalculator:
         return min(100.0, max(0.0, final_chance))
 
     @staticmethod
-    def roll_drops(drops_list: list[tuple[str, float]], luck: int, loot_boost: float = 1.0) -> list[str]:
+    def roll_drops(drops_list: List[Tuple[str, float]], luck: int, loot_boost: float = 1.0) -> List[str]:
         """
         Processes a list of potential drops and returns the keys of items that dropped.
 

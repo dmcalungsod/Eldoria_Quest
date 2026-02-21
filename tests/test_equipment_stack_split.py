@@ -1,7 +1,8 @@
-import os
-import sys
+
 import unittest
 from unittest.mock import MagicMock, patch
+import sys
+import os
 
 sys.path.append(os.getcwd())
 
@@ -15,9 +16,8 @@ sys.modules["pymongo.errors"] = mock_pymongo_errors
 sys.modules["discord"] = MagicMock()
 
 # Now import the modules under test
-from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
-
+from database.database_manager import DatabaseManager  # noqa: E402
 
 class TestStackEquipBug(unittest.TestCase):
     def setUp(self):
@@ -53,7 +53,7 @@ class TestStackEquipBug(unittest.TestCase):
             "slot": "sword",
             "count": 2,
             "equipped": 0,
-            "item_source_table": "equipment",
+            "item_source_table": "equipment"
         }
 
         self.mock_db.get_inventory_item.return_value = item_stack
@@ -63,7 +63,9 @@ class TestStackEquipBug(unittest.TestCase):
         self.mock_db.find_stackable_item.return_value = item_stack
 
         # Mock CLASSES to allow 'sword'
-        with patch("game_systems.items.equipment_manager.CLASSES", {"Warrior": {"id": 1, "allowed_slots": ["sword"]}}):
+        with patch("game_systems.items.equipment_manager.CLASSES", {
+            "Warrior": {"id": 1, "allowed_slots": ["sword"]}
+        }):
             # Execute Equip
             # Mock recalculate_player_stats to avoid needing PlayerStats dependencies
             self.manager.recalculate_player_stats = MagicMock()
@@ -89,7 +91,6 @@ class TestStackEquipBug(unittest.TestCase):
             self.mock_db.set_item_equipped.assert_not_called()
 
             print("Fix verified: split_stack_to_equipped was called.")
-
 
 if __name__ == "__main__":
     unittest.main()

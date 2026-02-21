@@ -154,10 +154,10 @@ class FactionSystem:
             self.db.add_inventory_item(
                 discord_id,
                 item_key,
-                item_name=item_key.replace("_", " ").title(),  # Fallback name
-                item_type="consumable",  # Default
-                rarity="Rare",  # Default
-                amount=amount,
+                item_name=item_key.replace("_", " ").title(), # Fallback name
+                item_type="consumable", # Default
+                rarity="Rare", # Default
+                amount=amount
             )
             logs.append(f"Received reward: {amount}x {item_key.replace('_', ' ').title()}")
 

@@ -39,7 +39,8 @@ STAT_UP_MESSAGES = {
 
 STAT_EXP_GAINS = {
     "str_exp": lambda br: br.get("str_hits", 0) * 0.5,
-    "dex_exp": lambda br: (br.get("dex_hits", 0) * 0.5) + (br.get("player_crit", 0) * 2.0),
+    "dex_exp": lambda br: (br.get("dex_hits", 0) * 0.5)
+    + (br.get("player_crit", 0) * 2.0),
     "agi_exp": lambda br: br.get("player_dodge", 0) * 1.5,
     "end_exp": lambda br: br.get("damage_taken", 0) * 0.2,
     "mag_exp": lambda br: br.get("mag_hits", 0) * 1.0,
@@ -76,9 +77,13 @@ class AdventureRewards:
             promo_rank = monster_data.get("promotion_target")
 
             if promo_rank:
-                success, msg = self.rank_system.finalize_promotion(self.discord_id, promo_rank)
+                success, msg = self.rank_system.finalize_promotion(
+                    self.discord_id, promo_rank
+                )
                 if success:
-                    logs.append(f"\n{E.MEDAL} **PROMOTION SUCCESSFUL!**\nYou are now **Rank {promo_rank}**.")
+                    logs.append(
+                        f"\n{E.MEDAL} **PROMOTION SUCCESSFUL!**\nYou are now **Rank {promo_rank}**."
+                    )
 
             # 2. Loot & Quests
             actual_drops = self._process_loot_and_quests(
@@ -109,19 +114,25 @@ class AdventureRewards:
                 # Event: Spectral Tide
                 ectoplasm_count = actual_drops.count("ectoplasm")
                 if ectoplasm_count > 0:
-                    tournament.record_action(self.discord_id, "spectral_tide", ectoplasm_count)
+                    tournament.record_action(
+                        self.discord_id, "spectral_tide", ectoplasm_count
+                    )
 
             except Exception as e:
                 logger.error(f"Tournament hook error: {e}")
             # -----------------------
 
             # 6. Achievements
-            ach_msg = self.achievement_system.check_kill_achievements(self.discord_id, tier)
+            ach_msg = self.achievement_system.check_kill_achievements(
+                self.discord_id, tier
+            )
             if ach_msg:
                 logs.append(f"\n{ach_msg}")
 
             # Check Group Achievements
-            group_ach_msg = self.achievement_system.check_group_achievements(self.discord_id, monster_name)
+            group_ach_msg = self.achievement_system.check_group_achievements(
+                self.discord_id, monster_name
+            )
             if group_ach_msg:
                 logs.append(f"\n{group_ach_msg}")
 
@@ -133,12 +144,16 @@ class AdventureRewards:
                 logs.append("\n" + "\n".join(faction_logs))
 
         except Exception as e:
-            logger.error(f"Reward processing failed for {self.discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Reward processing failed for {self.discord_id}: {e}", exc_info=True
+            )
             logs.append(f"\n{E.ERROR} *An error occurred processing some rewards.*")
 
         return logs
 
-    def _process_loot_and_quests(self, combat_result, quest_system, inventory_manager, session_loot, logs):
+    def _process_loot_and_quests(
+        self, combat_result, quest_system, inventory_manager, session_loot, logs
+    ):
         """Calculates drops and updates quest progress."""
         loot_bundle = defaultdict(int)
         exp_gain = combat_result["exp"]
@@ -152,7 +167,9 @@ class AdventureRewards:
         loot_boost = combat_result.get("active_boosts", {}).get("loot_boost", 1.0)
 
         # Material Drops (via Centralized Calculator)
-        rolled_drops = LootCalculator.roll_drops(combat_result.get("drops", []), stats.luck, loot_boost)
+        rolled_drops = LootCalculator.roll_drops(
+            combat_result.get("drops", []), stats.luck, loot_boost
+        )
 
         for drop_key in rolled_drops:
             self._add_loot_to_session(session_loot, drop_key, 1)
@@ -195,7 +212,9 @@ class AdventureRewards:
             "Legendary": 4,
             "Mythical": 5,
         }
-        sorted_loot = sorted(loot_bundle.items(), key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1]))
+        sorted_loot = sorted(
+            loot_bundle.items(), key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1])
+        )
 
         for (name, rarity), count in sorted_loot:
             qty = f" (x{count})" if count > 1 else ""
@@ -207,7 +226,9 @@ class AdventureRewards:
 
         # Quest Updates
         # FIX: Pass only actual drops, not potential drops
-        self._update_quests(quest_system, combat_result["monster_data"]["name"], actual_drops, logs)
+        self._update_quests(
+            quest_system, combat_result["monster_data"]["name"], actual_drops, logs
+        )
 
         return actual_drops
 
@@ -221,7 +242,9 @@ class AdventureRewards:
 
             # Defeat check
             if "defeat" in objs and monster_name in objs["defeat"]:
-                quest_system.update_progress(self.discord_id, q["id"], "defeat", monster_name)
+                quest_system.update_progress(
+                    self.discord_id, q["id"], "defeat", monster_name
+                )
                 progress_made = True
 
             # Collect check
@@ -229,7 +252,9 @@ class AdventureRewards:
                 # Iterate through actual drops instead of potential drops
                 for dk in actual_drops:
                     if dk in objs["collect"]:
-                        quest_system.update_progress(self.discord_id, q["id"], "collect", dk)
+                        quest_system.update_progress(
+                            self.discord_id, q["id"], "collect", dk
+                        )
                         progress_made = True
 
             if progress_made:
@@ -274,7 +299,9 @@ class AdventureRewards:
 
                 stat_key = exp_key.split("_")[0].upper()
 
-                new_exp, levels = self._calculate_growth(curr_exp[exp_key], gain, STAT_EXP_THRESHOLD)
+                new_exp, levels = self._calculate_growth(
+                    curr_exp[exp_key], gain, STAT_EXP_THRESHOLD
+                )
                 curr_exp[exp_key] = new_exp
 
                 if levels > 0:
@@ -334,7 +361,9 @@ class AdventureRewards:
                     lvl += levels
                     msgs.append(f"{E.LEVEL_UP} **{name}** reached **Level {lvl}**!")
 
-                self.db.update_player_skill(self.discord_id, s_key, skill_level=lvl, skill_exp=new_exp)
+                self.db.update_player_skill(
+                    self.discord_id, s_key, skill_level=lvl, skill_exp=new_exp
+                )
 
             if msgs:
                 logs.append("\n" + "\n".join(msgs))

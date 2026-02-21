@@ -162,12 +162,12 @@ class CharacterMenuView(View):
             title="The Adventurer's Guild: Reception",
             description=(
                 "The Guild Clerk looks up from a stack of parchment, adjusting her spectacles.\n\n"
-                '*"Name? Class? Ah, yes. Fresh blood. Welcome to the Guild, Initiate."*\n\n'
+                "*\"Name? Class? Ah, yes. Fresh blood. Welcome to the Guild, Initiate.\"*\n\n"
                 "She stamps a document and slides a heavy iron badge across the counter.\n\n"
-                '*"We handle the paperwork; you handle the monsters. Simple, yes? '
+                "*\"We handle the paperwork; you handle the monsters. Simple, yes? "
                 "But before I let you loose in the dungeon, let's see if you know which end of the weapon to hold.\"*"
             ),
-            color=discord.Color.dark_teal(),
+            color=discord.Color.dark_teal()
         )
         embed.set_footer(text="Complete the combat training to receive a starter kit.")
 
@@ -196,7 +196,7 @@ class GuildWelcomeView(View):
                 "A **Straw Dummy** stands before you. It mocks you with its silence and drawn-on angry eyebrows.\n\n"
                 "**Action:** Strike the dummy to begin."
             ),
-            color=discord.Color.red(),
+            color=discord.Color.red()
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -233,9 +233,7 @@ class CombatTutorialView(View):
             btn.callback = self.finish_callback
             self.add_item(btn)
         elif self.step == 3:
-            btn = Button(
-                label="🏆 Claim Badge & Enter Guild", style=discord.ButtonStyle.success, custom_id="tut_complete"
-            )
+            btn = Button(label="🏆 Claim Badge & Enter Guild", style=discord.ButtonStyle.success, custom_id="tut_complete")
             btn.callback = self.complete_callback
             self.add_item(btn)
 
@@ -274,7 +272,7 @@ class CombatTutorialView(View):
         embed.description = (
             "**CRITICAL HIT!**\n"
             "With a mighty blow, the straw dummy explodes into a cloud of hay.\n\n"
-            'The Clerk nods slowly. *"Not bad. You didn\'t trip, at least."*\n\n'
+            "The Clerk nods slowly. *\"Not bad. You didn't trip, at least.\"*\n\n"
             "You are ready for the real thing."
         )
         embed.color = discord.Color.gold()
@@ -287,15 +285,10 @@ class CombatTutorialView(View):
         # We assume potion_minor exists. If not, it fails silently or logs error, but we should be safe.
         # "potion_minor" | "Minor Health Potion" | "consumable" | "Common"
         try:
-            await asyncio.to_thread(
-                self.db.add_inventory_item,
-                self.user.id,
-                "potion_minor",
-                "Minor Health Potion",
-                "consumable",
-                "Common",
-                3,
-            )
+             await asyncio.to_thread(
+                 self.db.add_inventory_item,
+                 self.user.id, "potion_minor", "Minor Health Potion", "consumable", "Common", 3
+             )
         except Exception as e:
             logger.error(f"Failed to grant tutorial reward: {e}")
 

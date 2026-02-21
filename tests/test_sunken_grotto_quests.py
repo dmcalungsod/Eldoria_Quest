@@ -1,17 +1,15 @@
 import json
-import os
 import unittest
-
+import os
+from game_systems.data.monsters import MONSTERS
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.materials import MATERIALS
-from game_systems.data.monsters import MONSTERS
-
 
 class TestSunkenGrottoQuests(unittest.TestCase):
     def setUp(self):
         # Load quests.json
         quests_path = os.path.join(os.path.dirname(__file__), "../game_systems/data/quests.json")
-        with open(quests_path, encoding="utf-8") as f:
+        with open(quests_path, "r", encoding="utf-8") as f:
             self.quests = json.load(f)
 
         # Map Quest ID to Quest Object
@@ -37,41 +35,41 @@ class TestSunkenGrottoQuests(unittest.TestCase):
                 "tier": "C",
                 "location": "The Sunken Grotto",
                 "target": "Coral Golem",
-                "count": 5,
+                "count": 5
             },
             57: {
                 "title": "Lurkers in the Deep",
                 "tier": "C",
                 "location": "The Sunken Grotto",
                 "target": "Abyssal Eel",
-                "count": 5,
+                "count": 5
             },
             58: {
                 "title": "Siren's Call",
                 "tier": "C",
                 "location": "The Sunken Grotto",
                 "target": "Tide Siren",
-                "count": 5,
+                "count": 5
             },
             59: {
                 "title": "Crushing Depths",
                 "tier": "C",
                 "location": "The Sunken Grotto",
                 "target": "Deep Crawler",
-                "count": 3,
+                "count": 3
             },
             60: {
                 "title": "The Leviathan's Wake",
                 "tier": "C",
                 "location": "The Sunken Grotto",
                 "target": "Leviathan",
-                "count": 1,
-            },
+                "count": 1
+            }
         }
 
         for q_id, details in expected_quests.items():
             if q_id not in self.quest_map:
-                continue  # Skip if not implemented yet (will fail in test_new_quests_exist)
+                continue # Skip if not implemented yet (will fail in test_new_quests_exist)
 
             quest = self.quest_map[q_id]
             self.assertEqual(quest["title"], details["title"])
@@ -86,17 +84,12 @@ class TestSunkenGrottoQuests(unittest.TestCase):
             self.assertEqual(targets[details["target"]], details["count"])
 
             # Verify Target Name Validity
-            self.assertIn(
-                details["target"], self.valid_monster_names, f"Monster {details['target']} not defined in MONSTERS"
-            )
+            self.assertIn(details["target"], self.valid_monster_names, f"Monster {details['target']} not defined in MONSTERS")
 
             # Verify Reward Item Validity (if present)
             if "item" in quest["rewards"]:
                 item_name = quest["rewards"]["item"]
-                self.assertIn(
-                    item_name, self.valid_item_names, f"Reward item {item_name} not found in CONSUMABLES or MATERIALS"
-                )
-
+                self.assertIn(item_name, self.valid_item_names, f"Reward item {item_name} not found in CONSUMABLES or MATERIALS")
 
 if __name__ == "__main__":
     unittest.main()

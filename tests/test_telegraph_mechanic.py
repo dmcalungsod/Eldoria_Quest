@@ -11,9 +11,9 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
 from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
-from game_systems.monsters.monster_actions import MonsterAI  # noqa: E402
 from game_systems.player.level_up import LevelUpSystem  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from game_systems.monsters.monster_actions import MonsterAI  # noqa: E402
 
 
 class TestTelegraphMechanic(unittest.TestCase):
@@ -64,7 +64,7 @@ class TestTelegraphMechanic(unittest.TestCase):
                 player_mp=100,
                 player_class_id=1,
                 stats_dict={"MP": 100, "HP": 500, "END": 10, "AGI": 10},
-                action="defend",  # Player defends in anticipation
+                action="defend", # Player defends in anticipation
             )
 
             # Mock RNG
@@ -91,9 +91,7 @@ class TestTelegraphMechanic(unittest.TestCase):
 
         # Verify MonsterAI.choose_action returns execute_charge
         action = MonsterAI.choose_action(self.monster, 1000, 100)
-        self.assertEqual(
-            action["type"], "execute_charge", "MonsterAI should choose execute_charge when charged_skill is present"
-        )
+        self.assertEqual(action["type"], "execute_charge", "MonsterAI should choose execute_charge when charged_skill is present")
         self.assertEqual(action["skill"], self.high_power_skill)
 
         # Now run the engine with this action
@@ -146,7 +144,6 @@ class TestTelegraphMechanic(unittest.TestCase):
 
             self.assertEqual(action["type"], "telegraph", "MonsterAI should choose telegraph with correct RNG")
             self.assertEqual(action["skill"], self.high_power_skill)
-
 
 if __name__ == "__main__":
     unittest.main()

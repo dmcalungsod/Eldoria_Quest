@@ -126,7 +126,10 @@ class InfirmaryView(View):
         )
 
         if hp_miss > 0 or mp_miss > 0:
-            description += f"A full course of treatment will cost **{cost} {E.AURUM}** (0.5 Aurum per missing HP/MP)."
+            description += (
+                f"A full course of treatment will cost **{cost} {E.AURUM}** "
+                "(0.5 Aurum per missing HP/MP)."
+            )
         else:
             description += "You stand in peak condition; no treatment is required."
 

@@ -7,7 +7,7 @@ These events apply global modifiers to combat, loot, and experience.
 
 import datetime
 import logging
-from typing import Any
+from typing import Any, Dict
 
 from database.database_manager import DatabaseManager
 
@@ -54,7 +54,7 @@ class WorldEventSystem:
     def __init__(self, db: DatabaseManager):
         self.db = db
 
-    def get_current_event(self) -> dict[str, Any] | None:
+    def get_current_event(self) -> Dict[str, Any] | None:
         """
         Returns the currently active event if it hasn't expired.
         Auto-expires events if the end time has passed.
@@ -92,7 +92,9 @@ class WorldEventSystem:
         start_time = datetime.datetime.now()
         end_time = start_time + datetime.timedelta(hours=duration_hours)
 
-        self.db.set_active_world_event(event_type, start_time.isoformat(), end_time.isoformat())
+        self.db.set_active_world_event(
+            event_type, start_time.isoformat(), end_time.isoformat()
+        )
         logger.info(f"Started World Event: {event_type} for {duration_hours}h")
         return True
 
@@ -101,7 +103,7 @@ class WorldEventSystem:
         self.db.end_active_world_event()
         logger.info("Ended active World Event.")
 
-    def get_modifiers(self) -> dict[str, float]:
+    def get_modifiers(self) -> Dict[str, float]:
         """Returns the active modifiers dict."""
         event = self.get_current_event()
         if not event:
