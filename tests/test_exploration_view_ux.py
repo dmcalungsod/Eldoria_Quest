@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # Helper Mocks
 class MockView:
     def __init__(self, timeout=None):
@@ -55,6 +56,7 @@ class MockSelectOption:
         self.emoji = emoji
         self.default = default
 
+
 class TestExplorationViewUX(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules
@@ -79,24 +81,27 @@ class TestExplorationViewUX(unittest.TestCase):
         mock_ui.View = MockView
         mock_ui.Button = MockButton
         mock_ui.Select = MockSelect
-        mock_ui.Item = object # Minimal mock for base class if needed
+        mock_ui.Item = object  # Minimal mock for base class if needed
 
         sys.modules["discord.ui"] = mock_ui
 
         # Mock Dependencies
         sys.modules["pymongo"] = MagicMock()
+        sys.modules["pymongo.errors"] = MagicMock()
         sys.modules["cogs"] = MagicMock()
         sys.modules["cogs.ui_helpers"] = MagicMock()
         sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
 
         # Import module under test
         import game_systems.adventure.ui.exploration_view
+
         importlib.reload(game_systems.adventure.ui.exploration_view)
 
         self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
 
         # Import PlayerStats
         from game_systems.player.player_stats import PlayerStats
+
         self.PlayerStats = PlayerStats
 
         self.mock_db = MagicMock()

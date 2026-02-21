@@ -12,6 +12,7 @@ import discord
 import game_systems.data.emojis as E
 from cogs.ui_helpers import get_health_status_emoji, make_progress_bar
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.emojis import get_rarity_ansi
 from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.ui.embeds")
@@ -113,4 +114,59 @@ class AdventureEmbeds:
         else:
             embed.set_footer(text="Press Forward to continue • Field Pack to manage items")
 
+        return embed
+
+    @staticmethod
+    def build_summary_embed(summary: dict, location_name: str) -> discord.Embed:
+        """Constructs the mission report embed."""
+        s = summary
+
+        # 1. Title & Color
+        if s.get("leveled_up"):
+            title, color = f"{E.LEVEL_UP} Level Up! Expedition Complete", discord.Color.gold()
+        else:
+            title, color = f"{E.VICTORY} Expedition Complete: {location_name}", discord.Color.dark_green()
+
+        embed = discord.Embed(
+            title=title, description="*You return from the wilds, weary but burdened with spoils.*", color=color
+        )
+
+        # 2. Rewards
+        rewards = []
+        if (xp := s.get("xp_gained", 0)) > 0:
+            rewards.append(f"{E.EXP} **+{xp} XP**")
+        if (au := s.get("aurum_gained", 0)) > 0:
+            rewards.append(f"{E.AURUM} **+{au} Aurum**")
+        if logs := s.get("faction_logs"):
+            rewards.extend(f"• {log_entry}" for log_entry in logs)
+
+        if rewards:
+            embed.add_field(name="Rewards", value="\n".join(rewards), inline=False)
+
+        # 3. Loot
+        loot_lines = []
+        for i in s.get("loot", []):
+            item_text = f"{i['name']} (x{i['amount']})"
+            loot_lines.append(f"• {get_rarity_ansi(i.get('rarity'), item_text)}")
+
+        if loot_lines:
+            val = "```ansi\n" + "\n".join(loot_lines[:15]) + ("\n...and more" if len(loot_lines) > 15 else "") + "\n```"
+            embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value=val, inline=False)
+        else:
+            embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value="*No resources found.*", inline=False)
+
+        # 4. Level Up
+        if s.get("leveled_up"):
+            embed.add_field(
+                name="🌟 Ascension",
+                value=f"**Level {s.get('old_level')}** ➜ **Level {s.get('new_level')}**",
+                inline=False,
+            )
+
+        # 5. Full Inventory Warning
+        if failed := s.get("failed_items"):
+            names = sorted(list(set(f["item_name"] for f in failed)))
+            embed.add_field(name=f"{E.WARNING} Lost Items (Full Pack)", value=", ".join(names), inline=False)
+
+        embed.set_footer(text="Your journey is recorded in the archives.")
         return embed

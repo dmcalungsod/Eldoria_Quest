@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 # Fix path to include repo root
 sys.path.append(os.getcwd())
 
+
 # Helper Mocks
 class MockView:
     def __init__(self, timeout=180):
@@ -26,6 +27,7 @@ class MockButton:
 
     def _is_v2(self):
         return False
+
 
 class TestInfirmaryFallbackExploit(unittest.TestCase):
     def setUp(self):
@@ -53,11 +55,13 @@ class TestInfirmaryFallbackExploit(unittest.TestCase):
 
         # Import modules under test
         import cogs.infirmary_cog
+
         importlib.reload(cogs.infirmary_cog)
 
         self.InfirmaryView = cogs.infirmary_cog.InfirmaryView
 
         from game_systems.player.player_stats import PlayerStats
+
         self.PlayerStats = PlayerStats
 
         self.mock_db = MagicMock()

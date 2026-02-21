@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 sys.path.append(os.getcwd())
 
+
 class TestShopTransactionFailure(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules
@@ -26,6 +27,7 @@ class TestShopTransactionFailure(unittest.TestCase):
 
         # Import module under test
         import database.database_manager
+
         importlib.reload(database.database_manager)
 
         self.DatabaseManager = database.database_manager.DatabaseManager
@@ -55,8 +57,8 @@ class TestShopTransactionFailure(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
         self.modules_patcher.stop()
-        if hasattr(self, 'DatabaseManager'):
-             self.DatabaseManager._instance = None
+        if hasattr(self, "DatabaseManager"):
+            self.DatabaseManager._instance = None
 
     def test_purchase_item_refunds_on_inventory_failure(self):
         """

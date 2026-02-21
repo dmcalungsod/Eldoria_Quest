@@ -39,6 +39,7 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
     async def test_race_condition_double_click(self):
         import importlib
+
         import game_systems.adventure.ui.exploration_view as ev_module
 
         # Force reload so ExplorationView picks up our mocks (View, Button, Select)

@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # Helper Mocks
 class MockView:
     def __init__(self, timeout=None):
@@ -15,6 +16,7 @@ class MockView:
 
     def add_item(self, item):
         self.items.append(item)
+
 
 class MockButton:
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
@@ -27,6 +29,7 @@ class MockButton:
 
     def _is_v2(self):
         return False
+
 
 class TestAdventureUX(unittest.TestCase):
     def setUp(self):
@@ -60,11 +63,13 @@ class TestAdventureUX(unittest.TestCase):
 
         # Import module under test
         import game_systems.character.ui.adventure_menu
+
         importlib.reload(game_systems.character.ui.adventure_menu)
 
         self.AdventureView = game_systems.character.ui.adventure_menu.AdventureView
 
         import database.database_manager
+
         importlib.reload(database.database_manager)
         self.DatabaseManager = database.database_manager.DatabaseManager
 

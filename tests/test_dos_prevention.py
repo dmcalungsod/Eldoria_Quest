@@ -92,12 +92,14 @@ class TestDoSPrevention(unittest.TestCase):
 
         # Import module under test
         import game_systems.adventure.ui.exploration_view
+
         importlib.reload(game_systems.adventure.ui.exploration_view)
 
         self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
 
         # Import PlayerStats
         from game_systems.player.player_stats import PlayerStats
+
         self.PlayerStats = PlayerStats
 
         # Setup test objects

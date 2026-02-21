@@ -27,6 +27,7 @@ class MockButton:
     def _is_v2(self):
         return False
 
+
 class TestInfirmaryStateIssue(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules
@@ -50,20 +51,23 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # Mock Pymongo
         mock_pymongo = MagicMock()
         mock_pymongo.errors = MagicMock()
-        mock_pymongo.errors.DuplicateKeyError = Exception # Preserve original mock behavior
+        mock_pymongo.errors.DuplicateKeyError = Exception  # Preserve original mock behavior
 
         sys.modules["pymongo"] = mock_pymongo
         sys.modules["pymongo.errors"] = mock_pymongo.errors
 
         # Import module under test
         import cogs.infirmary_cog
+
         importlib.reload(cogs.infirmary_cog)
         self.InfirmaryView = cogs.infirmary_cog.InfirmaryView
 
         from database.database_manager import DatabaseManager
+
         self.DatabaseManager = DatabaseManager
 
         from game_systems.player.player_stats import PlayerStats
+
         self.PlayerStats = PlayerStats
 
         # Setup test objects

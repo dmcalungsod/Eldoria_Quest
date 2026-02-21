@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # Mock View for inheritance
 class MockView:
     def __init__(self, timeout=None):
@@ -21,6 +22,7 @@ class MockView:
 
     async def interaction_check(self, interaction):
         return True
+
 
 class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -49,6 +51,7 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
 
         # Import modules under test
         import cogs.onboarding_cog
+
         importlib.reload(cogs.onboarding_cog)
 
         self.GuildWelcomeView = cogs.onboarding_cog.GuildWelcomeView

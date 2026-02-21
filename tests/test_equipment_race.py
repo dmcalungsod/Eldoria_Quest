@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Force reload so equipment_manager picks up our mock_pymongo
 import importlib  # noqa: E402
+
 import game_systems.items.equipment_manager as _em_mod  # noqa: E402
 
 importlib.reload(_em_mod)

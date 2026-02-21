@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 class TestAdventureEmbeds(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules
@@ -34,11 +35,13 @@ class TestAdventureEmbeds(unittest.TestCase):
 
         # Import module under test
         import game_systems.adventure.ui.adventure_embeds
+
         importlib.reload(game_systems.adventure.ui.adventure_embeds)
 
         self.AdventureEmbeds = game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
 
         from game_systems.player.player_stats import PlayerStats
+
         self.PlayerStats = PlayerStats
 
         self.stats = MagicMock(spec=self.PlayerStats)
