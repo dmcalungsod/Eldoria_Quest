@@ -381,7 +381,13 @@ class ExplorationView(View):
         self.processing = True
         try:
             await interaction.response.defer()
-            await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
+            summary = await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
+
+            if summary and summary.get("failed_items"):
+                failed_names = sorted(list(set(f["item_name"] for f in summary["failed_items"])))
+                msg = f"{E.ERROR} **Inventory Full:** You had to leave behind: {', '.join(failed_names)}"
+                await interaction.followup.send(msg, ephemeral=True)
+
             await back_to_profile_callback(interaction, is_new_message=False)
         finally:
             self.processing = False

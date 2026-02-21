@@ -13,7 +13,7 @@ import logging
 import discord
 
 import game_systems.data.emojis as E
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager, MAX_INVENTORY_SLOTS
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.player.player_stats import PlayerStats
 
@@ -45,7 +45,11 @@ def get_health_status_emoji(current: int, max_val: int) -> str:
 
 def build_inventory_embed(items: list) -> discord.Embed:
     """Constructs the inventory display."""
-    embed = discord.Embed(title=f"{E.BACKPACK} Backpack", color=discord.Color.dark_orange())
+    slot_count = len(items)
+    embed = discord.Embed(
+        title=f"{E.BACKPACK} Backpack ({slot_count}/{MAX_INVENTORY_SLOTS})",
+        color=discord.Color.dark_orange(),
+    )
 
     if not items:
         embed.description = "*Your pack is light, holding only dust and echoes.*"

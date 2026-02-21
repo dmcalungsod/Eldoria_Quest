@@ -24,6 +24,8 @@ logger = logging.getLogger("eldoria.db")
 DEFAULT_MONGO_URI = "mongodb://localhost:27017"
 DEFAULT_DB_NAME = "eldoria_quest"
 
+MAX_INVENTORY_SLOTS = 20
+
 
 class DatabaseManager:
     """
@@ -696,6 +698,10 @@ class DatabaseManager:
     # INVENTORY (New methods for external call sites)
     # ============================================================
 
+    def get_inventory_slot_count(self, discord_id: int) -> int:
+        """Counts the number of distinct item slots (documents) used."""
+        return self._col("inventory").count_documents({"discord_id": discord_id})
+
     def get_inventory_items(
         self, discord_id: int, item_type: str | None = None, equipped: int | None = None
     ) -> list[dict]:
@@ -744,8 +750,8 @@ class DatabaseManager:
         amount: int = 1,
         slot: str | None = None,
         item_source_table: str | None = None,
-    ):
-        """Adds an item to inventory with stack merging."""
+    ) -> bool:
+        """Adds an item to inventory with stack merging. Returns True if successful, False if full."""
         existing = self.find_stackable_item(
             discord_id, item_key, rarity, slot, item_source_table
         )
@@ -754,7 +760,13 @@ class DatabaseManager:
                 {"id": existing["id"]},
                 {"$inc": {"count": amount}},
             )
+            return True
         else:
+            # Check capacity for new slot
+            current_slots = self.get_inventory_slot_count(discord_id)
+            if current_slots >= MAX_INVENTORY_SLOTS:
+                return False
+
             new_id = self._next_inventory_id()
             self._col("inventory").insert_one(
                 {
@@ -770,15 +782,16 @@ class DatabaseManager:
                     "equipped": 0,
                 }
             )
+            return True
 
-    def add_inventory_items_bulk(self, discord_id: int, items: list[dict]):
+    def add_inventory_items_bulk(self, discord_id: int, items: list[dict]) -> list[dict]:
         """
         Efficiently adds multiple items to inventory.
         Handles stacking and bulk insertion to reduce DB round-trips.
-        items: list of dicts with keys: item_key, item_name, item_type, rarity, amount, [slot], [item_source_table]
+        Returns a list of items that could NOT be added due to slot limits.
         """
         if not items:
-            return
+            return []
 
         # 1. Consolidate items to minimize operations
         consolidated = {}
@@ -839,7 +852,21 @@ class DatabaseManager:
                 # Queue for insertion
                 new_items_data.append(item_data)
 
-        # 4. Generate IDs for new items in a single batch
+        # 4. Check Capacity for New Items
+        failed_items = []
+        if new_items_data:
+            current_slots = self.get_inventory_slot_count(discord_id)
+            available = max(0, MAX_INVENTORY_SLOTS - current_slots)
+
+            if len(new_items_data) > available:
+                # Add only what fits
+                fitting = new_items_data[:available]
+                # Track failures
+                for fail in new_items_data[available:]:
+                    failed_items.append(fail)
+                new_items_data = fitting
+
+        # 5. Generate IDs for new items in a single batch
         if new_items_data:
             count = len(new_items_data)
             # Atomically reserve a block of IDs
@@ -872,12 +899,14 @@ class DatabaseManager:
                     )
                 )
 
-        # 5. Execute
+        # 6. Execute
         if operations:
             self._col("inventory").bulk_write(operations)
             logger.info(
-                f"Bulk added {len(items)} items ({len(operations)} ops) for {discord_id}"
+                f"Bulk added items for {discord_id}. Failures: {len(failed_items)}"
             )
+
+        return failed_items
 
     def get_inventory_item_count(self, discord_id: int, item_key: str) -> int:
         """Returns the total count of an item across all stacks."""
@@ -1587,7 +1616,7 @@ class DatabaseManager:
 
         # 2. Add item to inventory with Refund Logic
         try:
-            self.add_inventory_item(
+            success = self.add_inventory_item(
                 discord_id,
                 item_key,
                 item_data["name"],
@@ -1595,7 +1624,17 @@ class DatabaseManager:
                 item_data["rarity"],
                 1,
             )
-            return (True, item_data, new_aurum)
+
+            if success:
+                return (True, item_data, new_aurum)
+            else:
+                # Inventory Full -> Refund
+                self._col("players").update_one(
+                    {"discord_id": discord_id},
+                    {"$inc": {"aurum": price}},
+                )
+                refunded_balance = new_aurum + price
+                return (False, "Inventory Full.", refunded_balance)
 
         except Exception as e:
             logger.error(f"Purchase failed for {discord_id}, refunding {price}: {e}")

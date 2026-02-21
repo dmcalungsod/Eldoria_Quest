@@ -182,7 +182,7 @@ class AdventureRewards:
         eq_list = item_manager.generate_monster_loot(combat_result["monster_data"])
         for item in eq_list:
             # Add item to DB immediately to prevent loss
-            inventory_manager.add_item(
+            success = inventory_manager.add_item(
                 self.discord_id,
                 str(item["id"]),
                 item["name"],
@@ -192,7 +192,11 @@ class AdventureRewards:
                 item["slot"],
                 item["source"],
             )
-            loot_bundle[(item["name"], item["rarity"])] += 1
+            if success:
+                loot_bundle[(item["name"], item["rarity"])] += 1
+            else:
+                logs.append(f"\n{E.ERROR} **Inventory Full!** Left **{item['name']}** behind.")
+
             # Assuming equipment doesn't trigger "collect" quests for now, or if it does, it's not handled here.
             # Usually collect quests are for materials.
 
