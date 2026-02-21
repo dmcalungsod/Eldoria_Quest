@@ -25,7 +25,8 @@ mock_ui.View = MockView
 sys.modules["discord.ui"] = mock_ui
 mock_discord.ui = mock_ui
 
-from cogs.shop_cog import ShopView, SHOP_INVENTORY
+from cogs.shop_cog import ShopView, SHOP_INVENTORY  # noqa: E402
+
 
 class TestShopViewIntegration(unittest.TestCase):
     def test_shop_view_calls_purchase_item_success(self):

@@ -15,7 +15,8 @@ sys.modules["discord"] = mock_discord
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ui"] = MagicMock()
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
+
 
 class TestShopTransactionFailure(unittest.TestCase):
     def setUp(self):
@@ -103,7 +104,8 @@ class TestShopTransactionFailure(unittest.TestCase):
         refund_called = False
         for call in calls:
             args, _ = call
-            if not args: continue
+            if not args:
+                continue
             query, update = args
             if query.get("discord_id") == user_id and update.get("$inc", {}).get("aurum") == price:
                 refund_called = True
