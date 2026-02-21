@@ -14,6 +14,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 class TestGameSystems(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules
@@ -33,30 +34,37 @@ class TestGameSystems(unittest.TestCase):
 
         # Import modules under test
         import database.database_manager
+
         importlib.reload(database.database_manager)
         self.DatabaseManager = database.database_manager.DatabaseManager
 
         import game_systems.adventure.adventure_manager
+
         importlib.reload(game_systems.adventure.adventure_manager)
         self.AdventureManager = game_systems.adventure.adventure_manager.AdventureManager
 
         import game_systems.combat.combat_engine
+
         importlib.reload(game_systems.combat.combat_engine)
         self.CombatEngine = game_systems.combat.combat_engine.CombatEngine
 
         import game_systems.combat.damage_formula
+
         importlib.reload(game_systems.combat.damage_formula)
         self.DamageFormula = game_systems.combat.damage_formula.DamageFormula
 
         import game_systems.items.inventory_manager
+
         importlib.reload(game_systems.items.inventory_manager)
         self.InventoryManager = game_systems.items.inventory_manager.InventoryManager
 
         import game_systems.player.level_up
+
         importlib.reload(game_systems.player.level_up)
         self.LevelUpSystem = game_systems.player.level_up.LevelUpSystem
 
         import game_systems.player.player_stats
+
         importlib.reload(game_systems.player.player_stats)
         self.PlayerStats = game_systems.player.player_stats.PlayerStats
 

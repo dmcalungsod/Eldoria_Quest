@@ -1,8 +1,7 @@
-
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,6 +17,7 @@ sys.modules["pymongo.errors"] = mock_pymongo_errors
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.guild_system.guild_exchange import GuildExchange  # noqa: E402
 
+
 class TestGuildExchangeSecurity(unittest.TestCase):
     def setUp(self):
         # We need to re-instantiate because DatabaseManager is a singleton
@@ -27,12 +27,12 @@ class TestGuildExchangeSecurity(unittest.TestCase):
         # Mock the _col method to return a mock collection
         self.mock_collection = MagicMock()
         self.mock_db._col.return_value = self.mock_collection
-        self.mock_db.db = MagicMock() # Mock the db attribute
-        self.mock_db.db.__getitem__.return_value = self.mock_collection # Mock db['collection']
+        self.mock_db.db = MagicMock()  # Mock the db attribute
+        self.mock_db.db.__getitem__.return_value = self.mock_collection  # Mock db['collection']
 
         # Patch DatabaseManager to avoid actual init
         with patch("database.database_manager.MongoClient"):
-             self.exchange = GuildExchange(self.mock_db)
+            self.exchange = GuildExchange(self.mock_db)
 
     def test_exchange_all_materials_race_condition_fix(self):
         """
@@ -56,10 +56,9 @@ class TestGuildExchangeSecurity(unittest.TestCase):
         self.mock_db.increment_player_fields = MagicMock()
 
         # Mock MATERIALS data
-        with patch("game_systems.guild_system.guild_exchange.MATERIALS", {
-            "iron_ore": {"value": 10},
-            "gold_ore": {"value": 50}
-        }):
+        with patch(
+            "game_systems.guild_system.guild_exchange.MATERIALS", {"iron_ore": {"value": 10}, "gold_ore": {"value": 50}}
+        ):
             # Set db on exchange object (it's set in init but let's be sure)
             self.exchange.db = self.mock_db
 
@@ -68,7 +67,9 @@ class TestGuildExchangeSecurity(unittest.TestCase):
             # Verify results
             # Only item1 should contribute to value: 5 * 10 = 50
             # item2 (2 * 50 = 100) should NOT contribute because find_one_and_delete returned None
-            self.assertEqual(total_value, 50, f"Expected 50 but got {total_value}. This confirms race condition fix is needed.")
+            self.assertEqual(
+                total_value, 50, f"Expected 50 but got {total_value}. This confirms race condition fix is needed."
+            )
             self.assertEqual(len(items), 1)
             self.assertEqual(items[0]["id"], 1)
 
@@ -82,6 +83,7 @@ class TestGuildExchangeSecurity(unittest.TestCase):
 
             # 3. increment_player_fields called with correct amount
             self.mock_db.increment_player_fields.assert_called_with(discord_id, aurum=50)
+
 
 if __name__ == "__main__":
     unittest.main()

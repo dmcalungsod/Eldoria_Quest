@@ -138,22 +138,19 @@ class AdventureEmbeds:
         if (au := s.get("aurum_gained", 0)) > 0:
             rewards.append(f"{E.AURUM} **+{au} Aurum**")
         if logs := s.get("faction_logs"):
-            rewards.extend(f"• {l}" for l in logs)
+            rewards.extend(f"• {log_entry}" for log_entry in logs)
 
         if rewards:
             embed.add_field(name="Rewards", value="\n".join(rewards), inline=False)
 
         # 3. Loot
-        loot_lines = [
-            f"• {get_rarity_ansi(i.get('rarity'), f'{i['name']} (x{i['amount']})')}" for i in s.get("loot", [])
-        ]
+        loot_lines = []
+        for i in s.get("loot", []):
+            item_text = f"{i['name']} (x{i['amount']})"
+            loot_lines.append(f"• {get_rarity_ansi(i.get('rarity'), item_text)}")
+
         if loot_lines:
-            val = (
-                "```ansi\n"
-                + "\n".join(loot_lines[:15])
-                + ("\n...and more" if len(loot_lines) > 15 else "")
-                + "\n```"
-            )
+            val = "```ansi\n" + "\n".join(loot_lines[:15]) + ("\n...and more" if len(loot_lines) > 15 else "") + "\n```"
             embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value=val, inline=False)
         else:
             embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value="*No resources found.*", inline=False)
@@ -168,7 +165,7 @@ class AdventureEmbeds:
 
         # 5. Full Inventory Warning
         if failed := s.get("failed_items"):
-            names = sorted(list(set(f['item_name'] for f in failed)))
+            names = sorted(list(set(f["item_name"] for f in failed)))
             embed.add_field(name=f"{E.WARNING} Lost Items (Full Pack)", value=", ".join(names), inline=False)
 
         embed.set_footer(text="Your journey is recorded in the archives.")

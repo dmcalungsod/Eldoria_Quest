@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # Helper Mocks
 class MockView:
     def __init__(self, timeout=None):
@@ -81,6 +82,7 @@ class TestCraftingUI(unittest.TestCase):
 
         # Import module under test
         import game_systems.crafting.ui.crafting_view
+
         importlib.reload(game_systems.crafting.ui.crafting_view)
 
         self.CraftingView = game_systems.crafting.ui.crafting_view.CraftingView
