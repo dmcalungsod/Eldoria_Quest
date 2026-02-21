@@ -1112,5 +1112,54 @@
       "aurum": 1500,
       "item": "Magic Stone (Large)"
     }
+  },
+  {
+    "id": 61,
+    "title": "The Silent Witness: Evidence",
+    "tier": "E",
+    "quest_giver": "Archivist Thorne",
+    "location": "Willowcreek Outskirts",
+    "summary": "Investigate a potential traitor within the Guild.",
+    "description": "A page has been torn from a forbidden tome in the Guild Library. Archivist Thorne suspects a traitor has stolen it to perform a dark ritual. Search the grounds for clues before the trail goes cold.",
+    "objectives": {
+      "examine": {
+        "Torn Journal Page": 1,
+        "Discarded Dagger": 1
+      },
+      "locate": "Hooded Figure"
+    },
+    "flavor_text": {
+      "examine:Torn Journal Page": "You find a crumpled parchment caught in the brambles. It's covered in frantic scribbles about 'The Weaver's Return'.",
+      "examine:Discarded Dagger": "A dagger with a twisted, serpentine hilt lies half-buried in the mud. The blade hums with a faint, nauseating energy.",
+      "locate:Hooded Figure": "You spot a figure in grey robes slipping into the shadows. They leave behind a pouch of strange, glowing dust."
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 100,
+      "item": "Scholar's Draught"
+    }
+  },
+  {
+    "id": 62,
+    "title": "The Silent Witness: Justice",
+    "tier": "E",
+    "quest_giver": "Archivist Thorne",
+    "location": "Whispering Thicket",
+    "summary": "Hunt down the Veil-bound traitor.",
+    "description": "The clues point to the Whispering Thicket. The traitor, a member of the 'Veil-bound' cult, is attempting to complete the ritual. Thorne has authorized their elimination.",
+    "prerequisites": [61],
+    "objectives": {
+      "defeat": {
+        "Veil-bound Assassin": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Veil-bound Assassin": "As the assassin falls, their body dissolves into black mist, leaving only the stolen page behind."
+    },
+    "rewards": {
+      "exp": 800,
+      "aurum": 300,
+      "item": "Wardkeeper's Vial"
+    }
   }
 ]

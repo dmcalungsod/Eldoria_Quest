@@ -187,7 +187,15 @@ class EventHandler:
                                 )
 
                                 if success:
-                                    event_text = f"\n{AdventureEvents.quest_event(obj_type, task)}"
+                                    # Check for custom flavor text
+                                    flavor_key = f"{obj_type}:{task}"
+                                    flavor = quest.get("flavor_text", {}).get(flavor_key)
+
+                                    if flavor:
+                                        event_text = f"\n{E.QUEST_SCROLL} **{flavor}**"
+                                    else:
+                                        event_text = f"\n{AdventureEvents.quest_event(obj_type, task)}"
+
                                     return {
                                         "log": [
                                             event_text,

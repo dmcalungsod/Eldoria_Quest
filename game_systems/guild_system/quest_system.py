@@ -40,11 +40,35 @@ class QuestSystem:
             quests = list(
                 self.db._col("quests").find(
                     {"tier": {"$in": allowed_tiers}},
-                    {"_id": 0, "id": 1, "title": 1, "tier": 1, "summary": 1},
+                    {"_id": 0, "id": 1, "title": 1, "tier": 1, "summary": 1, "prerequisites": 1},
                 )
             )
 
-            return [q for q in quests if q["id"] not in taken_ids]
+            # Fetch completed quest IDs for prerequisite checking
+            completed_docs = self.db._col("player_quests").find(
+                {"discord_id": discord_id, "status": "completed"},
+                {"_id": 0, "quest_id": 1},
+            )
+            completed_ids = {d["quest_id"] for d in completed_docs}
+
+            available = []
+            for q in quests:
+                if q["id"] in taken_ids:
+                    continue
+
+                # Check prerequisites
+                prereqs = q.get("prerequisites")
+                if prereqs:
+                    # Support single ID or list
+                    if isinstance(prereqs, int):
+                        prereqs = [prereqs]
+
+                    if not all(pid in completed_ids for pid in prereqs):
+                        continue
+
+                available.append(q)
+
+            return available
         except Exception as e:
             logger.error(f"Error fetching quests for {discord_id}: {e}", exc_info=True)
             return []
@@ -86,7 +110,7 @@ class QuestSystem:
             for pq in pq_rows:
                 quest = self.db._col("quests").find_one(
                     {"id": pq["quest_id"]},
-                    {"_id": 0, "id": 1, "title": 1, "summary": 1, "location": 1, "objectives": 1},
+                    {"_id": 0, "id": 1, "title": 1, "summary": 1, "location": 1, "objectives": 1, "flavor_text": 1},
                 )
                 if not quest:
                     continue
@@ -99,6 +123,7 @@ class QuestSystem:
                     "status": pq["status"],
                     "progress": pq.get("progress", "{}"),
                     "objectives": quest.get("objectives", "{}"),
+                    "flavor_text": quest.get("flavor_text", {}),
                 }
 
                 try:
