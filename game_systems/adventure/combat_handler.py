@@ -228,7 +228,17 @@ class CombatHandler:
             # 5. Persist State (Vitals & Monster HP)
             # We update vitals immediately so if bot crashes, HP loss is saved
             if persist_vitals:
-                self.db.set_player_vitals(self.discord_id, result["hp_current"], result["mp_current"])
+                # Use Atomic Delta Update to prevent overwriting concurrent heals
+                delta_hp = result["hp_current"] - vitals["current_hp"]
+                delta_mp = result["mp_current"] - vitals["current_mp"]
+
+                self.db.update_player_vitals_delta(
+                    self.discord_id,
+                    delta_hp,
+                    delta_mp,
+                    player_stats.max_hp,
+                    player_stats.max_mp,
+                )
             active_monster["HP"] = result["monster_hp"]
 
             # 6. Update Report

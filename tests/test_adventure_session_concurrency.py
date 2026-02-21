@@ -8,7 +8,11 @@ from unittest.mock import MagicMock, patch
 sys.path.append(os.getcwd())
 
 # MOCK PYMONGO BEFORE IMPORT
-sys.modules["pymongo"] = MagicMock()
+mock_pymongo = MagicMock()
+mock_errors = MagicMock()
+mock_errors.DuplicateKeyError = Exception
+sys.modules["pymongo"] = mock_pymongo
+sys.modules["pymongo.errors"] = mock_errors
 
 # Now import
 from game_systems.adventure import adventure_session  # noqa: E402
@@ -98,6 +102,10 @@ class MockDatabaseManager:
     def set_player_vitals(self, discord_id, hp, mp):
         self.players[discord_id]["current_hp"] = hp
         self.players[discord_id]["current_mp"] = mp
+
+    def update_player_vitals_delta(self, discord_id, hp_delta, mp_delta, max_hp, max_mp):
+        self.players[discord_id]["current_hp"] += hp_delta
+        self.players[discord_id]["current_mp"] += mp_delta
 
 
 class TestAdventureSessionConcurrency(unittest.TestCase):
