@@ -45,22 +45,35 @@ class GuildExchange:
     def exchange_all_materials(self, discord_id: int) -> tuple[int, list[dict]]:
         """
         Sells all materials.
-        Deletes items AND adds gold.
+        Deletes items individually to prevent race conditions, then adds gold.
         """
-        # 1. Calculate first (InMemory)
-        total_val, items = self.calculate_exchange_value(discord_id)
-        if total_val == 0:
-            return 0, []
+        total_value = 0
+        sold_items = []
 
         try:
-            # 2. Add Aurum
-            self.db.increment_player_fields(discord_id, aurum=total_val)
+            # 1. Fetch all material items (just IDs and counts first)
+            cursor = self.db._col("inventory").find({"discord_id": discord_id, "item_type": "material"})
 
-            # 3. Delete Materials
-            self.db._col("inventory").delete_many({"discord_id": discord_id, "item_type": "material"})
+            # 2. Iterate and attempt to delete each item atomically
+            for item in cursor:
+                # Atomically delete: returns the document if found and deleted, None otherwise
+                deleted_item = self.db._col("inventory").find_one_and_delete(
+                    {"id": item["id"], "discord_id": discord_id}
+                )
 
-            logger.info(f"User {discord_id} exchanged materials for {total_val} Aurum.")
-            return total_val, items
+                if deleted_item:
+                    mat_data = MATERIALS.get(deleted_item["item_key"])
+                    if mat_data:
+                        val = mat_data.get("value", 0) * deleted_item["count"]
+                        total_value += val
+                        sold_items.append(deleted_item)
+
+            # 3. Add Aurum (only for items we successfully deleted)
+            if total_value > 0:
+                self.db.increment_player_fields(discord_id, aurum=total_value)
+                logger.info(f"User {discord_id} exchanged materials for {total_value} Aurum.")
+
+            return total_value, sold_items
 
         except Exception as e:
             logger.error(f"Exchange transaction failed for {discord_id}: {e}", exc_info=True)
