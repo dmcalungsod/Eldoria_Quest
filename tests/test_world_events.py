@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 mock_pymongo = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
 
-from game_systems.events.world_event_system import WorldEventSystem
+from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 
 
 class TestWorldEventSystem(unittest.TestCase):
