@@ -118,17 +118,5 @@ class TestFactionSystem(unittest.TestCase):
 
         self.mock_db.update_faction_reputation.assert_called_with(self.discord_id, 15)
 
-    def test_grant_reputation_helper(self):
-        self.mock_db.get_player_faction_data.return_value = {
-            "faction_id": "pathfinders",
-            "reputation": 100
-        }
-        self.mock_db.update_faction_reputation.return_value = 150
-
-        logs = self.system.grant_reputation(self.discord_id, 50, source="Test")
-
-        self.assertTrue(len(logs) > 0)
-        self.assertIn("+50 Reputation (Test)", logs[0])
-
 if __name__ == '__main__':
     unittest.main()

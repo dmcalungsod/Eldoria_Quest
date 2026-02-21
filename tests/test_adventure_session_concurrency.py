@@ -51,6 +51,9 @@ class MockDatabaseManager:
     def get_active_adventure(self, discord_id):
         return self.sessions.get(discord_id)
 
+    def get_active_world_event(self):
+        return None
+
     def update_adventure_session(
         self, discord_id, logs, loot_collected, active, active_monster_json, previous_version
     ):

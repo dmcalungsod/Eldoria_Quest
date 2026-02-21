@@ -169,18 +169,6 @@ class FactionSystem:
             self.db.add_title(discord_id, title)
             logs.append(f"Unlocked Title: **{title}**")
 
-    def grant_reputation(self, discord_id: int, amount: int, source: str = "Faction Activity") -> list[str]:
-        """
-        Generic helper to grant reputation and return formatted logs.
-        """
-        success, msg, rank_msgs = self.add_reputation(discord_id, amount)
-        if success:
-            # Only show reputation gain log if it's significant or requested
-            logs = [f"⚖️ +{amount} Reputation ({source})"]
-            logs.extend(rank_msgs)
-            return logs
-        return []
-
     def grant_reputation_for_kill(self, discord_id: int, monster_data: dict) -> list[str]:
         """
         Calculates and grants reputation based on monster kill.
@@ -208,7 +196,9 @@ class FactionSystem:
 
         final_rep = int(base_rep * multiplier)
         if final_rep > 0:
-            return self.grant_reputation(discord_id, final_rep, source=f"Defeated {monster_data.get('name', 'Monster')}")
+            success, msg, rank_msgs = self.add_reputation(discord_id, final_rep)
+            if success and rank_msgs:
+                return rank_msgs
 
         return []
 
@@ -232,6 +222,8 @@ class FactionSystem:
 
         final_rep = int(base_rep * multiplier)
         if final_rep > 0:
-            return self.grant_reputation(discord_id, final_rep, source="Exploration")
+            success, msg, rank_msgs = self.add_reputation(discord_id, final_rep)
+            if success and rank_msgs:
+                return rank_msgs
 
         return []

@@ -1945,3 +1945,40 @@ class DatabaseManager:
             {"_id": 0, "score": 1},
         )
         return doc["score"] if doc else 0
+
+    # ============================================================
+    # WORLD EVENTS
+    # ============================================================
+
+    def get_active_world_event(self) -> dict | None:
+        """Fetches the current active world event."""
+        return self._col("world_events").find_one(
+            {"active": 1},
+            {"_id": 0},
+        )
+
+    def set_active_world_event(
+        self, event_type: str, start_time: str, end_time: str, data: dict | None = None
+    ):
+        """
+        Sets the active world event.
+        Ensures only one event is active by deactivating others first.
+        """
+        self.end_active_world_event()
+
+        self._col("world_events").insert_one(
+            {
+                "type": event_type,
+                "start_time": start_time,
+                "end_time": end_time,
+                "data": data or {},
+                "active": 1,
+            }
+        )
+
+    def end_active_world_event(self):
+        """Marks all active world events as inactive."""
+        self._col("world_events").update_many(
+            {"active": 1},
+            {"$set": {"active": 0}},
+        )

@@ -96,7 +96,7 @@ class AdventureEmbeds:
             # Check for charged skill telegraph
             charged_skill = active_monster.get("charged_skill")
             if charged_skill:
-                warning = f"\n⚠️ **DANGER: CHARGING {charged_skill.get('name', 'Unknown Skill').upper()}!**\n🛡️ **DEFEND NOW!**"
+                warning = f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}{warning}"
             else:
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}"

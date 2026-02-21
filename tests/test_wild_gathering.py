@@ -6,14 +6,10 @@ from unittest.mock import MagicMock, patch
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock pymongo before importing anything that uses it
-sys.modules["pymongo"] = MagicMock()
-
-from database.database_manager import DatabaseManager  # noqa: E402
-from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
-from game_systems.adventure.event_handler import EventHandler  # noqa: E402
-from game_systems.player.player_stats import PlayerStats  # noqa: E402
-from game_systems.world_time import Weather  # noqa: E402
+from database.database_manager import DatabaseManager
+from game_systems.adventure.adventure_session import AdventureSession
+from game_systems.adventure.event_handler import EventHandler
+from game_systems.player.player_stats import PlayerStats
 
 
 class TestWildGathering(unittest.TestCase):
@@ -48,8 +44,6 @@ class TestWildGathering(unittest.TestCase):
 
         # Setup EventHandler
         self.event_handler = EventHandler(self.db, self.quest_system, self.discord_id)
-        # Mock FactionSystem to avoid side effects
-        self.event_handler.faction_system = MagicMock()
 
     def test_wild_gathering_trigger_with_location(self):
         """Test that wild gathering uses location data."""
@@ -64,17 +58,15 @@ class TestWildGathering(unittest.TestCase):
         ):
             # Mock randoms
             # randint(1, 100) -> 80 (skip regen)
-            # randint(1, 100) -> 20 (skip faction encounter > 10)
             # random() -> 0.1 (pass gather chance check < 0.35)
             # choices -> ["test_herb"]
             # random() again -> 0.9 (no extra item variance < 0.20)
 
             # side_effect:
-            # 1. resolve_non_combat (Regen): 80
-            # 2. resolve_non_combat (Faction): 20
-            # 3. _perform_wild_gathering: 1
+            # 1. resolve_non_combat: 80 (Fail Regen, > 70)
+            # 2. _perform_wild_gathering: 1 (Success Gather, <= 35)
             with (
-                patch("random.randint", side_effect=[80, 20, 1]),
+                patch("random.randint", side_effect=[80, 1]),
                 patch("random.random", side_effect=[0.9]),
                 patch("random.choices", return_value=["test_herb"]),
             ):
@@ -94,9 +86,9 @@ class TestWildGathering(unittest.TestCase):
 
         with patch("game_systems.adventure.event_handler.LOCATIONS", mock_locations):
             # Should fallback to default pool
-            # side_effect: 80 (Fail Regen), 20 (Fail Faction), 1 (Success Gather)
+            # side_effect: 80 (Fail Regen), 1 (Success Gather)
             with (
-                patch("random.randint", side_effect=[80, 20, 1]),
+                patch("random.randint", side_effect=[80, 1]),
                 patch("random.random", side_effect=[0.9]),
                 patch("random.choices", return_value=["medicinal_herb"]),
             ):  # Fallback pool item
@@ -126,7 +118,7 @@ class TestWildGathering(unittest.TestCase):
 
                 # Check call args
                 session.events.resolve_non_combat.assert_called_with(
-                    context=self.context, location_id="test_forest", regen_chance=70, location_name="Forest", weather=Weather.CLEAR
+                    context=self.context, location_id="test_forest", regen_chance=70, location_name="Forest"
                 )
 
 

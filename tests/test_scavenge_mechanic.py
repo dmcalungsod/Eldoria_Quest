@@ -104,13 +104,12 @@ class TestDeadTurns(unittest.TestCase):
 
         with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
             # Sequence:
-            # 1. Regen check: 100 (fail, assuming chance < 100, let's pass regen_chance=0)
-            # 2. Faction check: 100 (fail, > 10)
-            # 3. Gather check: 100 (fail > 35)
-            # 4. Scavenge amount (XP): 10
+            # 1. Regen check: 99 (fail, assuming chance < 100, let's pass regen_chance=0)
+            # 2. Gather check: 99 (fail > 35)
+            # 3. Scavenge amount (XP): 10
             # random.random for scavenge type: 0.6 (> 0.5 -> XP)
 
-            mock_randint.side_effect = [100, 100, 100, 10]
+            mock_randint.side_effect = [99, 99, 10]
             mock_random.return_value = 0.6
 
             result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=0)
