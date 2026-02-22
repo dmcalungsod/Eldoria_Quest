@@ -1,6 +1,10 @@
+import os
 import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock discord modules BEFORE importing anything else
 discord_mock = MagicMock()
@@ -12,6 +16,7 @@ sys.modules["discord.ext.commands"] = MagicMock()
 
 # Mock pymongo BEFORE importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 
 # Setup View and Button mocks
