@@ -437,10 +437,6 @@ class AdventureSession:
         max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
         max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
 
-        self.db.update_player_vitals_delta(
-            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
-        )
-
         # Final Results Block
         final_block = []
         if player_won:
@@ -470,6 +466,12 @@ class AdventureSession:
             self.logs.extend(frame)
 
         self.save_state()
+
+        # Update vitals only after successful save
+        self.db.update_player_vitals_delta(
+            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
+        )
+
         return self._build_result(sequence, is_dead, context)
 
     # ======================================================================
@@ -492,6 +494,11 @@ class AdventureSession:
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
+
+        # Capture initial HP/MP if context available
+        initial_hp = context["vitals"]["current_hp"] if context else 0
+        initial_mp = context["vitals"]["current_mp"] if context else 0
+
         result = self.combat.resolve_turn(
             self.active_monster,
             report,
@@ -499,12 +506,13 @@ class AdventureSession:
             context=context,
             action=action,
             stance=stance,
+            persist_vitals=False,  # FIX: Defer vital update
         )
 
         # Update context vitals from combat result
         if context:
-            context["vitals"]["current_hp"] = result.get("hp_current", context["vitals"]["current_hp"])
-            context["vitals"]["current_mp"] = result.get("mp_current", context["vitals"]["current_mp"])
+            context["vitals"]["current_hp"] = result.get("hp_current", initial_hp)
+            context["vitals"]["current_mp"] = result.get("mp_current", initial_mp)
 
         turn_logs = result["phrases"]
         if prepend_logs:
@@ -534,6 +542,24 @@ class AdventureSession:
 
         self.logs.extend(turn_logs)
         self.save_state()
+
+        # Update vitals only after successful save
+        if context:
+            final_hp = context["vitals"]["current_hp"]
+            final_mp = context["vitals"]["current_mp"]
+            delta_hp = final_hp - initial_hp
+            delta_mp = final_mp - initial_mp
+
+            # Get max stats safely
+            player_stats = context["player_stats"]
+            stats_dict = context.get("stats_dict")
+            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
+            max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
+
+            if delta_hp != 0 or delta_mp != 0:
+                self.db.update_player_vitals_delta(
+                    self.discord_id, delta_hp, delta_mp, max_hp, max_mp
+                )
 
         return self._build_result([turn_logs], is_dead, context)
 
