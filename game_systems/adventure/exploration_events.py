@@ -14,6 +14,7 @@ from typing import Any
 
 import game_systems.data.emojis as E
 from game_systems.data.materials import MATERIALS
+
 from .adventure_events import AdventureEvents
 
 logger = logging.getLogger("eldoria.exploration")
@@ -42,7 +43,12 @@ class ExplorationEvents:
 
         except Exception as e:
             logger.error(f"Error handling event {event_key}: {e}", exc_info=True)
-            return {"log": ["*Something shifts in the darkness, but nothing happens.*"], "vitals": context["vitals"], "loot": {}, "dead": False}
+            return {
+                "log": ["*Something shifts in the darkness, but nothing happens.*"],
+                "vitals": context["vitals"],
+                "loot": {},
+                "dead": False,
+            }
 
     def _handle_safe_room(self, context: dict[str, Any]) -> dict[str, Any]:
         stats = context["player_stats"]
@@ -66,7 +72,7 @@ class ExplorationEvents:
 
         log = [
             AdventureEvents.special_event_flavor("safe_room"),
-            f"{E.HEAL} Restored **{hp_gain}** HP and **{mp_gain}** MP."
+            f"{E.HEAL} Restored **{hp_gain}** HP and **{mp_gain}** MP.",
         ]
 
         return {"log": log, "vitals": vitals, "loot": {}, "dead": False}
@@ -99,7 +105,7 @@ class ExplorationEvents:
 
         log = [
             AdventureEvents.special_event_flavor("ancient_shrine"),
-            f"{E.EXP} You gain **{amount} XP** from the ancient knowledge."
+            f"{E.EXP} You gain **{amount} XP** from the ancient knowledge.",
         ]
 
         return {"log": log, "vitals": context["vitals"], "loot": loot, "dead": False}
@@ -133,10 +139,7 @@ class ExplorationEvents:
         if mitigated:
             flavor += f"\n{E.DODGE} You reacted quickly, reducing the impact!"
 
-        log = [
-            flavor,
-            f"{E.DAMAGE} You took **{damage}** damage."
-        ]
+        log = [flavor, f"{E.DAMAGE} You took **{damage}** damage."]
 
         dead = new_hp <= 0
 

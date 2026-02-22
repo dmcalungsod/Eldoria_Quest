@@ -66,7 +66,9 @@ class TestTournamentCaching(unittest.TestCase):
         self.assertEqual(tourney2["type"], "spectral_tide")
 
         # Expectation: Call count should remain the same (cached)
-        self.assertEqual(self.mock_db.tournaments.find_one.call_count, call_count_after_first, "DB should not be hit again if cached")
+        self.assertEqual(
+            self.mock_db.tournaments.find_one.call_count, call_count_after_first, "DB should not be hit again if cached"
+        )
 
     def test_cache_expiration(self):
         self.mock_db.tournaments.find_one.return_value = {"type": "spectral_tide", "active": 1}

@@ -1,5 +1,3 @@
-import os
-
 files = [
     "tests/test_world_events.py",
     "tests/test_db_purchase.py",
@@ -15,14 +13,14 @@ files = [
     "tests/test_adventure_day_night.py",
     "tests/test_shop_stale_state.py",
     "tests/test_quest_security.py",
-    "tests/test_harvest_event.py"
+    "tests/test_harvest_event.py",
 ]
 
 target_str = "sys.path.append(os.getcwd())"
 replacement_str = "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))"
 
 for filepath in files:
-    with open(filepath, "r") as f:
+    with open(filepath) as f:
         content = f.read()
 
     if target_str in content:

@@ -95,5 +95,6 @@ class TestGuildAdvisor(unittest.TestCase):
         self.assertIsInstance(advice, str)
         self.assertTrue(len(advice) > 10)
 
+
 if __name__ == "__main__":
     unittest.main()

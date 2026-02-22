@@ -182,17 +182,19 @@ class CombatEngine:
                 is_offensive = (
                     self.action in ["attack", "special_ability"]
                     or self.action.startswith("skill:")
-                    or (self.action == "auto")  # Allow auto to trigger randomly? No, safer to assume auto handles attack
+                    or (
+                        self.action == "auto"
+                    )  # Allow auto to trigger randomly? No, safer to assume auto handles attack
                 )
 
                 # Refine offensive check: Auto often means attack, but we want to reward choice.
                 # If action is 'auto', we'll rely on the random skill decision later, so we check specific actions here.
                 if self.action == "auto":
-                     # In auto mode, we give a small chance to "accidentally" counter
-                     if is_magic and random.randint(1, 100) <= 20:
+                    # In auto mode, we give a small chance to "accidentally" counter
+                    if is_magic and random.randint(1, 100) <= 20:
                         is_offensive = True
-                     else:
-                        is_offensive = False # Assume auto doesn't strategically counter
+                    else:
+                        is_offensive = False  # Assume auto doesn't strategically counter
 
                 if is_magic and is_offensive:
                     monster_stunned = True
@@ -357,7 +359,9 @@ class CombatEngine:
                     else:
                         turn_report["hits_taken"] = 1
                         emoji = skill.get("emoji", "🔥")
-                        attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
+                        attack_msg = (
+                            f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
+                        )
 
                         if player_defending:
                             dmg = int(dmg * 0.5)

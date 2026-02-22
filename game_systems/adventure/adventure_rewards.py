@@ -167,7 +167,9 @@ class AdventureRewards:
                     self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
 
                     mote_info = MATERIALS.get("elemental_mote", {})
-                    loot_bundle[(mote_info.get("name", "Elemental Mote"), mote_info.get("rarity", "Uncommon"))] += mote_count
+                    loot_bundle[(mote_info.get("name", "Elemental Mote"), mote_info.get("rarity", "Uncommon"))] += (
+                        mote_count
+                    )
 
                     # We add to actual_drops so quests/tournaments can track it
                     for _ in range(mote_count):

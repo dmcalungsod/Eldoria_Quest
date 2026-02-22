@@ -277,9 +277,7 @@ class AdventureSession:
                         max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
                         max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
 
-                        self.db.update_player_vitals_delta(
-                            self.discord_id, -damage, 0, max_hp, max_mp
-                        )
+                        self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
                         phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
@@ -437,9 +435,7 @@ class AdventureSession:
         max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
         max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
 
-        self.db.update_player_vitals_delta(
-            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
-        )
+        self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
         # Final Results Block
         final_block = []

@@ -1,4 +1,3 @@
-
 import os
 import sys
 import unittest
@@ -69,6 +68,7 @@ class TestRegenFormula(unittest.TestCase):
         # So it should be 251 (limited by base).
         regen_1000, max_hp_1000 = run_regen(1000)
         self.assertEqual(regen_1000, 251, "High Endurance regen incorrect")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,6 @@
 import os
 import sys
 import unittest
-from unittest.mock import patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,9 +23,11 @@ class TestDamageScaling(unittest.TestCase):
     def test_dynamic_scaling_stat(self):
         # Mock random to avoid variance and crits
         import unittest.mock
-        with unittest.mock.patch("random.uniform", return_value=1.0), \
-             unittest.mock.patch("random.random", return_value=0.5):
 
+        with (
+            unittest.mock.patch("random.uniform", return_value=1.0),
+            unittest.mock.patch("random.random", return_value=0.5),
+        ):
             # Mock skill using STR scaling
             skill_str = {
                 "key_id": "test_strike",
@@ -55,9 +56,11 @@ class TestDamageScaling(unittest.TestCase):
     def test_dynamic_scaling_factor(self):
         # Mock random to ensure consistent damage (no crits, variance 1.0)
         import unittest.mock
-        with unittest.mock.patch("random.uniform", return_value=1.0), \
-             unittest.mock.patch("random.random", return_value=0.5):
 
+        with (
+            unittest.mock.patch("random.uniform", return_value=1.0),
+            unittest.mock.patch("random.random", return_value=0.5),
+        ):
             # Mock skill with high factor
             skill_heavy = {
                 "key_id": "heavy_hit",

@@ -15,9 +15,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.database_manager import DatabaseManager
 
+
 # Local exception to ensure consistent mocking regardless of pymongo installation
 class MockDuplicateKeyError(Exception):
     pass
+
 
 class TestRaceCondition(unittest.TestCase):
     def setUp(self):
@@ -97,6 +99,7 @@ class TestRaceCondition(unittest.TestCase):
 
         self.assertFalse(success, f"Should have failed due to duplicate key. Msg: {msg}")
         self.assertIn("refunded", msg)
+
 
 if __name__ == "__main__":
     unittest.main()

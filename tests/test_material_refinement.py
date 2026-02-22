@@ -30,6 +30,7 @@ class TestMaterialRefinement(unittest.TestCase):
             if item_key == "iron_ore":
                 return 3
             return 0
+
         self.db.get_inventory_item_count.side_effect = get_count_side_effect
 
         self.db.remove_inventory_item.return_value = True
@@ -42,14 +43,7 @@ class TestMaterialRefinement(unittest.TestCase):
         self.assertTrue(success, f"Refinement failed: {msg}")
         self.db.remove_inventory_item.assert_called_with(self.discord_id, "iron_ore", 3)
         self.db.add_inventory_item.assert_called_with(
-            self.discord_id,
-            "iron_ingot",
-            "Iron Ingot",
-            "material",
-            "Common",
-            1,
-            None,
-            None
+            self.discord_id, "iron_ingot", "Iron Ingot", "material", "Common", 1, None, None
         )
 
     def test_craft_iron_dirk_with_ingots(self):
@@ -63,6 +57,7 @@ class TestMaterialRefinement(unittest.TestCase):
             elif item_key == "wolf_fang":
                 return 2
             return 0
+
         self.db.get_inventory_item_count.side_effect = get_count_side_effect
 
         self.db.remove_inventory_item.return_value = True
@@ -96,6 +91,7 @@ class TestMaterialRefinement(unittest.TestCase):
         # Verify
         self.assertFalse(success)
         self.assertIn("Missing material", msg)
+
 
 if __name__ == "__main__":
     unittest.main()
