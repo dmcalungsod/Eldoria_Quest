@@ -17,9 +17,10 @@ def run_command(command_list):
 
 
 def main():
-    days_threshold = 3
+    # Remove grace period (0 days) to delete all merged branches immediately during the daily run
+    days_threshold = 0
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_threshold)
-    print(f"Pruning merged branches older than {cutoff_date.isoformat()}...")
+    print(f"Pruning merged branches older than {cutoff_date.isoformat()} (immediate cleanup)...")
 
     # Get current repository
     current_repo_json = run_command(["gh", "repo", "view", "--json", "nameWithOwner"])
