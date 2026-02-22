@@ -329,7 +329,8 @@ class ExplorationView(View):
             await interaction.response.defer()
 
             items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
-            embed = build_inventory_embed(items)
+            max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
+            embed = build_inventory_embed(items, max_slots)
 
             view = InventoryView(self.db, self.interaction_user, self.return_from_inventory, "Return to Adventure")
             await interaction.edit_original_response(embed=embed, view=view)

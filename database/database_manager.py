@@ -24,7 +24,8 @@ logger = logging.getLogger("eldoria.db")
 DEFAULT_MONGO_URI = "mongodb://localhost:27017"
 DEFAULT_DB_NAME = "eldoria_quest"
 
-MAX_INVENTORY_SLOTS = 20
+BASE_INVENTORY_SLOTS = 10
+MAX_INVENTORY_SLOTS = 20  # Deprecated: Use calculate_inventory_limit
 MAX_STACK_CONSUMABLE = 5
 MAX_STACK_MATERIAL = 50
 MAX_STACK_EQUIPMENT = 1
@@ -700,6 +701,25 @@ class DatabaseManager:
     # INVENTORY (New methods for external call sites)
     # ============================================================
 
+    def calculate_inventory_limit(self, discord_id: int) -> int:
+        """
+        Calculates dynamic inventory limit based on player stats.
+        Base: 10 + STR/DEX bonuses.
+        """
+        # Avoid circular import
+        from game_systems.player.player_stats import PlayerStats
+
+        stats_json = self.get_player_stats_json(discord_id)
+        if not stats_json:
+            return BASE_INVENTORY_SLOTS
+
+        try:
+            stats = PlayerStats.from_dict(stats_json)
+            return stats.max_inventory_slots
+        except Exception as e:
+            logger.error(f"Error calculating inventory limit for {discord_id}: {e}")
+            return BASE_INVENTORY_SLOTS
+
     def get_inventory_slot_count(self, discord_id: int) -> int:
         """Counts the number of distinct item slots (documents) used."""
         return self._col("inventory").count_documents({"discord_id": discord_id})
@@ -791,7 +811,8 @@ class DatabaseManager:
         # 2. Check Capacity
         if needed_new_slots > 0:
             current_slots = self.get_inventory_slot_count(discord_id)
-            available_slots = max(0, MAX_INVENTORY_SLOTS - current_slots)
+            max_slots = self.calculate_inventory_limit(discord_id)
+            available_slots = max(0, max_slots - current_slots)
             if needed_new_slots > available_slots:
                 return False
 
@@ -899,7 +920,8 @@ class DatabaseManager:
         failed_items = []
 
         current_slots = self.get_inventory_slot_count(discord_id)
-        available_slots = max(0, MAX_INVENTORY_SLOTS - current_slots)
+        max_slots = self.calculate_inventory_limit(discord_id)
+        available_slots = max(0, max_slots - current_slots)
 
         # 3. Process each consolidated item group
         for key, item_data in consolidated.items():

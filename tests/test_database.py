@@ -99,6 +99,7 @@ class TestDatabaseManager(unittest.TestCase):
         with (
             patch.object(self.db, "find_stackable_item", return_value=None),
             patch.object(self.db, "get_inventory_slot_count", return_value=0),
+            patch.object(self.db, "calculate_inventory_limit", return_value=20),
         ):
             self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
 
@@ -111,6 +112,7 @@ class TestDatabaseManager(unittest.TestCase):
         with (
             patch.object(self.db, "find_stackable_item", return_value=existing_item),
             patch.object(self.db, "get_inventory_slot_count", return_value=1),
+            patch.object(self.db, "calculate_inventory_limit", return_value=20),
         ):
             self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
 

@@ -117,6 +117,18 @@ class PlayerStats:
         mp_bonus = calculate_tiered_bonus(self.magic, 5.0)
         return 20 + mp_bonus
 
+    @property
+    def max_inventory_slots(self) -> int:
+        """
+        Calculates total inventory slots based on STR and DEX.
+        Base: 10
+        Bonus: +0.5 per STR point, +0.25 per DEX point.
+        """
+        base_slots = 10
+        str_bonus = math.floor(self.strength * 0.5)
+        dex_bonus = math.floor(self.dexterity * 0.25)
+        return max(base_slots, base_slots + str_bonus + dex_bonus)
+
     # --- Stat modification ---
     def set_base_stat(self, stat_name: str, value: int):
         key = stat_name.upper()
