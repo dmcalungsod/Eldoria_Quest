@@ -22,14 +22,17 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task 0.3:** Implement `AdventureResolutionEngine` logic.
     - **Agent:** @SystemSmith
     - **Priority:** **Blocking**
-    - **Details:** Automated loop calling `AdventureSession.simulate_step` for full duration.
+    - **Details:** Automated loop calling `AdventureSession.simulate_step` for full duration (e.g. 60m = 4 steps).
+- [ ] **Task 0.4:** Update `AdventureSession` to support "Background Simulation" mode.
+    - **Agent:** @SystemSmith
+    - **Details:** Ensure `simulate_step` can run without user interaction (no waiting for input).
 
 ### Phase 1: Core Loop (UI & Logic)
 **Focus:** Enabling players to start and complete basic adventures.
 - [ ] **Task 1.1:** Implement `AdventureSetupView` (Location/Duration selection).
     - **Agent:** @Palette
     - **Details:** Dropdowns for Location & Duration. "Embark" button.
-- [ ] **Task 1.2:** Update `/adventure` command to use new View.
+- [ ] **Task 1.2:** Update Character Profile UI to link to Adventure Setup.
     - **Agent:** @Palette
 - [ ] **Task 1.3:** Create `AdventureReportEmbed` for results.
     - **Agent:** @Palette
