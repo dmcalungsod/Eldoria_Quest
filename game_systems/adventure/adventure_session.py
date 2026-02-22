@@ -261,32 +261,33 @@ class AdventureSession:
                     weather_flavor = WorldTime.get_weather_flavor(weather)
                     phrase = f"{weather_flavor}\n{phrase}"
 
+                    ambush_damage = 0
                     # --- NIGHT AMBUSH MECHANIC ---
                     # 20% Chance for monsters to strike first at night
                     if time_phase == TimePhase.NIGHT and random.random() < 0.20:
                         monster_atk = monster.get("ATK", 10)
-                        damage = int(monster_atk * 0.8)  # 80% ATK damage
-                        damage = max(1, damage)  # Minimum 1 damage
+                        ambush_damage = int(monster_atk * 0.8)  # 80% ATK damage
+                        ambush_damage = max(1, ambush_damage)  # Minimum 1 damage
 
-                        # Apply damage immediately
+                        # Apply damage locally
                         current_hp = context["vitals"]["current_hp"]
-                        new_hp = max(0, current_hp - damage)
+                        new_hp = max(0, current_hp - ambush_damage)
                         context["vitals"]["current_hp"] = new_hp
 
-                        # Use Delta Update
-                        max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
-                        max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
-
-                        self.db.update_player_vitals_delta(
-                            self.discord_id, -damage, 0, max_hp, max_mp
-                        )
-
-                        phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
+                        phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{ambush_damage}** damage!"
 
                     # Start new combat
                     self.active_monster = monster
                     self.logs.append(phrase)
                     self.save_state()
+
+                    if ambush_damage > 0:
+                        max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
+                        max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+                        self.db.update_player_vitals_delta(
+                            self.discord_id, -ambush_damage, 0, max_hp, max_mp
+                        )
+
                     return self._build_result([[phrase]], False, context)
 
                 # Location has no monster this tick
@@ -437,10 +438,6 @@ class AdventureSession:
         max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
         max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
 
-        self.db.update_player_vitals_delta(
-            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
-        )
-
         # Final Results Block
         final_block = []
         if player_won:
@@ -470,6 +467,12 @@ class AdventureSession:
             self.logs.extend(frame)
 
         self.save_state()
+
+        # Update vitals ONLY if save_state succeeded
+        self.db.update_player_vitals_delta(
+            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
+        )
+
         return self._build_result(sequence, is_dead, context)
 
     # ======================================================================
@@ -492,11 +495,17 @@ class AdventureSession:
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
+
+        # Capture vitals before turn for delta calculation
+        old_hp = context["vitals"]["current_hp"] if context else 0
+        old_mp = context["vitals"]["current_mp"] if context else 0
+
         result = self.combat.resolve_turn(
             self.active_monster,
             report,
             current_session_exp,
             context=context,
+            persist_vitals=False,  # <--- Defer persistence
             action=action,
             stance=stance,
         )
@@ -534,6 +543,20 @@ class AdventureSession:
 
         self.logs.extend(turn_logs)
         self.save_state()
+
+        # Manual Delta Update (deferred until after save_state succeeds)
+        if context:
+            player_stats = context["player_stats"]
+            stats_dict = context.get("stats_dict")
+            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
+            max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
+
+            delta_hp = result.get("hp_current", old_hp) - old_hp
+            delta_mp = result.get("mp_current", old_mp) - old_mp
+
+            self.db.update_player_vitals_delta(
+                self.discord_id, delta_hp, delta_mp, max_hp, max_mp
+            )
 
         return self._build_result([turn_logs], is_dead, context)
 
