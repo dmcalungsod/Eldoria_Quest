@@ -17,23 +17,12 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
+from game_systems.data.shop_data import SHOP_INVENTORY, SHOP_STOCK_LIMITS
 from game_systems.items.inventory_manager import InventoryManager
 
 from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
 logger = logging.getLogger("eldoria.shop")
-
-SHOP_INVENTORY = {
-    "hp_potion_1": 40,
-    "mp_potion_1": 40,
-    "antidote_basic": 40,
-    "smoke_pellet": 45,
-    "food_ration": 15,
-    "hp_potion_2": 90,
-    "mp_potion_2": 90,
-    "strength_brew": 120,
-    "dex_elixir": 120,
-}
 
 
 class ShopView(View):
@@ -67,27 +56,53 @@ class ShopView(View):
             item_select.disabled = True
             return item_select
 
+        # Fetch current stock
+        player_stock = self.db.get_shop_stock(self.interaction_user.id)
+
         can_afford_any = False
         for item_key, price in SHOP_INVENTORY.items():
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 continue
 
+            # Check Stock
+            limit = SHOP_STOCK_LIMITS.get(item_key, 0)
+            if not player_stock:
+                # No record implies full stock (fresh player or first run with new system)
+                current_stock = limit
+            else:
+                current_stock = player_stock.get(item_key, 0)
+
             can_afford = self.current_aurum >= price
-            if can_afford:
+            has_stock = current_stock > 0
+
+            if can_afford and has_stock:
                 can_afford_any = True
 
-            emoji = E.AURUM if can_afford else E.LOCKED
+            if not has_stock:
+                emoji = E.LOCKED
+            else:
+                emoji = E.AURUM if can_afford else E.LOCKED
 
             # Ensure label does not exceed 100 characters
             suffix = f" — {price} G"
-            if not can_afford:
+            if not has_stock:
+                suffix += " [Out of Stock]"
+            elif not can_afford:
                 suffix += " [Too Expensive]"
+            else:
+                suffix += f" ({current_stock} left)"
 
             name = item_data["name"]
+            # Truncate name to fit suffix
             max_name_len = 100 - len(suffix)
             if len(name) > max_name_len:
                 name = name[: max_name_len - 1] + "…"
+
+            # Disable option if out of stock? No, better to show it but make it error on click?
+            # Or just visual indication.
+            # To be user friendly, we should probably not disable, but the callback checks.
+            # But making it clear visually is key.
 
             item_select.add_option(
                 label=f"{name}{suffix}",
@@ -97,9 +112,10 @@ class ShopView(View):
             )
 
         if not can_afford_any:
-            item_select.placeholder = "Insufficient Funds"
-            if self.current_aurum == 0:
-                item_select.disabled = True
+            item_select.placeholder = "Stock Depleted / Insufficient Funds"
+            # We don't disable the select if they have money but no stock,
+            # so they can see the menu. But if EVERYTHING is out/expensive:
+            # We check can_afford_any.
 
         item_select.callback = self.purchase_item_callback
         return item_select
@@ -117,7 +133,13 @@ class ShopView(View):
                 return (False, "Item data missing.", 0)
 
             # Delegate to DatabaseManager for atomic execution with refund support
-            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, price)
+            success, result, new_balance = self.db.purchase_item(
+                self.interaction_user.id,
+                item_key,
+                item_data,
+                price,
+                stock_limits=SHOP_STOCK_LIMITS,
+            )
 
             if success:
                 logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")

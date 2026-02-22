@@ -7,3 +7,8 @@
 
 **Learning:** Migrating procedural Python monster generation to static JSON improves maintainability but requires careful hydration of related objects (skills) and conversion of types (lists to tuples for drops) to maintain backward compatibility.
 **Action:** Use intermediate scripts to extract complex data structures from Python code into JSON, and ensure the loading layer handles type reconstruction to keep the external API consistent.
+
+## 2024-10-31 — Migrated Skills to JSON
+
+**Learning:** Migrating skills to JSON requires validation to ensure critical fields like `mp_cost` and `class_id` are present and of the correct type, preventing runtime errors in combat logic.
+**Action:** Implement robust validation in the data loading layer to catch malformed data early, and keep related constants (like `MAGIC_SKILL_TYPES`) accessible alongside the loaded data.

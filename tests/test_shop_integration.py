@@ -36,6 +36,7 @@ from cogs.shop_cog import SHOP_INVENTORY, ShopView  # noqa: E402
 class TestShopViewIntegration(unittest.TestCase):
     def test_shop_view_calls_purchase_item_success(self):
         mock_db = MagicMock()
+        mock_db.get_shop_stock.return_value = {}
         mock_user = MagicMock()
         mock_user.id = 12345
         current_aurum = 1000
@@ -62,6 +63,7 @@ class TestShopViewIntegration(unittest.TestCase):
 
     def test_shop_view_handles_insufficient_funds(self):
         mock_db = MagicMock()
+        mock_db.get_shop_stock.return_value = {}
         mock_user = MagicMock()
         mock_user.id = 12345
         current_aurum = 10

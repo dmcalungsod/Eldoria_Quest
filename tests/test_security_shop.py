@@ -59,7 +59,8 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_success(self):
         """Verify that purchase_item_callback accepts valid input."""
         db = Mock()
-        user = MagicMock()
+        db.get_shop_stock = Mock(return_value={})
+        user = _safe_mock(spec=discord.User)
         user.id = 12345
 
         # Instantiate view with mocked dependencies
@@ -116,7 +117,8 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_failure_empty(self):
         """Verify that purchase_item_callback rejects empty input."""
         db = Mock()
-        user = MagicMock()
+        db.get_shop_stock = Mock(return_value={})
+        user = _safe_mock(spec=discord.User)
         view = self.ShopView(db, user, 1000)
 
         interaction = MagicMock()
@@ -140,7 +142,8 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_failure_malformed(self):
         """Verify that purchase_item_callback rejects malformed input."""
         db = Mock()
-        user = MagicMock()
+        db.get_shop_stock = Mock(return_value={})
+        user = _safe_mock(spec=discord.User)
         view = self.ShopView(db, user, 1000)
 
         interaction = MagicMock()

@@ -16,7 +16,7 @@ import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
-from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.skills_data import MAGIC_SKILL_TYPES
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.player_stats import PlayerStats
 
@@ -62,16 +62,41 @@ class ExplorationView(View):
         if self.active_monster:
             # --- COMBAT MODE ---
 
+            # Telegraph Logic
+            charged_skill = self.active_monster.get("charged_skill")
+            atk_style = discord.ButtonStyle.danger
+            atk_label = "Attack"
+            atk_emoji = E.SWORDS
+
+            def_style = discord.ButtonStyle.secondary
+            def_label = "Defend"
+            def_emoji = E.SHIELD
+
+            if charged_skill:
+                skill_type = charged_skill.get("type", "physical")
+                is_magic = skill_type in MAGIC_SKILL_TYPES
+
+                if is_magic:
+                    # Vulnerable to Interrupt (Attack)
+                    atk_style = discord.ButtonStyle.primary  # Blurple to stand out
+                    atk_label = "INTERRUPT!"
+                    atk_emoji = "⚡"
+                else:
+                    # Vulnerable to Parry (Defend)
+                    def_style = discord.ButtonStyle.success  # Green for success
+                    def_label = "PARRY!"
+                    def_emoji = "🛡️"
+
             # 1. Attack
             attack_btn = Button(
-                label="Attack", style=discord.ButtonStyle.danger, emoji=E.SWORDS, row=0, custom_id="attack"
+                label=atk_label, style=atk_style, emoji=atk_emoji, row=0, custom_id="attack"
             )
             attack_btn.callback = self.action_attack
             self.add_item(attack_btn)
 
             # 2. Defend
             defend_btn = Button(
-                label="Defend", style=discord.ButtonStyle.secondary, emoji=E.SHIELD, row=0, custom_id="defend"
+                label=def_label, style=def_style, emoji=def_emoji, row=0, custom_id="defend"
             )
             defend_btn.callback = self.action_defend
             self.add_item(defend_btn)

@@ -14,6 +14,7 @@ MONSTER_SKILLS = {
         "mp_cost": 5,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "physical",
     },
     "rapid_strike": {
         "key_id": "rapid_strike",
@@ -22,6 +23,7 @@ MONSTER_SKILLS = {
         "mp_cost": 3,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "physical",
     },
     "crushing_slam": {
         "key_id": "crushing_slam",
@@ -30,6 +32,7 @@ MONSTER_SKILLS = {
         "mp_cost": 8,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "physical",
     },
     "vicious_bite": {
         "key_id": "vicious_bite",
@@ -38,6 +41,7 @@ MONSTER_SKILLS = {
         "mp_cost": 4,
         "type": "physical",
         "desc_key": "bite",
+        "element": "physical",
     },
     "crystal_shard": {
         "key_id": "crystal_shard",
@@ -46,6 +50,7 @@ MONSTER_SKILLS = {
         "mp_cost": 6,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "earth",
     },
     # Magical / Elemental
     "prism_beam": {
@@ -55,8 +60,17 @@ MONSTER_SKILLS = {
         "mp_cost": 12,
         "type": "magical",
         "desc_key": "magic",
+        "element": "light",
     },
-    "ember": {"key_id": "ember", "name": "Ember", "power": 1.4, "mp_cost": 5, "type": "magical", "desc_key": "fire"},
+    "ember": {
+        "key_id": "ember",
+        "name": "Ember",
+        "power": 1.4,
+        "mp_cost": 5,
+        "type": "magical",
+        "desc_key": "fire",
+        "element": "fire",
+    },
     "flame_breath": {
         "key_id": "flame_breath",
         "name": "Flame Breath",
@@ -64,6 +78,7 @@ MONSTER_SKILLS = {
         "mp_cost": 10,
         "type": "magical",
         "desc_key": "fire",
+        "element": "fire",
     },
     "poison_spit": {
         "key_id": "poison_spit",
@@ -72,6 +87,7 @@ MONSTER_SKILLS = {
         "mp_cost": 5,
         "type": "physical",
         "desc_key": "poison",
+        "element": "poison",
     },
     "ice_shard": {
         "key_id": "ice_shard",
@@ -80,6 +96,7 @@ MONSTER_SKILLS = {
         "mp_cost": 6,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "ice",
     },
     "frost_breath": {
         "key_id": "frost_breath",
@@ -88,6 +105,7 @@ MONSTER_SKILLS = {
         "mp_cost": 10,
         "type": "magical",
         "desc_key": "magic",
+        "element": "ice",
     },
     "glacial_roar": {
         "key_id": "glacial_roar",
@@ -96,6 +114,7 @@ MONSTER_SKILLS = {
         "mp_cost": 12,
         "type": "magical",
         "desc_key": "magic",
+        "element": "ice",
     },
     # Clockwork / Steam Skills
     "steam_vent": {
@@ -105,6 +124,7 @@ MONSTER_SKILLS = {
         "mp_cost": 8,
         "type": "magical",
         "desc_key": "magic",
+        "element": "fire",
     },
     # Water / Aquatic Skills
     "water_jet": {
@@ -114,6 +134,7 @@ MONSTER_SKILLS = {
         "mp_cost": 6,
         "type": "magical",
         "desc_key": "magic",
+        "element": "water",
     },
     "tidal_wave": {
         "key_id": "tidal_wave",
@@ -122,6 +143,7 @@ MONSTER_SKILLS = {
         "mp_cost": 10,
         "type": "magical",
         "desc_key": "magic",
+        "element": "water",
     },
     "bubble_beam": {
         "key_id": "bubble_beam",
@@ -130,6 +152,7 @@ MONSTER_SKILLS = {
         "mp_cost": 5,
         "type": "magical",
         "desc_key": "magic",
+        "element": "water",
     },
     "crushing_depths": {
         "key_id": "crushing_depths",
@@ -138,6 +161,7 @@ MONSTER_SKILLS = {
         "mp_cost": 12,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "water",
     },
     # Healing
     "mend": {
@@ -147,6 +171,7 @@ MONSTER_SKILLS = {
         "mp_cost": 8,
         "type": "heal",
         "desc_key": "heal",
+        "element": "holy",
     },
     "regenerate": {
         "key_id": "regenerate",
@@ -155,6 +180,7 @@ MONSTER_SKILLS = {
         "mp_cost": 15,
         "type": "heal",
         "desc_key": "heal",
+        "element": "nature",
     },
     # Void / Entropy Skills (Rank S)
     "void_slash": {
@@ -164,6 +190,7 @@ MONSTER_SKILLS = {
         "mp_cost": 8,
         "type": "physical",
         "desc_key": "special_hit",
+        "element": "dark",
     },
     "entropy_wave": {
         "key_id": "entropy_wave",
@@ -172,6 +199,7 @@ MONSTER_SKILLS = {
         "mp_cost": 15,
         "type": "magical",
         "desc_key": "magic",
+        "element": "dark",
     },
     "annihilate": {
         "key_id": "annihilate",
@@ -180,5 +208,6 @@ MONSTER_SKILLS = {
         "mp_cost": 25,
         "type": "magical",
         "desc_key": "magic",
+        "element": "dark",
     },
 }

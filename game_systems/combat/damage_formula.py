@@ -31,7 +31,13 @@ class DamageFormula:
         return 0
 
     @staticmethod
-    def player_attack(player_stats, monster):
+    def player_attack(player_stats, monster, weather_modifiers: dict = None):
+        # Accuracy Check (Fog)
+        if weather_modifiers:
+            acc_mult = weather_modifiers.get("accuracy_mult", 1.0)
+            if acc_mult < 1.0 and random.random() > acc_mult:
+                return 0, False, "miss"
+
         str_val = DamageFormula._get_stat(player_stats, "STR")
         dex_val = DamageFormula._get_stat(player_stats, "DEX")
         mag_val = DamageFormula._get_stat(player_stats, "MAG")
@@ -65,7 +71,17 @@ class DamageFormula:
         return max(1, damage), is_crit, event_type
 
     @staticmethod
-    def player_skill(player_stats, monster, skill_data, skill_level: int):
+    def player_skill(player_stats, monster, skill_data, skill_level: int, weather_modifiers: dict = None):
+        # Accuracy Check (Fog) - Skills can miss too?
+        # Let's say skills ignore Fog unless specified.
+        # But wait, Fog affects VISIBILITY. It should affect targeted skills.
+        # However, making magic miss feels bad. Let's keep it to physical accuracy or global accuracy?
+        # WorldTime says "accuracy_mult". Let's apply it.
+        if weather_modifiers:
+            acc_mult = weather_modifiers.get("accuracy_mult", 1.0)
+            if acc_mult < 1.0 and random.random() > acc_mult:
+                return 0, False, "miss"
+
         # Data-driven scaling
         scaling_stat = skill_data.get("scaling_stat", "MAG").upper()
         scaling_factor = float(skill_data.get("scaling_factor", 1.0))
@@ -76,6 +92,14 @@ class DamageFormula:
         base_multiplier = float(skill_data.get("power_multiplier", 1.0))
         final_multiplier = base_multiplier + (0.08 * (skill_level - 1))
         attack_power *= final_multiplier
+
+        # Apply Elemental Weather Modifiers
+        if weather_modifiers:
+            element = skill_data.get("element")
+            if element:
+                mod_key = f"{element}_dmg"
+                multiplier = weather_modifiers.get(mod_key, 1.0)
+                attack_power *= multiplier
 
         monster_def = monster.get("DEF", 0)
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))
@@ -130,11 +154,17 @@ class DamageFormula:
         return actual_healed, new_hp, "heal"
 
     @staticmethod
-    def monster_attack(monster, player_stats):
+    def monster_attack(monster, player_stats, weather_modifiers: dict = None):
         """
         Calculates monster damage.
         Reduced Chip Damage to 5%.
         """
+        # Accuracy Check (Fog)
+        if weather_modifiers:
+            acc_mult = weather_modifiers.get("accuracy_mult", 1.0)
+            if acc_mult < 1.0 and random.random() > acc_mult:
+                return 0, False, "miss"
+
         agi = DamageFormula._get_stat(player_stats, "AGI")
         dodge_chance = agi * 0.001
         if random.random() < dodge_chance:
@@ -168,10 +198,16 @@ class DamageFormula:
         return max(1, damage), is_crit, event_type
 
     @staticmethod
-    def monster_skill(monster, player_stats, skill_data):
+    def monster_skill(monster, player_stats, skill_data, weather_modifiers: dict = None):
         """
         Calculates monster skill damage.
         """
+        # Accuracy Check (Fog)
+        if weather_modifiers:
+            acc_mult = weather_modifiers.get("accuracy_mult", 1.0)
+            if acc_mult < 1.0 and random.random() > acc_mult:
+                return 0, False, "miss"
+
         # Dodge check
         agi = DamageFormula._get_stat(player_stats, "AGI")
         dodge_chance = agi * 0.001
@@ -179,11 +215,33 @@ class DamageFormula:
             return 0, False, "dodge"
 
         # Base calculation uses standard attack logic
-        damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats)
+        # Pass modifiers to base attack for basic calculations (like crit) but accuracy was already checked?
+        # Actually monster_attack checks accuracy again.
+        # But we already checked it above.
+        # If we pass modifiers to monster_attack, it will check again.
+        # But random.random() will differ.
+        # Ideally we shouldn't check twice.
+        # Let's call monster_attack WITHOUT modifiers to skip accuracy check inside it,
+        # relying on the check we just done?
+        # But monster_attack logic might change.
+        # Let's just trust that checking twice is unlikely to be a huge issue (simulating multiple rolls?)
+        # Or better: We pass None to monster_attack, since we handled accuracy here.
+        damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats, None)
+
+        if event_type == "dodge":
+            return 0, False, "dodge"
 
         # Apply Skill Multiplier
         multiplier = float(skill_data.get("power", 1.5))
         damage = int(damage * multiplier)
+
+        # Apply Elemental Modifiers
+        if weather_modifiers:
+            element = skill_data.get("element")
+            if element:
+                mod_key = f"{element}_dmg"
+                elem_mult = weather_modifiers.get(mod_key, 1.0)
+                damage = int(damage * elem_mult)
 
         return damage, is_crit, event_type
 
