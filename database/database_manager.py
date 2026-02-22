@@ -1974,6 +1974,25 @@ class DatabaseManager:
     # PLAYER CREATOR (New methods for external call sites)
     # ============================================================
 
+    def delete_player_full(self, discord_id: int):
+        """
+        Hard delete of all player data.
+        Removes records from: players, stats, inventory, player_skills, player_quests,
+        guild_members, active_buffs, adventure_sessions, tournament_scores, player_factions.
+        """
+        logger.warning(f"Executing FULL DELETE for player {discord_id}")
+
+        self._col("players").delete_one({"discord_id": discord_id})
+        self._col("stats").delete_one({"discord_id": discord_id})
+        self._col("inventory").delete_many({"discord_id": discord_id})
+        self._col("player_skills").delete_many({"discord_id": discord_id})
+        self._col("player_quests").delete_many({"discord_id": discord_id})
+        self._col("guild_members").delete_one({"discord_id": discord_id})
+        self._col("active_buffs").delete_many({"discord_id": discord_id})
+        self._col("adventure_sessions").delete_many({"discord_id": discord_id})
+        self._col("tournament_scores").delete_many({"discord_id": discord_id})
+        self._col("player_factions").delete_one({"discord_id": discord_id})
+
     def create_player_full(
         self,
         discord_id: int,

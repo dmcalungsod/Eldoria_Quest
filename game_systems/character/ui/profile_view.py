@@ -22,6 +22,7 @@ from game_systems.player.player_stats import PlayerStats
 # Modular imports
 from .abilities_view import AbilitiesView
 from .adventure_menu import AdventureView
+from .settings_view import SettingsView
 
 logger = logging.getLogger("eldoria.ui.profile")
 
@@ -80,6 +81,17 @@ class CharacterTabView(View):
         )
         btn_guild.callback = self.guild_hall_callback
         self.add_item(btn_guild)
+
+        # --- Settings (Row 2) ---
+        btn_settings = Button(
+            label="Settings",
+            style=discord.ButtonStyle.secondary,
+            custom_id="settings_link",
+            emoji="⚙️",
+            row=2,
+        )
+        btn_settings.callback = self.settings_callback
+        self.add_item(btn_settings)
 
     # ------------------------------------------------------------------
     # Interaction Permissions Check
@@ -159,3 +171,16 @@ class CharacterTabView(View):
 
         # Calls shared logic in ui_helpers to load the Guild Hall
         await ui_helpers.back_to_guild_hall_callback(interaction)
+
+    async def settings_callback(self, interaction: discord.Interaction):
+        """Opens the Settings Menu."""
+        await interaction.response.defer()
+
+        embed = discord.Embed(
+            title="⚙️ Settings",
+            description="Manage your account and preferences.",
+            color=discord.Color.light_grey(),
+        )
+
+        view = SettingsView(self.db, self.interaction_user)
+        await interaction.edit_original_response(embed=embed, view=view)
