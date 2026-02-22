@@ -1,23 +1,40 @@
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 import discord
-
-# Need to adjust import path for modules
 import sys
 import os
+import importlib
 
+# Need to adjust import path for modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from cogs.shop_cog import ShopView  # noqa: E402
+# Import normally
+try:
+    from cogs.shop_cog import ShopView
+except ImportError:
+    ShopView = None
 
 
 class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        # Force reload cogs.shop_cog to ensure ShopView is the real class
+        # and not a Mock object left over from previous tests.
+        if "cogs.shop_cog" in sys.modules:
+            importlib.reload(sys.modules["cogs.shop_cog"])
+
+        # Re-import after reload
+        from cogs.shop_cog import ShopView as SV
+
+        self.ShopView = SV
+
     async def test_shop_callback_validation_success(self):
         """Verify that purchase_item_callback accepts valid input."""
         db = Mock()
         user = Mock(spec=discord.User)
         user.id = 12345
-        view = ShopView(db, user, 1000)
+
+        # Use the fresh class
+        view = self.ShopView(db, user, 1000)
 
         # Mock internal method to avoid DB calls
         view._execute_purchase = Mock(return_value=(True, {"name": "Potion"}, 900))
@@ -47,7 +64,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         """Verify that purchase_item_callback rejects empty input."""
         db = Mock()
         user = Mock(spec=discord.User)
-        view = ShopView(db, user, 1000)
+        view = self.ShopView(db, user, 1000)
 
         interaction = Mock(spec=discord.Interaction)
         interaction.user = user
@@ -77,7 +94,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         # `values[0]` checks truthiness.
         db = Mock()
         user = Mock(spec=discord.User)
-        view = ShopView(db, user, 1000)
+        view = self.ShopView(db, user, 1000)
 
         interaction = Mock(spec=discord.Interaction)
         interaction.user = user
