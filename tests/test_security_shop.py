@@ -45,6 +45,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_success(self):
         """Verify that purchase_item_callback accepts valid input."""
         db = Mock()
+        db.get_shop_stock = Mock(return_value={})
         user = _safe_mock(spec=discord.User)
         user.id = 12345
 
@@ -78,6 +79,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_failure_empty(self):
         """Verify that purchase_item_callback rejects empty input."""
         db = Mock()
+        db.get_shop_stock = Mock(return_value={})
         user = _safe_mock(spec=discord.User)
         view = self.ShopView(db, user, 1000)
 
@@ -104,6 +106,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         # My validation checks `values` presence.
         # `values[0]` checks truthiness.
         db = Mock()
+        db.get_shop_stock = Mock(return_value={})
         user = _safe_mock(spec=discord.User)
         view = self.ShopView(db, user, 1000)
 
