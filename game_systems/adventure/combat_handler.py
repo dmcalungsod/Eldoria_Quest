@@ -169,6 +169,7 @@ class CombatHandler:
             persist_vitals: Whether to write HP/MP to DB immediately.
             stance: Player's current combat stance (aggressive, balanced, defensive).
         """
+        vitals = None
         try:
             # 1. Load Data
             if context:
