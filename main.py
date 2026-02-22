@@ -75,7 +75,7 @@ async def start_health_server():
     port = int(os.getenv("PORT", 10000))
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", port)
+    site = web.TCPSite(runner, "0.0.0.0", port)  # nosec
     await site.start()
     logger.info(f"Health check server started on port {port}")
 
