@@ -1,32 +1,38 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add project root to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# 1. Mock dependencies BEFORE imports
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["discord"] = MagicMock()
-
-# Mock DatabaseManager module to prevent actual DB connection attempts
-mock_db_module = MagicMock()
-sys.modules["database.database_manager"] = mock_db_module
-
-# 2. Import System Under Test
-# We must ensure that 'DatabaseManager' is available on the mocked module
-# because achievement_system.py does: "from database.database_manager import DatabaseManager"
-mock_db_module.DatabaseManager = MagicMock()
-
-from game_systems.achievement_system import AchievementSystem  # noqa: E402
-
-
 class TestSkillAchievements(unittest.TestCase):
     def setUp(self):
+        # 1. Patch sys.modules dynamically
+        self.patcher = patch.dict(sys.modules)
+        self.patcher.start()
+
+        # Mock dependencies
+        self.mock_pymongo = MagicMock()
+        sys.modules["pymongo"] = self.mock_pymongo
+        sys.modules["pymongo.errors"] = MagicMock()
+        sys.modules["discord"] = MagicMock()
+
+        # Mock DatabaseManager
+        self.mock_db_module = MagicMock()
+        sys.modules["database.database_manager"] = self.mock_db_module
+        self.mock_db_module.DatabaseManager = MagicMock()
+
+        # Import System Under Test inside setUp to use patched modules
+        import game_systems.achievement_system
+        from game_systems.achievement_system import AchievementSystem
+
+        self.AchievementSystem = AchievementSystem
         self.mock_db = MagicMock()
-        self.ach_system = AchievementSystem(self.mock_db)
+        self.ach_system = self.AchievementSystem(self.mock_db)
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_skill_count_achievement_student(self):
         """Test awarding 'Student' for 2 skills."""

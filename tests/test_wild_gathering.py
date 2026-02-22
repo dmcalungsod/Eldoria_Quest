@@ -6,6 +6,9 @@ from unittest.mock import MagicMock, patch
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_session import AdventureSession
 from game_systems.adventure.event_handler import EventHandler
