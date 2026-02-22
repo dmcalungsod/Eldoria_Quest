@@ -15,6 +15,7 @@ import discord
 import game_systems.data.emojis as E
 from database.database_manager import MAX_INVENTORY_SLOTS, DatabaseManager
 from game_systems.data.emojis import get_rarity_ansi
+from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.ui")
@@ -59,9 +60,13 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
         embed.description += "\n\n*Your pack is light, holding only dust and echoes.*"
         return embed
 
-    equipped = []
-    categories = {"Equipment": [], "Consumable": [], "Material": [], "Misc": []}
+    equipped_groups = {
+        "Weapon": [],
+        "Armor": [],
+        "Accessory": [],
+    }
 
+    categories = {"Equipment": [], "Consumable": [], "Material": [], "Misc": []}
     unequipped_counts = {}
 
     for item in items:
@@ -70,19 +75,45 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
         name = item["item_name"]
 
         if item.get("equipped"):
-            slot = item.get("slot", "Unknown").replace("_", " ").title()
-            equipped.append(get_rarity_ansi(rarity, f"[E] {name} ({slot})"))
+            slot_key = item.get("slot", "")
+            slot_display = slot_key.replace("_", " ").title()
+
+            # Categorize Slot
+            cat = "Armor"  # Default
+            if slot_key in EquipmentManager.TWO_HANDED_SLOTS or slot_key in EquipmentManager.MAIN_HAND_SLOTS:
+                cat = "Weapon"
+            elif slot_key in EquipmentManager.OFF_HAND_SLOTS:
+                 # Shields are armor, others are weapons
+                if slot_key == "shield":
+                    cat = "Armor"
+                else:
+                    cat = "Weapon"
+            elif slot_key == "accessory":
+                cat = "Accessory"
+
+            equipped_groups[cat].append(get_rarity_ansi(rarity, f"• {name} ({slot_display})"))
         else:
             key = (itype, name, rarity)
             unequipped_counts[key] = unequipped_counts.get(key, 0) + item["count"]
 
+    # --- EQUIPPED SECTION ---
+    has_equipped = any(equipped_groups.values())
+    if has_equipped:
+        val = ""
+        if equipped_groups["Weapon"]:
+            val += "**Weapons**\n" + "\n".join(equipped_groups["Weapon"]) + "\n"
+        if equipped_groups["Armor"]:
+            val += "**Armor**\n" + "\n".join(equipped_groups["Armor"]) + "\n"
+        if equipped_groups["Accessory"]:
+            val += "**Accessories**\n" + "\n".join(equipped_groups["Accessory"]) + "\n"
+
+        embed.add_field(name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False)
+
+    # --- INVENTORY SECTION ---
     for (itype, name, rarity), count in sorted(unequipped_counts.items()):
         cat = itype if itype in categories else "Misc"
         text = f"• {name} (x{count})"
         categories[cat].append(get_rarity_ansi(rarity, text))
-
-    if equipped:
-        embed.add_field(name="Equipped Gear", value="```ansi\n" + "\n".join(equipped) + "\n```", inline=False)
 
     for cat, lines in categories.items():
         if lines:

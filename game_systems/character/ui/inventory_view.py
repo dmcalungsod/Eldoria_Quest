@@ -3,6 +3,7 @@ game_systems/character/ui/inventory_view.py
 
 The Adventurer’s Field Kit.
 Hardened: Async database operations for equipping/unequipping.
+Enhanced: Inventory filtering for better UX.
 """
 
 import asyncio
@@ -33,10 +34,12 @@ class InventoryView(View):
         interaction_user: discord.User,
         previous_view_callback,
         previous_view_label="Return",
+        current_filter="All",
     ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
+        self.current_filter = current_filter
 
         # Managers
         self.inv_manager = InventoryManager(self.db)
@@ -46,12 +49,20 @@ class InventoryView(View):
         self.previous_view_callback = previous_view_callback
         self.previous_view_label = previous_view_label
 
-        # UI Components
-        self.equip_select = Select(placeholder="Equip...", min_values=1, max_values=1, row=0)
-        self.unequip_select = Select(placeholder="Unequip...", min_values=1, max_values=1, row=1)
-        self.use_select = Select(placeholder="Use Item...", min_values=1, max_values=1, row=2)
+        # Fetch items once
+        try:
+            self.all_items = self.inv_manager.get_inventory(self.interaction_user.id)
+        except Exception:
+            self.all_items = []
 
-        self.back_button = Button(label=self.previous_view_label, style=discord.ButtonStyle.secondary, row=3)
+        # UI Components
+        self.create_filter_buttons()
+
+        self.equip_select = Select(placeholder="Equip...", min_values=1, max_values=1, row=1)
+        self.unequip_select = Select(placeholder="Unequip...", min_values=1, max_values=1, row=2)
+        self.use_select = Select(placeholder="Use Item...", min_values=1, max_values=1, row=3)
+
+        self.back_button = Button(label=self.previous_view_label, style=discord.ButtonStyle.secondary, row=4)
 
         self._populate_ui()
 
@@ -66,18 +77,41 @@ class InventoryView(View):
         self.add_item(self.use_select)
         self.add_item(self.back_button)
 
+    def create_filter_buttons(self):
+        """Creates filter buttons for the inventory."""
+        filters = ["All", "Weapon", "Armor", "Accessory", "Consumable"]
+        for f in filters:
+            style = discord.ButtonStyle.primary if f == self.current_filter else discord.ButtonStyle.secondary
+            btn = Button(label=f, style=style, custom_id=f"filter_{f}", row=0)
+            btn.callback = self.filter_callback
+            self.add_item(btn)
+
+    def _get_item_category(self, item):
+        """Determines the category of an item for filtering."""
+        if item["item_type"] == "consumable":
+            return "Consumable"
+
+        # Equipment logic
+        slot = item.get("slot", "")
+        if slot in EquipmentManager.TWO_HANDED_SLOTS or slot in EquipmentManager.MAIN_HAND_SLOTS:
+            return "Weapon"
+        if slot in EquipmentManager.OFF_HAND_SLOTS:
+            if slot == "shield":
+                return "Armor"
+            return "Weapon"
+        if slot == "accessory":
+            return "Accessory"
+
+        return "Armor" # Default fallback for equipment
+
     def _populate_ui(self):
-        """Populate dropdowns synchronously (safe for view init)."""
+        """Populate dropdowns based on current filter."""
         try:
             # Fetch player data for validation
             player = self.db.get_player(self.interaction_user.id)
             guild_rank = self.db.get_guild_rank(self.interaction_user.id) or "F"
             allowed_slots = self.eq_manager._get_player_allowed_slots(self.interaction_user.id)
-
-            # Using inventory manager's method which should be efficient enough
-            items = self.inv_manager.get_inventory(self.interaction_user.id)
         except Exception:
-            items = []
             player = None
             guild_rank = "F"
             allowed_slots = []
@@ -98,7 +132,12 @@ class InventoryView(View):
         unequip_opts = []
         use_opts = []
 
-        for item in items:
+        for item in self.all_items:
+            # Check Filter
+            category = self._get_item_category(item)
+            if self.current_filter != "All" and category != self.current_filter:
+                continue
+
             val = str(item["id"])
             if item["item_type"] == "equipment":
                 slot_name = self.eq_manager.get_slot_display_name(item["slot"])
@@ -134,14 +173,34 @@ class InventoryView(View):
                 use_opts.append(discord.SelectOption(label=label, value=val, emoji="🧪"))
 
         # Configure Dropdowns
-        self._set_options(self.equip_select, equip_opts, "No gear to equip.")
-        self._set_options(self.unequip_select, unequip_opts, "No gear equipped.")
-        self._set_options(self.use_select, use_opts, "No consumables.")
+        # Dynamically enable/disable based on filter context
 
-    def _set_options(self, select, options, empty_msg):
+        # Equip Select: Only for equipment filters or All
+        show_equip = self.current_filter in ["All", "Weapon", "Armor", "Accessory"]
+        self._set_options(self.equip_select, equip_opts, "No gear to equip.", visible=show_equip)
+
+        # Unequip Select: Always show unless viewing Consumables
+        show_unequip = self.current_filter != "Consumable"
+        # Note: If filtering by "Weapon", we might only want to show equipped weapons?
+        # Current logic iterates ALL items and filters them. So unequip_opts only contains filtered items.
+        # This is correct.
+        self._set_options(self.unequip_select, unequip_opts, "No gear equipped.", visible=show_unequip)
+
+        # Use Select: Only for Consumables or All
+        show_use = self.current_filter in ["All", "Consumable"]
+        self._set_options(self.use_select, use_opts, "No consumables.", visible=show_use)
+
+    def _set_options(self, select, options, empty_msg, visible=True):
+        if not visible:
+             select.disabled = True
+             select.placeholder = "---"
+             select.options = [discord.SelectOption(label="Disabled", value="disabled")]
+             return
+
         if options:
             select.options = options[:25]  # Discord limit
             select.disabled = False
+            select.placeholder = select.placeholder or "Select..."
         else:
             select.add_option(label=empty_msg, value="disabled")
             select.disabled = True
@@ -155,6 +214,22 @@ class InventoryView(View):
     # --------------------------------------------------------
     # Async Callbacks
     # --------------------------------------------------------
+    async def filter_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        # Custom ID format: filter_Category
+        new_filter = interaction.custom_id.split("_")[1]
+        self.current_filter = new_filter
+
+        # Update button styles
+        for child in self.children:
+            if isinstance(child, Button) and child.custom_id and child.custom_id.startswith("filter_"):
+                child.style = discord.ButtonStyle.primary if child.custom_id == f"filter_{new_filter}" else discord.ButtonStyle.secondary
+
+        # Re-populate selects
+        self._populate_ui()
+
+        await interaction.edit_original_response(view=self)
+
     async def equip_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         inv_id = int(interaction.data["values"][0])
@@ -188,5 +263,12 @@ class InventoryView(View):
         max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
         embed = build_inventory_embed(items, max_slots)
 
-        new_view = InventoryView(self.db, self.interaction_user, self.previous_view_callback, self.previous_view_label)
+        # Pass current filter to new view to maintain state
+        new_view = InventoryView(
+            self.db,
+            self.interaction_user,
+            self.previous_view_callback,
+            self.previous_view_label,
+            current_filter=self.current_filter
+        )
         await interaction.edit_original_response(embed=embed, view=new_view)
