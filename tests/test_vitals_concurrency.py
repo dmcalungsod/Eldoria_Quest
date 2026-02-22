@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 # Add repo root to path
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # MOCK PYMONGO BEFORE IMPORT
 mock_pymongo = MagicMock()

@@ -4,7 +4,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Helper Mocks
