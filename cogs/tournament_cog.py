@@ -163,7 +163,7 @@ class TournamentCog(commands.Cog):
     # ==================================================================
 
     @app_commands.command(name="tournament_admin_start", description="[Admin] Manually start a tournament.")
-    @app_commands.describe(event_type="Type of event (monster_kills, quests_completed, boss_kills)")
+    @app_commands.describe(event_type="Type of event (monster_kills, quests_completed, boss_kills, spectral_tide, elemental_harvest)")
     @app_commands.checks.has_permissions(administrator=True)
     async def admin_start(self, interaction: discord.Interaction, event_type: str = "monster_kills"):
         """Manually starts a tournament."""

@@ -22,6 +22,7 @@ class TournamentSystem:
         "quests_completed",
         "boss_kills",
         "spectral_tide",
+        "elemental_harvest",
     ]
 
     def __init__(self, db_manager: DatabaseManager):

@@ -20,6 +20,7 @@ class WorldEventSystem:
     CELESTIAL_CONVERGENCE = "celestial_convergence"
     VOID_INCURSION = "void_incursion"
     HARVEST_FESTIVAL = "harvest_festival"
+    ELEMENTAL_SURGE = "elemental_surge"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -58,6 +59,15 @@ class WorldEventSystem:
                 "exp_boost": 1.1,
                 "monster_buff": 1.0,
                 "gathering_boost": 2.0,
+            },
+        },
+        ELEMENTAL_SURGE: {
+            "name": "Elemental Surge",
+            "description": "Elemental energies are unstable. Monsters are stronger but drop Elemental Motes.",
+            "modifiers": {
+                "loot_boost": 1.3,
+                "exp_boost": 1.2,
+                "monster_buff": 1.2,
             },
         },
     }

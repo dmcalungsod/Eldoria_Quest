@@ -7,6 +7,7 @@ Hardened to ensure atomic reward distribution.
 
 import json
 import logging
+import random
 from collections import defaultdict
 
 import game_systems.data.emojis as E
@@ -111,6 +112,11 @@ class AdventureRewards:
                 if ectoplasm_count > 0:
                     tournament.record_action(self.discord_id, "spectral_tide", ectoplasm_count)
 
+                # Event: Elemental Harvest
+                mote_count = actual_drops.count("elemental_mote")
+                if mote_count > 0:
+                    tournament.record_action(self.discord_id, "elemental_harvest", mote_count)
+
             except Exception as e:
                 logger.error(f"Tournament hook error: {e}")
             # -----------------------
@@ -150,6 +156,24 @@ class AdventureRewards:
         # Determine drops
         stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
         loot_boost = combat_result.get("active_boosts", {}).get("loot_boost", 1.0)
+
+        # Check for World Event: Elemental Surge
+        try:
+            active_event = self.db.get_active_world_event()
+            if active_event and active_event.get("type") == "elemental_surge":
+                # 30% chance to drop 1-3 Elemental Motes
+                if random.random() < 0.3:
+                    mote_count = random.randint(1, 3)
+                    self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
+
+                    mote_info = MATERIALS.get("elemental_mote", {})
+                    loot_bundle[(mote_info.get("name", "Elemental Mote"), mote_info.get("rarity", "Uncommon"))] += mote_count
+
+                    # We add to actual_drops so quests/tournaments can track it
+                    for _ in range(mote_count):
+                        actual_drops.append("elemental_mote")
+        except Exception as e:
+            logger.error(f"Event loot error: {e}")
 
         # Material Drops (via Centralized Calculator)
         rolled_drops = LootCalculator.roll_drops(combat_result.get("drops", []), stats.luck, loot_boost)
