@@ -42,15 +42,16 @@ mock_discord.ui = mock_ui
 # We need to make sure we can import cogs.status_update_cog
 # We might need to add repo root to sys.path if not already there, but tests usually run from root.
 # Just in case:
-import os
+import os  # noqa: E402
+
 sys.path.insert(0, os.getcwd())
 
 try:
-    from cogs.status_update_cog import StatusUpdateView, BASE_STAT_COSTS # noqa: E402
+    from cogs.status_update_cog import StatusUpdateView  # noqa: E402
 except ImportError:
     # If import fails, we might be running from inside tests/
     sys.path.insert(0, os.path.dirname(os.getcwd()))
-    from cogs.status_update_cog import StatusUpdateView, BASE_STAT_COSTS # noqa: E402
+    from cogs.status_update_cog import StatusUpdateView  # noqa: E402
 
 
 class TestVPCostCurve(unittest.TestCase):
