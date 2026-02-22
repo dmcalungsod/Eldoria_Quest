@@ -6,8 +6,9 @@ on:
     types:
       - completed
   schedule:
-    # Run daily at midnight
+    # Run daily at midnight (UTC), which is 8 AM Philippine Standard Time (PST)
     - cron: '0 0 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -44,7 +45,7 @@ jobs:
 
   cleanup-branches:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'schedule' }}
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
