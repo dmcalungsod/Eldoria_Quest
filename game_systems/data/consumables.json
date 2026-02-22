@@ -158,5 +158,21 @@
         "effect": {"LCK": 4, "duration_s": 180},
         "rarity": "Rare",
         "description": "A whispered toast to fortune; coins seem to fall kinder."
+    },
+    "volatile_brew": {
+        "id": "volatile_brew",
+        "name": "Volatile Brew",
+        "type": "buff",
+        "effect": {"STR": 10, "DEF": -5, "duration_s": 60},
+        "rarity": "Rare",
+        "description": "A bubbling, unstable mixture. Grants immense power at a cost to safety."
+    },
+    "shadow_veil": {
+        "id": "shadow_veil",
+        "name": "Shadow Veil",
+        "type": "buff",
+        "effect": {"AGI": 5, "LCK": 5, "duration_s": 90},
+        "rarity": "Rare",
+        "description": "A liquid that seems to absorb light, making the drinker hard to track."
     }
 }

@@ -229,3 +229,18 @@ RECIPES = {
         "description": "Shape ancient wood into a sturdy plank.",
     },
 }
+
+# --- Hidden Experiment Recipes ---
+# Inputs are defined as sets of material keys.
+HIDDEN_RECIPES = [
+    {
+        "inputs": {"slime_gel", "fire_essence", "obsidian_shard"},
+        "output_key": "volatile_brew",
+        "output_amount": 1,
+    },
+    {
+        "inputs": {"spider_silk", "shadow_essence", "magic_stone_fragment"},
+        "output_key": "shadow_veil",
+        "output_amount": 1,
+    },
+]

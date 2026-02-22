@@ -127,8 +127,13 @@ class TestCraftingUI(unittest.TestCase):
         self.assertEqual(btn_equip.label, "Equipment")
         self.assertEqual(btn_equip.style, "secondary")  # Inactive
 
-        # Check Select Menu (Row 1)
-        select = view.children[3]
+        # Check Experiment Button (Row 0, index 3)
+        btn_exp = view.children[3]
+        self.assertEqual(btn_exp.label, "Experiment")
+        self.assertEqual(btn_exp.style, "success")
+
+        # Check Select Menu (Row 1, index 4)
+        select = view.children[4]
         # self.assertIsInstance(select, MockSelect) # MagicMock class check might fail, check attributes
         self.assertTrue(hasattr(select, "options"))
         self.assertIn("consumable", select.placeholder)
@@ -151,7 +156,7 @@ class TestCraftingUI(unittest.TestCase):
         self.assertEqual(btn_equip.style, "primary")  # Active
 
         # Check Select Menu
-        select = view.children[3]
+        select = view.children[4]
         self.assertIn("equipment", select.placeholder)
 
         # Should contain sword_1 but NOT potion_1

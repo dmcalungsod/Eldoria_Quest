@@ -14,6 +14,7 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.crafting.crafting_system import CraftingSystem
+from game_systems.crafting.ui.experiment_view import ExperimentView
 
 logger = logging.getLogger("eldoria.ui.crafting")
 
@@ -70,14 +71,23 @@ class CraftingView(View):
             custom_id="cat_dismantle",
             row=0,
         )
+        btn_experiment = Button(
+            label="Experiment",
+            style=discord.ButtonStyle.success,
+            custom_id="cat_experiment",
+            row=0,
+            emoji="🧪",
+        )
 
         btn_cons.callback = self.category_cons_callback
         btn_equip.callback = self.category_equip_callback
         btn_dismantle.callback = self.category_dismantle_callback
+        btn_experiment.callback = self.category_experiment_callback
 
         self.add_item(btn_cons)
         self.add_item(btn_equip)
         self.add_item(btn_dismantle)
+        self.add_item(btn_experiment)
 
         # Row 1: Select Menu
         if self.category == "dismantle":
@@ -189,6 +199,24 @@ class CraftingView(View):
 
     async def category_dismantle_callback(self, interaction: discord.Interaction):
         await self._switch_category(interaction, "dismantle")
+
+    async def category_experiment_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
+        # Capture original back button logic
+        original_back_callback = self.back_button.callback
+        original_back_label = self.back_button.label
+
+        async def return_to_crafting(inter: discord.Interaction):
+            await inter.response.defer()
+            view = CraftingView(self.db, self.interaction_user, category="consumable")
+            view.set_back_button(original_back_callback, original_back_label)
+            embed = view.build_embed()
+            await inter.edit_original_response(embed=embed, view=view)
+
+        new_view = ExperimentView(self.db, self.interaction_user, back_callback=return_to_crafting)
+        embed = new_view.build_embed()
+        await interaction.edit_original_response(embed=embed, view=new_view)
 
     async def _switch_category(self, interaction: discord.Interaction, category: str):
         if self.category == category:

@@ -12,7 +12,7 @@ from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.materials import MATERIALS
-from game_systems.data.recipes import RECIPES
+from game_systems.data.recipes import RECIPES, HIDDEN_RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
 
@@ -286,3 +286,87 @@ class CraftingSystem:
         except Exception as e:
             logger.error(f"Dismantle error for {discord_id}: {e}", exc_info=True)
             return False, "An error occurred during dismantling.", None
+
+    def experiment(self, discord_id: int, material_inv_ids: list[int]) -> tuple[bool, str, dict | None]:
+        """
+        Attempts to discover a recipe by combining materials.
+        material_inv_ids: List of inventory IDs (primary keys) to consume.
+        """
+        # 1. Fetch Items and Validate Ownership
+        input_keys = []
+
+        # Check for duplicates in input IDs
+        if len(material_inv_ids) != len(set(material_inv_ids)):
+            return False, "Cannot use the same item stack multiple times.", None
+
+        for inv_id in material_inv_ids:
+            item = self.db.get_inventory_item(discord_id, inv_id)
+            if not item:
+                return False, "One or more materials not found.", None
+            if item["item_type"] != "material":
+                return False, "Only materials can be used for experiments.", None
+
+            input_keys.append(item["item_key"])
+
+        # 2. Check for Match
+        input_set = set(input_keys)
+        match = None
+
+        for recipe in HIDDEN_RECIPES:
+            if recipe["inputs"] == input_set:
+                match = recipe
+                break
+
+        try:
+            # 3. Consume Materials (Atomic-ish)
+            for inv_id in material_inv_ids:
+                if not self.db.consume_item_atomic(inv_id, 1):
+                    logger.error(f"Failed to consume {inv_id} during experiment for {discord_id}")
+
+            if match:
+                # 4. Success Logic
+                output_key = match["output_key"]
+                output_amount = match["output_amount"]
+
+                # Check what type of item it is
+                item_data = CONSUMABLES.get(output_key)
+                item_type = "consumable"
+                if not item_data:
+                    # Check Materials
+                    item_data = MATERIALS.get(output_key)
+                    item_type = "material"
+
+                if not item_data:
+                    return False, f"System Error: Output {output_key} not defined.", None
+
+                final_name = item_data["name"]
+
+                self.db.add_inventory_item(
+                    discord_id,
+                    output_key,
+                    final_name,
+                    item_type,
+                    item_data["rarity"],
+                    output_amount,
+                )
+
+                logger.info(f"User {discord_id} discovered {output_key} via experiment.")
+                return True, f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!", item_data
+
+            else:
+                # 5. Failure Logic (Add Slag)
+                slag_data = MATERIALS.get("slag")
+                if slag_data:
+                    self.db.add_inventory_item(
+                        discord_id,
+                        "slag",
+                        slag_data["name"],
+                        "material",
+                        slag_data["rarity"],
+                        1,
+                    )
+                return False, "The mixture turns volatile and collapses into useless slag.", None
+
+        except Exception as e:
+            logger.error(f"Experiment error for {discord_id}: {e}", exc_info=True)
+            return False, "An error occurred during experimentation.", None

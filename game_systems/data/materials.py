@@ -342,4 +342,11 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 80,
     },
+    # --- Alchemical Byproducts ---
+    "slag": {
+        "name": "Alchemical Slag",
+        "description": "A useless lump of burnt material from a failed experiment.",
+        "rarity": "Common",
+        "value": 1,
+    },
 }
