@@ -168,8 +168,13 @@ class DeveloperCog(commands.Cog):
         self.db = DatabaseManager()
 
     @app_commands.command(name="devpanel", description="[Owner Only] Developer Controls")
-    @commands.is_owner()
     async def dev_panel(self, interaction: discord.Interaction):
+        # SECURITY: Manual check to ensure only the owner can access this panel.
+        # This is more robust than relying solely on decorators for app_commands.
+        if not await self.bot.is_owner(interaction.user):
+            await interaction.response.send_message("⛔ You are not the bot owner.", ephemeral=True)
+            return
+
         await interaction.response.defer(ephemeral=True)
 
         p_data = await asyncio.to_thread(self.db.get_player, interaction.user.id)
@@ -186,11 +191,11 @@ class DeveloperCog(commands.Cog):
 
     @dev_panel.error
     async def dev_error(self, interaction: discord.Interaction, error):
-        if isinstance(error, commands.NotOwner):
-            logger.warning(f"Unauthorized admin attempt by {interaction.user} ({interaction.user.id})")
-            await interaction.response.send_message("⛔ You are not the bot owner.", ephemeral=True)
-        else:
-            logger.error(f"Dev panel error: {error}")
+        logger.error(f"Dev panel error: {error}", exc_info=True)
+        if not interaction.response.is_done():
+            await interaction.response.send_message(
+                "❌ An error occurred while loading the developer panel.", ephemeral=True
+            )
 
 
 async def setup(bot: commands.Bot):
