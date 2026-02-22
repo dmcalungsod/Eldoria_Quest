@@ -10,37 +10,75 @@ from database.database_manager import DatabaseManager
 class RankSystem:
     # Static Configuration
     RANKS = {
-        "F": {"title": "Initiate", "next_rank": "E", "requirements": {"quests_completed": 3, "normal_kills": 25}},
+        "F": {
+            "title": "Initiate",
+            "next_rank": "E",
+            "requirements": {"quests_completed": 3, "normal_kills": 40},
+        },
         "E": {
             "title": "Novice",
             "next_rank": "D",
-            "requirements": {"quests_completed": 10, "normal_kills": 80, "elite_kills": 5},
+            "requirements": {
+                "quests_completed": 10,
+                "normal_kills": 100,
+                "elite_kills": 5,
+            },
         },
         "D": {
             "title": "Apprentice",
             "next_rank": "C",
-            "requirements": {"quests_completed": 20, "normal_kills": 250, "elite_kills": 20, "boss_kills": 1},
+            "requirements": {
+                "quests_completed": 20,
+                "normal_kills": 250,
+                "elite_kills": 20,
+                "boss_kills": 1,
+            },
         },
         "C": {
             "title": "Adept",
             "next_rank": "B",
-            "requirements": {"quests_completed": 30, "normal_kills": 400, "elite_kills": 50, "boss_kills": 5},
+            "requirements": {
+                "quests_completed": 30,
+                "normal_kills": 400,
+                "elite_kills": 50,
+                "boss_kills": 5,
+            },
         },
-        "B": {"title": "Veteran", "next_rank": "A", "requirements": {"quests_completed": 40, "boss_kills": 10}},
+        "B": {
+            "title": "Veteran",
+            "next_rank": "A",
+            "requirements": {
+                "quests_completed": 40,
+                "boss_kills": 10,
+                "elite_kills": 65,
+            },
+        },
         "A": {
             "title": "Master",
             "next_rank": "S",
-            "requirements": {"quests_completed": 50, "boss_kills": 20, "elite_kills": 80},
+            "requirements": {
+                "quests_completed": 50,
+                "boss_kills": 20,
+                "elite_kills": 80,
+            },
         },
         "S": {
             "title": "Elite",
             "next_rank": "SS",
-            "requirements": {"quests_completed": 60, "boss_kills": 35, "elite_kills": 120},
+            "requirements": {
+                "quests_completed": 60,
+                "boss_kills": 35,
+                "elite_kills": 120,
+            },
         },
         "SS": {
             "title": "Paragon",
             "next_rank": "SSS",
-            "requirements": {"quests_completed": 70, "boss_kills": 50, "elite_kills": 200},
+            "requirements": {
+                "quests_completed": 70,
+                "boss_kills": 50,
+                "elite_kills": 200,
+            },
         },
         "SSS": {"title": "Mythic", "next_rank": None, "requirements": {}},
     }
