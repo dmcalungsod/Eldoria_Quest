@@ -60,7 +60,7 @@ commands_mock.Bot = MockBotBase
 # Now import main
 import main  # noqa: E402
 
-async def test_sync_logic():
+async def _test_sync_logic_async():
     print("Testing sync logic...")
 
     # 1. Test with GUILD_ID set (simulated dev environment)
@@ -119,5 +119,9 @@ async def test_sync_logic():
     else:
         print("FAIL: Global sync NOT called.")
 
+def test_sync_logic():
+    """Wrapper to run async test logic in pytest environment without plugins."""
+    asyncio.run(_test_sync_logic_async())
+
 if __name__ == "__main__":
-    asyncio.run(test_sync_logic())
+    test_sync_logic()
