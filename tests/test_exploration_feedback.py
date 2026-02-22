@@ -80,8 +80,8 @@ mock_embeds.AdventureEmbeds.build_exploration_embed.return_value = MagicMock()
 sys.modules["game_systems.adventure.ui.adventure_embeds"] = mock_embeds
 
 # Now import the module under test
-from game_systems.adventure.ui.exploration_view import ExplorationView
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.ui.exploration_view import ExplorationView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):

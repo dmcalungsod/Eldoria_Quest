@@ -77,12 +77,11 @@ class _Select(_Item):
 class _SelectOption:
     """Minimal stand-in for discord.SelectOption."""
 
-    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+    def __init__(self, label=None, value=None, description=None, emoji=None):
         self.label = label
         self.value = value
         self.description = description
         self.emoji = emoji
-        self.default = default
 
 
 # ──────────────────────────────────────────────────────────────
