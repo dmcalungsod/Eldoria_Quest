@@ -15,8 +15,3 @@ jobs:
         run: |
           git clone --mirror https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
           git push --prune https://${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot.git +refs/heads/*:refs/heads/* +refs/tags/*:refs/tags/*
-
-      - name: Trigger Render Deployment
-        if: success()
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
