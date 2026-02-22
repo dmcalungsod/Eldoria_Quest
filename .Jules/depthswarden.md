@@ -24,3 +24,11 @@
 - **Mechanics:** Introduced `ATMOSPHERE_CLOCKWORK` for immersive audio-visual cues (grinding gears, steam).
 - **Economy:** Added `brass_gear`, `copper_wire`, `spring_coil`, `steam_core`, and `clockwork_heart` to support mid-tier crafting.
 - **Challenge:** Designed "The Gear Warden" (Level 26 Boss) with `steam_vent` to test magical mitigation.
+
+## 2025-10-30 — Exploration Events
+
+**Learning:** Exploration felt repetitive, consisting mainly of combat or generic gathering. Players lacked meaningful non-combat interactions that offered risk/reward choices.
+**Action:** Implemented the `ExplorationEvents` system.
+- **Mechanics:** Added 15% chance for special events: Safe Rooms (Heal), Hidden Stashes (Loot), Ancient Shrines (XP), and Traps (Damage).
+- **Immersion:** Added unique flavor text for each event type.
+- **Progression:** Provided alternative ways to sustain runs (Healing) or gain resources (Loot/XP) outside of combat.
