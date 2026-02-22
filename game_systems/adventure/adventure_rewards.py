@@ -241,11 +241,18 @@ class AdventureRewards:
         for q in quests:
             progress_made = False
             objs = q.get("objectives", {})
+            flavor_text = q.get("flavor_text", {})
+            added_flavors = set()
 
             # Defeat check
             if "defeat" in objs and monster_name in objs["defeat"]:
                 quest_system.update_progress(self.discord_id, q["id"], "defeat", monster_name)
                 progress_made = True
+
+                # Check for flavor text
+                key = f"defeat:{monster_name}"
+                if key in flavor_text:
+                    logs.append(f"\n*{flavor_text[key]}*")
 
             # Collect check
             if "collect" in objs:
@@ -254,6 +261,12 @@ class AdventureRewards:
                     if dk in objs["collect"]:
                         quest_system.update_progress(self.discord_id, q["id"], "collect", dk)
                         progress_made = True
+
+                        # Check for flavor text (avoid spamming if multiple drop)
+                        key = f"collect:{dk}"
+                        if key in flavor_text and key not in added_flavors:
+                            logs.append(f"\n*{flavor_text[key]}*")
+                            added_flavors.add(key)
 
             if progress_made:
                 updated.append(q["title"])
