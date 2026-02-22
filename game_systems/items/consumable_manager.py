@@ -64,30 +64,26 @@ class ConsumableManager:
             # -- Heal Logic --
             if "heal" in effect:
                 heal_amount = effect["heal"]
-                if current_hp >= max_hp:
-                    return False, "You are already at full health."
+                if current_hp < max_hp:
+                    old_hp = current_hp
+                    new_hp = min(current_hp + heal_amount, max_hp)
+                    healed_for = new_hp - old_hp
 
-                old_hp = current_hp
-                new_hp = min(current_hp + heal_amount, max_hp)
-                healed_for = new_hp - old_hp
-
-                current_hp = new_hp
-                message_lines.append(f"You healed for {healed_for} HP.")
-                item_used = True
+                    current_hp = new_hp
+                    message_lines.append(f"You healed for {healed_for} HP.")
+                    item_used = True
 
             # -- Mana Logic --
             if "mana" in effect:
                 mana_amount = effect["mana"]
-                if current_mp >= max_mp:
-                    return False, "You are already at full mana."
+                if current_mp < max_mp:
+                    old_mp = current_mp
+                    new_mp = min(current_mp + mana_amount, max_mp)
+                    restored_for = new_mp - old_mp
 
-                old_mp = current_mp
-                new_mp = min(current_mp + mana_amount, max_mp)
-                restored_for = new_mp - old_mp
-
-                current_mp = new_mp
-                message_lines.append(f"You restored {restored_for} MP.")
-                item_used = True
+                    current_mp = new_mp
+                    message_lines.append(f"You restored {restored_for} MP.")
+                    item_used = True
 
             # -- Buff Logic --
             is_buff_item = item_data.get("type") == "buff"
@@ -120,7 +116,14 @@ class ConsumableManager:
                     item_used = True
 
             if not item_used:
-                return False, "This item has no usable effect right now."
+                if "heal" in effect and "mana" in effect:
+                    return False, "You are already at full health and mana."
+                elif "heal" in effect:
+                    return False, "You are already at full health."
+                elif "mana" in effect:
+                    return False, "You are already at full mana."
+                else:
+                    return False, "This item has no usable effect right now."
 
             # 5. Consume Item Atomically (Fixes Race Condition)
             # We do this BEFORE applying effects to prevent duplication
