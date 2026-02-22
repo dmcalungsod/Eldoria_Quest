@@ -4,7 +4,7 @@
 Transform Eldoria Quest from manual turn-based exploration to a time-based auto-adventure system.
 
 **Design Document:** `.Jules/timeweaver_design.md`
-**Status:** 🚀 **Phase 0: Foundation (Starting)**
+**Status:** 🚀 **Phase 0: Foundation (Running)**
 
 ---
 
@@ -12,15 +12,17 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ### Phase 0: Foundation (Database & Scheduler)
 **Focus:** Backend infrastructure to support time-based sessions.
-- [ ] **Task 0.1:** Design `adventure_sessions` schema & update `DatabaseManager`.
+- [x] **Task 0.1:** Design `adventure_sessions` schema & update `DatabaseManager`.
     - **Agent:** @DataSteward / @SystemSmith
-    - **Details:** Add `start_time`, `end_time`, `duration_minutes`, `location_id`, `active`, `supplies`.
+    - **Status:** **Completed** (Schema exists in `database_manager.py`).
 - [ ] **Task 0.2:** Implement background scheduler (`cogs/adventure_loop.py`).
     - **Agent:** @SystemSmith
+    - **Priority:** **Blocking**
     - **Details:** Loop every 1 min, query `get_adventures_ending_before(now)`, mark `notification_sent`.
-- [ ] **Task 0.3:** Create basic `AdventureResolutionEngine` structure (stub).
+- [ ] **Task 0.3:** Implement `AdventureResolutionEngine` logic.
     - **Agent:** @SystemSmith
-    - **Details:** Class with `calculate_step(player, location)` method structure.
+    - **Priority:** **Blocking**
+    - **Details:** Automated loop calling `AdventureSession.simulate_step` for full duration.
 
 ### Phase 1: Core Loop (UI & Logic)
 **Focus:** Enabling players to start and complete basic adventures.
@@ -29,10 +31,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Details:** Dropdowns for Location & Duration. "Embark" button.
 - [ ] **Task 1.2:** Update `/adventure` command to use new View.
     - **Agent:** @Palette
-- [ ] **Task 1.3:** Implement `AdventureResolutionEngine` logic.
-    - **Agent:** @SystemSmith / @Tactician
-    - **Details:** Step-by-step simulation (Combat/Gather/Event rolls).
-- [ ] **Task 1.4:** Create `AdventureReportEmbed` for results.
+- [ ] **Task 1.3:** Create `AdventureReportEmbed` for results.
     - **Agent:** @Palette
     - **Details:** Summary of loot, XP, battles, HP lost.
 
@@ -68,5 +67,11 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ---
 
+## 🏗️ Parallel Projects
+*   **The Alchemist Class:** Design Phase (Namewright). Pending ID coordination.
+*   **The Frostfall Expanse:** Design Phase (Architect). ID Conflict Resolved (Already implemented as 111-115).
+*   **Codex & Bestiary:** Proposed (Codex Keeper). Pending approval.
+
 ## 📝 Activity Log
+- **2026-02-23:** Resumed project. Verified Phase 0.1 completion. Assigned Scheduler (0.2) and Engine (0.3) to SystemSmith.
 - **2025-10-29:** Plan created. Phase 0 initiated.
