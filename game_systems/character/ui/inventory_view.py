@@ -185,7 +185,8 @@ class InventoryView(View):
 
     async def _refresh(self, interaction: discord.Interaction):
         items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
-        embed = build_inventory_embed(items)
+        max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
+        embed = build_inventory_embed(items, max_slots)
 
         new_view = InventoryView(self.db, self.interaction_user, self.previous_view_callback, self.previous_view_label)
         await interaction.edit_original_response(embed=embed, view=new_view)

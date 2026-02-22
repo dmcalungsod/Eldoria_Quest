@@ -79,8 +79,9 @@ class AbilitiesView(View):
 
         try:
             items = await asyncio.to_thread(self.inventory_manager.get_inventory, self.interaction_user.id)
+            max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
             # build_inventory_embed is CPU bound (formatting), safe to run in thread
-            embed = await asyncio.to_thread(build_inventory_embed, items)
+            embed = await asyncio.to_thread(build_inventory_embed, items, max_slots)
 
             view = InventoryView(
                 self.db,
