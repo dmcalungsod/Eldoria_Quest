@@ -1,21 +1,31 @@
 [
   {
     "id": 1,
-    "title": "Culling the Slimes",
+    "title": "The Ooze that Whispers",
     "tier": "F",
     "quest_giver": "Farmer Tallen",
     "location": "Willowcreek Outskirts",
-    "summary": "Slimes are devouring crops and farm tools.",
-    "description": "Moisture from the Broken Veil has thickened the forest air, spawning an abnormal number of Forest Slimes. Farmer Tallen\u2019s fields have become a slow-moving tide of gelatinous pests. He seeks someone willing to drive them back before planting season is ruined.",
+    "summary": "Farmer Tallen fears the slimes are watching him.",
+    "description": "Farmer Tallen is terrified. The slimes aren't just eating crops; they are *watching* him. He swears one formed a face that looked like his late wife. He needs you to kill them and bring back samples to the Alchemist, but he's too scared to touch them.",
     "objectives": {
       "defeat": {
-        "Verdant Slime": 5,
-        "Glimmer Slime": 5
+        "Verdant Slime": 5
+      },
+      "collect": {
+        "slime_gel": 3
+      },
+      "examine": {
+        "pulsing_puddle": 1
       }
     },
+    "flavor_text": {
+      "defeat:Verdant Slime": "The slime dissolves with a sound like a sigh. Was that... relief?",
+      "collect:slime_gel": "The gel is warm and vibrates faintly in your flask.",
+      "examine:pulsing_puddle": "You find a puddle of slime that isn't evaporating. It ripples in a pattern... almost like a heartbeat."
+    },
     "rewards": {
-      "exp": 250,
-      "aurum": 60,
+      "exp": 300,
+      "aurum": 80,
       "item": "Dewfall Tonic"
     }
   },
