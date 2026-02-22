@@ -16,8 +16,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 if os.path.basename(os.getcwd()) != 'tests':
     sys.path.insert(0, os.getcwd())
 
-from game_systems.player.player_stats import PlayerStats
-from database.database_manager import DatabaseManager, BASE_INVENTORY_SLOTS
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from database.database_manager import DatabaseManager, BASE_INVENTORY_SLOTS  # noqa: E402
 
 class TestInventoryCapacity(unittest.TestCase):
     def setUp(self):
