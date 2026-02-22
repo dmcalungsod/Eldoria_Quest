@@ -426,14 +426,18 @@ class CombatEngine:
             dmg = int(dmg * self.dmg_dealt_mult)
 
         # Apply Special Effects
+        # Equilibrium Fix: Ensure force_crit (Interrupts) always triggers crit damage
+        # even if the ability has its own crit chance roll.
+        is_lucky_crit = False
         if spec.get("crit_bonus"):
             if random.randint(1, 100) <= spec["crit_bonus"]:
-                dmg = int(dmg * 1.5)
-                crit = True
-                event_type = "crit"
+                is_lucky_crit = True
 
-        if force_crit and not spec.get("crit_bonus"): # Apply crit bonus if forced and not already applied
-             dmg = int(dmg * 1.5)
+        if is_lucky_crit or force_crit:
+            # Only apply multiplier once
+            dmg = int(dmg * 1.5)
+            crit = True
+            event_type = "crit"
 
         if spec.get("heal"):
             heal_amount = spec["heal"] + int(self.player.level * 2)
