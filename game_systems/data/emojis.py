@@ -40,6 +40,8 @@ FIRE = "🔥"
 BUFF = "✨"  # Alias for EXP
 VICTORY = "🏆"
 DEFEAT = "💀"
+DODGE = "💨"
+DAMAGE = "🩸"
 
 # Stats (Eldoria System)
 STR = "💪"  # Strength
@@ -70,6 +72,8 @@ GEAR = "⚙️"
 HERB = "🌿"
 SWORDS = "⚔️"
 SKULL = "💀"
+TRAP = "🪤"
+LOOT = "💰"
 
 # Narrative / Class Specific
 HEART = "💔"

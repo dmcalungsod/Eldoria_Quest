@@ -416,6 +416,39 @@ class AdventureEvents:
         f"{E.EXP} Navigating the rough terrain grants you **{{}} XP**.",
     ]
 
+    # --- SPECIAL EVENT PHRASES ---
+    SAFE_ROOM_PHRASES = [
+        f"{E.HEAL} You discover a hidden sanctuary, untouched by the dungeon's corruption.",
+        f"{E.HEAL} A secure chamber with a fresh spring offers a moment of true respite.",
+        f"{E.HEAL} You stumble into a fortified camp left by previous explorers.",
+        f"{E.HEAL} A circle of protective runes keeps the monsters at bay.",
+        f"{E.HEAL} You find a sunlit glade where the air feels pure and healing.",
+    ]
+
+    HIDDEN_STASH_PHRASES = [
+        f"{E.LOOT} You notice a loose stone and pry it open to reveal a hidden cache!",
+        f"{E.LOOT} Hidden within a hollow tree, you find a stash of supplies.",
+        f"{E.LOOT} You uncover a buried chest, its lock long since rusted away.",
+        f"{E.LOOT} A skeleton clutches a bag of valuables—you relieve it of its burden.",
+        f"{E.LOOT} You spot a glimmer in the debris and dig out a forgotten treasure.",
+    ]
+
+    ANCIENT_SHRINE_PHRASES = [
+        f"{E.EXP} You kneel before an ancient shrine, and knowledge flows into your mind.",
+        f"{E.EXP} Touching the monolith, you see visions of the dungeon's history.",
+        f"{E.EXP} The inscriptions on the wall glow, imparting forgotten secrets.",
+        f"{E.EXP} You meditate at a place of power, expanding your understanding.",
+        f"{E.EXP} A spectral guide appears briefly, pointing the way forward.",
+    ]
+
+    TRAP_PHRASES = [
+        f"{E.TRAP} **CLICK.** You trigger a hidden mechanism!",
+        f"{E.TRAP} The ground gives way beneath your feet!",
+        f"{E.TRAP} A tripwire snaps, releasing a swinging log!",
+        f"{E.TRAP} Poisonous darts fly from the walls!",
+        f"{E.TRAP} You step on a rune that explodes with magical force!",
+    ]
+
     @staticmethod
     def regeneration(
         location_id: str | None = None,
@@ -531,6 +564,18 @@ class AdventureEvents:
         if reward_type == "aurum":
             return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
         return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+
+    @staticmethod
+    def special_event_flavor(event_key: str) -> str:
+        if event_key == "safe_room":
+            return random.choice(AdventureEvents.SAFE_ROOM_PHRASES)
+        elif event_key == "hidden_stash":
+            return random.choice(AdventureEvents.HIDDEN_STASH_PHRASES)
+        elif event_key == "ancient_shrine":
+            return random.choice(AdventureEvents.ANCIENT_SHRINE_PHRASES)
+        elif event_key == "trap_pit":
+            return random.choice(AdventureEvents.TRAP_PHRASES)
+        return "*A strange event occurs.*"
 
     @staticmethod
     def no_event_found() -> str:

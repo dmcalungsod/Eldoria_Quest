@@ -20,6 +20,7 @@ from game_systems.data.materials import MATERIALS
 from game_systems.world_time import Weather, WorldTime
 
 from .adventure_events import AdventureEvents
+from .exploration_events import ExplorationEvents
 
 logger = logging.getLogger("eldoria.events")
 
@@ -29,6 +30,7 @@ class EventHandler:
         self.db = db
         self.quest_system = quest_system
         self.discord_id = discord_id
+        self.exploration = ExplorationEvents(db)
 
     def resolve_non_combat(
         self,
@@ -44,6 +46,18 @@ class EventHandler:
             if random.randint(1, 100) <= regen_chance:
                 return self._perform_regeneration(context, location_id, weather, event_type)
             else:
+                # --- SPECIAL EXPLORATION EVENT (15% Chance) ---
+                if location_id and location_id in LOCATIONS:
+                    special_events = LOCATIONS[location_id].get("special_events", [])
+                    # 15% chance to trigger a special event if available
+                    if special_events and random.random() < 0.15:
+                        event_key = random.choice(special_events)
+                        result = self.exploration.handle_event(event_key, context)
+                        # Prepend newline to first log for formatting
+                        if result["log"]:
+                            result["log"][0] = f"\n{result['log'][0]}"
+                        return result
+
                 return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)

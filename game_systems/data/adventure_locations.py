@@ -34,6 +34,7 @@ LOCATIONS = {
             ("medicinal_herb", 70),
             ("magic_stone_fragment", 30),
         ],
+        "special_events": ["safe_room", "hidden_stash"],
     },
     "whispering_thicket": {
         "name": "Whispering Thicket",
@@ -59,6 +60,7 @@ LOCATIONS = {
             ("ancient_wood", 40),
             ("magic_stone_small", 20),
         ],
+        "special_events": ["hidden_stash", "trap_pit"],
     },
     "deepgrove_roots": {
         "name": "Deepgrove Roots",
@@ -83,6 +85,7 @@ LOCATIONS = {
             ("iron_ore", 30),
             ("magic_stone_medium", 20),
         ],
+        "special_events": ["trap_pit", "ancient_shrine"],
     },
     "shrouded_fen": {
         "name": "The Shrouded Fen",
@@ -120,6 +123,7 @@ LOCATIONS = {
             ("iron_ore", 20),
             ("magic_stone_medium", 20),
         ],
+        "special_events": ["safe_room", "trap_pit"],
     },
     "sunken_grotto": {
         "name": "The Sunken Grotto",
@@ -152,6 +156,7 @@ LOCATIONS = {
             ("magic_stone_medium", 20),
             ("bioluminescent_scale", 10),
         ],
+        "special_events": ["hidden_stash", "ancient_shrine"],
     },
     "crystal_caverns": {
         "name": "The Crystal Caverns",
@@ -183,6 +188,7 @@ LOCATIONS = {
             ("mithril_ore", 30),
             ("magic_stone_medium", 30),
         ],
+        "special_events": ["safe_room", "ancient_shrine"],
     },
     "clockwork_halls": {
         "name": "The Clockwork Halls",
@@ -215,6 +221,7 @@ LOCATIONS = {
             ("spring_coil", 20),
             ("magic_stone_medium", 10),
         ],
+        "special_events": ["trap_pit", "hidden_stash"],
     },
     "molten_caldera": {
         "name": "The Molten Caldera",
@@ -247,6 +254,7 @@ LOCATIONS = {
             ("magma_core", 20),
             ("magic_stone_large", 10),
         ],
+        "special_events": ["trap_pit", "safe_room"],
     },
     "frostfall_expanse": {
         "name": "The Frostfall Expanse",
@@ -278,6 +286,7 @@ LOCATIONS = {
             ("winter_wolf_pelt", 30),
             ("magic_stone_medium", 30),
         ],
+        "special_events": ["safe_room", "hidden_stash"],
     },
     "void_sanctum": {
         "name": "The Void Sanctum",
@@ -310,6 +319,7 @@ LOCATIONS = {
             ("entropy_crystal", 20),
             ("magic_stone_flawless", 10),
         ],
+        "special_events": ["trap_pit", "ancient_shrine"],
     },
     "guild_arena": {
         "name": "Guild Proving Grounds",
