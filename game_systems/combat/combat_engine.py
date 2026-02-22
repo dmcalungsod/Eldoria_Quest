@@ -85,6 +85,7 @@ class CombatEngine:
         stats_dict: dict = None,
         action: str = "auto",
         player_stance: str = "balanced",
+        weather_modifiers: dict = None,
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -96,6 +97,7 @@ class CombatEngine:
         stats_dict → Cached dictionary of player stats to avoid property overhead
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
         player_stance -> "aggressive", "balanced", or "defensive"
+        weather_modifiers -> Dict of weather effects (e.g. {"fire_dmg": 0.8})
         """
         self.player = player
         self.monster = monster
@@ -119,6 +121,7 @@ class CombatEngine:
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
         self.action = action
+        self.weather_modifiers = weather_modifiers or {}
 
         # Stance Logic
         self.player_stance = player_stance
@@ -133,6 +136,23 @@ class CombatEngine:
             self.dmg_dealt_mult = 0.8
             self.dmg_taken_mult = 0.8
 
+    def _process_weather_effects(self):
+        msgs = []
+        dot_pct = self.weather_modifiers.get("dot_hp_percent", 0)
+        if dot_pct > 0:
+            # Player DoT
+            p_dmg = max(1, int(self.stats_dict.get("HP", 100) * dot_pct))
+            self.player_hp = max(0, self.player_hp - p_dmg)
+
+            # Monster DoT
+            m_dmg = max(1, int(self.monster.get("max_hp", self.monster_hp) * dot_pct))
+            self.monster_hp = max(0, self.monster_hp - m_dmg)
+
+            flavor = self.weather_modifiers.get("dot_message", "The environment damages you.")
+            msgs.append(f"{flavor} (You: -{p_dmg}, Enemy: -{m_dmg})")
+
+        return msgs
+
     def run_combat_turn(self):
         """
         Runs ONE turn of combat.
@@ -140,6 +160,19 @@ class CombatEngine:
         """
         log = []
         log.append(f"\n--- {E.COMBAT} Turn ---")
+
+        # Process Weather Effects
+        weather_msgs = self._process_weather_effects()
+        if weather_msgs:
+            log.extend(weather_msgs)
+
+        # Check death from weather before proceeding?
+        if self.player_hp <= 0:
+            logger.info("Combat End: Player defeated by environment.")
+            return self._monster_victory(log, {})
+        if self.monster_hp <= 0:
+            logger.info("Combat End: Monster defeated by environment.")
+            return self._player_victory(log, {})
 
         # Process Buffs
         buff_msgs = MonsterAI.handle_buffs(self.monster)
@@ -262,7 +295,9 @@ class CombatEngine:
                 action = MonsterAI.choose_action(self.monster, self.monster_hp, self.monster.get("MP", 0))
 
                 if action["type"] == "attack":
-                    dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.stats_dict)
+                    dmg, crit, event_type = DamageFormula.monster_attack(
+                        self.monster, self.stats_dict, self.weather_modifiers
+                    )
 
                     # Apply Stance Multiplier
                     if self.dmg_taken_mult != 1.0:
@@ -270,6 +305,8 @@ class CombatEngine:
 
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
+                    elif event_type == "miss":
+                        log.append(f"🌫️ The {self.monster.get('name', 'enemy')} misses due to poor visibility!")
                     else:
                         turn_report["hits_taken"] = 1
                         if player_defending:
@@ -298,7 +335,9 @@ class CombatEngine:
                         log.append(CombatPhrases.monster_heal(self.monster, skill, heal))
                     else:
                         # --- Monster Offensive Skill ---
-                        dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+                        dmg, crit, event_type = DamageFormula.monster_skill(
+                            self.monster, self.stats_dict, skill, self.weather_modifiers
+                        )
 
                         # Apply Stance Multiplier
                         if self.dmg_taken_mult != 1.0:
@@ -306,6 +345,8 @@ class CombatEngine:
 
                         if event_type == "dodge":
                             turn_report["player_dodge"] = 1
+                        elif event_type == "miss":
+                            log.append(f"🌫️ The {self.monster.get('name', 'enemy')} misses due to poor visibility!")
                         else:
                             turn_report["hits_taken"] = 1
                             if player_defending:
@@ -339,7 +380,9 @@ class CombatEngine:
                     mp_cost = skill.get("mp_cost", 0)
                     self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
 
-                    dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+                    dmg, crit, event_type = DamageFormula.monster_skill(
+                        self.monster, self.stats_dict, skill, self.weather_modifiers
+                    )
 
                     # Apply Stance Multiplier
                     if self.dmg_taken_mult != 1.0:
@@ -347,6 +390,8 @@ class CombatEngine:
 
                     if event_type == "dodge":
                         turn_report["player_dodge"] = 1
+                    elif event_type == "miss":
+                        log.append(f"🌫️ The {self.monster.get('name', 'enemy')} misses due to poor visibility!")
                     else:
                         turn_report["hits_taken"] = 1
                         emoji = skill.get("emoji", "🔥")
@@ -407,7 +452,13 @@ class CombatEngine:
         log.append(f"{spec['emoji']} **{spec['name']}**: {spec['log']}")
 
         # Base Damage Calculation
-        base_dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+        base_dmg, crit, event_type = DamageFormula.player_attack(
+            self.stats_dict, self.monster, self.weather_modifiers
+        )
+
+        if event_type == "miss":
+            log.append(f"🌫️ You miss due to poor visibility!")
+            return
 
         if force_crit:
             crit = True
@@ -476,7 +527,13 @@ class CombatEngine:
 
         else:
             # --- Offensive Skill ---
-            dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, self.monster, skill, skill_level)
+            dmg, crit, event_type = DamageFormula.player_skill(
+                self.stats_dict, self.monster, skill, skill_level, self.weather_modifiers
+            )
+
+            if event_type == "miss":
+                log.append(f"🌫️ You miss due to poor visibility!")
+                return
 
             if force_crit:
                 crit = True
@@ -498,7 +555,13 @@ class CombatEngine:
 
     def _perform_basic_attack(self, log, turn_report, force_crit=False):
         # --- Basic Attack ---
-        dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+        dmg, crit, event_type = DamageFormula.player_attack(
+            self.stats_dict, self.monster, self.weather_modifiers
+        )
+
+        if event_type == "miss":
+            log.append(f"🌫️ You miss due to poor visibility!")
+            return
 
         if force_crit:
             crit = True
