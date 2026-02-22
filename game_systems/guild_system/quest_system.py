@@ -234,9 +234,18 @@ class QuestSystem:
             if not pq:
                 return False, f"{ERROR} Quest inactive or already completed."
 
-            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1})
+            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "rewards": 1})
             if not quest:
                 return False, f"{ERROR} Quest definition not found."
+
+            # --- PRE-VALIDATION: Ensure Rewards are Valid ---
+            try:
+                if isinstance(quest.get("rewards"), str):
+                    json.loads(quest["rewards"])
+            except json.JSONDecodeError:
+                logger.error(f"Critical: Corrupt reward JSON for quest {quest_id}")
+                return False, f"{ERROR} System error: Reward data corrupted. Please report this."
+            # ------------------------------------------------
 
             progress = json.loads(pq["progress"]) if isinstance(pq["progress"], str) else pq["progress"]
             objectives = (

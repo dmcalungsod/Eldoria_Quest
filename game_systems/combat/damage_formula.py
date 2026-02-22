@@ -67,7 +67,7 @@ class DamageFormula:
     @staticmethod
     def player_skill(player_stats, monster, skill_data, skill_level: int):
         # Data-driven scaling
-        scaling_stat = skill_data.get("scaling_stat", "MAG")
+        scaling_stat = skill_data.get("scaling_stat", "MAG").upper()
         scaling_factor = float(skill_data.get("scaling_factor", 1.0))
 
         base_stat_value = DamageFormula._get_stat(player_stats, scaling_stat)
