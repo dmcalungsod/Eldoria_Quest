@@ -1,6 +1,5 @@
-
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -14,8 +13,9 @@ sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.results"] = MagicMock()
 
 # Import after mocking
-from game_systems.player.player_stats import PlayerStats
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestInventoryCapacity(unittest.TestCase):
     def test_capacity_scaling(self):
@@ -66,6 +66,7 @@ class TestInventoryCapacity(unittest.TestCase):
             # 10 + floor(20*0.5) + floor(40*0.25) = 10 + 10 + 10 = 30
             limit = db.calculate_inventory_limit(12345)
             self.assertEqual(limit, 30)
+
 
 if __name__ == "__main__":
     unittest.main()
