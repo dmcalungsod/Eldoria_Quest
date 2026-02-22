@@ -9,16 +9,23 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock discord before importing anything that uses it
 mock_discord = MagicMock()
+
 # Ensure View is a class that can be inherited from without creating a MagicMock for every method
 class MockView:
     def __init__(self, *args, **kwargs):
-        pass
+        self.children = []
+
     def add_item(self, item):
-        pass
+        self.children.append(item)
+        return self # add_item typically returns self or None, strictly View.add_item returns self in some versions or None in others. discord.py returns None usually.
+
     def clear_items(self):
+        self.children.clear()
+
+    def stop(self):
         pass
 
-    # Allow async context manager if needed, though ShopView doesn't seem to use it
+    # Allow async context manager if needed
     async def __aenter__(self): return self
     async def __aexit__(self, exc_type, exc, tb): pass
 
@@ -80,7 +87,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
 
         # Let's try to patch get_player_or_error as well since the original test did
         # Mock db.get_player explicitly to return a dict, not a Mock
-        db.get_player.return_value = {"aurum": 900}
+        db.get_player = MagicMock(return_value={"aurum": 900})
 
         with patch("cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value={"aurum": 1000})):
             # Mock Interacton
