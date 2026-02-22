@@ -114,6 +114,14 @@ class EldoriaBot(commands.Bot):
                     logger.error(f"Failed to load {cog_name}: {e}", exc_info=True)
 
         # Command Sync
+        # Always sync globally so commands appear in all servers
+        try:
+            await self.tree.sync()
+            logger.info("Commands synced globally (may take up to 1 hour).")
+        except discord.HTTPException as e:
+            logger.error(f"Failed to sync global commands: {e}")
+
+        # If GUILD_ID is set, ALSO sync to that guild for instant updates (dev mode)
         if GUILD_ID:
             try:
                 guild = discord.Object(id=GUILD_ID)
@@ -123,9 +131,6 @@ class EldoriaBot(commands.Bot):
                 logger.info(f"Commands synced to Guild ID: {GUILD_ID}")
             except discord.HTTPException as e:
                 logger.error(f"Failed to sync commands to guild: {e}")
-        else:
-            await self.tree.sync()
-            logger.info("Commands synced globally (may take up to 1 hour).")
 
     async def on_ready(self):
         """Called when bot is connected."""
