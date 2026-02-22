@@ -20,31 +20,37 @@ The Frostfall Expanse was once a fertile valley until the Sundering cracked the 
   - `magic_stone_large` (Weight: 30)
 
 ## Monsters (for GameForge)
-*IDs 106-110 to follow Crystal Caverns*
+*IDs 111-115 to follow Molten Caldera (106-110)*
 
-1.  **Frostbit Wolf (ID 106)** - *Common*
+1.  **Frost Wolf (ID 111)** - *Common*
     -   **Level:** 26
     -   **Stats:** Fast, Medium ATK, Low DEF.
     -   **Skill:** *Pack Tactics* (Multi-hit).
     -   **Drops:** Wolf Pelt, Frost Fang.
 
-2.  **Ice Construct (ID 107)** - *Common*
+2.  **Ice Golem (ID 112)** - *Common*
     -   **Level:** 27
     -   **Stats:** Slow, High HP, High DEF (Weak to Fire/Blunt).
     -   **Skill:** *Shatter* (Explodes on death for minor AOE).
     -   **Drops:** Glacial Shard, Ancient Gear.
 
-3.  **Wendigo (ID 108)** - *Elite*
-    -   **Level:** 29
-    -   **Stats:** Very High ATK, Lifesteal.
-    -   **Skill:** *Devour* (Heals on hit).
-    -   **Drops:** Cursed Bone, Wendigo Antler.
+3.  **Chill Wisp (ID 113)** - *Common*
+    -   **Level:** 26
+    -   **Stats:** Evasive, Magic ATK.
+    -   **Skill:** *Frost Breath*.
+    -   **Drops:** Frost Crystal.
 
-4.  **Glacial Wyrm (ID 110)** - *Boss*
-    -   **Level:** 32
-    -   **Stats:** Massive HP, AOE Freeze.
+4.  **Glacial Drake (ID 114)** - *Elite*
+    -   **Level:** 28
+    -   **Stats:** High ATK, Flying.
     -   **Skill:** *Absolute Zero* (Stuns/Freezes player for 1 turn).
-    -   **Drops:** Wyrm Heart, Froststeel Ore (Rare).
+    -   **Drops:** Frozen Scale.
+
+5.  **Cryon, the Frozen King (ID 115)** - *Boss*
+    -   **Level:** 29
+    -   **Stats:** Massive HP, AOE Freeze.
+    -   **Skill:** *Glacial Roar*.
+    -   **Drops:** Ice Core, Frozen Scale.
 
 ## Items & Equipment (for GameForge)
 -   **Material:** *Froststeel Ore* (High-tier metal, blue-tinged).
