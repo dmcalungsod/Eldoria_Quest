@@ -13,16 +13,11 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import the real exception if available
-try:
-    from pymongo.errors import DuplicateKeyError
-except ImportError:
-    # Fallback for mocking if not installed (though it is installed in this env)
-    class DuplicateKeyError(Exception):
-        pass
+from database.database_manager import DatabaseManager
 
-import database.database_manager as _dbm  # noqa: E402
-from database.database_manager import DatabaseManager  # noqa: E402
+# Local exception to ensure consistent mocking regardless of pymongo installation
+class MockDuplicateKeyError(Exception):
+    pass
 
 class TestRaceCondition(unittest.TestCase):
     def setUp(self):
@@ -39,12 +34,17 @@ class TestRaceCondition(unittest.TestCase):
         self.mongo_patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
         self.mongo_patcher.start()
 
+        # Patch DuplicateKeyError in database_manager to use our local mock
+        self.dup_error_patcher = patch("database.database_manager.DuplicateKeyError", MockDuplicateKeyError)
+        self.dup_error_patcher.start()
+
         # Initialize DatabaseManager (singleton reset)
         DatabaseManager._instance = None
         self.db = DatabaseManager()
 
     def tearDown(self):
         self.mongo_patcher.stop()
+        self.dup_error_patcher.stop()
         DatabaseManager._instance = None
 
     def test_upgrade_skill_concurrent_failure_refunds_vestige(self):
@@ -85,10 +85,8 @@ class TestRaceCondition(unittest.TestCase):
         deduct_result = MagicMock()
         deduct_result.modified_count = 1
 
-        # Raise REAL DuplicateKeyError
-        # Note: DuplicateKeyError constructor signature might require arguments
-        # but usually string message is enough for generic exception behavior
-        self.mock_db.player_skills.insert_one.side_effect = DuplicateKeyError("Duplicate key")
+        # Raise our MOCKED DuplicateKeyError
+        self.mock_db.player_skills.insert_one.side_effect = MockDuplicateKeyError("Duplicate key")
 
         refund_result = MagicMock()
         refund_result.modified_count = 1
@@ -97,7 +95,7 @@ class TestRaceCondition(unittest.TestCase):
 
         success, msg = self.db.learn_skill(discord_id, skill_key, cost)
 
-        self.assertFalse(success)
+        self.assertFalse(success, f"Should have failed due to duplicate key. Msg: {msg}")
         self.assertIn("refunded", msg)
 
 if __name__ == "__main__":
