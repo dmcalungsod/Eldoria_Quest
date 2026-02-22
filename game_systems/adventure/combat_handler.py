@@ -7,6 +7,7 @@ Hardened: Syncs session XP to prevent duplicate level-up messages.
 
 import logging
 import random
+import uuid
 from typing import Any
 
 from database.database_manager import DatabaseManager
@@ -243,6 +244,21 @@ class CombatHandler:
 
             # 6. Update Report
             self._aggregate_battle_report(battle_report, result.get("turn_report", {}))
+
+            # 7. Persist New Buffs
+            new_buffs = result.get("new_buffs", [])
+            for buff in new_buffs:
+                # Convert turn duration to seconds (1 turn = 60s)
+                duration_s = buff.get("duration", 3) * 60
+                buff_id = uuid.uuid4().hex
+                self.db.add_active_buff(
+                    discord_id=self.discord_id,
+                    buff_id=buff_id,
+                    name=buff.get("name"),
+                    stat=buff.get("stat"),
+                    amount=buff.get("amount"),
+                    duration_s=duration_s,
+                )
 
             return result
 

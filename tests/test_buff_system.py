@@ -1,6 +1,6 @@
 import time
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.combat_handler import CombatHandler
@@ -19,6 +19,8 @@ class TestBuffSystem(unittest.TestCase):
             "name": "TestHero",
             "class_id": 1,
             "level": 1,
+            "experience": 0,
+            "exp_to_next": 1000,
         }
         self.mock_db.get_player_field.return_value = 1  # class_id
         self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
@@ -122,6 +124,59 @@ class TestBuffSystem(unittest.TestCase):
 
         finally:
             PlayerStats.add_bonus_stat = original_add_bonus
+
+    def test_combat_skills_generate_buffs(self):
+        """Tests that skill-based buffs are persisted to the database."""
+        # Need to mock CombatEngine since it's instantiated inside resolve_turn
+        with patch("game_systems.adventure.combat_handler.CombatEngine") as MockEngine:
+            mock_instance = MockEngine.return_value
+
+            # Setup run_combat_turn return value to simulate a buff skill usage
+            mock_instance.run_combat_turn.return_value = {
+                "winner": None,
+                "phrases": [],
+                "hp_current": 100,
+                "mp_current": 100,
+                "monster_hp": 50,
+                "turn_report": {},
+                "active_boosts": {},
+                "new_buffs": [
+                    {"name": "Test Buff", "stat": "STR", "amount": 5, "duration": 3}
+                ]
+            }
+
+            ch = CombatHandler(self.mock_db, self.discord_id)
+
+            # Mock DB calls needed for resolve_turn
+            self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+            self.mock_db.get_active_buffs.return_value = []
+            self.mock_db.get_player_stats_json.return_value = {}
+            self.mock_db.get_combat_skills.return_value = []
+            self.mock_db.get_active_boosts.return_value = []
+
+            monster = {"HP": 10, "ATK": 1, "DEF": 0, "name": "Dummy"}
+            report = ch.create_empty_battle_report()
+
+            ch.resolve_turn(monster, report, persist_vitals=False)
+
+            # Verify add_active_buff was called
+            # Duration should be 3 * 60 = 180s
+            self.mock_db.add_active_buff.assert_called()
+
+            # Find the call with our buff
+            found = False
+            for call in self.mock_db.add_active_buff.call_args_list:
+                args, kwargs = call
+                # Check args or kwargs depending on how it was called
+                # CombatHandler calls with keyword args:
+                # discord_id=..., buff_id=..., name=..., stat=..., amount=..., duration_s=...
+                if kwargs.get("name") == "Test Buff" and kwargs.get("stat") == "STR":
+                    self.assertEqual(kwargs["amount"], 5)
+                    self.assertEqual(kwargs["duration_s"], 180)
+                    found = True
+                    break
+
+            self.assertTrue(found, "add_active_buff was not called for the new buff.")
 
 
 if __name__ == "__main__":
