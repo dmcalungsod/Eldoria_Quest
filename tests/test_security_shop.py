@@ -15,6 +15,13 @@ class MockView:
         pass
     def add_item(self, item):
         pass
+    def clear_items(self):
+        pass
+
+    # Allow async context manager if needed, though ShopView doesn't seem to use it
+    async def __aenter__(self): return self
+    async def __aexit__(self, exc_type, exc, tb): pass
+
 mock_discord.ui.View = MockView
 
 sys.modules["discord"] = mock_discord

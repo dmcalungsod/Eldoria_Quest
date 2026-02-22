@@ -111,9 +111,8 @@ class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
         interaction.response.defer = AsyncMock()
 
         # Execute the command callback
-        # In our mock, the command is the function itself
-        # Pass (self, interaction)
-        await cog.dev_panel.callback(cog, interaction)
+        # Since we mocked the decorator to return the function, cog.dev_panel is the bound method.
+        await cog.dev_panel(interaction)
 
         bot.is_owner.assert_awaited_once_with(interaction.user)
         interaction.response.send_message.assert_awaited_with("⛔ You are not the bot owner.", ephemeral=True)
@@ -145,7 +144,7 @@ class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
         interaction.followup = MagicMock()
         interaction.followup.send = AsyncMock()
 
-        await cog.dev_panel.callback(cog, interaction)
+        await cog.dev_panel(interaction)
 
         bot.is_owner.assert_awaited_once_with(interaction.user)
         interaction.response.defer.assert_awaited_with(ephemeral=True)
