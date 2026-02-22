@@ -147,10 +147,13 @@ class AdventureRewards:
         """Calculates drops and updates quest progress."""
         loot_bundle = defaultdict(int)
         exp_gain = combat_result["exp"]
+        aurum_gain = combat_result.get("aurum", 0)
         actual_drops = []  # Track items that actually dropped for quests
 
-        # Add XP to session loot immediately
+        # Add XP and Aurum to session loot immediately
         self._add_loot_to_session(session_loot, "exp", exp_gain)
+        if aurum_gain > 0:
+            self._add_loot_to_session(session_loot, "aurum", aurum_gain)
 
         # Determine drops
         stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
@@ -208,6 +211,8 @@ class AdventureRewards:
 
         # Format Logs
         loot_lines = [get_rarity_ansi("Common", f"• {exp_gain} EXP")]
+        if aurum_gain > 0:
+            loot_lines.append(get_rarity_ansi("Common", f"• {aurum_gain} {E.AURUM}"))
 
         # Sort by Rarity
         rarity_order = {

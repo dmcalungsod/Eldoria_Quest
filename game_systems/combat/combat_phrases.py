@@ -772,6 +772,9 @@ class CombatPhrases:
 
         msg = f"{phrase}\nGained `{exp} EXP`"
 
+        if gold > 0:
+            msg += f" and `{gold} Aurum`"
+
         if leveled_up:
             msg += f"\n\n{E.LEVEL_UP} **A NEW THRESHOLD REACHED**\nYou have reached **Level {new_level}**."
         return msg
