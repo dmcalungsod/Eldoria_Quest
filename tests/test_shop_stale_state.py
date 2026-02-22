@@ -44,6 +44,7 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
     async def test_stale_state_on_purchase_failure(self):
         # Setup
         mock_db = MagicMock()
+        mock_db.get_shop_stock.return_value = {}
         mock_user = MagicMock()
         mock_user.id = 12345
         initial_aurum = 100
