@@ -17,7 +17,7 @@ from discord.ui import Button, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES
-from game_systems.player.player_stats import PlayerStats
+from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold
 
 from .ui_helpers import back_to_profile_callback, make_progress_bar
 
@@ -25,7 +25,6 @@ logger = logging.getLogger("eldoria.status")
 
 # Base costs remain the same, but scaling will be added
 BASE_STAT_COSTS = {"STR": 10, "END": 10, "DEX": 10, "AGI": 12, "MAG": 12, "LCK": 20}
-STAT_EXP_THRESHOLD = 100
 
 
 class StatusUpdateView(View):
@@ -236,20 +235,27 @@ class StatusUpdateView(View):
 
         # Practice bars visualization (restored)
         if s_row:
-            str_bar = make_progress_bar(s_row["str_exp"], STAT_EXP_THRESHOLD)
-            end_bar = make_progress_bar(s_row["end_exp"], STAT_EXP_THRESHOLD)
-            dex_bar = make_progress_bar(s_row["dex_exp"], STAT_EXP_THRESHOLD)
-            agi_bar = make_progress_bar(s_row["agi_exp"], STAT_EXP_THRESHOLD)
-            mag_bar = make_progress_bar(s_row["mag_exp"], STAT_EXP_THRESHOLD)
-            lck_bar = make_progress_bar(s_row["lck_exp"], STAT_EXP_THRESHOLD)
+            str_t = calculate_practice_threshold(base["STR"])
+            end_t = calculate_practice_threshold(base["END"])
+            dex_t = calculate_practice_threshold(base["DEX"])
+            agi_t = calculate_practice_threshold(base["AGI"])
+            mag_t = calculate_practice_threshold(base["MAG"])
+            lck_t = calculate_practice_threshold(base["LCK"])
+
+            str_bar = make_progress_bar(s_row["str_exp"], str_t)
+            end_bar = make_progress_bar(s_row["end_exp"], end_t)
+            dex_bar = make_progress_bar(s_row["dex_exp"], dex_t)
+            agi_bar = make_progress_bar(s_row["agi_exp"], agi_t)
+            mag_bar = make_progress_bar(s_row["mag_exp"], mag_t)
+            lck_bar = make_progress_bar(s_row["lck_exp"], lck_t)
 
             practice_bars = (
-                f"`STR:` `{str_bar}` {math.floor(s_row['str_exp'])}/{STAT_EXP_THRESHOLD}\n"
-                f"`END:` `{end_bar}` {math.floor(s_row['end_exp'])}/{STAT_EXP_THRESHOLD}\n"
-                f"`DEX:` `{dex_bar}` {math.floor(s_row['dex_exp'])}/{STAT_EXP_THRESHOLD}\n"
-                f"`AGI:` `{agi_bar}` {math.floor(s_row['agi_exp'])}/{STAT_EXP_THRESHOLD}\n"
-                f"`MAG:` `{mag_bar}` {math.floor(s_row['mag_exp'])}/{STAT_EXP_THRESHOLD}\n"
-                f"`LCK:` `{lck_bar}` {math.floor(s_row['lck_exp'])}/{STAT_EXP_THRESHOLD}"
+                f"`STR:` `{str_bar}` {math.floor(s_row['str_exp'])}/{str_t}\n"
+                f"`END:` `{end_bar}` {math.floor(s_row['end_exp'])}/{end_t}\n"
+                f"`DEX:` `{dex_bar}` {math.floor(s_row['dex_exp'])}/{dex_t}\n"
+                f"`AGI:` `{agi_bar}` {math.floor(s_row['agi_exp'])}/{agi_t}\n"
+                f"`MAG:` `{mag_bar}` {math.floor(s_row['mag_exp'])}/{mag_t}\n"
+                f"`LCK:` `{lck_bar}` {math.floor(s_row['lck_exp'])}/{lck_t}"
             )
             embed.add_field(name="Practice Progress", value=practice_bars, inline=False)
 

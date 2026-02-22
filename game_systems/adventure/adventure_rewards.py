@@ -19,13 +19,12 @@ from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.tournament_system import TournamentSystem
 from game_systems.items.item_manager import item_manager
-from game_systems.player.player_stats import PlayerStats
+from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold
 from game_systems.rewards.loot_calculator import LootCalculator
 
 logger = logging.getLogger("eldoria.rewards")
 
 # Configuration
-STAT_EXP_THRESHOLD = 100
 SKILL_EXP_THRESHOLD = 100
 SKILL_EXP_PER_USE = 2.5
 
@@ -297,17 +296,30 @@ class AdventureRewards:
                     continue
 
                 stat_key = exp_key.split("_")[0].upper()
+                current_val = base_stats[stat_key]
+                current_exp_val = curr_exp[exp_key] + gain
 
-                new_exp, levels = self._calculate_growth(curr_exp[exp_key], gain, STAT_EXP_THRESHOLD)
-                curr_exp[exp_key] = new_exp
+                levels_gained = 0
 
-                if levels > 0:
-                    base_stats[stat_key] += levels
+                # Dynamic Threshold Check
+                while True:
+                    threshold = calculate_practice_threshold(current_val)
+                    if current_exp_val >= threshold:
+                        current_exp_val -= threshold
+                        levels_gained += 1
+                        current_val += 1
+                    else:
+                        break
+
+                curr_exp[exp_key] = current_exp_val
+                base_stats[stat_key] = current_val
+
+                if levels_gained > 0:
                     if stat_key in STAT_UP_MESSAGES:
                         # Append message only once per stat type to avoid spam, or repeat?
                         # Original code appended once per level. Let's keep it simple.
                         # Assuming usually 1 level at a time.
-                        for _ in range(levels):
+                        for _ in range(levels_gained):
                             level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
 
             # Save updates

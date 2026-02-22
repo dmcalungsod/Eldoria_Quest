@@ -12,3 +12,8 @@
 
 **Learning:** Players were not receiving full HP restoration upon leveling up, unlike MP which was restored. This created an inconsistency and felt unrewarding.
 **Action:** Updated `AdventureManager._grant_rewards_internal` to restore `current_hp` to `max_hp` when `leveled_up` is True. This ensures a fresh start for the new level.
+
+## 2025-05-24 — Dynamic Stat Practice Thresholds
+
+**Learning:** The "Practice" system (gaining stats via XP from combat actions) used a fixed threshold (100 XP) while the Vestige Point cost scaled exponentially. This created a loophole where high-level players could grind low-level actions to bypass the intended progression curve.
+**Action:** Implemented a dynamic threshold formula (`100 + BaseStat * 5`) for practice XP. Progression systems must always scale difficulty with player power to prevent trivialization of end-game growth.

@@ -47,6 +47,20 @@ def calculate_tiered_bonus(stat_value: int, base_effect_per_point: float) -> int
     return math.floor(full_tiers_effect + remaining_effect)
 
 
+def calculate_practice_threshold(current_base: int) -> int:
+    """
+    Calculates the XP required to gain the NEXT point in a stat via practice.
+    Base: 100
+    Scaling: +5 per current point.
+
+    This scaling ensures that grinding 'practice' (combat actions) becomes
+    progressively harder as the stat increases, preventing high-level exploits.
+    """
+    base = 100
+    scaling = 5
+    return base + (current_base * scaling)
+
+
 @dataclass
 class StatBlock:
     """Stores the base and bonus values of a stat."""
