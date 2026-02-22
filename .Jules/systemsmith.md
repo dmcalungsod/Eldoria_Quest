@@ -17,3 +17,8 @@
 
 **Learning:** The "Practice" system (gaining stats via XP from combat actions) used a fixed threshold (100 XP) while the Vestige Point cost scaled exponentially. This created a loophole where high-level players could grind low-level actions to bypass the intended progression curve.
 **Action:** Implemented a dynamic threshold formula (`100 + BaseStat * 5`) for practice XP. Progression systems must always scale difficulty with player power to prevent trivialization of end-game growth.
+
+## 2025-10-27 — Profile Bundle Optimization
+
+**Learning:** The "Back to Profile" UI callback was making 5-6 separate database queries (Player, Guild, Stats, Skills, Title) sequentially (or gathered), causing latency and load. Using MongoDB's `$lookup` aggregation pipeline reduced this to a single round-trip.
+**Action:** Identify frequently accessed UI paths (like Profile, Inventory) and implement dedicated "bundle" methods in `DatabaseManager` using aggregations instead of multiple `find_one` calls in the cog.

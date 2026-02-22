@@ -167,6 +167,38 @@ class TestDatabaseManager(unittest.TestCase):
             {"$inc": {"exp": 50}},
         )
 
+    def test_get_profile_bundle(self):
+        """Test successful retrieval of profile bundle."""
+        discord_id = 12345
+
+        # Mock Aggregation Result
+        mock_result = [{
+            "discord_id": discord_id,
+            "name": "TestHero",
+            "class_id": 1,
+            "active_title": "The Brave",
+            "stats_docs": [{
+                "stats_json": '{"STR": 10, "DEX": 5}'
+            }],
+            "guild_docs": [{
+                "rank": "D",
+                "merit_points": 100
+            }]
+        }]
+
+        # Setup the mock aggregate return
+        self.mock_db.players.aggregate.return_value = mock_result
+
+        result = self.db.get_profile_bundle(discord_id)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result["player"]["name"], "TestHero")
+        self.assertEqual(result["stats"]["STR"], 10)
+        self.assertEqual(result["guild"]["rank"], "D")
+
+        # Verify aggregation called
+        self.assertTrue(self.mock_db.players.aggregate.called)
+
 
 def run_all_tests():
     """Runs the test suite for run_all_tests.py integration."""
