@@ -1171,5 +1171,92 @@
       "aurum": 300,
       "item": "Wardkeeper's Vial"
     }
+  },
+  {
+    "id": 63,
+    "title": "The Hissing Corridors",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls Entrance",
+    "summary": "Scout the steam-filled corridors.",
+    "description": "Jolen's instruments have picked up strange fluctuations from the ancient Clockwork Halls. The entrance is choked with steam and guarded by wisps of pure energy. Clear the way so he can set up his equipment.",
+    "objectives": {
+      "defeat": {
+        "Steam Wisp": 5
+      }
+    },
+    "flavor_text": {
+      "defeat:Steam Wisp": "The wisp dissipates with a sharp hiss, leaving the air smelling of ozone and copper."
+    },
+    "rewards": {
+      "exp": 2000,
+      "aurum": 600
+    }
+  },
+  {
+    "id": 64,
+    "title": "Gears of War",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "The Clockwork Halls",
+    "summary": "Collect parts for repairs.",
+    "description": "The machinery inside is marvelous but degraded. Jolen needs specific components—pristine brass gears and tensioned spring coils—to repair a lift that leads deeper into the complex. The local constructs should have plenty.",
+    "objectives": {
+      "collect": {
+        "Brass Gear": 5,
+        "Spring Coil": 3
+      }
+    },
+    "flavor_text": {
+      "collect:Brass Gear": "This gear is surprisingly heavy and etched with runes you don't recognize.",
+      "collect:Spring Coil": "You pry the coil loose. It snaps back with dangerous force."
+    },
+    "rewards": {
+      "exp": 2200,
+      "aurum": 650
+    }
+  },
+  {
+    "id": 65,
+    "title": "The Knight's Vigil",
+    "tier": "B",
+    "quest_giver": "Captain Rhea",
+    "location": "Clockwork Halls Depths",
+    "summary": "Defeat the Automaton Knights guarding the inner sanctum.",
+    "description": "Captain Rhea is concerned about the activation of the Automaton Knights. These ancient guardians were built for war, not patrol. Their awakening suggests something—or someone—has triggered the facility's defense protocols.",
+    "objectives": {
+      "defeat": {
+        "Automaton Knight": 4
+      }
+    },
+    "flavor_text": {
+      "defeat:Automaton Knight": "The knight freezes mid-swing, its eyes dimming as the mana core shatters."
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 700
+    }
+  },
+  {
+    "id": 66,
+    "title": "Silence the Warden",
+    "tier": "B",
+    "quest_giver": "Guildmaster Kael",
+    "location": "The Gear Heart",
+    "summary": "Defeat The Gear Warden.",
+    "description": "The source of the disturbance has been identified: The Gear Warden, the central intelligence of the Halls, has gone rogue. Its ceaseless production of war machines threatens to spill out into the caverns. Shut it down permanently.",
+    "objectives": {
+      "defeat": {
+        "The Gear Warden": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:The Gear Warden": "With a final, deafening grind of metal on metal, the massive construct collapses. The factory falls silent."
+    },
+    "rewards": {
+      "exp": 4000,
+      "aurum": 1200,
+      "item": "Magic Stone (Large)"
+    }
   }
 ]
