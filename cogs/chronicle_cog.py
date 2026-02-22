@@ -19,6 +19,7 @@ logger = logging.getLogger("eldoria.chronicles")
 
 class TitleSelect(Select):
     def __init__(self, titles, current_active):
+        self.titles = titles
         options = []
 
         # Add "No Title" option
@@ -53,9 +54,25 @@ class TitleSelect(Select):
         success = await asyncio.to_thread(db.set_active_title, interaction.user.id, title_to_set)
 
         if success:
-            await interaction.followup.send(
-                f"Title set to: **{selected if selected != 'None' else 'None'}**", ephemeral=True
-            )
+            # Update Embed
+            embed = interaction.message.embeds[0]
+            new_active_display = f"**{title_to_set}**" if title_to_set else "*None*"
+
+            # Find and update the "Active Title" field
+            for i, field in enumerate(embed.fields):
+                if field.name == "Active Title":
+                    embed.set_field_at(i, name="Active Title", value=new_active_display, inline=False)
+                    break
+
+            # Update View State
+            if hasattr(self.view, "active_title"):
+                self.view.active_title = title_to_set
+
+            # Rebuild Select to update default selection
+            self.view.clear_items()
+            self.view.add_item(TitleSelect(self.titles, title_to_set))
+
+            await interaction.edit_original_response(embed=embed, view=self.view)
         else:
             await interaction.followup.send("Failed to set title.", ephemeral=True)
 
@@ -65,6 +82,8 @@ class ChroniclesView(View):
         super().__init__(timeout=180)
         self.db = db
         self.user = user
+        self.titles = titles
+        self.active_title = active_title
 
         if titles:
             self.add_item(TitleSelect(titles, active_title))
