@@ -78,6 +78,7 @@ class GuildLobbyView(View, GuildViewMixin):
         await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
 
     async def _advisor_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         advisor = GuildAdvisor(self.db, self.interaction_user.id)
         # Run blocking DB calls in a thread
         advice = await asyncio.to_thread(advisor.get_advice)
@@ -87,4 +88,4 @@ class GuildLobbyView(View, GuildViewMixin):
             description=f"*An old veteran leans against a pillar, eyeing you up and down.*\n\n“{advice}”",
             color=discord.Color.light_grey(),
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed, ephemeral=True)
