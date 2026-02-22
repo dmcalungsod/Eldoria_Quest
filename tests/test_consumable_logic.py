@@ -16,8 +16,8 @@ mock_pymongo.errors = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-from game_systems.items.consumable_manager import ConsumableManager
-from game_systems.data.consumables import CONSUMABLES
+from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
+from game_systems.data.consumables import CONSUMABLES  # noqa: E402
 
 class TestDualConsumableBug(unittest.TestCase):
     def setUp(self):
