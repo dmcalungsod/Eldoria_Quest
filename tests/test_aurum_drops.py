@@ -13,8 +13,6 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.rewards.aurum_calculator import AurumCalculator
-# We need to mock things before importing combat_engine
-sys.modules["database.database_manager"] = MagicMock()
 
 class TestAurumDrops(unittest.TestCase):
     def test_aurum_calculator_normal(self):
