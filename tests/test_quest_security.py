@@ -10,8 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.guild_system.quest_system import QuestSystem
-from game_systems.data.emojis import ERROR
+from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
+from game_systems.data.emojis import ERROR  # noqa: E402
 
 
 class TestQuestSecurity(unittest.TestCase):
