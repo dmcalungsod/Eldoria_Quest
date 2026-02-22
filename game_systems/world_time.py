@@ -9,6 +9,7 @@ import datetime
 import random
 import zlib
 from enum import Enum
+from zoneinfo import ZoneInfo
 
 
 class TimePhase(Enum):
@@ -44,9 +45,19 @@ class WorldTime:
     """
 
     @staticmethod
+    def now() -> datetime.datetime:
+        """
+        Returns the current time in Philippine Standard Time (PST, UTC+8).
+        The returned datetime is naive (no timezone info) to maintain compatibility
+        with existing database records and logic, but reflects the time in Manila.
+        """
+        pst = ZoneInfo("Asia/Manila")
+        return datetime.datetime.now(pst).replace(tzinfo=None)
+
+    @staticmethod
     def get_current_phase() -> TimePhase:
         """Determines the current phase based on server time (UTC/Local)."""
-        hour = datetime.datetime.now().hour
+        hour = WorldTime.now().hour
 
         if 5 <= hour < 8:
             return TimePhase.DAWN
@@ -87,7 +98,7 @@ class WorldTime:
 
         # Seed based on hour + location hash
         # Use Adler32 for a fast, consistent hash across runs (unlike Python's hash())
-        hour = datetime.datetime.now().hour
+        hour = WorldTime.now().hour
         loc_hash = zlib.adler32(location_id.encode())
         seed = hour + loc_hash
 

@@ -8,6 +8,7 @@ import datetime
 import logging
 
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 from game_systems.data.emojis import ERROR, SUCCESS, WARNING
 from game_systems.data.factions import FACTIONS
 
@@ -77,7 +78,7 @@ class FactionSystem:
                     "discord_id": discord_id,
                     "faction_id": faction_id,
                     "reputation": 0,
-                    "join_date": datetime.datetime.now().isoformat(),
+                    "join_date": WorldTime.now().isoformat(),
                 }
             )
             name = FACTIONS[faction_id]["name"]

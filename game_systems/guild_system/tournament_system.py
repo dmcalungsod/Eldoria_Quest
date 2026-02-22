@@ -11,6 +11,7 @@ import random
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.tournament")
 
@@ -38,7 +39,7 @@ class TournamentSystem:
         if active:
             # Check if it should have ended
             end_time = datetime.datetime.fromisoformat(active["end_time"])
-            if datetime.datetime.now() > end_time:
+            if WorldTime.now() > end_time:
                 self.end_current_tournament()
             else:
                 return active["id"]
@@ -47,7 +48,7 @@ class TournamentSystem:
         event_type = random.choice(self.TOURNAMENT_TYPES)
 
         # Schedule for 7 days
-        start_time = datetime.datetime.now()
+        start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(days=7)
 
         # Create in DB
@@ -124,7 +125,7 @@ class TournamentSystem:
 
         # Check if expired
         end_time = datetime.datetime.fromisoformat(active["end_time"])
-        if datetime.datetime.now() > end_time:
+        if WorldTime.now() > end_time:
             return
 
         # Update Score

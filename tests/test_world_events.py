@@ -2,7 +2,7 @@ import datetime
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,6 +19,15 @@ class TestWorldEventSystem(unittest.TestCase):
     def setUp(self):
         self.mock_db = MagicMock()
         self.system = WorldEventSystem(self.mock_db)
+
+        # Patch WorldTime to return standard datetime.now() for tests
+        # so test inputs align with system checks
+        self.patcher = patch("game_systems.events.world_event_system.WorldTime")
+        self.mock_world_time = self.patcher.start()
+        self.mock_world_time.now.side_effect = datetime.datetime.now
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_start_event(self):
         self.system.start_event(WorldEventSystem.BLOOD_MOON, 24)

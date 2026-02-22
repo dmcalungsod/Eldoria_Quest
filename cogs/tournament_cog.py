@@ -14,6 +14,7 @@ from discord.ext import commands, tasks
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 from game_systems.guild_system.tournament_system import TournamentSystem
 
 logger = logging.getLogger("eldoria.cogs.tournament")
@@ -41,7 +42,7 @@ class TournamentCog(commands.Cog):
         """
         try:
             active = self.db.get_active_tournament()
-            now = datetime.datetime.now()
+            now = WorldTime.now()
 
             if active:
                 end_time = datetime.datetime.fromisoformat(active["end_time"])
@@ -104,7 +105,7 @@ class TournamentCog(commands.Cog):
             return
 
         end_time = datetime.datetime.fromisoformat(active["end_time"])
-        time_remaining = end_time - datetime.datetime.now()
+        time_remaining = end_time - WorldTime.now()
         days = time_remaining.days
         hours = time_remaining.seconds // 3600
 
@@ -181,7 +182,7 @@ class TournamentCog(commands.Cog):
         # we'll just implement a manual start helper here or override it.
         # Let's call create_tournament directly for manual control.
 
-        start_time = datetime.datetime.now()
+        start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(days=7)
 
         t_id = self.db.create_tournament(event_type, start_time.isoformat(), end_time.isoformat())

@@ -17,6 +17,7 @@ from discord.ui import Button, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.admin")
@@ -46,7 +47,7 @@ class DevPanelView(View):
     def _format_time_remaining(end_time_iso: str) -> str:
         try:
             end_time = datetime.datetime.fromisoformat(end_time_iso)
-            remaining = end_time - datetime.datetime.now()
+            remaining = end_time - WorldTime.now()
             if remaining.total_seconds() <= 0:
                 return "Expired"
             mins, secs = divmod(int(remaining.total_seconds()), 60)

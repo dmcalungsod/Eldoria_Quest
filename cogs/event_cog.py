@@ -14,6 +14,7 @@ from discord.ext import commands, tasks
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 from game_systems.events.world_event_system import WorldEventSystem
 
 logger = logging.getLogger("eldoria.cogs.events")
@@ -45,7 +46,7 @@ class EventCog(commands.Cog):
 
             # --- Seasonal Event Check ---
             if not active:
-                now = datetime.datetime.now()
+                now = WorldTime.now()
 
                 # Grand Harvest Festival: Oct 1st - Oct 7th
                 # Only auto-start on Oct 1st (to avoid spamming starts if manually ended)
@@ -100,7 +101,7 @@ class EventCog(commands.Cog):
             return
 
         end_time = datetime.datetime.fromisoformat(active["end_time"])
-        time_remaining = end_time - datetime.datetime.now()
+        time_remaining = end_time - WorldTime.now()
         days = time_remaining.days
         hours = time_remaining.seconds // 3600
         minutes = (time_remaining.seconds % 3600) // 60

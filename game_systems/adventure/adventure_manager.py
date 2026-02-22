@@ -10,6 +10,7 @@ import json
 import logging
 
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
@@ -44,7 +45,7 @@ class AdventureManager:
             logger.warning(f"Invalid adventure duration: {duration_minutes} by {discord_id}")
             return False
 
-        start_time = datetime.datetime.now()
+        start_time = WorldTime.now()
         end_time = (
             start_time + datetime.timedelta(days=90)
             if duration_minutes == -1
@@ -208,7 +209,7 @@ class AdventureManager:
             # If duration is -1, calculate actual time elapsed
             if duration_min == -1:
                 start_dt = datetime.datetime.fromisoformat(row["start_time"])
-                duration_min = int((datetime.datetime.now() - start_dt).total_seconds() / 60)
+                duration_min = int((WorldTime.now() - start_dt).total_seconds() / 60)
 
             # Ensure non-negative duration
             duration_min = max(0, duration_min)
@@ -328,7 +329,7 @@ class AdventureManager:
                 "promotion_target": next_rank,
             }
 
-            start = datetime.datetime.now()
+            start = WorldTime.now()
             end = start + datetime.timedelta(hours=1)
 
             # Perform buff cleanup
