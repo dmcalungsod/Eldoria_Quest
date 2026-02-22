@@ -1,12 +1,27 @@
-import unittest
-from unittest.mock import AsyncMock, Mock, patch
-import discord
-import sys
-import os
 import importlib
+import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import discord
 
 # Need to adjust import path for modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def _is_mock(obj):
+    """Check if an object is a Mock/MagicMock (i.e. discord module is mocked)."""
+    return isinstance(obj, (Mock, MagicMock))
+
+
+def _safe_mock(**kwargs):
+    """Create a Mock, dropping `spec` if the spec target is itself a Mock."""
+    spec = kwargs.get("spec")
+    if spec is not None and _is_mock(spec):
+        kwargs.pop("spec")
+    return Mock(**kwargs)
+
 
 # Import normally
 try:
@@ -30,7 +45,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_success(self):
         """Verify that purchase_item_callback accepts valid input."""
         db = Mock()
-        user = Mock(spec=discord.User)
+        user = _safe_mock(spec=discord.User)
         user.id = 12345
 
         # Use the fresh class
@@ -40,7 +55,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         view._execute_purchase = Mock(return_value=(True, {"name": "Potion"}, 900))
 
         # Mock Interaction with VALID data
-        interaction = Mock(spec=discord.Interaction)
+        interaction = _safe_mock(spec=discord.Interaction)
         interaction.user = user
         interaction.data = {"values": ["hp_potion_1:40"]}
         interaction.response = Mock()
@@ -63,10 +78,10 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     async def test_shop_callback_validation_failure_empty(self):
         """Verify that purchase_item_callback rejects empty input."""
         db = Mock()
-        user = Mock(spec=discord.User)
+        user = _safe_mock(spec=discord.User)
         view = self.ShopView(db, user, 1000)
 
-        interaction = Mock(spec=discord.Interaction)
+        interaction = _safe_mock(spec=discord.Interaction)
         interaction.user = user
         interaction.data = {"values": []}  # Empty
         interaction.response = Mock()
@@ -74,9 +89,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         interaction.followup = Mock()
         interaction.followup.send = AsyncMock()
 
-        with patch(
-            "cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)
-        ):
+        with patch("cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)):
             await view.purchase_item_callback(interaction)
 
         # Should NOT defer (or defer then send error)
@@ -84,19 +97,17 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         interaction.response.defer.assert_awaited()
 
         # Should send error
-        interaction.followup.send.assert_awaited_with(
-            "❌ Invalid selection.", ephemeral=True
-        )
+        interaction.followup.send.assert_awaited_with("❌ Invalid selection.", ephemeral=True)
 
     async def test_shop_callback_validation_failure_malformed(self):
         """Verify that purchase_item_callback rejects malformed input."""
         # My validation checks `values` presence.
         # `values[0]` checks truthiness.
         db = Mock()
-        user = Mock(spec=discord.User)
+        user = _safe_mock(spec=discord.User)
         view = self.ShopView(db, user, 1000)
 
-        interaction = Mock(spec=discord.Interaction)
+        interaction = _safe_mock(spec=discord.Interaction)
         interaction.user = user
         interaction.data = {"values": [""]}  # Empty string in list
         interaction.response = Mock()
@@ -104,14 +115,10 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         interaction.followup = Mock()
         interaction.followup.send = AsyncMock()
 
-        with patch(
-            "cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)
-        ):
+        with patch("cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)):
             await view.purchase_item_callback(interaction)
 
-        interaction.followup.send.assert_awaited_with(
-            "❌ Invalid selection.", ephemeral=True
-        )
+        interaction.followup.send.assert_awaited_with("❌ Invalid selection.", ephemeral=True)
 
 
 if __name__ == "__main__":

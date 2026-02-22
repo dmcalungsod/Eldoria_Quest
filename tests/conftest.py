@@ -170,9 +170,41 @@ def _patch_discord_ui():
             mod.View = _View
 
 
+def _patch_app_commands():
+    """Ensure cogs that use @app_commands.command have real async callbacks.
+
+    When discord is mocked at module level by other tests, the decorator
+    wraps methods in MagicMock objects.  Purge and reimport affected modules
+    so decorators resolve against the current (real or properly mocked)
+    discord module.
+    """
+    import asyncio
+    import importlib
+
+    for mod_name, class_name, method_name in (("cogs.developer_cog", "DeveloperCog", "dev_panel"),):
+        mod = sys.modules.get(mod_name)
+        if mod is None:
+            continue
+        cls = getattr(mod, class_name, None)
+        if cls is None:
+            continue
+        method = getattr(cls, method_name, None)
+        if method is None:
+            continue
+        cb = getattr(method, "callback", None)
+        if cb is not None and asyncio.iscoroutinefunction(cb):
+            continue  # Already valid
+        if asyncio.iscoroutinefunction(method):
+            continue  # Already valid
+        # Stale MagicMock decorator — purge and reimport
+        del sys.modules[mod_name]
+        importlib.import_module(mod_name)
+
+
 def _patch_all():
     _patch_duplicate_key_error()
     _patch_discord_ui()
+    _patch_app_commands()
 
 
 # ──────────────────────────────────────────────────────────────
