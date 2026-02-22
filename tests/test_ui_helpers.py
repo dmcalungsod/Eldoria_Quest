@@ -1,38 +1,48 @@
 import sys
 import os
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Adjust path to include the root directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock pymongo
+# Mock pymongo globally as it's a hard dependency for many imports
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.results"] = MagicMock()
 
-# Mock discord
-mock_discord = MagicMock()
-mock_discord.Color.dark_orange.return_value = "dark_orange"
+# Import the module to test
+# We rely on patching 'cogs.ui_helpers.discord' during tests
+from cogs.ui_helpers import build_inventory_embed, make_progress_bar  # noqa: E402
+
 
 class MockEmbed:
     def __init__(self, title=None, description=None, color=None):
         self.title = title
-        self.description = description
+        self.description = description or ""
         self.color = color
         self.fields = []
 
     def add_field(self, name, value, inline=False):
         self.fields.append({"name": name, "value": value, "inline": inline})
 
-mock_discord.Embed = MockEmbed
-sys.modules["discord"] = mock_discord
-
-from cogs.ui_helpers import build_inventory_embed, make_progress_bar  # noqa: E402
-import game_systems.data.emojis as E  # noqa: E402
 
 class TestUIHelpers(unittest.TestCase):
+    def setUp(self):
+        # Patch discord.Embed inside cogs.ui_helpers to use our MockEmbed
+        self.embed_patcher = patch('cogs.ui_helpers.discord.Embed', side_effect=MockEmbed)
+        self.mock_embed_class = self.embed_patcher.start()
+
+        # Patch discord.Color inside cogs.ui_helpers
+        self.color_patcher = patch('cogs.ui_helpers.discord.Color')
+        self.mock_color = self.color_patcher.start()
+        self.mock_color.dark_orange.return_value = "dark_orange"
+
+    def tearDown(self):
+        self.embed_patcher.stop()
+        self.color_patcher.stop()
+
     def test_progress_bar_logic(self):
         """Test progress bar logic directly."""
         bar = make_progress_bar(5, 10, length=10, empty_char="-", filled_char="#")
@@ -72,6 +82,7 @@ class TestUIHelpers(unittest.TestCase):
         self.assertIn("**Capacity:**", embed.description)
         self.assertIn("0/15", embed.description)
         self.assertIn("Your pack is light", embed.description)
+
 
 if __name__ == "__main__":
     unittest.main()
