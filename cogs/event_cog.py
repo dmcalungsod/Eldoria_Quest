@@ -129,7 +129,7 @@ class EventCog(commands.Cog):
 
     @app_commands.command(name="admin_event_start", description="[Admin] Manually start a world event.")
     @app_commands.describe(
-        event_type="Type of event (blood_moon, celestial_convergence, void_incursion)",
+        event_type="Type of event (blood_moon, celestial_convergence, void_incursion, elemental_surge)",
         hours="Duration in hours",
     )
     @app_commands.checks.has_permissions(administrator=True)

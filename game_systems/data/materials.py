@@ -50,6 +50,12 @@ MATERIALS = {
         "rarity": "Rare",
         "value": 200,
     },
+    "elemental_mote": {
+        "name": "Elemental Mote",
+        "description": "A flickering spark of raw elemental energy, unstable and valuable.",
+        "rarity": "Uncommon",
+        "value": 40,
+    },
     # --- Forest Zone Drops ---
     "goblin_ear": {
         "name": "Goblin Ear",
