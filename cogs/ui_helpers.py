@@ -51,8 +51,12 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
         color=discord.Color.dark_orange(),
     )
 
+    # Capacity Bar
+    progress = make_progress_bar(slot_count, max_slots, length=12)
+    embed.description = f"**Capacity:** `{progress}` {slot_count}/{max_slots}"
+
     if not items:
-        embed.description = "*Your pack is light, holding only dust and echoes.*"
+        embed.description += "\n\n*Your pack is light, holding only dust and echoes.*"
         return embed
 
     equipped = []
