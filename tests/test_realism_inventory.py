@@ -39,27 +39,30 @@ class TestRealismInventory(unittest.TestCase):
         self.discord_id = 12345
 
     def test_inventory_limit_logic(self):
-        # 1. Mock DB to report 20 slots
-        with patch.object(self.db, "get_inventory_slot_count", return_value=20):
-            # 2. Try adding new unique item
-            with patch.object(self.db, "find_stackable_item", return_value=None):
-                success = self.inv_manager.add_item(self.discord_id, "new_item", "New Item", "material", "Common", 1)
-                self.assertFalse(success, "Should fail when inventory is full")
+        # Mock calculate_inventory_limit to fixed 20 for this test
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            # 1. Mock DB to report 20 slots
+            with patch.object(self.db, "get_inventory_slot_count", return_value=20):
+                # 2. Try adding new unique item
+                with patch.object(self.db, "find_stackable_item", return_value=None):
+                    success = self.inv_manager.add_item(self.discord_id, "new_item", "New Item", "material", "Common", 1)
+                    self.assertFalse(success, "Should fail when inventory is full")
 
-        # 3. Mock DB to report 19 slots
-        with patch.object(self.db, "get_inventory_slot_count", return_value=19):
-            with patch.object(self.db, "find_stackable_item", return_value=None):
-                # Should succeed
-                with patch.object(self.db, "_next_inventory_id", return_value=999):
-                    success = self.inv_manager.add_item(
-                        self.discord_id, "new_item_2", "New Item 2", "material", "Common", 1
-                    )
-                    self.assertTrue(success, "Should succeed when space available")
+            # 3. Mock DB to report 19 slots
+            with patch.object(self.db, "get_inventory_slot_count", return_value=19):
+                with patch.object(self.db, "find_stackable_item", return_value=None):
+                    # Should succeed
+                    with patch.object(self.db, "_next_inventory_id", return_value=999):
+                        success = self.inv_manager.add_item(
+                            self.discord_id, "new_item_2", "New Item 2", "material", "Common", 1
+                        )
+                        self.assertTrue(success, "Should succeed when space available")
 
     def test_add_items_bulk_limit(self):
         # Mock 18 slots used (MAX=20)
-        with patch.object(self.db, "get_inventory_slot_count", return_value=18):
-            items = [
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            with patch.object(self.db, "get_inventory_slot_count", return_value=18):
+                items = [
                 {
                     "item_key": "k1",
                     "rarity": "Common",
@@ -74,47 +77,48 @@ class TestRealismInventory(unittest.TestCase):
                     "item_name": "I2",
                     "item_type": "material",
                 },  # New (20)
-                {
-                    "item_key": "k3",
-                    "rarity": "Common",
-                    "amount": 1,
-                    "item_name": "I3",
-                    "item_type": "material",
-                },  # New (Fail)
-            ]
+                    {
+                        "item_key": "k3",
+                        "rarity": "Common",
+                        "amount": 1,
+                        "item_name": "I3",
+                        "item_type": "material",
+                    },  # New (Fail)
+                ]
 
-            # Mock find (existing stacks) to return empty with sort() chain support
-            mock_cursor = MagicMock()
-            mock_cursor.sort.return_value = []
-            self.inventory_col.find.return_value = mock_cursor
+                # Mock find (existing stacks) to return empty with sort() chain support
+                mock_cursor = MagicMock()
+                mock_cursor.sort.return_value = []
+                self.inventory_col.find.return_value = mock_cursor
 
-            # Mock bulk_write
-            self.inventory_col.bulk_write.return_value = MagicMock()
+                # Mock bulk_write
+                self.inventory_col.bulk_write.return_value = MagicMock()
 
-            # Mock counters
-            self.counters_col.find_one_and_update.return_value = {"seq": 100}
+                # Mock counters
+                self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-            failed = self.inv_manager.add_items_bulk(self.discord_id, items)
+                failed = self.inv_manager.add_items_bulk(self.discord_id, items)
 
-            self.assertEqual(len(failed), 1, "Should have 1 failed item")
-            self.assertEqual(failed[0]["item_key"], "k3")
+                self.assertEqual(len(failed), 1, "Should have 1 failed item")
+                self.assertEqual(failed[0]["item_key"], "k3")
 
     def test_purchase_item_full(self):
         # Mock full inventory
-        with patch.object(self.db, "get_inventory_slot_count", return_value=20):
-            with patch.object(self.db, "find_stackable_item", return_value=None):
-                # Mock balance check
-                with patch.object(self.db, "deduct_aurum", return_value=100):
-                    # Mock refund
-                    self.players_col.update_one = MagicMock()
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            with patch.object(self.db, "get_inventory_slot_count", return_value=20):
+                with patch.object(self.db, "find_stackable_item", return_value=None):
+                    # Mock balance check
+                    with patch.object(self.db, "deduct_aurum", return_value=100):
+                        # Mock refund
+                        self.players_col.update_one = MagicMock()
 
-                    success, msg, bal = self.db.purchase_item(
-                        self.discord_id, "shop_item", {"name": "Shop Item", "rarity": "Common"}, 10
-                    )
+                        success, msg, bal = self.db.purchase_item(
+                            self.discord_id, "shop_item", {"name": "Shop Item", "rarity": "Common"}, 10
+                        )
 
-                    self.assertFalse(success)
-                    self.assertEqual(msg, "Inventory Full.")
-                    self.assertEqual(bal, 110)  # 100 + 10 Refunded
+                        self.assertFalse(success)
+                        self.assertEqual(msg, "Inventory Full.")
+                        self.assertEqual(bal, 110)  # 100 + 10 Refunded
 
 
 if __name__ == "__main__":

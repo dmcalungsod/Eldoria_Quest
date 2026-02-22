@@ -47,7 +47,8 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 0
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-        success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 12)
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 12)
 
         self.assertTrue(success)
 
@@ -70,7 +71,8 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 1
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-        success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 10)
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 10)
 
         self.assertTrue(success)
 
@@ -91,7 +93,8 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.find_one.return_value = None
         self.inventory_col.count_documents.return_value = 19
 
-        success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 6)
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 6)
 
         self.assertFalse(success)
         self.inventory_col.insert_many.assert_not_called()
@@ -105,7 +108,8 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 0
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
-        success = self.db.add_inventory_item(self.discord_id, "sword", "Sword", "equipment", "Common", 2)
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            success = self.db.add_inventory_item(self.discord_id, "sword", "Sword", "equipment", "Common", 2)
 
         self.assertTrue(success)
 
@@ -143,7 +147,8 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 1  # 1 slot used
         self.counters_col.find_one_and_update.return_value = {"seq": 200}
 
-        failed = self.db.add_inventory_items_bulk(self.discord_id, items)
+        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+            failed = self.db.add_inventory_items_bulk(self.discord_id, items)
 
         self.assertEqual(len(failed), 0)
 
