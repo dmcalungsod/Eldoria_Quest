@@ -68,6 +68,9 @@ class DatabaseManager:
         self._world_event_cache: dict | None = None
         self._world_event_cache_time: float = 0.0
 
+        self._tournament_cache: dict | None = None
+        self._tournament_cache_time: float = 0.0
+
         logger.info(f"Connected to MongoDB: {self._db_name}")
         self._initialized = True
 
@@ -2112,14 +2115,21 @@ class DatabaseManager:
                 "active": 1,
             }
         )
+        self._tournament_cache_time = 0.0  # Invalidate cache
         return new_id
 
     def get_active_tournament(self) -> dict | None:
-        """Fetches the current active tournament."""
-        return self._col("tournaments").find_one(
+        """Fetches the current active tournament (Cached for 60s)."""
+        now_ts = time.time()
+        if now_ts - self._tournament_cache_time < 60:
+            return self._tournament_cache.copy() if self._tournament_cache else None
+
+        self._tournament_cache = self._col("tournaments").find_one(
             {"active": 1},
             {"_id": 0},
         )
+        self._tournament_cache_time = now_ts
+        return self._tournament_cache.copy() if self._tournament_cache else None
 
     def end_active_tournament(self):
         """Marks all active tournaments as inactive."""
@@ -2127,6 +2137,7 @@ class DatabaseManager:
             {"active": 1},
             {"$set": {"active": 0}},
         )
+        self._tournament_cache_time = 0.0  # Invalidate cache
 
     def update_tournament_score(self, discord_id: int, tournament_id: int, score_increment: int):
         """Updates (increments) a player's score for a tournament."""
