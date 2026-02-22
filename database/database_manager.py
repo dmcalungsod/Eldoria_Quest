@@ -631,6 +631,8 @@ class DatabaseManager:
         start_time: str,
         end_time: str,
         duration_minutes: int,
+        supplies: dict[str, int] | None = None,
+        status: str = "in_progress",
     ):
         """Creates a new adventure session."""
         # Remove any existing sessions first (replace behavior)
@@ -643,11 +645,33 @@ class DatabaseManager:
                 "end_time": end_time,
                 "duration_minutes": duration_minutes,
                 "active": 1,
+                "status": status,
+                "supplies": supplies or {},
                 "logs": "[]",
                 "loot_collected": "{}",
                 "active_monster_json": None,
                 "version": 1,
             }
+        )
+
+    def get_adventures_ending_before(self, timestamp_iso: str) -> list[dict]:
+        """Fetches active adventures that end before the given timestamp."""
+        return list(
+            self._col("adventure_sessions").find(
+                {
+                    "active": 1,
+                    "status": "in_progress",
+                    "end_time": {"$lte": timestamp_iso},
+                },
+                {"_id": 0},
+            )
+        )
+
+    def update_adventure_status(self, discord_id: int, status: str):
+        """Updates the status of an active adventure."""
+        self._col("adventure_sessions").update_one(
+            {"discord_id": discord_id, "active": 1},
+            {"$set": {"status": status}},
         )
 
     def get_active_adventure(self, discord_id: int) -> dict | None:
