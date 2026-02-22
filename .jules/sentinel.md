@@ -1,29 +1,9 @@
-## 2024-05-22 - Discord Interaction Price Tampering
-**Vulnerability:** A shop system trusted the price value sent back from a Discord Select Menu interaction (`value="item_id:price"`). A malicious user could manipulate the interaction data to buy expensive items for 1 gold.
-**Learning:** Discord interaction values are client-controlled inputs. Never trust sensitive data (like prices) embedded in them.
-**Prevention:** Only embed IDs in interaction values. Always fetch prices or critical data from the server-side source of truth using those IDs.
+# Sentinel's Journal
 
-## 2024-05-23 - Insecure JSON Construction
-**Vulnerability:** Player statistics were being serialized to JSON using `str(dict).replace("'", '"')` instead of `json.dumps()`. This is brittle and can produce invalid JSON if strings contain quotes, or lead to injection if user input is ever stored in stats.
-**Learning:** Never manually construct JSON strings. Python's string representation of a dict is not valid JSON.
-**Prevention:** Always use the standard `json` library (`json.dumps`, `json.loads`) for serialization to ensure proper escaping and formatting.
+## 2025-02-18 — Application Command Authorization Bypass Risk
 
-## 2024-06-03 - Skill Trainer Cost Manipulation
-**Vulnerability:** The Skill Trainer trusted the cost value sent back from the "Learn/Upgrade Skill" interaction (`value="skill_key:cost"`). Malicious users could modify this value to learn expensive skills for 0 cost or even negative values.
-**Learning:** This is a classic "Parameter Tampering" vulnerability. Discord interaction data is untrusted client input, even if it originated from the bot's own UI.
-**Prevention:** Only use the `skill_key` or unique identifier from the interaction. Always recalculate the cost server-side based on the current player state and authoritative data source (`SKILLS`).
+**Vulnerability:** The `@commands.is_owner()` decorator from `discord.ext.commands` was applied to an `@app_commands.command`. While some libraries support this, mixing `ext.commands` checks with `app_commands` can lead to scenarios where the check is not properly registered or enforced by the interaction system, potentially allowing unauthorized users to execute admin commands.
 
-## 2024-06-15 - Quest Location Validation Bypass
-**Vulnerability:** The quest event system progressed "locate" and other objective types whenever a random non-combat event triggered, regardless of the player's current location. This allowed players to complete location-specific quests (e.g. "Locate Hidden Cave") by simply walking in circles in a safe zone.
-**Learning:** Context-sensitive actions (like finding a specific location) must be validated against the current state context (the player's location) before applying progress. Assuming "event happened = progress made" is insecure.
-**Prevention:** Always validate that the current game state (location, inventory, etc.) meets the specific requirements of the objective before granting progress. Pass context explicitly to handler functions.
+**Learning:** `app_commands` rely on the interaction tree for checks. Traditional `ext.commands` decorators might not integrate seamlessly with the slash command system's error handling pipeline, or might be ignored if the command is not a hybrid command.
 
-## 2025-10-27 - Stale State in Persistent Views
-**Vulnerability:** The `InfirmaryView` used cached `PlayerStats` from initialization to calculate healing costs and apply updates. If the player's stats changed in the database (e.g., via equipment swap in another session) while the view was open, the healing logic would use outdated values, leading to potential exploits (overhealing or incorrect costs).
-**Learning:** UI Views in Discord.py are persistent in memory but the underlying database state is not. Relying on `self.attributes` initialized in `__init__` for critical logic is dangerous if that state can change externally.
-**Prevention:** Always re-fetch critical data (like player stats or balances) from the database at the start of any sensitive transactional method (like `_execute_heal`), ensuring the logic uses the current authoritative state.
-
-## 2025-10-27 - Quest Acceptance Rank Bypass
-**Vulnerability:** `QuestSystem.accept_quest` allowed accepting quests of any tier by ID, bypassing the rank filtering used in the UI. A low-rank player could accept a high-rank quest if they knew the ID.
-**Learning:** Filtering at the UI/List level (`get_available_quests`) is insufficient. Critical state-changing actions must re-validate authorization/eligibility on the server side, as input IDs can be manipulated or stale.
-**Prevention:** Always re-validate eligibility (Rank, Level, Cost) within the transactional method itself, treating the ID as untrusted input.
+**Prevention:** Always use explicit checks within the command body (e.g., `if not await bot.is_owner(user): return`) or use dedicated `app_commands.checks` decorators. Defense in depth (manual check + decorator) is preferred for critical administrative functions.

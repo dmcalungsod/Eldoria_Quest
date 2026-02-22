@@ -14,6 +14,10 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock external dependencies for environments where they aren't installed
+_original_discord = sys.modules.get("discord")
+_original_discord_ext = sys.modules.get("discord.ext")
+_mocked_discord = False
+
 try:
     import pymongo  # noqa: F401
 except ImportError:
@@ -26,9 +30,21 @@ try:
 except ImportError:
     sys.modules["discord"] = MagicMock()
     sys.modules["discord.ext"] = MagicMock()
+    _mocked_discord = True
 
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.player.player_creator import PlayerCreator  # noqa: E402
+
+# Restore original discord modules to prevent polluting other tests
+if _mocked_discord:
+    if _original_discord is not None:
+        sys.modules["discord"] = _original_discord
+    else:
+        sys.modules.pop("discord", None)
+    if _original_discord_ext is not None:
+        sys.modules["discord.ext"] = _original_discord_ext
+    else:
+        sys.modules.pop("discord.ext", None)
 
 
 class TestSecurity(unittest.TestCase):
