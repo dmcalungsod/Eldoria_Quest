@@ -14,6 +14,7 @@ import time
 from contextlib import contextmanager
 from typing import Any
 
+from game_systems.world_time import WorldTime
 from pymongo import InsertOne, MongoClient, UpdateOne
 from pymongo.errors import DuplicateKeyError
 
@@ -171,7 +172,7 @@ class DatabaseManager:
         Returns a dict with 'player', 'stats', 'buffs', 'skills'.
         Returns None if player not found.
         """
-        now_iso = datetime.datetime.now().isoformat()
+        now_iso = WorldTime.now().isoformat()
 
         # Optimized: Single Aggregation Pipeline to reduce DB round-trips from 4 to 1
         pipeline = [
@@ -476,7 +477,7 @@ class DatabaseManager:
                 "$set": {
                     "faction_id": faction_id,
                     "reputation": 0,
-                    "join_date": datetime.datetime.now().isoformat(),
+                    "join_date": WorldTime.now().isoformat(),
                 }
             },
             upsert=True,
@@ -530,7 +531,7 @@ class DatabaseManager:
         if now_ts - self._boost_cache_time < 60:
             return self._boost_cache
 
-        now_iso = datetime.datetime.now().isoformat()
+        now_iso = WorldTime.now().isoformat()
         try:
             self._boost_cache = list(
                 self._col("global_boosts").find(
@@ -549,7 +550,7 @@ class DatabaseManager:
         Sets a global boost (e.g., exp_boost, loot_boost).
         Updates the record if it already exists (upsert).
         """
-        end_time = (datetime.datetime.now() + datetime.timedelta(hours=duration_hours)).isoformat()
+        end_time = (WorldTime.now() + datetime.timedelta(hours=duration_hours)).isoformat()
         self._col("global_boosts").update_one(
             {"boost_key": key},
             {
@@ -584,7 +585,7 @@ class DatabaseManager:
         duration_s: int,
     ):
         """Adds a buff to the player."""
-        end_time = (datetime.datetime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
+        end_time = (WorldTime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
         self._col("active_buffs").insert_one(
             {
                 "discord_id": discord_id,
@@ -598,7 +599,7 @@ class DatabaseManager:
 
     def get_active_buffs(self, discord_id: int) -> list[dict[str, Any]]:
         """Fetches active buffs for the player."""
-        now = datetime.datetime.now().isoformat()
+        now = WorldTime.now().isoformat()
         return list(
             self._col("active_buffs").find(
                 {"discord_id": discord_id, "end_time": {"$gt": now}},
@@ -608,7 +609,7 @@ class DatabaseManager:
 
     def clear_expired_buffs(self, discord_id: int):
         """Removes expired buffs."""
-        now = datetime.datetime.now().isoformat()
+        now = WorldTime.now().isoformat()
         self._col("active_buffs").delete_many(
             {"discord_id": discord_id, "end_time": {"$lte": now}},
         )
@@ -1355,7 +1356,7 @@ class DatabaseManager:
             {
                 "discord_id": discord_id,
                 "rank": rank,
-                "join_date": datetime.datetime.now().isoformat(),
+                "join_date": WorldTime.now().isoformat(),
                 "merit_points": 0,
                 "quests_completed": 0,
                 "normal_kills": 0,

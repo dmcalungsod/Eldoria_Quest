@@ -10,6 +10,7 @@ import logging
 from typing import Any
 
 from database.database_manager import DatabaseManager
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.events")
 
@@ -87,7 +88,7 @@ class WorldEventSystem:
         # Check expiration
         try:
             end_time = datetime.datetime.fromisoformat(event["end_time"])
-            if datetime.datetime.now() > end_time:
+            if WorldTime.now() > end_time:
                 self.end_current_event()
                 return None
         except ValueError:
@@ -110,7 +111,7 @@ class WorldEventSystem:
             logger.warning(f"Attempted to start unknown event: {event_type}")
             return False
 
-        start_time = datetime.datetime.now()
+        start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(hours=duration_hours)
 
         self.db.set_active_world_event(event_type, start_time.isoformat(), end_time.isoformat())
