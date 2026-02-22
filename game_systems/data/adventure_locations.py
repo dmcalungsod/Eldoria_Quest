@@ -87,6 +87,39 @@ LOCATIONS = {
         ],
         "special_events": ["trap_pit", "ancient_shrine"],
     },
+    "the_ashlands": {
+        "name": "The Ashlands",
+        "emoji": "🌋",
+        "min_rank": "D",
+        "level_req": 12,
+        "duration_options": [60, 120, 240],
+        "monsters": [
+            ("monster_131", 30),  # Ash Rat
+            ("monster_132", 30),  # Cinder Mite
+            ("monster_133", 25),  # Ember Fox
+            ("monster_134", 15),  # Scorched Scavenger
+        ],
+        "night_monsters": [
+            ("monster_133", 40),  # Ember Fox (Active at night)
+            ("monster_134", 40),  # Scorched Scavenger
+            ("monster_132", 20),
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_135",  # Slag Golem (Boss)
+                "weight": 5,
+                "min_level": 16,
+            }
+        ],
+        "description": "A grey wasteland of volcanic ash and skeletal trees. The heat is oppressive.",
+        "gatherables": [
+            ("obsidian_shard", 40),
+            ("ash_blossom", 30),
+            ("iron_ore", 20),
+            ("magic_stone_medium", 10),
+        ],
+        "special_events": ["trap_pit", "hidden_stash", "safe_room"],
+    },
     "shrouded_fen": {
         "name": "The Shrouded Fen",
         "emoji": "🌫️",

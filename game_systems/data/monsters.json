@@ -2081,5 +2081,138 @@
             "regenerate"
         ],
         "description": "The massive central processing unit of the Clockwork Halls, armed and dangerous."
+    },
+    "monster_131": {
+        "id": 131,
+        "name": "Ash Rat",
+        "level": 12,
+        "tier": "Normal",
+        "hp": 450,
+        "atk": 30,
+        "def": 14,
+        "xp": 360,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "ash_blossom",
+                30
+            ]
+        ],
+        "skills": [
+            "vicious_bite"
+        ],
+        "description": "A scavenger adapted to the toxic ash, its fur is stiff with soot."
+    },
+    "monster_132": {
+        "id": 132,
+        "name": "Cinder Mite",
+        "level": 13,
+        "tier": "Normal",
+        "hp": 480,
+        "atk": 32,
+        "def": 16,
+        "xp": 390,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "scorched_chitin",
+                40
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "ember"
+        ],
+        "description": "A small insectoid creature that glows with internal heat."
+    },
+    "monster_133": {
+        "id": 133,
+        "name": "Ember Fox",
+        "level": 14,
+        "tier": "Normal",
+        "hp": 510,
+        "atk": 34,
+        "def": 18,
+        "xp": 420,
+        "drops": [
+            [
+                "magic_stone_small",
+                80
+            ],
+            [
+                "fire_essence",
+                20
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "ember"
+        ],
+        "description": "A fox wreathed in flickering flames, elusive and dangerous."
+    },
+    "monster_134": {
+        "id": 134,
+        "name": "Scorched Scavenger",
+        "level": 15,
+        "tier": "Elite",
+        "hp": 850,
+        "atk": 55,
+        "def": 25,
+        "xp": 1500,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "obsidian_shard",
+                40
+            ],
+            [
+                "iron_ingot",
+                15
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "rapid_strike"
+        ],
+        "description": "A humanoid figure twisted by the ash, searching for scraps of metal."
+    },
+    "monster_135": {
+        "id": 135,
+        "name": "Slag Golem",
+        "level": 16,
+        "tier": "Boss",
+        "hp": 3000,
+        "atk": 90,
+        "def": 40,
+        "xp": 5000,
+        "drops": [
+            [
+                "magic_stone_large",
+                100
+            ],
+            [
+                "magma_core",
+                50
+            ],
+            [
+                "obsidian_shard",
+                100
+            ]
+        ],
+        "skills": [
+            "crushing_slam",
+            "heavy_blow",
+            "regenerate"
+        ],
+        "description": "A lumbering mass of molten rock and iron, formed from the waste of the Sundering."
     }
 }
