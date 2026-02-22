@@ -219,6 +219,21 @@ class AdventureEvents:
         "Leaves rustle with a joyous energy.",
     ]
 
+    ATMOSPHERE_ASHLANDS = [
+        "The ground is hot beneath your boots, and ash chokes the air.",
+        "Skeletal trees claw at the grey sky, stripped of all life.",
+        "A constant, low rumble vibrates through the volcanic rock.",
+        "The air smells of sulfur and old fire.",
+        "Dust storms swirl across the barren plains, obscuring vision.",
+        "You step over the charred remains of what was once a forest.",
+        "Heat radiates from the cracks in the earth.",
+        "The silence is heavy, broken only by the hiss of escaping steam.",
+        "A red haze hangs over the horizon, where the lava flows.",
+        "Nothing grows here but the twisted, thorny ash blossoms.",
+        "The wind howls through the canyons like a dying beast.",
+        "Your skin feels dry and tight from the oppressive heat.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -295,6 +310,15 @@ class AdventureEvents:
         f"{E.GEAR} You adjust your gear while the steam clears.",
         f"{E.GEAR} Huddled behind a brass pillar, you take a moment.",
         f"{E.GEAR} You watch the mesmerizing rotation of the gears and calm your mind.",
+    ]
+
+    REGEN_PHRASES_ASHLANDS = [
+        f"{E.VOLCANO} You find a windbreak behind a large obsidian boulder and rest.",
+        f"{E.VOLCANO} The air is thick, but you manage to catch your breath.",
+        f"{E.VOLCANO} You wipe the ash from your face and take a sip of warm water.",
+        f"{E.VOLCANO} Huddled in a shallow depression, you wait for the dust to settle.",
+        f"{E.VOLCANO} The heat is draining, but you force yourself to focus.",
+        f"{E.VOLCANO} You inspect your gear for signs of melting or corrosion.",
     ]
 
     REGEN_LOW_HP = [
@@ -488,6 +512,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CLOCKWORK)]
         elif location_id == "guild_arena":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
+        elif location_id == "the_ashlands":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ASHLANDS)]
 
         # 5. Generic Fallback
         else:
@@ -512,6 +538,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_CLOCKWORK
             elif location_id == "guild_arena":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
+            elif location_id == "the_ashlands":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_ASHLANDS
 
             # Event Override (High Priority)
             if event_type == "blood_moon":

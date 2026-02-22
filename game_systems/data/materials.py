@@ -311,6 +311,19 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1500,
     },
+    # --- The Ashlands Materials (Rank D) ---
+    "ash_blossom": {
+        "name": "Ash Blossom",
+        "description": "A pale, hardy flower that grows in volcanic soil.",
+        "rarity": "Common",
+        "value": 15,
+    },
+    "scorched_chitin": {
+        "name": "Scorched Chitin",
+        "description": "A piece of insect shell, hardened by heat.",
+        "rarity": "Uncommon",
+        "value": 35,
+    },
     # --- Refined Materials ---
     "iron_ingot": {
         "name": "Iron Ingot",
