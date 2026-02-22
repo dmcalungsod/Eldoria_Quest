@@ -10,7 +10,8 @@
         "learn_cost": 0,
         "upgrade_cost": 200,
         "scaling_stat": "STR",
-        "scaling_factor": 2.7
+        "scaling_factor": 2.7,
+        "element": "physical"
     },
     "cleave": {
         "key_id": "cleave",
@@ -23,7 +24,8 @@
         "learn_cost": 2000,
         "upgrade_cost": 300,
         "scaling_stat": "STR",
-        "scaling_factor": 2.7
+        "scaling_factor": 2.7,
+        "element": "physical"
     },
     "endure": {
         "key_id": "endure",
@@ -39,7 +41,8 @@
         "learn_cost": 1500,
         "upgrade_cost": 250,
         "scaling_stat": "END",
-        "scaling_factor": 1.0
+        "scaling_factor": 1.0,
+        "element": "physical"
     },
     "fireball": {
         "key_id": "fireball",
@@ -52,7 +55,8 @@
         "learn_cost": 0,
         "upgrade_cost": 200,
         "scaling_stat": "MAG",
-        "scaling_factor": 2.8
+        "scaling_factor": 2.8,
+        "element": "fire"
     },
     "ice_lance": {
         "key_id": "ice_lance",
@@ -65,7 +69,8 @@
         "learn_cost": 2000,
         "upgrade_cost": 300,
         "scaling_stat": "MAG",
-        "scaling_factor": 2.8
+        "scaling_factor": 2.8,
+        "element": "ice"
     },
     "mana_shield": {
         "key_id": "mana_shield",
@@ -81,7 +86,8 @@
         "learn_cost": 3000,
         "upgrade_cost": 400,
         "scaling_stat": "MAG",
-        "scaling_factor": 1.0
+        "scaling_factor": 1.0,
+        "element": "arcane"
     },
     "explosion": {
         "key_id": "explosion",
@@ -94,7 +100,8 @@
         "learn_cost": 10000,
         "upgrade_cost": 800,
         "scaling_stat": "MAG",
-        "scaling_factor": 2.8
+        "scaling_factor": 2.8,
+        "element": "fire"
     },
     "stealth": {
         "key_id": "stealth",
@@ -109,7 +116,8 @@
         "learn_cost": 0,
         "upgrade_cost": 500,
         "scaling_stat": "AGI",
-        "scaling_factor": 1.0
+        "scaling_factor": 1.0,
+        "element": "physical"
     },
     "double_strike": {
         "key_id": "double_strike",
@@ -122,7 +130,8 @@
         "learn_cost": 2500,
         "upgrade_cost": 350,
         "scaling_stat": "DEX",
-        "scaling_factor": 2.6
+        "scaling_factor": 2.6,
+        "element": "physical"
     },
     "toxic_blade": {
         "key_id": "toxic_blade",
@@ -139,7 +148,8 @@
         "learn_cost": 2000,
         "upgrade_cost": 300,
         "scaling_stat": "DEX",
-        "scaling_factor": 2.6
+        "scaling_factor": 2.6,
+        "element": "poison"
     },
     "heal": {
         "key_id": "heal",
@@ -152,7 +162,8 @@
         "learn_cost": 0,
         "upgrade_cost": 200,
         "scaling_stat": "MAG",
-        "scaling_factor": 1.5
+        "scaling_factor": 1.5,
+        "element": "holy"
     },
     "smite": {
         "key_id": "smite",
@@ -165,7 +176,8 @@
         "learn_cost": 1500,
         "upgrade_cost": 250,
         "scaling_stat": "MAG",
-        "scaling_factor": 2.8
+        "scaling_factor": 2.8,
+        "element": "holy"
     },
     "blessing": {
         "key_id": "blessing",
@@ -181,7 +193,8 @@
         "learn_cost": 3000,
         "upgrade_cost": 400,
         "scaling_stat": "MAG",
-        "scaling_factor": 1.0
+        "scaling_factor": 1.0,
+        "element": "holy"
     },
     "true_shot": {
         "key_id": "true_shot",
@@ -194,7 +207,8 @@
         "learn_cost": 0,
         "upgrade_cost": 200,
         "scaling_stat": "DEX",
-        "scaling_factor": 2.6
+        "scaling_factor": 2.6,
+        "element": "physical"
     },
     "multi_shot": {
         "key_id": "multi_shot",
@@ -207,7 +221,8 @@
         "learn_cost": 2000,
         "upgrade_cost": 300,
         "scaling_stat": "DEX",
-        "scaling_factor": 2.6
+        "scaling_factor": 2.6,
+        "element": "physical"
     },
     "survivalist": {
         "key_id": "survivalist",
@@ -223,6 +238,7 @@
         "learn_cost": 3000,
         "upgrade_cost": 500,
         "scaling_stat": "END",
-        "scaling_factor": 1.0
+        "scaling_factor": 1.0,
+        "element": "physical"
     }
 }
