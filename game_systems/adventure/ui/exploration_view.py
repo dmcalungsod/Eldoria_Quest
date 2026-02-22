@@ -255,7 +255,17 @@ class ExplorationView(View):
 
             # 1. Disable UI immediately
             self._disable_all()
-            await interaction.edit_original_response(view=self)
+
+            # UX Improvement: Show processing state
+            try:
+                # Retrieve current embed to update footer for feedback
+                embed = interaction.message.embeds[0]
+                status_text = "⚔️ Resolving combat..." if self.active_monster else "🥾 Exploring..."
+                embed.set_footer(text=status_text)
+                await interaction.edit_original_response(embed=embed, view=self)
+            except Exception:
+                # Fallback if embed retrieval fails
+                await interaction.edit_original_response(view=self)
 
             # 2. Run Simulation Thread
             result = await asyncio.to_thread(self.manager.simulate_adventure_step, self.interaction_user.id, action)

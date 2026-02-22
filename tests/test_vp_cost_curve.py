@@ -44,14 +44,9 @@ mock_discord.ui = mock_ui
 # Just in case:
 import os  # noqa: E402
 
-sys.path.insert(0, os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-try:
-    from cogs.status_update_cog import StatusUpdateView  # noqa: E402
-except ImportError:
-    # If import fails, we might be running from inside tests/
-    sys.path.insert(0, os.path.dirname(os.getcwd()))
-    from cogs.status_update_cog import StatusUpdateView  # noqa: E402
+from cogs.status_update_cog import StatusUpdateView  # noqa: E402
 
 
 class TestVPCostCurve(unittest.TestCase):

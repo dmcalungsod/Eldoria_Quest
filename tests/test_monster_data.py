@@ -3,7 +3,7 @@ import sys
 import unittest
 
 # Add repo root to path
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.data.monsters import MONSTERS
 from game_systems.monsters.monster_skills import MONSTER_SKILLS
