@@ -18,13 +18,19 @@ except ImportError:
 
 class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        # 1. Check if 'discord' is currently a Mock (due to other tests)
-        #    If so, we need to ensure app_commands.command works as a decorator
-        #    that preserves the callback function.
-        if isinstance(discord, (Mock, MagicMock)) or hasattr(discord, "call_args"):
+        # 1. Get the CURRENT discord module from sys.modules
+        #    This accounts for other tests (like test_shop_integration) patching it.
+        current_discord = sys.modules.get("discord")
+
+        # Check if it's a Mock (or MagicMock) or has mocking artifacts
+        is_mocked = isinstance(current_discord, (Mock, MagicMock)) or hasattr(
+            current_discord, "call_args"
+        )
+
+        if is_mocked:
             # Ensure app_commands exists on the mock
-            if not getattr(discord, "app_commands", None):
-                discord.app_commands = MagicMock()
+            if not getattr(current_discord, "app_commands", None):
+                current_discord.app_commands = MagicMock()
 
             # Define side_effect to simulate @app_commands.command(...)
             def command_decorator_factory(*args, **kwargs):
@@ -38,7 +44,7 @@ class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
 
                 return decorator
 
-            discord.app_commands.command.side_effect = command_decorator_factory
+            current_discord.app_commands.command.side_effect = command_decorator_factory
 
             # 2. Force reload cogs.developer_cog to apply this decorator logic
             if "cogs.developer_cog" in sys.modules:
