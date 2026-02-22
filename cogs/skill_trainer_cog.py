@@ -16,6 +16,7 @@ from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.achievement_system import AchievementSystem
 from game_systems.data.skills_data import SKILLS
 
 from .ui_helpers import back_to_guild_hall_callback
@@ -47,6 +48,7 @@ class SkillTrainerView(View):
 
         # Load skills synchronously here as it is lightweight reading
         self.player_skills = self._get_player_skills_sync()
+        self.achievements = AchievementSystem(self.db)
 
         # Components
         self.add_item(self.build_learn_select())
@@ -207,12 +209,22 @@ class SkillTrainerView(View):
         success, msg = await asyncio.to_thread(self._execute_learn, skill_key)
         await self._refresh_ui(interaction, success, msg, skill_key)
 
+        if success:
+            ach_msg = await asyncio.to_thread(self.achievements.check_skill_achievements, interaction.user.id)
+            if ach_msg:
+                await interaction.followup.send(ach_msg, ephemeral=True)
+
     async def upgrade_skill_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         skill_key = interaction.data["values"][0].split(":")[0]
 
         success, msg, new_level = await asyncio.to_thread(self._execute_upgrade, skill_key)
         await self._refresh_ui(interaction, success, msg, skill_key, new_level)
+
+        if success:
+            ach_msg = await asyncio.to_thread(self.achievements.check_skill_achievements, interaction.user.id)
+            if ach_msg:
+                await interaction.followup.send(ach_msg, ephemeral=True)
 
     async def _refresh_ui(self, interaction, success, msg, skill_key, level=1):
         """Common refresh logic."""

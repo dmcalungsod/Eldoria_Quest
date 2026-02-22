@@ -95,6 +95,18 @@ LOCATION_MILESTONES = {
     12: ("World-Walker", "Discovered all known locations."),
 }
 
+SKILL_COUNT_MILESTONES = {
+    2: ("Student", "Learned 2 skills."),
+    4: ("Scholar", "Learned 4 skills."),
+    6: ("Polymath", "Learned 6 skills."),
+}
+
+SKILL_LEVEL_MILESTONES = {
+    5: ("Expert", "Reached skill level 5."),
+    10: ("Virtuoso", "Reached skill level 10."),
+    20: ("Paragon", "Reached skill level 20."),
+}
+
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -270,4 +282,45 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking exploration achievements for {discord_id}: {e}")
+            return None
+
+    def check_skill_achievements(self, discord_id: int) -> str | None:
+        """
+        Checks if the player has reached skill milestones (count or max level).
+        Returns a success message if a new title is awarded, else None.
+        """
+        try:
+            skills = self.db.get_all_player_skills(discord_id)
+            if not skills:
+                return None
+
+            skill_count = len(skills)
+            max_skill_level = max(s["skill_level"] for s in skills) if skills else 0
+
+            newly_awarded = []
+
+            # Check Skill Count Milestones
+            for count, (title, desc) in SKILL_COUNT_MILESTONES.items():
+                if skill_count >= count:
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
+            # Check Skill Level Milestones
+            for level, (title, desc) in SKILL_LEVEL_MILESTONES.items():
+                if max_skill_level >= level:
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
+            if newly_awarded:
+                if len(newly_awarded) == 1:
+                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
+                else:
+                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Error checking skill achievements for {discord_id}: {e}")
             return None
