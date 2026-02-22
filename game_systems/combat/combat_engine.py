@@ -122,6 +122,7 @@ class CombatEngine:
         self.player_stance = player_stance
         self.dmg_dealt_mult = 1.0
         self.dmg_taken_mult = 1.0
+        self.new_buffs = []
 
         if self.player_stance == "aggressive":
             self.dmg_dealt_mult = 1.2
@@ -382,6 +383,7 @@ class CombatEngine:
                 "monster_hp": self.monster_hp,
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
+                "new_buffs": self.new_buffs,
             }
 
         except Exception as e:
@@ -395,6 +397,7 @@ class CombatEngine:
                 "monster_hp": self.monster_hp,
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
+                "new_buffs": self.new_buffs,
             }
 
     def _resolve_special_ability(self, log, turn_report, force_crit=False):
@@ -476,6 +479,7 @@ class CombatEngine:
 
         elif skill.get("buff_data"):
             # --- Buff/Utility Skill ---
+            self._apply_skill_buffs(skill)
             log.append(CombatPhrases.player_buff(self.player, skill))
 
         else:
@@ -528,6 +532,49 @@ class CombatEngine:
 
         self.monster_hp -= dmg
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
+
+    def _apply_skill_buffs(self, skill):
+        """
+        Calculates and records buffs from a skill.
+        Converts % bonuses to flat values based on current stats.
+        """
+        buff_data = skill.get("buff_data", {})
+        if not buff_data:
+            return
+
+        duration = int(buff_data.get("duration", 3))
+
+        def add_buff(stat, amount):
+            self.new_buffs.append(
+                {
+                    "name": skill.get("name", "Unknown Buff"),
+                    "stat": stat,
+                    "amount": int(amount),
+                    "duration": duration,
+                }
+            )
+
+        for key, val in buff_data.items():
+            if key == "duration":
+                continue
+
+            if key == "all_stats_percent":
+                # Apply to all primary stats
+                for stat_code in ["STR", "END", "DEX", "AGI", "MAG", "LCK"]:
+                    current_val = self.stats_dict.get(stat_code, 10)
+                    bonus = current_val * float(val)
+                    if bonus > 0:
+                        add_buff(stat_code, bonus)
+
+            elif key.endswith("_percent"):
+                # e.g., "END_percent": 0.25 -> +25% END
+                stat_code = key.replace("_percent", "").upper()
+                current_val = self.stats_dict.get(stat_code, 10)
+                bonus = current_val * float(val)
+                if bonus > 0:
+                    add_buff(stat_code, bonus)
+
+            # Potential future handling for "mana_shield" or other non-stat buffs could go here.
 
     def _tag_damage_type(self, skill, report):
         """Helper to categorize skill damage for stat growth."""
