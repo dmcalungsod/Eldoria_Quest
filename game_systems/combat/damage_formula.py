@@ -67,7 +67,24 @@ class DamageFormula:
     @staticmethod
     def player_skill(player_stats, monster, skill_data, skill_level: int):
         # Data-driven scaling
-        scaling_stat = skill_data.get("scaling_stat", "MAG").upper()
+        scaling_stat = skill_data.get("scaling_stat")
+
+        # Fallback mechanism for potentially broken DB records
+        if not scaling_stat:
+            key_id = skill_data.get("key_id", "")
+            # Known physical skills
+            if key_id in ["power_strike", "cleave", "shield_bash", "charge"]:
+                scaling_stat = "STR"
+            # Known agility/dex skills
+            elif key_id in ["double_strike", "toxic_blade", "backstab", "true_shot", "multi_shot", "aimed_shot"]:
+                scaling_stat = "DEX"
+            # Known magic skills
+            elif key_id in ["fireball", "ice_lance", "smite", "explosion", "heal", "lightning_bolt"]:
+                scaling_stat = "MAG"
+            else:
+                scaling_stat = "MAG"  # Default fallback
+
+        scaling_stat = scaling_stat.upper()
         scaling_factor = float(skill_data.get("scaling_factor", 1.0))
 
         base_stat_value = DamageFormula._get_stat(player_stats, scaling_stat)
