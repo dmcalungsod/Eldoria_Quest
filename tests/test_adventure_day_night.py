@@ -110,7 +110,9 @@ class TestAdventureDayNight(unittest.TestCase):
                         expected_hp = 100 - 16
                         self.assertEqual(self.mock_context["vitals"]["current_hp"], expected_hp)
                         # Verify atomic delta update is used
-                        self.mock_db.update_player_vitals_delta.assert_called_with(123456789, -16, 0, 100, 50)
+                        self.mock_db.update_player_vitals_delta.assert_called_with(
+                            123456789, -16, 0, 100, 50
+                        )
 
     def test_night_no_ambush(self):
         """Nighttime encounter chance failure should not ambush."""

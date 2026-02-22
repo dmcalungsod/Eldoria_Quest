@@ -1,3 +1,4 @@
+
 import sys
 import unittest
 from unittest.mock import MagicMock
@@ -19,9 +20,7 @@ class TestArmorSlots(unittest.TestCase):
         self.mock_db.get_guild_rank.return_value = "F"
 
         # Mock allowed slots to allow everything for this test
-        self.manager._get_player_allowed_slots = MagicMock(
-            return_value=["helm", "leather_cap", "heavy_armor", "medium_armor"]
-        )
+        self.manager._get_player_allowed_slots = MagicMock(return_value=["helm", "leather_cap", "heavy_armor", "medium_armor"])
         self.manager.check_requirements = MagicMock(return_value=(True, None))
 
         self.inventory = {}
@@ -47,24 +46,12 @@ class TestArmorSlots(unittest.TestCase):
     def test_head_slot_conflict(self):
         # 1. Create items
         helm = {
-            "id": 1,
-            "item_key": "helm",
-            "item_name": "Iron Helm",
-            "item_type": "equipment",
-            "slot": "helm",
-            "rarity": "Common",
-            "equipped": 0,
-            "count": 1,
+            "id": 1, "item_key": "helm", "item_name": "Iron Helm",
+            "item_type": "equipment", "slot": "helm", "rarity": "Common", "equipped": 0, "count": 1
         }
         cap = {
-            "id": 2,
-            "item_key": "cap",
-            "item_name": "Leather Cap",
-            "item_type": "equipment",
-            "slot": "leather_cap",
-            "rarity": "Common",
-            "equipped": 0,
-            "count": 1,
+            "id": 2, "item_key": "cap", "item_name": "Leather Cap",
+            "item_type": "equipment", "slot": "leather_cap", "rarity": "Common", "equipped": 0, "count": 1
         }
         self.inventory[1] = helm
         self.inventory[2] = cap
@@ -85,24 +72,12 @@ class TestArmorSlots(unittest.TestCase):
     def test_body_slot_conflict(self):
         # 1. Create items
         plate = {
-            "id": 3,
-            "item_key": "plate",
-            "item_name": "Plate Armor",
-            "item_type": "equipment",
-            "slot": "heavy_armor",
-            "rarity": "Common",
-            "equipped": 0,
-            "count": 1,
+            "id": 3, "item_key": "plate", "item_name": "Plate Armor",
+            "item_type": "equipment", "slot": "heavy_armor", "rarity": "Common", "equipped": 0, "count": 1
         }
         leather = {
-            "id": 4,
-            "item_key": "leather",
-            "item_name": "Leather Armor",
-            "item_type": "equipment",
-            "slot": "medium_armor",
-            "rarity": "Common",
-            "equipped": 0,
-            "count": 1,
+            "id": 4, "item_key": "leather", "item_name": "Leather Armor",
+            "item_type": "equipment", "slot": "medium_armor", "rarity": "Common", "equipped": 0, "count": 1
         }
         self.inventory[3] = plate
         self.inventory[4] = leather
@@ -124,7 +99,6 @@ class TestArmorSlots(unittest.TestCase):
         self.assertEqual(self.manager.get_slot_display_name("leather_cap"), "Head")
         self.assertEqual(self.manager.get_slot_display_name("heavy_armor"), "Body")
         self.assertEqual(self.manager.get_slot_display_name("medium_armor"), "Body")
-
 
 if __name__ == "__main__":
     unittest.main()

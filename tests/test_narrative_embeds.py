@@ -1,11 +1,10 @@
-import os
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
+import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 class TestNarrativeEmbeds(unittest.TestCase):
     def setUp(self):
@@ -22,14 +21,12 @@ class TestNarrativeEmbeds(unittest.TestCase):
         # Setup Embed mock to capture attributes
         def embed_side_effect(*args, **kwargs):
             mock_obj = MagicMock()
-            mock_obj.title = kwargs.get("title")
-            mock_obj.description = kwargs.get("description")
-            mock_obj.color = kwargs.get("color")
+            mock_obj.title = kwargs.get('title')
+            mock_obj.description = kwargs.get('description')
+            mock_obj.color = kwargs.get('color')
             mock_obj.fields = []
-
             def add_field(name, value, inline=True):
-                mock_obj.fields.append({"name": name, "value": value, "inline": inline})
-
+                mock_obj.fields.append({'name': name, 'value': value, 'inline': inline})
             mock_obj.add_field.side_effect = add_field
             mock_obj.set_footer = MagicMock()
             return mock_obj
@@ -48,12 +45,11 @@ class TestNarrativeEmbeds(unittest.TestCase):
         # Since we added repo root to path, it should be fine.
 
         # We also need to ensure narrative_data is importable.
-        # Reload to ensure mocks are applied if already imported
-        import importlib
-
         import game_systems.adventure.ui.adventure_embeds
         import game_systems.data.narrative_data
 
+        # Reload to ensure mocks are applied if already imported
+        import importlib
         importlib.reload(game_systems.adventure.ui.adventure_embeds)
 
         self.AdventureEmbeds = game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
@@ -74,7 +70,7 @@ class TestNarrativeEmbeds(unittest.TestCase):
         self.assertEqual(embed.color, "gold")
 
         # Check description comes from OUTCOME_FLAVOR_TEXT["level_up"]
-        description = embed.description.replace("*", "")  # Remove italics
+        description = embed.description.replace("*", "") # Remove italics
         self.assertIn(description, self.OUTCOME_FLAVOR_TEXT["level_up"])
 
     def test_build_summary_embed_location_flavor(self):
@@ -100,7 +96,6 @@ class TestNarrativeEmbeds(unittest.TestCase):
         # Check description comes from OUTCOME_FLAVOR_TEXT["default"]
         description = embed.description.replace("*", "")
         self.assertIn(description, self.OUTCOME_FLAVOR_TEXT["default"])
-
 
 if __name__ == "__main__":
     unittest.main()

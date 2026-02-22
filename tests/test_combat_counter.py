@@ -1,13 +1,12 @@
-import os
 import sys
+import os
 import unittest
 from unittest.mock import MagicMock
 
 # Add repo root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from game_systems.combat.combat_engine import CombatEngine
-
 
 class TestCombatCounter(unittest.TestCase):
     def setUp(self):
@@ -17,7 +16,15 @@ class TestCombatCounter(unittest.TestCase):
         self.player.stats.get_total_stats_dict.return_value = {"HP": 100, "MP": 100, "ATK": 10, "DEF": 10}
         self.player.level = 1
 
-        self.monster = {"name": "Test Monster", "HP": 100, "max_hp": 100, "MP": 100, "ATK": 20, "DEF": 5, "skills": []}
+        self.monster = {
+            "name": "Test Monster",
+            "HP": 100,
+            "max_hp": 100,
+            "MP": 100,
+            "ATK": 20,
+            "DEF": 5,
+            "skills": []
+        }
 
     def test_parry_physical_charge(self):
         # Setup Physical Charge
@@ -29,7 +36,7 @@ class TestCombatCounter(unittest.TestCase):
             player_skills=[],
             player_mp=100,
             player_class_id=1,
-            action="defend",
+            action="defend"
         )
 
         result = engine.run_combat_turn()
@@ -38,9 +45,9 @@ class TestCombatCounter(unittest.TestCase):
         phrases = " ".join(result["phrases"])
         self.assertIn("PARRIED!", phrases)
         self.assertIn("Reflected!", phrases)
-        self.assertIn("misses its turn", phrases)  # Monster should be stunned
-        self.assertLess(result["monster_hp"], 100)  # Monster took reflect damage
-        self.assertNotIn("unleashes **Smash**", phrases)  # Charge cancelled
+        self.assertIn("misses its turn", phrases) # Monster should be stunned
+        self.assertLess(result["monster_hp"], 100) # Monster took reflect damage
+        self.assertNotIn("unleashes **Smash**", phrases) # Charge cancelled
 
     def test_interrupt_magical_charge(self):
         # Setup Magical Charge
@@ -52,7 +59,7 @@ class TestCombatCounter(unittest.TestCase):
             player_skills=[],
             player_mp=100,
             player_class_id=1,
-            action="attack",
+            action="attack"
         )
 
         result = engine.run_combat_turn()
@@ -75,7 +82,7 @@ class TestCombatCounter(unittest.TestCase):
             player_skills=[],
             player_mp=100,
             player_class_id=1,
-            action="attack",
+            action="attack"
         )
 
         result = engine.run_combat_turn()
@@ -86,6 +93,5 @@ class TestCombatCounter(unittest.TestCase):
         # Monster should execute charge
         self.assertIn("unleashes **Smash**", phrases)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

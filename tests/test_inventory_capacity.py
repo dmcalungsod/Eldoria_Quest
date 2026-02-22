@@ -1,24 +1,23 @@
-import os
 import sys
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
 # Mock pymongo BEFORE importing database_manager
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["pymongo.collection"] = MagicMock()
-sys.modules["pymongo.results"] = MagicMock()
+sys.modules['pymongo'] = MagicMock()
+sys.modules['pymongo.errors'] = MagicMock()
+sys.modules['pymongo.collection'] = MagicMock()
+sys.modules['pymongo.results'] = MagicMock()
 
 # Add repo root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 # Adjust path for execution from root
-if os.path.basename(os.getcwd()) != "tests":
+if os.path.basename(os.getcwd()) != 'tests':
     sys.path.insert(0, os.getcwd())
 
-from database.database_manager import BASE_INVENTORY_SLOTS, DatabaseManager  # noqa: E402
 from game_systems.player.player_stats import PlayerStats  # noqa: E402
-
+from database.database_manager import DatabaseManager, BASE_INVENTORY_SLOTS  # noqa: E402
 
 class TestInventoryCapacity(unittest.TestCase):
     def setUp(self):
@@ -44,7 +43,7 @@ class TestInventoryCapacity(unittest.TestCase):
         stats = PlayerStats(str_base=9, dex_base=3)
         self.assertEqual(stats.max_inventory_slots, 14)
 
-    @patch("database.database_manager.MongoClient")
+    @patch('database.database_manager.MongoClient')
     def test_calculate_inventory_limit(self, mock_mongo):
         """Test DB method delegates to PlayerStats correctly"""
         # Mock instance creation
@@ -63,7 +62,7 @@ class TestInventoryCapacity(unittest.TestCase):
         # Should be 17
         self.assertEqual(db.calculate_inventory_limit(123), 17)
 
-    @patch("database.database_manager.MongoClient")
+    @patch('database.database_manager.MongoClient')
     def test_add_inventory_item_capacity_check(self, mock_mongo):
         """Test add_inventory_item respects dynamic limit"""
         db = DatabaseManager()
@@ -107,13 +106,12 @@ class TestInventoryCapacity(unittest.TestCase):
 
         # We need to make sure db._col returns different mocks for different collections or handle it
         # Actually simplest is just to patch _col method
-        with patch.object(db, "_col") as mock_col_method:
-            mock_col_method.return_value = MagicMock()
-            mock_col_method.return_value.find_one_and_update.return_value = {"seq": 100}
+        with patch.object(db, '_col') as mock_col_method:
+             mock_col_method.return_value = MagicMock()
+             mock_col_method.return_value.find_one_and_update.return_value = {"seq": 100}
 
-            result = db.add_inventory_item(123, "potion", "Potion", "consumable", "Common", 1)
-            self.assertTrue(result)
+             result = db.add_inventory_item(123, "potion", "Potion", "consumable", "Common", 1)
+             self.assertTrue(result)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

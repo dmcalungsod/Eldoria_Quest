@@ -8,15 +8,14 @@ Tests the regression of reward distribution logic:
 """
 
 import importlib
-import json
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+import json
+from unittest.mock import MagicMock, patch, ANY
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 class TestAdventureRewards(unittest.TestCase):
     def setUp(self):
@@ -37,17 +36,14 @@ class TestAdventureRewards(unittest.TestCase):
 
         # Import modules under test
         import database.database_manager
-
         importlib.reload(database.database_manager)
         self.DatabaseManager = database.database_manager.DatabaseManager
 
         import game_systems.adventure.adventure_rewards
-
         importlib.reload(game_systems.adventure.adventure_rewards)
         self.AdventureRewards = game_systems.adventure.adventure_rewards.AdventureRewards
 
         import game_systems.items.inventory_manager
-
         importlib.reload(game_systems.items.inventory_manager)
         self.InventoryManager = game_systems.items.inventory_manager.InventoryManager
 
@@ -87,7 +83,7 @@ class TestAdventureRewards(unittest.TestCase):
             "player_dodge": 4,
             "dex_hits": 6,
             "str_hits": 8,
-            "mag_hits": 5,
+            "mag_hits": 5
         }
 
         # Expected gains:
@@ -106,18 +102,13 @@ class TestAdventureRewards(unittest.TestCase):
             "DEX": {"base": 10},
             "AGI": {"base": 10},
             "MAG": {"base": 10},
-            "LCK": {"base": 10},
+            "LCK": {"base": 10}
         }
 
         # Current XP (all 0)
         self.mock_db.get_stat_exp_row.return_value = {
             "stats_json": json.dumps(stats_json),
-            "str_exp": 0,
-            "end_exp": 0,
-            "dex_exp": 0,
-            "agi_exp": 0,
-            "mag_exp": 0,
-            "lck_exp": 0,
+            "str_exp": 0, "end_exp": 0, "dex_exp": 0, "agi_exp": 0, "mag_exp": 0, "lck_exp": 0
         }
 
         # Mock combat result and other args for process_victory
@@ -125,7 +116,7 @@ class TestAdventureRewards(unittest.TestCase):
             "exp": 100,
             "monster_data": {"name": "Test Monster", "tier": "Normal"},
             "drops": [],
-            "active_boosts": {},
+            "active_boosts": {}
         }
         quest_system = MagicMock()
         quest_system.get_player_quests.return_value = []
@@ -158,30 +149,40 @@ class TestAdventureRewards(unittest.TestCase):
 
     def test_process_victory_skill_xp(self):
         """Verify skill XP increments based on usage."""
-        report_list = [{"skill_key_used": "slash"}, {"skill_key_used": "slash"}, {"skill_key_used": "fireball"}]
+        report_list = [
+            {"skill_key_used": "slash"},
+            {"skill_key_used": "slash"},
+            {"skill_key_used": "fireball"}
+        ]
 
         # Mock DB return for skills
         def get_skill_side_effect(discord_id, skill_key):
             if skill_key == "slash":
                 return {"skill_level": 1, "skill_exp": 0, "name": "Slash"}
             if skill_key == "fireball":
-                return {"skill_level": 1, "skill_exp": 99, "name": "Fireball"}  # Nearly level up
+                return {"skill_level": 1, "skill_exp": 99, "name": "Fireball"} # Nearly level up
             return None
 
         self.mock_db.get_skill_with_definition.side_effect = get_skill_side_effect
 
         # Mock other systems
-        combat_result = {"exp": 100, "monster_data": {"name": "Test Monster", "tier": "Normal"}, "drops": []}
+        combat_result = {
+            "exp": 100,
+            "monster_data": {"name": "Test Monster", "tier": "Normal"},
+            "drops": []
+        }
         quest_system = MagicMock()
         quest_system.get_player_quests.return_value = []
         inv_manager = MagicMock()
         session_loot = {}
 
         # We need to mock get_stat_exp_row to avoid errors in stat processing
-        self.mock_db.get_stat_exp_row.return_value = None  # Skip stat processing
+        self.mock_db.get_stat_exp_row.return_value = None # Skip stat processing
 
         with patch("game_systems.rewards.loot_calculator.LootCalculator.roll_drops", return_value=[]):
-            self.rewards_system.process_victory({}, report_list, combat_result, quest_system, inv_manager, session_loot)
+            self.rewards_system.process_victory(
+                {}, report_list, combat_result, quest_system, inv_manager, session_loot
+            )
 
         # Verify Slash: used 2 times. 2 * 2.5 = 5.0 XP. No level up.
         # Verify Fireball: used 1 time. 1 * 2.5 = 2.5 XP. 99 + 2.5 = 101.5. Level up!
@@ -193,13 +194,13 @@ class TestAdventureRewards(unittest.TestCase):
         fireball_call = next((c for c in calls if c.args[1] == "fireball"), None)
 
         self.assertIsNotNone(slash_call)
-        self.assertEqual(slash_call.kwargs["skill_level"], 1)
-        self.assertEqual(slash_call.kwargs["skill_exp"], 5.0)
+        self.assertEqual(slash_call.kwargs['skill_level'], 1)
+        self.assertEqual(slash_call.kwargs['skill_exp'], 5.0)
 
         self.assertIsNotNone(fireball_call)
         # Threshold is 100. 101.5 - 100 = 1.5 exp. Level 1 -> 2.
-        self.assertEqual(fireball_call.kwargs["skill_level"], 2)
-        self.assertEqual(fireball_call.kwargs["skill_exp"], 1.5)
+        self.assertEqual(fireball_call.kwargs['skill_level'], 2)
+        self.assertEqual(fireball_call.kwargs['skill_exp'], 1.5)
 
     def test_process_victory_loot_and_quests(self):
         """Verify loot is added and quests updated."""
@@ -208,33 +209,24 @@ class TestAdventureRewards(unittest.TestCase):
             "exp": 100,
             "monster_data": {"name": "Goblin", "tier": "Normal"},
             "drops": [{"name": "Goblin Ear", "rate": 1.0}],
-            "active_boosts": {},
+            "active_boosts": {}
         }
 
         # LootCalculator returns "Goblin Ear"
         with patch("game_systems.rewards.loot_calculator.LootCalculator.roll_drops", return_value=["Goblin Ear"]):
-            with patch(
-                "game_systems.adventure.adventure_rewards.MATERIALS",
-                {"Goblin Ear": {"rarity": "Common", "name": "Goblin Ear"}},
-            ):
+            with patch("game_systems.adventure.adventure_rewards.MATERIALS", {"Goblin Ear": {"rarity": "Common", "name": "Goblin Ear"}}):
                 # Mock Inventory
                 inv_manager = MagicMock()
 
                 # Mock Quest
                 quest_system = MagicMock()
                 quest_system.get_player_quests.return_value = [
-                    {
-                        "id": "q1",
-                        "title": "Hunt Goblins",
-                        "objectives": {"defeat": ["Goblin"], "collect": ["Goblin Ear"]},
-                    }
+                    {"id": "q1", "title": "Hunt Goblins", "objectives": {"defeat": ["Goblin"], "collect": ["Goblin Ear"]}}
                 ]
 
                 # Mock DB
                 self.mock_db.get_stat_exp_row.return_value = None
-                self.mock_db.get_player_stats_json.return_value = {
-                    "LUCK": 10
-                }  # Needed for LootCalculator call in actual code
+                self.mock_db.get_player_stats_json.return_value = {"LUCK": 10} # Needed for LootCalculator call in actual code
 
                 session_loot = {}
 
@@ -254,7 +246,6 @@ class TestAdventureRewards(unittest.TestCase):
 
                 # Verify Logs contain loot
                 self.assertTrue(any("Goblin Ear" in log for log in logs))
-
 
 if __name__ == "__main__":
     unittest.main()

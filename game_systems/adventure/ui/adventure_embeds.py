@@ -147,7 +147,9 @@ class AdventureEmbeds:
             else:
                 flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["default"])
 
-        embed = discord.Embed(title=title, description=f"*{flavor_text}*", color=color)
+        embed = discord.Embed(
+            title=title, description=f"*{flavor_text}*", color=color
+        )
 
         # 2. Rewards
         rewards = []

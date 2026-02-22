@@ -45,9 +45,7 @@ class TestRealismInventory(unittest.TestCase):
             with patch.object(self.db, "get_inventory_slot_count", return_value=20):
                 # 2. Try adding new unique item
                 with patch.object(self.db, "find_stackable_item", return_value=None):
-                    success = self.inv_manager.add_item(
-                        self.discord_id, "new_item", "New Item", "material", "Common", 1
-                    )
+                    success = self.inv_manager.add_item(self.discord_id, "new_item", "New Item", "material", "Common", 1)
                     self.assertFalse(success, "Should fail when inventory is full")
 
             # 3. Mock DB to report 19 slots
@@ -65,20 +63,20 @@ class TestRealismInventory(unittest.TestCase):
         with patch.object(self.db, "calculate_inventory_limit", return_value=20):
             with patch.object(self.db, "get_inventory_slot_count", return_value=18):
                 items = [
-                    {
-                        "item_key": "k1",
-                        "rarity": "Common",
-                        "amount": 1,
-                        "item_name": "I1",
-                        "item_type": "material",
-                    },  # New (19)
-                    {
-                        "item_key": "k2",
-                        "rarity": "Common",
-                        "amount": 1,
-                        "item_name": "I2",
-                        "item_type": "material",
-                    },  # New (20)
+                {
+                    "item_key": "k1",
+                    "rarity": "Common",
+                    "amount": 1,
+                    "item_name": "I1",
+                    "item_type": "material",
+                },  # New (19)
+                {
+                    "item_key": "k2",
+                    "rarity": "Common",
+                    "amount": 1,
+                    "item_name": "I2",
+                    "item_type": "material",
+                },  # New (20)
                     {
                         "item_key": "k3",
                         "rarity": "Common",

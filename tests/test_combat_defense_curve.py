@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -35,16 +35,19 @@ class TestCombatDefenseCurve(unittest.TestCase):
         test_cases = [
             (0, 35),
             (50, 15),
-            (100, 1),  # 35 - 50 < 1 -> 1
-            (200, 1),
+            (100, 1), # 35 - 50 < 1 -> 1
+            (200, 1)
         ]
 
-        with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):  # No crit
+        with patch("random.uniform", return_value=1.0), \
+             patch("random.random", return_value=0.5): # No crit
+
             for def_val, expected_dmg in test_cases:
                 monster = {"DEF": def_val}
                 dmg, is_crit, _ = DamageFormula.player_attack(self.stats, monster)
 
-                self.assertEqual(dmg, expected_dmg, f"Failed for DEF={def_val}. Expected {expected_dmg}, got {dmg}")
+                self.assertEqual(dmg, expected_dmg,
+                    f"Failed for DEF={def_val}. Expected {expected_dmg}, got {dmg}")
                 self.assertFalse(is_crit)
 
     def test_monster_attack_player_defense_scaling(self):
@@ -79,10 +82,12 @@ class TestCombatDefenseCurve(unittest.TestCase):
         test_cases = [
             (10, 95),
             (100, 25),
-            (200, 5),  # Chip damage floor
+            (200, 5)  # Chip damage floor
         ]
 
-        with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):  # No dodge, no crit
+        with patch("random.uniform", return_value=1.0), \
+             patch("random.random", return_value=0.5): # No dodge, no crit
+
             for end_val, expected_dmg in test_cases:
                 # Update stats
                 self.stats._stats["END"].base = end_val
@@ -90,7 +95,8 @@ class TestCombatDefenseCurve(unittest.TestCase):
 
                 dmg, is_crit, _ = DamageFormula.monster_attack(monster, self.stats)
 
-                self.assertEqual(dmg, expected_dmg, f"Failed for END={end_val}. Expected {expected_dmg}, got {dmg}")
+                self.assertEqual(dmg, expected_dmg,
+                    f"Failed for END={end_val}. Expected {expected_dmg}, got {dmg}")
 
     def test_monster_chip_damage_floor(self):
         """
@@ -103,32 +109,33 @@ class TestCombatDefenseCurve(unittest.TestCase):
         # If END=200, Red=168.
         self.stats._stats["END"].base = 200
 
-        with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):
+        with patch("random.uniform", return_value=1.0), \
+             patch("random.random", return_value=0.5):
+
             dmg, _, _ = DamageFormula.monster_attack(monster, self.stats)
 
-            expected_chip = int(100 * 0.05)  # 5
-            self.assertEqual(dmg, expected_chip, f"Chip damage should be {expected_chip}, got {dmg}")
+            expected_chip = int(100 * 0.05) # 5
+            self.assertEqual(dmg, expected_chip,
+                f"Chip damage should be {expected_chip}, got {dmg}")
 
     def test_crit_multiplier(self):
         """
         Verify crit multiplier is 1.75x for players.
         """
-        base_ap = 35  # Setup default
+        base_ap = 35 # Setup default
         monster = {"DEF": 0}
 
         # Force Crit
         # Damage = 35 * 1.75 = 61.25 -> 61
 
-        with (
-            patch("random.uniform", return_value=1.0),
-            patch("random.random", return_value=0.0),
-        ):  # Force Crit (0.0 < chance)
-            dmg, is_crit, event = DamageFormula.player_attack(self.stats, monster)
+        with patch("random.uniform", return_value=1.0), \
+             patch("random.random", return_value=0.0): # Force Crit (0.0 < chance)
 
-            self.assertTrue(is_crit)
-            self.assertEqual(event, "crit")
-            self.assertEqual(dmg, 61)
+             dmg, is_crit, event = DamageFormula.player_attack(self.stats, monster)
 
+             self.assertTrue(is_crit)
+             self.assertEqual(event, "crit")
+             self.assertEqual(dmg, 61)
 
 if __name__ == "__main__":
     unittest.main()

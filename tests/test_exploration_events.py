@@ -28,7 +28,7 @@ class TestExplorationEvents(unittest.TestCase):
             "player_stats": self.stats,
             "vitals": {"current_hp": 50, "current_mp": 20},
             "player_row": {"discord_id": 12345},
-            "loot": {},
+            "loot": {}
         }
 
     def test_safe_room_event(self):
@@ -53,7 +53,7 @@ class TestExplorationEvents(unittest.TestCase):
         result = self.events.handle_event("hidden_stash", self.context)
 
         self.assertFalse(result["dead"])
-        self.assertTrue(result["loot"])  # Should have something
+        self.assertTrue(result["loot"]) # Should have something
 
         has_aurum = "aurum" in result["loot"]
         has_item = len(result["loot"]) > 0 and not has_aurum
@@ -77,7 +77,7 @@ class TestExplorationEvents(unittest.TestCase):
 
         # Force a high random roll for dodge check (randint > dodge_chance) to ensure hit
         # dodge_chance for 10 AGI is 5.
-        with patch("random.randint", return_value=100):
+        with patch('random.randint', return_value=100):
             result = self.events.handle_event("trap_pit", self.context)
 
             self.assertLess(result["vitals"]["current_hp"], initial_hp)
@@ -101,7 +101,6 @@ class TestExplorationEvents(unittest.TestCase):
         result = self.events.handle_event("unknown_xyz", self.context)
         self.assertFalse(result["dead"])
         self.assertEqual(result["vitals"], self.context["vitals"])
-
 
 if __name__ == "__main__":
     unittest.main()
