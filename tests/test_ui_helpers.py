@@ -1,7 +1,8 @@
-import sys
+import importlib
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Adjust path to include the root directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,6 +19,7 @@ sys.modules["discord"] = mock_discord
 sys.modules["discord.ui"] = MagicMock()
 
 # Import the module to test
+import cogs.ui_helpers  # noqa: E402
 from cogs.ui_helpers import build_inventory_embed, make_progress_bar  # noqa: E402
 
 
@@ -34,6 +36,14 @@ class MockEmbed:
 
 class TestUIHelpers(unittest.TestCase):
     def setUp(self):
+        # RELOAD cogs.ui_helpers to ensure it uses the current mock_discord
+        # This fixes issues where other tests (like test_inventory_filtering.py)
+        # load cogs.ui_helpers with a DIFFERENT discord mock.
+        global build_inventory_embed, make_progress_bar
+        importlib.reload(cogs.ui_helpers)
+        build_inventory_embed = cogs.ui_helpers.build_inventory_embed
+        make_progress_bar = cogs.ui_helpers.make_progress_bar
+
         # We need to make sure discord.Embed returns our MockEmbed
         mock_discord.Embed.side_effect = MockEmbed
         mock_discord.Color.dark_orange.return_value = "dark_orange"
