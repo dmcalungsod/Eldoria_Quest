@@ -5,6 +5,18 @@ Contains all skill definitions for Eldoria Quest.
 This data is imported by populate_database.py.
 """
 
+MAGIC_SKILL_TYPES = [
+    "magical",
+    "fire",
+    "ice",
+    "poison",
+    "water",
+    "wind",
+    "earth",
+    "dark",
+    "holy",
+]
+
 SKILLS = {
     # === WARRIOR (Class 1) ===
     "power_strike": {
