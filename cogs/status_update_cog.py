@@ -53,19 +53,21 @@ class StatusUpdateView(View):
 
     def _calculate_single_point_cost(self, stat: str, current_val: int) -> int:
         """
-        Calculates cost for the NEXT point.
-        Formula: Base + floor((Current - Starting) / 5)
+        Calculates cost for the NEXT point using an exponential curve.
+        Formula: floor(Base * (Invested + 1) ^ 1.5)
         """
         base_cost = BASE_STAT_COSTS.get(stat, 10)
         start_val = self.starting_stats.get(stat, 1)
 
-        # Ensure we don't get negative scaling if current < start (rare/bug fix)
+        # Invested points (current - start)
         diff = max(0, current_val - start_val)
+        exponent = 1.5
 
-        # Progressive Scaling: Cost increases by 1 for every 5 points gained
-        scaling = math.floor(diff / 5)
+        # Exponential Scaling
+        # We use (diff + 1) because the first point (diff=0) should cost base * 1^1.5
+        cost = math.floor(base_cost * ((diff + 1) ** exponent))
 
-        return base_cost + scaling
+        return int(cost)
 
     def _calculate_bulk_cost(self, stat: str, current_val: int, amount: int) -> int:
         """Calculates total cost for adding 'amount' points."""
