@@ -239,7 +239,7 @@ class CombatTutorialView(View):
             btn.callback = self.complete_callback
             self.add_item(btn)
 
-    async def attack_callback(self, interaction: discord.Interaction, button: Button):
+    async def attack_callback(self, interaction: discord.Interaction):
         self.step = 1
         self._update_buttons()
 
@@ -252,7 +252,7 @@ class CombatTutorialView(View):
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
-    async def defend_callback(self, interaction: discord.Interaction, button: Button):
+    async def defend_callback(self, interaction: discord.Interaction):
         self.step = 2
         self._update_buttons()
 
@@ -265,7 +265,7 @@ class CombatTutorialView(View):
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
-    async def finish_callback(self, interaction: discord.Interaction, button: Button):
+    async def finish_callback(self, interaction: discord.Interaction):
         self.step = 3
         self._update_buttons()
 
@@ -280,7 +280,7 @@ class CombatTutorialView(View):
         embed.color = discord.Color.gold()
         await interaction.response.edit_message(embed=embed, view=self)
 
-    async def complete_callback(self, interaction: discord.Interaction, button: Button):
+    async def complete_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
         # Grant a small reward - Minor Potions (simulated logic, just calling add item)
