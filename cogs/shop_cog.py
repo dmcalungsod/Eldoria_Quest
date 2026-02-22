@@ -136,7 +136,13 @@ class ShopView(View):
         await interaction.response.defer()
 
         # Vulnerability Fix: Ignore client-provided price
-        item_key = interaction.data["values"][0].split(":")[0]
+        # SECURITY: Ensure values are present and formatted correctly
+        values = interaction.data.get("values", [])
+        if not values or not isinstance(values, list) or not values[0]:
+            await interaction.followup.send("❌ Invalid selection.", ephemeral=True)
+            return
+
+        item_key = values[0].split(":")[0]
 
         success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key)
 

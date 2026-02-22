@@ -10,7 +10,7 @@ SKILLS = {
     "power_strike": {
         "key_id": "power_strike",
         "name": "Power Strike",
-        "description": "A heavy, focused blow that aims to break an enemy's guard. Scales heavily with STR.",
+        "description": "A heavy, focused blow that aims to break an enemy's guard.",
         "type": "Active",
         "class_id": 1,
         "mp_cost": 5,
@@ -18,7 +18,7 @@ SKILLS = {
         "learn_cost": 0,  # Default skill
         "upgrade_cost": 200,  # Base Vestige cost
         "scaling_stat": "STR",
-        "scaling_factor": 3.0,
+        "scaling_factor": 2.7,
     },
     "cleave": {
         "key_id": "cleave",
