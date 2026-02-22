@@ -268,6 +268,18 @@ class AdventureRewards:
                             logs.append(f"\n*{flavor_text[key]}*")
                             added_flavors.add(key)
 
+            # Examine check (for exploration events)
+            if "examine" in objs:
+                for dk in actual_drops:
+                    if dk in objs["examine"]:
+                        quest_system.update_progress(self.discord_id, q["id"], "examine", dk)
+                        progress_made = True
+
+                        key = f"examine:{dk}"
+                        if key in flavor_text and key not in added_flavors:
+                            logs.append(f"\n*{flavor_text[key]}*")
+                            added_flavors.add(key)
+
             if progress_made:
                 updated.append(q["title"])
 
