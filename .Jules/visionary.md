@@ -1,36 +1,35 @@
-# Visionary Strategy Memo — 2025-10-28
+# Visionary Strategy Memo — 2026-02-22
 
 ## 📊 Yesterday’s Summary
-- **Sentinel (Security)** identified two critical vulnerabilities on 2025-10-27:
-    1.  **Stale State in Persistent Views**: The `InfirmaryView` relies on cached `PlayerStats`, allowing exploits if stats change externally (e.g., via equipment swaps) while the view is open.
-    2.  **Quest Acceptance Rank Bypass**: `QuestSystem.accept_quest` lacks server-side rank validation, allowing low-rank players to accept high-rank quests by manipulating IDs.
-- **Bolt (Performance)** previously optimized database caching and N+1 queries (May 2024), establishing a foundation for better performance but highlighting the complexity of state management.
-- **Palette (UX)** has been working on context-aware instructions, which is relevant as we fix the UI state issues.
+- **Namewright (2026-02-21):** Proposed naming conventions and concepts for the new **Alchemist Class** (e.g., "Vitriol Phial", "Suture & Salve"). Identified ID conflict with Molten Caldera.
+- **Foreman (2025-10-29):** Initiated **Auto-Adventure Overhaul** (Phase 0). Assigned DataSteward & SystemSmith to database schema design.
+- **BugHunter (2025-10-28):** Fixed Skill Upgrade Cost Bypass exploit.
 
 ## 🔗 Dependencies & Opportunities
-- **Critical Dependency**: Fixing the `InfirmaryView` stale state is a prerequisite for a secure economy. Without it, gold and healing costs can be manipulated.
-- **Critical Dependency**: Fixing `QuestSystem` validation is required to maintain the integrity of the Rank progression system.
-- **Opportunity**: While refactoring `InfirmaryView` and `QuestSystem`, we can implement **Palette's** "Context-Aware Instructions" to better guide users when actions fail due to validation checks.
+- **Architect → Namewright:** Needs to review Alchemist names and resolve the ID conflict for Frostfall Expanse.
+- **SystemSmith/DataSteward → Foreman:** Need to finalize `adventure_sessions` schema to unblock Scheduler and UI work for Auto-Adventure.
+- **GameForge:** Can begin drafting Alchemist skill mechanics once names are approved by Architect.
 
 ## ⚠️ Conflicts & Warnings
-- **Warning**: The "Stale State" vulnerability in `InfirmaryView` likely affects *all* persistent views (e.g., `ShopView`, `SkillTrainerView`). A piecemeal fix might leave holes.
-- **Conflict**: Performance optimizations (caching) must be balanced with the need for fresh data to prevent stale state exploits. **Bolt** and **Sentinel** should align on a "smart cache" or "re-fetch criticals" strategy.
+- **ID Conflict:** Namewright noted that Frostfall Expanse IDs (106-110) conflict with Molten Caldera. Proposed moving to 111-115. **Action:** Architect to confirm.
+- **Timeline Discrepancy:** Significant gap in logs between Oct 2025 and Feb 2026. Status of "Auto-Adventure Overhaul" is unclear. **Action:** Foreman to verify if this project is still active or paused.
+- **Missing Inputs:** `roadmap.md` and `feedback.md` were not found. I have inferred goals and feedback from logs, but these files should be created for proper tracking.
 
 ## 🏁 Progress Toward Goals
-*(Note: `roadmap.md` was missing; goals inferred from `Improvements.md` and logs)*
-- **Security Hardening**: 0/2 critical vulnerabilities patched (New Focus).
-- **Performance Optimization**: Connection pooling and caching implemented (Ongoing).
-- **Database Stability**: Context managers added (Completed).
+- **Auto-Adventure Overhaul:** Phase 0 (Foundation) - **STARTED** (as of Oct 2025).
+- **Alchemist Class:** **Naming/Concept Phase**.
+- **The Frostfall Expanse:** **Concept Phase**.
 
 ## 🗣️ Player Feedback Highlights
-*(Note: `feedback.md` was missing; no new feedback to report)*
-- **Inferred**: Players likely expect a fair and exploit-free game environment.
+- **Inferred:** Players desire a "Grim Survival" tone (supported by Namewright's choices).
+- **Inferred:** "Players want more healing options" (Alchemist class addresses this with "Suture & Salve").
+- **Addressed:** Skill upgrade exploit fixed by BugHunter.
 
 ## 🎯 Recommended Focus for Today
-1.  **Sentinel / BugHunter**: **Priority 1**: Patch the **Stale State** vulnerability in `InfirmaryView` by implementing the "re-fetch critical data" pattern.
-2.  **Sentinel / BugHunter**: **Priority 2**: Patch the **Quest Rank Bypass** in `QuestSystem.accept_quest` by adding server-side rank validation.
-3.  **Bolt**: Audit `ShopView` and `SkillTrainerView` to identify if they share the stale state vulnerability.
-4.  **Palette**: If bandwidth allows, improve UI feedback for failed validation (e.g., "Quest Rank too high" message) during the fixes.
+1.  **Architect**: Review Namewright's Alchemist proposals and resolve the Frostfall/Molten Caldera ID conflict (106-110 vs 111-115).
+2.  **Foreman**: Clarify the status of the "Auto-Adventure Overhaul" given the time gap.
+3.  **SystemSmith & DataSteward**: If Auto-Adventure is active, prioritize the `adventure_sessions` database schema design (Task 0.1).
 
 ## 🚧 Blockers
-- **Critical Security Flaws**: The economy and progression systems are currently vulnerable to exploits until the patches are applied.
+- **Missing Documentation:** `roadmap.md` and `feedback.md` are missing, limiting the ability to align with long-term goals and player sentiment.
+- **Uncertainty:** The 4-month log gap raises questions about the continuity of the Auto-Adventure project.
