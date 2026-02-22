@@ -58,7 +58,7 @@ class MockBotBase:
 commands_mock.Bot = MockBotBase
 
 # Now import main
-import main
+import main  # noqa: E402
 
 async def test_sync_logic():
     print("Testing sync logic...")
