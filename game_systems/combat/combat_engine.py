@@ -12,6 +12,7 @@ import random
 import game_systems.data.emojis as E
 
 from ..monsters.monster_actions import MonsterAI
+from ..rewards.aurum_calculator import AurumCalculator
 from ..rewards.exp_calculator import ExpCalculator
 from .combat_phrases import CombatPhrases
 from .damage_formula import DamageFormula
@@ -623,10 +624,17 @@ class CombatEngine:
     def _player_victory(self, log, turn_report):
         """Handles rewarding EXP and passing up monster drops."""
         exp = ExpCalculator.calculate_exp(self.player.level, self.monster, self.exp_boost)
+
+        # Calculate Aurum
+        monster_lvl = self.monster.get("level", 1)
+        monster_tier = self.monster.get("tier", "Normal")
+        luck = self.stats_dict.get("LCK", 0)
+        aurum = AurumCalculator.calculate_drop(monster_lvl, monster_tier, luck)
+
         drops = self.monster.get("drops", [])
         leveled_up = self.player.add_exp(exp)
 
-        log.append(CombatPhrases.player_victory(self.monster, exp, 0, leveled_up, self.player.level))
+        log.append(CombatPhrases.player_victory(self.monster, exp, aurum, leveled_up, self.player.level))
 
         return {
             "winner": "player",
@@ -635,6 +643,7 @@ class CombatEngine:
             "mp_current": self.player_mp,
             "monster_hp": 0,
             "exp": exp,
+            "aurum": aurum,
             "drops": drops,
             "monster_data": self.monster,
             "turn_report": turn_report,
