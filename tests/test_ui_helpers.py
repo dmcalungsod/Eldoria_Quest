@@ -13,10 +13,11 @@ sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.results"] = MagicMock()
 
-# Mock discord globally before import
-mock_discord = MagicMock()
-sys.modules["discord"] = mock_discord
-sys.modules["discord.ui"] = MagicMock()
+# Ensure discord is mocked at module level so imports don't fail during collection
+if "discord" not in sys.modules or not isinstance(sys.modules["discord"], MagicMock):
+    mock_discord = MagicMock()
+    sys.modules["discord"] = mock_discord
+    sys.modules["discord.ui"] = MagicMock()
 
 # Import the module to test
 import cogs.ui_helpers  # noqa: E402
@@ -36,17 +37,18 @@ class MockEmbed:
 
 class TestUIHelpers(unittest.TestCase):
     def setUp(self):
-        # RELOAD cogs.ui_helpers to ensure it uses the current mock_discord
-        # This fixes issues where other tests (like test_inventory_filtering.py)
-        # load cogs.ui_helpers with a DIFFERENT discord mock.
+        # Retrieve the CURRENT global discord mock
+        current_discord_mock = sys.modules["discord"]
+
+        # Configure it
+        current_discord_mock.Embed.side_effect = MockEmbed
+        current_discord_mock.Color.dark_orange.return_value = "dark_orange"
+
+        # Reload module to ensure it uses this mock (if it was holding an old one)
         global build_inventory_embed, make_progress_bar
         importlib.reload(cogs.ui_helpers)
         build_inventory_embed = cogs.ui_helpers.build_inventory_embed
         make_progress_bar = cogs.ui_helpers.make_progress_bar
-
-        # We need to make sure discord.Embed returns our MockEmbed
-        mock_discord.Embed.side_effect = MockEmbed
-        mock_discord.Color.dark_orange.return_value = "dark_orange"
 
     def test_progress_bar_logic(self):
         """Test progress bar logic directly."""
