@@ -82,21 +82,21 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         interaction.message.embeds = [mock_embed]
 
         # Simulate Attack (Step 0 -> 1)
-        await view.attack_callback(interaction, MagicMock())
+        await view.attack_callback(interaction)
         self.assertEqual(view.step, 1)
         interaction.response.edit_message.assert_called()
 
         # Simulate Defend (Step 1 -> 2)
-        await view.defend_callback(interaction, MagicMock())
+        await view.defend_callback(interaction)
         self.assertEqual(view.step, 2)
 
         # Simulate Finish (Step 2 -> 3)
-        await view.finish_callback(interaction, MagicMock())
+        await view.finish_callback(interaction)
         self.assertEqual(view.step, 3)
 
         # Simulate Complete (Step 3 -> End)
         with patch("cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock) as mock_transition:
-            await view.complete_callback(interaction, MagicMock())
+            await view.complete_callback(interaction)
             mock_transition.assert_called_with(interaction, db, user)
 
 
