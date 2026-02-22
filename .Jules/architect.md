@@ -44,3 +44,27 @@ New Class: Alchemist (Survivor/Pragmatist).
 **Next Steps:**
 - Coordinate with Tactician to unlock the `debuff` mechanic.
 - Once implemented, verify "Acid Flask" applies "Defense Down".
+
+## 2026-02-24 — System Design: The Eldoria Codex
+
+**Design Choice:**
+Major Content Expansion: The Eldoria Codex (Bestiary, Atlas, Armory).
+
+**Reasoning:**
+- **Player Demand:** "More Lore" is a top request in `feedback.md`.
+- **Engagement:** Moves the game from "grind to level up" to "grind to collect".
+- **Roadmap:** Explicitly listed as a "Future Concept" in `roadmap.md`.
+- **Timing:** With Frostfall Expanse and Alchemist in progress, a meta-system is needed to tie content together.
+
+**Theme Alignment:**
+- "Knowledge is Survival": Fits the pragmatic tone.
+- Rewards are practical (Damage %, XP %) rather than just cosmetic.
+
+**Integration Notes:**
+- **Database:** Requires a new `player_codex` collection. Schema designed to be extensible.
+- **Combat:** `CombatEngine` needs a hook for kill tracking.
+- **Exploration:** `AdventureSession` needs a hook for location visits.
+
+**Next Steps:**
+- Notify `DatabaseManager` to implement schema.
+- Notify `CodexKeeper` (or `ChronicleKeeper`) to begin UI implementation.
