@@ -233,6 +233,8 @@ class CombatPhrases:
                 "A dirty blade finds a gap in your armor— `{dmg}` damage.",
                 "The {name} bites and claws, dealing `{dmg}` damage.",
                 "A jagged dagger scrapes across your skin— `{dmg}` damage.",
+                "The {name} throws dirt in your eyes and strikes— `{dmg}` damage.",
+                "The {name} leaps from a rock, landing a blow for `{dmg}` damage.",
             ],
             [
                 "The {name}'s blade sinks deep into your side! `{dmg}` damage! **(CRITICAL!)**",
@@ -247,6 +249,8 @@ class CombatPhrases:
                 "The {name} engulfs your limb momentarily, burning for `{dmg}` damage.",
                 "A pseudopod whips out, striking you for `{dmg}` damage.",
                 "The {name} surges forward, bludgeoning you for `{dmg}` damage.",
+                "A wave of sludge knocks you back— `{dmg}` damage.",
+                "The {name} hardens its body and rams you— `{dmg}` damage.",
             ],
             [
                 "The {name} envelops you, its acid dissolving your armor! `{dmg}` damage! **(CRITICAL!)**",
@@ -261,6 +265,8 @@ class CombatPhrases:
                 "Hot breath precedes a tearing snap of jaws— `{dmg}` damage.",
                 "The {name} leaps, knocking you back for `{dmg}` damage.",
                 "Fangs graze your arm— `{dmg}` damage.",
+                "The {name} circles and snaps at your legs— `{dmg}` damage.",
+                "A feral lunge catches you off guard— `{dmg}` damage.",
             ],
             [
                 "The {name}'s jaws lock onto your limb, tearing flesh! `{dmg}` damage! **(CRITICAL!)**",
@@ -289,6 +295,7 @@ class CombatPhrases:
                 "Venom burns as the {name} strikes for `{dmg}` damage.",
                 "Webs entangle you as the {name} bites— `{dmg}` damage.",
                 "The {name} skitters past, slashing you for `{dmg}` damage.",
+                "The {name} drops from above, landing a heavy blow— `{dmg}` damage.",
             ],
             [
                 "Venom floods your veins as the {name} lands a deep bite! `{dmg}` damage! **(CRITICAL!)**",
@@ -303,6 +310,7 @@ class CombatPhrases:
                 "Bone-crushing weight slams into you for `{dmg}` damage.",
                 "The {name} gores you with brutal efficiency— `{dmg}` damage.",
                 "A tusk grazes your leg— `{dmg}` damage.",
+                "The {name} thrashes wildly, hitting you— `{dmg}` damage.",
             ],
             [
                 "The {name} tramples you, crushing ribs under its weight! `{dmg}` damage! **(CRITICAL!)**",
@@ -316,6 +324,7 @@ class CombatPhrases:
                 "You are thrown back by the {name}'s charge— `{dmg}` damage.",
                 "Bone-crushing weight slams into you for `{dmg}` damage.",
                 "The {name} mauls you with brutal efficiency— `{dmg}` damage.",
+                "A massive paw swats you aside— `{dmg}` damage.",
             ],
             [
                 "The {name} crushes you in a bear hug, snapping bone! `{dmg}` damage! **(CRITICAL!)**",
@@ -329,6 +338,7 @@ class CombatPhrases:
                 "The {name} crushes you with the weight of old wood— `{dmg}` damage.",
                 "Thorns tear at your flesh as the {name} strikes for `{dmg}` damage.",
                 "The {name} swings a massive limb— `{dmg}` damage.",
+                "Bark scrapes against steel as the {name} slams you— `{dmg}` damage.",
             ],
             [
                 "A root constricts your chest, cracking ribs! `{dmg}` damage! **(CRITICAL!)**",
@@ -336,7 +346,6 @@ class CombatPhrases:
                 "Thorns tear deep into muscle, leaving you bleeding! `{dmg}` damage! **(CRITICAL!)**",
             ],
         ),
-        # Mapped types for Treant-like
         "Ent": "Treant",
         "Vineling": "Treant",
         "Bramble": "Treant",
@@ -348,6 +357,7 @@ class CombatPhrases:
                 "Spectral energy flares, burning you with cold fire for `{dmg}` damage.",
                 "The {name} strikes with an otherworldly force— `{dmg}` damage.",
                 "Your breath freezes as the {name} touches you— `{dmg}` damage.",
+                "The air warps around the {name} as it hits you— `{dmg}` damage.",
             ],
             [
                 "The {name} passes straight through your heart—liquid ice fills your veins! `{dmg}` damage! **(CRITICAL!)**",
@@ -355,7 +365,6 @@ class CombatPhrases:
                 "The {name} feeds directly on your life force! `{dmg}` damage! **(CRITICAL!)**",
             ],
         ),
-        # Mapped types for Wisp-like
         "Shade": "Wisp",
         "Revenant": "Wisp",
         "Wight": "Wisp",
@@ -369,6 +378,7 @@ class CombatPhrases:
                 "Mandibles snap shut on your arm— `{dmg}` damage.",
                 "The {name} swarms over your defenses, biting for `{dmg}` damage.",
                 "Sharp legs scratch and tear— `{dmg}` damage.",
+                "The {name} spits a caustic fluid— `{dmg}` damage.",
             ],
             [
                 "The {name} burrows its mandibles into your flesh! `{dmg}` damage! **(CRITICAL!)**",
@@ -376,7 +386,6 @@ class CombatPhrases:
                 "Venom and acid overwhelm your senses! `{dmg}` damage! **(CRITICAL!)**",
             ],
         ),
-        # Mapped types
         "Urch": "Crawler",
         "Lurker": "Crawler",
         "Undead": (
@@ -386,6 +395,7 @@ class CombatPhrases:
                 "A rusty weapon swings with unnatural strength, dealing `{dmg}` damage.",
                 "The {name} lurches forward, tearing at you for `{dmg}` damage.",
                 "Cold, dead fingers claw at your face— `{dmg}` damage.",
+                "The {name} vomits a cloud of decay, choking you— `{dmg}` damage.",
             ],
             [
                 "The {name}'s rusty blade finds a gap, infecting the wound! `{dmg}` damage! **(CRITICAL!)**",
@@ -393,7 +403,6 @@ class CombatPhrases:
                 "The {name} tears a chunk of flesh away! `{dmg}` damage! **(CRITICAL!)**",
             ],
         ),
-        # Mapped types
         "Skeleton": "Undead",
         "Zombie": "Undead",
     }
@@ -413,7 +422,203 @@ class CombatPhrases:
         ],
     )
 
-    # --- SKILL PHRASES (New) ---
+    # --- PLAYER CLASS ATTACK PHRASES ---
+    WARRIOR_ATTACKS = (
+        [
+            "You cleave into the {m_name}, steel ringing against bone. {d_str}",
+            "A heavy blow forces the {m_name} back. {d_str}",
+            "Your blade bites into the {m_name}'s hide. {d_str}",
+            "You drive your shoulder into the strike, hitting the {m_name}. {d_str}",
+            "You deflect an attack and counter with a solid hit. {d_str}",
+            "You slam your pommel into the {m_name}, following with a slash. {d_str}",
+            "You grunt with effort, your weapon carving a path through the {m_name}'s guard. {d_str}",
+            "A disciplined strike finds its mark on the {m_name}. {d_str}",
+            "You batter the {m_name}'s defenses, chipping away at its resolve. {d_str}",
+            "Steel meets flesh in a spray of crimson as you hit the {m_name}. {d_str}",
+            "You step into the {m_name}'s range and punish it. {d_str}",
+            "Your weapon feels like an extension of your arm as it strikes the {m_name}. {d_str}",
+        ],
+        [
+            "You put your entire weight behind the swing, shattering the {m_name}'s defense! {d_str}",
+            "A thunderous impact! Your weapon crushes into the {m_name}. {d_str}",
+            "You roar with effort, cleaving deep into the {m_name}'s flesh! {d_str}",
+            "You bash the {m_name} with your shield before delivering a fatal slash! {d_str}",
+            "Your strike breaks bone and spirit alike! The {m_name} reels! {d_str}",
+            "A perfect parry opens the {m_name} for a devastating counter-strike! {d_str}",
+            "The force of your blow lifts the {m_name} off its feet! {d_str}",
+            "You sever the {m_name}'s guard with brutal efficiency! {d_str}",
+        ]
+    )
+
+    MAGE_ATTACKS = (
+        [
+            "Arcane energy hammers the {m_name}. {d_str}",
+            "A raw bolt of mana sears the {m_name}'s skin. {d_str}",
+            "You conjure a burst of power, scorching the {m_name}. {d_str}",
+            "The weave responds to your call, striking the {m_name}. {d_str}",
+            "You mutter a word of power, and the {m_name} recoils. {d_str}",
+            "Sparks fly from your fingertips, burning the {m_name}. {d_str}",
+            "A sudden pressure wave of magic slams into the {m_name}. {d_str}",
+            "You weave a quick sigil, sending a dart of energy at the {m_name}. {d_str}",
+            "The air crackles around you as you strike the {m_name}. {d_str}",
+            "You focus your will, manifesting it as a blow against the {m_name}. {d_str}",
+            "Elemental residue clings to the {m_name} after your attack. {d_str}",
+            "You chant a brief syllable, and force erupts against the {m_name}. {d_str}",
+        ],
+        [
+            "The air screams as concentrated mana obliterates the {m_name}'s guard! {d_str}",
+            "A blinding flash! Your spell consumes the {m_name} in raw power. {d_str}",
+            "You unravel the {m_name}'s very essence with a surge of arcane force! {d_str}",
+            "Pure energy arcs from your fingers, turning the {m_name} into a conduit of pain! {d_str}",
+            "Reality distorts around the {m_name} as your spell impacts! {d_str}",
+            "You overcharge the spell, sending the {m_name} flying in a blast of light! {d_str}",
+            "The {m_name} is engulfed in a chaotic storm of magic! {d_str}",
+            "You tap into the deep ley lines, unleashing a torrent of destruction! {d_str}",
+        ]
+    )
+
+    ROGUE_ATTACKS = (
+        [
+            "You slip through an opening, cutting the {m_name}. {d_str}",
+            "A silent, surgical strike lands true on the {m_name}. {d_str}",
+            "A rapid feint leaves the {m_name} exposed to your blade. {d_str}",
+            "You find a gap in the {m_name}'s armor. {d_str}",
+            "Quick as a viper, you slash the {m_name}. {d_str}",
+            "You sidestep a clumsy attack and punish the {m_name}. {d_str}",
+            "Your dagger flicks out, drawing a thin line of red on the {m_name}. {d_str}",
+            "You move faster than the {m_name} can follow, striking its flank. {d_str}",
+            "A cheap shot, but effective—you hit the {m_name} where it hurts. {d_str}",
+            "You dance out of reach, stinging the {m_name} with a quick thrust. {d_str}",
+            "Your blade is a blur, catching the {m_name} off balance. {d_str}",
+            "Precise and deadly, your attack lands on the {m_name}. {d_str}",
+        ],
+        [
+            "Perfect execution! Your blade finds a vital artery on the {m_name}. {d_str}",
+            "You vanish for a heartbeat, reappearing as your dagger sinks deep. {d_str}",
+            "A spray of blood marks your precision strike on the {m_name}! {d_str}",
+            "You exploit a micro-second gap, driving your blade into the {m_name}'s weak point! {d_str}",
+            "You sever a tendon, bringing the {m_name} to its knees! {d_str}",
+            "Cold steel meets warm flesh in a lethal display of skill! {d_str}",
+            "The {m_name} never saw it coming—your strike is true and deep! {d_str}",
+            "You twist the blade, inflicting maximum pain and damage! {d_str}",
+        ]
+    )
+
+    CLERIC_ATTACKS = (
+        [
+            "You strike the {m_name} with righteous fury. {d_str}",
+            "Your weapon descends like judgment upon the {m_name}. {d_str}",
+            "A flash of holy light accompanies your blow against the {m_name}. {d_str}",
+            "You batter the {m_name} with the weight of your conviction. {d_str}",
+            "You chant a hymn of battle, your strike guided by faith. {d_str}",
+            "Your mace connects with a solid, purifying thud against the {m_name}. {d_str}",
+            "You drive back the darkness with a heavy swing at the {m_name}. {d_str}",
+            "Divine power reinforces your arm as you hit the {m_name}. {d_str}",
+            "You punish the {m_name} for its existence. {d_str}",
+            "Sacred sparks fly as your weapon impacts the {m_name}. {d_str}",
+            "You stand firm, your attack carrying the weight of the church. {d_str}",
+            "With a prayer on your lips, you smite the {m_name}. {d_str}",
+        ],
+        [
+            "Divine judgment descends! The {m_name} reels from the holy impact. {d_str}",
+            "Your weapon glows with blinding light, smiting the {m_name} where it stands! {d_str}",
+            "Faith guides your hand into a devastating blow against the {m_name}! {d_str}",
+            "A halo of light erupts as you crush the {m_name} with sacred force! {d_str}",
+            "The heavens themselves seem to aid your strike! {d_str}",
+            "You purge the corruption with a single, bone-shattering blow! {d_str}",
+            "Holy fire sears the {m_name} as your weapon connects! {d_str}",
+            "You are the hammer of the gods, and the {m_name} is the anvil! {d_str}",
+        ]
+    )
+
+    RANGER_ATTACKS = (
+        [
+            "Your arrow thuds into the {m_name}. {d_str}",
+            "A well-placed shot strikes the {m_name}. {d_str}",
+            "Your bow sings—the {m_name} recoils from the hit. {d_str}",
+            "You loose an arrow, catching the {m_name} in the flank. {d_str}",
+            "You snap-fire a shot, hitting the {m_name} in stride. {d_str}",
+            "You strafe to the side, firing a shaft into the {m_name}. {d_str}",
+            "Your fletching brushes your cheek as you send death at the {m_name}. {d_str}",
+            "A quick draw, a loose string, and the {m_name} is hit. {d_str}",
+            "You target a joint, slowing the {m_name} with a sharp hit. {d_str}",
+            "The wind carries your shot true to the {m_name}. {d_str}",
+            "You calmly plant an arrow in the {m_name}'s hide. {d_str}",
+            "Your aim is steady, your shot is true against the {m_name}. {d_str}",
+        ],
+        [
+            "A perfect shot! Your arrow pierces the {m_name}'s eye! {d_str}",
+            "You loose the shaft before the {m_name} can blink—dead center! {d_str}",
+            "The wind guides your aim into a lethal strike on the {m_name}! {d_str}",
+            "An impossible shot! You pin the {m_name} with a high-velocity arrow! {d_str}",
+            "Your arrow punches through armor and flesh alike! {d_str}",
+            "You thread the needle, hitting a vital organ! {d_str}",
+            "The {m_name} stumbles, an arrow protruding from its throat! {d_str}",
+            "One shot, one devastating impact! {d_str}",
+        ]
+    )
+
+    DEFAULT_ATTACKS = (
+        [
+            "You strike cleanly, hitting the {m_name}. {d_str}",
+            "A decisive blow lands on the {m_name}. {d_str}",
+            "Steel meets flesh as you hit the {m_name}. {d_str}",
+        ],
+        [
+            "An incredible blow! The {m_name} staggers violently. {d_str}",
+            "You find a weakness and exploit it with brutal force! {d_str}",
+        ]
+    )
+
+    # --- CLASS VICTORY PHRASES ---
+    WARRIOR_VICTORY = [
+        "With a final, brutal swing, you cleave the {name} in two.",
+        "The {name} falls, its weapon shattered by your overwhelming force.",
+        "You wipe the blood from your blade as the {name} collapses.",
+        "Your boot rests on the fallen {name}. The battle is won.",
+        "Silence falls as your enemy lies broken at your feet.",
+    ]
+
+    MAGE_VICTORY = [
+        "The {name} disintegrates into ash, consumed by your magic.",
+        "You lower your hand, the last embers fading from the {name}'s corpse.",
+        "Frozen in a final scream, the {name} shatters into ice.",
+        "The air cools as the {name} falls, its energy spent.",
+        "Your spellwork leaves nothing but a smoking crater where the {name} stood.",
+    ]
+
+    ROGUE_VICTORY = [
+        "The {name} slumps forward, never seeing the final strike.",
+        "You sheath your blade before the {name} even hits the ground.",
+        "A single, clean cut ends the {name}'s struggle.",
+        "You step back into the shadows as the {name} breathes its last.",
+        "Bleeding from a dozen wounds, the {name} finally succumbs.",
+    ]
+
+    CLERIC_VICTORY = [
+        "The light fades, leaving the {name} purified in death.",
+        "You offer a brief prayer as the {name} returns to the earth.",
+        "Divine judgment has been dealt. The {name} falls.",
+        "Your weapon lowers, the {name} purged of its corruption.",
+        "Peace returns to the battlefield as the {name} is vanquished.",
+    ]
+
+    RANGER_VICTORY = [
+        "The {name} falls, a single arrow protruding from its heart.",
+        "You lower your bow, watching the {name} take its final breath.",
+        "The hunt is over. The {name} lies still.",
+        "You retrieve your arrow from the fallen {name}.",
+        "Nature claims the {name} once more.",
+    ]
+
+    GENERIC_VICTORY = [
+        "The {name} collapses, the threat fading.",
+        "With a final gasp, the {name} falls silent.",
+        "You stand victorious over the fallen {name}.",
+        "The {name} lies defeated at your feet.",
+    ]
+
+    # --- SKILL PHRASES ---
     SKILL_PHRASES = {
         # --- WARRIOR ---
         "power_strike": [
@@ -516,112 +721,24 @@ class CombatPhrases:
             return f"{base} **(CRITICAL!)**" if crit else base
 
         d_str = fmt(damage, is_crit)
+        pool = None
 
-        # --- WARRIOR (ID 1) ---
         if player_class_id == 1:
-            if is_crit:
-                pool = [
-                    f"You put your entire weight behind the swing, shattering the {m_name}'s defense! {d_str}",
-                    f"A thunderous impact! Your weapon crushes into the {m_name}. {d_str}",
-                    f"You roar with effort, cleaving deep into the {m_name}'s flesh! {d_str}",
-                    f"You bash the {m_name} with your shield before delivering a fatal slash! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"You cleave into the {m_name}, steel ringing against bone. {d_str}",
-                    f"A heavy blow forces the {m_name} back. {d_str}",
-                    f"Your blade bites into the {m_name}'s hide. {d_str}",
-                    f"You drive your shoulder into the strike, hitting the {m_name}. {d_str}",
-                    f"You deflect an attack and counter with a solid hit. {d_str}",
-                ]
-
-        # --- MAGE (ID 2) ---
+            pool = CombatPhrases.WARRIOR_ATTACKS
         elif player_class_id == 2:
-            if is_crit:
-                pool = [
-                    f"The air screams as concentrated mana obliterates the {m_name}'s guard! {d_str}",
-                    f"A blinding flash! Your spell consumes the {m_name} in raw power. {d_str}",
-                    f"You unravel the {m_name}'s very essence with a surge of arcane force! {d_str}",
-                    f"Pure energy arcs from your fingers, turning the {m_name} into a conduit of pain! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"Arcane energy hammers the {m_name}. {d_str}",
-                    f"A raw bolt of mana sears the {m_name}'s skin. {d_str}",
-                    f"You conjure a burst of power, scorching the {m_name}. {d_str}",
-                    f"The weave responds to your call, striking the {m_name}. {d_str}",
-                    f"You mutter a word of power, and the {m_name} recoils. {d_str}",
-                ]
-
-        # --- ROGUE (ID 3) ---
+            pool = CombatPhrases.MAGE_ATTACKS
         elif player_class_id == 3:
-            if is_crit:
-                pool = [
-                    f"Perfect execution! Your blade finds a vital artery on the {m_name}. {d_str}",
-                    f"You vanish for a heartbeat, reappearing as your dagger sinks deep. {d_str}",
-                    f"A spray of blood marks your precision strike on the {m_name}! {d_str}",
-                    f"You exploit a micro-second gap, driving your blade into the {m_name}'s weak point! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"You slip through an opening, cutting the {m_name}. {d_str}",
-                    f"A silent, surgical strike lands true on the {m_name}. {d_str}",
-                    f"A rapid feint leaves the {m_name} exposed to your blade. {d_str}",
-                    f"You find a gap in the {m_name}'s armor. {d_str}",
-                    f"Quick as a viper, you slash the {m_name}. {d_str}",
-                ]
-
-        # --- CLERIC (ID 4) ---
+            pool = CombatPhrases.ROGUE_ATTACKS
         elif player_class_id == 4:
-            if is_crit:
-                pool = [
-                    f"Divine judgment descends! The {m_name} reels from the holy impact. {d_str}",
-                    f"Your weapon glows with blinding light, smiting the {m_name} where it stands! {d_str}",
-                    f"Faith guides your hand into a devastating blow against the {m_name}! {d_str}",
-                    f"A halo of light erupts as you crush the {m_name} with sacred force! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"You strike the {m_name} with righteous fury. {d_str}",
-                    f"Your weapon descends like judgment upon the {m_name}. {d_str}",
-                    f"A flash of holy light accompanies your blow against the {m_name}. {d_str}",
-                    f"You batter the {m_name} with the weight of your conviction. {d_str}",
-                    f"You chant a hymn of battle, your strike guided by faith. {d_str}",
-                ]
-
-        # --- RANGER (ID 5) ---
+            pool = CombatPhrases.CLERIC_ATTACKS
         elif player_class_id == 5:
-            if is_crit:
-                pool = [
-                    f"A perfect shot! Your arrow pierces the {m_name}'s eye! {d_str}",
-                    f"You loose the shaft before the {m_name} can blink—dead center! {d_str}",
-                    f"The wind guides your aim into a lethal strike on the {m_name}! {d_str}",
-                    f"An impossible shot! You pin the {m_name} with a high-velocity arrow! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"Your arrow thuds into the {m_name}. {d_str}",
-                    f"A well-placed shot strikes the {m_name}. {d_str}",
-                    f"Your bow sings—the {m_name} recoils from the hit. {d_str}",
-                    f"You loose an arrow, catching the {m_name} in the flank. {d_str}",
-                    f"You snap-fire a shot, hitting the {m_name} in stride. {d_str}",
-                ]
-
-        # --- DEFAULT ---
+            pool = CombatPhrases.RANGER_ATTACKS
         else:
-            if is_crit:
-                pool = [
-                    f"An incredible blow! The {m_name} staggers violently. {d_str}",
-                    f"You find a weakness and exploit it with brutal force! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"You strike cleanly, hitting the {m_name}. {d_str}",
-                    f"A decisive blow lands on the {m_name}. {d_str}",
-                    f"Steel meets flesh as you hit the {m_name}. {d_str}",
-                ]
+            pool = CombatPhrases.DEFAULT_ATTACKS
 
-        return random.choice(pool)
+        # Select pool based on crit
+        phrases = pool[1] if is_crit else pool[0]
+        return random.choice(phrases).format(m_name=m_name, d_str=d_str)
 
     @staticmethod
     def player_skill(player, monster, skill, damage, is_crit) -> str:
@@ -759,16 +876,22 @@ class CombatPhrases:
             return f"🛡️ **PARRIED!** You deflect the {m_name}'s **{skill_name}** perfectly! (REFLECT DAMAGE + STUN)"
 
     @staticmethod
-    def player_victory(monster, exp, gold, leveled_up, new_level) -> str:
+    def player_victory(monster, exp, gold, leveled_up, new_level, player_class_id: int | None = None) -> str:
         m_name = str(monster.get("name", "the enemy"))
 
-        victory_phrases = [
-            f"The {m_name} collapses, the threat fading.",
-            f"With a final gasp, the {m_name} falls silent.",
-            f"You stand victorious over the fallen {m_name}.",
-            f"The {m_name} lies defeated at your feet.",
-        ]
-        phrase = random.choice(victory_phrases)
+        pool = CombatPhrases.GENERIC_VICTORY
+        if player_class_id == 1:
+            pool = CombatPhrases.WARRIOR_VICTORY
+        elif player_class_id == 2:
+            pool = CombatPhrases.MAGE_VICTORY
+        elif player_class_id == 3:
+            pool = CombatPhrases.ROGUE_VICTORY
+        elif player_class_id == 4:
+            pool = CombatPhrases.CLERIC_VICTORY
+        elif player_class_id == 5:
+            pool = CombatPhrases.RANGER_VICTORY
+
+        phrase = random.choice(pool).format(name=m_name)
 
         msg = f"{phrase}\nGained `{exp} EXP`"
 

@@ -625,7 +625,7 @@ class CombatEngine:
         drops = self.monster.get("drops", [])
         leveled_up = self.player.add_exp(exp)
 
-        log.append(CombatPhrases.player_victory(self.monster, exp, aurum, leveled_up, self.player.level))
+        log.append(CombatPhrases.player_victory(self.monster, exp, aurum, leveled_up, self.player.level, self.player_class_id))
 
         return {
             "winner": "player",
