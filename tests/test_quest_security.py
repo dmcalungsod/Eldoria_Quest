@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.guild_system.quest_system import QuestSystem
+from game_systems.data.emojis import ERROR
 
 
 class TestQuestSecurity(unittest.TestCase):
@@ -55,6 +56,52 @@ class TestQuestSecurity(unittest.TestCase):
             print("\n[CRITICAL] VULNERABILITY STILL EXISTS: F-Rank player accepted S-Rank quest!")
 
         self.assertFalse(result, "The security check should block this action.")
+
+    def test_complete_quest_malformed_rewards(self):
+        """
+        Regression Test: Ensure quests with malformed 'rewards' JSON strings
+        cannot be completed, preventing crashes or data corruption.
+        """
+        user_id = 12345
+        quest_id = 101
+
+        # Mock database collections
+        mock_quests_col = MagicMock()
+        mock_player_quests_col = MagicMock()
+
+        def mock_col(name):
+            if name == "quests":
+                return mock_quests_col
+            elif name == "player_quests":
+                return mock_player_quests_col
+            return MagicMock()
+
+        self.mock_db._col.side_effect = mock_col
+
+        # 1. Mock Player Quest (In Progress, ready to complete)
+        # Objectives met: Slay 1 Goblin
+        mock_player_quests_col.find_one.return_value = {
+            "discord_id": user_id,
+            "quest_id": quest_id,
+            "status": "in_progress",
+            "progress": '{"slay": {"Goblin": 1}}' # Valid JSON progress
+        }
+
+        # 2. Mock Quest Data (BROKEN REWARDS JSON)
+        mock_quests_col.find_one.return_value = {
+            "id": quest_id,
+            "tier": "F",
+            "objectives": '{"slay": {"Goblin": 1}}',
+            "rewards": '{ "gold": 100, "xp": 50 ' # <-- MISSING CLOSING BRACE
+        }
+
+        # EXECUTE
+        success, message = self.quest_system.complete_quest(user_id, quest_id)
+
+        # VERIFY
+        self.assertFalse(success, "Should fail due to malformed rewards JSON")
+        self.assertIn("System error: Reward data corrupted", message)
+        self.assertIn(ERROR, message)
 
 
 if __name__ == "__main__":
