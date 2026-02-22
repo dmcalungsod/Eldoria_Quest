@@ -63,6 +63,8 @@ class AdventureManager:
                 start_time.isoformat(),
                 end_time.isoformat(),
                 duration_minutes,
+                supplies={},
+                status="in_progress",
             )
             return True
         except Exception as e:
