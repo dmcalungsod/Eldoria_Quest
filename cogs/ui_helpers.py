@@ -142,6 +142,23 @@ async def get_player_or_error(
     return player
 
 
+async def get_profile_bundle_or_error(
+    interaction: discord.Interaction, db: DatabaseManager, content: str = "Character record not found."
+) -> dict | None:
+    """
+    Fetches the profile bundle. If not found, sends an ephemeral error message.
+    Returns the bundle dict or None.
+    """
+    bundle = await asyncio.to_thread(db.get_profile_bundle, interaction.user.id)
+    if not bundle:
+        if not interaction.response.is_done():
+            await interaction.response.send_message(content, ephemeral=True)
+        else:
+            await interaction.followup.send(content, ephemeral=True)
+        return None
+    return bundle
+
+
 async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
     """Navigation: Returns to Character Profile."""
     from game_systems.character.ui.profile_view import CharacterTabView
@@ -153,22 +170,21 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
     discord_id = interaction.user.id
 
     try:
-        player = await get_player_or_error(interaction, db)
-        if not player:
+        # Optimized: Fetch Player, Stats, and Guild in one go
+        bundle = await get_profile_bundle_or_error(interaction, db)
+        if not bundle:
             return
 
-        tasks = [
-            asyncio.to_thread(db.get_guild_member_data, discord_id),
-            asyncio.to_thread(db.get_player_stats_json, discord_id),
-            asyncio.to_thread(db.get_player_skills, discord_id),
-            asyncio.to_thread(db.get_class, player["class_id"]),
-            asyncio.to_thread(db.get_active_title, discord_id),
-        ]
-        results = await asyncio.gather(*tasks)
+        player = bundle["player"]
+        stats_data = bundle["stats"]
+        guild_data = bundle["guild"]
 
-        guild_data, stats_json, skills, class_data, active_title = results
-        stats = PlayerStats.from_dict(stats_json)
+        # Fetch Class (Cached)
+        class_data = await asyncio.to_thread(db.get_class, player["class_id"])
+
+        stats = PlayerStats.from_dict(stats_data)
         class_name = class_data["name"] if class_data else "Unknown"
+        active_title = player.get("active_title")
 
         title_display = f" *{active_title}*" if active_title else ""
 

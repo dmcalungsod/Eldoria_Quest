@@ -302,6 +302,67 @@ class DatabaseManager:
             "active_session": session_data,
         }
 
+    def get_profile_bundle(self, discord_id: int) -> dict | None:
+        """
+        Fetches player, stats, and guild data in a single aggregation.
+        Reduces DB round-trips for the profile UI.
+        """
+        # Optimized: Single Aggregation Pipeline to reduce DB round-trips
+        pipeline = [
+            {"$match": {"discord_id": discord_id}},
+            {
+                "$lookup": {
+                    "from": "stats",
+                    "localField": "discord_id",
+                    "foreignField": "discord_id",
+                    "as": "stats_docs",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "guild_members",
+                    "localField": "discord_id",
+                    "foreignField": "discord_id",
+                    "as": "guild_docs",
+                }
+            },
+            {"$project": {"stats_docs._id": 0, "guild_docs._id": 0}},
+        ]
+
+        result = list(self._col("players").aggregate(pipeline))
+
+        if not result:
+            return None
+
+        data = result[0]
+
+        # 1. Process Stats
+        stats_data = {}
+        if data.get("stats_docs"):
+            stats_row = data["stats_docs"][0]
+            if stats_row.get("stats_json"):
+                try:
+                    stats_data = json.loads(stats_row["stats_json"])
+                except json.JSONDecodeError:
+                    logger.error(f"Corrupted stats_json for user {discord_id}")
+
+        # 2. Process Guild
+        guild_data = None
+        if data.get("guild_docs"):
+            guild_data = data["guild_docs"][0]
+
+        # 3. Clean Player Data
+        # Remove the joined arrays to return a clean player dict
+        player_data = {
+            k: v for k, v in data.items() if k not in ["stats_docs", "guild_docs"]
+        }
+
+        return {
+            "player": player_data,
+            "stats": stats_data,
+            "guild": guild_data,
+        }
+
     # ============================================================
     # STATS & VITALS
     # ============================================================
