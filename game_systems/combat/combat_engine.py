@@ -14,6 +14,7 @@ import game_systems.data.emojis as E
 from ..monsters.monster_actions import MonsterAI
 from ..rewards.aurum_calculator import AurumCalculator
 from ..rewards.exp_calculator import ExpCalculator
+from ..data.skills_data import MAGIC_SKILL_TYPES
 from .combat_phrases import CombatPhrases
 from .damage_formula import DamageFormula
 
@@ -170,17 +171,7 @@ class CombatEngine:
                 skill_type = charged_skill.get("type", "physical")
 
                 # INTERRUPT LOGIC: Magic Charge + Offensive Action
-                is_magic = skill_type in [
-                    "magical",
-                    "fire",
-                    "ice",
-                    "poison",
-                    "water",
-                    "wind",
-                    "earth",
-                    "dark",
-                    "holy",
-                ]
+                is_magic = skill_type in MAGIC_SKILL_TYPES
                 is_offensive = (
                     self.action in ["attack", "special_ability"]
                     or self.action.startswith("skill:")

@@ -13,6 +13,7 @@ import discord
 import game_systems.data.emojis as E
 from cogs.ui_helpers import get_health_status_emoji, make_progress_bar
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.skills_data import MAGIC_SKILL_TYPES
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.narrative_data import MISSION_FLAVOR_TEXT, OUTCOME_FLAVOR_TEXT
 from game_systems.player.player_stats import PlayerStats
@@ -100,7 +101,15 @@ class AdventureEmbeds:
             # Check for charged skill telegraph
             charged_skill = active_monster.get("charged_skill")
             if charged_skill:
-                warning = f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
+                skill_type = charged_skill.get("type", "physical")
+                is_magic = skill_type in MAGIC_SKILL_TYPES
+
+                if is_magic:
+                    hint = "Attack to INTERRUPT!"
+                else:
+                    hint = "Defend to PARRY!"
+
+                warning = f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}\n💡 *{hint}*"
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}{warning}"
             else:
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}"
