@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import MagicMock
 
 # Add repo root to path
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 1. Mock discord and pymongo modules BEFORE importing the cog
 mock_discord = MagicMock()
@@ -36,24 +36,8 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ui"] = mock_discord_ui
 
 # 2. Now import the classes to test
-# We need to ensure cogs.ui_helpers is importable or mocked if needed
-# But since we are mocking discord, UI helpers might just work if they only use discord types
-# However, cogs.status_update_cog imports .ui_helpers relative import
-# This requires cogs to be a package.
-
-# To avoid import errors with relative imports when running as script:
-# We will patch cogs.ui_helpers if needed, but since we are running from root,
-# `from .ui_helpers import ...` inside `cogs/status_update_cog.py` should resolve to `cogs/ui_helpers.py`.
-
-# But we need to mock DatabaseManager too? No, we pass a mock instance.
-# But the file imports it. It must exist.
-
-try:
-    from cogs.status_update_cog import StatusUpdateView
-    from game_systems.player.player_stats import PlayerStats
-except ImportError as e:
-    print(f"Import Error: {e}")
-    sys.exit(1)
+from cogs.status_update_cog import StatusUpdateView  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestOptimisticLocking(unittest.TestCase):
