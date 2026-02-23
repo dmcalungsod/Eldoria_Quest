@@ -354,6 +354,39 @@ LOCATIONS = {
         ],
         "special_events": ["trap_pit", "ancient_shrine"],
     },
+    "gale_scarred_heights": {
+        "name": "Gale-Scarred Heights",
+        "emoji": "🌪️",
+        "min_rank": "A",
+        "level_req": 35,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_136", 30),  # Zephyr Wisp
+            ("monster_137", 30),  # Cloud Ray
+            ("monster_138", 25),  # Storm Griffin (Elite)
+            ("monster_139", 15),  # Thunder Roc (Elite)
+        ],
+        "night_monsters": [
+            ("monster_138", 40),  # Storm Griffin
+            ("monster_139", 30),  # Thunder Roc
+            ("monster_137", 30),
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_140",  # Tempest Guardian (Boss)
+                "weight": 5,
+                "min_level": 39,
+            }
+        ],
+        "description": "High peaks where the wind howls like a living thing. Only the sure-footed survive.",
+        "gatherables": [
+            ("cloud_wisp", 40),
+            ("mithril_ore", 30),
+            ("magic_stone_large", 20),
+            ("charged_core", 10),
+        ],
+        "special_events": ["trap_pit", "ancient_shrine"],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",
