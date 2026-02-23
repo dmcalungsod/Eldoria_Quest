@@ -342,6 +342,7 @@ class AdventureSession:
                 regen_chance=70,
                 location_name=location_name,
                 weather=weather,
+                time_phase=time_phase,
                 event_type=context.get("event_type"),
             )
             self.logs.extend(result["log"])
