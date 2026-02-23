@@ -145,6 +145,11 @@ class CombatEngine:
         if buff_msgs:
             log.extend(buff_msgs)
 
+        # Process Debuffs
+        debuff_msgs = self._process_monster_debuffs()
+        if debuff_msgs:
+            log.extend(debuff_msgs)
+
         turn_report = {
             "str_hits": 0,
             "dex_hits": 0,
@@ -502,8 +507,85 @@ class CombatEngine:
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
 
+            # Apply Debuffs (if any)
+            if skill.get("debuff"):
+                debuff_msg = self._apply_monster_debuff(skill)
+                if debuff_msg:
+                    log.append(debuff_msg)
+
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
+
+    def _process_monster_debuffs(self):
+        """
+        Handles damage over time from debuffs on the monster.
+        """
+        if "debuffs" not in self.monster or not self.monster["debuffs"]:
+            return []
+
+        msgs = []
+        active_debuffs = []
+
+        for debuff in self.monster["debuffs"]:
+            dmg = debuff["damage"]
+            name = debuff["name"]
+
+            # Apply Damage
+            self.monster_hp -= dmg
+            msgs.append(f"☠️ **{self.monster.get('name', 'Enemy')}** takes {dmg} {name.lower()} damage!")
+
+            # Decrement Duration
+            debuff["duration"] -= 1
+            if debuff["duration"] > 0:
+                active_debuffs.append(debuff)
+            else:
+                msgs.append(f"✅ {name} on **{self.monster.get('name', 'Enemy')}** has worn off.")
+
+        self.monster["debuffs"] = active_debuffs
+        return msgs
+
+    def _apply_monster_debuff(self, skill):
+        """
+        Applies a debuff to the monster (e.g., Poison).
+        Scales damage based on player stats.
+        """
+        debuff_data = skill.get("debuff", {})
+        if not debuff_data:
+            return None
+
+        # Initialize debuffs list if missing
+        if "debuffs" not in self.monster:
+            self.monster["debuffs"] = []
+
+        # Check for Poison
+        if "poison" in debuff_data:
+            base_dmg = float(debuff_data["poison"])
+            duration = int(debuff_data.get("duration", 3))
+
+            # Scaling: Base + (Stat * 0.1)
+            # Default scaling stat for Rogue is DEX
+            scaling_stat = skill.get("scaling_stat", "DEX").upper()
+            stat_val = self.stats_dict.get(scaling_stat, 10)
+
+            # 10% scaling seems fair for a DoT (e.g., 20 DEX -> +2 dmg per turn)
+            scaled_dmg = int(base_dmg + (stat_val * 0.1))
+
+            # Avoid duplicate stacking (refresh duration instead)
+            existing = next((d for d in self.monster["debuffs"] if d["type"] == "poison"), None)
+            if existing:
+                existing["duration"] = duration
+                existing["damage"] = max(existing["damage"], scaled_dmg) # Keep higher damage
+                return f"☠️ **{self.monster.get('name', 'Enemy')}**'s poison is refreshed!"
+            else:
+                self.monster["debuffs"].append({
+                    "type": "poison",
+                    "damage": scaled_dmg,
+                    "duration": duration,
+                    "name": "Poison"
+                })
+                return f"☠️ **{self.monster.get('name', 'Enemy')}** is poisoned for {scaled_dmg} dmg/turn!"
+
+        return None
 
     def _perform_basic_attack(self, log, turn_report, force_crit=False):
         # --- Basic Attack ---
