@@ -1,115 +1,63 @@
-# 📖 Eldoria Quest: Lore Canon
-
-**Last Updated:** 2026-02-25
-**Maintained by:** Lorekeeper
+# 📖 LORE CANON — ELDORIA QUEST
 
 > *This document serves as the single source of truth for the history, factions, and world of Eldoria Quest. All narrative content must align with these entries.*
 
 ---
 
-## 🌍 **I. The World: Eldoria**
+## 🌑 **I. Core History & Premise**
 
-### 🌑 **The Sundering (500 Years Ago)**
-*   **The Event:** A magical catastrophe that tore open the Veil between worlds, fracturing reality and unleashing horrors across the realm. Theories include a failed ritual, divine war, or natural instability.
-*   **Consequences:** The land is scarred, monster populations have exploded, and magic has become volatile. The sky turned a permanent, bruised twilight in many regions.
-*   **The Veil:** The barrier between the mortal world and the chaotic dimensions beyond. It is now thin and broken in places like the "Sundering Scar," allowing magic to seep through but also spawning monsters.
+### **The Sundering (500 Years Ago)**
+A cataclysmic event of unknown origin (theories: failed ritual, divine war, natural instability) that tore open the **Veil** separating the mortal realm from the chaotic energies of the Void.
+*   **Consequences:** The land fractured. Monstrous entities poured through the rifts. The sky turned a permanent, bruised twilight in many regions.
+*   **The Veil:** The barrier between worlds. It is now thin and "broken" in places, allowing magic to seep through (which powers the world) but also allowing monsters to spawn endlessly.
 
-### 🏰 **Astraeon (The Last Bastion)**
-*   **Description:** A massive, fortified city-state built around the **Guild Hall**. It is the only safe haven in a world overrun by darkness.
-*   **Significance:** Home to the **Adventurer’s Guild**, an institution forged out of necessity rather than glory.
-*   **Governance:** **Oligarchy/Meritocracy.** Ruled by the **Guild Council** (composed of high-ranking Guild officials and representatives from major factions). **There is no King or Queen.** The Guild *is* the government.
+### **Astraeon: The Last Bastion**
+A massive, fortified city-state built around the **Guild Hall**. It is the only safe haven in a world overrun by darkness.
+*   **Government:** **Oligarchy/Meritocracy.** Ruled by the **Guild Council** (composed of high-ranking Guild officials and representatives from major factions). **There is no King or Queen.** The Guild *is* the government.
 *   **Economy:** Entirely dependent on **Magic Stones** harvested from monsters. These stones fuel the city's barriers, light its streets, and power its technology.
 *   **Atmosphere:** Industrial, desperate, crowded. Layers of stone and iron.
 
-### 🎭 **Tone & Atmosphere**
-*   **Genre:** Dark High-Fantasy Survival.
-*   **Inspirations:** *Danmachi* (Guild structure), *Grimgar of Fantasy and Ash* (Grounded danger, material focus).
-*   **Key Themes:**
-    *   **Fragility of Life:** Adventurers are not superheroes; they are laborers facing death daily. Life expectancy is short.
-    *   **Material-Driven Economy:** Monsters drop materials (Magic Stones, parts), not gold. Wealth comes from processing and trading these.
-    *   **Strategic Survival:** Preparation (torches, rations) is as important as combat skill.
+### **Adventurers**
+They are not chosen heroes or glorious knights. They are **laborers** of the dangerous frontier.
+*   **Role:** To venture into the "Wilds" (dungeons/zones), cull monster populations to prevent them from overrunning the city, and harvest Magic Stones to keep the lights on.
+*   **Life Expectancy:** Short. Most die in their first year.
 
 ---
 
 ## ⚔️ **II. Factions**
 
-### 🧭 **The Pathfinders** (Explorer's League)
-*   **Role:** Explorers dedicated to mapping the unknown depths of the dungeon.
+### **The Pathfinders** (Explorer's League)
 *   **Philosophy:** "To map the unknown is to conquer fear."
-*   **Interests:** Exploration, Gathering (Beast/Plant types).
-*   **Ranks:** Initiate → Scout → Wayfarer → Trailblazer → Cartographer.
+*   **Focus:** Exploration, mapping new zones, understanding the geography of the fractured world.
+*   **Key Interest:** Beast/Plant monsters, rare herbs, new routes.
 *   **Motto:** *Light the Way.*
 
-### 🛡️ **The Iron Vanguard** (Protectors of Eldoria)
-*   **Role:** Protectors of Eldoria who specialize in eliminating dangerous threats.
+### **The Iron Vanguard** (Protectors of Eldoria)
 *   **Philosophy:** "Steel is the only wall between order and chaos."
-*   **Interests:** Boss Kills, Elite Kills (Undead/Construct types).
-*   **Ranks:** Recruit → Guard → Sentinel → Vanguard → Champion.
+*   **Focus:** Combat superiority, eliminating high-threat targets (Bosses/Elites), protecting Astraeon's walls.
+*   **Key Interest:** Undead/Construct monsters, boss drops, weaponry.
 *   **Motto:** *Hold the Line.*
 
-### 🔮 **The Arcane Assembly** (Scholars of the Veil)
-*   **Role:** Scholars seeking to understand the magical mysteries of the dungeon.
+### **The Arcane Assembly** (Scholars of the Veil)
 *   **Philosophy:** "Magic is a tool, not a curse. We must master it."
-*   **Interests:** Magic Kills, Collecting (Elemental/Demon types).
-*   **Ranks:** Novice → Adept → Scholar → Magister → Archmage.
+*   **Focus:** Researching the Veil, studying magical anomalies, crafting spells and artifacts.
+*   **Key Interest:** Elemental/Demon monsters, magic stones, ancient texts.
 *   **Motto:** *Knowledge is Power.*
 
 ---
 
-## 🗺️ **III. Locations & Biomes**
+## 🗺️ **III. Locations (Progression)**
 
-### 🌲 **Forest Outskirts & Willowcreek (Rank F)**
-*   **Description:** The immediate wilderness outside Astraeon. Tame compared to deeper zones but still dangerous.
-*   **Inhabitants:** Slimes, Goblins, stray Wolves.
-*   **Key Landmarks:** Willowcreek Village, Cranelight Inn.
-
-### 🍃 **The Whispering Thicket (Rank E)**
-*   **Description:** A dense, dark forest where the wind carries voices. The canopy is thick, blocking much light.
-*   **Hazards:** Poisonous plants, disorienting whispers.
-*   **Inhabitants:** Spiders, Sprites, Treants.
-
-### 🍂 **Deepgrove Roots (Rank D)**
-*   **Description:** The corrupted heart of the forest. Twisted roots, rot, and ancient treants.
-*   **Hazards:** Entangling roots, toxic spores.
-*   **Inhabitants:** Ancient Treants, Rot-infused beasts.
-
-### 🌫️ **The Shrouded Fen (Rank C)**
-*   **Description:** A mist-choked swamp where the ground is treacherous. Spirits and drowned things lurk here.
-*   **Hazards:** Sinking mud, hidden pools, thick fog.
-*   **Inhabitants:** Wisps, Mire Lurkers, Revenants.
-
-### 🌊 **The Sunken Grotto (Rank C)**
-*   **Description:** A submerged cavern network lit by bioluminescence. The water here is deep and cold.
-*   **Hazards:** Drowning, crushing pressure.
-*   **Inhabitants:** Coral Golems, Abyssal Eels, Tide Sirens.
-*   **Boss:** Leviathan.
-
-### 💎 **The Crystal Caverns (Rank B)**
-*   **Description:** Subterranean tunnels filled with glowing, sharp crystals. Beautiful but deadly.
-*   **Hazards:** Blinding light, sharp terrain.
-*   **Inhabitants:** Crystal Golems, Prism Spiders, Obsidian Gargoyles.
-
-### ⚙️ **The Clockwork Halls (Rank B)**
-*   **Description:** An ancient, automated facility buried deep underground. A labyrinth of grinding gears and hissing steam pipes.
-*   **Hazards:** Moving machinery, steam vents.
-*   **Inhabitants:** Cogwork Spiders, Brass Golems, Automaton Knights.
-*   **Boss:** The Gear Warden.
-
-### 🔥 **The Molten Caldera (Rank A)**
-*   **Description:** A volcanic region of ash and fire. The heat is oppressive.
-*   **Hazards:** Lava flows, toxic fumes.
-*   **Inhabitants:** Fire Elementals, Magma Golems, Lava Drakes.
-
-### ❄️ **The Frostfall Expanse (Rank A)**
-*   **Description:** A frozen wasteland of eternal winter.
-*   **Hazards:** Extreme cold, blizzards.
-*   **Inhabitants:** Frost Wolves, Ice Golems, Glacial Drakes.
-
-### 🌌 **The Void Sanctum (Rank S)**
-*   **Description:** The edge of reality itself. A place where the Veil is almost non-existent.
-*   **Hazards:** Reality distortion, pure void energy.
-*   **Inhabitants:** Void Stalkers, Null Wisps, Entropy Drakes.
-*   **Boss:** Omega, The Void Heart.
+1.  **Willowcreek Outskirts (Rank F):** The "safe" zone. A forest edge corrupted by weak slime and goblin tribes.
+2.  **Whispering Thicket (Rank E):** Dense, dark woods where sunlight fails. Home to pack hunters (wolves, spiders).
+3.  **Deepgrove Roots (Rank D):** The corrupted heart of the forest. Twisted roots, rot, and ancient treants.
+4.  **The Shrouded Fen (Rank C):** A wetland choked by magical fog. Spirits and drowned things lurk here.
+5.  **The Sunken Grotto (Rank C):** A submerged cavern network lit by bioluminescence. The water here is deep and cold.
+6.  **The Crystal Caverns (Rank B):** Subterranean tunnels filled with glowing, sharp crystals and ancient constructs.
+7.  **The Clockwork Halls (Rank B):** A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.
+8.  **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
+9.  **The Frostfall Expanse (Rank A):** A frozen wasteland of eternal winter.
+10. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
 
 ---
 
@@ -126,50 +74,7 @@
 
 ---
 
-## 🐉 **V. Bestiary (Lore Highlights)**
-
-### **Veil-Born Horrors**
-*   **Origin:** Creatures that crawled from the Sundering Scar or were warped by its energy.
-*   **Examples:** Slimes, Wisps, Void Stalkers.
-
-### **Warped Nature**
-*   **Origin:** Natural beasts twisted by leaking energies from the Broken Veil.
-*   **Examples:** Forest Wolves, Treants, Spiders.
-
-### **Constructs**
-*   **Origin:** Remnants of an older age or formed from the earth itself.
-*   **Examples:** Golems (Crystal, Magma, Ice), Automata.
-
-### **The Goblins**
-*   **Lore:** Stunted, vicious scavengers born from the Sundering. Not a natural race, but a plague.
-*   **Hierarchy:** Grunts -> Scouts -> Lieutenants -> Warlords.
-
----
-
-## 👥 **VI. Key Figures (NPCs)**
-
-*   **Guildmaster Kael:** The pragmatic leader of the Adventurer’s Guild. Issues high-level boss quests.
-*   **Captain Rhea:** Leader of the Guard/Iron Vanguard operations. Focuses on threat elimination.
-*   **Hunter Yorin:** A veteran tracker who monitors beast movements.
-*   **Artificer Jolen:** A researcher obsessed with ancient technology and crystals.
-*   **Mage Lyra:** A scholar of the Arcane Assembly studying elemental phenomena.
-*   **Blacksmith Gorn:** A master smith constantly seeking rarer materials for weapons.
-*   **Herbalist Mirra & Apothecary Lune:** Healers dealing with the unique poisons of the wilds.
-*   **Archivist Thorne:** Keeper of the Guild Library, investigates dark rituals and lore.
-
----
-
-## 🛡️ **VII. Classes**
-
-*   **Warrior:** The unyielding bulwark. Uses heavy armor and weapons to hold the line.
-*   **Mage:** Commanders of arcane storms. Fragile but devastating.
-*   **Rogue:** Masters of lethal subtlety. Exploit openings with precision.
-*   **Cleric:** Healers and harbingers. Wield holy light to mend allies and judge foes.
-*   **Ranger:** Trackers of the wild. Strike with instinct and accuracy from a distance.
-
----
-
-## 📜 **VIII. Tone Guidelines**
+## 📜 **V. Tone Guidelines**
 
 *   **Grim but Hopeful:** The world is dark and dangerous, but people survive through grit and cooperation.
 *   **Literary:** Descriptions should be evocative. Avoid "video gamey" slang (e.g., "mob," "aggro," "spawn") in narrative text. Use "creature," "hostile," "emerge."

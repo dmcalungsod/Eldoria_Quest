@@ -40,6 +40,10 @@ class TestSkillUpgradeCost(unittest.TestCase):
         self.patcher = patch.dict(sys.modules)
         self.patcher.start()
 
+        # Mock pymongo
+        sys.modules["pymongo"] = MagicMock()
+        sys.modules["pymongo.errors"] = MagicMock()
+
         self.mock_discord = MagicMock()
         self.mock_discord.ui.View = MockView
         self.mock_discord.ui.Button = MockButton

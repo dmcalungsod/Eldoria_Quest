@@ -196,11 +196,6 @@ class AdventureSession:
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
 
-            # --- Weather & Time System Check ---
-            weather = WorldTime.get_current_weather(self.location_id)
-            time_phase = WorldTime.get_current_phase()
-            weather_mods = WorldTime.get_weather_modifiers(weather)
-
             # --- 1. Continue Combat ---
             if self.active_monster:
                 if action and action.startswith("set_stance:"):
@@ -217,20 +212,24 @@ class AdventureSession:
                     return self._attempt_flee(context)
 
                 if action == "defend":
-                    return self._process_combat_turn(context, action="defend", weather_modifiers=weather_mods)
+                    return self._process_combat_turn(context, action="defend")
 
                 if action == "special_ability":
-                    return self._process_combat_turn(context, action="special_ability", weather_modifiers=weather_mods)
+                    return self._process_combat_turn(context, action="special_ability")
 
                 should_auto = self._check_auto_condition(context)
 
                 # If explicit attack or implicit auto, and eligible -> Auto
                 if (action == "attack" or not action) and should_auto:
-                    return self._resolve_auto_combat(context, weather_modifiers=weather_mods)
+                    return self._resolve_auto_combat(context)
 
                 # Otherwise manual single turn
                 final_action = action if action else "attack"
-                return self._process_combat_turn(context, action=final_action, weather_modifiers=weather_mods)
+                return self._process_combat_turn(context, action=final_action)
+
+            # --- Weather & Time System Check ---
+            weather = WorldTime.get_current_weather(self.location_id)
+            time_phase = WorldTime.get_current_phase()
 
             # Dynamic Combat Threshold based on Weather and Time
             # Base REGEN_CHANCE is 40 (meaning 60% combat).
@@ -366,9 +365,7 @@ class AdventureSession:
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(
-        self, context: dict[str, Any] | None = None, weather_modifiers: dict = None
-    ) -> dict[str, Any]:
+    def _resolve_auto_combat(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """
@@ -406,7 +403,6 @@ class AdventureSession:
                 context=context,
                 persist_vitals=False,
                 stance=stance,
-                weather_modifiers=weather_modifiers,
             )
             turn_reports.append(result.get("turn_report", {}))
 
@@ -487,7 +483,6 @@ class AdventureSession:
         context: dict[str, Any] | None = None,
         action: str = "attack",
         prepend_logs: list = None,
-        weather_modifiers: dict = None,
     ) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
@@ -512,7 +507,6 @@ class AdventureSession:
             action=action,
             stance=stance,
             persist_vitals=False,  # FIX: Defer vital update
-            weather_modifiers=weather_modifiers,
         )
 
         # Update context vitals from combat result

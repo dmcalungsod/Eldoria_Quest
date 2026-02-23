@@ -4,6 +4,10 @@ import unittest
 import asyncio
 from unittest.mock import MagicMock, AsyncMock, patch
 
+# Mock pymongo
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

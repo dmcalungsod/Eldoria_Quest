@@ -12,6 +12,10 @@ class TestNarrativeEmbeds(unittest.TestCase):
         self.modules_patcher = patch.dict(sys.modules)
         self.modules_patcher.start()
 
+        # Mock pymongo
+        sys.modules["pymongo"] = MagicMock()
+        sys.modules["pymongo.errors"] = MagicMock()
+
         # Mock discord
         self.mock_discord = MagicMock()
         self.mock_discord.Color.gold.return_value = "gold"
