@@ -13,14 +13,14 @@ class RankSystem:
         "F": {
             "title": "Initiate",
             "next_rank": "E",
-            "requirements": {"quests_completed": 3, "normal_kills": 40},
+            "requirements": {"quests_completed": 3, "normal_kills": 25},
         },
         "E": {
             "title": "Novice",
             "next_rank": "D",
             "requirements": {
                 "quests_completed": 10,
-                "normal_kills": 100,
+                "normal_kills": 75,
                 "elite_kills": 5,
             },
         },
@@ -29,7 +29,7 @@ class RankSystem:
             "next_rank": "C",
             "requirements": {
                 "quests_completed": 20,
-                "normal_kills": 250,
+                "normal_kills": 200,
                 "elite_kills": 20,
                 "boss_kills": 1,
             },
@@ -75,7 +75,7 @@ class RankSystem:
             "title": "Paragon",
             "next_rank": "SSS",
             "requirements": {
-                "quests_completed": 70,
+                "quests_completed": 65,
                 "boss_kills": 50,
                 "elite_kills": 200,
             },
