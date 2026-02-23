@@ -15,3 +15,13 @@ jobs:
         run: |
           git clone --mirror https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
           git push --prune https://${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot.git +refs/heads/*:refs/heads/* +refs/tags/*:refs/tags/*
+
+      - name: Log Summary
+        if: always()
+        run: |
+          echo "### 🪞 Mirror Status" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+             echo "✅ Mirror sync completed successfully." >> $GITHUB_STEP_SUMMARY
+          else
+             echo "❌ Mirror sync failed." >> $GITHUB_STEP_SUMMARY
+          fi

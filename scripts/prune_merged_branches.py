@@ -1,7 +1,15 @@
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
+
+
+def log_summary(message):
+    summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_file:
+        with open(summary_file, "a") as f:
+            f.write(message + "\n")
 
 
 def run_command(command_list):
@@ -17,6 +25,8 @@ def run_command(command_list):
 
 
 def main():
+    log_summary("### 🧹 Branch Pruning Report")
+
     # Set retention period (20 hours) to allow recent branches to persist for a bit
     hours_threshold = 20
     cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
@@ -54,6 +64,8 @@ def main():
 
     prs = json.loads(prs_json)
     print(f"Found {len(prs)} merged PRs to check.")
+
+    deleted_count = 0
 
     for pr in prs:
         pr_number = pr.get("number")
@@ -106,8 +118,17 @@ def main():
 
         if delete_result.returncode == 0:
             print(f"Successfully deleted branch '{head_ref}'.")
+            log_summary(f"- ✅ Deleted branch `{head_ref}` (merged {merged_at_str})")
+            deleted_count += 1
         else:
-            print(f"Failed to delete branch '{head_ref}': {delete_result.stderr.strip()}")
+            error_msg = delete_result.stderr.strip()
+            print(f"Failed to delete branch '{head_ref}': {error_msg}")
+            log_summary(f"- ❌ Failed to delete branch `{head_ref}`: {error_msg}")
+
+    if deleted_count == 0:
+        log_summary("No branches were pruned.")
+    else:
+        log_summary(f"\n**Total branches pruned:** {deleted_count}")
 
 
 if __name__ == "__main__":
