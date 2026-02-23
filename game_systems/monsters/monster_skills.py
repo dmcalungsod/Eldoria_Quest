@@ -181,4 +181,29 @@ MONSTER_SKILLS = {
         "type": "magical",
         "desc_key": "magic",
     },
+    # Wind / Storm Skills
+    "gust": {
+        "key_id": "gust",
+        "name": "Gust",
+        "power": 1.3,
+        "mp_cost": 5,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "aerial_dive": {
+        "key_id": "aerial_dive",
+        "name": "Aerial Dive",
+        "power": 1.6,
+        "mp_cost": 8,
+        "type": "physical",
+        "desc_key": "special_hit",
+    },
+    "thunder_call": {
+        "key_id": "thunder_call",
+        "name": "Thunder Call",
+        "power": 1.9,
+        "mp_cost": 12,
+        "type": "magical",
+        "desc_key": "magic",
+    },
 }

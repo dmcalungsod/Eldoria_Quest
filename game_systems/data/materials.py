@@ -362,4 +362,29 @@ MATERIALS = {
         "rarity": "Common",
         "value": 1,
     },
+    # --- Gale-Scarred Heights Materials (Level 35, Rank A) ---
+    "cloud_wisp": {
+        "name": "Cloud Wisp",
+        "description": "A captured breath of living wind, soft to the touch.",
+        "rarity": "Common",
+        "value": 35,
+    },
+    "griffon_feather": {
+        "name": "Griffon Feather",
+        "description": "A striped feather that hums with static electricity.",
+        "rarity": "Uncommon",
+        "value": 50,
+    },
+    "charged_core": {
+        "name": "Charged Core",
+        "description": "The sparking heart of a storm construct.",
+        "rarity": "Rare",
+        "value": 220,
+    },
+    "tempest_heart": {
+        "name": "Tempest Heart",
+        "description": "A swirling sphere of concentrated storm energy, dropped by a high guardian.",
+        "rarity": "Epic",
+        "value": 1200,
+    },
 }

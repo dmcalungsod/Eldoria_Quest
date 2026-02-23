@@ -2214,5 +2214,137 @@
             "regenerate"
         ],
         "description": "A lumbering mass of molten rock and iron, formed from the waste of the Sundering."
+    },
+    "monster_136": {
+        "id": 136,
+        "name": "Zephyr Wisp",
+        "level": 35,
+        "tier": "Normal",
+        "hp": 1600,
+        "atk": 105,
+        "def": 35,
+        "xp": 3100,
+        "drops": [
+            [
+                "cloud_wisp",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "gust",
+            "rapid_strike"
+        ],
+        "description": "A playful but dangerous spirit of wind that can knock a warrior off their feet."
+    },
+    "monster_137": {
+        "id": 137,
+        "name": "Cloud Ray",
+        "level": 36,
+        "tier": "Normal",
+        "hp": 1800,
+        "atk": 115,
+        "def": 40,
+        "xp": 3300,
+        "drops": [
+            [
+                "cloud_wisp",
+                50
+            ],
+            [
+                "charged_core",
+                30
+            ]
+        ],
+        "skills": [
+            "aerial_dive",
+            "gust"
+        ],
+        "description": "A flat-bodied creature that glides effortlessly through the high-altitude currents."
+    },
+    "monster_138": {
+        "id": 138,
+        "name": "Storm Griffin",
+        "level": 37,
+        "tier": "Elite",
+        "hp": 3200,
+        "atk": 135,
+        "def": 55,
+        "xp": 4500,
+        "drops": [
+            [
+                "griffon_feather",
+                40
+            ],
+            [
+                "magic_stone_large",
+                30
+            ]
+        ],
+        "skills": [
+            "aerial_dive",
+            "rapid_strike",
+            "gust"
+        ],
+        "description": "A majestic beast with the head of an eagle and body of a lion, crackling with static."
+    },
+    "monster_139": {
+        "id": 139,
+        "name": "Thunder Roc",
+        "level": 38,
+        "tier": "Elite",
+        "hp": 3500,
+        "atk": 145,
+        "def": 60,
+        "xp": 5000,
+        "drops": [
+            [
+                "griffon_feather",
+                50
+            ],
+            [
+                "charged_core",
+                40
+            ]
+        ],
+        "skills": [
+            "thunder_call",
+            "heavy_blow"
+        ],
+        "description": "A massive bird of prey whose wingspan blocks out the sun. Its cry summons storms."
+    },
+    "monster_140": {
+        "id": 140,
+        "name": "Tempest Guardian",
+        "level": 39,
+        "tier": "Boss",
+        "hp": 12000,
+        "atk": 180,
+        "def": 100,
+        "xp": 18000,
+        "drops": [
+            [
+                "tempest_heart",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                80
+            ],
+            [
+                "charged_core",
+                100
+            ]
+        ],
+        "skills": [
+            "thunder_call",
+            "aerial_dive",
+            "gust",
+            "regenerate"
+        ],
+        "description": "An ancient construct of clouds and lightning, eternally guarding the highest peaks."
     }
 }

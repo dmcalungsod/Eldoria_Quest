@@ -32,3 +32,12 @@
 - **Mechanics:** Added 15% chance for special events: Safe Rooms (Heal), Hidden Stashes (Loot), Ancient Shrines (XP), and Traps (Damage).
 - **Immersion:** Added unique flavor text for each event type.
 - **Progression:** Provided alternative ways to sustain runs (Healing) or gain resources (Loot/XP) outside of combat.
+
+## 2026-02-23 — Gale-Scarred Heights
+
+**Learning:** Players faced a steep difficulty spike between Rank A (Level 30) and Rank S (Level 40). A bridge was needed at Level 35.
+**Action:** Implemented "Gale-Scarred Heights" (Rank A, Level 35).
+- **Theme:** High altitude / Wind / Storm.
+- **Mechanics:** Introduced wind-themed skills (`gust`, `aerial_dive`, `thunder_call`) focusing on magic/physical hybrid damage.
+- **Economy:** Added `cloud_wisp`, `griffon_feather`, `charged_core`, and `tempest_heart` to support future crafting.
+- **Challenge:** Designed "Tempest Guardian" (Level 39 Boss) with `aerial_dive` and `thunder_call` to test mixed mitigation.
