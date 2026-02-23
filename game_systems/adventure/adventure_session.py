@@ -56,6 +56,7 @@ class AdventureSession:
             self.location_id = row_data["location_id"]
             self.active = bool(row_data["active"])
             self.version = row_data.get("version", 1)
+            self.steps_completed = row_data.get("steps_completed", 0)
 
             # Safe JSON Load
             try:
@@ -80,6 +81,7 @@ class AdventureSession:
             self.loot = {}
             self.logs = []
             self.location_id = None
+            self.steps_completed = 0
             self.version = 1
 
     def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
@@ -181,7 +183,9 @@ class AdventureSession:
         except Exception:
             return False
 
-    def simulate_step(self, context_bundle: dict | None = None, action: str = None) -> dict[str, Any]:
+    def simulate_step(
+        self, context_bundle: dict | None = None, action: str = None, background: bool = False
+    ) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
         Returns: { "sequence": List[List[str]], "dead": bool, "vitals": dict, "player_stats": PlayerStats, "active_monster": dict }
@@ -220,6 +224,22 @@ class AdventureSession:
                     return self._process_combat_turn(context, action="special_ability")
 
                 should_auto = self._check_auto_condition(context)
+
+                if background:
+                    # Background: Flee if HP critical, else Auto-Combat
+                    if context and context.get("vitals"):
+                        current_hp = context["vitals"]["current_hp"]
+                        # Ensure max_hp is at least 1
+                        if "stats_dict" in context:
+                            max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
+                        else:
+                            max_hp = max(context["player_stats"].max_hp, 1)
+
+                        if (current_hp / max_hp) < 0.30:
+                            # Auto-Flee logic
+                            return self._attempt_flee(context)
+
+                    return self._resolve_auto_combat(context, background=True)
 
                 # If explicit attack or implicit auto, and eligible -> Auto
                 if (action == "attack" or not action) and should_auto:
@@ -365,7 +385,9 @@ class AdventureSession:
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _resolve_auto_combat(
+        self, context: dict[str, Any] | None = None, background: bool = False
+    ) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """
@@ -417,7 +439,9 @@ class AdventureSession:
             # Safety: Drop to manual if HP is too low
             max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
             if result["hp_current"] / max(max_hp, 1) < 0.30:
-                sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                if not background:
+                    sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                # If background, we break silently. Next simulate_step will trigger _attempt_flee
                 break
 
             if result.get("winner") == "monster":
@@ -580,6 +604,7 @@ class AdventureSession:
                 active=1 if self.active else 0,
                 active_monster_json=m_json,
                 previous_version=self.version,
+                steps_completed=getattr(self, "steps_completed", 0),
             )
             if not success:
                 raise RuntimeError("Adventure session state conflict (optimistic lock failed).")

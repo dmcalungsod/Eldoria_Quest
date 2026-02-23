@@ -66,6 +66,7 @@ class MockDatabaseManager:
         active,
         active_monster_json,
         previous_version,
+        steps_completed=None,
     ):
         if discord_id not in self.sessions:
             return False
