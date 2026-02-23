@@ -132,12 +132,14 @@ class AdventureSession:
 
             # --- WORLD EVENT BOOSTS ---
             event_system = WorldEventSystem(self.db)
-            event_modifiers = event_system.get_modifiers()
-            boosts_dict.update(event_modifiers)
-
-            # Fetch event type for atmosphere
+            # OPTIMIZATION: Fetch event once to get both modifiers and type
             event = event_system.get_current_event()
-            event_type = event["type"] if event else None
+
+            if event:
+                boosts_dict.update(event.get("modifiers", {}))
+                event_type = event["type"]
+            else:
+                event_type = None
             # --------------------------
 
             return {
