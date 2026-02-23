@@ -107,6 +107,13 @@ SKILL_LEVEL_MILESTONES = {
     20: ("Paragon", "Reached skill level 20."),
 }
 
+CRAFTING_MILESTONES = {
+    5: ("Apprentice Smith", "Reached Crafting Level 5."),
+    10: ("Journeyman Smith", "Reached Crafting Level 10."),
+    20: ("Master Artificer", "Reached Crafting Level 20."),
+    50: ("Grandmaster Crafter", "Reached Crafting Level 50."),
+}
+
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -323,4 +330,36 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking skill achievements for {discord_id}: {e}")
+            return None
+
+    def check_crafting_achievements(self, discord_id: int, current_level: int | None = None) -> str | None:
+        """
+        Checks if the player has reached a crafting milestone.
+        Returns a success message if a new title is awarded, else None.
+        """
+        try:
+            if current_level is None:
+                player = self.db.get_player(discord_id)
+                if not player:
+                    return None
+                current_level = player.get("crafting_level", 1)
+
+            newly_awarded = []
+
+            for level, (title, desc) in CRAFTING_MILESTONES.items():
+                if current_level >= level:
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
+            if newly_awarded:
+                if len(newly_awarded) == 1:
+                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
+                else:
+                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Error checking crafting achievements for {discord_id}: {e}")
             return None
