@@ -255,10 +255,15 @@ class QuestSystem:
             if not self.check_completion(progress, objectives):
                 return False, f"{WARNING} Objectives not met."
 
-            self.db._col("player_quests").update_one(
-                {"discord_id": discord_id, "quest_id": quest_id},
+            result = self.db._col("player_quests").update_one(
+                {"discord_id": discord_id, "quest_id": quest_id, "status": "in_progress"},
                 {"$set": {"status": "completed"}},
             )
+
+            if result.modified_count == 0:
+                # Race Condition Detected: Status changed between find_one and update_one
+                logger.warning(f"Quest completion race condition prevented for {discord_id}, quest {quest_id}")
+                return False, f"{ERROR} Quest already completed or inactive."
 
             # Grant rewards
             reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
