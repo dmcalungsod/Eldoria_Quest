@@ -16,9 +16,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.achievement_system import AchievementSystem
-from game_systems.crafting.crafting_system import CraftingSystem
-from database.database_manager import DatabaseManager
+from game_systems.achievement_system import AchievementSystem  # noqa: E402
+from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
 
 class TestCraftingAchievements(unittest.TestCase):
     def setUp(self):
