@@ -10,7 +10,7 @@ from unittest.mock import MagicMock
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
 
 
 class TestInfirmaryLogic(unittest.TestCase):
