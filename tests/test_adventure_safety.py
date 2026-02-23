@@ -28,13 +28,15 @@ class TestAdventureDataLoss(unittest.TestCase):
         discord_id = 12345
 
         # Mock active session
-        self.mock_db.get_active_adventure.return_value = {
+        active_session = {
             "location_id": "test_loc",
             "active": 1,
             "logs": "[]",
             "loot_collected": '{"iron_ore": 5}',
             "active_monster_json": None,
         }
+        self.mock_db.get_active_adventure.return_value = active_session
+        self.mock_db.mark_adventure_claiming.return_value = active_session
 
         # Mock player stats
         self.mock_db.get_player_stats_json.return_value = {}
@@ -86,13 +88,15 @@ class TestAdventureDataLoss(unittest.TestCase):
         """
         discord_id = 12345
 
-        self.mock_db.get_active_adventure.return_value = {
+        active_session = {
             "location_id": "test_loc",
             "active": 1,
             "logs": "[]",
             "loot_collected": '{"iron_ore": 5}',
             "active_monster_json": None,
         }
+        self.mock_db.get_active_adventure.return_value = active_session
+        self.mock_db.mark_adventure_claiming.return_value = active_session
         self.mock_db.get_player_stats_json.return_value = {}
         self.mock_db.get_player.return_value = {
             "level": 1,

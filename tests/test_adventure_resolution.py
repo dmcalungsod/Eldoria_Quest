@@ -1,6 +1,10 @@
 import pytest
 from unittest.mock import MagicMock, patch
 import sys
+import os
+
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock modules before importing
 sys.modules["pymongo"] = MagicMock()
@@ -85,9 +89,16 @@ def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock
     # Should simulate 2 steps only
     assert mock_session.simulate_step.call_count == 2
     # Should handle death
-    engine.adventure_manager._handle_death_rewards.assert_called_once_with(123, mock_session)
-    # Should update status to failed
-    mock_db.update_adventure_status.assert_called_with(123, "failed")
+    engine.adventure_manager._handle_death_rewards.assert_called_once_with(123, mock_session, deactivate=False)
+    # Should update status to failed using new method
+    # Note: logs contains the death message
+    mock_db.set_adventure_failed.assert_called_once_with(
+        discord_id=123,
+        logs='["You died."]',
+        loot_collected="{}",
+        steps_completed=2,
+        previous_version=1
+    )
 
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")

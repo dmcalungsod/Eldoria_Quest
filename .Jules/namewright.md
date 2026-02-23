@@ -71,3 +71,30 @@
 ### 📝 Notes
 - "Potion" is too generic/fantasy. Use "Phial", "Draught", "Serum".
 - Names should sound like they belong in a field hospital or a lab, not a wizard's tower.
+
+## 2026-02-27 — The Skybound Questline
+
+**Request:** Proactive (based on Lorekeeper's Gap Analysis)
+**Context:** Filling the narrative void for the new Sky Realms locations.
+**Tone:** Elemental, Vertiginous, Ancient.
+
+### 📜 Generated Names
+
+#### 📍 The Ashlands (Rank D)
+1.  **Shard of the Sky** – Simple, mysterious object name.
+2.  **Gaze of the Ash** – Implies looking up through the gloom.
+3.  **The First Ascent** – Classic adventure trope, fits the "beginning" vibe.
+
+#### 📍 The Celestial Archipelago (Rank B)
+1.  **Echoes of Gravity** – Suggests the physical distortion of the zone.
+2.  **Void-Touched Winds** – Links to the corruption/void theme.
+3.  **The Silent Observatory** – A place name that implies lost purpose.
+
+#### 📍 Gale-Scarred Heights (Rank A)
+1.  **Breath of the Storm** – Personifies the wind.
+2.  **The Summit’s Price** – Implies sacrifice is needed to reach the top.
+3.  **Wind-Walker’s Legacy** – Hints at a specific character history.
+
+### 📝 Notes
+- Progression moves from "looking up" (Ashlands) to "being there" (Archipelago) to "conquering it" (Heights).
+- Kept names relatively short to fit UI constraints if necessary.

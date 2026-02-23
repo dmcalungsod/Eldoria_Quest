@@ -789,11 +789,53 @@ class DatabaseManager:
         )
         return result.modified_count > 0
 
+    def set_adventure_failed(
+        self,
+        discord_id: int,
+        logs: str,
+        loot_collected: str,
+        steps_completed: int,
+        previous_version: int,
+    ) -> bool:
+        """
+        Updates an active adventure session to 'failed' status while keeping it active.
+        Used for background death reporting.
+        """
+        result = self._col("adventure_sessions").update_one(
+            {"discord_id": discord_id, "active": 1},
+            {
+                "$set": {
+                    "logs": logs,
+                    "loot_collected": loot_collected,
+                    "active_monster_json": None,
+                    "steps_completed": steps_completed,
+                    "status": "failed",
+                    "version": previous_version + 1,
+                }
+            },
+        )
+        return result.modified_count > 0
+
     def end_adventure_session(self, discord_id: int):
         """Marks all adventure sessions as inactive."""
         self._col("adventure_sessions").update_many(
             {"discord_id": discord_id},
             {"$set": {"active": 0}},
+        )
+
+    def mark_adventure_claiming(self, discord_id: int) -> dict | None:
+        """
+        Atomically marks the active adventure as 'claiming' to prevent
+        concurrent reward claims. Returns the session document if successful.
+        """
+        return self._col("adventure_sessions").find_one_and_update(
+            {
+                "discord_id": discord_id,
+                "active": 1,
+                "status": {"$in": ["in_progress", "completed"]},
+            },
+            {"$set": {"status": "claiming"}},
+            return_document=False,  # Return original state for reward calculation
         )
 
     # ============================================================

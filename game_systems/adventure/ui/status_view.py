@@ -5,7 +5,7 @@ View for monitoring active background adventures.
 Allows refreshing status or retreating early.
 """
 
-import asyncio
+import datetime
 import logging
 
 import discord
@@ -99,7 +99,7 @@ class AdventureStatusView(View):
             style=discord.ButtonStyle.primary,
             custom_id="adv_refresh",
             emoji="🔄",
-            row=0,
+            row=0
         )
         self.btn_refresh.callback = self.refresh_callback
         self.add_item(self.btn_refresh)
@@ -121,7 +121,7 @@ class AdventureStatusView(View):
             style=discord.ButtonStyle.danger,
             custom_id="adv_retreat",
             emoji="🏳️",
-            row=0,
+            row=0
         )
         self.btn_retreat.callback = self.retreat_callback
         self.add_item(self.btn_retreat)
