@@ -144,11 +144,19 @@ class TestToxicBlade(unittest.TestCase):
 
         # So yes, it applies damage then decrements. 1 -> 0. Removed.
 
-        self.assertEqual(
-            monster["HP"],
-            hp_after_tick - 22,
-            "Turn 4: Monster should take 11 poison damage",
-        )
+        expected_final_hp = hp_after_tick - 22
+        if expected_final_hp <= 0:
+            self.assertEqual(
+                monster["HP"],
+                0,
+                f"Turn 4: Monster should die (HP clamped to 0). Expected <=0, got {monster['HP']}",
+            )
+        else:
+            self.assertEqual(
+                monster["HP"],
+                expected_final_hp,
+                "Turn 4: Monster should take 11 poison damage",
+            )
         self.assertEqual(len(monster["debuffs"]), 0, "Turn 4: Poison should expire")
 
         print("Test Passed: Full lifecycle of Toxic Blade poison verified!")
