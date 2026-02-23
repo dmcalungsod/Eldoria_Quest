@@ -3,16 +3,18 @@ import pytest
 from unittest.mock import MagicMock, patch
 import sys
 
-# Mock modules to avoid import errors
-sys.modules["database.database_manager"] = MagicMock()
-sys.modules["game_systems.data.consumables"] = MagicMock()
-sys.modules["game_systems.data.crafting_recipes"] = MagicMock()
-sys.modules["game_systems.data.equipments"] = MagicMock()
-sys.modules["game_systems.data.materials"] = MagicMock()
-sys.modules["game_systems.data.recipes"] = MagicMock()
+# Patching sys.modules to mock pymongo is standard in this repo's tests
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
-# Now import the class and function
-from game_systems.crafting.crafting_system import CraftingSystem, calculate_crafting_xp_req
+# Do NOT mock database.database_manager or game_systems.data... in sys.modules
+# because that pollutes the environment for other tests.
+# Instead, we will rely on dependency injection (passing mock_db)
+# and patching data attributes on the imported class/module if needed.
+
+# Import the class and function
+# noqa: E402
+from game_systems.crafting.crafting_system import CraftingSystem, calculate_crafting_xp_req  # noqa: E402
 
 class TestCraftingProficiency:
     def setup_method(self):
