@@ -66,6 +66,12 @@ MISSION_FLAVOR_TEXT = {
         "Colors seem too bright, sounds too loud. You have looked into the nothingness and returned.",
         "You feel a strange lightness, as if gravity is welcoming you back. The Void has let you go... for now.",
     ],
+    "celestial_archipelago": [
+        "The winds of the high atmosphere release you. You descend from the clouds, pockets full of starlight.",
+        "Your feet touch solid ground again, the vertigo of the floating isles fading like a dream.",
+        "You shake the celestial dust from your cloak. The ruins still drift above, silent and eternal.",
+        "The air feels thick and heavy down here. You have walked among the clouds and returned.",
+    ],
     "guild_arena": [
         "The cheers (or jeers) of the crowd fade. You step out of the ring, your test concluded.",
         "Sand pours from your boots. The Arena has measured your worth.",

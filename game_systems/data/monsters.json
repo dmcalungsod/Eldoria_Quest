@@ -2346,5 +2346,139 @@
             "regenerate"
         ],
         "description": "An ancient construct of clouds and lightning, eternally guarding the highest peaks."
+    },
+    "monster_141": {
+        "id": 141,
+        "name": "Arcane Sentinel",
+        "level": 28,
+        "tier": "Normal",
+        "hp": 1300,
+        "atk": 90,
+        "def": 60,
+        "xp": 900,
+        "drops": [
+            [
+                "aether_stone",
+                60
+            ],
+            [
+                "star_metal_fragment",
+                30
+            ]
+        ],
+        "skills": [
+            "arcane_pulse",
+            "heavy_blow"
+        ],
+        "description": "A stone guardian floating on currents of magic, its runes pulsing with ancient power."
+    },
+    "monster_142": {
+        "id": 142,
+        "name": "Aether Wisp",
+        "level": 28,
+        "tier": "Normal",
+        "hp": 800,
+        "atk": 110,
+        "def": 20,
+        "xp": 880,
+        "drops": [
+            [
+                "aether_stone",
+                80
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "arcane_pulse",
+            "prism_beam"
+        ],
+        "description": "A flickering mote of pure starlight, beautiful but dangerously unstable."
+    },
+    "monster_143": {
+        "id": 143,
+        "name": "Sky-Ray",
+        "level": 29,
+        "tier": "Normal",
+        "hp": 1500,
+        "atk": 100,
+        "def": 45,
+        "xp": 950,
+        "drops": [
+            [
+                "star_metal_fragment",
+                40
+            ],
+            [
+                "magic_stone_medium",
+                50
+            ]
+        ],
+        "skills": [
+            "aerial_dive",
+            "gravity_crush"
+        ],
+        "description": "A majestic creature that glides between the floating islands, hunting with crushing gravity."
+    },
+    "monster_144": {
+        "id": 144,
+        "name": "Ruin Stalker",
+        "level": 29,
+        "tier": "Elite",
+        "hp": 2400,
+        "atk": 125,
+        "def": 50,
+        "xp": 3200,
+        "drops": [
+            [
+                "ancient_tablet",
+                40
+            ],
+            [
+                "star_metal_fragment",
+                50
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "void_slash"
+        ],
+        "description": "A shadowy figure draped in tattered robes, eternally patrolling the empty streets of the lost city."
+    },
+    "monster_145": {
+        "id": 145,
+        "name": "The Celestial Arbiter",
+        "level": 31,
+        "tier": "Boss",
+        "hp": 8500,
+        "atk": 160,
+        "def": 90,
+        "xp": 13000,
+        "drops": [
+            [
+                "celestial_core",
+                100
+            ],
+            [
+                "ancient_tablet",
+                80
+            ],
+            [
+                "star_metal_fragment",
+                80
+            ],
+            [
+                "magic_stone_flawless",
+                50
+            ]
+        ],
+        "skills": [
+            "celestial_beam",
+            "gravity_crush",
+            "regenerate"
+        ],
+        "description": "The central defense mechanism of the Archipelago. It judges intruders with the weight of stars."
     }
 }

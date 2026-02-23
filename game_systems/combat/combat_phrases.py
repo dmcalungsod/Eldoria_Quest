@@ -210,6 +210,21 @@ class CombatPhrases:
             "Death itself seems to cling to the {name} approaching you.",
             "Empty sockets stare into your soul as a {name} advances.",
         ],
+        "Sentinel": [
+            "A {name} hums to life, its runes glowing with warning.",
+            "Heavy stone grinds against stone as a {name} turns to face you.",
+            "A {name} blocks your path, floating silently.",
+        ],
+        "Ray": [
+            "A shadow passes overhead—a {name} dives toward you.",
+            "The {name} glides effortlessly through the air, circling for a strike.",
+            "A shrill cry echoes as a {name} descends.",
+        ],
+        "Arbiter": [
+            "The {name} descends from the heavens, judging your worth.",
+            "A blinding light heralds the arrival of the {name}.",
+            "Gravity shifts around you as the {name} manifests.",
+        ],
     }
 
     GENERIC_OPENING = [
@@ -396,6 +411,40 @@ class CombatPhrases:
         # Mapped types
         "Skeleton": "Undead",
         "Zombie": "Undead",
+        "Sentinel": (
+            [
+                "The {name} slams into you with the weight of stone— `{dmg}` damage.",
+                "Arcane energy pulses from the {name}, striking you for `{dmg}` damage.",
+                "The {name} swings a heavy limb, dealing `{dmg}` damage.",
+            ],
+            [
+                "The {name} crushes you under a gravity well! `{dmg}` damage! **(CRITICAL!)**",
+                "Runes flare blindingly as the {name} strikes! `{dmg}` damage! **(CRITICAL!)**",
+            ],
+        ),
+        "Ray": (
+            [
+                "The {name} swoops down, battering you for `{dmg}` damage.",
+                "A tail whip from the {name} catches you— `{dmg}` damage.",
+                "The {name} dives, slamming into you for `{dmg}` damage.",
+            ],
+            [
+                "The {name} wraps around you, crushing your ribs! `{dmg}` damage! **(CRITICAL!)**",
+                "A high-speed dive impact sends you flying! `{dmg}` damage! **(CRITICAL!)**",
+            ],
+        ),
+        "Arbiter": (
+            [
+                "The {name} fires a beam of light, dealing `{dmg}` damage.",
+                "Gravity increases tenfold, crushing you for `{dmg}` damage.",
+                "The {name} strikes with a fist of starlight— `{dmg}` damage.",
+            ],
+            [
+                "The {name} judges you wanting! A massive beam obliterates your guard! `{dmg}` damage! **(CRITICAL!)**",
+                "You are pinned by immense gravity as the {name} strikes! `{dmg}` damage! **(CRITICAL!)**",
+            ],
+        ),
+        "Stalker": "Wisp",
     }
 
     GENERIC_ATTACK = (
