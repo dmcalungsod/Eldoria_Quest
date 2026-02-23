@@ -2,7 +2,7 @@ import sys
 import os
 import unittest
 import asyncio
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -59,7 +59,6 @@ importlib.reload(game_systems.guild_system.ui.services_menu)
 from game_systems.guild_system.ui.services_menu import GuildServicesView  # noqa: E402
 from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 from game_systems.data.shop_data import MYSTIC_MERCHANT_INVENTORY  # noqa: E402
-from unittest.mock import patch
 
 class TestMysticMerchantEvent(unittest.TestCase):
     def setUp(self):
