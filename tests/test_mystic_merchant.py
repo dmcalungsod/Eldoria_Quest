@@ -58,7 +58,6 @@ importlib.reload(game_systems.guild_system.ui.services_menu)
 
 # Now import the modules under test
 from game_systems.data.shop_data import MYSTIC_MERCHANT_INVENTORY  # noqa: E402
-from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 from game_systems.guild_system.ui.services_menu import GuildServicesView  # noqa: E402
 
 
@@ -79,15 +78,18 @@ class TestMysticMerchantEvent(unittest.TestCase):
     def test_button_appears_when_event_active(self):
         # Setup active event
         event_data = {
-            "type": WorldEventSystem.MYSTIC_MERCHANT,
+            "type": "mystic_merchant",
             "start_time": "2023-01-01T00:00:00",
             "end_time": "2099-01-01T00:00:00",
         }
 
-        # Patch get_current_event directly to bypass time/expiration logic
-        with patch(
-            "game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=event_data
-        ):
+        # Patch WorldEventSystem in the services_menu module to ensure interception
+        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES:
+            # Setup constant on the class
+            MockWES.MYSTIC_MERCHANT = "mystic_merchant"
+            # Setup instance method return value
+            MockWES.return_value.get_current_event.return_value = event_data
+
             view = GuildServicesView(self.mock_db, self.mock_user)
 
         # Check if Mystic Merchant button is in children
@@ -101,8 +103,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
         self.assertEqual(mystic_btn.label, "Mystic Merchant")
 
     def test_button_missing_when_no_event(self):
-        # Patch get_current_event directly
-        with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=None):
+        # Patch WorldEventSystem in services_menu
+        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES:
+            MockWES.return_value.get_current_event.return_value = None
             view = GuildServicesView(self.mock_db, self.mock_user)
 
         mystic_btn = None
@@ -118,8 +121,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
         MockShopViewClass = MagicMock()
         self.mock_shop_cog.ShopView = MockShopViewClass
 
-        # Ensure __init__ doesn't crash on event check
-        with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=None):
+        # Ensure __init__ doesn't crash on event check using patch
+        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES:
+            MockWES.return_value.get_current_event.return_value = None
             view = GuildServicesView(self.mock_db, self.mock_user)
 
         # Prepare interaction
