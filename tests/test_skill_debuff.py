@@ -59,7 +59,7 @@ class TestToxicBlade(unittest.TestCase):
 
         # Check Debuff Applied
         self.assertEqual(len(monster["debuffs"]), 1, "Turn 1: Monster should be poisoned")
-        self.assertEqual(monster["debuffs"][0]["damage"], 7, "Turn 1: Poison damage should be 7")
+        self.assertEqual(monster["debuffs"][0]["damage"], 11, "Turn 1: Poison damage should be 11")
         self.assertEqual(monster["debuffs"][0]["duration"], 3, "Turn 1: Duration should be 3")
 
         self.assertLess(
@@ -93,11 +93,11 @@ class TestToxicBlade(unittest.TestCase):
         # self.monster_hp -= dmg.
         # result["monster_hp"] reflects this.
 
-        expected_hp = hp_after_attack - 7
+        expected_hp = hp_after_attack - 11
         self.assertEqual(
             hp_after_tick,
             expected_hp,
-            f"Turn 2: Monster should take 7 poison damage. Expected {expected_hp}, got {hp_after_tick}",
+            f"Turn 2: Monster should take 11 poison damage. Expected {expected_hp}, got {hp_after_tick}",
         )
 
         # Duration check
@@ -118,8 +118,8 @@ class TestToxicBlade(unittest.TestCase):
 
         self.assertEqual(
             monster["HP"],
-            hp_after_tick - 7,
-            "Turn 3: Monster should take 7 poison damage",
+            hp_after_tick - 11,
+            "Turn 3: Monster should take 11 poison damage",
         )
         self.assertEqual(monster["debuffs"][0]["duration"], 1, "Turn 3: Duration should be 1")
 
@@ -146,8 +146,8 @@ class TestToxicBlade(unittest.TestCase):
 
         self.assertEqual(
             monster["HP"],
-            hp_after_tick - 14,
-            "Turn 4: Monster should take 7 poison damage",
+            hp_after_tick - 22,
+            "Turn 4: Monster should take 11 poison damage",
         )
         self.assertEqual(len(monster["debuffs"]), 0, "Turn 4: Poison should expire")
 
