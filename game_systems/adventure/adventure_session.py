@@ -116,8 +116,25 @@ class AdventureSession:
 
             # Apply Active Buffs (Crucial: Ensures buffs apply to both combat and gathering)
             active_buffs = bundle["buffs"]
+            player_debuffs = []
+
             for buff in active_buffs:
-                player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+                if buff["stat"] in ["poison", "bleed"]:
+                    # Helper to convert DB format to CombatEngine format
+                    try:
+                        end_time = WorldTime.parse(buff["end_time"])
+                        duration_mins = int((end_time - WorldTime.now()).total_seconds() / 60)
+                        if duration_mins > 0:
+                            player_debuffs.append({
+                                "type": buff["stat"],
+                                "damage": buff["amount"],
+                                "duration": duration_mins,
+                                "name": buff["name"]
+                            })
+                    except Exception:
+                        pass
+                else:
+                    player_stats.add_bonus_stat(buff["stat"], buff["amount"])
 
             # Extract vitals from player row
             player_row = bundle["player"]
@@ -152,6 +169,7 @@ class AdventureSession:
                 "skills": skills,
                 "active_boosts": boosts_dict,
                 "event_type": event_type,
+                "player_debuffs": player_debuffs,
             }
         except Exception as e:
             logger.error(f"Session context fetch failed: {e}")

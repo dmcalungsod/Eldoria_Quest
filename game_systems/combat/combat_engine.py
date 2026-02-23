@@ -85,6 +85,7 @@ class CombatEngine:
         stats_dict: dict = None,
         action: str = "auto",
         player_stance: str = "balanced",
+        player_debuffs: list = None,
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -96,6 +97,7 @@ class CombatEngine:
         stats_dict → Cached dictionary of player stats to avoid property overhead
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
         player_stance -> "aggressive", "balanced", or "defensive"
+        player_debuffs -> List of active debuffs on the player
         """
         self.player = player
         self.monster = monster
@@ -119,6 +121,9 @@ class CombatEngine:
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
         self.action = action
+
+        # Combat Status Effects
+        self.player_debuffs = player_debuffs or []
 
         # Stance Logic
         self.player_stance = player_stance
@@ -147,9 +152,13 @@ class CombatEngine:
             log.extend(buff_msgs)
 
         # Process Debuffs
-        debuff_msgs = self._process_monster_debuffs()
-        if debuff_msgs:
-            log.extend(debuff_msgs)
+        monster_debuff_msgs = self._process_monster_debuffs()
+        if monster_debuff_msgs:
+            log.extend(monster_debuff_msgs)
+
+        player_debuff_msgs = self._process_player_debuffs()
+        if player_debuff_msgs:
+            log.extend(player_debuff_msgs)
 
         turn_report = {
             "str_hits": 0,
@@ -338,6 +347,12 @@ class CombatEngine:
                             if not player_defending:
                                 log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
 
+                                # Apply Debuff (if any)
+                                if skill.get("debuff"):
+                                    debuff_msg = self._apply_player_debuff(skill)
+                                    if debuff_msg:
+                                        log.append(debuff_msg)
+
                 elif action["type"] == "buff":
                     buff = action["buff"]
                     mp_cost = buff.get("mp_cost", 0)
@@ -398,6 +413,7 @@ class CombatEngine:
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
                 "new_buffs": self.new_buffs,
+                "player_debuffs": self.player_debuffs,
             }
 
         except Exception as e:
@@ -412,6 +428,7 @@ class CombatEngine:
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
                 "new_buffs": self.new_buffs,
+                "player_debuffs": self.player_debuffs,
             }
 
     def _resolve_special_ability(self, log, turn_report, force_crit=False):
@@ -551,6 +568,71 @@ class CombatEngine:
 
         self.monster["debuffs"] = active_debuffs
         return msgs
+
+    def _process_player_debuffs(self):
+        """
+        Handles damage over time from debuffs on the player.
+        """
+        if not self.player_debuffs:
+            return []
+
+        msgs = []
+        active_debuffs = []
+
+        for debuff in self.player_debuffs:
+            # Handle different formats (from DB vs internal)
+            # From DB: 'amount'
+            # From Skill: 'damage'
+            dmg = int(debuff.get("damage") or debuff.get("amount") or 0)
+            name = debuff.get("name", "Debuff")
+            if debuff.get("type") == "poison":
+                name = "Poison"
+
+            # Apply Damage
+            self.player_hp -= dmg
+            msgs.append(f"☠️ **You** take {dmg} {name.lower()} damage!")
+
+            # Decrement Duration
+            debuff["duration"] = int(debuff.get("duration", 0)) - 1
+            if debuff["duration"] > 0:
+                active_debuffs.append(debuff)
+            else:
+                msgs.append(f"✅ **{name}** has worn off your body.")
+
+        self.player_debuffs = active_debuffs
+        return msgs
+
+    def _apply_player_debuff(self, skill):
+        """
+        Applies a debuff to the player (from monster skill).
+        """
+        debuff_data = skill.get("debuff", {})
+        if not debuff_data:
+            return None
+
+        # Check for Poison
+        if "poison" in debuff_data:
+            dmg = int(debuff_data["poison"])
+            duration = int(debuff_data.get("duration", 3))
+
+            # Check if already poisoned
+            existing = next((d for d in self.player_debuffs if d.get("type") == "poison"), None)
+            if existing:
+                existing["duration"] = duration
+                existing["damage"] = max(existing.get("damage", 0), dmg)
+                return "☠️ **The poison in your veins is refreshed!**"
+            else:
+                self.player_debuffs.append(
+                    {
+                        "type": "poison",
+                        "damage": dmg,
+                        "duration": duration,
+                        "name": "Poison",
+                    }
+                )
+                return f"☠️ **You are poisoned!** taking {dmg} damage per turn!"
+
+        return None
 
     def _apply_monster_debuff(self, skill):
         """
@@ -742,6 +824,7 @@ class CombatEngine:
             "monster_data": self.monster,
             "turn_report": turn_report,
             "active_boosts": self.active_boosts_dict,
+            "player_debuffs": self.player_debuffs,
         }
 
     def _monster_victory(self, log, turn_report):
@@ -756,4 +839,5 @@ class CombatEngine:
             "monster_hp": self.monster_hp,
             "turn_report": turn_report,
             "active_boosts": self.active_boosts_dict,
+            "player_debuffs": self.player_debuffs,
         }
