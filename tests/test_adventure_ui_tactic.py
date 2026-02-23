@@ -1,28 +1,39 @@
 
 import json
-import sys
 import os
+import sys
 from unittest.mock import MagicMock
 
+# --- Global Module Patching (Must happen before imports) ---
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Mock discord
+# Mock discord and pymongo to prevent ImportErrors during module loading
 sys.modules["discord"] = MagicMock()
 sys.modules["discord.ui"] = MagicMock()
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
+# -----------------------------------------------------------
 
-import pytest
-from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
-from game_systems.data.adventure_locations import LOCATIONS
+from unittest.mock import patch  # noqa: E402
 
-@pytest.fixture(autouse=True)
-def reset_discord_mock():
-    # Create a fresh mock for Embed each test
-    sys.modules["discord"].Embed.side_effect = lambda **kwargs: MagicMock()
+import pytest  # noqa: E402
 
-def test_build_status_embed_with_stance():
+from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds  # noqa: E402
+
+
+@pytest.fixture
+def mock_discord_embed():
+    """
+    Patches discord.Embed inside AdventureEmbeds to return a fresh mock for each test.
+    This ensures isolation even if the module was previously loaded.
+    """
+    with patch('game_systems.adventure.ui.adventure_embeds.discord') as mock_discord:
+        # Configure side_effect to return a NEW MagicMock each time Embed() is called
+        mock_discord.Embed.side_effect = lambda **kwargs: MagicMock()
+        yield mock_discord
+
+def test_build_status_embed_with_stance(mock_discord_embed):
     # Mock data
     session = {
         "location_id": "forest_clearing",
@@ -42,11 +53,9 @@ def test_build_status_embed_with_stance():
     # Call method
     embed = AdventureEmbeds.build_status_embed(session, location_data, "10m", 5)
 
-    # Verify Stance Field via Mock calls
+    # Verify Stance Field via Mock calls on the returned embed instance
     found = False
     for call in embed.add_field.call_args_list:
-        # call is tuple(args, kwargs) if inspecting directly, or call object
-        # With MagicMock, accessing .kwargs works
         if call.kwargs.get("name") == "⚔️ Tactics":
             found = True
             val = call.kwargs.get("value")
@@ -56,7 +65,7 @@ def test_build_status_embed_with_stance():
 
     assert found, "Tactics field not added"
 
-def test_build_status_embed_without_monster():
+def test_build_status_embed_without_monster(mock_discord_embed):
     # Mock data
     session = {
         "location_id": "forest_clearing",
@@ -75,7 +84,7 @@ def test_build_status_embed_without_monster():
             break
     assert not found
 
-def test_build_status_embed_default_stance():
+def test_build_status_embed_default_stance(mock_discord_embed):
     # Mock data
     session = {
         "location_id": "forest_clearing",
@@ -83,7 +92,7 @@ def test_build_status_embed_default_stance():
             "name": "Goblin",
             "HP": 50,
             "max_hp": 50
-            # No player_stance key
+            # No player_stance key -> defaults to balanced
         })
     }
     location_data = {"name": "Forest", "emoji": "🌲"}
