@@ -14,6 +14,7 @@ import game_systems.data.emojis as E
 from ..monsters.monster_actions import MonsterAI
 from ..rewards.aurum_calculator import AurumCalculator
 from ..rewards.exp_calculator import ExpCalculator
+from ..player.player_stats import calculate_tiered_bonus
 from .combat_phrases import CombatPhrases
 from .damage_formula import DamageFormula
 
@@ -569,13 +570,15 @@ class CombatEngine:
             base_dmg = float(debuff_data["poison"])
             duration = int(debuff_data.get("duration", 3))
 
-            # Scaling: Base + (Stat * 0.1)
+            # Scaling: Base + Tiered Bonus (Factor 0.3)
             # Default scaling stat for Rogue is DEX
             scaling_stat = skill.get("scaling_stat", "DEX").upper()
             stat_val = self.stats_dict.get(scaling_stat, 10)
 
-            # 10% scaling seems fair for a DoT (e.g., 20 DEX -> +2 dmg per turn)
-            scaled_dmg = int(base_dmg + (stat_val * 0.1))
+            # Equilibrium Fix: Use Tiered Scaling (0.3) to match direct damage progression.
+            # Prevents DoTs from becoming obsolete at high levels due to super-linear stat growth.
+            stat_bonus = calculate_tiered_bonus(stat_val, 0.3)
+            scaled_dmg = int(base_dmg + stat_bonus)
 
             # Avoid duplicate stacking (refresh duration instead)
             existing = next((d for d in self.monster["debuffs"] if d["type"] == "poison"), None)
