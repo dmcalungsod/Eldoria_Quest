@@ -12,8 +12,8 @@ sys.path.append(os.getcwd())
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from pathlib import Path
-from game_systems.guild_system.rank_system import RankSystem
+from pathlib import Path  # noqa: E402
+from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
 
 class TestRankBalance(unittest.TestCase):
     def test_quest_counts_are_achievable(self):
