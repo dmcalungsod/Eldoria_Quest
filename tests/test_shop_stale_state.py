@@ -39,10 +39,11 @@ sys.modules["discord.ext.commands"] = MagicMock()
 import importlib  # noqa: E402
 
 # Now import the class under test
-from cogs import shop_cog  # noqa: E402
-
 # RELOAD to ensure ShopView uses the MockView defined above, not a stale one
-importlib.reload(shop_cog)
+if "cogs.shop_cog" in sys.modules:
+    del sys.modules["cogs.shop_cog"]
+
+import cogs.shop_cog as shop_cog  # noqa: E402
 from cogs.shop_cog import ShopView  # noqa: E402
 
 

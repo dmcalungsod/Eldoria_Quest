@@ -32,9 +32,13 @@ mock_discord.ui = mock_ui
 
 from game_systems.data.shop_data import SHOP_INVENTORY  # noqa: E402
 import importlib  # noqa: E402
-import cogs.shop_cog  # noqa: E402
+
 # Force reload to ensure ShopView uses the MockView defined above
-importlib.reload(cogs.shop_cog)
+# We delete from sys.modules to handle cases where it might be mocked
+if "cogs.shop_cog" in sys.modules:
+    del sys.modules["cogs.shop_cog"]
+
+import cogs.shop_cog  # noqa: E402
 from cogs.shop_cog import ShopView  # noqa: E402
 
 
