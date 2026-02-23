@@ -6,6 +6,7 @@ Hardened: Safe JSON parsing for session resumption.
 """
 
 import asyncio
+import datetime
 import json
 import logging
 
@@ -20,7 +21,10 @@ from database.database_manager import DatabaseManager
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
 from game_systems.adventure.ui.exploration_view import ExplorationView
 from game_systems.adventure.ui.setup_view import AdventureSetupView
+from game_systems.adventure.ui.status_view import AdventureStatusView
+from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.ui.adventure_menu")
 
@@ -103,8 +107,82 @@ class AdventureView(View):
             if not interaction.response.is_done():
                 await interaction.response.defer()
 
+            status = session.get("status")
             loc_id = session["location_id"]
 
+            # === CASE 1: IN PROGRESS (Show Status) ===
+            if status == "in_progress":
+                try:
+                    # Calculate time remaining
+                    end_time_str = session.get("end_time")
+                    time_str = "Unknown"
+                    if end_time_str:
+                        end_time = datetime.datetime.fromisoformat(end_time_str)
+                        now = WorldTime.now()
+                        remaining = end_time - now
+                        if remaining.total_seconds() <= 0:
+                            time_str = "Complete!"
+                        else:
+                            hours, remainder = divmod(int(remaining.total_seconds()), 3600)
+                            minutes, _ = divmod(remainder, 60)
+                            time_str = f"{hours}h {minutes}m"
+
+                    loc_data = LOCATIONS.get(loc_id, {})
+                    steps = session.get("steps_completed", 0)
+
+                    embed = AdventureEmbeds.build_status_embed(session, loc_data, time_str, steps)
+                    view = AdventureStatusView(self.db, adventure_cog.manager, self.interaction_user)
+                    await interaction.edit_original_response(embed=embed, view=view)
+                except Exception as e:
+                    logger.error(f"Error showing status: {e}", exc_info=True)
+                    await interaction.followup.send("Error loading status.", ephemeral=True)
+                return
+
+            # === CASE 2: COMPLETED (Claim Rewards) ===
+            elif status == "completed":
+                try:
+                    summary = await asyncio.to_thread(adventure_cog.manager.end_adventure, self.interaction_user.id)
+                    if summary:
+                        embed = AdventureEmbeds.build_summary_embed(summary, loc_id)
+
+                        view = View()
+                        btn = Button(label="Return to Profile", style=discord.ButtonStyle.grey)
+                        btn.callback = back_to_profile_callback
+                        view.add_item(btn)
+
+                        await interaction.edit_original_response(embed=embed, view=view)
+                    else:
+                        await interaction.followup.send("Error processing rewards.", ephemeral=True)
+                except Exception as e:
+                    logger.error(f"Error claiming rewards: {e}", exc_info=True)
+                    await interaction.followup.send("Error processing rewards.", ephemeral=True)
+                return
+
+            # === CASE 3: FAILED (Death Report) ===
+            elif status == "failed":
+                try:
+                    loc_data = LOCATIONS.get(loc_id, {})
+                    embed = AdventureEmbeds.build_death_embed(session, loc_data)
+
+                    view = View()
+                    async def ack_callback(inter):
+                         if inter.user.id != self.interaction_user.id:
+                             await inter.response.send_message("This is not your session.", ephemeral=True)
+                             return
+                         await asyncio.to_thread(self.db.end_adventure_session, self.interaction_user.id)
+                         await back_to_profile_callback(inter)
+
+                    btn = Button(label="Acknowledge Loss", style=discord.ButtonStyle.danger)
+                    btn.callback = ack_callback
+                    view.add_item(btn)
+
+                    await interaction.edit_original_response(embed=embed, view=view)
+                except Exception as e:
+                    logger.error(f"Error showing death report: {e}", exc_info=True)
+                    await interaction.followup.send("Error loading report.", ephemeral=True)
+                return
+
+            # === CASE 4: LEGACY MANUAL / FALLBACK ===
             try:
                 logs = json.loads(session["logs"]) if session["logs"] else []
             except json.JSONDecodeError:
