@@ -792,8 +792,8 @@ class DatabaseManager:
 
     def calculate_inventory_limit(self, discord_id: int) -> int:
         """
-        Calculates dynamic inventory limit based on player stats.
-        Base: 10 + STR/DEX bonuses.
+        Calculates dynamic inventory limit based on player stats (STR/DEX).
+        Delegates to PlayerStats.max_inventory_slots.
         """
         # Avoid circular import
         from game_systems.player.player_stats import PlayerStats

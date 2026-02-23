@@ -11,8 +11,8 @@ sys.path.append(os.getcwd())
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.player.player_stats import PlayerStats
-from database.database_manager import DatabaseManager
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
 
 class TestInventoryScaling(unittest.TestCase):
     def test_scaling_formula(self):
