@@ -42,7 +42,7 @@ jobs:
     # 4. Dependency Security Audit
     - name: Audit Dependencies (pip-audit)
       run: |
-        pip-audit --strict --desc on
+        pip-audit -r requirements.txt --strict --desc on
 
     # 5. Auto-Fix Code (The "Self-Healing" Step) — PR only to prevent infinite loops
     - name: Run Ruff (Fix & Format)
