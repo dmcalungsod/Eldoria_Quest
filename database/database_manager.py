@@ -823,6 +823,21 @@ class DatabaseManager:
             {"$set": {"active": 0}},
         )
 
+    def mark_adventure_claiming(self, discord_id: int) -> dict | None:
+        """
+        Atomically marks the active adventure as 'claiming' to prevent
+        concurrent reward claims. Returns the session document if successful.
+        """
+        return self._col("adventure_sessions").find_one_and_update(
+            {
+                "discord_id": discord_id,
+                "active": 1,
+                "status": {"$in": ["in_progress", "completed"]},
+            },
+            {"$set": {"status": "claiming"}},
+            return_document=False,  # Return original state for reward calculation
+        )
+
     # ============================================================
     # INVENTORY (New methods for external call sites)
     # ============================================================

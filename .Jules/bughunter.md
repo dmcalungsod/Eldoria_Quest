@@ -12,3 +12,8 @@
 
 **Learning:** `ShopView` relied on cached `current_aurum` in its state to update the UI after a purchase attempt. If a player's balance changed externally (e.g., spent elsewhere) while the shop was open, a failed purchase would still display the old (stale) balance, confusing the user.
 **Action:** Implemented the "Refetch Critical Data" pattern. `ShopView` now explicitly fetches fresh player data from the database after every transaction attempt (successful or not) to ensure the UI reflects the true server state. Added `tests/test_shop_stale_state.py` to verify this behavior.
+
+## 2026-02-23 — Adventure Double Claim Race Condition
+
+**Learning:** `AdventureManager.end_adventure` fetched the active session and then updated it separately, leaving a window where concurrent requests could claim rewards multiple times before the session was closed. This is a classic "Time-of-check to time-of-use" (TOCTOU) vulnerability.
+**Action:** Implemented `DatabaseManager.mark_adventure_claiming` to atomically transition the session status from `in_progress`/`completed` to `claiming` using `find_one_and_update`. This ensures only one request can proceed to reward distribution. Always use atomic operations for critical state transitions involving economy or rewards.

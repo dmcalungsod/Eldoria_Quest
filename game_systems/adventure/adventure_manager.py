@@ -185,7 +185,8 @@ class AdventureManager:
             items_to_add = []
             summary = None
 
-            row = self.db.get_active_adventure(discord_id)
+            # FIX: Atomically transition status to prevent concurrent claims
+            row = self.db.mark_adventure_claiming(discord_id)
             if not row:
                 return None
 
