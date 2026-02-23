@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
@@ -9,12 +10,11 @@ sys.modules["discord"] = MagicMock()
 
 # Import target classes (assuming correct paths)
 # Note: Adjust paths if necessary based on repo structure
-import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.adventure.adventure_rewards import AdventureRewards
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.adventure_rewards import AdventureRewards  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+
 
 class TestLootBoostPipeline(unittest.TestCase):
     def setUp(self):
@@ -45,12 +45,12 @@ class TestLootBoostPipeline(unittest.TestCase):
 
         # We need to patch WorldEventSystem to control get_current_event directly,
         # or mock db.get_active_world_event if WorldEventSystem relies on it.
-        # Let's check how WorldEventSystem is implemented. It uses db.get_active_world_event.
+        # Based on previous read, WorldEventSystem(db) calls db.get_active_world_event().
 
         active_event = {
             "type": "treasure_hunt",
             "active": 1,
-            "modifiers": {"loot_boost": 1.5}
+            "modifiers": {"loot_boost": 1.5},
         }
 
         # We need to patch where WorldEventSystem is imported in AdventureSession
@@ -75,8 +75,11 @@ class TestLootBoostPipeline(unittest.TestCase):
             # 5. Assert
             self.assertIsNotNone(context, "Context should not be None")
             self.assertIn("active_boosts", context)
-            self.assertEqual(context["active_boosts"].get("loot_boost"), 1.5,
-                             "Loot boost from event modifier should be present in context")
+            self.assertEqual(
+                context["active_boosts"].get("loot_boost"),
+                1.5,
+                "Loot boost from event modifier should be present in context",
+            )
 
     def test_adventure_rewards_uses_loot_boost(self):
         """
@@ -94,7 +97,7 @@ class TestLootBoostPipeline(unittest.TestCase):
             "exp": 100,
             "active_boosts": {"loot_boost": 2.5},
             "drops": [("material_a", 0.5)],
-            "monster_data": {"name": "Test Monster", "tier": "Normal"}
+            "monster_data": {"name": "Test Monster", "tier": "Normal"},
         }
 
         # 3. Patch LootCalculator
@@ -129,6 +132,7 @@ class TestLootBoostPipeline(unittest.TestCase):
             # Base 50 LCK -> 50 Luck if no other modifiers.
             # Let's verify it's close to 50.
             self.assertEqual(args[1], 50, f"Expected luck=50, got {args[1]}")
+
 
 if __name__ == "__main__":
     unittest.main()
