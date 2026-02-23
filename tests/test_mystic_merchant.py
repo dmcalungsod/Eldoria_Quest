@@ -67,6 +67,11 @@ class TestMysticMerchantEvent(unittest.TestCase):
         self.mock_user = MagicMock()
         self.mock_user.id = 12345
 
+        # Re-sync MockButton on discord.ui and reload components to prevent pollution
+        # from other tests (e.g. test_lobby_view) that reload components with a different Button class.
+        sys.modules["discord.ui"].Button = MockButton
+        importlib.reload(game_systems.guild_system.ui.components)
+
         # Mock cogs.shop_cog specifically for this test class to avoid collision with other tests
         self.mock_shop_cog = MagicMock()
         self.shop_cog_patcher = patch.dict(sys.modules, {"cogs.shop_cog": self.mock_shop_cog})
