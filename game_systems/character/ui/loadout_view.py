@@ -19,7 +19,7 @@ class LoadoutNameModal(Modal, title="Save Loadout"):
         max_length=30,
     )
 
-    def __init__(self, db: DatabaseManager, eq_manager: EquipmentManager, parent_view: 'LoadoutView'):
+    def __init__(self, db: DatabaseManager, eq_manager: EquipmentManager, parent_view: "LoadoutView"):
         super().__init__()
         self.db = db
         self.eq_manager = eq_manager
@@ -69,33 +69,28 @@ class LoadoutView(View):
         for loadout in loadouts:
             name = loadout["name"]
             item_count = len(loadout.get("items", {}))
-            is_default = (self.selected_loadout == name)
-            options.append(discord.SelectOption(
-                label=name,
-                description=f"{item_count} items",
-                value=name,
-                default=is_default
-            ))
+            is_default = self.selected_loadout == name
+            options.append(
+                discord.SelectOption(label=name, description=f"{item_count} items", value=name, default=is_default)
+            )
 
         if not options:
             self.select_menu = Select(
                 placeholder="No loadouts saved",
                 options=[discord.SelectOption(label="---", value="none")],
                 disabled=True,
-                row=0
+                row=0,
             )
         else:
-            self.select_menu = Select(
-                placeholder="Select a loadout...",
-                options=options,
-                row=0
-            )
+            self.select_menu = Select(placeholder="Select a loadout...", options=options, row=0)
             self.select_menu.callback = self.select_callback
 
         self.add_item(self.select_menu)
 
         # 3. Action Buttons
-        self.equip_btn = Button(label="Equip Loadout", style=discord.ButtonStyle.success, disabled=not self.selected_loadout, row=1)
+        self.equip_btn = Button(
+            label="Equip Loadout", style=discord.ButtonStyle.success, disabled=not self.selected_loadout, row=1
+        )
         self.equip_btn.callback = self.equip_callback
         self.add_item(self.equip_btn)
 
@@ -103,7 +98,9 @@ class LoadoutView(View):
         self.save_btn.callback = self.save_callback
         self.add_item(self.save_btn)
 
-        self.delete_btn = Button(label="Delete", style=discord.ButtonStyle.danger, disabled=not self.selected_loadout, row=1)
+        self.delete_btn = Button(
+            label="Delete", style=discord.ButtonStyle.danger, disabled=not self.selected_loadout, row=1
+        )
         self.delete_btn.callback = self.delete_callback
         self.add_item(self.delete_btn)
 
@@ -121,7 +118,7 @@ class LoadoutView(View):
             return
 
         self.selected_loadout = val
-        self._setup_ui() # Rebuild to update button states and default option
+        self._setup_ui()  # Rebuild to update button states and default option
         await interaction.response.edit_message(view=self)
 
     async def equip_callback(self, interaction: discord.Interaction):
@@ -158,7 +155,7 @@ class LoadoutView(View):
         success, msg = self.eq_manager.delete_loadout(self.interaction_user.id, self.selected_loadout)
 
         self.selected_loadout = None
-        self._setup_ui() # Refresh list
+        self._setup_ui()  # Refresh list
         await interaction.response.edit_message(view=self)
         await interaction.followup.send(msg, ephemeral=True)
 

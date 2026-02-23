@@ -117,10 +117,10 @@ class AdventureResolutionEngine:
                 discord_id,
                 logs=json.dumps(trimmed_logs),
                 loot_collected=json.dumps(session.loot),
-                active=0, # Ensure inactive
+                active=0,  # Ensure inactive
                 active_monster_json=None,
-                previous_version=session.version, # Hope version matches
-                steps_completed=session.steps_completed
+                previous_version=session.version,  # Hope version matches
+                steps_completed=session.steps_completed,
             )
 
         self.db.update_adventure_status(discord_id, "failed")

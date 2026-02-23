@@ -385,9 +385,7 @@ class AdventureSession:
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(
-        self, context: dict[str, Any] | None = None, background: bool = False
-    ) -> dict[str, Any]:
+    def _resolve_auto_combat(self, context: dict[str, Any] | None = None, background: bool = False) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """

@@ -226,9 +226,7 @@ class AdventureEmbeds:
         )
 
         embed.add_field(name="⏳ Time Remaining", value=f"`{remaining_str}`", inline=True)
-        embed.add_field(
-            name="👣 Steps Taken", value=f"`{session.get('steps_completed', 0)}`", inline=True
-        )
+        embed.add_field(name="👣 Steps Taken", value=f"`{session.get('steps_completed', 0)}`", inline=True)
 
         # Loot Count
         try:

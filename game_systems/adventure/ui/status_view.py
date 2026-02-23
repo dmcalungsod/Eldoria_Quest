@@ -7,12 +7,12 @@ Hardened: Async handling and robust error recovery.
 
 import asyncio
 import logging
+
 import discord
 from discord.ui import Button, View
 
 from cogs.ui_helpers import back_to_profile_callback
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
-import game_systems.data.emojis as E
 
 logger = logging.getLogger("eldoria.ui.status_view")
 
@@ -67,9 +67,7 @@ class AdventureStatusView(View):
         session = await asyncio.to_thread(self.manager.get_active_session, self.user.id)
 
         if not session:
-            await interaction.followup.send(
-                "Adventure session not found or already ended.", ephemeral=True
-            )
+            await interaction.followup.send("Adventure session not found or already ended.", ephemeral=True)
             # Disable buttons since session is gone
             for item in self.children:
                 if item != self.back_btn:
