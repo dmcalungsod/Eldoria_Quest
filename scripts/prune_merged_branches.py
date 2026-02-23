@@ -17,10 +17,10 @@ def run_command(command_list):
 
 
 def main():
-    # Remove grace period (0 days) to delete all merged branches immediately during the daily run
-    days_threshold = 0
-    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_threshold)
-    print(f"Pruning merged branches older than {cutoff_date.isoformat()} (immediate cleanup)...")
+    # Set retention period (20 hours) to allow recent branches to persist for a bit
+    hours_threshold = 20
+    cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
+    print(f"Pruning merged branches older than {cutoff_date.isoformat()} ({hours_threshold} hours retention)...")
 
     # Get current repository
     current_repo_json = run_command(["gh", "repo", "view", "--json", "nameWithOwner"])
@@ -32,7 +32,7 @@ def main():
         print("Could not determine current repository.")
         sys.exit(1)
 
-    # Get merged PRs (limit 100 should be sufficient for regular cleanup)
+    # Get merged PRs (limit 1000 to catch older branches that might have been missed)
     # We fetch enough fields to determine branch and merge time.
     prs_json = run_command(
         [
@@ -44,7 +44,7 @@ def main():
             "--json",
             "number,headRefName,mergedAt,headRepository",
             "--limit",
-            "100",
+            "1000",
         ]
     )
 
@@ -53,6 +53,7 @@ def main():
         return
 
     prs = json.loads(prs_json)
+    print(f"Found {len(prs)} merged PRs to check.")
 
     for pr in prs:
         pr_number = pr.get("number")
@@ -75,6 +76,7 @@ def main():
 
         # Check if old enough
         if merged_at > cutoff_date:
+            print(f"Skipping PR #{pr_number} ({head_ref}): Merged at {merged_at} is newer than cutoff {cutoff_date}")
             continue
 
         # Check if it's from the same repository (not a fork)
