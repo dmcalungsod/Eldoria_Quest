@@ -7,6 +7,7 @@ Hardened: Robust JSON parsing and layout stability.
 
 import logging
 import random
+import re
 
 import discord
 
@@ -23,8 +24,70 @@ logger = logging.getLogger("eldoria.ui.embeds")
 
 class AdventureEmbeds:
     @staticmethod
+    def _format_log_line(line: str) -> str:
+        """
+        Applies ANSI coloring to adventure log lines.
+        Replaces Markdown **bold** with ANSI Bold.
+        """
+        if not line or line == "\u200b":
+            return line
+
+        # 1. Determine Base Color
+        line_lower = line.lower()
+
+        # ANSI Constants
+        ESC = "\u001b"
+        RESET = f"{ESC}[0m"
+        BOLD = f"{ESC}[1m"
+
+        # Default: Reset (let Discord handle it, usually white/gray)
+        color_code = f"{ESC}[0;37m"
+
+        # Check context for color
+        if any(
+            x in line_lower
+            for x in [
+                "you take",
+                "strikes you",
+                "ambush",
+                "defeated",
+                "fallen",
+                "fail",
+                "miss",
+            ]
+        ):
+            color_code = f"{ESC}[0;31m"  # Red
+        elif any(
+            x in line_lower
+            for x in ["you hit", "you deal", "critical", "cast", "attack", "shift into"]
+        ):
+            color_code = f"{ESC}[0;36m"  # Cyan
+        elif any(x in line_lower for x in ["heal", "recover", "restored", "buff"]):
+            color_code = f"{ESC}[0;32m"  # Green
+        elif any(
+            x in line_lower
+            for x in ["found", "gained", "looted", "victory", "level up", "xp", "aurum"]
+        ):
+            color_code = f"{ESC}[0;33m"  # Yellow/Gold
+        elif any(x in line_lower for x in ["fled", "escape"]):
+            color_code = f"{ESC}[0;34m"  # Blue
+
+        # 2. Replace Markdown Bold (**text**) with ANSI Bold
+        def replacer(match):
+            return f"{BOLD}{match.group(1)}{RESET}{color_code}"
+
+        formatted_line = re.sub(r"\*\*(.*?)\*\*", replacer, line)
+
+        # 3. Wrap line in color
+        return f"{color_code}{formatted_line}{RESET}"
+
+    @staticmethod
     def build_exploration_embed(
-        location_id: str, log: list, player_stats: PlayerStats, vitals: dict, active_monster: dict | None
+        location_id: str,
+        log: list,
+        player_stats: PlayerStats,
+        vitals: dict,
+        active_monster: dict | None,
     ) -> discord.Embed:
         """
         Generates the main game interface embed.
@@ -63,7 +126,9 @@ class AdventureEmbeds:
         else:
             final_log = current_lines
 
-        log_text = "\n".join(final_log)
+        # Apply ANSI Formatting
+        formatted_log = [AdventureEmbeds._format_log_line(line) for line in final_log]
+        log_text = "```ansi\n" + "\n".join(formatted_log) + "\n```"
 
         embed = discord.Embed(
             title=title,
@@ -78,7 +143,9 @@ class AdventureEmbeds:
             mp_bar = make_progress_bar(vitals["current_mp"], player_stats.max_mp)
 
             # Simple status indicator
-            status_icon = get_health_status_emoji(vitals["current_hp"], player_stats.max_hp)
+            status_icon = get_health_status_emoji(
+                vitals["current_hp"], player_stats.max_hp
+            )
 
             embed.add_field(
                 name=f"Adventurer Status {status_icon}",
@@ -100,7 +167,9 @@ class AdventureEmbeds:
             # Check for charged skill telegraph
             charged_skill = active_monster.get("charged_skill")
             if charged_skill:
-                warning = f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
+                warning = (
+                    f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
+                )
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}{warning}"
             else:
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}"
@@ -119,7 +188,9 @@ class AdventureEmbeds:
         if active_monster:
             embed.set_footer(text="Choose your combat action • Field Pack to use items")
         else:
-            embed.set_footer(text="Press Forward to continue • Field Pack to manage items")
+            embed.set_footer(
+                text="Press Forward to continue • Field Pack to manage items"
+            )
 
         return embed
 
@@ -132,9 +203,15 @@ class AdventureEmbeds:
 
         # 1. Title & Color
         if s.get("leveled_up"):
-            title, color = f"{E.LEVEL_UP} Level Up! Expedition Complete", discord.Color.gold()
+            title, color = (
+                f"{E.LEVEL_UP} Level Up! Expedition Complete",
+                discord.Color.gold(),
+            )
         else:
-            title, color = f"{E.VICTORY} Expedition Complete: {location_name}", discord.Color.dark_green()
+            title, color = (
+                f"{E.VICTORY} Expedition Complete: {location_name}",
+                discord.Color.dark_green(),
+            )
 
         # 2. Determine Flavor Text
         if s.get("leveled_up"):
@@ -147,9 +224,7 @@ class AdventureEmbeds:
             else:
                 flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["default"])
 
-        embed = discord.Embed(
-            title=title, description=f"*{flavor_text}*", color=color
-        )
+        embed = discord.Embed(title=title, description=f"*{flavor_text}*", color=color)
 
         # 2. Rewards
         rewards = []
@@ -170,10 +245,19 @@ class AdventureEmbeds:
             loot_lines.append(f"• {get_rarity_ansi(i.get('rarity'), item_text)}")
 
         if loot_lines:
-            val = "```ansi\n" + "\n".join(loot_lines[:15]) + ("\n...and more" if len(loot_lines) > 15 else "") + "\n```"
+            val = (
+                "```ansi\n"
+                + "\n".join(loot_lines[:15])
+                + ("\n...and more" if len(loot_lines) > 15 else "")
+                + "\n```"
+            )
             embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value=val, inline=False)
         else:
-            embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value="*No resources found.*", inline=False)
+            embed.add_field(
+                name=f"{E.ITEM_BOX} Gathered Loot",
+                value="*No resources found.*",
+                inline=False,
+            )
 
         # 4. Level Up
         if s.get("leveled_up"):
@@ -186,11 +270,17 @@ class AdventureEmbeds:
         # 5. Full Inventory Warning
         if failed := s.get("failed_items"):
             names = sorted(list(set(f["item_name"] for f in failed)))
-            embed.add_field(name=f"{E.WARNING} Lost Items (Full Pack)", value=", ".join(names), inline=False)
+            embed.add_field(
+                name=f"{E.WARNING} Lost Items (Full Pack)",
+                value=", ".join(names),
+                inline=False,
+            )
 
         # 6. Achievements
         if new_titles := s.get("new_titles"):
-            embed.add_field(name="🏆 Achievements Unlocked", value=new_titles, inline=False)
+            embed.add_field(
+                name="🏆 Achievements Unlocked", value=new_titles, inline=False
+            )
 
         embed.set_footer(text="Your journey is recorded in the archives.")
         return embed
