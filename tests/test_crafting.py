@@ -55,7 +55,10 @@ class TestDatabaseEnhancements(unittest.TestCase):
         self.mock_db.inventory.aggregate.return_value = [{"total": 10}]
 
         # Mock stacks: 2 stacks of 5
-        self.mock_db.inventory.find.return_value.sort.return_value = [{"id": 1, "count": 5}, {"id": 2, "count": 5}]
+        self.mock_db.inventory.find.return_value.sort.return_value = [
+            {"id": 1, "count": 5},
+            {"id": 2, "count": 5},
+        ]
 
         # Remove 7
         success = self.db.remove_inventory_item(12345, "herb", 7)

@@ -5,6 +5,7 @@ Hardened: Async loading and circular import protection.
 """
 
 import asyncio
+
 import discord
 from discord.ui import View
 
@@ -16,7 +17,12 @@ from .components import EmbedBuilder, GuildViewMixin, ViewFactory
 
 
 class GuildLobbyView(View, GuildViewMixin):
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, rank: str = "F"):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        rank: str = "F",
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -26,7 +32,12 @@ class GuildLobbyView(View, GuildViewMixin):
     def _setup_buttons(self):
         self.add_item(
             ViewFactory.create_button(
-                "Quests", discord.ButtonStyle.success, "lobby_quests", "📜", 0, callback=self._quests_btn_callback
+                "Quests",
+                discord.ButtonStyle.success,
+                "lobby_quests",
+                "📜",
+                0,
+                callback=self._quests_btn_callback,
             )
         )
         self.add_item(

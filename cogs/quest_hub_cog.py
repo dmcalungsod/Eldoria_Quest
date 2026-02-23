@@ -23,7 +23,11 @@ from database.database_manager import DatabaseManager
 from game_systems.guild_system.quest_system import QuestSystem
 
 # --- Local Imports ---
-from .ui_helpers import back_to_guild_hall_callback, back_to_profile_callback, make_progress_bar
+from .ui_helpers import (
+    back_to_guild_hall_callback,
+    back_to_profile_callback,
+    make_progress_bar,
+)
 
 logger = logging.getLogger("eldoria.quest_ui")
 
@@ -39,7 +43,12 @@ class QuestLedgerView(View):
     This is read-only and does not allow turn-in.
     """
 
-    def __init__(self, db_manager: DatabaseManager, active_quests: list, interaction_user: discord.User):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        active_quests: list,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.active_quests = active_quests
@@ -77,7 +86,12 @@ class QuestLogView(View):
     Displays accepted quests and allows the player to turn in completed ones.
     """
 
-    def __init__(self, db_manager: DatabaseManager, active_quests: list, interaction_user: discord.User):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        active_quests: list,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.active_quests = active_quests
@@ -342,7 +356,11 @@ class QuestBoardView(View):
 
         # Pass navigation context to Detail View
         view = QuestDetailView(
-            self.db, quest_id, self.quests, self.interaction_user, parent_back_data=self.parent_back_data
+            self.db,
+            quest_id,
+            self.quests,
+            self.interaction_user,
+            parent_back_data=self.parent_back_data,
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -366,7 +384,11 @@ class QuestBoardView(View):
 
         # Pass navigation context back
         view = QuestBoardView(
-            self.db, quests, self.interaction_user, status_message=status_msg, parent_back_data=self.parent_back_data
+            self.db,
+            quests,
+            self.interaction_user,
+            status_message=status_msg,
+            parent_back_data=self.parent_back_data,
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -441,7 +463,10 @@ class QuestDetailView(View):
         await self.back_to_quest_board_callback(interaction, deferred=True, status_message=status_msg)
 
     async def back_to_quest_board_callback(
-        self, interaction: discord.Interaction, deferred: bool = False, status_message: str = None
+        self,
+        interaction: discord.Interaction,
+        deferred: bool = False,
+        status_message: str = None,
     ):
         if not deferred and not interaction.response.is_done():
             await interaction.response.defer()

@@ -140,7 +140,10 @@ class AdventureSetupView(View):
                 return
 
             player_data = bundle["player"]
-            vitals = {"current_hp": player_data["current_hp"], "current_mp": player_data["current_mp"]}
+            vitals = {
+                "current_hp": player_data["current_hp"],
+                "current_mp": player_data["current_mp"],
+            }
             session_row = bundle["active_session"]
             stats_data = bundle["stats"]
             skills = bundle["skills"]

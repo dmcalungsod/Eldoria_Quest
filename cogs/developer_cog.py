@@ -17,8 +17,8 @@ from discord.ui import Button, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.admin")
 
@@ -119,7 +119,12 @@ class DevPanelView(View):
             logger.error(f"Clear boosts failed: {e}")
 
     # --- Buttons Row 0: Grants ---
-    @discord.ui.button(label="Give 10k XP/Vestige", style=discord.ButtonStyle.success, emoji="✨", row=0)
+    @discord.ui.button(
+        label="Give 10k XP/Vestige",
+        style=discord.ButtonStyle.success,
+        emoji="✨",
+        row=0,
+    )
     async def exp_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await asyncio.to_thread(self._grant, exp=10000, vestige=10000)
@@ -151,7 +156,12 @@ class DevPanelView(View):
         try:
             stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
             stats = PlayerStats.from_dict(stats_json)
-            await asyncio.to_thread(self.db.set_player_vitals, self.interaction_user.id, stats.max_hp, stats.max_mp)
+            await asyncio.to_thread(
+                self.db.set_player_vitals,
+                self.interaction_user.id,
+                stats.max_hp,
+                stats.max_mp,
+            )
             await self._refresh_view(interaction)
         except Exception as e:
             logger.error(f"Admin heal error: {e}")
@@ -195,7 +205,8 @@ class DeveloperCog(commands.Cog):
         logger.error(f"Dev panel error: {error}", exc_info=True)
         if not interaction.response.is_done():
             await interaction.response.send_message(
-                "❌ An error occurred while loading the developer panel.", ephemeral=True
+                "❌ An error occurred while loading the developer panel.",
+                ephemeral=True,
             )
 
 

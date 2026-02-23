@@ -16,7 +16,6 @@ import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
-from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.player_stats import PlayerStats
 
@@ -64,26 +63,44 @@ class ExplorationView(View):
 
             # 1. Attack
             attack_btn = Button(
-                label="Attack", style=discord.ButtonStyle.danger, emoji=E.SWORDS, row=0, custom_id="attack"
+                label="Attack",
+                style=discord.ButtonStyle.danger,
+                emoji=E.SWORDS,
+                row=0,
+                custom_id="attack",
             )
             attack_btn.callback = self.action_attack
             self.add_item(attack_btn)
 
             # 2. Defend
             defend_btn = Button(
-                label="Defend", style=discord.ButtonStyle.secondary, emoji=E.SHIELD, row=0, custom_id="defend"
+                label="Defend",
+                style=discord.ButtonStyle.secondary,
+                emoji=E.SHIELD,
+                row=0,
+                custom_id="defend",
             )
             defend_btn.callback = self.action_defend
             self.add_item(defend_btn)
 
             # 3. Flee
-            flee_btn = Button(label="Flee", style=discord.ButtonStyle.secondary, emoji="🏃", row=0, custom_id="flee")
+            flee_btn = Button(
+                label="Flee",
+                style=discord.ButtonStyle.secondary,
+                emoji="🏃",
+                row=0,
+                custom_id="flee",
+            )
             flee_btn.callback = self.action_flee
             self.add_item(flee_btn)
 
             # 4. Pack (Row 1)
             inv_btn = Button(
-                label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack"
+                label="Pack",
+                style=discord.ButtonStyle.secondary,
+                emoji=E.BACKPACK,
+                row=1,
+                custom_id="pack",
             )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
@@ -100,7 +117,11 @@ class ExplorationView(View):
             spec = specials.get(self.class_id, {"label": "Special", "emoji": "⚡"})
 
             special_btn = Button(
-                label=spec["label"], style=discord.ButtonStyle.primary, emoji=spec["emoji"], row=1, custom_id="special"
+                label=spec["label"],
+                style=discord.ButtonStyle.primary,
+                emoji=spec["emoji"],
+                row=1,
+                custom_id="special",
             )
             special_btn.callback = self.action_special
             self.add_item(special_btn)
@@ -193,14 +214,22 @@ class ExplorationView(View):
 
             # 2. Pack
             inv_btn = Button(
-                label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack"
+                label="Pack",
+                style=discord.ButtonStyle.secondary,
+                emoji=E.BACKPACK,
+                row=0,
+                custom_id="pack",
             )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
 
             # 3. Return
             leave_btn = Button(
-                label="Return to Town", style=discord.ButtonStyle.primary, emoji="🏠", row=0, custom_id="leave"
+                label="Return to Town",
+                style=discord.ButtonStyle.primary,
+                emoji="🏠",
+                row=0,
+                custom_id="leave",
             )
             leave_btn.callback = self.leave_callback
             self.add_item(leave_btn)
@@ -287,7 +316,11 @@ class ExplorationView(View):
 
                 # Prepare UI state
                 embed = AdventureEmbeds.build_exploration_embed(
-                    self.location_id, self.log, self.player_stats, vitals, self.active_monster
+                    self.location_id,
+                    self.log,
+                    self.player_stats,
+                    vitals,
+                    self.active_monster,
                 )
 
                 is_last_frame = i == len(sequence) - 1
@@ -342,7 +375,12 @@ class ExplorationView(View):
             max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
             embed = build_inventory_embed(items, max_slots)
 
-            view = InventoryView(self.db, self.interaction_user, self.return_from_inventory, "Return to Adventure")
+            view = InventoryView(
+                self.db,
+                self.interaction_user,
+                self.return_from_inventory,
+                "Return to Adventure",
+            )
             await interaction.edit_original_response(embed=embed, view=view)
         finally:
             self.processing = False
@@ -372,7 +410,11 @@ class ExplorationView(View):
                 self.active_monster = None
 
             embed = AdventureEmbeds.build_exploration_embed(
-                self.location_id, self.log, self.player_stats, vitals, self.active_monster
+                self.location_id,
+                self.log,
+                self.player_stats,
+                vitals,
+                self.active_monster,
             )
 
             # Reset my buttons
@@ -401,7 +443,11 @@ class ExplorationView(View):
 
                 # Configure view for Summary Mode
                 self.clear_items()
-                btn_return = Button(label="Return to Profile", style=discord.ButtonStyle.primary, emoji="👤")
+                btn_return = Button(
+                    label="Return to Profile",
+                    style=discord.ButtonStyle.primary,
+                    emoji="👤",
+                )
                 btn_return.callback = back_to_profile_callback
                 self.add_item(btn_return)
 

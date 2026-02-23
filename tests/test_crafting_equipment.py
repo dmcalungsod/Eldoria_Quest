@@ -87,7 +87,9 @@ class TestCraftingEquipment(unittest.TestCase):
             # Check Output Key exists in EQUIPMENT_DATA
             output_key = recipe["output_key"]
             self.assertIn(
-                output_key, EQUIPMENT_DATA, f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA."
+                output_key,
+                EQUIPMENT_DATA,
+                f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA.",
             )
 
             # Check Name matches EQUIPMENT_DATA name
@@ -101,7 +103,11 @@ class TestCraftingEquipment(unittest.TestCase):
 
             # Check Materials exist in MATERIALS
             for mat_key, amt in recipe["materials"].items():
-                self.assertIn(mat_key, MATERIALS, f"Material {mat_key} for {recipe_id} not found in MATERIALS.")
+                self.assertIn(
+                    mat_key,
+                    MATERIALS,
+                    f"Material {mat_key} for {recipe_id} not found in MATERIALS.",
+                )
 
 
 if __name__ == "__main__":

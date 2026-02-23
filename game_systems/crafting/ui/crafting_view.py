@@ -36,7 +36,12 @@ class CraftingView(View):
         self.category = category  # "consumable", "equipment", or "dismantle"
 
         # Back Button placeholder (re-attached via set_back_button)
-        self.back_button = Button(label="Back", style=discord.ButtonStyle.secondary, custom_id="back_crafting", row=2)
+        self.back_button = Button(
+            label="Back",
+            style=discord.ButtonStyle.secondary,
+            custom_id="back_crafting",
+            row=2,
+        )
 
         self._setup_ui()
 
@@ -55,19 +60,19 @@ class CraftingView(View):
         # Row 0: Category Buttons
         btn_cons = Button(
             label="Consumables",
-            style=discord.ButtonStyle.primary if self.category == "consumable" else discord.ButtonStyle.secondary,
+            style=(discord.ButtonStyle.primary if self.category == "consumable" else discord.ButtonStyle.secondary),
             custom_id="cat_consumable",
             row=0,
         )
         btn_equip = Button(
             label="Equipment",
-            style=discord.ButtonStyle.primary if self.category == "equipment" else discord.ButtonStyle.secondary,
+            style=(discord.ButtonStyle.primary if self.category == "equipment" else discord.ButtonStyle.secondary),
             custom_id="cat_equipment",
             row=0,
         )
         btn_dismantle = Button(
             label="Dismantle",
-            style=discord.ButtonStyle.danger if self.category == "dismantle" else discord.ButtonStyle.secondary,
+            style=(discord.ButtonStyle.danger if self.category == "dismantle" else discord.ButtonStyle.secondary),
             custom_id="cat_dismantle",
             row=0,
         )
@@ -115,8 +120,20 @@ class CraftingView(View):
 
         # Sort by rarity or name? Rarity then Name.
         # Rarity order helper?
-        rarity_rank = {"Common": 1, "Uncommon": 2, "Rare": 3, "Epic": 4, "Legendary": 5, "Mythical": 6}
-        items.sort(key=lambda x: (rarity_rank.get(x.get("rarity", "Common"), 0), x.get("item_name", "")))
+        rarity_rank = {
+            "Common": 1,
+            "Uncommon": 2,
+            "Rare": 3,
+            "Epic": 4,
+            "Legendary": 5,
+            "Mythical": 6,
+        }
+        items.sort(
+            key=lambda x: (
+                rarity_rank.get(x.get("rarity", "Common"), 0),
+                x.get("item_name", ""),
+            )
+        )
 
         for item in items[:25]:
             inv_id = str(item["id"])
@@ -154,7 +171,12 @@ class CraftingView(View):
             self.add_item(select)
             return
 
-        select = Select(placeholder=f"Select {self.category} to craft...", min_values=1, max_values=1, row=1)
+        select = Select(
+            placeholder=f"Select {self.category} to craft...",
+            min_values=1,
+            max_values=1,
+            row=1,
+        )
 
         # Sort recipes by cost for better UX
         sorted_recipes = sorted(filtered_recipes.items(), key=lambda x: x[1].get("cost", 0))

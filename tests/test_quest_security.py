@@ -1,4 +1,3 @@
-
 import os
 import sys
 import unittest
@@ -58,9 +57,7 @@ class TestQuestSecurity(unittest.TestCase):
         if not result:
             print("\n[SECURE] Access Denied: Rank mismatch correctly caught.")
         else:
-            print(
-                "\n[CRITICAL] VULNERABILITY STILL EXISTS: F-Rank player accepted S-Rank quest!"
-            )
+            print("\n[CRITICAL] VULNERABILITY STILL EXISTS: F-Rank player accepted S-Rank quest!")
 
         self.assertFalse(result, "The security check should block this action.")
 

@@ -4,8 +4,8 @@ Tests for Aurum Drops
 Verifies that monsters now drop Aurum based on tier/level.
 """
 
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -13,6 +13,7 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.rewards.aurum_calculator import AurumCalculator
+
 
 class TestAurumDrops(unittest.TestCase):
     def test_aurum_calculator_normal(self):
@@ -82,9 +83,7 @@ class TestAurumDrops(unittest.TestCase):
         player.stats.get_total_stats_dict.return_value = {"LCK": 0}
         monster = {"name": "Test", "level": 5, "tier": "Normal", "HP": 10, "drops": []}
 
-        engine = CombatEngine(
-            player, monster, [], 10, 1, stats_dict={"LCK": 0}
-        )
+        engine = CombatEngine(player, monster, [], 10, 1, stats_dict={"LCK": 0})
 
         # Force kill
         engine.monster_hp = 0
@@ -95,6 +94,7 @@ class TestAurumDrops(unittest.TestCase):
         self.assertGreater(result["aurum"], 0)
         # Level 5 Normal -> ~15 Aurum
         self.assertTrue(10 <= result["aurum"] <= 20)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -129,7 +129,9 @@ class TestDatabaseManager(unittest.TestCase):
 
         self.assertEqual(new_balance, 50)
         self.mock_db.players.find_one_and_update.assert_called_with(
-            {"discord_id": 12345, "aurum": {"$gte": 100}}, {"$inc": {"aurum": -100}}, return_document=True
+            {"discord_id": 12345, "aurum": {"$gte": 100}},
+            {"$inc": {"aurum": -100}},
+            return_document=True,
         )
 
         # Mock insufficient funds
@@ -172,19 +174,16 @@ class TestDatabaseManager(unittest.TestCase):
         discord_id = 12345
 
         # Mock Aggregation Result
-        mock_result = [{
-            "discord_id": discord_id,
-            "name": "TestHero",
-            "class_id": 1,
-            "active_title": "The Brave",
-            "stats_docs": [{
-                "stats_json": '{"STR": 10, "DEX": 5}'
-            }],
-            "guild_docs": [{
-                "rank": "D",
-                "merit_points": 100
-            }]
-        }]
+        mock_result = [
+            {
+                "discord_id": discord_id,
+                "name": "TestHero",
+                "class_id": 1,
+                "active_title": "The Brave",
+                "stats_docs": [{"stats_json": '{"STR": 10, "DEX": 5}'}],
+                "guild_docs": [{"rank": "D", "merit_points": 100}],
+            }
+        ]
 
         # Setup the mock aggregate return
         self.mock_db.players.aggregate.return_value = mock_result

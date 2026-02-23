@@ -40,22 +40,42 @@ class GuildServicesView(View, GuildViewMixin):
         )
         self.add_item(
             ViewFactory.create_button(
-                "Guild Supply", discord.ButtonStyle.primary, "g_shop", "🪙", 0, callback=self.shop_callback
+                "Guild Supply",
+                discord.ButtonStyle.primary,
+                "g_shop",
+                "🪙",
+                0,
+                callback=self.shop_callback,
             )
         )
         self.add_item(
             ViewFactory.create_button(
-                "Infirmary", discord.ButtonStyle.secondary, "g_infirmary", "❤️‍🩹", 1, callback=self.infirmary_callback
+                "Infirmary",
+                discord.ButtonStyle.secondary,
+                "g_infirmary",
+                "❤️‍🩹",
+                1,
+                callback=self.infirmary_callback,
             )
         )
         self.add_item(
             ViewFactory.create_button(
-                "Skill Trainer", discord.ButtonStyle.secondary, "g_trainer", "🧠", 1, callback=self.trainer_callback
+                "Skill Trainer",
+                discord.ButtonStyle.secondary,
+                "g_trainer",
+                "🧠",
+                1,
+                callback=self.trainer_callback,
             )
         )
         self.add_item(
             ViewFactory.create_button(
-                "Alchemist", discord.ButtonStyle.secondary, "g_alchemist", "⚗️", 1, callback=self.alchemist_callback
+                "Alchemist",
+                discord.ButtonStyle.secondary,
+                "g_alchemist",
+                "⚗️",
+                1,
+                callback=self.alchemist_callback,
             )
         )
 
@@ -75,7 +95,11 @@ class GuildServicesView(View, GuildViewMixin):
             )
 
         self.back_btn = ViewFactory.create_button(
-            "Back to Guild Lobby", discord.ButtonStyle.grey, "back_lobby", row=2, callback=back_to_guild_hall_callback
+            "Back to Guild Lobby",
+            discord.ButtonStyle.grey,
+            "back_lobby",
+            row=2,
+            callback=back_to_guild_hall_callback,
         )
         self.add_item(self.back_btn)
 
@@ -114,7 +138,11 @@ class GuildServicesView(View, GuildViewMixin):
 
         aurum = p_data["aurum"]
 
-        embed = discord.Embed(title="Guild Supply", description=f"Funds: {aurum} Aurum", color=discord.Color.green())
+        embed = discord.Embed(
+            title="Guild Supply",
+            description=f"Funds: {aurum} Aurum",
+            color=discord.Color.green(),
+        )
         view = ShopView(self.db, self.interaction_user, aurum)
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)

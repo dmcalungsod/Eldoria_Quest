@@ -731,7 +731,17 @@ class CombatPhrases:
         skill_type = skill.get("type", "physical")
 
         # Magic types -> Interrupt (Attack)
-        if skill_type in ["magical", "fire", "ice", "poison", "water", "wind", "earth", "dark", "holy"]:
+        if skill_type in [
+            "magical",
+            "fire",
+            "ice",
+            "poison",
+            "water",
+            "wind",
+            "earth",
+            "dark",
+            "holy",
+        ]:
             hint = "**INTERRUPT** (Attack!)"
             phrases = [
                 f"⚠️ The {m_name} begins chanting **{skill_name}**! {hint}",
@@ -754,7 +764,9 @@ class CombatPhrases:
         skill_name = str(skill.get("name", "attack"))
 
         if counter_type == "interrupt":
-            return f"⚡ **INTERRUPTED!** You strike the {m_name} while it channels **{skill_name}**! (CRITICAL HIT + STUN)"
+            return (
+                f"⚡ **INTERRUPTED!** You strike the {m_name} while it channels **{skill_name}**! (CRITICAL HIT + STUN)"
+            )
         else:
             return f"🛡️ **PARRIED!** You deflect the {m_name}'s **{skill_name}** perfectly! (REFLECT DAMAGE + STUN)"
 

@@ -45,7 +45,10 @@ class TestWorldEventCaching(unittest.TestCase):
 
     def test_world_event_caching(self):
         # Setup mock return
-        self.mock_db.world_events.find_one.return_value = {"type": "blood_moon", "active": 1}
+        self.mock_db.world_events.find_one.return_value = {
+            "type": "blood_moon",
+            "active": 1,
+        }
 
         # 1. First Call - Should hit DB
         with patch("time.time", return_value=1000.0):
@@ -67,7 +70,10 @@ class TestWorldEventCaching(unittest.TestCase):
         self.mock_db.world_events.find_one.assert_not_called()
 
     def test_cache_expiration(self):
-        self.mock_db.world_events.find_one.return_value = {"type": "blood_moon", "active": 1}
+        self.mock_db.world_events.find_one.return_value = {
+            "type": "blood_moon",
+            "active": 1,
+        }
 
         # 1. Populate cache
         with patch("time.time", return_value=1000.0):
@@ -83,7 +89,10 @@ class TestWorldEventCaching(unittest.TestCase):
         self.mock_db.world_events.find_one.assert_called_once()
 
     def test_invalidation_on_set(self):
-        self.mock_db.world_events.find_one.return_value = {"type": "blood_moon", "active": 1}
+        self.mock_db.world_events.find_one.return_value = {
+            "type": "blood_moon",
+            "active": 1,
+        }
 
         # Populate cache
         with patch("time.time", return_value=1000.0):
@@ -103,7 +112,11 @@ class TestWorldEventCaching(unittest.TestCase):
 
     def test_return_copy(self):
         """Test that the cache returns a copy to prevent mutation."""
-        self.mock_db.world_events.find_one.return_value = {"type": "blood_moon", "active": 1, "data": {}}
+        self.mock_db.world_events.find_one.return_value = {
+            "type": "blood_moon",
+            "active": 1,
+            "data": {},
+        }
 
         with patch("time.time", return_value=1000.0):
             event1 = self.db.get_active_world_event()

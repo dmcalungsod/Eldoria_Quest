@@ -161,7 +161,10 @@ class CharacterTabView(View):
 
             await interaction.edit_original_response(embed=embed, view=view)
         except Exception as e:
-            logger.error(f"Status callback error for {self.interaction_user.id}: {e}", exc_info=True)
+            logger.error(
+                f"Status callback error for {self.interaction_user.id}: {e}",
+                exc_info=True,
+            )
             await interaction.followup.send("System error loading status.", ephemeral=True)
 
     async def guild_hall_callback(self, interaction: discord.Interaction):

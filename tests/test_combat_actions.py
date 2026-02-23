@@ -105,14 +105,26 @@ class TestCombatActions(unittest.TestCase):
             with patch("random.uniform", return_value=1.0):
                 result = engine.run_combat_turn()
 
-        self.assertEqual(result["turn_report"]["str_hits"], 0, "Player should not attack on flee fail")
+        self.assertEqual(
+            result["turn_report"]["str_hits"],
+            0,
+            "Player should not attack on flee fail",
+        )
         self.assertTrue(result["turn_report"]["damage_taken"] > 0, "Monster should attack")
 
     def test_special_ability_action(self):
         """Test that Special Ability action uses MP and deals boosted damage."""
         current_mp = 50
         max_mp = 100
-        stats = {"MP": 100, "HP": 100, "STR": 20, "END": 10, "AGI": 10, "MAG": 10, "LCK": 10}
+        stats = {
+            "MP": 100,
+            "HP": 100,
+            "STR": 20,
+            "END": 10,
+            "AGI": 10,
+            "MAG": 10,
+            "LCK": 10,
+        }
 
         # Warrior (Class 1) -> Cleave (1.5x DMG)
         engine = CombatEngine(

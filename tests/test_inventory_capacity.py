@@ -48,7 +48,7 @@ class TestInventoryCapacity(unittest.TestCase):
     def test_db_integration(self):
         """Test that DatabaseManager uses the calculated limit."""
         # Mocking get_player_stats_json within DatabaseManager
-        with patch.object(DatabaseManager, 'get_player_stats_json') as mock_get_stats:
+        with patch.object(DatabaseManager, "get_player_stats_json") as mock_get_stats:
             mock_get_stats.return_value = {
                 "STR": {"base": 20, "bonus": 0},
                 "DEX": {"base": 40, "bonus": 0},
@@ -56,7 +56,7 @@ class TestInventoryCapacity(unittest.TestCase):
                 "AGI": {"base": 1, "bonus": 0},
                 "MAG": {"base": 1, "bonus": 0},
                 "LCK": {"base": 1, "bonus": 0},
-                "DEF": {"base": 0, "bonus": 0}
+                "DEF": {"base": 0, "bonus": 0},
             }
 
             # We need to initialize DatabaseManager but avoid __init__ logic that connects to mongo

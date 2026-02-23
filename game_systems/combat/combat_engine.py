@@ -189,17 +189,19 @@ class CombatEngine:
                 is_offensive = (
                     self.action in ["attack", "special_ability"]
                     or self.action.startswith("skill:")
-                    or (self.action == "auto")  # Allow auto to trigger randomly? No, safer to assume auto handles attack
+                    or (
+                        self.action == "auto"
+                    )  # Allow auto to trigger randomly? No, safer to assume auto handles attack
                 )
 
                 # Refine offensive check: Auto often means attack, but we want to reward choice.
                 # If action is 'auto', we'll rely on the random skill decision later, so we check specific actions here.
                 if self.action == "auto":
-                     # In auto mode, we give a small chance to "accidentally" counter
-                     if is_magic and random.randint(1, 100) <= 20:
+                    # In auto mode, we give a small chance to "accidentally" counter
+                    if is_magic and random.randint(1, 100) <= 20:
                         is_offensive = True
-                     else:
-                        is_offensive = False # Assume auto doesn't strategically counter
+                    else:
+                        is_offensive = False  # Assume auto doesn't strategically counter
 
                 if is_magic and is_offensive:
                     monster_stunned = True
@@ -239,7 +241,10 @@ class CombatEngine:
             elif self.action.startswith("skill:"):
                 # Explicit Skill Usage
                 skill_key = self.action.split(":", 1)[1]
-                use_skill = next((s for s in self.player_skills if s.get("key_id") == skill_key), None)
+                use_skill = next(
+                    (s for s in self.player_skills if s.get("key_id") == skill_key),
+                    None,
+                )
 
                 if not use_skill:
                     log.append(f"⚠️ **Skill Failed:** You try to use a skill you don't know ({skill_key}).")
@@ -364,7 +369,9 @@ class CombatEngine:
                     else:
                         turn_report["hits_taken"] = 1
                         emoji = skill.get("emoji", "🔥")
-                        attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
+                        attack_msg = (
+                            f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
+                        )
 
                         if player_defending:
                             dmg = int(dmg * 0.5)
@@ -574,15 +581,17 @@ class CombatEngine:
             existing = next((d for d in self.monster["debuffs"] if d["type"] == "poison"), None)
             if existing:
                 existing["duration"] = duration
-                existing["damage"] = max(existing["damage"], scaled_dmg) # Keep higher damage
+                existing["damage"] = max(existing["damage"], scaled_dmg)  # Keep higher damage
                 return f"☠️ **{self.monster.get('name', 'Enemy')}**'s poison is refreshed!"
             else:
-                self.monster["debuffs"].append({
-                    "type": "poison",
-                    "damage": scaled_dmg,
-                    "duration": duration,
-                    "name": "Poison"
-                })
+                self.monster["debuffs"].append(
+                    {
+                        "type": "poison",
+                        "damage": scaled_dmg,
+                        "duration": duration,
+                        "name": "Poison",
+                    }
+                )
                 return f"☠️ **{self.monster.get('name', 'Enemy')}** is poisoned for {scaled_dmg} dmg/turn!"
 
         return None

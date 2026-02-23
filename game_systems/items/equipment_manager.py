@@ -157,7 +157,13 @@ class EquipmentManager:
                 if table not in self.VALID_TABLES:
                     continue
 
-                item_data = self.db._col(table).find_one({"id": int(item["item_key"])}, {"_id": 0})
+                try:
+                    item_id = int(item["item_key"])
+                except ValueError:
+                    logger.warning(f"Skipping invalid item key '{item.get('item_key')}' for user {discord_id}")
+                    continue
+
+                item_data = self.db._col(table).find_one({"id": item_id}, {"_id": 0})
                 if item_data:
                     # Calculate Quality Scaling
                     base_rarity = item_data.get("rarity", "Common")

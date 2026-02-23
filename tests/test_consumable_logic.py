@@ -1,9 +1,7 @@
-
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
-import json
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,7 +15,7 @@ sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
 from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
-from game_systems.data.consumables import CONSUMABLES  # noqa: E402
+
 
 class TestDualConsumableBug(unittest.TestCase):
     def setUp(self):
@@ -35,7 +33,7 @@ class TestDualConsumableBug(unittest.TestCase):
             "type": "potion",
             "effect": {"heal": 50, "mana": 50},
             "rarity": "Common",
-            "description": "Restores both HP and MP."
+            "description": "Restores both HP and MP.",
         }
 
     def test_use_dual_item_full_hp_missing_mp(self):
@@ -53,12 +51,12 @@ class TestDualConsumableBug(unittest.TestCase):
 
         self.mock_db.get_inventory_item.return_value = {
             "item_key": self.test_item_key,
-            "item_type": "consumable"
+            "item_type": "consumable",
         }
 
         self.mock_db.get_player_vitals.return_value = {
             "current_hp": 100,
-            "current_mp": 0
+            "current_mp": 0,
         }
 
         # Mock PlayerStats to return max values
@@ -67,9 +65,13 @@ class TestDualConsumableBug(unittest.TestCase):
         stats_mock.max_mp = 100
 
         # We need to mock PlayerStats.from_dict
-        with patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats, \
-             patch.dict("game_systems.items.consumable_manager.CONSUMABLES", {self.test_item_key: self.test_item_data}):
-
+        with (
+            patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats,
+            patch.dict(
+                "game_systems.items.consumable_manager.CONSUMABLES",
+                {self.test_item_key: self.test_item_data},
+            ),
+        ):
             MockPlayerStats.from_dict.return_value = stats_mock
 
             # Execute
@@ -97,21 +99,25 @@ class TestDualConsumableBug(unittest.TestCase):
 
         self.mock_db.get_inventory_item.return_value = {
             "item_key": self.test_item_key,
-            "item_type": "consumable"
+            "item_type": "consumable",
         }
 
         self.mock_db.get_player_vitals.return_value = {
             "current_hp": 100,
-            "current_mp": 100
+            "current_mp": 100,
         }
 
         stats_mock = MagicMock()
         stats_mock.max_hp = 100
         stats_mock.max_mp = 100
 
-        with patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats, \
-             patch.dict("game_systems.items.consumable_manager.CONSUMABLES", {self.test_item_key: self.test_item_data}):
-
+        with (
+            patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats,
+            patch.dict(
+                "game_systems.items.consumable_manager.CONSUMABLES",
+                {self.test_item_key: self.test_item_data},
+            ),
+        ):
             MockPlayerStats.from_dict.return_value = stats_mock
 
             success, message = self.manager.use_item(discord_id, inventory_id)
@@ -120,6 +126,7 @@ class TestDualConsumableBug(unittest.TestCase):
 
             self.assertFalse(success)
             self.assertEqual(message, "You are already at full health and mana.")
+
 
 if __name__ == "__main__":
     unittest.main()

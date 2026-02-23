@@ -16,7 +16,11 @@ class TestEquipmentSlots(unittest.TestCase):
 
         # Setup common mock returns
         self.mock_db.get_player_field.return_value = 2  # Class ID 2 (Mage)
-        self.mock_db.get_player.return_value = {"class_id": 2, "level": 10, "name": "MagePlayer"}
+        self.mock_db.get_player.return_value = {
+            "class_id": 2,
+            "level": 10,
+            "name": "MagePlayer",
+        }
         self.mock_db.get_guild_rank.return_value = "A"
 
         # Mage allowed slots (including new 'wand')
@@ -100,7 +104,10 @@ class TestEquipmentSlots(unittest.TestCase):
         # Setup: Wand and Orb equipped
         self.inventory[101]["equipped"] = 1
         self.inventory[102]["equipped"] = 1
-        self.mock_db.get_equipped_items.return_value = [self.inventory[101], self.inventory[102]]
+        self.mock_db.get_equipped_items.return_value = [
+            self.inventory[101],
+            self.inventory[102],
+        ]
 
         # Equip Staff
         success, msg = self.manager.equip_item(1, 103)

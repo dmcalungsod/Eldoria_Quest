@@ -65,7 +65,14 @@ class TestDatabaseAggregation(unittest.TestCase):
         self.mock_db["players"].aggregate.return_value = mock_agg_result
 
         # Ensure skill cache is populated so we can resolve the skill
-        self.db._skill_cache = {"fireball": {"key_id": "fireball", "name": "Fireball", "type": "Active", "mp_cost": 10}}
+        self.db._skill_cache = {
+            "fireball": {
+                "key_id": "fireball",
+                "name": "Fireball",
+                "type": "Active",
+                "mp_cost": 10,
+            }
+        }
 
         # Execute
         result = self.db.get_combat_context_bundle(discord_id)
@@ -81,11 +88,31 @@ class TestDatabaseAggregation(unittest.TestCase):
         print(f"active_buffs.find: {self.collections['active_buffs'].find.call_count}")
         print(f"player_skills.find: {self.collections['player_skills'].find.call_count}")
 
-        self.assertEqual(self.collections["players"].aggregate.call_count, 1, "Should use aggregation")
-        self.assertEqual(self.collections["players"].find_one.call_count, 0, "Should not use find_one on players")
-        self.assertEqual(self.collections["stats"].find_one.call_count, 0, "Should not use find_one on stats")
-        self.assertEqual(self.collections["active_buffs"].find.call_count, 0, "Should not use find on active_buffs")
-        self.assertEqual(self.collections["player_skills"].find.call_count, 0, "Should not use find on player_skills")
+        self.assertEqual(
+            self.collections["players"].aggregate.call_count,
+            1,
+            "Should use aggregation",
+        )
+        self.assertEqual(
+            self.collections["players"].find_one.call_count,
+            0,
+            "Should not use find_one on players",
+        )
+        self.assertEqual(
+            self.collections["stats"].find_one.call_count,
+            0,
+            "Should not use find_one on stats",
+        )
+        self.assertEqual(
+            self.collections["active_buffs"].find.call_count,
+            0,
+            "Should not use find on active_buffs",
+        )
+        self.assertEqual(
+            self.collections["player_skills"].find.call_count,
+            0,
+            "Should not use find on player_skills",
+        )
 
         # Check Result correctness
         self.assertIsNotNone(result)

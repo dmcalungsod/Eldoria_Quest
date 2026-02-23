@@ -63,7 +63,10 @@ class TestStackEquipBug(unittest.TestCase):
         self.mock_db.find_stackable_item.return_value = item_stack
 
         # Mock CLASSES to allow 'sword'
-        with patch("game_systems.items.equipment_manager.CLASSES", {"Warrior": {"id": 1, "allowed_slots": ["sword"]}}):
+        with patch(
+            "game_systems.items.equipment_manager.CLASSES",
+            {"Warrior": {"id": 1, "allowed_slots": ["sword"]}},
+        ):
             # Execute Equip
             # Mock recalculate_player_stats to avoid needing PlayerStats dependencies
             self.manager.recalculate_player_stats = MagicMock()

@@ -88,7 +88,10 @@ class EldoriaBot(commands.Bot):
         intents.message_content = True  # Required for reading commands
 
         super().__init__(
-            command_prefix="!", intents=intents, activity=discord.Game(name="Eldoria | /start"), help_command=None
+            command_prefix="!",
+            intents=intents,
+            activity=discord.Game(name="Eldoria | /start"),
+            help_command=None,
         )
 
     async def setup_hook(self):

@@ -44,9 +44,15 @@ async def transition_to_guild_lobby(interaction: discord.Interaction, db: Databa
         color=discord.Color.dark_gold(),
     )
 
-    embed.add_field(name="📜 Quest Board", value="Review available contracts and report successes.", inline=False)
     embed.add_field(
-        name="⚙️ Guild Services", value="Access the Shop, Exchange, Infirmary, or Training Grounds.", inline=False
+        name="📜 Quest Board",
+        value="Review available contracts and report successes.",
+        inline=False,
+    )
+    embed.add_field(
+        name="⚙️ Guild Services",
+        value="Access the Shop, Exchange, Infirmary, or Training Grounds.",
+        inline=False,
     )
 
     view = GuildLobbyView(db, user, rank=card["rank"])
@@ -118,7 +124,10 @@ class ClassDetailView(View):
             return
 
         success, msg = await asyncio.to_thread(
-            self.creator.create_player, self.user.id, self.user.display_name, self.class_id
+            self.creator.create_player,
+            self.user.id,
+            self.user.display_name,
+            self.class_id,
         )
 
         if success:
@@ -130,7 +139,11 @@ class ClassDetailView(View):
                 "\n\n*The city gates loom above you, iron-bound and weathered by centuries of defense against the dark.*"
             )
 
-            embed = discord.Embed(title=welcome_title, description=welcome_desc, color=discord.Color.dark_gold())
+            embed = discord.Embed(
+                title=welcome_title,
+                description=welcome_desc,
+                color=discord.Color.dark_gold(),
+            )
             embed.set_footer(text="Your journey begins now. Tread boldly.")
 
             view = CharacterMenuView(self.db, self.user)
@@ -221,20 +234,34 @@ class CombatTutorialView(View):
         self.clear_items()
 
         if self.step == 0:
-            btn = Button(label="⚔️ Attack", style=discord.ButtonStyle.danger, custom_id="tut_attack")
+            btn = Button(
+                label="⚔️ Attack",
+                style=discord.ButtonStyle.danger,
+                custom_id="tut_attack",
+            )
             btn.callback = self.attack_callback
             self.add_item(btn)
         elif self.step == 1:
-            btn = Button(label="🛡️ Defend", style=discord.ButtonStyle.primary, custom_id="tut_defend")
+            btn = Button(
+                label="🛡️ Defend",
+                style=discord.ButtonStyle.primary,
+                custom_id="tut_defend",
+            )
             btn.callback = self.defend_callback
             self.add_item(btn)
         elif self.step == 2:
-            btn = Button(label="⚔️ Finish It", style=discord.ButtonStyle.danger, custom_id="tut_finish")
+            btn = Button(
+                label="⚔️ Finish It",
+                style=discord.ButtonStyle.danger,
+                custom_id="tut_finish",
+            )
             btn.callback = self.finish_callback
             self.add_item(btn)
         elif self.step == 3:
             btn = Button(
-                label="🏆 Claim Badge & Enter Guild", style=discord.ButtonStyle.success, custom_id="tut_complete"
+                label="🏆 Claim Badge & Enter Guild",
+                style=discord.ButtonStyle.success,
+                custom_id="tut_complete",
             )
             btn.callback = self.complete_callback
             self.add_item(btn)
@@ -315,7 +342,11 @@ class OnboardingCog(commands.Cog):
             await interaction.response.defer()
             await back_to_profile_callback(interaction, is_new_message=True)
         else:
-            embed = discord.Embed(title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold())
+            embed = discord.Embed(
+                title=WELCOME_TITLE,
+                description=WELCOME_MESSAGE,
+                color=discord.Color.gold(),
+            )
             view = StartMenuView(self.db, interaction.user)
             await interaction.response.send_message(embed=embed, view=view)
 

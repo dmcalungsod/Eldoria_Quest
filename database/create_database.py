@@ -82,7 +82,12 @@ def create_tables(db=None):
     db["inventory"].create_index("id", unique=True)
     db["inventory"].create_index("discord_id")
     db["inventory"].create_index(
-        [("discord_id", ASCENDING), ("item_key", ASCENDING), ("rarity", ASCENDING), ("equipped", ASCENDING)]
+        [
+            ("discord_id", ASCENDING),
+            ("item_key", ASCENDING),
+            ("rarity", ASCENDING),
+            ("equipped", ASCENDING),
+        ]
     )
     db["inventory"].create_index(
         [("discord_id", ASCENDING), ("slot", ASCENDING)],

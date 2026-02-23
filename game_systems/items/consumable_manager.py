@@ -136,7 +136,14 @@ class ConsumableManager:
 
                 # 7. Apply Buffs (Deferred)
                 for b in buffs_to_apply:
-                    self.db.add_active_buff(discord_id, item_key, item_data["name"], b["key"], b["val"], b["duration"])
+                    self.db.add_active_buff(
+                        discord_id,
+                        item_key,
+                        item_data["name"],
+                        b["key"],
+                        b["val"],
+                        b["duration"],
+                    )
 
                 return True, " ".join(message_lines)
 

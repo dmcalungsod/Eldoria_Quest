@@ -57,7 +57,10 @@ class TestWildGathering(unittest.TestCase):
         # Mock MATERIALS to include test_herb
         with (
             patch("game_systems.adventure.event_handler.LOCATIONS", mock_locations),
-            patch.dict("game_systems.adventure.event_handler.MATERIALS", {"test_herb": {"name": "Test Herb"}}),
+            patch.dict(
+                "game_systems.adventure.event_handler.MATERIALS",
+                {"test_herb": {"name": "Test Herb"}},
+            ),
         ):
             # Mock randoms
             # randint(1, 100) -> 80 (skip regen)
@@ -115,7 +118,10 @@ class TestWildGathering(unittest.TestCase):
         session.location_id = "test_forest"
 
         # Mock LOCATIONS
-        with patch("game_systems.adventure.adventure_session.LOCATIONS", {"test_forest": {"name": "Forest"}}):
+        with patch(
+            "game_systems.adventure.adventure_session.LOCATIONS",
+            {"test_forest": {"name": "Forest"}},
+        ):
             # Force non-combat
             with patch("random.randint", return_value=10):
                 session.simulate_step()

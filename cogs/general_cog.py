@@ -28,7 +28,9 @@ class GeneralCog(commands.Cog):
             latency_ms = round(self.bot.latency * 1000)
 
             embed = discord.Embed(
-                title="🏓 Pong!", description=f"Latency: **{latency_ms}ms**", color=discord.Color.blue()
+                title="🏓 Pong!",
+                description=f"Latency: **{latency_ms}ms**",
+                color=discord.Color.blue(),
             )
 
             await interaction.response.send_message(embed=embed, ephemeral=True)

@@ -11,7 +11,6 @@ import discord
 from discord.ui import Button, View
 
 import cogs.ui_helpers as ui_helpers
-import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.ui.settings")

@@ -56,7 +56,10 @@ class TestTelegraphMechanic(unittest.TestCase):
         # We manually inject the action to test the ENGINE'S handling
         telegraph_action = {"type": "telegraph", "skill": self.high_power_skill}
 
-        with patch("game_systems.monsters.monster_actions.MonsterAI.choose_action", return_value=telegraph_action):
+        with patch(
+            "game_systems.monsters.monster_actions.MonsterAI.choose_action",
+            return_value=telegraph_action,
+        ):
             engine = CombatEngine(
                 player=self.player_wrapper,
                 monster=self.monster,
@@ -74,7 +77,11 @@ class TestTelegraphMechanic(unittest.TestCase):
 
             # ASSERTIONS FOR TELEGRAPH
             # 1. No damage should be taken
-            self.assertEqual(result["turn_report"]["damage_taken"], 0, "Telegraph turn should deal 0 damage")
+            self.assertEqual(
+                result["turn_report"]["damage_taken"],
+                0,
+                "Telegraph turn should deal 0 damage",
+            )
 
             # 2. Monster should have charged_skill set
             self.assertIn("charged_skill", self.monster)
@@ -95,12 +102,17 @@ class TestTelegraphMechanic(unittest.TestCase):
         # Verify MonsterAI.choose_action returns execute_charge
         action = MonsterAI.choose_action(self.monster, 1000, 100)
         self.assertEqual(
-            action["type"], "execute_charge", "MonsterAI should choose execute_charge when charged_skill is present"
+            action["type"],
+            "execute_charge",
+            "MonsterAI should choose execute_charge when charged_skill is present",
         )
         self.assertEqual(action["skill"], self.high_power_skill)
 
         # Now run the engine with this action
-        with patch("game_systems.monsters.monster_actions.MonsterAI.choose_action", return_value=action):
+        with patch(
+            "game_systems.monsters.monster_actions.MonsterAI.choose_action",
+            return_value=action,
+        ):
             engine = CombatEngine(
                 player=self.player_wrapper,
                 monster=self.monster,
@@ -117,7 +129,10 @@ class TestTelegraphMechanic(unittest.TestCase):
 
             # ASSERTIONS FOR EXECUTION
             # 1. Damage should be taken
-            self.assertTrue(result["turn_report"]["damage_taken"] > 0, "Execute charge should deal damage")
+            self.assertTrue(
+                result["turn_report"]["damage_taken"] > 0,
+                "Execute charge should deal damage",
+            )
 
             # 2. Monster should NO LONGER have charged_skill
             self.assertNotIn("charged_skill", self.monster)
@@ -146,7 +161,11 @@ class TestTelegraphMechanic(unittest.TestCase):
 
             action = MonsterAI.choose_action(self.monster, 1000, 100)
 
-            self.assertEqual(action["type"], "telegraph", "MonsterAI should choose telegraph with correct RNG")
+            self.assertEqual(
+                action["type"],
+                "telegraph",
+                "MonsterAI should choose telegraph with correct RNG",
+            )
             self.assertEqual(action["skill"], self.high_power_skill)
 
 

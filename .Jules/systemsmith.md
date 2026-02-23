@@ -22,3 +22,8 @@
 
 **Learning:** The "Back to Profile" UI callback was making 5-6 separate database queries (Player, Guild, Stats, Skills, Title) sequentially (or gathered), causing latency and load. Using MongoDB's `$lookup` aggregation pipeline reduced this to a single round-trip.
 **Action:** Identify frequently accessed UI paths (like Profile, Inventory) and implement dedicated "bundle" methods in `DatabaseManager` using aggregations instead of multiple `find_one` calls in the cog.
+
+## 2025-11-20 — Robust Equipment Stat Calculation
+
+**Learning:** `EquipmentManager` and `ItemManager` were crashing on `int(item_key)` conversion when encountering malformed data (non-numeric item keys), potentially zeroing out player stats on recalculation.
+**Action:** Always wrap type conversions of database keys in `try-except` blocks and log warnings instead of allowing uncaught exceptions to propagate, ensuring system resilience against data corruption.

@@ -20,7 +20,11 @@ class TestContentExpansion(unittest.TestCase):
 
         if "conditional_monsters" in fen:
             for cm in fen["conditional_monsters"]:
-                self.assertIn(cm["monster_key"], MONSTERS, f"Conditional monster {cm['monster_key']} not in MONSTERS")
+                self.assertIn(
+                    cm["monster_key"],
+                    MONSTERS,
+                    f"Conditional monster {cm['monster_key']} not in MONSTERS",
+                )
 
     def test_c_tier_quests_loaded(self):
         """Verify C-Tier quests are loaded and structured correctly."""
@@ -44,7 +48,9 @@ class TestContentExpansion(unittest.TestCase):
                 targets = objectives["defeat"]
                 for target_name in targets:
                     self.assertIn(
-                        target_name, monster_names, f"Quest '{title}' references unknown monster '{target_name}'"
+                        target_name,
+                        monster_names,
+                        f"Quest '{title}' references unknown monster '{target_name}'",
                     )
 
     def test_quest_location_references(self):

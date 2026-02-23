@@ -20,7 +20,12 @@ class TestCraftingExpanded(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules to mock pymongo globally for this test
         self.patcher = patch.dict(
-            "sys.modules", {"pymongo": MagicMock(), "pymongo.collection": MagicMock(), "pymongo.results": MagicMock()}
+            "sys.modules",
+            {
+                "pymongo": MagicMock(),
+                "pymongo.collection": MagicMock(),
+                "pymongo.results": MagicMock(),
+            },
         )
         self.patcher.start()
 

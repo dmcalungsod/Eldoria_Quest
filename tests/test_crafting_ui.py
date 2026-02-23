@@ -34,7 +34,14 @@ class MockButton:
 
 class MockSelect:
     def __init__(
-        self, placeholder=None, min_values=1, max_values=1, options=None, disabled=False, row=None, custom_id=None
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        disabled=False,
+        row=None,
+        custom_id=None,
     ):
         self.placeholder = placeholder
         self.options = options or []
@@ -96,8 +103,18 @@ class TestCraftingUI(unittest.TestCase):
 
         # Mock recipes
         self.recipes = {
-            "potion_1": {"name": "Health Potion", "cost": 10, "type": "consumable", "materials": {"herb": 1}},
-            "sword_1": {"name": "Iron Sword", "cost": 50, "type": "equipment", "materials": {"iron": 2}},
+            "potion_1": {
+                "name": "Health Potion",
+                "cost": 10,
+                "type": "consumable",
+                "materials": {"herb": 1},
+            },
+            "sword_1": {
+                "name": "Iron Sword",
+                "cost": 50,
+                "type": "equipment",
+                "materials": {"iron": 2},
+            },
         }
 
         # We need to make sure the instance returns these recipes

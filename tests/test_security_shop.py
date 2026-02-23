@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Mock discord before importing anything that uses it
 mock_discord = MagicMock()
 
+
 # Ensure View is a class that can be inherited from without creating a MagicMock for every method
 class MockView:
     def __init__(self, *args, **kwargs):
@@ -17,7 +18,7 @@ class MockView:
 
     def add_item(self, item):
         self.children.append(item)
-        return self # add_item typically returns self or None, strictly View.add_item returns self in some versions or None in others. discord.py returns None usually.
+        return self  # add_item typically returns self or None, strictly View.add_item returns self in some versions or None in others. discord.py returns None usually.
 
     def clear_items(self):
         self.children.clear()
@@ -26,8 +27,12 @@ class MockView:
         pass
 
     # Allow async context manager if needed
-    async def __aenter__(self): return self
-    async def __aexit__(self, exc_type, exc, tb): pass
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
+
 
 mock_discord.ui.View = MockView
 
@@ -57,6 +62,7 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
             importlib.reload(shop_cog)
 
         from cogs.shop_cog import ShopView as SV
+
         self.ShopView = SV
 
     async def test_shop_callback_validation_success(self):
@@ -92,7 +98,10 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         # Mock db.get_player explicitly to return a dict, not a Mock
         db.get_player = MagicMock(return_value={"aurum": 900})
 
-        with patch("cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value={"aurum": 1000})):
+        with patch(
+            "cogs.shop_cog.get_player_or_error",
+            new=AsyncMock(return_value={"aurum": 1000}),
+        ):
             # Mock Interacton
             interaction = MagicMock()
             interaction.user = user

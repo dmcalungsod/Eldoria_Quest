@@ -22,7 +22,17 @@ class TestMonsterData(unittest.TestCase):
         if not monster:
             self.skipTest("monster_001 not found")
 
-        required_fields = ["id", "name", "level", "hp", "atk", "def", "xp", "drops", "skills"]
+        required_fields = [
+            "id",
+            "name",
+            "level",
+            "hp",
+            "atk",
+            "def",
+            "xp",
+            "drops",
+            "skills",
+        ]
         for field in required_fields:
             self.assertIn(field, monster)
 

@@ -58,7 +58,15 @@ class MockDatabaseManager:
     def get_active_world_event(self):
         return None
 
-    def update_adventure_session(self, discord_id, logs, loot_collected, active, active_monster_json, previous_version):
+    def update_adventure_session(
+        self,
+        discord_id,
+        logs,
+        loot_collected,
+        active,
+        active_monster_json,
+        previous_version,
+    ):
         if discord_id not in self.sessions:
             return False
 
@@ -115,7 +123,8 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
 
         # Patch LOCATIONS to ensure simulate_step proceeds
         self.locations_patcher = patch.dict(
-            adventure_session.LOCATIONS, {"loc_1": {"name": "Test Location", "monsters": []}}
+            adventure_session.LOCATIONS,
+            {"loc_1": {"name": "Test Location", "monsters": []}},
         )
         self.locations_patcher.start()
 

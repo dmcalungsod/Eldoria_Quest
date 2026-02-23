@@ -41,7 +41,15 @@ _Item = object
 class _Button(_Item):
     """Minimal stand-in for discord.ui.Button."""
 
-    def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        emoji=None,
+        row=None,
+        custom_id=None,
+        disabled=False,
+    ):
         self.label = label
         self.style = style
         self.emoji = emoji
@@ -57,7 +65,15 @@ class _Button(_Item):
 class _Select(_Item):
     """Minimal stand-in for discord.ui.Select."""
 
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+    def __init__(
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        row=None,
+        custom_id=None,
+    ):
         self.placeholder = placeholder
         self.min_values = min_values
         self.max_values = max_values

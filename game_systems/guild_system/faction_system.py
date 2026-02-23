@@ -4,13 +4,12 @@ faction_system.py
 Manages Faction membership, reputation, and progression.
 """
 
-import datetime
 import logging
 
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
 from game_systems.data.emojis import ERROR, SUCCESS, WARNING
 from game_systems.data.factions import FACTIONS
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.factions")
 
@@ -69,7 +68,10 @@ class FactionSystem:
         if existing:
             current_id = existing.get("faction_id")
             name = FACTIONS.get(current_id, {}).get("name", "Unknown")
-            return False, f"{WARNING} You are already a member of **{name}**. Leave first."
+            return (
+                False,
+                f"{WARNING} You are already a member of **{name}**. Leave first.",
+            )
 
         # Insert new membership
         try:

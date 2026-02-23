@@ -15,8 +15,8 @@ sys.modules["pymongo.errors"] = pymongo_errors_mock
 sys.modules["discord"] = MagicMock()
 
 # Now import the modules
-from game_systems.adventure.combat_handler import CombatHandler  # noqa: E402
 from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.combat_handler import CombatHandler  # noqa: E402
 
 
 class TestCombatCrash(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestCombatCrash(unittest.TestCase):
             result = handler.resolve_turn(
                 active_monster=active_monster,
                 battle_report=battle_report,
-                accumulated_exp=0
+                accumulated_exp=0,
             )
 
             # If we reach here, we check if the result is valid
@@ -52,6 +52,7 @@ class TestCombatCrash(unittest.TestCase):
             raise  # Re-raise to fail the test and confirm the bug
         except Exception as e:
             self.fail(f"CombatHandler crashed with unexpected exception: {e}")
+
 
 if __name__ == "__main__":
     unittest.main()

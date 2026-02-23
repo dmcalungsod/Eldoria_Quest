@@ -56,7 +56,14 @@ MONSTER_SKILLS = {
         "type": "magical",
         "desc_key": "magic",
     },
-    "ember": {"key_id": "ember", "name": "Ember", "power": 1.4, "mp_cost": 5, "type": "magical", "desc_key": "fire"},
+    "ember": {
+        "key_id": "ember",
+        "name": "Ember",
+        "power": 1.4,
+        "mp_cost": 5,
+        "type": "magical",
+        "desc_key": "fire",
+    },
     "flame_breath": {
         "key_id": "flame_breath",
         "name": "Flame Breath",

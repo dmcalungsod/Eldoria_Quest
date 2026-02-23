@@ -88,7 +88,8 @@ class AdventureView(View):
 
         if not adventure_cog:
             await interaction.response.send_message(
-                f"{E.ERROR} The adventure system is currently unavailable.", ephemeral=True
+                f"{E.ERROR} The adventure system is currently unavailable.",
+                ephemeral=True,
             )
             return
 

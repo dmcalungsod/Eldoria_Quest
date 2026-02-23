@@ -30,9 +30,18 @@ class Weather(Enum):
 
 LOCATION_WEATHER_WEIGHTS = {
     # Default: Mostly clear, some rain/fog/storm
-    "default": [(Weather.CLEAR, 60), (Weather.RAIN, 20), (Weather.FOG, 10), (Weather.STORM, 10)],
+    "default": [
+        (Weather.CLEAR, 60),
+        (Weather.RAIN, 20),
+        (Weather.FOG, 10),
+        (Weather.STORM, 10),
+    ],
     # Specific Locations
-    "molten_caldera": [(Weather.CLEAR, 50), (Weather.ASH, 40), (Weather.STORM, 10)],  # Storm = Firestorm
+    "molten_caldera": [
+        (Weather.CLEAR, 50),
+        (Weather.ASH, 40),
+        (Weather.STORM, 10),
+    ],  # Storm = Firestorm
     "shrouded_fen": [(Weather.FOG, 50), (Weather.RAIN, 30), (Weather.CLEAR, 20)],
     "deepgrove_roots": [(Weather.CLEAR, 70), (Weather.FOG, 30)],  # Underground/roots
     "crystal_caverns": [(Weather.CLEAR, 80), (Weather.FOG, 20)],  # Glimmering mist

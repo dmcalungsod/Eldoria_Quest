@@ -14,9 +14,10 @@ import time
 from contextlib import contextmanager
 from typing import Any
 
-from game_systems.world_time import WorldTime
 from pymongo import InsertOne, MongoClient, UpdateOne
 from pymongo.errors import DuplicateKeyError
+
+from game_systems.world_time import WorldTime
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")
@@ -353,9 +354,7 @@ class DatabaseManager:
 
         # 3. Clean Player Data
         # Remove the joined arrays to return a clean player dict
-        player_data = {
-            k: v for k, v in data.items() if k not in ["stats_docs", "guild_docs"]
-        }
+        player_data = {k: v for k, v in data.items() if k not in ["stats_docs", "guild_docs"]}
 
         return {
             "player": player_data,
@@ -404,9 +403,7 @@ class DatabaseManager:
             {"$set": {"current_hp": hp, "current_mp": mp}},
         )
 
-    def update_player_vitals_delta(
-        self, discord_id: int, hp_delta: int, mp_delta: int, max_hp: int, max_mp: int
-    ):
+    def update_player_vitals_delta(self, discord_id: int, hp_delta: int, mp_delta: int, max_hp: int, max_mp: int):
         """
         Updates HP/MP by a delta, clamping to [0, max].
         Uses MongoDB aggregation pipeline in update for atomicity.
@@ -415,10 +412,16 @@ class DatabaseManager:
             {
                 "$set": {
                     "current_hp": {
-                        "$min": [max_hp, {"$max": [0, {"$add": ["$current_hp", hp_delta]}]}]
+                        "$min": [
+                            max_hp,
+                            {"$max": [0, {"$add": ["$current_hp", hp_delta]}]},
+                        ]
                     },
                     "current_mp": {
-                        "$min": [max_mp, {"$max": [0, {"$add": ["$current_mp", mp_delta]}]}]
+                        "$min": [
+                            max_mp,
+                            {"$max": [0, {"$add": ["$current_mp", mp_delta]}]},
+                        ]
                     },
                 }
             }

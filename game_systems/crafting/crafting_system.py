@@ -12,7 +12,7 @@ from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.materials import MATERIALS
-from game_systems.data.recipes import RECIPES, HIDDEN_RECIPES
+from game_systems.data.recipes import HIDDEN_RECIPES, RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
 
@@ -109,7 +109,11 @@ class CraftingSystem:
                 # Resolve DB ID
                 db_id = self.db.get_equipment_id_by_name(item_data["name"])
                 if not db_id:
-                    return False, f"System Error: Equipment '{item_data['name']}' not found in database.", None
+                    return (
+                        False,
+                        f"System Error: Equipment '{item_data['name']}' not found in database.",
+                        None,
+                    )
 
                 # --- QUALITY ROLL ---
                 base_rarity = item_data.get("rarity", "Common")
@@ -179,7 +183,11 @@ class CraftingSystem:
                 )
 
             logger.info(f"User {discord_id} crafted {output_amount}x {output_key}")
-            return True, f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}", item_data
+            return (
+                True,
+                f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}",
+                item_data,
+            )
 
         except Exception as e:
             logger.error(f"Crafting system error for {discord_id}: {e}", exc_info=True)
@@ -337,7 +345,11 @@ class CraftingSystem:
                     item_type = "material"
 
                 if not item_data:
-                    return False, f"System Error: Output {output_key} not defined.", None
+                    return (
+                        False,
+                        f"System Error: Output {output_key} not defined.",
+                        None,
+                    )
 
                 final_name = item_data["name"]
 
@@ -351,7 +363,11 @@ class CraftingSystem:
                 )
 
                 logger.info(f"User {discord_id} discovered {output_key} via experiment.")
-                return True, f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!", item_data
+                return (
+                    True,
+                    f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!",
+                    item_data,
+                )
 
             else:
                 # 5. Failure Logic (Add Slag)
@@ -365,7 +381,11 @@ class CraftingSystem:
                         slag_data["rarity"],
                         1,
                     )
-                return False, "The mixture turns volatile and collapses into useless slag.", None
+                return (
+                    False,
+                    "The mixture turns volatile and collapses into useless slag.",
+                    None,
+                )
 
         except Exception as e:
             logger.error(f"Experiment error for {discord_id}: {e}", exc_info=True)

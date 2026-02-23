@@ -103,7 +103,8 @@ def main():
 
         # Check if branch still exists
         branch_check = subprocess.run(
-            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"], capture_output=True
+            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"],
+            capture_output=True,
         )
 
         if branch_check.returncode != 0:
@@ -113,7 +114,13 @@ def main():
         print(f"Deleting branch '{head_ref}' (merged {merged_at_str})...")
 
         # Delete the branch
-        delete_cmd = ["gh", "api", "--method", "DELETE", f"repos/{current_repo}/git/refs/heads/{head_ref}"]
+        delete_cmd = [
+            "gh",
+            "api",
+            "--method",
+            "DELETE",
+            f"repos/{current_repo}/git/refs/heads/{head_ref}",
+        ]
         delete_result = subprocess.run(delete_cmd, capture_output=True, text=True)
 
         if delete_result.returncode == 0:

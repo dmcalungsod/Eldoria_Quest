@@ -25,7 +25,12 @@ class RankProgressView(View, GuildViewMixin):
     Displays the player's current rank progress and a button to begin the Promotion Trial.
     """
 
-    def __init__(self, db_manager: DatabaseManager, eligible: bool, interaction_user: discord.User):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        eligible: bool,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -62,7 +67,8 @@ class RankProgressView(View, GuildViewMixin):
             eligible = await asyncio.to_thread(self.rank_system.check_promotion_eligibility, self.interaction_user.id)
             if not eligible:
                 await interaction.followup.send(
-                    f"{E.WARNING} You no longer meet the promotion requirements.", ephemeral=True
+                    f"{E.WARNING} You no longer meet the promotion requirements.",
+                    ephemeral=True,
                 )
                 return
 
@@ -72,7 +78,10 @@ class RankProgressView(View, GuildViewMixin):
             next_rank_key = self.rank_system.get_next_rank(current_rank)
 
             if not next_rank_key:
-                await interaction.followup.send(f"{E.MEDAL} You have already reached the highest rank.", ephemeral=True)
+                await interaction.followup.send(
+                    f"{E.MEDAL} You have already reached the highest rank.",
+                    ephemeral=True,
+                )
                 return
 
             next_rank_title = self.rank_system.RANKS.get(next_rank_key, {}).get("title", next_rank_key)
@@ -95,7 +104,10 @@ class RankProgressView(View, GuildViewMixin):
             await interaction.edit_original_response(embed=embed, view=view)
 
         except Exception as e:
-            logger.error(f"Promotion callback error for {self.interaction_user.id}: {e}", exc_info=True)
+            logger.error(
+                f"Promotion callback error for {self.interaction_user.id}: {e}",
+                exc_info=True,
+            )
             await interaction.followup.send("An error occurred checking eligibility.", ephemeral=True)
 
 
@@ -105,7 +117,12 @@ class RankTrialConfirmationView(View, GuildViewMixin):
     Responsible for starting the special promotion adventure session.
     """
 
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, next_rank: str):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        next_rank: str,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -123,7 +140,10 @@ class RankTrialConfirmationView(View, GuildViewMixin):
 
         # Return to previous menu
         self.return_btn = ViewFactory.create_button(
-            label="Return", style=discord.ButtonStyle.grey, custom_id="cancel_trial", callback=self.cancel_callback
+            label="Return",
+            style=discord.ButtonStyle.grey,
+            custom_id="cancel_trial",
+            callback=self.cancel_callback,
         )
         self.add_item(self.return_btn)
 
@@ -143,7 +163,9 @@ class RankTrialConfirmationView(View, GuildViewMixin):
         # Start the promotion trial session in a thread-safe manner
         try:
             await asyncio.to_thread(
-                adventure_cog.manager.start_promotion_trial, self.interaction_user.id, self.next_rank
+                adventure_cog.manager.start_promotion_trial,
+                self.interaction_user.id,
+                self.next_rank,
             )
         except Exception as exc:
             logger.error(f"Failed to start trial for {self.interaction_user.id}: {exc}")
@@ -232,7 +254,9 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             progress_lines.append(f"• **{req.replace('_', ' ').title()}:** {current_value} / {required_value}")
 
         embed.add_field(
-            name="Current Progress", value="\n".join(progress_lines) or "No tracked progress.", inline=False
+            name="Current Progress",
+            value="\n".join(progress_lines) or "No tracked progress.",
+            inline=False,
         )
 
         if eligible:
@@ -254,7 +278,9 @@ class RankTrialConfirmationView(View, GuildViewMixin):
                 embed_menu = EmbedBuilder.quest_menu()
             except Exception:
                 embed_menu = discord.Embed(
-                    title="Quests", description="Guild quest board.", color=discord.Color.dark_green()
+                    title="Quests",
+                    description="Guild quest board.",
+                    color=discord.Color.dark_green(),
                 )
             await inter.edit_original_response(embed=embed_menu, view=v)
 

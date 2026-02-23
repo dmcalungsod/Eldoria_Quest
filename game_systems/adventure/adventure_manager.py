@@ -10,16 +10,16 @@ import json
 import logging
 
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
+from game_systems.achievement_system import AchievementSystem
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
-from game_systems.achievement_system import AchievementSystem
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 from .adventure_session import AdventureSession
 
@@ -256,7 +256,8 @@ class AdventureManager:
                     summary["new_titles"] = new_title_msg
             except Exception as e:
                 logger.error(
-                    f"Error checking exploration achievements for {discord_id}: {e}", exc_info=True
+                    f"Error checking exploration achievements for {discord_id}: {e}",
+                    exc_info=True,
                 )
 
             # End session ONLY after items are safely added
@@ -273,7 +274,10 @@ class AdventureManager:
         p_row = self.db.get_player(session.discord_id)
 
         level_sys = LevelUpSystem(
-            stats=player_stats, level=p_row["level"], exp=p_row["experience"], exp_to_next=p_row["exp_to_next"]
+            stats=player_stats,
+            level=p_row["level"],
+            exp=p_row["experience"],
+            exp_to_next=p_row["exp_to_next"],
         )
 
         leveled_up = False
@@ -306,7 +310,15 @@ class AdventureManager:
             mat = MATERIALS.get(item_key)
             name = mat["name"] if mat else item_key
             rarity = mat.get("rarity", "Common") if mat else "Common"
-            items_awarded.append({"key": item_key, "name": name, "type": "material", "rarity": rarity, "amount": count})
+            items_awarded.append(
+                {
+                    "key": item_key,
+                    "name": name,
+                    "type": "material",
+                    "rarity": rarity,
+                    "amount": count,
+                }
+            )
 
         return items_awarded
 

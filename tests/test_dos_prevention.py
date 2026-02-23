@@ -38,7 +38,15 @@ class MockButton:
 
 
 class MockSelect:
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+    def __init__(
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        row=None,
+        custom_id=None,
+    ):
         self.placeholder = placeholder
         self.min_values = min_values
         self.max_values = max_values

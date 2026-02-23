@@ -1,8 +1,7 @@
-
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Add repo root to path
 sys.path.append(os.getcwd())
@@ -11,8 +10,9 @@ sys.path.append(os.getcwd())
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.player.player_stats import PlayerStats  # noqa: E402
 from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestInventoryScaling(unittest.TestCase):
     def test_scaling_formula(self):
@@ -44,8 +44,8 @@ class TestInventoryScaling(unittest.TestCase):
         # Mock stats JSON returning STR=10, DEX=10
         stats_data = {"STR": {"base": 10}, "DEX": {"base": 10}}
         with patch.object(db, "get_player_stats_json", return_value=stats_data):
-             limit = db.calculate_inventory_limit(discord_id)
-             self.assertEqual(limit, 17)
+            limit = db.calculate_inventory_limit(discord_id)
+            self.assertEqual(limit, 17)
 
     def test_fallback_to_base(self):
         """Verify fallback if stats missing."""
@@ -53,8 +53,9 @@ class TestInventoryScaling(unittest.TestCase):
         discord_id = 12345
 
         with patch.object(db, "get_player_stats_json", return_value=None):
-             limit = db.calculate_inventory_limit(discord_id)
-             self.assertEqual(limit, 10) # BASE_INVENTORY_SLOTS
+            limit = db.calculate_inventory_limit(discord_id)
+            self.assertEqual(limit, 10)  # BASE_INVENTORY_SLOTS
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,7 +2,6 @@ import importlib
 import os
 import sys
 import unittest
-import json
 from unittest.mock import MagicMock, patch
 
 # Mock pymongo
@@ -11,6 +10,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestElementalSurgeEvent(unittest.TestCase):
     def setUp(self):
@@ -31,10 +31,12 @@ class TestElementalSurgeEvent(unittest.TestCase):
 
         # Import modules under test
         import database.database_manager
+
         importlib.reload(database.database_manager)
         self.DatabaseManager = database.database_manager.DatabaseManager
 
         import game_systems.adventure.adventure_rewards
+
         importlib.reload(game_systems.adventure.adventure_rewards)
         self.AdventureRewards = game_systems.adventure.adventure_rewards.AdventureRewards
 
@@ -60,7 +62,7 @@ class TestElementalSurgeEvent(unittest.TestCase):
         # Setup Event
         self.mock_db.get_active_world_event.return_value = {
             "type": "elemental_surge",
-            "active": 1
+            "active": 1,
         }
 
         # Setup Player Stats (needed for loot calc)
@@ -71,7 +73,7 @@ class TestElementalSurgeEvent(unittest.TestCase):
             "exp": 100,
             "monster_data": {"name": "Test Monster", "tier": "Normal"},
             "drops": [],
-            "active_boosts": {}
+            "active_boosts": {},
         }
 
         session_loot = {}
@@ -79,22 +81,18 @@ class TestElementalSurgeEvent(unittest.TestCase):
         inv_manager = MagicMock()
 
         # Force random to hit the chance
-        with patch("random.random", return_value=0.1): # < 0.3
-            with patch("random.randint", return_value=2): # 2 motes
+        with patch("random.random", return_value=0.1):  # < 0.3
+            with patch("random.randint", return_value=2):  # 2 motes
                 with patch("game_systems.adventure.adventure_rewards.TournamentSystem") as MockTournament:
-                     mock_tournament_instance = MockTournament.return_value
+                    mock_tournament_instance = MockTournament.return_value
 
-                     self.rewards_system.process_victory(
-                         {}, [], combat_result, quest_system, inv_manager, session_loot
-                     )
+                    self.rewards_system.process_victory({}, [], combat_result, quest_system, inv_manager, session_loot)
 
-                     # Verify Session Loot has Mote
-                     self.assertEqual(session_loot.get("elemental_mote"), 2)
+                    # Verify Session Loot has Mote
+                    self.assertEqual(session_loot.get("elemental_mote"), 2)
 
-                     # Verify Tournament Record
-                     mock_tournament_instance.record_action.assert_any_call(
-                         self.discord_id, "elemental_harvest", 2
-                     )
+                    # Verify Tournament Record
+                    mock_tournament_instance.record_action.assert_any_call(self.discord_id, "elemental_harvest", 2)
 
     def test_no_event_no_mote(self):
         """Verify no drops when event is not active."""
@@ -105,24 +103,23 @@ class TestElementalSurgeEvent(unittest.TestCase):
             "exp": 100,
             "monster_data": {"name": "Test Monster", "tier": "Normal"},
             "drops": [],
-            "active_boosts": {}
+            "active_boosts": {},
         }
 
         session_loot = {}
 
         with patch("game_systems.adventure.adventure_rewards.TournamentSystem") as MockTournament:
-             mock_tournament_instance = MockTournament.return_value
+            mock_tournament_instance = MockTournament.return_value
 
-             self.rewards_system.process_victory(
-                 {}, [], combat_result, MagicMock(), MagicMock(), session_loot
-             )
+            self.rewards_system.process_victory({}, [], combat_result, MagicMock(), MagicMock(), session_loot)
 
-             self.assertIsNone(session_loot.get("elemental_mote"))
-             # Ensure record_action was NOT called for elemental_harvest
-             # It might be called for monster_kills though
-             calls = mock_tournament_instance.record_action.call_args_list
-             harvest_calls = [c for c in calls if c.args[1] == "elemental_harvest"]
-             self.assertEqual(len(harvest_calls), 0)
+            self.assertIsNone(session_loot.get("elemental_mote"))
+            # Ensure record_action was NOT called for elemental_harvest
+            # It might be called for monster_kills though
+            calls = mock_tournament_instance.record_action.call_args_list
+            harvest_calls = [c for c in calls if c.args[1] == "elemental_harvest"]
+            self.assertEqual(len(harvest_calls), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

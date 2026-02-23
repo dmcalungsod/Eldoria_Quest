@@ -113,7 +113,23 @@ class TestGameSystems(unittest.TestCase):
                 tier += 1
             return int(total // 1)  # match math.floor behavior
 
-        test_cases = [0, 1, 50, 99, 100, 101, 150, 199, 200, 250, 300, 500, 1000, 1234, 5000]
+        test_cases = [
+            0,
+            1,
+            50,
+            99,
+            100,
+            101,
+            150,
+            199,
+            200,
+            250,
+            300,
+            500,
+            1000,
+            1234,
+            5000,
+        ]
         base_values = [1.0, 0.5, 2.0, 10.0]
 
         for val in test_cases:
@@ -141,7 +157,14 @@ class TestGameSystems(unittest.TestCase):
 
         # Verify DB call
         self.mock_db.add_inventory_item.assert_called_with(
-            discord_id, "test_sword", "Test Sword", "equipment", "Uncommon", 1, "sword", "equipment"
+            discord_id,
+            "test_sword",
+            "Test Sword",
+            "equipment",
+            "Uncommon",
+            1,
+            "sword",
+            "equipment",
         )
 
         # Test getting inventory
@@ -171,7 +194,12 @@ class TestGameSystems(unittest.TestCase):
         discord_id = 12345
 
         # Setup mocks
-        player_data = {"level": 5, "experience": 1000, "exp_to_next": 2000, "class_id": 1}
+        player_data = {
+            "level": 5,
+            "experience": 1000,
+            "exp_to_next": 2000,
+            "class_id": 1,
+        }
         stats_json = '{"STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10}'
 
         self.mock_db.get_player.return_value = player_data
@@ -188,10 +216,23 @@ class TestGameSystems(unittest.TestCase):
         player_wrapper.hp_current = 100
         player_wrapper.hp_max = 100
 
-        test_monster = {"name": "Test Goblin", "HP": 50, "ATK": 10, "DEF": 5, "DEX": 8, "MAG": 0, "Level": 1, "EXP": 20}
+        test_monster = {
+            "name": "Test Goblin",
+            "HP": 50,
+            "ATK": 10,
+            "DEF": 5,
+            "DEX": 8,
+            "MAG": 0,
+            "Level": 1,
+            "EXP": 20,
+        }
 
         engine = self.CombatEngine(
-            player=player_wrapper, monster=test_monster, player_skills=[], player_mp=30, player_class_id=1
+            player=player_wrapper,
+            monster=test_monster,
+            player_skills=[],
+            player_mp=30,
+            player_class_id=1,
         )
 
         # Mock random to ensure player hits and monster hits

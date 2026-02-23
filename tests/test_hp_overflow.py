@@ -31,7 +31,10 @@ class MockDatabaseManager:
             }
         }
         self.stats = {
-            123: {"discord_id": 123, "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}'}
+            123: {
+                "discord_id": 123,
+                "stats_json": '{"STR": {"base": 10, "bonus": 0}, "END": {"base": 10, "bonus": 0}}',
+            }
         }
         self.inventory = {
             1: {
@@ -81,7 +84,10 @@ class MockDatabaseManager:
     def get_player_vitals(self, discord_id):
         p = self.players.get(discord_id)
         if p:
-            return {"current_hp": p.get("current_hp"), "current_mp": p.get("current_mp")}
+            return {
+                "current_hp": p.get("current_hp"),
+                "current_mp": p.get("current_mp"),
+            }
         return None
 
     def set_player_vitals(self, discord_id, hp, mp):

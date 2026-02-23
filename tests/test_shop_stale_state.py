@@ -95,4 +95,8 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         print(f"New View Aurum: {new_view.current_aurum}")
 
         # Assert that the new view reflects the fresh state (5), not the stale state (100)
-        self.assertEqual(new_view.current_aurum, 5, "Bug reproduced: View has stale aurum (100) instead of fresh (5)")
+        self.assertEqual(
+            new_view.current_aurum,
+            5,
+            "Bug reproduced: View has stale aurum (100) instead of fresh (5)",
+        )

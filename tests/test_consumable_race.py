@@ -19,7 +19,13 @@ class TestConsumableRace(unittest.TestCase):
         # Patch CONSUMABLES to have a test item
         self.patcher = patch(
             "game_systems.items.consumable_manager.CONSUMABLES",
-            {"test_potion": {"name": "Test Potion", "type": "consumable", "effect": {"heal": 50}}},
+            {
+                "test_potion": {
+                    "name": "Test Potion",
+                    "type": "consumable",
+                    "effect": {"heal": 50},
+                }
+            },
         )
         self.mock_consumables = self.patcher.start()
 
@@ -48,7 +54,10 @@ class TestConsumableRace(unittest.TestCase):
         # 2. get_player_vitals and stats
         self.db.get_player_vitals = MagicMock(return_value={"current_hp": 10, "current_mp": 10})
         self.db.get_player_stats_json = MagicMock(
-            return_value={"HP": {"base": 100, "bonus": 0}, "MP": {"base": 50, "bonus": 0}}
+            return_value={
+                "HP": {"base": 100, "bonus": 0},
+                "MP": {"base": 50, "bonus": 0},
+            }
         )
 
         # 3. consume_item_atomic (New Method) should be called
@@ -81,7 +90,12 @@ class TestConsumableRace(unittest.TestCase):
         inv_id = 1
 
         self.db.get_inventory_item = MagicMock(
-            return_value={"id": inv_id, "item_key": "test_potion", "item_type": "consumable", "count": 1}
+            return_value={
+                "id": inv_id,
+                "item_key": "test_potion",
+                "item_type": "consumable",
+                "count": 1,
+            }
         )
         self.db.get_player_vitals = MagicMock(return_value={"current_hp": 10, "current_mp": 10})
         self.db.get_player_stats_json = MagicMock(return_value={"HP": {"base": 100, "bonus": 0}})

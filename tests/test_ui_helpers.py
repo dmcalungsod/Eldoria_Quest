@@ -59,15 +59,50 @@ class TestUIHelpers(unittest.TestCase):
         """Test that inventory embed categorizes equipped items."""
         items = [
             # Weapon
-            {"item_name": "Sword of Testing", "item_type": "equipment", "count": 1, "rarity": "Rare", "equipped": 1, "slot": "sword"},
+            {
+                "item_name": "Sword of Testing",
+                "item_type": "equipment",
+                "count": 1,
+                "rarity": "Rare",
+                "equipped": 1,
+                "slot": "sword",
+            },
             # Armor
-            {"item_name": "Iron Plate", "item_type": "equipment", "count": 1, "rarity": "Common", "equipped": 1, "slot": "heavy_armor"},
+            {
+                "item_name": "Iron Plate",
+                "item_type": "equipment",
+                "count": 1,
+                "rarity": "Common",
+                "equipped": 1,
+                "slot": "heavy_armor",
+            },
             # Accessory
-            {"item_name": "Magic Ring", "item_type": "equipment", "count": 1, "rarity": "Uncommon", "equipped": 1, "slot": "accessory"},
+            {
+                "item_name": "Magic Ring",
+                "item_type": "equipment",
+                "count": 1,
+                "rarity": "Uncommon",
+                "equipped": 1,
+                "slot": "accessory",
+            },
             # Off-Hand (Shield -> Armor)
-            {"item_name": "Wooden Shield", "item_type": "equipment", "count": 1, "rarity": "Common", "equipped": 1, "slot": "shield"},
-             # Off-Hand (Orb -> Weapon)
-            {"item_name": "Mystic Orb", "item_type": "equipment", "count": 1, "rarity": "Epic", "equipped": 1, "slot": "orb"},
+            {
+                "item_name": "Wooden Shield",
+                "item_type": "equipment",
+                "count": 1,
+                "rarity": "Common",
+                "equipped": 1,
+                "slot": "shield",
+            },
+            # Off-Hand (Orb -> Weapon)
+            {
+                "item_name": "Mystic Orb",
+                "item_type": "equipment",
+                "count": 1,
+                "rarity": "Epic",
+                "equipped": 1,
+                "slot": "orb",
+            },
         ]
         max_slots = 20
 
@@ -96,8 +131,20 @@ class TestUIHelpers(unittest.TestCase):
     def test_inventory_embed_unequipped(self):
         """Test unequipped items grouping."""
         items = [
-            {"item_name": "Potion", "item_type": "consumable", "count": 5, "rarity": "Common", "equipped": 0},
-            {"item_name": "Spare Sword", "item_type": "equipment", "count": 1, "rarity": "Common", "equipped": 0}
+            {
+                "item_name": "Potion",
+                "item_type": "consumable",
+                "count": 5,
+                "rarity": "Common",
+                "equipped": 0,
+            },
+            {
+                "item_name": "Spare Sword",
+                "item_type": "equipment",
+                "count": 1,
+                "rarity": "Common",
+                "equipped": 0,
+            },
         ]
 
         embed = build_inventory_embed(items, 20)

@@ -38,7 +38,13 @@ class TestClockworkHalls(unittest.TestCase):
                 self.assertIn("clockwork_heart", drop_keys)
 
     def test_materials_exist(self):
-        new_mats = ["brass_gear", "copper_wire", "spring_coil", "steam_core", "clockwork_heart"]
+        new_mats = [
+            "brass_gear",
+            "copper_wire",
+            "spring_coil",
+            "steam_core",
+            "clockwork_heart",
+        ]
         for mat in new_mats:
             self.assertIn(mat, MATERIALS)
 

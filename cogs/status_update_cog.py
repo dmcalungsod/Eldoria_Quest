@@ -93,7 +93,10 @@ class StatusUpdateView(View):
 
         # Back Button
         self.back_button = Button(
-            label="Back to Profile", style=discord.ButtonStyle.secondary, custom_id="back_prof", row=2
+            label="Back to Profile",
+            style=discord.ButtonStyle.secondary,
+            custom_id="back_prof",
+            row=2,
         )
         self.back_button.callback = back_to_profile_callback
         self.add_item(self.back_button)
@@ -214,7 +217,14 @@ class StatusUpdateView(View):
 
         embed = self.build_status_embed(self.p_data, new_stats_obj, new_stats_row)
 
-        new_view = StatusUpdateView(self.db, self.user, self.p_data, new_stats_obj, new_stats_row, self.multiplier)
+        new_view = StatusUpdateView(
+            self.db,
+            self.user,
+            self.p_data,
+            new_stats_obj,
+            new_stats_row,
+            self.multiplier,
+        )
 
         await interaction.edit_original_response(embed=embed, view=new_view)
 

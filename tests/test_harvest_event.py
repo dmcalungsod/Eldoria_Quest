@@ -89,7 +89,11 @@ class TestHarvestEvent(unittest.TestCase):
         # Setup context WITHOUT gathering boost
         stats = PlayerStats()
         stats.set_base_stat("LCK", 0)
-        context = {"player_stats": stats, "active_boosts": {}, "vitals": {"current_hp": 100, "current_mp": 100}}
+        context = {
+            "player_stats": stats,
+            "active_boosts": {},
+            "vitals": {"current_hp": 100, "current_mp": 100},
+        }
 
         with patch("game_systems.adventure.event_handler.random") as mock_random:
             mock_random.randint.return_value = 1

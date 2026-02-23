@@ -279,9 +279,7 @@ class AdventureSession:
                         max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
                         max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
 
-                        self.db.update_player_vitals_delta(
-                            self.discord_id, -damage, 0, max_hp, max_mp
-                        )
+                        self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
                         phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
@@ -470,9 +468,7 @@ class AdventureSession:
         self.save_state()
 
         # Update vitals only after successful save
-        self.db.update_player_vitals_delta(
-            self.discord_id, delta_hp, delta_mp, max_hp, max_mp
-        )
+        self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
         return self._build_result(sequence, is_dead, context)
 
@@ -559,9 +555,7 @@ class AdventureSession:
             max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
 
             if delta_hp != 0 or delta_mp != 0:
-                self.db.update_player_vitals_delta(
-                    self.discord_id, delta_hp, delta_mp, max_hp, max_mp
-                )
+                self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
         return self._build_result([turn_logs], is_dead, context)
 

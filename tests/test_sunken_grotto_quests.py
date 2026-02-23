@@ -87,14 +87,18 @@ class TestSunkenGrottoQuests(unittest.TestCase):
 
             # Verify Target Name Validity
             self.assertIn(
-                details["target"], self.valid_monster_names, f"Monster {details['target']} not defined in MONSTERS"
+                details["target"],
+                self.valid_monster_names,
+                f"Monster {details['target']} not defined in MONSTERS",
             )
 
             # Verify Reward Item Validity (if present)
             if "item" in quest["rewards"]:
                 item_name = quest["rewards"]["item"]
                 self.assertIn(
-                    item_name, self.valid_item_names, f"Reward item {item_name} not found in CONSUMABLES or MATERIALS"
+                    item_name,
+                    self.valid_item_names,
+                    f"Reward item {item_name} not found in CONSUMABLES or MATERIALS",
                 )
 
 

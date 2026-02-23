@@ -23,7 +23,10 @@ class TestBuffSystem(unittest.TestCase):
             "exp_to_next": 1000,
         }
         self.mock_db.get_player_field.return_value = 1  # class_id
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 100,
+            "current_mp": 50,
+        }
         self.mock_db.get_player_stats_json.return_value = {
             "STR": {"base": 10, "bonus": 0},
             "END": {"base": 10, "bonus": 0},
@@ -109,11 +112,24 @@ class TestBuffSystem(unittest.TestCase):
 
             # Mock get_active_buffs to return our buff
             self.mock_db.get_active_buffs.return_value = [
-                {"buff_id": "buff_1", "name": "Strong", "stat": "STR", "amount": 50.0, "end_time": time.time() + 3600}
+                {
+                    "buff_id": "buff_1",
+                    "name": "Strong",
+                    "stat": "STR",
+                    "amount": 50.0,
+                    "end_time": time.time() + 3600,
+                }
             ]
 
             # We call resolve_turn with a dummy monster
-            monster = {"HP": 10, "ATK": 1, "DEF": 0, "name": "Dummy", "skills": [], "drops": []}
+            monster = {
+                "HP": 10,
+                "ATK": 1,
+                "DEF": 0,
+                "name": "Dummy",
+                "skills": [],
+                "drops": [],
+            }
             report = ch.create_empty_battle_report()
 
             # Use Manual Mode (context=None)
@@ -140,15 +156,16 @@ class TestBuffSystem(unittest.TestCase):
                 "monster_hp": 50,
                 "turn_report": {},
                 "active_boosts": {},
-                "new_buffs": [
-                    {"name": "Test Buff", "stat": "STR", "amount": 5, "duration": 3}
-                ]
+                "new_buffs": [{"name": "Test Buff", "stat": "STR", "amount": 5, "duration": 3}],
             }
 
             ch = CombatHandler(self.mock_db, self.discord_id)
 
             # Mock DB calls needed for resolve_turn
-            self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+            self.mock_db.get_player_vitals.return_value = {
+                "current_hp": 100,
+                "current_mp": 50,
+            }
             self.mock_db.get_active_buffs.return_value = []
             self.mock_db.get_player_stats_json.return_value = {}
             self.mock_db.get_combat_skills.return_value = []

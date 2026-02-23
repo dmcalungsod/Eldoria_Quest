@@ -7,43 +7,61 @@ mocked discord (Cog base class, app_commands.command decorator, ui classes)
 to be real objects, then reimports ``cogs.developer_cog`` in a clean state.
 """
 
-import asyncio
 import importlib
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── Minimal stand-in classes ────────────────────────────────────────────
 
+
 class _Cog:
     """Minimal stand-in for discord.ext.commands.Cog."""
+
     def __init__(self, bot=None, *args, **kwargs):
         self.bot = bot
 
+
 class _View:
     """Minimal stand-in for discord.ui.View."""
+
     def __init__(self, timeout=None):
         self.children = []
+
     def add_item(self, item):
         self.children.append(item)
+
     def clear_items(self):
         self.children.clear()
 
+
 class _Button:
     """Minimal stand-in for discord.ui.Button."""
-    def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None, disabled=False):
+
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        emoji=None,
+        row=None,
+        custom_id=None,
+        disabled=False,
+    ):
         self.label = label
         self.style = style
         self.disabled = disabled
         self.callback = None
+
     def _is_v2(self):
         return False
 
+
 # ── Helper to load cog with patched dependencies ───────────────────────
+
 
 def _load_developer_cog():
     """Load DeveloperCog with mocked dependencies in a clean environment."""
@@ -62,6 +80,7 @@ def _load_developer_cog():
             # Mock the .error decorator
             func.error = lambda f: f
             return func
+
         return decorator
 
     mock_discord.app_commands.command = command_decorator
@@ -85,13 +104,15 @@ def _load_developer_cog():
             del sys.modules["cogs.developer_cog"]
 
         import cogs.developer_cog
+
         importlib.reload(cogs.developer_cog)
         return cogs.developer_cog.DeveloperCog
 
+
 # ── Tests ───────────────────────────────────────────────────────────────
 
-class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
 
+class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
     async def test_dev_panel_access_denied_for_non_owner(self):
         """Verify that dev_panel denies access to non-owners."""
         DeveloperCog = _load_developer_cog()
@@ -148,6 +169,7 @@ class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
 
         bot.is_owner.assert_awaited_once_with(interaction.user)
         interaction.response.defer.assert_awaited_with(ephemeral=True)
+
 
 if __name__ == "__main__":
     unittest.main()

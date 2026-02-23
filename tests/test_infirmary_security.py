@@ -20,7 +20,15 @@ class MockView:
 
 
 class MockButton:
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        custom_id=None,
+        emoji=None,
+        row=None,
+        disabled=False,
+    ):
         self.callback = None
         self.label = label
 
@@ -103,7 +111,10 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # 2. Simulate DB state where player has changed
 
         # Mock get_player_vitals (Current state)
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 50, "current_mp": 10}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 50,
+            "current_mp": 10,
+        }
         self.mock_db.get_player_field.return_value = 1000  # Aurum
 
         # Mock get_player_stats_json to return FRESH stats (Max HP 200)
@@ -119,7 +130,9 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # Also ensure it wasn't called with old HP
         args, _ = self.mock_db.execute_heal.call_args
         self.assertEqual(
-            args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)"
+            args[1],
+            new_max_hp,
+            f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)",
         )
 
 

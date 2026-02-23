@@ -18,7 +18,10 @@ class MonsterAI:
         try:
             # 0. Check for Charged Skill (Priority 1)
             if "charged_skill" in monster_data:
-                return {"type": "execute_charge", "skill": monster_data["charged_skill"]}
+                return {
+                    "type": "execute_charge",
+                    "skill": monster_data["charged_skill"],
+                }
 
             skills = monster_data.get("skills", [])
             max_hp = monster_data.get("max_hp", 100)

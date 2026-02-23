@@ -35,7 +35,13 @@ class ItemManager:
             return {}
 
         try:
-            row = self.db._col(source_table).find_one({"id": int(item_key)}, {"_id": 0})
+            try:
+                item_id = int(item_key)
+            except ValueError:
+                logger.warning(f"Invalid equipment key format: {item_key}")
+                return {}
+
+            row = self.db._col(source_table).find_one({"id": item_id}, {"_id": 0})
             if not row:
                 return {}
             return {stat: row[key] for key, stat in STAT_MAP.items() if key in row and row[key] != 0}
@@ -85,7 +91,14 @@ class ItemManager:
     # DROPS & RNG
     # --------------------------------------------------------------------
     def roll_rarity(self):
-        rolls = {"Common": 55, "Uncommon": 25, "Rare": 12, "Epic": 5, "Legendary": 2, "Mythical": 1}
+        rolls = {
+            "Common": 55,
+            "Uncommon": 25,
+            "Rare": 12,
+            "Epic": 5,
+            "Legendary": 2,
+            "Mythical": 1,
+        }
         r = random.randint(1, sum(rolls.values()))
         current = 0
         for rarity, weight in rolls.items():

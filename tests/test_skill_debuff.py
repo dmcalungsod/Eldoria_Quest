@@ -1,9 +1,10 @@
-
 import unittest
 from unittest.mock import MagicMock
+
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
+
 
 class TestToxicBlade(unittest.TestCase):
     def test_toxic_blade_full_lifecycle(self):
@@ -12,9 +13,21 @@ class TestToxicBlade(unittest.TestCase):
         player.stats = stats
         player.hp_current = 100
         player.level = 1
-        player.stats.get_total_stats_dict = lambda: {"STR": 10, "DEX": 20, "HP": 100, "MP": 50}
+        player.stats.get_total_stats_dict = lambda: {
+            "STR": 10,
+            "DEX": 20,
+            "HP": 100,
+            "MP": 50,
+        }
 
-        monster = {"name": "Test Monster", "HP": 100, "max_hp": 100, "ATK": 10, "DEF": 0, "debuffs": []}
+        monster = {
+            "name": "Test Monster",
+            "HP": 100,
+            "max_hp": 100,
+            "ATK": 10,
+            "DEF": 0,
+            "debuffs": [],
+        }
 
         toxic_blade = {
             "key_id": "toxic_blade",
@@ -24,7 +37,7 @@ class TestToxicBlade(unittest.TestCase):
             "power_multiplier": 0.8,
             "debuff": {"poison": 5, "duration": 3},
             "scaling_stat": "DEX",
-            "scaling_factor": 2.6
+            "scaling_factor": 2.6,
         }
 
         skills = [toxic_blade]
@@ -36,7 +49,7 @@ class TestToxicBlade(unittest.TestCase):
             player_skills=skills,
             player_mp=50,
             player_class_id=3,
-            action="skill:toxic_blade"
+            action="skill:toxic_blade",
         )
 
         result1 = engine1.run_combat_turn()
@@ -49,17 +62,21 @@ class TestToxicBlade(unittest.TestCase):
         self.assertEqual(monster["debuffs"][0]["damage"], 7, "Turn 1: Poison damage should be 7")
         self.assertEqual(monster["debuffs"][0]["duration"], 3, "Turn 1: Duration should be 3")
 
-        self.assertLess(monster["HP"], 100, f"Turn 1: Monster should take attack damage. HP: {monster['HP']}")
+        self.assertLess(
+            monster["HP"],
+            100,
+            f"Turn 1: Monster should take attack damage. HP: {monster['HP']}",
+        )
         hp_after_attack = monster["HP"]
 
         # --- TURN 2: Poison Tick ---
         engine2 = CombatEngine(
             player=player,
-            monster=monster, # Monster dict has debuffs now
+            monster=monster,  # Monster dict has debuffs now
             player_skills=skills,
             player_mp=45,
             player_class_id=3,
-            action="defend"
+            action="defend",
         )
 
         result2 = engine2.run_combat_turn()
@@ -77,7 +94,11 @@ class TestToxicBlade(unittest.TestCase):
         # result["monster_hp"] reflects this.
 
         expected_hp = hp_after_attack - 7
-        self.assertEqual(hp_after_tick, expected_hp, f"Turn 2: Monster should take 7 poison damage. Expected {expected_hp}, got {hp_after_tick}")
+        self.assertEqual(
+            hp_after_tick,
+            expected_hp,
+            f"Turn 2: Monster should take 7 poison damage. Expected {expected_hp}, got {hp_after_tick}",
+        )
 
         # Duration check
         # Duration decrements in _process_monster_debuffs
@@ -90,12 +111,16 @@ class TestToxicBlade(unittest.TestCase):
             player_skills=skills,
             player_mp=45,
             player_class_id=3,
-            action="defend"
+            action="defend",
         )
         result3 = engine3.run_combat_turn()
         monster["HP"] = result3["monster_hp"]
 
-        self.assertEqual(monster["HP"], hp_after_tick - 7, "Turn 3: Monster should take 7 poison damage")
+        self.assertEqual(
+            monster["HP"],
+            hp_after_tick - 7,
+            "Turn 3: Monster should take 7 poison damage",
+        )
         self.assertEqual(monster["debuffs"][0]["duration"], 1, "Turn 3: Duration should be 1")
 
         # --- TURN 4: Poison Tick & Expire ---
@@ -105,7 +130,7 @@ class TestToxicBlade(unittest.TestCase):
             player_skills=skills,
             player_mp=45,
             player_class_id=3,
-            action="defend"
+            action="defend",
         )
         result4 = engine4.run_combat_turn()
         monster["HP"] = result4["monster_hp"]
@@ -119,10 +144,15 @@ class TestToxicBlade(unittest.TestCase):
 
         # So yes, it applies damage then decrements. 1 -> 0. Removed.
 
-        self.assertEqual(monster["HP"], hp_after_tick - 14, "Turn 4: Monster should take 7 poison damage")
+        self.assertEqual(
+            monster["HP"],
+            hp_after_tick - 14,
+            "Turn 4: Monster should take 7 poison damage",
+        )
         self.assertEqual(len(monster["debuffs"]), 0, "Turn 4: Poison should expire")
 
         print("Test Passed: Full lifecycle of Toxic Blade poison verified!")
+
 
 if __name__ == "__main__":
     unittest.main()

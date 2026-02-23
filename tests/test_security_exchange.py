@@ -57,7 +57,8 @@ class TestGuildExchangeSecurity(unittest.TestCase):
 
         # Mock MATERIALS data
         with patch(
-            "game_systems.guild_system.guild_exchange.MATERIALS", {"iron_ore": {"value": 10}, "gold_ore": {"value": 50}}
+            "game_systems.guild_system.guild_exchange.MATERIALS",
+            {"iron_ore": {"value": 10}, "gold_ore": {"value": 50}},
         ):
             # Set db on exchange object (it's set in init but let's be sure)
             self.exchange.db = self.mock_db
@@ -68,7 +69,9 @@ class TestGuildExchangeSecurity(unittest.TestCase):
             # Only item1 should contribute to value: 5 * 10 = 50
             # item2 (2 * 50 = 100) should NOT contribute because find_one_and_delete returned None
             self.assertEqual(
-                total_value, 50, f"Expected 50 but got {total_value}. This confirms race condition fix is needed."
+                total_value,
+                50,
+                f"Expected 50 but got {total_value}. This confirms race condition fix is needed.",
             )
             self.assertEqual(len(items), 1)
             self.assertEqual(items[0]["id"], 1)

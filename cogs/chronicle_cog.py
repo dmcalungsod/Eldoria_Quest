@@ -54,7 +54,8 @@ class TitleSelect(Select):
 
         if success:
             await interaction.followup.send(
-                f"Title set to: **{selected if selected != 'None' else 'None'}**", ephemeral=True
+                f"Title set to: **{selected if selected != 'None' else 'None'}**",
+                ephemeral=True,
             )
         else:
             await interaction.followup.send("Failed to set title.", ephemeral=True)
@@ -95,9 +96,17 @@ class ChronicleCog(commands.Cog):
 
         description = "*Your deeds are etched in history.*"
 
-        embed = discord.Embed(title="🏆 Chronicles & Titles", description=description, color=discord.Color.gold())
+        embed = discord.Embed(
+            title="🏆 Chronicles & Titles",
+            description=description,
+            color=discord.Color.gold(),
+        )
 
-        embed.add_field(name="Active Title", value=f"**{active_title}**" if active_title else "*None*", inline=False)
+        embed.add_field(
+            name="Active Title",
+            value=f"**{active_title}**" if active_title else "*None*",
+            inline=False,
+        )
 
         if titles:
             titles.sort()

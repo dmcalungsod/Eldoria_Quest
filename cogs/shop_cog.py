@@ -17,8 +17,8 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
-from game_systems.items.inventory_manager import InventoryManager
 from game_systems.data.shop_data import SHOP_INVENTORY
+from game_systems.items.inventory_manager import InventoryManager
 
 from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
@@ -43,7 +43,10 @@ class ShopView(View):
         self.add_item(self.build_item_select())
 
         self.back_button = Button(
-            label="Return to Guild Hall", style=discord.ButtonStyle.secondary, custom_id="back_to_guild_hall", row=1
+            label="Return to Guild Hall",
+            style=discord.ButtonStyle.secondary,
+            custom_id="back_to_guild_hall",
+            row=1,
         )
         self.back_button.callback = back_to_guild_hall_callback
         self.add_item(self.back_button)

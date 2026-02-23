@@ -12,7 +12,7 @@ sys.modules["pymongo.MongoClient"] = MagicMock()
 sys.modules["pymongo.UpdateOne"] = MagicMock()
 sys.modules["pymongo.InsertOne"] = MagicMock()
 
-from database.database_manager import MAX_STACK_CONSUMABLE, DatabaseManager  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
 
 
 class TestStackLimits(unittest.TestCase):
@@ -137,7 +137,13 @@ class TestStackLimits(unittest.TestCase):
         ]
 
         # Mock find returning existing stack
-        existing_doc = {"id": 50, "count": 2, "item_key": "hp_potion", "rarity": "Common", "equipped": 0}
+        existing_doc = {
+            "id": 50,
+            "count": 2,
+            "item_key": "hp_potion",
+            "rarity": "Common",
+            "equipped": 0,
+        }
 
         # Mock find().sort() chain
         cursor = MagicMock()

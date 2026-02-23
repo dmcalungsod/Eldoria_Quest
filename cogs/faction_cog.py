@@ -53,27 +53,41 @@ class FactionCog(commands.Cog):
 
         if not data:
             await interaction.response.send_message(
-                "You are not in a faction. Use `/faction list` to see options.", ephemeral=True
+                "You are not in a faction. Use `/faction list` to see options.",
+                ephemeral=True,
             )
             return
 
         embed = discord.Embed(
-            title=f"{data['emoji']} {data['name']}", description=data["description"], color=discord.Color.green()
+            title=f"{data['emoji']} {data['name']}",
+            description=data["description"],
+            color=discord.Color.green(),
         )
 
-        embed.add_field(name="Rank", value=f"{data['rank_title']} (Tier {data['rank_tier']})", inline=True)
+        embed.add_field(
+            name="Rank",
+            value=f"{data['rank_title']} (Tier {data['rank_tier']})",
+            inline=True,
+        )
         embed.add_field(name="Reputation", value=f"{data['reputation']}", inline=True)
 
         next_rank = data.get("next_rank")
         if next_rank:
             needed = next_rank["reputation_needed"] - data["reputation"]
-            embed.add_field(name="Next Rank", value=f"{next_rank['title']} (Needs {needed} more rep)", inline=False)
+            embed.add_field(
+                name="Next Rank",
+                value=f"{next_rank['title']} (Needs {needed} more rep)",
+                inline=False,
+            )
         else:
             embed.add_field(name="Next Rank", value="Maximum Rank Achieved", inline=False)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @faction_group.command(name="leave", description="Leave your current faction (Reputation will be reset).")
+    @faction_group.command(
+        name="leave",
+        description="Leave your current faction (Reputation will be reset).",
+    )
     async def leave_faction(self, interaction: discord.Interaction):
         """Leaves the current faction."""
         # Confirmation could be added here with a View, but for simplicity we'll just do it.

@@ -1,39 +1,54 @@
-import asyncio
+import importlib
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
-import importlib
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 # Mock classes
 class MockView:
     def __init__(self, timeout=180):
         pass
+
     def add_item(self, item):
         pass
 
+
 class MockButton:
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        custom_id=None,
+        emoji=None,
+        row=None,
+        disabled=False,
+    ):
         self.callback = None
         self.label = label
+
     def _is_v2(self):
         return False
+
 
 class MockSelect:
     def __init__(self, placeholder=None, min_values=1, max_values=1, row=None, disabled=False):
         self.callback = None
         self.options = []
         self.disabled = disabled
+
     def add_option(self, label, value, description=None, emoji=None):
         self.options.append((label, value))
+
 
 class MockUser:
     def __init__(self, id, name):
         self.id = id
         self.name = name
         self.display_name = name
+
 
 class TestSkillUpgradeCost(unittest.TestCase):
     def setUp(self):
@@ -59,6 +74,7 @@ class TestSkillUpgradeCost(unittest.TestCase):
         sys.modules["discord.ext.commands"] = MagicMock()
 
         import cogs.skill_trainer_cog
+
         importlib.reload(cogs.skill_trainer_cog)
 
         self.mock_db = MagicMock()
@@ -89,7 +105,10 @@ class TestSkillUpgradeCost(unittest.TestCase):
 
         self.mock_db.get_player.return_value = self.player_data
         self.mock_db.get_all_player_skills.return_value = [{"skill_key": "power_strike", "skill_level": 1}]
-        self.mock_db.get_player_skill_row.return_value = {"skill_key": "power_strike", "skill_level": 1}
+        self.mock_db.get_player_skill_row.return_value = {
+            "skill_key": "power_strike",
+            "skill_level": 1,
+        }
         self.mock_db.get_default_skill_keys.return_value = []
 
         view = SkillTrainerView(self.mock_db, self.user, self.player_data)
@@ -111,6 +130,7 @@ class TestSkillUpgradeCost(unittest.TestCase):
 
         # Since we can't easily inspect internal variables of View without modifying MockView to store them.
         pass
+
 
 if __name__ == "__main__":
     unittest.main()

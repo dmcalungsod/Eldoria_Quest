@@ -80,7 +80,14 @@ def load_and_validate_equipments():
 
     for key, item in data.items():
         # 1. Check required keys
-        required_keys = {"name", "slot", "rarity", "level_req", "stats_bonus", "description"}
+        required_keys = {
+            "name",
+            "slot",
+            "rarity",
+            "level_req",
+            "stats_bonus",
+            "description",
+        }
         missing_keys = required_keys - item.keys()
         if missing_keys:
             logger.warning(f"Item '{key}' missing required keys: {missing_keys}. Skipping.")

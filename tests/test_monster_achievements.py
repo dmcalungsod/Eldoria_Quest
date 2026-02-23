@@ -18,7 +18,11 @@ class TestMonsterAchievements(unittest.TestCase):
         """Test that killing 100 Goblins awards Goblin-Bane."""
         # Setup mock return for get_specific_monster_kills
         # 60 Grunts + 40 Scouts = 100 Goblins
-        self.mock_db.get_specific_monster_kills.return_value = {"Goblin Grunt": 60, "Goblin Scout": 40, "Wolf": 10}
+        self.mock_db.get_specific_monster_kills.return_value = {
+            "Goblin Grunt": 60,
+            "Goblin Scout": 40,
+            "Wolf": 10,
+        }
 
         # Setup add_title to return True (title newly added)
         self.mock_db.add_title.return_value = True

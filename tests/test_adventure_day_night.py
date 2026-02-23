@@ -37,7 +37,12 @@ class TestAdventureDayNight(unittest.TestCase):
             "player_stats": MagicMock(max_hp=100, max_mp=50, agility=10),
             "stats_dict": {"HP": 100},
             "vitals": {"current_hp": 100, "current_mp": 50},
-            "player_row": {"level": 1, "class_id": 1, "current_hp": 100, "current_mp": 50},
+            "player_row": {
+                "level": 1,
+                "class_id": 1,
+                "current_hp": 100,
+                "current_mp": 50,
+            },
             "skills": [],
             "active_boosts": {},
             "event_type": None,
@@ -110,9 +115,7 @@ class TestAdventureDayNight(unittest.TestCase):
                         expected_hp = 100 - 16
                         self.assertEqual(self.mock_context["vitals"]["current_hp"], expected_hp)
                         # Verify atomic delta update is used
-                        self.mock_db.update_player_vitals_delta.assert_called_with(
-                            123456789, -16, 0, 100, 50
-                        )
+                        self.mock_db.update_player_vitals_delta.assert_called_with(123456789, -16, 0, 100, 50)
 
     def test_night_no_ambush(self):
         """Nighttime encounter chance failure should not ambush."""

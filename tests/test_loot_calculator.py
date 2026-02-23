@@ -68,7 +68,10 @@ class TestLootCalculator(unittest.TestCase):
         self.assertEqual(chance, 100.0)
 
     @patch("game_systems.rewards.loot_calculator.random.uniform")
-    @patch("game_systems.rewards.loot_calculator.MATERIALS", {"test_item": {"rarity": "Common"}})
+    @patch(
+        "game_systems.rewards.loot_calculator.MATERIALS",
+        {"test_item": {"rarity": "Common"}},
+    )
     def test_roll_drops_success(self, mock_uniform):
         # Mock roll to be low enough (5 < 10)
         mock_uniform.return_value = 5.0
@@ -81,7 +84,10 @@ class TestLootCalculator(unittest.TestCase):
         self.assertEqual(result, ["test_item"])
 
     @patch("game_systems.rewards.loot_calculator.random.uniform")
-    @patch("game_systems.rewards.loot_calculator.MATERIALS", {"test_item": {"rarity": "Common"}})
+    @patch(
+        "game_systems.rewards.loot_calculator.MATERIALS",
+        {"test_item": {"rarity": "Common"}},
+    )
     def test_roll_drops_failure(self, mock_uniform):
         # Mock roll to be too high (15 > 10)
         mock_uniform.return_value = 15.0

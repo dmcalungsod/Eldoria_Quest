@@ -18,7 +18,12 @@ logger = logging.getLogger("eldoria.ui.experiment")
 
 
 class ExperimentView(View):
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, back_callback=None):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        back_callback=None,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -53,26 +58,41 @@ class ExperimentView(View):
             # But the requirement is "Select 2-3".
             # If len < 2, disable?
             if len(materials) < 2:
-                select = Select(placeholder="Not enough unique materials (need 2+).", disabled=True, row=0)
+                select = Select(
+                    placeholder="Not enough unique materials (need 2+).",
+                    disabled=True,
+                    row=0,
+                )
                 select.add_option(label="Empty", value="empty")
                 self.add_item(select)
             else:
                 max_val = min(3, len(materials))
                 select = Select(
-                    placeholder="Select 2-3 materials to mix...", min_values=2, max_values=max_val, row=0
+                    placeholder="Select 2-3 materials to mix...",
+                    min_values=2,
+                    max_values=max_val,
+                    row=0,
                 )
 
                 for item in materials[:25]:
                     label = f"{item['item_name']} (x{item['count']})"
                     # Value must be string
-                    select.add_option(label=label, value=str(item["id"]), description=item.get("rarity", "Common"))
+                    select.add_option(
+                        label=label,
+                        value=str(item["id"]),
+                        description=item.get("rarity", "Common"),
+                    )
 
                 select.callback = self.material_select_callback
                 self.add_item(select)
 
         # 2. Mix Button
         self.mix_btn = Button(
-            label="Mix Ingredients", style=discord.ButtonStyle.success, disabled=True, row=1, emoji="⚗️"
+            label="Mix Ingredients",
+            style=discord.ButtonStyle.success,
+            disabled=True,
+            row=1,
+            emoji="⚗️",
         )
         self.mix_btn.callback = self.mix_callback
         self.add_item(self.mix_btn)
@@ -102,7 +122,9 @@ class ExperimentView(View):
 
         # Execute Experiment
         success, msg, result_item = await asyncio.to_thread(
-            self.crafting_system.experiment, self.interaction_user.id, self.selected_materials
+            self.crafting_system.experiment,
+            self.interaction_user.id,
+            self.selected_materials,
         )
 
         # Show Result

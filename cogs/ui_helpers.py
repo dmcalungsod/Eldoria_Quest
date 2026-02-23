@@ -22,7 +22,11 @@ logger = logging.getLogger("eldoria.ui")
 
 
 def make_progress_bar(
-    current: int, max_val: int, length: int = 10, empty_char: str = "░", filled_char: str = "█"
+    current: int,
+    max_val: int,
+    length: int = 10,
+    empty_char: str = "░",
+    filled_char: str = "█",
 ) -> str:
     """Generates a visual progress bar string."""
     percent = max(0, min(1, current / max(max_val, 1)))
@@ -84,7 +88,7 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
             if slot_key in EquipmentManager.TWO_HANDED_SLOTS or slot_key in EquipmentManager.MAIN_HAND_SLOTS:
                 cat = "Weapon"
             elif slot_key in EquipmentManager.OFF_HAND_SLOTS:
-                 # Shields are armor, others are weapons
+                # Shields are armor, others are weapons
                 if slot_key == "shield":
                     cat = "Armor"
                 else:
@@ -127,7 +131,9 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
 
 
 async def get_player_or_error(
-    interaction: discord.Interaction, db: DatabaseManager, content: str = "Character record not found."
+    interaction: discord.Interaction,
+    db: DatabaseManager,
+    content: str = "Character record not found.",
 ) -> dict | None:
     """
     Fetches the player record. If not found, sends an ephemeral error message.
@@ -144,7 +150,9 @@ async def get_player_or_error(
 
 
 async def get_profile_bundle_or_error(
-    interaction: discord.Interaction, db: DatabaseManager, content: str = "Character record not found."
+    interaction: discord.Interaction,
+    db: DatabaseManager,
+    content: str = "Character record not found.",
 ) -> dict | None:
     """
     Fetches the profile bundle. If not found, sends an ephemeral error message.
@@ -198,7 +206,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
         )
 
         embed = discord.Embed(
-            title=f"{E.SCROLL} Character Status", description=description, color=discord.Color.dark_red()
+            title=f"{E.SCROLL} Character Status",
+            description=description,
+            color=discord.Color.dark_red(),
         )
 
         if interaction.user.avatar:
@@ -273,9 +283,15 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
             color=discord.Color.dark_gold(),
         )
 
-        embed.add_field(name="📜 Quest Board", value="Review available contracts and report successes.", inline=False)
         embed.add_field(
-            name="⚙️ Guild Services", value="Access the Shop, Exchange, Infirmary, or Training Grounds.", inline=False
+            name="📜 Quest Board",
+            value="Review available contracts and report successes.",
+            inline=False,
+        )
+        embed.add_field(
+            name="⚙️ Guild Services",
+            value="Access the Shop, Exchange, Infirmary, or Training Grounds.",
+            inline=False,
         )
 
         view = GuildLobbyView(db, interaction.user, rank=card["rank"])

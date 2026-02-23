@@ -102,7 +102,7 @@ class InventoryView(View):
         if slot == "accessory":
             return "Accessory"
 
-        return "Armor" # Default fallback for equipment
+        return "Armor"  # Default fallback for equipment
 
     def _populate_ui(self):
         """Populate dropdowns based on current filter."""
@@ -164,7 +164,10 @@ class InventoryView(View):
                         locked_label = f"🔒 {label[:80]}"  # Truncate to ensure fit
                         equip_opts.append(
                             discord.SelectOption(
-                                label=locked_label, value=val, emoji="🚫", description=f"Cannot Equip: {reason}"
+                                label=locked_label,
+                                value=val,
+                                emoji="🚫",
+                                description=f"Cannot Equip: {reason}",
                             )
                         )
 
@@ -192,10 +195,10 @@ class InventoryView(View):
 
     def _set_options(self, select, options, empty_msg, visible=True):
         if not visible:
-             select.disabled = True
-             select.placeholder = "---"
-             select.options = [discord.SelectOption(label="Disabled", value="disabled")]
-             return
+            select.disabled = True
+            select.placeholder = "---"
+            select.options = [discord.SelectOption(label="Disabled", value="disabled")]
+            return
 
         if options:
             select.options = options[:25]  # Discord limit
@@ -223,7 +226,11 @@ class InventoryView(View):
         # Update button styles
         for child in self.children:
             if isinstance(child, Button) and child.custom_id and child.custom_id.startswith("filter_"):
-                child.style = discord.ButtonStyle.primary if child.custom_id == f"filter_{new_filter}" else discord.ButtonStyle.secondary
+                child.style = (
+                    discord.ButtonStyle.primary
+                    if child.custom_id == f"filter_{new_filter}"
+                    else discord.ButtonStyle.secondary
+                )
 
         # Re-populate selects
         self._populate_ui()
@@ -269,6 +276,6 @@ class InventoryView(View):
             self.interaction_user,
             self.previous_view_callback,
             self.previous_view_label,
-            current_filter=self.current_filter
+            current_filter=self.current_filter,
         )
         await interaction.edit_original_response(embed=embed, view=new_view)

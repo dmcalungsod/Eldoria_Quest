@@ -37,7 +37,10 @@ class TestDeadTurns(unittest.TestCase):
         # Calculated Max MP (MAG=10): 20 + (10 * 5) = 70
 
         # Default to Full HP/MP for Surge tests
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 150, "current_mp": 70}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 150,
+            "current_mp": 70,
+        }
 
         # Mock Context
         self.player_stats = PlayerStats(str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10, lck_base=10)

@@ -21,7 +21,15 @@ class MockView:
 
 
 class MockButton:
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        custom_id=None,
+        emoji=None,
+        row=None,
+        disabled=False,
+    ):
         self.callback = None
         self.label = label
 

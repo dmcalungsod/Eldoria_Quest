@@ -42,7 +42,14 @@ class InventoryManager:
 
         try:
             success = self.db.add_inventory_item(
-                discord_id, item_key, item_name, item_type, rarity, amount, slot, item_source_table
+                discord_id,
+                item_key,
+                item_name,
+                item_type,
+                rarity,
+                amount,
+                slot,
+                item_source_table,
             )
             if success:
                 logger.info(f"Added {amount}x {item_key} for user {discord_id}")

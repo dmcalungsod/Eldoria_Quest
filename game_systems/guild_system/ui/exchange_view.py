@@ -21,7 +21,12 @@ logger = logging.getLogger("eldoria.ui.exchange")
 
 
 class GuildExchangeView(View, GuildViewMixin):
-    def __init__(self, db_manager: DatabaseManager, can_sell: bool, interaction_user: discord.User):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        can_sell: bool,
+        interaction_user: discord.User,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -40,7 +45,11 @@ class GuildExchangeView(View, GuildViewMixin):
 
         # Back Button
         self.back_btn = ViewFactory.create_button(
-            "Back to Hall", discord.ButtonStyle.secondary, "back_gh", row=1, callback=back_to_guild_hall_callback
+            "Back to Hall",
+            discord.ButtonStyle.secondary,
+            "back_gh",
+            row=1,
+            callback=back_to_guild_hall_callback,
         )
         self.add_item(self.back_btn)
 
