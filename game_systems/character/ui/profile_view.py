@@ -23,6 +23,7 @@ from game_systems.player.player_stats import PlayerStats
 from .abilities_view import AbilitiesView
 from .adventure_menu import AdventureView
 from .settings_view import SettingsView
+from game_systems.chronicle.ui.chronicle_view import ChroniclesView
 
 logger = logging.getLogger("eldoria.ui.profile")
 
@@ -92,6 +93,17 @@ class CharacterTabView(View):
         )
         btn_settings.callback = self.settings_callback
         self.add_item(btn_settings)
+
+        # --- Chronicles (Row 2) ---
+        btn_chronicles = Button(
+            label="Chronicles",
+            style=discord.ButtonStyle.secondary,
+            custom_id="chronicles_link",
+            emoji="🏆",
+            row=2,
+        )
+        btn_chronicles.callback = self.chronicles_callback
+        self.add_item(btn_chronicles)
 
     # ------------------------------------------------------------------
     # Interaction Permissions Check
@@ -186,4 +198,34 @@ class CharacterTabView(View):
         )
 
         view = SettingsView(self.db, self.interaction_user)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def chronicles_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
+        titles = await asyncio.to_thread(self.db.get_titles, self.interaction_user.id)
+        active_title = await asyncio.to_thread(self.db.get_active_title, self.interaction_user.id)
+
+        description = "*Your deeds are etched in history.*"
+
+        embed = discord.Embed(
+            title="🏆 Chronicles & Titles",
+            description=description,
+            color=discord.Color.gold(),
+        )
+
+        embed.add_field(
+            name="Active Title",
+            value=f"**{active_title}**" if active_title else "*None*",
+            inline=False,
+        )
+
+        if titles:
+            titles.sort()
+            titles_str = ", ".join([f"`{t}`" for t in titles])
+            embed.add_field(name=f"Unlocked Titles ({len(titles)})", value=titles_str, inline=False)
+        else:
+            embed.add_field(name="Unlocked Titles", value="*No titles earned yet.*", inline=False)
+
+        view = ChroniclesView(self.db, self.interaction_user, titles, active_title)
         await interaction.edit_original_response(embed=embed, view=view)

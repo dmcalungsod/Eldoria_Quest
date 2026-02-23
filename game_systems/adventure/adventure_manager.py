@@ -107,7 +107,7 @@ class AdventureManager:
 
         return result
 
-    def _handle_death_rewards(self, discord_id, session) -> str | None:
+    def _handle_death_rewards(self, discord_id, session, deactivate: bool = True) -> str | None:
         """Extracts partial rewards on death and returns a loss report."""
         loss_report = []
         try:
@@ -167,7 +167,8 @@ class AdventureManager:
                 failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
                 loss_report.append(f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}")
 
-            self.db.end_adventure_session(discord_id)
+            if deactivate:
+                self.db.end_adventure_session(discord_id)
 
             if loss_report:
                 return "\n" + SKULL + " **Losses Incurred:**\n" + "\n".join(loss_report)
@@ -184,7 +185,8 @@ class AdventureManager:
             items_to_add = []
             summary = None
 
-            row = self.db.get_active_adventure(discord_id)
+            # FIX: Atomically transition status to prevent concurrent claims
+            row = self.db.mark_adventure_claiming(discord_id)
             if not row:
                 return None
 

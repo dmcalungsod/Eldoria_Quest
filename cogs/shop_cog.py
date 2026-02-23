@@ -8,6 +8,7 @@ Atmosphere restored.
 
 import asyncio
 import logging
+import math
 from typing import Any
 
 import discord
@@ -40,6 +41,9 @@ class ShopView(View):
         self.inventory = inventory or SHOP_INVENTORY
         self.inv_manager = InventoryManager(self.db)
 
+        # Scarcity: Fetch owned counts for dynamic pricing
+        self.owned_counts = self._fetch_owned_counts()
+
         self.add_item(self.build_item_select())
 
         self.back_button = Button(
@@ -58,6 +62,26 @@ class ShopView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.interaction_user.id
 
+    def _fetch_owned_counts(self) -> dict[str, int]:
+        """Fetches total count of items in player inventory."""
+        try:
+            items = self.inv_manager.get_inventory(self.interaction_user.id)
+            counts = {}
+            for item in items:
+                k = item["item_key"]
+                counts[k] = counts.get(k, 0) + item["count"]
+            return counts
+        except Exception:
+            return {}
+
+    def _calculate_dynamic_price(self, base_price: int, owned_count: int) -> int:
+        """
+        Calculates price with scarcity tax.
+        Formula: Base * (1.0 + (Owned * 0.10))
+        """
+        multiplier = 1.0 + (owned_count * 0.10)
+        return math.ceil(base_price * multiplier)
+
     def build_item_select(self) -> Select:
         item_select = Select(placeholder="Select provisions...", min_values=1, max_values=1, row=0)
 
@@ -67,10 +91,14 @@ class ShopView(View):
             return item_select
 
         can_afford_any = False
-        for item_key, price in self.inventory.items():
+        for item_key, base_price in self.inventory.items():
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 continue
+
+            # Dynamic Pricing
+            owned = self.owned_counts.get(item_key, 0)
+            price = self._calculate_dynamic_price(base_price, owned)
 
             can_afford = self.current_aurum >= price
             if can_afford:
@@ -107,19 +135,25 @@ class ShopView(View):
         """Atomic purchase transaction."""
         try:
             # SECURITY: Fetch price from server inventory, do not trust client
-            price = self.inventory.get(item_key)
-            if price is None:
+            base_price = self.inventory.get(item_key)
+            if base_price is None:
                 return (False, "Item not available.", 0)
 
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 return (False, "Item data missing.", 0)
 
+            # SCARCITY: Recalculate dynamic price atomically
+            # We fetch the exact count from DB to ensure we charge the correct amount
+            # even if the user somehow spams interactions.
+            owned = self.db.get_inventory_item_count(self.interaction_user.id, item_key)
+            dynamic_price = self._calculate_dynamic_price(base_price, owned)
+
             # Delegate to DatabaseManager for atomic execution with refund support
-            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, price)
+            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, dynamic_price)
 
             if success:
-                logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
+                logger.info(f"User {self.interaction_user.id} bought {item_key} for {dynamic_price} (Owned: {owned})")
 
             return (success, result, new_balance)
 

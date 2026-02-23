@@ -179,6 +179,7 @@ class CombatHandler:
                 p_row = context["player_row"]
                 skills = context["skills"]
                 boosts = context.get("active_boosts", {})
+                player_debuffs = context.get("player_debuffs", [])
             else:
                 stats_json = self.db.get_player_stats_json(self.discord_id)
                 player_stats = PlayerStats.from_dict(stats_json)
@@ -186,8 +187,28 @@ class CombatHandler:
                 # Apply Active Buffs (Manual Mode)
                 self.db.clear_expired_buffs(self.discord_id)
                 active_buffs = self.db.get_active_buffs(self.discord_id)
+                player_debuffs = []
+
                 for buff in active_buffs:
-                    player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+                    if buff["stat"] in ["poison", "bleed"]:
+                        # Manual parsing
+                        # We don't have easy access to WorldTime here without import loop?
+                        # WorldTime is imported.
+                        # active_buffs has end_time string.
+                        try:
+                            end_time = WorldTime.parse(buff["end_time"])
+                            duration_mins = int((end_time - WorldTime.now()).total_seconds() / 60)
+                            if duration_mins > 0:
+                                player_debuffs.append({
+                                    "type": buff["stat"],
+                                    "damage": buff["amount"],
+                                    "duration": duration_mins,
+                                    "name": buff["name"]
+                                })
+                        except Exception:
+                            pass
+                    else:
+                        player_stats.add_bonus_stat(buff["stat"], buff["amount"])
 
                 # Generate cached stats dict
                 stats_dict = player_stats.get_total_stats_dict()
@@ -223,6 +244,7 @@ class CombatHandler:
                 stats_dict=stats_dict,
                 action=action,
                 player_stance=stance,
+                player_debuffs=player_debuffs,
             )
 
             result = engine.run_combat_turn()
@@ -260,6 +282,34 @@ class CombatHandler:
                     amount=buff.get("amount"),
                     duration_s=duration_s,
                 )
+
+            # 8. Persist Player Debuffs (Full Sync)
+            # Only if debuffs changed (check if list is different?)
+            # For safety, we clear existing poison/bleed and re-add active ones.
+            # This handles expiration and duration updates.
+            final_debuffs = result.get("player_debuffs", [])
+
+            # Prune existing debuffs first
+            # We can't easily select "poison OR bleed" in one delete call without regex or $in
+            # Using loop for clarity
+            for debuff_type in ["poison", "bleed"]:
+                self.db.db["active_buffs"].delete_many({
+                    "discord_id": self.discord_id,
+                    "stat": debuff_type
+                })
+
+            for debuff in final_debuffs:
+                duration_s = debuff.get("duration", 3) * 60
+                if duration_s > 0:
+                    buff_id = uuid.uuid4().hex
+                    self.db.add_active_buff(
+                        discord_id=self.discord_id,
+                        buff_id=buff_id,
+                        name=debuff.get("name", "Debuff"),
+                        stat=debuff.get("type", "poison"),
+                        amount=debuff.get("damage", 0),
+                        duration_s=duration_s,
+                    )
 
             return result
 
