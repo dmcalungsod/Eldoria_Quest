@@ -12,9 +12,9 @@ import random
 import game_systems.data.emojis as E
 
 from ..monsters.monster_actions import MonsterAI
+from ..player.player_stats import calculate_tiered_bonus
 from ..rewards.aurum_calculator import AurumCalculator
 from ..rewards.exp_calculator import ExpCalculator
-from ..player.player_stats import calculate_tiered_bonus
 from .combat_phrases import CombatPhrases
 from .damage_formula import DamageFormula
 

@@ -439,11 +439,7 @@ class EquipmentManager:
 
             # Check if already equipped
             current_item = current_equipped.get(slot)
-            if (
-                current_item
-                and current_item["item_key"] == target_key
-                and current_item["rarity"] == target_rarity
-            ):
+            if current_item and current_item["item_key"] == target_key and current_item["rarity"] == target_rarity:
                 success_count += 1
                 continue
 
@@ -472,7 +468,7 @@ class EquipmentManager:
         if missing_items:
             details = ", ".join(missing_items[:3])
             if len(missing_items) > 3:
-                details += f" and {len(missing_items)-3} more"
+                details += f" and {len(missing_items) - 3} more"
             msg += f" Missing/Failed: {details}"
 
         return True, msg

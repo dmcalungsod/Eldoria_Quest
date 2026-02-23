@@ -19,7 +19,6 @@ from database.database_manager import DatabaseManager
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
 from game_systems.adventure.ui.setup_view import AdventureSetupView
 from game_systems.adventure.ui.status_view import AdventureStatusView
-from game_systems.data.adventure_locations import LOCATIONS
 
 logger = logging.getLogger("eldoria.ui.adventure_menu")
 
@@ -69,9 +68,7 @@ class AdventureView(View):
         Restricts interaction to the original user.
         """
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your session.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your session.", ephemeral=True)
             return False
         return True
 
@@ -95,9 +92,7 @@ class AdventureView(View):
             return
 
         # Check if an adventure is already active (threaded)
-        session = await asyncio.to_thread(
-            adventure_cog.manager.get_active_session, self.interaction_user.id
-        )
+        session = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
 
         # --------------------------------------------------------
         # Resume existing adventure
@@ -111,13 +106,9 @@ class AdventureView(View):
             try:
                 # CASE 1: Completed -> Show Rewards
                 if status == "completed":
-                    summary = await asyncio.to_thread(
-                        adventure_cog.manager.end_adventure, self.interaction_user.id
-                    )
+                    summary = await asyncio.to_thread(adventure_cog.manager.end_adventure, self.interaction_user.id)
                     if not summary:
-                        await interaction.followup.send(
-                            "Error processing rewards.", ephemeral=True
-                        )
+                        await interaction.followup.send("Error processing rewards.", ephemeral=True)
                         return
 
                     loc_id = session.get("location_id")
@@ -125,9 +116,7 @@ class AdventureView(View):
 
                     # Create a simple view with just "Back"
                     view = View()
-                    back_btn = Button(
-                        label="Return to Profile", style=discord.ButtonStyle.grey
-                    )
+                    back_btn = Button(label="Return to Profile", style=discord.ButtonStyle.grey)
                     back_btn.callback = back_to_profile_callback
                     view.add_item(back_btn)
 
@@ -137,16 +126,12 @@ class AdventureView(View):
                 # CASE 2: Active / In Progress / Failed
                 # Show Status View
                 embed = AdventureEmbeds.build_adventure_status_embed(session)
-                view = AdventureStatusView(
-                    self.db, adventure_cog.manager, self.interaction_user, session
-                )
+                view = AdventureStatusView(self.db, adventure_cog.manager, self.interaction_user, session)
                 await interaction.edit_original_response(embed=embed, view=view)
 
             except Exception as e:
                 logger.error(f"Resume adventure failed: {e}", exc_info=True)
-                await interaction.followup.send(
-                    "Error resuming session.", ephemeral=True
-                )
+                await interaction.followup.send("Error resuming session.", ephemeral=True)
             return
 
         # --------------------------------------------------------
@@ -157,9 +142,7 @@ class AdventureView(View):
         try:
             # Parallel fetch of guild rank and player level
             guild_member, player_data = await asyncio.gather(
-                asyncio.to_thread(
-                    self.db.get_guild_member_data, self.interaction_user.id
-                ),
+                asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
             )
             rank = guild_member["rank"] if guild_member else "F"
@@ -174,9 +157,7 @@ class AdventureView(View):
                 color=discord.Color.dark_green(),
             )
 
-            view = AdventureSetupView(
-                self.db, adventure_cog.manager, self.interaction_user, rank, level
-            )
+            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank, level)
             view.back_btn.callback = back_to_profile_callback
 
             await interaction.edit_original_response(embed=embed, view=view)

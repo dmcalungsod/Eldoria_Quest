@@ -1,10 +1,13 @@
 import logging
+
 from discord.ext import commands, tasks
+
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
 from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.loop")
+
 
 class AdventureLoop(commands.Cog):
     def __init__(self, bot):
@@ -36,11 +39,14 @@ class AdventureLoop(commands.Cog):
             try:
                 self.engine.resolve_session(session)
             except Exception as e:
-                logger.error(f"[AdventureLoop] Failed to resolve session {session.get('discord_id')}: {e}", exc_info=True)
+                logger.error(
+                    f"[AdventureLoop] Failed to resolve session {session.get('discord_id')}: {e}", exc_info=True
+                )
 
     @adventure_worker.before_loop
     async def before_worker(self):
         await self.bot.wait_until_ready()
+
 
 async def setup(bot):
     await bot.add_cog(AdventureLoop(bot))

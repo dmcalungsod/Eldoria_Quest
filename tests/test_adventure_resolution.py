@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import MagicMock, patch
 import sys
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 # Mock modules before importing
 sys.modules["pymongo"] = MagicMock()
@@ -9,13 +10,16 @@ sys.modules["discord"] = MagicMock()
 
 from game_systems.adventure.adventure_resolution import AdventureResolutionEngine  # noqa: E402
 
+
 @pytest.fixture
 def mock_db():
     return MagicMock()
 
+
 @pytest.fixture
 def mock_bot():
     return MagicMock()
+
 
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
@@ -32,8 +36,8 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
 
     session_doc = {
         "discord_id": 123,
-        "duration_minutes": 30, # 2 steps
-        "steps_completed": 0
+        "duration_minutes": 30,  # 2 steps
+        "steps_completed": 0,
     }
 
     # Execute
@@ -50,6 +54,7 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     assert mock_session.save_state.call_count == 2
     # Should update status to completed
     mock_db.update_adventure_status.assert_called_with(123, "completed")
+
 
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
@@ -73,8 +78,8 @@ def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock
 
     session_doc = {
         "discord_id": 123,
-        "duration_minutes": 45, # 3 steps
-        "steps_completed": 0
+        "duration_minutes": 45,  # 3 steps
+        "steps_completed": 0,
     }
 
     # Execute
@@ -88,6 +93,7 @@ def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock
     engine.adventure_manager._handle_death_rewards.assert_called_once_with(123, mock_session)
     # Should update status to failed
     mock_db.update_adventure_status.assert_called_with(123, "failed")
+
 
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
@@ -104,8 +110,8 @@ def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_b
 
     session_doc = {
         "discord_id": 123,
-        "duration_minutes": 60, # 4 steps total
-        "steps_completed": 2
+        "duration_minutes": 60,  # 4 steps total
+        "steps_completed": 2,
     }
 
     # Execute

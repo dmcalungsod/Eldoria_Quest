@@ -51,7 +51,7 @@ class TestEquipmentSets(unittest.TestCase):
                 "rarity": "Common",
                 "item_name": "Iron Sword",
                 "item_source_table": "equipment",
-                "equipped": 1
+                "equipped": 1,
             }
         ]
 
@@ -80,24 +80,18 @@ class TestEquipmentSets(unittest.TestCase):
         # Mock loadout
         self.mock_db.equipment_sets.find_one.return_value = {
             "name": "Battle Set",
-            "items": {
-                "sword": {
-                    "item_key": "iron_sword",
-                    "rarity": "Common",
-                    "item_name": "Iron Sword"
-                }
-            }
+            "items": {"sword": {"item_key": "iron_sword", "rarity": "Common", "item_name": "Iron Sword"}},
         }
 
         # Mock currently equipped (empty)
         # We need to mock find_one explicitly since we used it in equip_loadout logic
-        self.mock_db.inventory.find.return_value = [] # for get_equipped_items
+        self.mock_db.inventory.find.return_value = []  # for get_equipped_items
 
         self.mock_db.inventory.find_one.return_value = {
             "id": 10,
             "item_key": "iron_sword",
             "rarity": "Common",
-            "item_name": "Iron Sword"
+            "item_name": "Iron Sword",
         }
 
         # Mock equip_item success
@@ -112,27 +106,22 @@ class TestEquipmentSets(unittest.TestCase):
         # Mock loadout
         self.mock_db.equipment_sets.find_one.return_value = {
             "name": "Battle Set",
-            "items": {
-                "sword": {
-                    "item_key": "god_slayer",
-                    "rarity": "Mythical",
-                    "item_name": "God Slayer"
-                }
-            }
+            "items": {"sword": {"item_key": "god_slayer", "rarity": "Mythical", "item_name": "God Slayer"}},
         }
 
-        self.mock_db.inventory.find.return_value = [] # No equipped
-        self.mock_db.inventory.find_one.return_value = None # Not found in inventory
+        self.mock_db.inventory.find.return_value = []  # No equipped
+        self.mock_db.inventory.find_one.return_value = None  # Not found in inventory
 
         success, msg = self.eq_manager.equip_loadout(self.discord_id, "Battle Set")
 
-        self.assertTrue(success) # Operation is success, but reports missing
+        self.assertTrue(success)  # Operation is success, but reports missing
         self.assertIn("Missing/Failed", msg)
         self.assertIn("God Slayer", msg)
 
     def test_delete_loadout(self):
         self.eq_manager.delete_loadout(self.discord_id, "Old Set")
         self.mock_db.equipment_sets.delete_one.assert_called_with({"discord_id": self.discord_id, "name": "Old Set"})
+
 
 if __name__ == "__main__":
     unittest.main()

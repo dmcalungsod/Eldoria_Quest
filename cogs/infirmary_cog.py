@@ -8,7 +8,6 @@ Atmosphere restored.
 
 import asyncio
 import logging
-import math
 
 import discord
 from discord.ext import commands
@@ -37,9 +36,7 @@ class InfirmaryView(View):
         self.missing_mp = max(0, stats.max_mp - current_mp)
 
         # Use centralized cost calculation from DatabaseManager
-        self.cost = DatabaseManager.calculate_heal_cost(
-            current_hp, current_mp, stats.max_hp, stats.max_mp
-        )
+        self.cost = DatabaseManager.calculate_heal_cost(current_hp, current_mp, stats.max_hp, stats.max_mp)
 
         # Heal Button
         disabled = self.missing_hp <= 0 and self.missing_mp <= 0
@@ -122,9 +119,7 @@ class InfirmaryView(View):
         mp_miss = max(0, stats.max_mp - p["current_mp"])
 
         # Use centralized cost calculation
-        cost = DatabaseManager.calculate_heal_cost(
-            p["current_hp"], p["current_mp"], stats.max_hp, stats.max_mp
-        )
+        cost = DatabaseManager.calculate_heal_cost(p["current_hp"], p["current_mp"], stats.max_hp, stats.max_mp)
 
         hp_bar = make_progress_bar(p["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(p["current_mp"], stats.max_mp)

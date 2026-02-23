@@ -81,18 +81,10 @@ class AdventureSetupView(View):
             max_values=1,
             row=1,
             options=[
-                discord.SelectOption(
-                    label="30 Minutes", value="30", description="Short patrol", emoji="⏲️"
-                ),
-                discord.SelectOption(
-                    label="1 Hour", value="60", description="Standard expedition", emoji="⏲️"
-                ),
-                discord.SelectOption(
-                    label="4 Hours", value="240", description="Extended journey", emoji="⛺"
-                ),
-                discord.SelectOption(
-                    label="8 Hours", value="480", description="Full day trek", emoji="🌙"
-                ),
+                discord.SelectOption(label="30 Minutes", value="30", description="Short patrol", emoji="⏲️"),
+                discord.SelectOption(label="1 Hour", value="60", description="Standard expedition", emoji="⏲️"),
+                discord.SelectOption(label="4 Hours", value="240", description="Extended journey", emoji="⛺"),
+                discord.SelectOption(label="8 Hours", value="480", description="Full day trek", emoji="🌙"),
             ],
         )
         self.duration_select.callback = self.duration_callback
@@ -110,9 +102,7 @@ class AdventureSetupView(View):
         self.add_item(self.start_btn)
 
         # 4. Back Button
-        self.back_btn = Button(
-            label="Return to Ledger", style=discord.ButtonStyle.grey, row=2
-        )
+        self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=2)
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
 
@@ -133,18 +123,14 @@ class AdventureSetupView(View):
                 return False
         except ValueError:
             # Fallback if rank is unknown (shouldn't happen)
-            logger.warning(
-                f"Unknown rank encountered: {self.player_rank} or {req_rank}"
-            )
+            logger.warning(f"Unknown rank encountered: {self.player_rank} or {req_rank}")
             return False
 
         return True
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
@@ -195,15 +181,11 @@ class AdventureSetupView(View):
             )
 
             if not success:
-                await interaction.followup.send(
-                    "Failed to start adventure. Please try again.", ephemeral=True
-                )
+                await interaction.followup.send("Failed to start adventure. Please try again.", ephemeral=True)
                 return
 
             # 2. Get new session data
-            session = await asyncio.to_thread(
-                self.manager.get_active_session, interaction.user.id
-            )
+            session = await asyncio.to_thread(self.manager.get_active_session, interaction.user.id)
             if not session:
                 await interaction.followup.send("Error starting session.", ephemeral=True)
                 return
@@ -212,13 +194,9 @@ class AdventureSetupView(View):
             embed = AdventureEmbeds.build_adventure_status_embed(session)
 
             # 4. Switch View
-            view = AdventureStatusView(
-                self.db, self.manager, self.interaction_user, session
-            )
+            view = AdventureStatusView(self.db, self.manager, self.interaction_user, session)
             await interaction.edit_original_response(embed=embed, view=view)
 
         except Exception as e:
             logger.error(f"Adventure start error: {e}", exc_info=True)
-            await interaction.followup.send(
-                "An error occurred starting the expedition.", ephemeral=True
-            )
+            await interaction.followup.send("An error occurred starting the expedition.", ephemeral=True)
