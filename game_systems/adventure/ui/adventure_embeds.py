@@ -5,6 +5,8 @@ Handles the creation of Discord embeds for the adventure system.
 Hardened: Robust JSON parsing and layout stability.
 """
 
+import datetime
+import json
 import logging
 import random
 import re
@@ -183,6 +185,69 @@ class AdventureEmbeds:
         return embed
 
     @staticmethod
+    def build_adventure_status_embed(session: dict) -> discord.Embed:
+        """
+        Builds the status embed for an active auto-adventure.
+        """
+        loc_id = session.get("location_id")
+        loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone", "emoji": E.MAP})
+
+        # Calculate Times
+        start_time = datetime.datetime.fromisoformat(session["start_time"])
+        end_time = datetime.datetime.fromisoformat(session["end_time"])
+        now = WorldTime.now()
+
+        remaining = end_time - now
+
+        # Format duration strings
+        def fmt_delta(d):
+            seconds = int(d.total_seconds())
+            if seconds < 0:
+                return "0m"
+            hours, remainder = divmod(seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+            if hours > 0:
+                return f"{hours}h {minutes}m"
+            return f"{minutes}m"
+
+        remaining_str = fmt_delta(remaining)
+        if remaining.total_seconds() <= 0:
+            remaining_str = "Complete!"
+            status_text = "Ready to Return"
+            color = discord.Color.gold()
+        else:
+            status_text = "In Progress"
+            color = discord.Color.blue()
+
+        embed = discord.Embed(
+            title=f"{loc_data.get('emoji', '')} {loc_data.get('name')}",
+            description=f"**Status:** {status_text}",
+            color=color,
+        )
+
+        embed.add_field(name="⏳ Time Remaining", value=f"`{remaining_str}`", inline=True)
+        embed.add_field(
+            name="👣 Steps Taken", value=f"`{session.get('steps_completed', 0)}`", inline=True
+        )
+
+        # Loot Count
+        try:
+            loot_raw = session.get("loot_collected", "{}")
+            loot = json.loads(loot_raw) if isinstance(loot_raw, str) else loot_raw
+            # Filter out non-item keys like 'exp' or 'aurum' if they are in loot dict
+            # AdventureSession stores actual items in loot dict, exp/aurum are special but check anyway
+            loot_count = sum(v for k, v in loot.items() if k not in ("exp", "aurum"))
+        except Exception:
+            loot_count = 0
+
+        embed.add_field(name="🎒 Loot Gathered", value=f"`{loot_count}` items", inline=True)
+
+        # Flavor footer
+        embed.set_footer(text="Your party is exploring automatically.")
+
+        return embed
+
+    @staticmethod
     def build_summary_embed(summary: dict, location_id: str) -> discord.Embed:
         """Constructs the mission report embed."""
         s = summary
@@ -214,7 +279,11 @@ class AdventureEmbeds:
 
         embed = discord.Embed(title=title, description=f"*{flavor_text}*", color=color)
 
-        # 2. Rewards
+        # 2. Stats (Steps/Battles) - If available
+        if (steps := s.get("steps_completed")) is not None:
+            embed.add_field(name="👣 Distance Traveled", value=f"{steps} Steps", inline=True)
+
+        # 3. Rewards
         rewards = []
         if (xp := s.get("xp_gained", 0)) > 0:
             rewards.append(f"{E.EXP} **+{xp} XP**")

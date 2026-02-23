@@ -6,7 +6,6 @@ Hardened: Safe JSON parsing for session resumption.
 """
 
 import asyncio
-import json
 import logging
 
 import discord
@@ -18,9 +17,8 @@ import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
 from database.database_manager import DatabaseManager
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
-from game_systems.adventure.ui.exploration_view import ExplorationView
 from game_systems.adventure.ui.setup_view import AdventureSetupView
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.ui.status_view import AdventureStatusView
 
 logger = logging.getLogger("eldoria.ui.adventure_menu")
 
@@ -70,7 +68,9 @@ class AdventureView(View):
         Restricts interaction to the original user.
         """
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your session.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your session.", ephemeral=True
+            )
             return False
         return True
 
@@ -94,7 +94,9 @@ class AdventureView(View):
             return
 
         # Check if an adventure is already active (threaded)
-        session = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
+        session = await asyncio.to_thread(
+            adventure_cog.manager.get_active_session, self.interaction_user.id
+        )
 
         # --------------------------------------------------------
         # Resume existing adventure
@@ -103,49 +105,47 @@ class AdventureView(View):
             if not interaction.response.is_done():
                 await interaction.response.defer()
 
-            loc_id = session["location_id"]
+            status = session.get("status", "in_progress")
 
             try:
-                logs = json.loads(session["logs"]) if session["logs"] else []
-            except json.JSONDecodeError:
-                logs = ["*Log corrupted or lost.*"]
+                # CASE 1: Completed -> Show Rewards
+                if status == "completed":
+                    summary = await asyncio.to_thread(
+                        adventure_cog.manager.end_adventure, self.interaction_user.id
+                    )
+                    if not summary:
+                        await interaction.followup.send(
+                            "Error processing rewards.", ephemeral=True
+                        )
+                        return
 
-            # Parse active monster to update button state
-            active_monster = None
-            if session["active_monster_json"]:
-                try:
-                    active_monster = json.loads(session["active_monster_json"])
-                except Exception:
-                    active_monster = None
+                    loc_id = session.get("location_id")
+                    embed = AdventureEmbeds.build_summary_embed(summary, loc_id)
 
-            # Fetch stats and vitals
-            try:
-                stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
-                stats = PlayerStats.from_dict(stats_json)
-                vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
-                player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-                skills = await asyncio.to_thread(self.db.get_combat_skills, self.interaction_user.id)
-                class_id = player_data["class_id"] if player_data else 1
+                    # Create a simple view with just "Back"
+                    view = View()
+                    back_btn = Button(
+                        label="Return to Profile", style=discord.ButtonStyle.grey
+                    )
+                    back_btn.callback = back_to_profile_callback
+                    view.add_item(back_btn)
 
-                embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, active_monster)
+                    await interaction.edit_original_response(embed=embed, view=view)
+                    return
 
-                view = ExplorationView(
-                    self.db,
-                    adventure_cog.manager,
-                    loc_id,
-                    logs,
-                    self.interaction_user,
-                    stats,
-                    vitals=vitals,
-                    active_monster=active_monster,
-                    class_id=class_id,
-                    skills=skills,
+                # CASE 2: Active / In Progress / Failed
+                # Show Status View
+                embed = AdventureEmbeds.build_adventure_status_embed(session)
+                view = AdventureStatusView(
+                    self.db, adventure_cog.manager, self.interaction_user, session
                 )
-
                 await interaction.edit_original_response(embed=embed, view=view)
+
             except Exception as e:
                 logger.error(f"Resume adventure failed: {e}", exc_info=True)
-                await interaction.followup.send("Error resuming session.", ephemeral=True)
+                await interaction.followup.send(
+                    "Error resuming session.", ephemeral=True
+                )
             return
 
         # --------------------------------------------------------
@@ -156,7 +156,9 @@ class AdventureView(View):
         try:
             # Parallel fetch of guild rank and player level
             guild_member, player_data = await asyncio.gather(
-                asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
+                asyncio.to_thread(
+                    self.db.get_guild_member_data, self.interaction_user.id
+                ),
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
             )
             rank = guild_member["rank"] if guild_member else "F"
@@ -166,12 +168,14 @@ class AdventureView(View):
                 title=f"{E.MAP} Prepare for Expedition",
                 description=(
                     "*The great gates of the city loom overhead, iron-bound and weathered by countless journeys.*\n\n"
-                    "Select a destination to begin your expedition."
+                    "Select a destination and duration to begin."
                 ),
                 color=discord.Color.dark_green(),
             )
 
-            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank, level)
+            view = AdventureSetupView(
+                self.db, adventure_cog.manager, self.interaction_user, rank, level
+            )
             view.back_btn.callback = back_to_profile_callback
 
             await interaction.edit_original_response(embed=embed, view=view)
