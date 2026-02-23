@@ -47,9 +47,9 @@ class MockView:
 
 sys.modules["discord.ui"].View = MockView
 
-import importlib
-import game_systems.guild_system.ui.components
-import game_systems.guild_system.ui.services_menu
+import importlib  # noqa: E402
+import game_systems.guild_system.ui.components  # noqa: E402
+import game_systems.guild_system.ui.services_menu  # noqa: E402
 
 # Reload to ensure ViewFactory uses our MockButton
 importlib.reload(game_systems.guild_system.ui.components)
