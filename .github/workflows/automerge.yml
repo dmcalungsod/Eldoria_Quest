@@ -30,8 +30,11 @@ jobs:
           # The workflow_run event provides a list of PRs that triggered the workflow
           # We iterate through them and merge
 
+          echo "### 🤖 Auto-Merge Report" >> $GITHUB_STEP_SUMMARY
+
           if [ "$PR_LIST" == "null" ] || [ -z "$PR_LIST" ]; then
             echo "No PRs associated with this workflow run."
+            echo "No PRs to merge." >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
 
@@ -39,7 +42,12 @@ jobs:
           echo "$PR_LIST" | jq -r '.[] | .number' | while read pr_number; do
             if [ "$pr_number" != "null" ] && [ -n "$pr_number" ]; then
               echo "Merging PR #$pr_number..."
-              gh pr merge "$pr_number" --squash || echo "Failed to merge PR #$pr_number"
+              if gh pr merge "$pr_number" --squash; then
+                echo "- ✅ Merged PR #$pr_number" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "Failed to merge PR #$pr_number"
+                echo "- ❌ Failed to merge PR #$pr_number" >> $GITHUB_STEP_SUMMARY
+              fi
             fi
           done
 

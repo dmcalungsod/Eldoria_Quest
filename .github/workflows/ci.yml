@@ -42,12 +42,16 @@ jobs:
         run: |
           ruff check .
           ruff format --check .
+          echo "### 🖌️ Linting Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Ruff checks passed" >> $GITHUB_STEP_SUMMARY
 
       - name: Run Ruff (Fix & Format)
         if: github.event_name == 'pull_request'
         run: |
           ruff check . --fix
           ruff format .
+          echo "### 🖌️ Linting Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Ruff checks (fix mode) completed" >> $GITHUB_STEP_SUMMARY
 
       - name: Commit Ruff Fixes
         if: github.event_name == 'pull_request'
@@ -58,7 +62,9 @@ jobs:
           file_pattern: '*.py'
 
       - name: Run Bandit Security Linter
-        run: bandit -r . -ll
+        run: |
+          bandit -r . -ll
+          echo "✅ Bandit Security Scan passed" >> $GITHUB_STEP_SUMMARY
 
   test:
     name: Run Tests
@@ -90,11 +96,25 @@ jobs:
           GUILD_ID: "123456789"
           MONGO_URI: "mongodb://localhost:27017"
         run: |
+          set -o pipefail
           python -m pytest tests/ \
             --cov=. \
             --cov-report=term-missing \
             --cov-report=html \
-            -v
+            -v | tee pytest_output.txt
+
+      - name: Generate Test Summary
+        if: always()
+        run: |
+          echo "### 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          if [ -f pytest_output.txt ]; then
+            # Extract the summary line (e.g. === 150 passed in 2.3s ===)
+            summary_line=$(grep -E "=== .* ===" pytest_output.txt | tail -n 1)
+            echo "\`$summary_line\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed to run or crashed." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "📊 Coverage Report: Attached as artifact \`coverage-report\`" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Coverage Report
         if: always()
@@ -124,11 +144,14 @@ jobs:
 
       - name: Audit Dependencies (pip-audit)
         run: |
+          echo "### 🛡️ Security Audit" >> $GITHUB_STEP_SUMMARY
           if [ -f requirements.txt ]; then
             pip-audit -r requirements.txt \
               --strict --desc on
+            echo "✅ Dependency audit passed. No vulnerabilities found." >> $GITHUB_STEP_SUMMARY
           else
             echo "No requirements.txt found, skipping dependency audit."
+            echo "⚠️ Skipped: No requirements.txt found." >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Validate Database Technology
@@ -136,5 +159,7 @@ jobs:
           if grep -r "import sqlite3" database/; then
             echo "Error: SQLite usage detected in database/ directory."
             echo "Please use MongoDB."
+            echo "❌ Database Check Failed: SQLite usage detected." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
+          echo "✅ Database Check Passed: MongoDB compliance verified." >> $GITHUB_STEP_SUMMARY
