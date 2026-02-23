@@ -289,6 +289,34 @@ class AdventureEmbeds:
         embed.add_field(name="⏳ Time Remaining", value=f"**{time_remaining}**", inline=True)
         embed.add_field(name="👣 Progress", value=f"**{steps_completed} Steps**", inline=True)
 
+        # Combat Stance (If active monster)
+        try:
+            am_json = session.get("active_monster_json")
+            if am_json:
+                active_monster = json.loads(am_json)
+                if active_monster:
+                    stance = active_monster.get("player_stance", "balanced")
+
+                    # Stance formatting
+                    stance_emoji = "⚖️"
+                    stance_desc = "Standard"
+                    if stance == "aggressive":
+                        stance_emoji = "⚔️"
+                        stance_desc = "High Dmg"
+                    elif stance == "defensive":
+                        stance_emoji = "🛡️"
+                        stance_desc = "High Def"
+
+                    embed.add_field(
+                        name="⚔️ Tactics",
+                        value=f"{stance_emoji} **{stance.capitalize()}**\n*({stance_desc})*",
+                        inline=True,
+                    )
+        except (json.JSONDecodeError, TypeError):
+            pass
+        except Exception as e:
+            logger.warning(f"Error parsing stance: {e}")
+
         # Loot Preview
         try:
             loot_collected = json.loads(session.get("loot_collected", "{}"))
