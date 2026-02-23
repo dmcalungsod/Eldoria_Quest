@@ -792,8 +792,8 @@ class DatabaseManager:
 
     def calculate_inventory_limit(self, discord_id: int) -> int:
         """
-        Calculates dynamic inventory limit based on player stats.
-        Base: 10 + STR/DEX bonuses.
+        Calculates dynamic inventory limit based on player stats (STR/DEX).
+        Delegates to PlayerStats.max_inventory_slots.
         """
         # Avoid circular import
         from game_systems.player.player_stats import PlayerStats
@@ -810,8 +810,8 @@ class DatabaseManager:
             return BASE_INVENTORY_SLOTS
 
     def get_inventory_slot_count(self, discord_id: int) -> int:
-        """Counts the number of distinct item slots (documents) used."""
-        return self._col("inventory").count_documents({"discord_id": discord_id})
+        """Counts the number of distinct item slots (documents) used (excluding equipped)."""
+        return self._col("inventory").count_documents({"discord_id": discord_id, "equipped": {"$ne": 1}})
 
     def get_inventory_items(
         self, discord_id: int, item_type: str | None = None, equipped: int | None = None

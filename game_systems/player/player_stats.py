@@ -135,8 +135,7 @@ class PlayerStats:
     def max_inventory_slots(self) -> int:
         """
         Calculates total inventory slots based on STR and DEX.
-        Base: 10
-        Bonus: +0.5 per STR point, +0.25 per DEX point.
+        Formula: Base(10) + floor(STR * 0.5) + floor(DEX * 0.25).
         """
         base_slots = 10
         str_bonus = math.floor(self.strength * 0.5)
