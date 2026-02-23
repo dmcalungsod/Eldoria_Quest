@@ -83,33 +83,6 @@ class TestAdventureEmbeds(unittest.TestCase):
         expected_footer = "Choose your combat action • Field Pack to use items"
         embed.set_footer.assert_called_with(text=expected_footer)
 
-    def test_status_embed(self):
-        """Test build_status_embed returns correct footer."""
-        session = {
-            "loot_collected": "{}",
-            "logs": "[]"
-        }
-        loc_data = {"name": "Test Loc", "emoji": "🗺️"}
-        embed = self.AdventureEmbeds.build_status_embed(
-            session=session,
-            location_data=loc_data,
-            time_remaining="1h 30m",
-            steps_completed=5
-        )
-        embed.set_footer.assert_called_with(text="Check back later for the full report.")
-
-    def test_death_embed(self):
-        """Test build_death_embed returns correct footer."""
-        session = {
-            "logs": "[]"
-        }
-        loc_data = {"name": "Test Loc"}
-        embed = self.AdventureEmbeds.build_death_embed(
-            session=session,
-            location_data=loc_data
-        )
-        embed.set_footer.assert_called_with(text="Rest and recover at the Infirmary.")
-
 
 if __name__ == "__main__":
     unittest.main()

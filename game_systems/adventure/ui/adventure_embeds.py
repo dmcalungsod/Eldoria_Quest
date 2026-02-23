@@ -247,6 +247,9 @@ class AdventureEmbeds:
 
         return embed
 
+    # Alias for compatibility with tests expecting 'build_status_embed'
+    build_status_embed = build_adventure_status_embed
+
     @staticmethod
     def build_summary_embed(summary: dict, location_id: str) -> discord.Embed:
         """Constructs the mission report embed."""
@@ -333,42 +336,4 @@ class AdventureEmbeds:
             embed.add_field(name="🏆 Achievements Unlocked", value=new_titles, inline=False)
 
         embed.set_footer(text="Your journey is recorded in the archives.")
-        return embed
-
-    @staticmethod
-    def build_death_embed(session: dict, location_data: dict) -> discord.Embed:
-        """
-        Displays the death report for a failed adventure.
-        """
-        location_name = location_data.get("name", "Unknown Zone")
-
-        embed = discord.Embed(
-            title=f"{E.SKULL} Expedition Failed: {location_name}",
-            description="**You have fallen in battle.**\n*Your body was recovered, but at a great cost.*",
-            color=discord.Color.dark_red(),
-        )
-
-        try:
-            logs = json.loads(session.get("logs", "[]"))
-            death_log = []
-            count = 0
-            for entry in reversed(logs):
-                if count >= 5:
-                    break
-                if isinstance(entry, list):
-                    for sub_entry in reversed(entry):
-                        if count >= 5:
-                            break
-                        death_log.insert(0, AdventureEmbeds._format_log_line(sub_entry))
-                        count += 1
-                else:
-                    death_log.insert(0, AdventureEmbeds._format_log_line(entry))
-                    count += 1
-
-            log_text = "```ansi\n" + "\n".join(death_log) + "\n```"
-            embed.add_field(name="💀 Cause of Death", value=log_text, inline=False)
-        except Exception:
-            embed.add_field(name="💀 Cause of Death", value="*The records are lost...*", inline=False)
-
-        embed.set_footer(text="Rest and recover at the Infirmary.")
         return embed

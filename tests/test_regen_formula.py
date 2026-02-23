@@ -22,7 +22,9 @@ class TestRegenFormula(unittest.TestCase):
         self.event_handler = EventHandler(self.db, self.quest_system, 12345)
 
     @patch("game_systems.adventure.event_handler.AdventureEvents")
-    def test_regeneration_scaling(self, mock_events):
+    @patch("game_systems.adventure.event_handler.WorldTime")
+    def test_regeneration_scaling(self, mock_world_time, mock_events):
+        mock_world_time.get_current_phase.return_value = "Day"
         mock_events.regeneration.return_value = ["Resting..."]
 
         # Helper to run regen

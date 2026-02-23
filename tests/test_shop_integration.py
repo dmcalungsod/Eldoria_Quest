@@ -55,8 +55,6 @@ class TestShopViewIntegration(unittest.TestCase):
 
         # Mock purchase_item return: (success, item_data, new_balance)
         mock_db.purchase_item.return_value = (True, {"name": "Test Potion"}, 960)
-        # Mock owned count to 0 so price is base price
-        mock_db.get_inventory_item_count.return_value = 0
 
         success, result, new_aurum = view._execute_purchase(item_key)
 
@@ -65,7 +63,6 @@ class TestShopViewIntegration(unittest.TestCase):
         args, _ = mock_db.purchase_item.call_args
         self.assertEqual(args[0], 12345)
         self.assertEqual(args[1], item_key)
-        # Price should be base price because count is 0
         self.assertEqual(args[3], price)
 
         self.assertTrue(success)
@@ -84,8 +81,6 @@ class TestShopViewIntegration(unittest.TestCase):
 
         # Mock purchase_item return: (failure, msg, 0)
         mock_db.purchase_item.return_value = (False, "Insufficient Aurum.", 0)
-        # Mock owned count to 0
-        mock_db.get_inventory_item_count.return_value = 0
 
         success, result, new_aurum = view._execute_purchase(item_key)
 
@@ -110,8 +105,6 @@ class TestShopViewIntegration(unittest.TestCase):
 
         # Mock purchase_item return
         mock_db.purchase_item.return_value = (True, {"name": "Dewfall Tonic"}, 1)
-        # Mock owned count to 0
-        mock_db.get_inventory_item_count.return_value = 0
 
         success, result, new_aurum = view._execute_purchase(item_key)
 
@@ -119,30 +112,6 @@ class TestShopViewIntegration(unittest.TestCase):
         mock_db.purchase_item.assert_called_once()
         args, _ = mock_db.purchase_item.call_args
         self.assertEqual(args[3], price)
-
-    def test_shop_view_dynamic_pricing(self):
-        mock_db = MagicMock()
-        mock_user = MagicMock()
-        mock_user.id = 12345
-        current_aurum = 1000
-
-        view = ShopView(mock_db, mock_user, current_aurum)
-
-        item_key = "hp_potion_1"
-        # Base price 40
-        owned_count = 5
-
-        # Expected: 40 * (1 + 0.5) = 60
-        expected_price = 60
-
-        mock_db.purchase_item.return_value = (True, {"name": "Test Potion"}, 940)
-        mock_db.get_inventory_item_count.return_value = owned_count
-
-        success, result, new_aurum = view._execute_purchase(item_key)
-
-        mock_db.purchase_item.assert_called_once()
-        args, _ = mock_db.purchase_item.call_args
-        self.assertEqual(args[3], expected_price)
 
 
 if __name__ == "__main__":

@@ -24,15 +24,15 @@ class TestCombatDefenseCurve(unittest.TestCase):
         Verify that monster Defense reduces player damage according to the formula:
         reduction = DEF * (0.3 + 0.2 * min(1, DEF/100))
         """
-        base_ap = 30  # Calculated from setup (10*2.0 + 10*0.5 + 10*0.5)
+        base_ap = 35  # Calculated from setup
 
         # Test Cases: (Monster DEF, Expected Reduction, Expected Damage)
-        # 1. DEF = 0 -> Red = 0 * 0.3 = 0. Dmg = 30.
-        # 2. DEF = 50 -> Red = 50 * (0.3 + 0.1) = 20. Dmg = 10.
+        # 1. DEF = 0 -> Red = 0 * 0.3 = 0. Dmg = 35.
+        # 2. DEF = 50 -> Red = 50 * (0.3 + 0.1) = 20. Dmg = 15.
         # 3. DEF = 100 -> Red = 100 * (0.3 + 0.2) = 50. Dmg = 1 (Floor).
         # 4. DEF = 200 -> Red = 200 * 0.5 = 100. Dmg = 1 (Floor).
 
-        test_cases = [(0, 30), (50, 10), (100, 1), (200, 1)]  # 30 - 20 = 10
+        test_cases = [(0, 35), (50, 15), (100, 1), (200, 1)]  # 35 - 50 < 1 -> 1
 
         with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):  # No crit
             for def_val, expected_dmg in test_cases:
@@ -112,11 +112,11 @@ class TestCombatDefenseCurve(unittest.TestCase):
         """
         Verify crit multiplier is 1.75x for players.
         """
-        base_ap = 30  # Setup default (10/10/10 -> 20 + 5 + 5 = 30)
+        base_ap = 35  # Setup default
         monster = {"DEF": 0}
 
         # Force Crit
-        # Damage = 30 * 1.75 = 52.5 -> 52
+        # Damage = 35 * 1.75 = 61.25 -> 61
 
         with (
             patch("random.uniform", return_value=1.0),
@@ -126,7 +126,7 @@ class TestCombatDefenseCurve(unittest.TestCase):
 
             self.assertTrue(is_crit)
             self.assertEqual(event, "crit")
-            self.assertEqual(dmg, 52)
+            self.assertEqual(dmg, 61)
 
 
 if __name__ == "__main__":

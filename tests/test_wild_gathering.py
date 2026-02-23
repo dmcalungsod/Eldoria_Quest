@@ -73,7 +73,7 @@ class TestWildGathering(unittest.TestCase):
             # 2. _perform_wild_gathering: 1 (Success Gather, <= 35)
             with (
                 patch("random.randint", side_effect=[80, 1]),
-                patch("random.random", side_effect=[0.9, 0.9]),
+                patch("random.random", side_effect=[0.9]),
                 patch("random.choices", return_value=["test_herb"]),
             ):
                 result = self.event_handler.resolve_non_combat(
@@ -95,7 +95,7 @@ class TestWildGathering(unittest.TestCase):
             # side_effect: 80 (Fail Regen), 1 (Success Gather)
             with (
                 patch("random.randint", side_effect=[80, 1]),
-                patch("random.random", side_effect=[0.9, 0.9]),
+                patch("random.random", side_effect=[0.9]),
                 patch("random.choices", return_value=["medicinal_herb"]),
             ):  # Fallback pool item
                 result = self.event_handler.resolve_non_combat(
@@ -133,7 +133,6 @@ class TestWildGathering(unittest.TestCase):
                     regen_chance=70,
                     location_name="Forest",
                     weather=ANY,
-                    time_phase=ANY,
                     event_type=ANY,
                 )
 
