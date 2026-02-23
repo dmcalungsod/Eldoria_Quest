@@ -11,9 +11,9 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.world_time import Weather, WorldTime
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.world_time import Weather, WorldTime  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 @pytest.fixture
