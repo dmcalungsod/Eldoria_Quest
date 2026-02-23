@@ -107,6 +107,8 @@ class AdventureView(View):
 
             status = session.get("status", "in_progress")
 
+            loc_id = session.get("location_id")
+
             try:
                 # CASE 1: Completed -> Show Rewards
                 if status == "completed":
@@ -119,10 +121,8 @@ class AdventureView(View):
                         )
                         return
 
-                    loc_id = session.get("location_id")
                     embed = AdventureEmbeds.build_summary_embed(summary, loc_id)
 
-                    # Create a simple view with just "Back"
                     view = View()
                     back_btn = Button(
                         label="Return to Profile", style=discord.ButtonStyle.grey
@@ -133,8 +133,29 @@ class AdventureView(View):
                     await interaction.edit_original_response(embed=embed, view=view)
                     return
 
-                # CASE 2: Active / In Progress / Failed
-                # Show Status View
+                # CASE 2: Failed -> Show Death Report
+                if status == "failed":
+                    from game_systems.data.adventure_locations import LOCATIONS
+                    loc_data = LOCATIONS.get(loc_id, {})
+                    embed = AdventureEmbeds.build_death_embed(session, loc_data)
+
+                    view = View()
+
+                    async def ack_callback(inter: discord.Interaction):
+                        if inter.user.id != self.interaction_user.id:
+                            await inter.response.send_message("This is not your session.", ephemeral=True)
+                            return
+                        await asyncio.to_thread(self.db.end_adventure_session, self.interaction_user.id)
+                        await back_to_profile_callback(inter)
+
+                    btn = Button(label="Acknowledge Loss", style=discord.ButtonStyle.danger)
+                    btn.callback = ack_callback
+                    view.add_item(btn)
+
+                    await interaction.edit_original_response(embed=embed, view=view)
+                    return
+
+                # CASE 3: In Progress / Other -> Show Status View
                 embed = AdventureEmbeds.build_adventure_status_embed(session)
                 view = AdventureStatusView(
                     self.db, adventure_cog.manager, self.interaction_user, session
