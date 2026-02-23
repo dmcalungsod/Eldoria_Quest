@@ -27,3 +27,7 @@
 ## 2025-06-05 - [Context-Aware Instructions]
 **Learning:** When UI components change state (e.g., Exploration -> Combat), static instructions (like "Press Forward") that reference unavailable buttons create confusion and break trust in the UI.
 **Action:** Ensure instructional text (especially footers) dynamically updates to reflect only the currently valid actions, guiding the user accurately.
+
+## 2026-02-23 - [Log Readability]
+**Learning:** Dense text logs in embeds become hard to scan during fast-paced gameplay. Using Discord's ANSI code blocks allows for semantic coloring (Damage=Red, Loot=Gold, Healing=Green), transforming a wall of text into a structured, easily parsable feed.
+**Action:** Wrap critical gameplay logs in ` ```ansi ` blocks and apply consistent color coding to key events to improve information density without clutter.
