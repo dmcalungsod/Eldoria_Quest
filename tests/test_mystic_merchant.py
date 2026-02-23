@@ -1,8 +1,8 @@
-import sys
-import os
-import unittest
 import asyncio
-from unittest.mock import MagicMock, AsyncMock, patch
+import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -25,9 +25,6 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-# Mock cogs.shop_cog
-mock_shop_cog = MagicMock()
-sys.modules["cogs.shop_cog"] = mock_shop_cog
 
 # Mock button and view
 class MockButton:
@@ -36,7 +33,9 @@ class MockButton:
         self.custom_id = custom_id
         self.callback = None
 
+
 sys.modules["discord.ui"].Button = MockButton
+
 
 class MockView:
     def __init__(self, timeout=None):
@@ -45,9 +44,11 @@ class MockView:
     def add_item(self, item):
         self.children.append(item)
 
+
 sys.modules["discord.ui"].View = MockView
 
 import importlib  # noqa: E402
+
 import game_systems.guild_system.ui.components  # noqa: E402
 import game_systems.guild_system.ui.services_menu  # noqa: E402
 
@@ -56,9 +57,10 @@ importlib.reload(game_systems.guild_system.ui.components)
 importlib.reload(game_systems.guild_system.ui.services_menu)
 
 # Now import the modules under test
-from game_systems.guild_system.ui.services_menu import GuildServicesView  # noqa: E402
-from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 from game_systems.data.shop_data import MYSTIC_MERCHANT_INVENTORY  # noqa: E402
+from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
+from game_systems.guild_system.ui.services_menu import GuildServicesView  # noqa: E402
+
 
 class TestMysticMerchantEvent(unittest.TestCase):
     def setUp(self):
@@ -66,16 +68,26 @@ class TestMysticMerchantEvent(unittest.TestCase):
         self.mock_user = MagicMock()
         self.mock_user.id = 12345
 
+        # Mock cogs.shop_cog specifically for this test class to avoid collision with other tests
+        self.mock_shop_cog = MagicMock()
+        self.shop_cog_patcher = patch.dict(sys.modules, {"cogs.shop_cog": self.mock_shop_cog})
+        self.shop_cog_patcher.start()
+
+    def tearDown(self):
+        self.shop_cog_patcher.stop()
+
     def test_button_appears_when_event_active(self):
         # Setup active event
         event_data = {
             "type": WorldEventSystem.MYSTIC_MERCHANT,
             "start_time": "2023-01-01T00:00:00",
-            "end_time": "2099-01-01T00:00:00"
+            "end_time": "2099-01-01T00:00:00",
         }
 
         # Patch get_current_event directly to bypass time/expiration logic
-        with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=event_data):
+        with patch(
+            "game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=event_data
+        ):
             view = GuildServicesView(self.mock_db, self.mock_user)
 
         # Check if Mystic Merchant button is in children
@@ -104,7 +116,7 @@ class TestMysticMerchantEvent(unittest.TestCase):
     def test_mystic_merchant_callback_opens_shop(self):
         # Setup the mock class inside the mocked module
         MockShopViewClass = MagicMock()
-        mock_shop_cog.ShopView = MockShopViewClass
+        self.mock_shop_cog.ShopView = MockShopViewClass
 
         # Ensure __init__ doesn't crash on event check
         with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=None):
@@ -130,6 +142,7 @@ class TestMysticMerchantEvent(unittest.TestCase):
         self.assertEqual(args[1], self.mock_user)
         self.assertEqual(args[2], 500)
         self.assertEqual(kwargs.get("inventory"), MYSTIC_MERCHANT_INVENTORY)
+
 
 if __name__ == "__main__":
     unittest.main()

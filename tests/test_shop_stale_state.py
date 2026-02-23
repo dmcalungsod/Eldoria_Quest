@@ -36,7 +36,6 @@ sys.modules["discord.ext.commands"] = MagicMock()
 # DO NOT mock database.database_manager directly, as other tests need the real module.
 # ShopView imports DatabaseManager class, so we let it import the real class (which uses mocked pymongo).
 
-import importlib  # noqa: E402
 
 # Now import the class under test
 # RELOAD to ensure ShopView uses the MockView defined above, not a stale one
