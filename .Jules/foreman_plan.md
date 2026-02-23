@@ -4,7 +4,7 @@
 Transform Eldoria Quest from manual turn-based exploration to a time-based auto-adventure system.
 
 **Design Document:** `.Jules/timeweaver_design.md`
-**Status:** 🚀 **Phase 0: Foundation (Running)**
+**Status:** 🚧 **Phase 0: Foundation (Mixed with Content Phase)**
 
 ---
 
@@ -40,9 +40,10 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ### Phase 2: Content & Balance
 **Focus:** Populating the world and tuning numbers.
-- [ ] **Task 2.1:** Design new Adventure Locations (data).
+- [x] **Task 2.1:** Design new Adventure Locations (data).
     - **Agent:** @GameForge
-    - **Details:** Define locations, difficulty ranks, and resource pools.
+    - **Status:** **Completed** (Verified `adventure_locations.py` contains 12+ locations including Frostfall Expanse).
+    - **Note:** ID Conflict for Frostfall Expanse resolved (111-115).
 - [ ] **Task 2.2:** Configure Loot Tables & Drop Rates.
     - **Agent:** @DataSteward / @GameBalancer
     - **Details:** Ensure economy balance (materials vs time).
@@ -72,9 +73,10 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ## 🏗️ Parallel Projects
 *   **The Alchemist Class:** Design Phase (Namewright). Pending ID coordination.
-*   **The Frostfall Expanse:** Design Phase (Architect). ID Conflict Resolved (Already implemented as 111-115).
+*   **The Frostfall Expanse:** Implemented in `adventure_locations.py` (IDs 111-115).
 *   **Codex & Bestiary:** Proposed (Codex Keeper). Pending approval.
 
 ## 📝 Activity Log
+- **2026-02-24:** Updated plan. Marked Task 0.1 and 2.1 as Complete. Re-assigned blocking Tasks 0.2 and 0.3 to SystemSmith. Noted successful ID resolution for Frostfall Expanse.
 - **2026-02-23:** Resumed project. Verified Phase 0.1 completion. Assigned Scheduler (0.2) and Engine (0.3) to SystemSmith.
 - **2025-10-29:** Plan created. Phase 0 initiated.
