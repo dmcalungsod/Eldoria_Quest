@@ -2,7 +2,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Mock pymongo before importing anything that uses it
 sys.modules["pymongo"] = MagicMock()
@@ -11,8 +11,8 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.guild_system.quest_system import QuestSystem
-from game_systems.data.emojis import ERROR
+from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
+
 
 class TestQuestRaceCondition(unittest.TestCase):
     def setUp(self):
@@ -56,7 +56,7 @@ class TestQuestRaceCondition(unittest.TestCase):
             "discord_id": user_id,
             "quest_id": quest_id,
             "status": "in_progress",
-            "progress": '{"slay": {"Goblin": 1}}'
+            "progress": '{"slay": {"Goblin": 1}}',
         }
 
         # 2. Mock Quest Data (Valid)
@@ -64,7 +64,7 @@ class TestQuestRaceCondition(unittest.TestCase):
             "id": quest_id,
             "tier": "F",
             "objectives": '{"slay": {"Goblin": 1}}',
-            "rewards": '{"gold": 100}'
+            "rewards": '{"gold": 100}',
         }
 
         # 3. Simulate Race Condition: update_one returns modified_count=0
@@ -78,15 +78,24 @@ class TestQuestRaceCondition(unittest.TestCase):
 
         # VERIFY
         print(f"\n[TEST] Success: {success}, Message: {message}")
-        print(f"[TEST] Rewards Granted Call Count: {self.quest_system.reward_system.grant_rewards.call_count}")
+        print(
+            f"[TEST] Rewards Granted Call Count: {self.quest_system.reward_system.grant_rewards.call_count}"
+        )
 
         if self.quest_system.reward_system.grant_rewards.call_count > 0:
-             print("[VULNERABLE] Rewards were granted despite update failure (Race Condition Exploit Successful).")
+            print(
+                "[VULNERABLE] Rewards were granted despite update failure (Race Condition Exploit Successful)."
+            )
         else:
-             print("[SECURE] Rewards were NOT granted when update failed.")
+            print("[SECURE] Rewards were NOT granted when update failed.")
 
         # For verification, we assert that the vulnerability is FIXED (so we expect 0 calls)
-        self.assertEqual(self.quest_system.reward_system.grant_rewards.call_count, 0, "Fix failed: Rewards granted despite update failure.")
+        self.assertEqual(
+            self.quest_system.reward_system.grant_rewards.call_count,
+            0,
+            "Fix failed: Rewards granted despite update failure.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

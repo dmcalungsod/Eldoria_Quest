@@ -1,3 +1,4 @@
+
 import os
 import sys
 import unittest
@@ -10,8 +11,8 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.guild_system.quest_system import QuestSystem
-from game_systems.data.emojis import ERROR
+from game_systems.data.emojis import ERROR  # noqa: E402
+from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
 
 
 class TestQuestSecurity(unittest.TestCase):
@@ -57,7 +58,9 @@ class TestQuestSecurity(unittest.TestCase):
         if not result:
             print("\n[SECURE] Access Denied: Rank mismatch correctly caught.")
         else:
-            print("\n[CRITICAL] VULNERABILITY STILL EXISTS: F-Rank player accepted S-Rank quest!")
+            print(
+                "\n[CRITICAL] VULNERABILITY STILL EXISTS: F-Rank player accepted S-Rank quest!"
+            )
 
         self.assertFalse(result, "The security check should block this action.")
 
@@ -88,7 +91,7 @@ class TestQuestSecurity(unittest.TestCase):
             "discord_id": user_id,
             "quest_id": quest_id,
             "status": "in_progress",
-            "progress": '{"slay": {"Goblin": 1}}' # Valid JSON progress
+            "progress": '{"slay": {"Goblin": 1}}',  # Valid JSON progress
         }
 
         # 2. Mock Quest Data (BROKEN REWARDS JSON)
@@ -96,7 +99,7 @@ class TestQuestSecurity(unittest.TestCase):
             "id": quest_id,
             "tier": "F",
             "objectives": '{"slay": {"Goblin": 1}}',
-            "rewards": '{ "gold": 100, "xp": 50 ' # <-- MISSING CLOSING BRACE
+            "rewards": '{ "gold": 100, "xp": 50 ',  # <-- MISSING CLOSING BRACE
         }
 
         # EXECUTE
