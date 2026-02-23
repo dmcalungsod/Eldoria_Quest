@@ -8,9 +8,9 @@ sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 # -----------------------------
 
-import pytest
-from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.player.player_stats import PlayerStats
+import pytest  # noqa: E402
+
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 
 
 @pytest.fixture
