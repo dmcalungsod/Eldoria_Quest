@@ -59,7 +59,12 @@ class TestGuildAdvisor(unittest.TestCase):
         self.mock_db.get_guild_member_data.return_value = {"quests_completed": 0}
 
         advice = self.advisor.get_advice()
-        self.assertTrue(any(x in advice for x in ["Quest Board", "contracts", "reputation", "Quests"]))
+        self.assertTrue(
+            any(
+                x in advice
+                for x in ["Quest Board", "contracts", "reputation", "Quests"]
+            )
+        )
 
     def test_no_active_quests(self):
         """Test advice when player has no active quests."""
@@ -69,7 +74,12 @@ class TestGuildAdvisor(unittest.TestCase):
         self.mock_db.get_player_quests_joined.return_value = []
 
         advice = self.advisor.get_advice()
-        self.assertTrue(any(x in advice for x in ["active contracts", "Idle hands", "monsters are waiting"]))
+        self.assertTrue(
+            any(
+                x in advice
+                for x in ["active contracts", "Idle hands", "monsters are waiting"]
+            )
+        )
 
     def test_rich_but_unarmed(self):
         """Test advice when player has money but no weapon."""

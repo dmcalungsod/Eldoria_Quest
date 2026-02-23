@@ -82,12 +82,20 @@ class TestCraftingExpanded(unittest.TestCase):
         self.assertIsNotNone(item_data)
 
         # Verify deductions
-        self.mock_db.increment_player_fields.assert_called_with(self.discord_id, aurum=-recipe["cost"])
+        self.mock_db.increment_player_fields.assert_called_with(
+            self.discord_id, aurum=-recipe["cost"]
+        )
 
         # Verify material removal calls
-        self.mock_db.remove_inventory_item.assert_any_call(self.discord_id, "boar_meat", 2)
-        self.mock_db.remove_inventory_item.assert_any_call(self.discord_id, "medicinal_herb", 2)
-        self.mock_db.remove_inventory_item.assert_any_call(self.discord_id, "magic_stone_fragment", 1)
+        self.mock_db.remove_inventory_item.assert_any_call(
+            self.discord_id, "boar_meat", 2
+        )
+        self.mock_db.remove_inventory_item.assert_any_call(
+            self.discord_id, "medicinal_herb", 2
+        )
+        self.mock_db.remove_inventory_item.assert_any_call(
+            self.discord_id, "magic_stone_fragment", 1
+        )
 
         # Verify item addition
         self.mock_db.add_inventory_item.assert_called()

@@ -55,11 +55,15 @@ class GuildExchangeView(View, GuildViewMixin):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This exchange is not for you.", ephemeral=True)
+            await interaction.response.send_message(
+                "This exchange is not for you.", ephemeral=True
+            )
             return False
         return True
 
-    async def sell_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def sell_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         """
         Executes the sale of all materials.
         """
@@ -67,7 +71,9 @@ class GuildExchangeView(View, GuildViewMixin):
 
         try:
             # Run the atomic transaction in a thread
-            earned, items = await asyncio.to_thread(self.exchange.exchange_all_materials, self.interaction_user.id)
+            earned, items = await asyncio.to_thread(
+                self.exchange.exchange_all_materials, self.interaction_user.id
+            )
 
             if earned == 0:
                 await interaction.followup.send("No materials to sell.", ephemeral=True)
@@ -97,8 +103,14 @@ class GuildExchangeView(View, GuildViewMixin):
                 new_view.set_back_button(self.back_btn.callback, self.back_btn.label)
 
             await interaction.edit_original_response(embed=embed, view=new_view)
-            logger.info(f"User {self.interaction_user.id} sold items for {earned} gold.")
+            logger.info(
+                f"User {self.interaction_user.id} sold items for {earned} gold."
+            )
 
         except Exception as e:
-            logger.error(f"Exchange UI error for {self.interaction_user.id}: {e}", exc_info=True)
-            await interaction.followup.send("An error occurred during the exchange.", ephemeral=True)
+            logger.error(
+                f"Exchange UI error for {self.interaction_user.id}: {e}", exc_info=True
+            )
+            await interaction.followup.send(
+                "An error occurred during the exchange.", ephemeral=True
+            )

@@ -99,7 +99,9 @@ class CharacterTabView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This profile does not belong to you.", ephemeral=True)
+            await interaction.response.send_message(
+                "This profile does not belong to you.", ephemeral=True
+            )
             return False
         return True
 
@@ -123,7 +125,9 @@ class CharacterTabView(View):
         await interaction.response.defer()
 
         # Check for active session
-        session = await asyncio.to_thread(self.db.get_active_adventure, self.interaction_user.id)
+        session = await asyncio.to_thread(
+            self.db.get_active_adventure, self.interaction_user.id
+        )
         has_active_session = session is not None
 
         embed = discord.Embed(
@@ -134,7 +138,9 @@ class CharacterTabView(View):
             ),
             color=discord.Color.dark_teal(),
         )
-        view = AdventureView(self.db, self.interaction_user, active_session=has_active_session)
+        view = AdventureView(
+            self.db, self.interaction_user, active_session=has_active_session
+        )
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def status_callback(self, interaction: discord.Interaction):
@@ -144,17 +150,23 @@ class CharacterTabView(View):
             # Fetch player data and stats concurrently in threads
             p_data, s_row = await asyncio.gather(
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_player_stats_row, self.interaction_user.id),
+                asyncio.to_thread(
+                    self.db.get_player_stats_row, self.interaction_user.id
+                ),
             )
 
             if not p_data or not s_row:
-                await interaction.followup.send("Error retrieving character data.", ephemeral=True)
+                await interaction.followup.send(
+                    "Error retrieving character data.", ephemeral=True
+                )
                 return
 
             stats = PlayerStats.from_dict(json.loads(s_row["stats_json"]))
 
             embed = StatusUpdateView.build_status_embed(p_data, stats, s_row)
-            view = StatusUpdateView(self.db, self.interaction_user, p_data, stats, s_row)
+            view = StatusUpdateView(
+                self.db, self.interaction_user, p_data, stats, s_row
+            )
 
             # Assign profile return callback via helper
             view.back_button.callback = ui_helpers.back_to_profile_callback
@@ -165,7 +177,9 @@ class CharacterTabView(View):
                 f"Status callback error for {self.interaction_user.id}: {e}",
                 exc_info=True,
             )
-            await interaction.followup.send("System error loading status.", ephemeral=True)
+            await interaction.followup.send(
+                "System error loading status.", ephemeral=True
+            )
 
     async def guild_hall_callback(self, interaction: discord.Interaction):
         """Opens the Guild Hall Lobby directly."""

@@ -28,7 +28,9 @@ class TestMonsterAchievements(unittest.TestCase):
         self.mock_db.add_title.return_value = True
 
         # Run the check
-        result = self.achievement_system.check_group_achievements(self.discord_id, "Goblin Grunt")
+        result = self.achievement_system.check_group_achievements(
+            self.discord_id, "Goblin Grunt"
+        )
 
         # Verify calls
         self.mock_db.add_title.assert_any_call(self.discord_id, "Goblin-Chaser")
@@ -41,7 +43,9 @@ class TestMonsterAchievements(unittest.TestCase):
         """Test that low kills do not award titles."""
         self.mock_db.get_specific_monster_kills.return_value = {"Goblin Grunt": 10}
 
-        result = self.achievement_system.check_group_achievements(self.discord_id, "Goblin Grunt")
+        result = self.achievement_system.check_group_achievements(
+            self.discord_id, "Goblin Grunt"
+        )
 
         self.mock_db.add_title.assert_not_called()
         self.assertIsNone(result)
@@ -53,7 +57,9 @@ class TestMonsterAchievements(unittest.TestCase):
         self.mock_db.get_specific_monster_kills.return_value = {"Abyssal Wolf": 50}
         self.mock_db.add_title.return_value = True
 
-        result = self.achievement_system.check_group_achievements(self.discord_id, "Abyssal Wolf")
+        result = self.achievement_system.check_group_achievements(
+            self.discord_id, "Abyssal Wolf"
+        )
 
         # Should trigger Wolf-Hunter (50 Wolves) and Void-Walker (50 Void)
         self.mock_db.add_title.assert_any_call(self.discord_id, "Wolf-Hunter")

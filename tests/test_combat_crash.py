@@ -15,8 +15,8 @@ sys.modules["pymongo.errors"] = pymongo_errors_mock
 sys.modules["discord"] = MagicMock()
 
 # Now import the modules
-from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.combat_handler import CombatHandler  # noqa: E402
+from database.database_manager import DatabaseManager  # noqa: E402
 
 
 class TestCombatCrash(unittest.TestCase):
@@ -27,7 +27,9 @@ class TestCombatCrash(unittest.TestCase):
         db_mock = MagicMock(spec=DatabaseManager)
 
         # Simulate DB failure early in the process
-        db_mock.get_player_stats_json.side_effect = Exception("Database Connection Failed")
+        db_mock.get_player_stats_json.side_effect = Exception(
+            "Database Connection Failed"
+        )
 
         handler = CombatHandler(db_mock, 12345)
 
@@ -44,7 +46,9 @@ class TestCombatCrash(unittest.TestCase):
             # If we reach here, we check if the result is valid
             print(f"Result: {result}")
             self.assertIsNone(result["winner"])
-            self.assertEqual(result["phrases"][0], "*Something disrupts the flow of battle...*")
+            self.assertEqual(
+                result["phrases"][0], "*Something disrupts the flow of battle...*"
+            )
 
         except UnboundLocalError as e:
             # THIS IS EXPECTED TO FAIL currently

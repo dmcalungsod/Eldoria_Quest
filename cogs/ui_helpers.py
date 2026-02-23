@@ -48,7 +48,9 @@ def get_health_status_emoji(current: int, max_val: int) -> str:
     return "🔴"
 
 
-def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> discord.Embed:
+def build_inventory_embed(
+    items: list, max_slots: int = MAX_INVENTORY_SLOTS
+) -> discord.Embed:
     """Constructs the inventory display."""
     # Only count unequipped items (backpack slots)
     slot_count = len([i for i in items if not i.get("equipped")])
@@ -85,7 +87,10 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
 
             # Categorize Slot
             cat = "Armor"  # Default
-            if slot_key in EquipmentManager.TWO_HANDED_SLOTS or slot_key in EquipmentManager.MAIN_HAND_SLOTS:
+            if (
+                slot_key in EquipmentManager.TWO_HANDED_SLOTS
+                or slot_key in EquipmentManager.MAIN_HAND_SLOTS
+            ):
                 cat = "Weapon"
             elif slot_key in EquipmentManager.OFF_HAND_SLOTS:
                 # Shields are armor, others are weapons
@@ -96,7 +101,9 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
             elif slot_key == "accessory":
                 cat = "Accessory"
 
-            equipped_groups[cat].append(get_rarity_ansi(rarity, f"• {name} ({slot_display})"))
+            equipped_groups[cat].append(
+                get_rarity_ansi(rarity, f"• {name} ({slot_display})")
+            )
         else:
             key = (itype, name, rarity)
             unequipped_counts[key] = unequipped_counts.get(key, 0) + item["count"]
@@ -112,7 +119,9 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
         if equipped_groups["Accessory"]:
             val += "**Accessories**\n" + "\n".join(equipped_groups["Accessory"]) + "\n"
 
-        embed.add_field(name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False)
+        embed.add_field(
+            name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False
+        )
 
     # --- INVENTORY SECTION ---
     for (itype, name, rarity), count in sorted(unequipped_counts.items()):
@@ -168,7 +177,9 @@ async def get_profile_bundle_or_error(
     return bundle
 
 
-async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
+async def back_to_profile_callback(
+    interaction: discord.Interaction, is_new_message: bool = False
+):
     """Navigation: Returns to Character Profile."""
     from game_systems.character.ui.profile_view import CharacterTabView
 
@@ -252,7 +263,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
     except Exception as e:
         logger.error(f"Profile load error for {discord_id}: {e}", exc_info=True)
         if not interaction.response.is_done():
-            await interaction.response.send_message("Error loading profile.", ephemeral=True)
+            await interaction.response.send_message(
+                "Error loading profile.", ephemeral=True
+            )
 
 
 async def back_to_guild_hall_callback(interaction: discord.Interaction):
@@ -270,7 +283,9 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
 
         card = await asyncio.to_thread(db.get_guild_card_data, interaction.user.id)
         if not card:
-            await interaction.followup.send("You are not a guild member.", ephemeral=True)
+            await interaction.followup.send(
+                "You are not a guild member.", ephemeral=True
+            )
             return
 
         embed = discord.Embed(

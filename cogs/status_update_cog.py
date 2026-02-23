@@ -164,10 +164,14 @@ class StatusUpdateView(View):
 
             # Phase 2: Update Stats with Optimistic Lock
             # If the JSON string in DB has changed since we read it, this returns False
-            if not self.db.update_player_stats_optimistic(self.user.id, raw_json_str, current_stats.to_dict()):
+            if not self.db.update_player_stats_optimistic(
+                self.user.id, raw_json_str, current_stats.to_dict()
+            ):
                 # Rollback: Refund the cost
                 self.db.refund_vestige(self.user.id, total_cost)
-                logger.warning(f"Optimistic lock failed for user {self.user.id} upgrading {stat}")
+                logger.warning(
+                    f"Optimistic lock failed for user {self.user.id} upgrading {stat}"
+                )
                 return False, "System busy (Race Condition). Try again.", 0
 
             # Phase 3: Update Vitals (Only add the GAIN, do not full heal)
@@ -180,7 +184,9 @@ class StatusUpdateView(View):
                 new_current_hp = min(new_max_hp, current_hp + hp_gain)
                 new_current_mp = min(new_max_mp, current_mp + mp_gain)
 
-                self.db.update_player_vitals(self.user.id, new_current_hp, new_current_mp)
+                self.db.update_player_vitals(
+                    self.user.id, new_current_hp, new_current_mp
+                )
 
             return True, "", vestige - total_cost
         except Exception as e:
@@ -203,7 +209,9 @@ class StatusUpdateView(View):
         await interaction.response.defer()
         stat = interaction.data["custom_id"].split("_")[1]
 
-        success, msg, new_vestige = await asyncio.to_thread(self._execute_upgrade, stat, self.multiplier)
+        success, msg, new_vestige = await asyncio.to_thread(
+            self._execute_upgrade, stat, self.multiplier
+        )
 
         if not success:
             await interaction.followup.send(f"{E.ERROR} {msg}", ephemeral=True)
@@ -212,7 +220,9 @@ class StatusUpdateView(View):
         # Refresh UI
         self.p_data["vestige_pool"] = new_vestige
         # We need fresh stats to show the new values
-        new_stats_row = await asyncio.to_thread(self.db.get_player_stats_row, self.user.id)
+        new_stats_row = await asyncio.to_thread(
+            self.db.get_player_stats_row, self.user.id
+        )
         new_stats_obj = PlayerStats.from_dict(json.loads(new_stats_row["stats_json"]))
 
         embed = self.build_status_embed(self.p_data, new_stats_obj, new_stats_row)

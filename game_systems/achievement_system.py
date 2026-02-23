@@ -190,7 +190,9 @@ class AchievementSystem:
             logger.error(f"Error checking quest achievements for {discord_id}: {e}")
             return None
 
-    def check_group_achievements(self, discord_id: int, monster_name: str) -> str | None:
+    def check_group_achievements(
+        self, discord_id: int, monster_name: str
+    ) -> str | None:
         """
         Checks if the player has reached a milestone for a monster group.
         Returns a success message if a new title is awarded, else None.
@@ -281,7 +283,9 @@ class AchievementSystem:
             return None
 
         except Exception as e:
-            logger.error(f"Error checking exploration achievements for {discord_id}: {e}")
+            logger.error(
+                f"Error checking exploration achievements for {discord_id}: {e}"
+            )
             return None
 
     def check_skill_achievements(self, discord_id: int) -> str | None:

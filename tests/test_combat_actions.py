@@ -17,7 +17,9 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestCombatActions(unittest.TestCase):
     def setUp(self):
-        self.stats = PlayerStats(str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10)
+        self.stats = PlayerStats(
+            str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10
+        )
         self.player_wrapper = MagicMock(spec=LevelUpSystem)
         self.player_wrapper.stats = self.stats
         self.player_wrapper.level = 1
@@ -61,7 +63,9 @@ class TestCombatActions(unittest.TestCase):
         # Verify MP Restoration (5% of 100 = 5)
         # Note: If previous logic was correct, MP becomes 15
         expected_mp = 15
-        self.assertEqual(result["mp_current"], expected_mp, "Defend should restore 5% MP")
+        self.assertEqual(
+            result["mp_current"], expected_mp, "Defend should restore 5% MP"
+        )
 
         # Verify Damage Mitigation
         damage_defended = result["turn_report"]["damage_taken"]
@@ -86,7 +90,9 @@ class TestCombatActions(unittest.TestCase):
 
         damage_attacked = result_attack["turn_report"]["damage_taken"]
 
-        self.assertTrue(damage_defended < damage_attacked, "Defend should reduce damage")
+        self.assertTrue(
+            damage_defended < damage_attacked, "Defend should reduce damage"
+        )
         self.assertAlmostEqual(damage_defended, int(damage_attacked * 0.5), delta=1)
 
     def test_flee_failed_action(self):
@@ -110,7 +116,9 @@ class TestCombatActions(unittest.TestCase):
             0,
             "Player should not attack on flee fail",
         )
-        self.assertTrue(result["turn_report"]["damage_taken"] > 0, "Monster should attack")
+        self.assertTrue(
+            result["turn_report"]["damage_taken"] > 0, "Monster should attack"
+        )
 
     def test_special_ability_action(self):
         """Test that Special Ability action uses MP and deals boosted damage."""
@@ -144,7 +152,9 @@ class TestCombatActions(unittest.TestCase):
                 result_special = engine.run_combat_turn()
 
         # Check MP Deduction (Cost 20)
-        self.assertEqual(result_special["mp_current"], 30, "Special Ability should cost 20 MP")
+        self.assertEqual(
+            result_special["mp_current"], 30, "Special Ability should cost 20 MP"
+        )
 
         # Check Damage
         # Compare with normal attack

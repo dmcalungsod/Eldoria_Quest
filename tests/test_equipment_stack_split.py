@@ -79,7 +79,9 @@ class TestStackEquipBug(unittest.TestCase):
             # We expect that we call the safe split method split_stack_to_equipped.
 
             # Assert that split_stack_to_equipped WAS called
-            self.mock_db.split_stack_to_equipped.assert_called_with(discord_id, inv_id, item_stack)
+            self.mock_db.split_stack_to_equipped.assert_called_with(
+                discord_id, inv_id, item_stack
+            )
 
             # Assert that insert_equipped_split was NOT called directly (it is called inside split_stack_to_equipped)
             # But EquipmentManager shouldn't call it directly anymore.

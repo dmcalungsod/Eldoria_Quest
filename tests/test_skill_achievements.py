@@ -25,6 +25,7 @@ class TestSkillAchievements(unittest.TestCase):
         self.mock_db_module.DatabaseManager = MagicMock()
 
         # Import System Under Test inside setUp to use patched modules
+        import game_systems.achievement_system
         from game_systems.achievement_system import AchievementSystem
 
         self.AchievementSystem = AchievementSystem
@@ -52,7 +53,9 @@ class TestSkillAchievements(unittest.TestCase):
 
     def test_skill_count_achievement_scholar(self):
         """Test awarding 'Scholar' for 4 skills."""
-        self.mock_db.get_all_player_skills.return_value = [{"skill_key": f"s{i}", "skill_level": 1} for i in range(4)]
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": f"s{i}", "skill_level": 1} for i in range(4)
+        ]
         self.mock_db.add_title.side_effect = lambda uid, title: True
 
         msg = self.ach_system.check_skill_achievements(123)
@@ -63,7 +66,9 @@ class TestSkillAchievements(unittest.TestCase):
 
     def test_skill_level_achievement_virtuoso(self):
         """Test awarding 'Virtuoso' for level 10 skill."""
-        self.mock_db.get_all_player_skills.return_value = [{"skill_key": "s1", "skill_level": 10}]
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": "s1", "skill_level": 10}
+        ]
         self.mock_db.add_title.side_effect = lambda uid, title: True
 
         msg = self.ach_system.check_skill_achievements(123)

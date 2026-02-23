@@ -1,7 +1,8 @@
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
+import asyncio
+from unittest.mock import MagicMock, AsyncMock, patch
 
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
@@ -22,7 +23,9 @@ mock_discord.Color.dark_grey.return_value = "dark_grey"
 
 
 class MockSelectOption:
-    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+    def __init__(
+        self, label=None, value=None, description=None, emoji=None, default=False
+    ):
         self.label = label
         self.value = value
         self.description = description
@@ -141,15 +144,17 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
         ].AdventureEmbeds.build_exploration_embed.return_value = MagicMock()
 
         # Import modules under test INSIDE the patched context
-        # Reload to ensure they use our fresh mocks
-        import importlib
-
         import game_systems.adventure.ui.exploration_view
         import game_systems.player.player_stats
 
+        # Reload to ensure they use our fresh mocks
+        import importlib
+
         importlib.reload(game_systems.adventure.ui.exploration_view)
 
-        self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
+        self.ExplorationView = (
+            game_systems.adventure.ui.exploration_view.ExplorationView
+        )
         self.PlayerStats = game_systems.player.player_stats.PlayerStats
 
         self.mock_db = MagicMock()
@@ -208,7 +213,9 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
 
         # Assert that 'embed' was passed and contains the new footer
         # Currently expected to fail
-        self.assertIn("embed", kwargs, "Embed should be updated in the first response edit")
+        self.assertIn(
+            "embed", kwargs, "Embed should be updated in the first response edit"
+        )
 
         mock_embed.set_footer.assert_called_with(text="⚔️ Resolving combat...")
 

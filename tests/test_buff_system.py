@@ -92,7 +92,9 @@ class TestBuffSystem(unittest.TestCase):
     def test_combat_handler_applies_buff(self):
         """Tests that CombatHandler applies active buffs to player stats."""
         # Add buff
-        self.mock_db.add_active_buff(self.discord_id, "buff_1", "Strong", "STR", 50, 3600)
+        self.mock_db.add_active_buff(
+            self.discord_id, "buff_1", "Strong", "STR", 50, 3600
+        )
 
         # Monkeypatch PlayerStats.add_bonus_stat to verify call
         original_add_bonus = PlayerStats.add_bonus_stat
@@ -156,7 +158,9 @@ class TestBuffSystem(unittest.TestCase):
                 "monster_hp": 50,
                 "turn_report": {},
                 "active_boosts": {},
-                "new_buffs": [{"name": "Test Buff", "stat": "STR", "amount": 5, "duration": 3}],
+                "new_buffs": [
+                    {"name": "Test Buff", "stat": "STR", "amount": 5, "duration": 3}
+                ],
             }
 
             ch = CombatHandler(self.mock_db, self.discord_id)

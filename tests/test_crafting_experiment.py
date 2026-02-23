@@ -4,17 +4,19 @@ test_crafting_experiment.py
 Tests for the Alchemy Experimentation System.
 """
 
-import os
 import sys
+import os
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Mock pymongo BEFORE imports
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
 # Add repo root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # noqa: E402
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)  # noqa: E402
 
 from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
 

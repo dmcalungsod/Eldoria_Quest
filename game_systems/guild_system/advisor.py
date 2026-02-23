@@ -4,6 +4,7 @@ The Guild Advisor system, providing context-aware guidance to new players.
 """
 
 import random
+from typing import Optional
 
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats

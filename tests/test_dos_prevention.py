@@ -59,7 +59,9 @@ class MockSelect:
 
 
 class MockSelectOption:
-    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+    def __init__(
+        self, label=None, value=None, description=None, emoji=None, default=False
+    ):
         self.label = label
         self.value = value
         self.description = description
@@ -107,7 +109,9 @@ class TestDoSPrevention(unittest.TestCase):
 
         importlib.reload(game_systems.adventure.ui.exploration_view)
 
-        self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
+        self.ExplorationView = (
+            game_systems.adventure.ui.exploration_view.ExplorationView
+        )
 
         # Import PlayerStats
         from game_systems.player.player_stats import PlayerStats
@@ -159,7 +163,9 @@ class TestDoSPrevention(unittest.TestCase):
             self.mock_manager.simulate_adventure_step.assert_not_called()
 
             # Assert User got error message
-            interaction.response.send_message.assert_called_with("Invalid action data.", ephemeral=True)
+            interaction.response.send_message.assert_called_with(
+                "Invalid action data.", ephemeral=True
+            )
         finally:
             loop.close()
 

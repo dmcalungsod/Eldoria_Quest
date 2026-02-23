@@ -68,7 +68,9 @@ class MockDatabaseManager:
     def get_active_world_event(self):
         return None
 
-    def update_player_vitals_delta(self, discord_id, hp_delta, mp_delta, max_hp, max_mp):
+    def update_player_vitals_delta(
+        self, discord_id, hp_delta, mp_delta, max_hp, max_mp
+    ):
         # Emulate the atomic update with clamping
         # Apply delta
         new_hp = self.player_data["current_hp"] + hp_delta
@@ -101,15 +103,17 @@ class TestHealRaceCondition(unittest.TestCase):
         # because they might try to use real DB calls if not careful.
         # AdventureSession instantiates them in __init__.
 
-        with (
-            patch("game_systems.adventure.adventure_session.AdventureRewards") as MockRewards,
-            patch("game_systems.adventure.adventure_session.CombatHandler") as MockCombat,
-            patch("game_systems.adventure.adventure_session.EventHandler") as MockEvents,
-            patch(
-                "game_systems.adventure.adventure_session.LOCATIONS",
-                {"loc_1": {"name": "Test", "monsters": []}},
-            ),
+        with patch(
+            "game_systems.adventure.adventure_session.AdventureRewards"
+        ) as MockRewards, patch(
+            "game_systems.adventure.adventure_session.CombatHandler"
+        ) as MockCombat, patch(
+            "game_systems.adventure.adventure_session.EventHandler"
+        ) as MockEvents, patch(
+            "game_systems.adventure.adventure_session.LOCATIONS",
+            {"loc_1": {"name": "Test", "monsters": []}},
         ):
+
             session = AdventureSession(
                 self.db,
                 MagicMock(),

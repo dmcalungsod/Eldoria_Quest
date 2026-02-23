@@ -5,7 +5,6 @@ Hardened: Async loading and circular import protection.
 """
 
 import asyncio
-
 import discord
 from discord.ui import View
 
@@ -79,14 +78,18 @@ class GuildLobbyView(View, GuildViewMixin):
 
         await interaction.response.defer()
         view = QuestsMenuView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.quest_menu(), view=view)
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.quest_menu(), view=view
+        )
 
     async def _services_btn_callback(self, interaction: discord.Interaction):
         from .services_menu import GuildServicesView
 
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.services_menu(), view=view
+        )
 
     async def _advisor_callback(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)

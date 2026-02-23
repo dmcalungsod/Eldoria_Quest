@@ -9,8 +9,8 @@ sys.modules["discord"] = MagicMock()
 # -----------------------------
 
 import pytest  # noqa: E402
-
 from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 @pytest.fixture

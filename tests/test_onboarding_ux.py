@@ -95,7 +95,9 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(view.step, 3)
 
         # Simulate Complete (Step 3 -> End)
-        with patch("cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock) as mock_transition:
+        with patch(
+            "cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock
+        ) as mock_transition:
             await view.complete_callback(interaction)
             mock_transition.assert_called_with(interaction, db, user)
 

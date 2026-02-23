@@ -12,7 +12,9 @@ class ExpCalculator:
     TIER_MULTIPLIER = {"Normal": 1.0, "Elite": 2.5, "Boss": 10.0}
 
     @staticmethod
-    def calculate_exp(player_level: int, monster_data: dict, exp_boost_mult: float = 1.0) -> int:
+    def calculate_exp(
+        player_level: int, monster_data: dict, exp_boost_mult: float = 1.0
+    ) -> int:
         """
         Calculates XP reward for a single player.
         """

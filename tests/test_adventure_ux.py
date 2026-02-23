@@ -90,8 +90,12 @@ class TestAdventureUX(unittest.TestCase):
             button = view.items[0]
             print(f"Button Label: {button.label}, Emoji: {button.emoji}")
 
-            self.assertEqual(button.label, "Resume Expedition", "Label should be 'Resume Expedition'")
-            self.assertIn(button.emoji, ["🧭", "🗺️"], "Emoji should be Compass or Map for resume")
+            self.assertEqual(
+                button.label, "Resume Expedition", "Label should be 'Resume Expedition'"
+            )
+            self.assertIn(
+                button.emoji, ["🧭", "🗺️"], "Emoji should be Compass or Map for resume"
+            )
 
         except TypeError as e:
             print(f"Caught expected TypeError (not implemented yet): {e}")
@@ -109,7 +113,9 @@ class TestAdventureUX(unittest.TestCase):
             button = view.items[0]
             print(f"Button Label: {button.label}, Emoji: {button.emoji}")
 
-            self.assertEqual(button.label, "Begin Expedition", "Label should be 'Begin Expedition'")
+            self.assertEqual(
+                button.label, "Begin Expedition", "Label should be 'Begin Expedition'"
+            )
             self.assertEqual(button.emoji, "⚔️", "Emoji should be Swords for begin")
 
         except TypeError as e:

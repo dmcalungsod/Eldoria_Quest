@@ -1,7 +1,7 @@
-import os
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
+import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -52,15 +52,17 @@ class TestNarrativeEmbeds(unittest.TestCase):
         # Since we added repo root to path, it should be fine.
 
         # We also need to ensure narrative_data is importable.
-        # Reload to ensure mocks are applied if already imported
-        import importlib
-
         import game_systems.adventure.ui.adventure_embeds
         import game_systems.data.narrative_data
 
+        # Reload to ensure mocks are applied if already imported
+        import importlib
+
         importlib.reload(game_systems.adventure.ui.adventure_embeds)
 
-        self.AdventureEmbeds = game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
+        self.AdventureEmbeds = (
+            game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
+        )
         self.MISSION_FLAVOR_TEXT = game_systems.data.narrative_data.MISSION_FLAVOR_TEXT
         self.OUTCOME_FLAVOR_TEXT = game_systems.data.narrative_data.OUTCOME_FLAVOR_TEXT
 

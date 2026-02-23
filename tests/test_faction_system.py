@@ -24,7 +24,9 @@ class TestFactionSystem(unittest.TestCase):
         self.mock_db._col.return_value.insert_one.assert_called_once()
 
     def test_join_faction_already_member(self):
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders"}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders"
+        }
 
         success, msg = self.system.join_faction(self.discord_id, "iron_vanguard")
 
@@ -36,7 +38,9 @@ class TestFactionSystem(unittest.TestCase):
         self.assertFalse(success)
 
     def test_leave_faction(self):
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders"}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders"
+        }
 
         success, msg = self.system.leave_faction(self.discord_id)
 
@@ -114,7 +118,9 @@ class TestFactionSystem(unittest.TestCase):
 
         self.mock_db.update_faction_reputation.return_value = 15
 
-        logs = self.system.grant_reputation_for_adventure(self.discord_id, 30, "any_loc")
+        logs = self.system.grant_reputation_for_adventure(
+            self.discord_id, 30, "any_loc"
+        )
 
         self.mock_db.update_faction_reputation.assert_called_with(self.discord_id, 15)
 

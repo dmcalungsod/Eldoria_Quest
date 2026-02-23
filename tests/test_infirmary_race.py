@@ -56,7 +56,9 @@ class TestInfirmaryRace(unittest.TestCase):
         )
 
         # 2. Verify Atomic Increment: Update should use $inc for aurum
-        self.assertIn("$inc", update_op, "Update should use $inc for atomic balance deduction")
+        self.assertIn(
+            "$inc", update_op, "Update should use $inc for atomic balance deduction"
+        )
         self.assertEqual(update_op["$inc"]["aurum"], -320, "Should deduct 320 aurum")
 
         # 3. Verify Vitals Set: Update should use $set for HP/MP

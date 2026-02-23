@@ -82,7 +82,10 @@ class GuildServicesView(View, GuildViewMixin):
         # Check for Mystic Merchant Event
         self.event_system = WorldEventSystem(self.db)
         active_event = self.event_system.get_current_event()
-        if active_event and active_event.get("type") == WorldEventSystem.MYSTIC_MERCHANT:
+        if (
+            active_event
+            and active_event.get("type") == WorldEventSystem.MYSTIC_MERCHANT
+        ):
             self.add_item(
                 ViewFactory.create_button(
                     "Mystic Merchant",
@@ -103,14 +106,18 @@ class GuildServicesView(View, GuildViewMixin):
         )
         self.add_item(self.back_btn)
 
-    async def exchange_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def exchange_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         from .exchange_view import GuildExchangeView
 
         await interaction.response.defer()
         exchange = SystemCache.get_guild_exchange(self.db)
 
         # Heavy calculation in thread
-        val, mats = await asyncio.to_thread(exchange.calculate_exchange_value, self.interaction_user.id)
+        val, mats = await asyncio.to_thread(
+            exchange.calculate_exchange_value, self.interaction_user.id
+        )
 
         embed = EmbedBuilder.guild_exchange()
         if val == 0:
@@ -128,7 +135,9 @@ class GuildServicesView(View, GuildViewMixin):
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def shop_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def shop_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         from cogs.shop_cog import ShopView
 
         await interaction.response.defer()
@@ -147,7 +156,9 @@ class GuildServicesView(View, GuildViewMixin):
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def infirmary_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def infirmary_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         from cogs.infirmary_cog import InfirmaryView
         from game_systems.player.player_stats import PlayerStats
 
@@ -157,7 +168,9 @@ class GuildServicesView(View, GuildViewMixin):
         try:
             p_data, s_json = await asyncio.gather(
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id),
+                asyncio.to_thread(
+                    self.db.get_player_stats_json, self.interaction_user.id
+                ),
             )
             stats = PlayerStats.from_dict(s_json)
 
@@ -168,7 +181,9 @@ class GuildServicesView(View, GuildViewMixin):
         except Exception as e:
             logger.error(f"Infirmary open error: {e}")
 
-    async def trainer_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def trainer_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         from cogs.skill_trainer_cog import SkillTrainerView
 
         await interaction.response.defer()
@@ -179,7 +194,9 @@ class GuildServicesView(View, GuildViewMixin):
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def alchemist_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def alchemist_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         from game_systems.crafting.ui.crafting_view import CraftingView
 
         await interaction.response.defer()
@@ -191,7 +208,9 @@ class GuildServicesView(View, GuildViewMixin):
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def mystic_merchant_callback(self, interaction: discord.Interaction, button: Button = None):
+    async def mystic_merchant_callback(
+        self, interaction: discord.Interaction, button: Button = None
+    ):
         from cogs.shop_cog import ShopView
 
         await interaction.response.defer()
@@ -206,11 +225,15 @@ class GuildServicesView(View, GuildViewMixin):
             description=f"A cloaked figure displays wares that shimmer with strange energy.\n\nFunds: {aurum} Aurum",
             color=discord.Color.purple(),
         )
-        view = ShopView(self.db, self.interaction_user, aurum, inventory=MYSTIC_MERCHANT_INVENTORY)
+        view = ShopView(
+            self.db, self.interaction_user, aurum, inventory=MYSTIC_MERCHANT_INVENTORY
+        )
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def back_to_services(self, interaction: discord.Interaction):
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.services_menu(), view=view
+        )

@@ -8,11 +8,11 @@ Tests the regression of reward distribution logic:
 """
 
 import importlib
-import json
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+import json
+from unittest.mock import MagicMock, patch, ANY
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -44,7 +44,9 @@ class TestAdventureRewards(unittest.TestCase):
         import game_systems.adventure.adventure_rewards
 
         importlib.reload(game_systems.adventure.adventure_rewards)
-        self.AdventureRewards = game_systems.adventure.adventure_rewards.AdventureRewards
+        self.AdventureRewards = (
+            game_systems.adventure.adventure_rewards.AdventureRewards
+        )
 
         import game_systems.items.inventory_manager
 
@@ -61,8 +63,12 @@ class TestAdventureRewards(unittest.TestCase):
         self.rewards_system.achievement_system = MagicMock()
         self.rewards_system.faction_system = MagicMock()
         self.rewards_system.faction_system.grant_reputation_for_kill.return_value = []
-        self.rewards_system.achievement_system.check_kill_achievements.return_value = None
-        self.rewards_system.achievement_system.check_group_achievements.return_value = None
+        self.rewards_system.achievement_system.check_kill_achievements.return_value = (
+            None
+        )
+        self.rewards_system.achievement_system.check_group_achievements.return_value = (
+            None
+        )
         self.rewards_system.rank_system.finalize_promotion.return_value = (False, "")
 
     def tearDown(self):
@@ -204,7 +210,9 @@ class TestAdventureRewards(unittest.TestCase):
             "game_systems.rewards.loot_calculator.LootCalculator.roll_drops",
             return_value=[],
         ):
-            self.rewards_system.process_victory({}, report_list, combat_result, quest_system, inv_manager, session_loot)
+            self.rewards_system.process_victory(
+                {}, report_list, combat_result, quest_system, inv_manager, session_loot
+            )
 
         # Verify Slash: used 2 times. 2 * 2.5 = 5.0 XP. No level up.
         # Verify Fireball: used 1 time. 1 * 2.5 = 2.5 XP. 99 + 2.5 = 101.5. Level up!
@@ -274,9 +282,13 @@ class TestAdventureRewards(unittest.TestCase):
 
                 # Verify Quest Updates
                 # Should update for defeat
-                quest_system.update_progress.assert_any_call(self.discord_id, "q1", "defeat", "Goblin")
+                quest_system.update_progress.assert_any_call(
+                    self.discord_id, "q1", "defeat", "Goblin"
+                )
                 # Should update for collect
-                quest_system.update_progress.assert_any_call(self.discord_id, "q1", "collect", "Goblin Ear")
+                quest_system.update_progress.assert_any_call(
+                    self.discord_id, "q1", "collect", "Goblin Ear"
+                )
 
                 # Verify Logs contain loot
                 self.assertTrue(any("Goblin Ear" in log for log in logs))

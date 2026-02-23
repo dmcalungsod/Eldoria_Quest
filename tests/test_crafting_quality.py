@@ -83,7 +83,9 @@ class TestCraftingQuality(unittest.TestCase):
         # Force upgrade to Uncommon
         mock_random.side_effect = [0.05, 0.5]
 
-        success, msg, item = self.crafting.craft_item(self.discord_id, "craft_rusted_sword")
+        success, msg, item = self.crafting.craft_item(
+            self.discord_id, "craft_rusted_sword"
+        )
 
         self.assertTrue(success)
         self.assertIn("Critical Success", msg)

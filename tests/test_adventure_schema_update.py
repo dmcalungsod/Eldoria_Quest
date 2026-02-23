@@ -1,7 +1,7 @@
-import os
-import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, ANY
+import sys
+import os
 
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.database_manager import DatabaseManager  # noqa: E402
 from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
+from game_systems.data.adventure_locations import LOCATIONS  # noqa: E402
 
 
 class TestAdventureSchemaUpdate(unittest.TestCase):
@@ -27,7 +28,9 @@ class TestAdventureSchemaUpdate(unittest.TestCase):
         with 'supplies' and 'status' arguments.
         """
         discord_id = 12345
-        location_id = "forest_outskirts"  # Assuming this is valid based on previous files
+        location_id = (
+            "forest_outskirts"  # Assuming this is valid based on previous files
+        )
         duration = 60
 
         # Ensure location is valid in the imported LOCATIONS
@@ -37,7 +40,9 @@ class TestAdventureSchemaUpdate(unittest.TestCase):
         # Since we imported it, we can't easily mock it unless we patch it.
         # Let's use a key that likely exists or patch LOCATIONS.
 
-        with unittest.mock.patch("game_systems.adventure.adventure_manager.LOCATIONS", {"test_loc": {}}):
+        with unittest.mock.patch(
+            "game_systems.adventure.adventure_manager.LOCATIONS", {"test_loc": {}}
+        ):
             self.manager.start_adventure(discord_id, "test_loc", duration)
 
         # Verify insert_adventure_session was called
@@ -72,7 +77,9 @@ class TestAdventureSchemaUpdate(unittest.TestCase):
         self.assertIn("status", kwargs)
         self.assertEqual(kwargs["status"], "in_progress")
 
-        print("SUCCESS: AdventureManager calls insert_adventure_session with new schema args.")
+        print(
+            "SUCCESS: AdventureManager calls insert_adventure_session with new schema args."
+        )
 
     def test_database_manager_methods_exist(self):
         """

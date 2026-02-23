@@ -15,7 +15,9 @@ def log_summary(message):
 def run_command(command_list):
     try:
         # Use shell=False and pass list for safety
-        result = subprocess.run(command_list, capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            command_list, capture_output=True, text=True, check=True
+        )
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         # Avoid printing full command if it contains secrets (though here it's just branch names)
@@ -30,7 +32,9 @@ def main():
     # Set retention period (20 hours) to allow recent branches to persist for a bit
     hours_threshold = 20
     cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
-    print(f"Pruning merged branches older than {cutoff_date.isoformat()} ({hours_threshold} hours retention)...")
+    print(
+        f"Pruning merged branches older than {cutoff_date.isoformat()} ({hours_threshold} hours retention)..."
+    )
 
     # Get current repository
     current_repo_json = run_command(["gh", "repo", "view", "--json", "nameWithOwner"])
@@ -88,7 +92,9 @@ def main():
 
         # Check if old enough
         if merged_at > cutoff_date:
-            print(f"Skipping PR #{pr_number} ({head_ref}): Merged at {merged_at} is newer than cutoff {cutoff_date}")
+            print(
+                f"Skipping PR #{pr_number} ({head_ref}): Merged at {merged_at} is newer than cutoff {cutoff_date}"
+            )
             continue
 
         # Check if it's from the same repository (not a fork)

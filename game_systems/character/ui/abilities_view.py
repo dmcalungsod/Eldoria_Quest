@@ -66,7 +66,9 @@ class AbilitiesView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your profile.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your profile.", ephemeral=True
+            )
             return False
         return True
 
@@ -78,8 +80,12 @@ class AbilitiesView(View):
         await interaction.response.defer()
 
         try:
-            items = await asyncio.to_thread(self.inventory_manager.get_inventory, self.interaction_user.id)
-            max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
+            items = await asyncio.to_thread(
+                self.inventory_manager.get_inventory, self.interaction_user.id
+            )
+            max_slots = await asyncio.to_thread(
+                self.db.calculate_inventory_limit, self.interaction_user.id
+            )
             # build_inventory_embed is CPU bound (formatting), safe to run in thread
             embed = await asyncio.to_thread(build_inventory_embed, items, max_slots)
 
@@ -103,17 +109,26 @@ class AbilitiesView(View):
         await interaction.response.defer()
 
         try:
-            skills = await asyncio.to_thread(self.db.get_player_skills, self.interaction_user.id)
+            skills = await asyncio.to_thread(
+                self.db.get_player_skills, self.interaction_user.id
+            )
 
             if not skills:
                 skills_str = "*No recorded techniques.*"
             else:
                 # Using dict access since Row behaves like dict
-                skills_str = "\n".join([f"• **{s['name']}** — *{s['type']}*, Rank {s['skill_level']}" for s in skills])
+                skills_str = "\n".join(
+                    [
+                        f"• **{s['name']}** — *{s['type']}*, Rank {s['skill_level']}"
+                        for s in skills
+                    ]
+                )
 
             embed = discord.Embed(
                 title="📖 Tome of Arts",
-                description=(f"*Collected techniques and disciplined forms.*\n\n{skills_str}"),
+                description=(
+                    f"*Collected techniques and disciplined forms.*\n\n{skills_str}"
+                ),
                 color=discord.Color.purple(),
             )
 

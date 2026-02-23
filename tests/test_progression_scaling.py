@@ -4,7 +4,9 @@ import sys
 import pytest
 
 # Add repo root to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # noqa: E402
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)  # noqa: E402
 
 from game_systems.player.player_stats import calculate_practice_threshold
 

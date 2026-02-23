@@ -16,7 +16,9 @@ class TestContentExpansion(unittest.TestCase):
 
         # Verify monsters exist in MONSTERS
         for monster_key, _ in fen["monsters"]:
-            self.assertIn(monster_key, MONSTERS, f"Monster {monster_key} not in MONSTERS")
+            self.assertIn(
+                monster_key, MONSTERS, f"Monster {monster_key} not in MONSTERS"
+            )
 
         if "conditional_monsters" in fen:
             for cm in fen["conditional_monsters"]:

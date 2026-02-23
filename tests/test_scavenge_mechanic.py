@@ -22,7 +22,9 @@ class TestDeadTurns(unittest.TestCase):
         self.mock_db = MagicMock(spec=DatabaseManager)
         self.mock_quest_system = MagicMock()
         self.discord_id = 12345
-        self.event_handler = EventHandler(self.mock_db, self.mock_quest_system, self.discord_id)
+        self.event_handler = EventHandler(
+            self.mock_db, self.mock_quest_system, self.discord_id
+        )
 
         # Common Mock Returns
         self.mock_db.get_player_stats_json.return_value = {
@@ -43,7 +45,9 @@ class TestDeadTurns(unittest.TestCase):
         }
 
         # Mock Context
-        self.player_stats = PlayerStats(str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10, lck_base=10)
+        self.player_stats = PlayerStats(
+            str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10, lck_base=10
+        )
         self.context = {
             "player_stats": self.player_stats,
             "vitals": {"current_hp": 150, "current_mp": 70},
@@ -54,7 +58,9 @@ class TestDeadTurns(unittest.TestCase):
     def test_full_rest_prevention(self):
         """Test that full HP/MP now returns 'Already Rested' message instead of SURGE."""
         # Force regen path by high regen_chance
-        result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=100)
+        result = self.event_handler.resolve_non_combat(
+            context=self.context, regen_chance=100
+        )
 
         # Should have "Already Rested" message
         log_str = "\n".join(result["log"])
@@ -68,7 +74,9 @@ class TestDeadTurns(unittest.TestCase):
         # Or just pass regen_chance=0
         self.mock_quest_system.get_player_quests.return_value = []
 
-        with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
+        with patch("random.randint") as mock_randint, patch(
+            "random.random"
+        ) as mock_random:
             # Sequence:
             # 1. Regen check: 100 (fail, since we pass regen_chance=0 to be sure, but let's assume standard flow)
             # Actually, let's just use regen_chance=0 to skip regen logic entirely.
@@ -89,11 +97,15 @@ class TestDeadTurns(unittest.TestCase):
             mock_random.return_value = 0.1
 
             # Ensure regen_chance allows failing regen check
-            result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=50)
+            result = self.event_handler.resolve_non_combat(
+                context=self.context, regen_chance=50
+            )
 
         # Should NOT have SURGE message
         log_str = "\n".join(result["log"])
-        self.assertFalse(any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES))
+        self.assertFalse(
+            any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES)
+        )
 
         # Should have Aurum Scavenge message
         self.assertTrue("Aurum" in log_str)
@@ -107,7 +119,9 @@ class TestDeadTurns(unittest.TestCase):
         """Test failed gathering from normal exploration triggers Scavenge."""
         self.mock_quest_system.get_player_quests.return_value = []
 
-        with patch("random.randint") as mock_randint, patch("random.random") as mock_random:
+        with patch("random.randint") as mock_randint, patch(
+            "random.random"
+        ) as mock_random:
             # Sequence:
             # 1. Regen check: 99 (fail)
             # 2. Gather check: 99 (fail)
@@ -117,11 +131,15 @@ class TestDeadTurns(unittest.TestCase):
             mock_randint.side_effect = [99, 99, 10]
             mock_random.return_value = 0.6
 
-            result = self.event_handler.resolve_non_combat(context=self.context, regen_chance=0)
+            result = self.event_handler.resolve_non_combat(
+                context=self.context, regen_chance=0
+            )
 
         # Should NOT have SURGE message
         log_str = "\n".join(result["log"])
-        self.assertFalse(any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES))
+        self.assertFalse(
+            any(phrase in log_str for phrase in AdventureEvents.SURGE_PHRASES)
+        )
 
         # Should have XP Scavenge message
         self.assertTrue("XP" in log_str)

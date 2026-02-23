@@ -57,11 +57,17 @@ class AdventureEmbeds:
             ]
         ):
             color_code = f"{ESC}[0;31m"  # Red
-        elif any(x in line_lower for x in ["you hit", "you deal", "critical", "cast", "attack", "shift into"]):
+        elif any(
+            x in line_lower
+            for x in ["you hit", "you deal", "critical", "cast", "attack", "shift into"]
+        ):
             color_code = f"{ESC}[0;36m"  # Cyan
         elif any(x in line_lower for x in ["heal", "recover", "restored", "buff"]):
             color_code = f"{ESC}[0;32m"  # Green
-        elif any(x in line_lower for x in ["found", "gained", "looted", "victory", "level up", "xp", "aurum"]):
+        elif any(
+            x in line_lower
+            for x in ["found", "gained", "looted", "victory", "level up", "xp", "aurum"]
+        ):
             color_code = f"{ESC}[0;33m"  # Yellow/Gold
         elif any(x in line_lower for x in ["fled", "escape"]):
             color_code = f"{ESC}[0;34m"  # Blue
@@ -137,7 +143,9 @@ class AdventureEmbeds:
             mp_bar = make_progress_bar(vitals["current_mp"], player_stats.max_mp)
 
             # Simple status indicator
-            status_icon = get_health_status_emoji(vitals["current_hp"], player_stats.max_hp)
+            status_icon = get_health_status_emoji(
+                vitals["current_hp"], player_stats.max_hp
+            )
 
             embed.add_field(
                 name=f"Adventurer Status {status_icon}",
@@ -159,7 +167,9 @@ class AdventureEmbeds:
             # Check for charged skill telegraph
             charged_skill = active_monster.get("charged_skill")
             if charged_skill:
-                warning = f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
+                warning = (
+                    f"\n⚠️ **CHARGING:** {charged_skill.get('name', 'Unknown Skill')}"
+                )
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}{warning}"
             else:
                 val = f"**HP:** `{bar}` {m_hp}/{m_max}"
@@ -178,7 +188,9 @@ class AdventureEmbeds:
         if active_monster:
             embed.set_footer(text="Choose your combat action • Field Pack to use items")
         else:
-            embed.set_footer(text="Press Forward to continue • Field Pack to manage items")
+            embed.set_footer(
+                text="Press Forward to continue • Field Pack to manage items"
+            )
 
         return embed
 
@@ -233,7 +245,12 @@ class AdventureEmbeds:
             loot_lines.append(f"• {get_rarity_ansi(i.get('rarity'), item_text)}")
 
         if loot_lines:
-            val = "```ansi\n" + "\n".join(loot_lines[:15]) + ("\n...and more" if len(loot_lines) > 15 else "") + "\n```"
+            val = (
+                "```ansi\n"
+                + "\n".join(loot_lines[:15])
+                + ("\n...and more" if len(loot_lines) > 15 else "")
+                + "\n```"
+            )
             embed.add_field(name=f"{E.ITEM_BOX} Gathered Loot", value=val, inline=False)
         else:
             embed.add_field(
@@ -261,7 +278,9 @@ class AdventureEmbeds:
 
         # 6. Achievements
         if new_titles := s.get("new_titles"):
-            embed.add_field(name="🏆 Achievements Unlocked", value=new_titles, inline=False)
+            embed.add_field(
+                name="🏆 Achievements Unlocked", value=new_titles, inline=False
+            )
 
         embed.set_footer(text="Your journey is recorded in the archives.")
         return embed

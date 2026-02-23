@@ -50,7 +50,9 @@ class MockSelect:
         self.callback = None
 
     def add_option(self, label, value, description=None, emoji=None):
-        self.options.append({"label": label, "value": value, "description": description, "emoji": emoji})
+        self.options.append(
+            {"label": label, "value": value, "description": description, "emoji": emoji}
+        )
 
 
 class TestCraftingUI(unittest.TestCase):
@@ -122,7 +124,9 @@ class TestCraftingUI(unittest.TestCase):
         self.mock_crafting_system.can_craft.return_value = (True, "Ready")
 
         # Patch CraftingSystem constructor
-        patcher = unittest.mock.patch("game_systems.crafting.ui.crafting_view.CraftingSystem")
+        patcher = unittest.mock.patch(
+            "game_systems.crafting.ui.crafting_view.CraftingSystem"
+        )
         self.MockCraftingSystemClass = patcher.start()
         self.MockCraftingSystemClass.return_value = self.mock_crafting_system
         self.addCleanup(patcher.stop)

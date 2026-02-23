@@ -109,7 +109,9 @@ class TestUIHelpers(unittest.TestCase):
         embed = build_inventory_embed(items, max_slots)
 
         # Verify Equipped Gear field exists
-        equipped_field = next((f for f in embed.fields if "Equipped Gear" in f["name"]), None)
+        equipped_field = next(
+            (f for f in embed.fields if "Equipped Gear" in f["name"]), None
+        )
         self.assertIsNotNone(equipped_field)
 
         val = equipped_field["value"]

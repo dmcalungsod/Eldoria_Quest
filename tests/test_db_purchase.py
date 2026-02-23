@@ -47,7 +47,9 @@ class TestShopTransactionFailure(unittest.TestCase):
         self.mock_db.__getitem__.side_effect = get_collection
 
         # Patch MongoClient
-        self.patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
+        self.patcher = patch(
+            "database.database_manager.MongoClient", return_value=self.mock_client
+        )
         self.patcher.start()
 
         # Reset Singleton
@@ -88,7 +90,9 @@ class TestShopTransactionFailure(unittest.TestCase):
         self.mock_db.inventory.insert_one.side_effect = Exception("DB Insert Failed")
 
         # Also mock add_inventory_item to fail IF it's called (future proofing)
-        self.db.add_inventory_item = MagicMock(side_effect=Exception("DB Insert Failed"))
+        self.db.add_inventory_item = MagicMock(
+            side_effect=Exception("DB Insert Failed")
+        )
 
         # Mock counters (needed for insert path in original impl)
         self.mock_db.counters.find_one_and_update.return_value = {"seq": 99}
@@ -99,7 +103,9 @@ class TestShopTransactionFailure(unittest.TestCase):
         # 3. Call purchase_item
         # This should fail if inventory insert fails
         try:
-            success, result, new_aurum = self.db.purchase_item(user_id, item_key, item_data, price)
+            success, result, new_aurum = self.db.purchase_item(
+                user_id, item_key, item_data, price
+            )
         except Exception:
             # If it raises exception instead of returning failure, catch it
             success = False
@@ -121,7 +127,10 @@ class TestShopTransactionFailure(unittest.TestCase):
             if not args:
                 continue
             query, update = args
-            if query.get("discord_id") == user_id and update.get("$inc", {}).get("aurum") == price:
+            if (
+                query.get("discord_id") == user_id
+                and update.get("$inc", {}).get("aurum") == price
+            ):
                 refund_called = True
                 break
 

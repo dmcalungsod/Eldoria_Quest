@@ -56,17 +56,23 @@ class TestStatXPRefinement(unittest.TestCase):
         )
 
         # Mock monster attack to always hit (patching where it is used)
-        with patch("game_systems.combat.combat_engine.DamageFormula.monster_attack") as mock_attack:
+        with patch(
+            "game_systems.combat.combat_engine.DamageFormula.monster_attack"
+        ) as mock_attack:
             mock_attack.return_value = (10, False, "hit")  # dmg, crit, event_type
 
             # Force monster to attack
-            with patch("game_systems.monsters.monster_actions.MonsterAI.choose_action") as mock_ai:
+            with patch(
+                "game_systems.monsters.monster_actions.MonsterAI.choose_action"
+            ) as mock_ai:
                 mock_ai.return_value = {"type": "attack"}
 
                 result = engine.run_combat_turn()
 
                 self.assertEqual(result["turn_report"]["hits_taken"], 1)
-                self.assertEqual(result["turn_report"]["damage_taken"], 5)  # Defend halves damage (10 -> 5)
+                self.assertEqual(
+                    result["turn_report"]["damage_taken"], 5
+                )  # Defend halves damage (10 -> 5)
 
     def test_hits_taken_ignored_on_dodge(self):
         """Test that hits_taken is NOT incremented on dodge."""
@@ -81,10 +87,14 @@ class TestStatXPRefinement(unittest.TestCase):
         )
 
         # Patch DamageFormula where it is used in CombatEngine
-        with patch("game_systems.combat.combat_engine.DamageFormula") as MockDamageFormula:
+        with patch(
+            "game_systems.combat.combat_engine.DamageFormula"
+        ) as MockDamageFormula:
             MockDamageFormula.monster_attack.return_value = (0, False, "dodge")
 
-            with patch("game_systems.monsters.monster_actions.MonsterAI.choose_action") as mock_ai:
+            with patch(
+                "game_systems.monsters.monster_actions.MonsterAI.choose_action"
+            ) as mock_ai:
                 mock_ai.return_value = {"type": "attack"}
 
                 result = engine.run_combat_turn()
@@ -122,7 +132,9 @@ class TestStatXPRefinement(unittest.TestCase):
             action="skill:fireball",
         )
 
-        with patch("game_systems.combat.damage_formula.DamageFormula.player_skill") as mock_skill_dmg:
+        with patch(
+            "game_systems.combat.damage_formula.DamageFormula.player_skill"
+        ) as mock_skill_dmg:
             mock_skill_dmg.return_value = (20, False, "hit")
 
             # 1. Test MAG Skill

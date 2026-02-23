@@ -66,7 +66,9 @@ class QuestLedgerView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
             return False
         return True
 
@@ -120,7 +122,9 @@ class QuestLogView(View):
         completable_quests = []
         for quest in self.active_quests:
             # Uses logic from QuestSystem to check progress vs objectives
-            if self.quest_system.check_completion(quest["progress"], quest["objectives"]):
+            if self.quest_system.check_completion(
+                quest["progress"], quest["objectives"]
+            ):
                 completable_quests.append(quest)
 
         if not completable_quests:
@@ -143,7 +147,9 @@ class QuestLogView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
             return False
         return True
 
@@ -172,7 +178,9 @@ class QuestLogView(View):
         )
 
         # Refresh quest list to show updated state
-        new_active_quests = await asyncio.to_thread(self.quest_system.get_player_quests, self.interaction_user.id)
+        new_active_quests = await asyncio.to_thread(
+            self.quest_system.get_player_quests, self.interaction_user.id
+        )
 
         # Rebuild the embed
         embed = interaction.message.embeds[0]
@@ -180,7 +188,9 @@ class QuestLogView(View):
         embed.clear_fields()
 
         if not new_active_quests:
-            embed.add_field(name="No Active Quests", value="Visit the Quest Board to accept a task.")
+            embed.add_field(
+                name="No Active Quests", value="Visit the Quest Board to accept a task."
+            )
         else:
             for quest in new_active_quests:
                 progress_lines = []
@@ -197,7 +207,9 @@ class QuestLogView(View):
                         task = tasks
                         cur = progress.get(obj_type, {}).get(task, 0)
                         bar = make_progress_bar(cur, 1, length=8)
-                        progress_lines.append(f"• {obj_type.title()} {task}: `{bar}` {cur}/1")
+                        progress_lines.append(
+                            f"• {obj_type.title()} {task}: `{bar}` {cur}/1"
+                        )
 
                 embed.add_field(
                     name=f"{quest['title']} (ID: {quest['id']})",
@@ -300,7 +312,9 @@ class QuestBoardView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
             return False
         return True
 
@@ -313,10 +327,14 @@ class QuestBoardView(View):
             await self.refresh_board(interaction, f"{E.ERROR} Invalid quest selection.")
             return
 
-        quest_details = await asyncio.to_thread(self.quest_system.get_quest_details, quest_id)
+        quest_details = await asyncio.to_thread(
+            self.quest_system.get_quest_details, quest_id
+        )
 
         if not quest_details:
-            await self.refresh_board(interaction, f"{E.ERROR} Could not retrieve quest details.")
+            await self.refresh_board(
+                interaction, f"{E.ERROR} Could not retrieve quest details."
+            )
             return
 
         embed = discord.Embed(
@@ -364,9 +382,13 @@ class QuestBoardView(View):
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def refresh_board(self, interaction: discord.Interaction, status_msg: str = None):
+    async def refresh_board(
+        self, interaction: discord.Interaction, status_msg: str = None
+    ):
         """Helper to reload the board with a status message."""
-        quests = await asyncio.to_thread(self.quest_system.get_available_quests, self.interaction_user.id)
+        quests = await asyncio.to_thread(
+            self.quest_system.get_available_quests, self.interaction_user.id
+        )
 
         embed = discord.Embed(
             title=f"{E.SCROLL} Quest Board",
@@ -439,7 +461,9 @@ class QuestDetailView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
             return False
         return True
 
@@ -455,12 +479,18 @@ class QuestDetailView(View):
 
         status_msg = ""
         if success:
-            status_msg = f"{E.CHECK} Contract sealed. The details are recorded in your ledger."
-            logger.info(f"User {self.interaction_user.id} accepted quest {self.quest_id}")
+            status_msg = (
+                f"{E.CHECK} Contract sealed. The details are recorded in your ledger."
+            )
+            logger.info(
+                f"User {self.interaction_user.id} accepted quest {self.quest_id}"
+            )
         else:
             status_msg = f"{E.WARNING} You have already sworn to undertake this task."
 
-        await self.back_to_quest_board_callback(interaction, deferred=True, status_message=status_msg)
+        await self.back_to_quest_board_callback(
+            interaction, deferred=True, status_message=status_msg
+        )
 
     async def back_to_quest_board_callback(
         self,

@@ -14,7 +14,6 @@ from typing import Any
 
 import game_systems.data.emojis as E
 from game_systems.data.materials import MATERIALS
-
 from .adventure_events import AdventureEvents
 
 logger = logging.getLogger("eldoria.exploration")
@@ -57,8 +56,12 @@ class ExplorationEvents:
         # Heal 50-100% of Max HP/MP
         heal_percent = random.uniform(0.5, 1.0)
 
-        new_hp = min(stats.max_hp, int(vitals["current_hp"] + stats.max_hp * heal_percent))
-        new_mp = min(stats.max_mp, int(vitals["current_mp"] + stats.max_mp * heal_percent))
+        new_hp = min(
+            stats.max_hp, int(vitals["current_hp"] + stats.max_hp * heal_percent)
+        )
+        new_mp = min(
+            stats.max_mp, int(vitals["current_mp"] + stats.max_mp * heal_percent)
+        )
 
         hp_gain = new_hp - vitals["current_hp"]
         mp_gain = new_mp - vitals["current_mp"]
@@ -131,7 +134,9 @@ class ExplorationEvents:
         new_hp = max(0, current_hp - damage)
 
         # Update DB
-        self.db.set_player_vitals(context["player_row"]["discord_id"], new_hp, vitals["current_mp"])
+        self.db.set_player_vitals(
+            context["player_row"]["discord_id"], new_hp, vitals["current_mp"]
+        )
 
         vitals["current_hp"] = new_hp
 

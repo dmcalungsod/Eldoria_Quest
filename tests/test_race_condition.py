@@ -33,11 +33,15 @@ class TestRaceCondition(unittest.TestCase):
 
         self.mock_db.__getitem__.side_effect = get_collection
 
-        self.mongo_patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
+        self.mongo_patcher = patch(
+            "database.database_manager.MongoClient", return_value=self.mock_client
+        )
         self.mongo_patcher.start()
 
         # Patch DuplicateKeyError in database_manager to use our local mock
-        self.dup_error_patcher = patch("database.database_manager.DuplicateKeyError", MockDuplicateKeyError)
+        self.dup_error_patcher = patch(
+            "database.database_manager.DuplicateKeyError", MockDuplicateKeyError
+        )
         self.dup_error_patcher.start()
 
         # Initialize DatabaseManager (singleton reset)
@@ -55,7 +59,9 @@ class TestRaceCondition(unittest.TestCase):
         cost = 10
         current_level = 1
 
-        self.mock_db.player_skills.find_one.return_value = {"skill_level": current_level}
+        self.mock_db.player_skills.find_one.return_value = {
+            "skill_level": current_level
+        }
         self.mock_db.players.find_one.return_value = {"vestige_pool": 100}
 
         deduct_result = MagicMock()
@@ -88,7 +94,9 @@ class TestRaceCondition(unittest.TestCase):
         deduct_result.modified_count = 1
 
         # Raise our MOCKED DuplicateKeyError
-        self.mock_db.player_skills.insert_one.side_effect = MockDuplicateKeyError("Duplicate key")
+        self.mock_db.player_skills.insert_one.side_effect = MockDuplicateKeyError(
+            "Duplicate key"
+        )
 
         refund_result = MagicMock()
         refund_result.modified_count = 1
@@ -97,7 +105,9 @@ class TestRaceCondition(unittest.TestCase):
 
         success, msg = self.db.learn_skill(discord_id, skill_key, cost)
 
-        self.assertFalse(success, f"Should have failed due to duplicate key. Msg: {msg}")
+        self.assertFalse(
+            success, f"Should have failed due to duplicate key. Msg: {msg}"
+        )
         self.assertIn("refunded", msg)
 
 

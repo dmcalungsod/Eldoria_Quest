@@ -26,7 +26,9 @@ class TestDatabaseOptimization(unittest.TestCase):
         self.mock_db.__getitem__.side_effect = get_collection
 
         # Patch MongoClient
-        self.mongo_patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
+        self.mongo_patcher = patch(
+            "database.database_manager.MongoClient", return_value=self.mock_client
+        )
         self.mongo_patcher.start()
 
         # Reset singleton
@@ -82,7 +84,9 @@ class TestDatabaseOptimization(unittest.TestCase):
         # The optimization goal: 1 find call, 0 find_one calls
         # Currently, it should fail with find_calls=0 and find_one_calls=3
         self.assertEqual(find_calls, 1, f"Expected 1 find call, got {find_calls}")
-        self.assertEqual(find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}")
+        self.assertEqual(
+            find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}"
+        )
 
     def test_get_combat_skills_optimization(self):
         discord_id = 12345
@@ -110,7 +114,9 @@ class TestDatabaseOptimization(unittest.TestCase):
         find_one_calls = self.mock_db["skills"].find_one.call_count
 
         self.assertEqual(find_calls, 1, f"Expected 1 find call, got {find_calls}")
-        self.assertEqual(find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}")
+        self.assertEqual(
+            find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}"
+        )
 
     def test_get_player_skills_optimization(self):
         discord_id = 12345
@@ -141,7 +147,9 @@ class TestDatabaseOptimization(unittest.TestCase):
         # But mock_db is reused? No, setUp resets mocks.
 
         self.assertEqual(find_calls, 1, f"Expected 1 find call, got {find_calls}")
-        self.assertEqual(find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}")
+        self.assertEqual(
+            find_one_calls, 0, f"Expected 0 find_one calls, got {find_one_calls}"
+        )
 
 
 if __name__ == "__main__":

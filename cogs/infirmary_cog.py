@@ -30,7 +30,9 @@ def infirmary_cost(missing_hp: int, missing_mp: int) -> int:
 
 
 class InfirmaryView(View):
-    def __init__(self, db: DatabaseManager, user: discord.User, p_data, stats: PlayerStats):
+    def __init__(
+        self, db: DatabaseManager, user: discord.User, p_data, stats: PlayerStats
+    ):
         super().__init__(timeout=180)
         self.db = db
         self.user = user
@@ -46,7 +48,11 @@ class InfirmaryView(View):
         # Heal Button
         disabled = self.missing_hp <= 0 and self.missing_mp <= 0
         label = f"Heal ({self.cost} G)" if not disabled else "Fully Restored"
-        style = discord.ButtonStyle.primary if not disabled else discord.ButtonStyle.secondary
+        style = (
+            discord.ButtonStyle.primary
+            if not disabled
+            else discord.ButtonStyle.secondary
+        )
 
         # Disable if broke
         if self.p_data["aurum"] < self.cost:

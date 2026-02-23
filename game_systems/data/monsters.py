@@ -36,7 +36,9 @@ def load_monsters():
     for key, monster_data in data.items():
         # Basic Validation
         if "id" not in monster_data or "name" not in monster_data:
-            logger.warning(f"Monster '{key}' missing required fields (id, name). Skipping.")
+            logger.warning(
+                f"Monster '{key}' missing required fields (id, name). Skipping."
+            )
             continue
 
         # Rehydrate Skills
@@ -47,7 +49,9 @@ def load_monsters():
             if skill_key in MONSTER_SKILLS:
                 hydrated_skills.append(MONSTER_SKILLS[skill_key])
             else:
-                logger.warning(f"Monster '{key}' ({monster_data.get('name')}) references unknown skill '{skill_key}'")
+                logger.warning(
+                    f"Monster '{key}' ({monster_data.get('name')}) references unknown skill '{skill_key}'"
+                )
 
         monster_data["skills"] = hydrated_skills
 

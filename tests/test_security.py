@@ -63,7 +63,9 @@ class TestSecurity(unittest.TestCase):
         self.mock_db.player_exists.return_value = False
         self.mock_db.get_default_skill_keys.return_value = []
 
-        success, msg = self.creator.create_player(discord_id, dirty_name, 1)  # 1 is a valid class_id
+        success, msg = self.creator.create_player(
+            discord_id, dirty_name, 1
+        )  # 1 is a valid class_id
 
         self.assertTrue(success, f"Player creation failed: {msg}")
 
@@ -73,7 +75,9 @@ class TestSecurity(unittest.TestCase):
         # username is 2nd positional arg or keyword 'username'
         actual_name = kwargs.get("username", args[1] if len(args) > 1 else None)
 
-        self.assertEqual(actual_name, expected_clean_name, "Markdown characters were not removed!")
+        self.assertEqual(
+            actual_name, expected_clean_name, "Markdown characters were not removed!"
+        )
 
     def test_link_sanitization(self):
         """Test that link markdown characters are removed from username."""

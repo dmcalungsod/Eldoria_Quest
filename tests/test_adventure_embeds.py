@@ -38,7 +38,9 @@ class TestAdventureEmbeds(unittest.TestCase):
 
         importlib.reload(game_systems.adventure.ui.adventure_embeds)
 
-        self.AdventureEmbeds = game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
+        self.AdventureEmbeds = (
+            game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
+        )
 
         from game_systems.player.player_stats import PlayerStats
 
