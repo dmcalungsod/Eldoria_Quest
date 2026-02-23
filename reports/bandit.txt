@@ -1,0 +1,1445 @@
+Run started:2026-02-23 03:02:40.008210+00:00
+
+Test results:
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:489:33
+488	        # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
+489	        if hp_percent < 0.30 and random.random() < 0.50:
+490	            base_logs = [random.choice(AdventureEvents.REGEN_LOW_HP)]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:490:25
+489	        if hp_percent < 0.30 and random.random() < 0.50:
+490	            base_logs = [random.choice(AdventureEvents.REGEN_LOW_HP)]
+491
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:493:35
+492	        # 2. High HP (> 80%): 30% chance for confident flavor
+493	        elif hp_percent > 0.80 and random.random() < 0.30:
+494	            base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:494:25
+493	        elif hp_percent > 0.80 and random.random() < 0.30:
+494	            base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
+495
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:497:67
+496	        # 3. Class-Specific Flavor: 30% chance
+497	        elif class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
+498	            base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:498:25
+497	        elif class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
+498	            base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
+499
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:502:25
+501	        elif location_id == "whispering_thicket":
+502	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
+503	        elif location_id == "deepgrove_roots":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:504:25
+503	        elif location_id == "deepgrove_roots":
+504	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
+505	        elif location_id == "crystal_caverns":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:506:25
+505	        elif location_id == "crystal_caverns":
+506	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
+507	        elif location_id == "molten_caldera":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:508:25
+507	        elif location_id == "molten_caldera":
+508	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_MAGMA)]
+509	        elif location_id == "sunken_grotto":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:510:25
+509	        elif location_id == "sunken_grotto":
+510	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_GROTTO)]
+511	        elif location_id == "clockwork_halls":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:512:25
+511	        elif location_id == "clockwork_halls":
+512	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CLOCKWORK)]
+513	        elif location_id == "guild_arena":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:514:25
+513	        elif location_id == "guild_arena":
+514	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
+515	        elif location_id == "the_ashlands":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:516:25
+515	        elif location_id == "the_ashlands":
+516	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ASHLANDS)]
+517
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:520:25
+519	        else:
+520	            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES)]
+521
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:524:11
+523	        # 40% chance to add an atmospheric intro line
+524	        if random.random() < 0.40:
+525	            atmosphere_pool = AdventureEvents.ATMOSPHERE_FOREST  # Default
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:551:51
+550	            # Time Phase Override (30% chance)
+551	            elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
+552	                atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:553:50
+552	                atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
+553	            elif time_phase == TimePhase.DAWN and random.random() < 0.3:
+554	                atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:555:50
+554	                atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
+555	            elif time_phase == TimePhase.DUSK and random.random() < 0.3:
+556	                atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:563:65
+562
+563	            if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+564	                atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:567:31
+566	            # Select and prepend
+567	            atmospheric_line = random.choice(atmosphere_pool)
+568	            base_logs.insert(0, atmospheric_line)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:575:19
+574	        if objective_type == "gather":
+575	            return random.choice(AdventureEvents.GATHER_PHRASES).format(target_name)
+576	        if objective_type == "locate":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:577:19
+576	        if objective_type == "locate":
+577	            return random.choice(AdventureEvents.LOCATE_PHRASES).format(target_name)
+578	        if objective_type in ("examine", "survey"):
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:579:19
+578	        if objective_type in ("examine", "survey"):
+579	            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
+580	        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:580:15
+579	            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
+580	        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+581
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:584:15
+583	    def wild_gather_event(item_name: str) -> str:
+584	        return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
+585
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:588:15
+587	    def surge_event() -> str:
+588	        return random.choice(AdventureEvents.SURGE_PHRASES)
+589
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:593:19
+592	        if reward_type == "aurum":
+593	            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
+594	        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:594:15
+593	            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
+594	        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+595
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:599:19
+598	        if event_key == "safe_room":
+599	            return random.choice(AdventureEvents.SAFE_ROOM_PHRASES)
+600	        elif event_key == "hidden_stash":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:601:19
+600	        elif event_key == "hidden_stash":
+601	            return random.choice(AdventureEvents.HIDDEN_STASH_PHRASES)
+602	        elif event_key == "ancient_shrine":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:603:19
+602	        elif event_key == "ancient_shrine":
+603	            return random.choice(AdventureEvents.ANCIENT_SHRINE_PHRASES)
+604	        elif event_key == "trap_pit":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:605:19
+604	        elif event_key == "trap_pit":
+605	            return random.choice(AdventureEvents.TRAP_PHRASES)
+606	        return "*A strange event occurs.*"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:610:15
+609	    def no_event_found() -> str:
+610	        return random.choice(AdventureEvents.NO_EVENT_PHRASES)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_rewards.py:167:19
+166	                # 30% chance to drop 1-3 Elemental Motes
+167	                if random.random() < 0.3:
+168	                    mote_count = random.randint(1, 3)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_rewards.py:168:33
+167	                if random.random() < 0.3:
+168	                    mote_count = random.randint(1, 3)
+169	                    self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_session.py:256:15
+255	            # --- 2. Trigger New Encounter ---
+256	            if random.randint(1, 100) > regen_threshold:
+257	                # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_session.py:268:57
+267	                    # 20% Chance for monsters to strike first at night
+268	                    if time_phase == TimePhase.NIGHT and random.random() < 0.20:
+269	                        monster_atk = monster.get("ATK", 10)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_session.py:352:15
+351
+352	        roll = random.randint(1, 100)
+353
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/combat_handler.py:62:26
+61	            choices, weights = zip(*monster_pool)
+62	            monster_key = random.choices(choices, weights=weights, k=1)[0]
+63
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/combat_handler.py:102:27
+101	                        # 30% chance for Blood-Crazed prefix
+102	                        if random.random() < 0.30:
+103	                            active_monster["name"] = f"Blood-Crazed {active_monster['name']}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/combat_handler.py:126:23
+125	                    # 20% Chance for Spectral variant
+126	                    if random.random() < 0.20:
+127	                        active_monster["name"] = f"Spectral {active_monster['name']}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:46:15
+45	        try:
+46	            if random.randint(1, 100) <= regen_chance:
+47	                return self._perform_regeneration(context, location_id, weather, event_type)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:53:42
+52	                    # 15% chance to trigger a special event if available
+53	                    if special_events and random.random() < 0.15:
+54	                        event_key = random.choice(special_events)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:54:36
+53	                    if special_events and random.random() < 0.15:
+54	                        event_key = random.choice(special_events)
+55	                        result = self.exploration.handle_event(event_key, context)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:251:11
+250	        base_chance = 35 + bonus_chance
+251	        if random.randint(1, 100) <= base_chance:
+252	            # Weighted Selection
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:254:23
+253	            choices, weights = zip(*gatherables)
+254	            item_key = random.choices(choices, weights=weights, k=1)[0]
+255	            mat_data = MATERIALS.get(item_key)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:267:19
+266	                # Random variance: 20% chance to get +1 extra
+267	                if random.random() < 0.20:
+268	                    quantity += 1
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:294:11
+293	        # 50% Aurum / 50% XP
+294	        if random.random() < 0.5:
+295	            # Aurum
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:296:21
+295	            # Aurum
+296	            amount = random.randint(1, 5)
+297	            msg = f"\n{AdventureEvents.scavenge_event('aurum', amount)}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:301:21
+300	            # XP
+301	            amount = random.randint(5, 10)
+302	            msg = f"\n{AdventureEvents.scavenge_event('exp', amount)}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:52:23
+51	        # Heal 50-100% of Max HP/MP
+52	        heal_percent = random.uniform(0.5, 1.0)
+53
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:79:11
+78
+79	        if random.random() < 0.6:
+80	            # Aurum
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:81:21
+80	            # Aurum
+81	            amount = random.randint(50, 200)
+82	            loot["aurum"] = amount
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:88:27
+87	            if rare_mats:
+88	                item_key = random.choice(rare_mats)
+89	                mat_name = MATERIALS[item_key]["name"]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:97:17
+96	        # Grant XP
+97	        amount = random.randint(100, 300)
+98	        loot = {"exp": amount}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:112:25
+111	        # Damage 10-25% of Max HP
+112	        damage_percent = random.uniform(0.10, 0.25)
+113	        damage = int(stats.max_hp * damage_percent)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:120:11
+119	        mitigated = False
+120	        if random.randint(1, 100) <= dodge_chance:
+121	            damage = damage // 2
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/ui/adventure_embeds.py:141:26
+140	        if s.get("leveled_up"):
+141	            flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["level_up"])
+142	        else:
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/ui/adventure_embeds.py:146:30
+145	            if loc_flavors:
+146	                flavor_text = random.choice(loc_flavors)
+147	            else:
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/ui/adventure_embeds.py:148:30
+147	            else:
+148	                flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["default"])
+149
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:194:37
+193	                     # In auto mode, we give a small chance to "accidentally" counter
+194	                     if is_magic and random.randint(1, 100) <= 20:
+195	                        is_offensive = True
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:437:15
+436	        if spec.get("crit_bonus"):
+437	            if random.randint(1, 100) <= spec["crit_bonus"]:
+438	                is_lucky_crit = True
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:594:15
+593
+594	        roll = random.randint(1, 100)
+595	        if roll > self.PLAYER_SKILL_CHANCE:
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:612:30
+611	        utility_skills = [s for s in usable_skills if s.get("buff_data")]
+612	        if utility_skills and random.randint(1, 100) > 50:
+613	            chosen_skill = random.choice(utility_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:613:27
+612	        if utility_skills and random.randint(1, 100) > 50:
+613	            chosen_skill = random.choice(utility_skills)
+614	            return {"skill": chosen_skill, "reason": "Buff chosen."}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:619:27
+618	        if offensive_skills:
+619	            chosen_skill = random.choice(offensive_skills)
+620	            return {"skill": chosen_skill, "reason": "Offense chosen."}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:507:20
+506
+507	        return f"**{random.choice(phrase_list).format(name=name)}**"
+508
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:624:15
+623
+624	        return random.choice(pool)
+625
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:635:21
+634	        if skill_key in CombatPhrases.SKILL_PHRASES:
+635	            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+636	            return f"{phrase.format(skill_name=skill_name, m_name=m_name)} (`{damage}` damage){crit_text}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:644:15
+643	        ]
+644	        return random.choice(phrases)
+645
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:653:21
+652	        if skill_key in CombatPhrases.SKILL_PHRASES:
+653	            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+654	            return f"{phrase.format(skill_name=skill_name)} (+`{heal_amount}` HP)"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:662:15
+661	        ]
+662	        return random.choice(phrases)
+663
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:671:21
+670	        if skill_key in CombatPhrases.SKILL_PHRASES:
+671	            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+672	            return f"{E.BUFF} {phrase.format(skill_name=skill_name)}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:680:27
+679	        ]
+680	        return f"{E.BUFF} {random.choice(phrases)}"
+681
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:703:15
+702
+703	        return random.choice(pool).format(name=m_name, dmg=damage)
+704
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:715:15
+714	        ]
+715	        return random.choice(phrases)
+716
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:725:15
+724	        ]
+725	        return random.choice(phrases)
+726
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:749:15
+748	            ]
+749	        return random.choice(phrases)
+750
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:771:17
+770	        ]
+771	        phrase = random.choice(victory_phrases)
+772
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:796:15
+795	        ]
+796	        return random.choice(phrases)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:53:19
+52
+53	        variance = random.uniform(0.9, 1.1)
+54	        damage = int(base_damage * variance)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:58:18
+57	        crit_chance = 0.03 + (luck_val * 0.002)
+58	        is_crit = random.random() < crit_chance
+59
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:85:19
+84
+85	        variance = random.uniform(0.9, 1.1)
+86	        damage = int(base_damage * variance)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:90:18
+89	        crit_chance = 0.03 + (luck_val * 0.002)
+90	        is_crit = random.random() < crit_chance
+91
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:125:19
+124
+125	        variance = random.uniform(0.9, 1.1)
+126	        heal_amount = int(total_heal * variance)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:140:11
+139	        dodge_chance = agi * 0.001
+140	        if random.random() < dodge_chance:
+141	            return 0, False, "dodge"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:158:19
+157
+158	        variance = random.uniform(0.9, 1.1)
+159	        damage = int(final_damage * variance)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:161:18
+160
+161	        is_crit = random.random() < 0.05
+162	        event_type = "hit"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:178:11
+177	        dodge_chance = agi * 0.001
+178	        if random.random() < dodge_chance:
+179	            return 0, False, "dodge"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/damage_formula.py:198:19
+197	        # Variance
+198	        variance = random.uniform(0.9, 1.1)
+199	        heal_amount = int(heal_amount * variance)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/crafting/crafting_system.py:61:11
+60	        # 10% chance to upgrade
+61	        if random.random() < 0.10:
+62	            if current_index + 1 < len(tiers):
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/crafting/crafting_system.py:65:22
+64	                # Cascade: 10% chance for another upgrade
+65	                while random.random() < 0.10 and current_index + 1 < len(tiers):
+66	                    current_index += 1
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b110_try_except_pass.html
+   Location: ./game_systems/crafting/crafting_system.py:242:12
+241	                    original_name = original_data["name"]
+242	            except Exception:
+243	                pass  # Fallback to stored name
+244
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:35:27
+34	                if max_hp > 0 and (current_hp / max_hp) < 0.3:
+35	                    return random.choice([
+36	                        "You look pale, adventurer. Visit the **Infirmary** before you collapse.",
+37	                        "Bleeding out is bad for business. Get patched up at the **Infirmary**.",
+38	                        "Don't be a hero. Heal your wounds before heading out again."
+39	                    ])
+40
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:46:19
+45	        if quests_completed == 0:
+46	            return random.choice([
+47	                "Welcome to the Guild. The **Quest Board** is to your left. Don't stare at it all day.",
+48	                "First time? Pick a simple contract from the **Quests** menu. Try not to die.",
+49	                "Your reputation is non-existent. Complete a **Quest** to change that."
+50	            ])
+51
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:55:19
+54	        if not active_quests:
+55	            return random.choice([
+56	                "You have no active contracts. The Guild doesn't pay for loitering.",
+57	                "Idle hands earn no coin. Check the **Quest Board**.",
+58	                "The monsters are waiting. You should pick up a **Quest**."
+59	            ])
+60
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:71:23
+70	            if not has_weapon:
+71	                return random.choice([
+72	                    "You have coin, but no weapon. Visit the **Shop** before you become monster chow.",
+73	                    "A full purse won't protect you like a good sword. Buy gear at the **Shop**.",
+74	                    "Invest in your survival. The **Shop** has what you need."
+75	                ])
+76
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:78:15
+77	        # 5. Generic Advice (Fallback)
+78	        return random.choice([
+79	            "Always check your supplies before leaving the city.",
+80	            "If you find yourself overwhelmed, retreat is a valid strategy.",
+81	            "The deeper you go, the darker it gets. Bring a torch... or a wizard.",
+82	            "Keep your blade sharp and your wits sharper.",
+83	            "Report your success at the Quest Board to claim your rewards."
+84	        ])
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/tournament_system.py:48:21
+47	        # Pick a random event type
+48	        event_type = random.choice(self.TOURNAMENT_TYPES)
+49
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/items/item_manager.py:89:12
+88	        rolls = {"Common": 55, "Uncommon": 25, "Rare": 12, "Epic": 5, "Legendary": 2, "Mythical": 1}
+89	        r = random.randint(1, sum(rolls.values()))
+90	        current = 0
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/items/item_manager.py:100:11
+99	        loot = []
+100	        if random.randint(1, 100) > 20:  # 80% chance of no equipment
+101	            return loot
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:35:23
+34	                    # 70% chance to heal if critical
+35	                    if random.randint(1, 100) <= 70:
+36	                        chosen = random.choice(heal_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:36:33
+35	                    if random.randint(1, 100) <= 70:
+36	                        chosen = random.choice(heal_skills)
+37	                        return {"type": "skill", "skill": chosen}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:53:19
+52
+53	                if random.randint(1, 100) <= skill_chance:
+54	                    chosen = random.choice(offensive_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:54:29
+53	                if random.randint(1, 100) <= skill_chance:
+54	                    chosen = random.choice(offensive_skills)
+55
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:63:42
+62	                        should_telegraph = True  # Always telegraph massive attacks
+63	                    elif power >= 1.4 and random.randint(1, 100) <= 50:
+64	                        should_telegraph = True  # 50% chance for heavy attacks
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:75:19
+74	                # 25% chance to use a buff if available
+75	                if random.randint(1, 100) <= 25:
+76	                    chosen = random.choice(buff_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:76:29
+75	                if random.randint(1, 100) <= 25:
+76	                    chosen = random.choice(buff_skills)
+77	                    return {"type": "buff", "buff": chosen}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/rewards/aurum_calculator.py:37:19
+36	        # Variance: 0.8 to 1.2
+37	        variance = random.uniform(0.8, 1.2)
+38
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/rewards/loot_calculator.py:70:19
+69	            # random.uniform(0, 100) returns a float between 0.0 and 100.0
+70	            roll = random.uniform(0, 100)
+71
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/world_time.py:106:14
+105	        # Use a local random instance to avoid affecting global random state
+106	        rng = random.Random(seed)
+107
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./scripts/prune_merged_branches.py:2:0
+1	import json
+2	import subprocess
+3	import sys
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/prune_merged_branches.py:10:17
+9	        # Use shell=False and pass list for safety
+10	        result = subprocess.run(command_list, capture_output=True, text=True, check=True)
+11	        return result.stdout.strip()
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/prune_merged_branches.py:91:23
+90	        # Check if branch still exists
+91	        branch_check = subprocess.run(
+92	            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"], capture_output=True
+93	        )
+94
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/prune_merged_branches.py:91:23
+90	        # Check if branch still exists
+91	        branch_check = subprocess.run(
+92	            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"], capture_output=True
+93	        )
+94
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/prune_merged_branches.py:103:24
+102	        delete_cmd = ["gh", "api", "--method", "DELETE", f"repos/{current_repo}/git/refs/heads/{head_ref}"]
+103	        delete_result = subprocess.run(delete_cmd, capture_output=True, text=True)
+104
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_infirmary_fallback.py:75:8
+74	        # Check max_hp
+75	        assert self.stale_stats.max_hp == 100, f"Setup error: Expected 100 HP, got {self.stale_stats.max_hp}"
+76
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:15:4
+14	    # Formula: 100 + (current * 5)
+15	    assert calculate_practice_threshold(1) == 105
+16	    assert calculate_practice_threshold(10) == 150
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:16:4
+15	    assert calculate_practice_threshold(1) == 105
+16	    assert calculate_practice_threshold(10) == 150
+17	    assert calculate_practice_threshold(20) == 200
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:17:4
+16	    assert calculate_practice_threshold(10) == 150
+17	    assert calculate_practice_threshold(20) == 200
+18	    assert calculate_practice_threshold(100) == 600
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:18:4
+17	    assert calculate_practice_threshold(20) == 200
+18	    assert calculate_practice_threshold(100) == 600
+19
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:46:4
+45
+46	    assert levels_gained == 1
+47	    assert current_val == 2
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:47:4
+46	    assert levels_gained == 1
+47	    assert current_val == 2
+48	    assert current_exp_val == 95
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:48:4
+47	    assert current_val == 2
+48	    assert current_exp_val == 95
+49
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:81:4
+80
+81	    assert levels_gained == 3
+82	    assert current_val == 4
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:82:4
+81	    assert levels_gained == 3
+82	    assert current_val == 4
+83	    assert current_exp_val == 10
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:83:4
+82	    assert current_val == 4
+83	    assert current_exp_val == 10
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'mock_token'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b105_hardcoded_password_string.html
+   Location: ./tests/test_sync_logic.py:11:11
+10	# Mock environment variables BEFORE import
+11	os.environ["DISCORD_BOT_TOKEN"] = "mock_token"
+12	os.environ["GUILD_ID"] = "123456789"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:16:8
+15	        """Ensure Weather enum is correctly defined."""
+16	        assert Weather.CLEAR.value == "Clear"
+17	        assert Weather.STORM.value == "Storm"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:17:8
+16	        assert Weather.CLEAR.value == "Clear"
+17	        assert Weather.STORM.value == "Storm"
+18	        assert Weather.ASH.value == "Ash Storm"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:18:8
+17	        assert Weather.STORM.value == "Storm"
+18	        assert Weather.ASH.value == "Ash Storm"
+19
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:38:12
+37
+38	            assert w1 == w2, "Weather must be consistent for same location/time"
+39
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:53:12
+52
+53	            assert len(results) > 0
+54
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:68:12
+67
+68	            assert isinstance(w1, Weather)
+69	            assert isinstance(w2, Weather)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:69:12
+68	            assert isinstance(w1, Weather)
+69	            assert isinstance(w2, Weather)
+70
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:84:16
+83	                weather = WorldTime.get_current_weather(location_id)
+84	                assert weather in [Weather.CLEAR, Weather.ASH, Weather.STORM], (
+85	                    f"Molten Caldera had unexpected weather: {weather}"
+86	                )
+87
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:90:8
+89	        """Ensure flavor text returns strings."""
+90	        assert "Rain" in WorldTime.get_weather_flavor(Weather.RAIN)
+91	        assert "Ash" in WorldTime.get_weather_flavor(Weather.ASH)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:91:8
+90	        assert "Rain" in WorldTime.get_weather_flavor(Weather.RAIN)
+91	        assert "Ash" in WorldTime.get_weather_flavor(Weather.ASH)
+92	        assert "Clear" in WorldTime.get_weather_flavor(Weather.CLEAR)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.3/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:92:8
+91	        assert "Ash" in WorldTime.get_weather_flavor(Weather.ASH)
+92	        assert "Clear" in WorldTime.get_weather_flavor(Weather.CLEAR)
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 24385
+	Total lines skipped (#nosec): 1
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 140
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 1
+		High: 139
+Files skipped (0):

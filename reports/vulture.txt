@@ -1,0 +1,6 @@
+main.py:66: unused variable 'request' (100% confidence)
+tests/test_achievement_logic.py:29: unused variable 'did' (100% confidence)
+tests/test_crafting_equipment.py:17: unused variable 'mock_rng' (100% confidence)
+tests/test_hp_overflow.py:96: unused variable 'projection' (100% confidence)
+tests/test_security_shop.py:30: unused variable 'exc_type' (100% confidence)
+tests/test_security_shop.py:30: unused variable 'tb' (100% confidence)
