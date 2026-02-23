@@ -28,9 +28,7 @@ class TestAdventureDayNight(unittest.TestCase):
         self.mock_inv = MagicMock()
 
         # Setup session
-        self.session = AdventureSession(
-            self.mock_db, self.mock_quest, self.mock_inv, discord_id=123456789
-        )
+        self.session = AdventureSession(self.mock_db, self.mock_quest, self.mock_inv, discord_id=123456789)
         self.session.location_id = "forest_outskirts"
         self.session.logs = []
 
@@ -57,17 +55,13 @@ class TestAdventureDayNight(unittest.TestCase):
             MockTime.get_current_phase.return_value = TimePhase.DAY
             MockTime.get_weather_flavor.return_value = "Clear Sky"
 
-            with patch.object(
-                self.session, "_fetch_session_context", return_value=self.mock_context
-            ):
+            with patch.object(self.session, "_fetch_session_context", return_value=self.mock_context):
                 # Mock random to force combat (roll > threshold)
                 # Threshold = 40 (base) + 5 (CLEAR) + 5 (DAY) = 50
                 # So roll > 50 triggers combat.
                 with patch("random.randint", return_value=51):
                     # Mock initiate_combat to return nothing so we don't crash on monster setup
-                    self.session.combat.initiate_combat = MagicMock(
-                        return_value=(None, "No monster")
-                    )
+                    self.session.combat.initiate_combat = MagicMock(return_value=(None, "No monster"))
 
                     self.session.simulate_step(context_bundle=None)
 
@@ -81,15 +75,11 @@ class TestAdventureDayNight(unittest.TestCase):
             MockTime.get_current_phase.return_value = TimePhase.NIGHT
             MockTime.get_weather_flavor.return_value = "Clear Night"
 
-            with patch.object(
-                self.session, "_fetch_session_context", return_value=self.mock_context
-            ):
+            with patch.object(self.session, "_fetch_session_context", return_value=self.mock_context):
                 # Threshold = 40 (base) + 5 (CLEAR) - 10 (NIGHT) = 35
                 # So roll > 35 triggers combat.
                 with patch("random.randint", return_value=36):
-                    self.session.combat.initiate_combat = MagicMock(
-                        return_value=(None, "No monster")
-                    )
+                    self.session.combat.initiate_combat = MagicMock(return_value=(None, "No monster"))
 
                     self.session.simulate_step(context_bundle=None)
 
@@ -105,9 +95,7 @@ class TestAdventureDayNight(unittest.TestCase):
             MockTime.get_weather_flavor.return_value = "Clear Night"
 
             # Mock session context fetch
-            with patch.object(
-                self.session, "_fetch_session_context", return_value=self.mock_context
-            ):
+            with patch.object(self.session, "_fetch_session_context", return_value=self.mock_context):
                 # Mock combat trigger
                 with patch("random.randint", return_value=100):
                     # Mock initiate_combat
@@ -125,13 +113,9 @@ class TestAdventureDayNight(unittest.TestCase):
 
                         # Verify Damage (20 * 0.8 = 16)
                         expected_hp = 100 - 16
-                        self.assertEqual(
-                            self.mock_context["vitals"]["current_hp"], expected_hp
-                        )
+                        self.assertEqual(self.mock_context["vitals"]["current_hp"], expected_hp)
                         # Verify atomic delta update is used
-                        self.mock_db.update_player_vitals_delta.assert_called_with(
-                            123456789, -16, 0, 100, 50
-                        )
+                        self.mock_db.update_player_vitals_delta.assert_called_with(123456789, -16, 0, 100, 50)
 
     def test_night_no_ambush(self):
         """Nighttime encounter chance failure should not ambush."""
@@ -141,9 +125,7 @@ class TestAdventureDayNight(unittest.TestCase):
             MockTime.get_current_weather.return_value = Weather.CLEAR
             MockTime.get_current_phase.return_value = TimePhase.NIGHT
 
-            with patch.object(
-                self.session, "_fetch_session_context", return_value=self.mock_context
-            ):
+            with patch.object(self.session, "_fetch_session_context", return_value=self.mock_context):
                 with patch("random.randint", return_value=100):
                     self.session.combat.initiate_combat = MagicMock(
                         return_value=(monster_data, "A wild goblin appears!")
@@ -165,9 +147,7 @@ class TestAdventureDayNight(unittest.TestCase):
             MockTime.get_current_weather.return_value = Weather.CLEAR
             MockTime.get_current_phase.return_value = TimePhase.DAY
 
-            with patch.object(
-                self.session, "_fetch_session_context", return_value=self.mock_context
-            ):
+            with patch.object(self.session, "_fetch_session_context", return_value=self.mock_context):
                 with patch("random.randint", return_value=100):
                     self.session.combat.initiate_combat = MagicMock(
                         return_value=(monster_data, "A wild goblin appears!")

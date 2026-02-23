@@ -11,7 +11,6 @@ import discord
 from discord.ui import Button, View
 
 import cogs.ui_helpers as ui_helpers
-import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.ui.settings")
@@ -52,9 +51,7 @@ class SettingsView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This menu does not belong to you.", ephemeral=True
-            )
+            await interaction.response.send_message("This menu does not belong to you.", ephemeral=True)
             return False
         return True
 
@@ -108,9 +105,7 @@ class ResetConfirmationView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This menu does not belong to you.", ephemeral=True
-            )
+            await interaction.response.send_message("This menu does not belong to you.", ephemeral=True)
             return False
         return True
 
@@ -121,9 +116,7 @@ class ResetConfirmationView(View):
             # Execute Hard Delete
             self.db.delete_player_full(self.interaction_user.id)
 
-            logger.warning(
-                f"User {self.interaction_user.id} ({self.interaction_user.name}) reset their character."
-            )
+            logger.warning(f"User {self.interaction_user.id} ({self.interaction_user.name}) reset their character.")
 
             embed = discord.Embed(
                 title="Character Deleted",
@@ -138,12 +131,8 @@ class ResetConfirmationView(View):
             await interaction.edit_original_response(embed=embed, view=None)
 
         except Exception as e:
-            logger.error(
-                f"Error resetting character for {self.interaction_user.id}: {e}"
-            )
-            await interaction.followup.send(
-                "System error during deletion. Please contact an admin.", ephemeral=True
-            )
+            logger.error(f"Error resetting character for {self.interaction_user.id}: {e}")
+            await interaction.followup.send("System error during deletion. Please contact an admin.", ephemeral=True)
 
     async def cancel_callback(self, interaction: discord.Interaction):
         # Return to Settings Menu

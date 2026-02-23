@@ -25,9 +25,7 @@ class RewardSystem:
         self.inv_manager = InventoryManager(db_manager)
         self.achievement_system = AchievementSystem(db_manager)
 
-    def _get_consumable_data_by_name(
-        self, item_name: str
-    ) -> tuple[str | None, dict | None]:
+    def _get_consumable_data_by_name(self, item_name: str) -> tuple[str | None, dict | None]:
         """Helper to find a consumable's key_id and data by its display name."""
         for key, data in CONSUMABLES.items():
             if data["name"] == item_name:
@@ -41,9 +39,7 @@ class RewardSystem:
         """
         try:
             # 1. Fetch Quest Reward Data
-            quest_row = self.db._col("quests").find_one(
-                {"id": quest_id}, {"_id": 0, "rewards": 1, "title": 1}
-            )
+            quest_row = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "rewards": 1, "title": 1})
             if not quest_row:
                 return f"{E.ERROR} Error: Quest definition not found."
 
@@ -94,9 +90,7 @@ class RewardSystem:
             # 5. Item Rewards
             item_msg = ""
             if item_reward_name:
-                item_key, item_data = self._get_consumable_data_by_name(
-                    item_reward_name
-                )
+                item_key, item_data = self._get_consumable_data_by_name(item_reward_name)
                 if item_key and item_data:
                     self.db.add_inventory_item(
                         discord_id,
@@ -106,13 +100,9 @@ class RewardSystem:
                         item_data["rarity"],
                         1,
                     )
-                    item_msg = (
-                        f"\n{E.ITEM_BOX} **Item Acquired:** `{item_data['name']}`"
-                    )
+                    item_msg = f"\n{E.ITEM_BOX} **Item Acquired:** `{item_data['name']}`"
                 else:
-                    logger.warning(
-                        f"Quest {quest_id} tried to give unknown item '{item_reward_name}'"
-                    )
+                    logger.warning(f"Quest {quest_id} tried to give unknown item '{item_reward_name}'")
                     item_msg = f"\n{E.WARNING} *Reward item '{item_reward_name}' not found in database.*"
 
             # -------- SUMMARY GENERATION --------

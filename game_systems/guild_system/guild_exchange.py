@@ -52,9 +52,7 @@ class GuildExchange:
 
         try:
             # 1. Fetch all material items (just IDs and counts first)
-            cursor = self.db._col("inventory").find(
-                {"discord_id": discord_id, "item_type": "material"}
-            )
+            cursor = self.db._col("inventory").find({"discord_id": discord_id, "item_type": "material"})
 
             # 2. Iterate and attempt to delete each item atomically
             for item in cursor:
@@ -73,14 +71,10 @@ class GuildExchange:
             # 3. Add Aurum (only for items we successfully deleted)
             if total_value > 0:
                 self.db.increment_player_fields(discord_id, aurum=total_value)
-                logger.info(
-                    f"User {discord_id} exchanged materials for {total_value} Aurum."
-                )
+                logger.info(f"User {discord_id} exchanged materials for {total_value} Aurum.")
 
             return total_value, sold_items
 
         except Exception as e:
-            logger.error(
-                f"Exchange transaction failed for {discord_id}: {e}", exc_info=True
-            )
+            logger.error(f"Exchange transaction failed for {discord_id}: {e}", exc_info=True)
             return 0, []

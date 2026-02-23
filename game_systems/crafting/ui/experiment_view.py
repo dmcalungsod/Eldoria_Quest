@@ -36,18 +36,14 @@ class ExperimentView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This workbench is occupied.", ephemeral=True
-            )
+            await interaction.response.send_message("This workbench is occupied.", ephemeral=True)
             return False
         return True
 
     def _setup_ui(self):
         # 1. Material Select Menu
         # Fetch materials (limit to 25, sort by count)
-        materials = self.db.get_inventory_items(
-            self.interaction_user.id, item_type="material", equipped=0
-        )
+        materials = self.db.get_inventory_items(self.interaction_user.id, item_type="material", equipped=0)
 
         # Sort by count desc
         materials.sort(key=lambda x: x["count"], reverse=True)
@@ -154,9 +150,7 @@ class ExperimentView(View):
         embed = discord.Embed(title=title, description=msg, color=color)
         if success and result_item:
             # Add item details
-            embed.add_field(
-                name="Item Created", value=result_item["name"], inline=False
-            )
+            embed.add_field(name="Item Created", value=result_item["name"], inline=False)
             if result_item.get("effect"):
                 # Format effect nicely
                 effects = []

@@ -70,9 +70,7 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
         result = await self.get_player_or_error(self.interaction, self.mock_db)
 
         self.assertIsNone(result)
-        self.interaction.response.send_message.assert_called_with(
-            "Character record not found.", ephemeral=True
-        )
+        self.interaction.response.send_message.assert_called_with("Character record not found.", ephemeral=True)
         self.interaction.followup.send.assert_not_called()
 
     async def test_player_not_found_deferred(self):
@@ -85,9 +83,7 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
 
         self.assertIsNone(result)
         self.interaction.response.send_message.assert_not_called()
-        self.interaction.followup.send.assert_called_with(
-            "Character record not found.", ephemeral=True
-        )
+        self.interaction.followup.send.assert_called_with("Character record not found.", ephemeral=True)
 
     async def test_custom_message(self):
         """Test validation with custom error message."""
@@ -95,14 +91,10 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
         self.interaction.response.is_done.return_value = False
         self.interaction.response.send_message = AsyncMock()
 
-        result = await self.get_player_or_error(
-            self.interaction, self.mock_db, content="Custom Error"
-        )
+        result = await self.get_player_or_error(self.interaction, self.mock_db, content="Custom Error")
 
         self.assertIsNone(result)
-        self.interaction.response.send_message.assert_called_with(
-            "Custom Error", ephemeral=True
-        )
+        self.interaction.response.send_message.assert_called_with("Custom Error", ephemeral=True)
 
 
 if __name__ == "__main__":

@@ -52,9 +52,7 @@ class CraftingView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This workbench is occupied.", ephemeral=True
-            )
+            await interaction.response.send_message("This workbench is occupied.", ephemeral=True)
             return False
         return True
 
@@ -62,31 +60,19 @@ class CraftingView(View):
         # Row 0: Category Buttons
         btn_cons = Button(
             label="Consumables",
-            style=(
-                discord.ButtonStyle.primary
-                if self.category == "consumable"
-                else discord.ButtonStyle.secondary
-            ),
+            style=(discord.ButtonStyle.primary if self.category == "consumable" else discord.ButtonStyle.secondary),
             custom_id="cat_consumable",
             row=0,
         )
         btn_equip = Button(
             label="Equipment",
-            style=(
-                discord.ButtonStyle.primary
-                if self.category == "equipment"
-                else discord.ButtonStyle.secondary
-            ),
+            style=(discord.ButtonStyle.primary if self.category == "equipment" else discord.ButtonStyle.secondary),
             custom_id="cat_equipment",
             row=0,
         )
         btn_dismantle = Button(
             label="Dismantle",
-            style=(
-                discord.ButtonStyle.danger
-                if self.category == "dismantle"
-                else discord.ButtonStyle.secondary
-            ),
+            style=(discord.ButtonStyle.danger if self.category == "dismantle" else discord.ButtonStyle.secondary),
             custom_id="cat_dismantle",
             row=0,
         )
@@ -116,9 +102,7 @@ class CraftingView(View):
 
     def _setup_dismantle_select(self):
         # Fetch unequipped equipment
-        items = self.db.get_inventory_items(
-            self.interaction_user.id, item_type="equipment", equipped=0
-        )
+        items = self.db.get_inventory_items(self.interaction_user.id, item_type="equipment", equipped=0)
 
         if not items:
             select = Select(
@@ -132,9 +116,7 @@ class CraftingView(View):
             self.add_item(select)
             return
 
-        select = Select(
-            placeholder="Select item to dismantle...", min_values=1, max_values=1, row=1
-        )
+        select = Select(placeholder="Select item to dismantle...", min_values=1, max_values=1, row=1)
 
         # Sort by rarity or name? Rarity then Name.
         # Rarity order helper?
@@ -197,16 +179,12 @@ class CraftingView(View):
         )
 
         # Sort recipes by cost for better UX
-        sorted_recipes = sorted(
-            filtered_recipes.items(), key=lambda x: x[1].get("cost", 0)
-        )
+        sorted_recipes = sorted(filtered_recipes.items(), key=lambda x: x[1].get("cost", 0))
 
         # Limit to 25 just in case
         for r_id, r_data in sorted_recipes[:25]:
             # Calculate if craftable
-            can_craft, _ = self.crafting_system.can_craft(
-                self.interaction_user.id, r_id
-            )
+            can_craft, _ = self.crafting_system.can_craft(self.interaction_user.id, r_id)
 
             # Determine Emoji
             if not can_craft:
@@ -258,9 +236,7 @@ class CraftingView(View):
             embed = view.build_embed()
             await inter.edit_original_response(embed=embed, view=view)
 
-        new_view = ExperimentView(
-            self.db, self.interaction_user, back_callback=return_to_crafting
-        )
+        new_view = ExperimentView(self.db, self.interaction_user, back_callback=return_to_crafting)
         embed = new_view.build_embed()
         await interaction.edit_original_response(embed=embed, view=new_view)
 
@@ -270,9 +246,7 @@ class CraftingView(View):
             return  # No change
 
         await interaction.response.defer()
-        new_view = CraftingView(
-            self.db, self.interaction_user, status_msg=None, category=category
-        )
+        new_view = CraftingView(self.db, self.interaction_user, status_msg=None, category=category)
         # Re-attach back button
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
         embed = new_view.build_embed()
@@ -288,9 +262,7 @@ class CraftingView(View):
         )
 
         # Refresh View (Keep category)
-        new_view = CraftingView(
-            self.db, self.interaction_user, status_msg=msg, category=self.category
-        )
+        new_view = CraftingView(self.db, self.interaction_user, status_msg=msg, category=self.category)
         new_view.last_success = success
         # Re-attach back button
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
@@ -313,9 +285,7 @@ class CraftingView(View):
         )
 
         # Refresh View
-        new_view = CraftingView(
-            self.db, self.interaction_user, status_msg=msg, category=self.category
-        )
+        new_view = CraftingView(self.db, self.interaction_user, status_msg=msg, category=self.category)
         new_view.last_success = success
         # Re-attach back button
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
@@ -338,7 +308,9 @@ class CraftingView(View):
             desc = "The forge is hot and the anvil rings.\nSelect a recipe to forge new gear."
         else:
             cat_title = "Dismantling"
-            desc = "Salvage materials from your unwanted equipment.\n**Warning:** Dismantled items are destroyed forever."
+            desc = (
+                "Salvage materials from your unwanted equipment.\n**Warning:** Dismantled items are destroyed forever."
+            )
 
         embed = discord.Embed(
             title=f"⚗️ Alchemist's Workbench — {cat_title}",
@@ -349,9 +321,7 @@ class CraftingView(View):
         # Show Status
         if self.status_msg:
             icon = E.CHECK if self.last_success else E.ERROR
-            embed.add_field(
-                name="Result", value=f"{icon} {self.status_msg}", inline=False
-            )
+            embed.add_field(name="Result", value=f"{icon} {self.status_msg}", inline=False)
 
         # Show Player Gold
         player = self.db.get_player(self.interaction_user.id)

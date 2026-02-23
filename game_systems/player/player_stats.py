@@ -37,18 +37,12 @@ def calculate_tiered_bonus(stat_value: int, base_effect_per_point: float) -> int
     # 1. Contribution from full tiers
     # Sum of arithmetic series: 100 * base * sum(1 + 0.25*i for i in 0..T-1)
     # Sum = 100 * base * (T + 0.125 * T * (T-1))
-    full_tiers_effect = (
-        100.0
-        * base_effect_per_point
-        * (full_tiers + 0.125 * full_tiers * (full_tiers - 1))
-    )
+    full_tiers_effect = 100.0 * base_effect_per_point * (full_tiers + 0.125 * full_tiers * (full_tiers - 1))
 
     # 2. Contribution from remaining points
     # Multiplier for the current tier is (1 + 0.25 * T)
     current_tier_multiplier = 1.0 + (full_tiers * 0.25)
-    remaining_effect = (
-        remaining_points * base_effect_per_point * current_tier_multiplier
-    )
+    remaining_effect = remaining_points * base_effect_per_point * current_tier_multiplier
 
     return math.floor(full_tiers_effect + remaining_effect)
 
@@ -84,9 +78,7 @@ class PlayerStats:
     Manages all stats for a player character.
     """
 
-    def __init__(
-        self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1
-    ):
+    def __init__(self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1):
         self._stats: dict[str, StatBlock] = {
             "STR": StatBlock(base=str_base),
             "END": StatBlock(base=end_base),

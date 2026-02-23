@@ -38,9 +38,7 @@ class GeneralCog(commands.Cog):
 
         except Exception as e:
             logger.error(f"Ping command failed: {e}")
-            await interaction.response.send_message(
-                "Error calculating latency.", ephemeral=True
-            )
+            await interaction.response.send_message("Error calculating latency.", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

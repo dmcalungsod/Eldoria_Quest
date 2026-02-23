@@ -114,9 +114,7 @@ class WorldTime:
         # Use a local random instance to avoid affecting global random state
         rng = random.Random(seed)
 
-        weights = LOCATION_WEATHER_WEIGHTS.get(
-            location_id, LOCATION_WEATHER_WEIGHTS["default"]
-        )
+        weights = LOCATION_WEATHER_WEIGHTS.get(location_id, LOCATION_WEATHER_WEIGHTS["default"])
         choices, probabilities = zip(*weights)
 
         # Pick one based on weights

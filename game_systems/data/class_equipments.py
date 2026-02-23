@@ -183,9 +183,7 @@ for class_name in CLASSES:
             for stat, percentage in budget.items():
                 if stat == "MP_MULT":
                     # Special case: Add flat MP based on a multiplier of the budget
-                    stats_bonus["MP"] = ceil(
-                        total_stat_budget * percentage * 3
-                    )  # 3 is an arbitrary value, feels good
+                    stats_bonus["MP"] = ceil(total_stat_budget * percentage * 3)  # 3 is an arbitrary value, feels good
                 else:
                     # Normal stat
                     stats_bonus[stat] = ceil(total_stat_budget * percentage)

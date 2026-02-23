@@ -76,9 +76,7 @@ class TournamentSystem:
         # Fetch Top 3
         winners = self.db.get_tournament_leaderboard(t_id, limit=3)
 
-        results_msg = [
-            f"{E.VICTORY} **Tournament Ended: {event_type.replace('_', ' ').title()}**\n"
-        ]
+        results_msg = [f"{E.VICTORY} **Tournament Ended: {event_type.replace('_', ' ').title()}**\n"]
 
         if not winners:
             results_msg.append("No participants qualified for rewards.")
@@ -97,9 +95,7 @@ class TournamentSystem:
                     title = "Grand Champion"
                     self.db.add_title(discord_id, title)
                     self.db.increment_player_fields(discord_id, aurum=reward)
-                    results_msg.append(
-                        f"🥇 **{name}**: {score} pts — {reward} Aurum & Title: *{title}*"
-                    )
+                    results_msg.append(f"🥇 **{name}**: {score} pts — {reward} Aurum & Title: *{title}*")
                 elif rank == 2:
                     reward = 500
                     self.db.increment_player_fields(discord_id, aurum=reward)

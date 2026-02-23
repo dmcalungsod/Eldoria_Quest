@@ -1,8 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
-import json
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,7 +15,6 @@ sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
 from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
-from game_systems.data.consumables import CONSUMABLES  # noqa: E402
 
 
 class TestDualConsumableBug(unittest.TestCase):
@@ -67,13 +65,13 @@ class TestDualConsumableBug(unittest.TestCase):
         stats_mock.max_mp = 100
 
         # We need to mock PlayerStats.from_dict
-        with patch(
-            "game_systems.items.consumable_manager.PlayerStats"
-        ) as MockPlayerStats, patch.dict(
-            "game_systems.items.consumable_manager.CONSUMABLES",
-            {self.test_item_key: self.test_item_data},
+        with (
+            patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats,
+            patch.dict(
+                "game_systems.items.consumable_manager.CONSUMABLES",
+                {self.test_item_key: self.test_item_data},
+            ),
         ):
-
             MockPlayerStats.from_dict.return_value = stats_mock
 
             # Execute
@@ -84,15 +82,11 @@ class TestDualConsumableBug(unittest.TestCase):
             # Assertions
             # This should BE True if fixed. Currently expected to be False.
             if not success and "already at full health" in message:
-                print(
-                    "BUG REPRODUCED: Item failed because HP is full, ignoring MP restoration."
-                )
+                print("BUG REPRODUCED: Item failed because HP is full, ignoring MP restoration.")
             elif success:
                 print("BUG NOT REPRODUCED: Item worked correctly.")
 
-            self.assertTrue(
-                success, "Item usage should succeed because MP needs restoring."
-            )
+            self.assertTrue(success, "Item usage should succeed because MP needs restoring.")
             self.assertIn("restored", message.lower())
 
     def test_use_dual_item_full_hp_full_mp(self):
@@ -117,13 +111,13 @@ class TestDualConsumableBug(unittest.TestCase):
         stats_mock.max_hp = 100
         stats_mock.max_mp = 100
 
-        with patch(
-            "game_systems.items.consumable_manager.PlayerStats"
-        ) as MockPlayerStats, patch.dict(
-            "game_systems.items.consumable_manager.CONSUMABLES",
-            {self.test_item_key: self.test_item_data},
+        with (
+            patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats,
+            patch.dict(
+                "game_systems.items.consumable_manager.CONSUMABLES",
+                {self.test_item_key: self.test_item_data},
+            ),
         ):
-
             MockPlayerStats.from_dict.return_value = stats_mock
 
             success, message = self.manager.use_item(discord_id, inventory_id)

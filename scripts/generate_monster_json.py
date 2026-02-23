@@ -25,9 +25,7 @@ def export_monsters():
                 if isinstance(skill, dict) and "key_id" in skill:
                     skill_keys.append(skill["key_id"])
                 else:
-                    logger.warning(
-                        f"Warning: Skill in {key} missing key_id or not a dict: {skill}"
-                    )
+                    logger.warning(f"Warning: Skill in {key} missing key_id or not a dict: {skill}")
             m_data["skills"] = skill_keys
 
         # drops are list of tuples, json dump handles this automatically (converts to list of lists)
@@ -38,9 +36,7 @@ def export_monsters():
     try:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(json_monsters, f, indent=4)
-        logger.info(
-            f"Successfully exported {len(json_monsters)} monsters to {output_path}"
-        )
+        logger.info(f"Successfully exported {len(json_monsters)} monsters to {output_path}")
     except Exception as e:
         logger.error(f"Failed to export monsters: {e}")
 

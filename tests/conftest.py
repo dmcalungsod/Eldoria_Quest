@@ -120,17 +120,13 @@ def _patch_duplicate_key_error():
         if mod is None:
             continue
         target = mod if key == "pymongo.errors" else getattr(mod, "errors", None)
-        if target is not None and not _is_real_exc(
-            getattr(target, "DuplicateKeyError", None)
-        ):
+        if target is not None and not _is_real_exc(getattr(target, "DuplicateKeyError", None)):
             target.DuplicateKeyError = _DuplicateKeyError
 
     # 2. Patch the locally-bound reference inside production modules.
     for mod_name in ("database.database_manager",):
         mod = sys.modules.get(mod_name)
-        if mod is not None and not _is_real_exc(
-            getattr(mod, "DuplicateKeyError", None)
-        ):
+        if mod is not None and not _is_real_exc(getattr(mod, "DuplicateKeyError", None)):
             mod.DuplicateKeyError = _DuplicateKeyError
 
     # 3. Patch equipment_manager's pymongo reference.
@@ -139,9 +135,7 @@ def _patch_duplicate_key_error():
         pymongo_ref = getattr(em, "pymongo", None)
         if pymongo_ref is not None:
             errors_ref = getattr(pymongo_ref, "errors", None)
-            if errors_ref is not None and not _is_real_exc(
-                getattr(errors_ref, "DuplicateKeyError", None)
-            ):
+            if errors_ref is not None and not _is_real_exc(getattr(errors_ref, "DuplicateKeyError", None)):
                 errors_ref.DuplicateKeyError = _DuplicateKeyError
 
 
@@ -203,9 +197,7 @@ def _patch_app_commands():
     import asyncio
     import importlib
 
-    for mod_name, class_name, method_name in (
-        ("cogs.developer_cog", "DeveloperCog", "dev_panel"),
-    ):
+    for mod_name, class_name, method_name in (("cogs.developer_cog", "DeveloperCog", "dev_panel"),):
         mod = sys.modules.get(mod_name)
         if mod is None:
             continue

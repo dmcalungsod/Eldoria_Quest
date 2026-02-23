@@ -140,18 +140,14 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         interaction.followup.send = AsyncMock()
 
         # Patch get_player_or_error
-        with patch(
-            "cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)
-        ):
+        with patch("cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)):
             await view.purchase_item_callback(interaction)
 
         # Should defer
         interaction.response.defer.assert_awaited()
 
         # Should send error about invalid selection
-        interaction.followup.send.assert_awaited_with(
-            "❌ Invalid selection.", ephemeral=True
-        )
+        interaction.followup.send.assert_awaited_with("❌ Invalid selection.", ephemeral=True)
 
     async def test_shop_callback_validation_failure_malformed(self):
         """Verify that purchase_item_callback rejects malformed input."""
@@ -168,14 +164,10 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         interaction.followup.send = AsyncMock()
 
         # Patch get_player_or_error
-        with patch(
-            "cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)
-        ):
+        with patch("cogs.shop_cog.get_player_or_error", new=AsyncMock(return_value=True)):
             await view.purchase_item_callback(interaction)
 
-        interaction.followup.send.assert_awaited_with(
-            "❌ Invalid selection.", ephemeral=True
-        )
+        interaction.followup.send.assert_awaited_with("❌ Invalid selection.", ephemeral=True)
 
 
 if __name__ == "__main__":

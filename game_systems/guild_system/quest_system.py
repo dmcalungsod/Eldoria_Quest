@@ -94,9 +94,7 @@ class QuestSystem:
                     else details["objectives"]
                 )
                 details["rewards"] = (
-                    json.loads(details["rewards"])
-                    if isinstance(details["rewards"], str)
-                    else details["rewards"]
+                    json.loads(details["rewards"]) if isinstance(details["rewards"], str) else details["rewards"]
                 )
             except json.JSONDecodeError:
                 details["objectives"] = {}
@@ -144,15 +142,9 @@ class QuestSystem:
                 }
 
                 try:
-                    d["progress"] = (
-                        json.loads(d["progress"])
-                        if isinstance(d["progress"], str)
-                        else d["progress"]
-                    )
+                    d["progress"] = json.loads(d["progress"]) if isinstance(d["progress"], str) else d["progress"]
                     d["objectives"] = (
-                        json.loads(d["objectives"])
-                        if isinstance(d["objectives"], str)
-                        else d["objectives"]
+                        json.loads(d["objectives"]) if isinstance(d["objectives"], str) else d["objectives"]
                     )
                 except json.JSONDecodeError:
                     d["progress"] = {}
@@ -171,9 +163,7 @@ class QuestSystem:
             if exists:
                 return False
 
-            quest = self.db._col("quests").find_one(
-                {"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1}
-            )
+            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1})
             if not quest:
                 return False
 
@@ -198,9 +188,7 @@ class QuestSystem:
 
             try:
                 objectives = (
-                    json.loads(quest["objectives"])
-                    if isinstance(quest["objectives"], str)
-                    else quest["objectives"]
+                    json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
                 )
             except json.JSONDecodeError:
                 return False
@@ -243,11 +231,7 @@ class QuestSystem:
                 return False
 
             try:
-                progress = (
-                    json.loads(row["progress"])
-                    if isinstance(row["progress"], str)
-                    else row["progress"]
-                )
+                progress = json.loads(row["progress"]) if isinstance(row["progress"], str) else row["progress"]
             except json.JSONDecodeError:
                 return False
 
@@ -276,9 +260,7 @@ class QuestSystem:
             if not pq:
                 return False, f"{ERROR} Quest inactive or already completed."
 
-            quest = self.db._col("quests").find_one(
-                {"id": quest_id}, {"_id": 0, "objectives": 1, "rewards": 1}
-            )
+            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "rewards": 1})
             if not quest:
                 return False, f"{ERROR} Quest definition not found."
 
@@ -294,15 +276,9 @@ class QuestSystem:
                 )
             # ------------------------------------------------
 
-            progress = (
-                json.loads(pq["progress"])
-                if isinstance(pq["progress"], str)
-                else pq["progress"]
-            )
+            progress = json.loads(pq["progress"]) if isinstance(pq["progress"], str) else pq["progress"]
             objectives = (
-                json.loads(quest["objectives"])
-                if isinstance(quest["objectives"], str)
-                else quest["objectives"]
+                json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
             )
 
             if not self.check_completion(progress, objectives):
@@ -319,9 +295,7 @@ class QuestSystem:
 
             if result.modified_count == 0:
                 # Race Condition Detected: Status changed between find_one and update_one
-                logger.warning(
-                    f"Quest completion race condition prevented for {discord_id}, quest {quest_id}"
-                )
+                logger.warning(f"Quest completion race condition prevented for {discord_id}, quest {quest_id}")
                 return False, f"{ERROR} Quest already completed or inactive."
 
             # Grant rewards

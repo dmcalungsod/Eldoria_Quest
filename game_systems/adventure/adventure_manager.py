@@ -10,16 +10,16 @@ import json
 import logging
 
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
+from game_systems.achievement_system import AchievementSystem
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
-from game_systems.achievement_system import AchievementSystem
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
+from game_systems.world_time import WorldTime
 
 from .adventure_session import AdventureSession
 
@@ -34,21 +34,15 @@ class AdventureManager:
         self.quest_system = QuestSystem(self.db)
         self.faction_system = FactionSystem(self.db)
 
-    def start_adventure(
-        self, discord_id: int, location_id: str, duration_minutes: int
-    ) -> bool:
+    def start_adventure(self, discord_id: int, location_id: str, duration_minutes: int) -> bool:
         # --- SECURITY FIX: Input Validation ---
         if location_id not in LOCATIONS:
-            logger.warning(
-                f"Invalid location_id attempted: {location_id} by {discord_id}"
-            )
+            logger.warning(f"Invalid location_id attempted: {location_id} by {discord_id}")
             return False
 
         # Max duration: 1 year (approx 525,600 minutes) to prevent overflow
         if duration_minutes != -1 and not (0 < duration_minutes <= 525600):
-            logger.warning(
-                f"Invalid adventure duration: {duration_minutes} by {discord_id}"
-            )
+            logger.warning(f"Invalid adventure duration: {duration_minutes} by {discord_id}")
             return False
 
         start_time = WorldTime.now()
@@ -99,9 +93,7 @@ class AdventureManager:
                 "active_monster": None,
             }
 
-        session = AdventureSession(
-            self.db, self.quest_system, self.inventory_manager, discord_id, session_row
-        )
+        session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, session_row)
 
         result = session.simulate_step(context_bundle=bundle, action=action)
 
@@ -173,9 +165,7 @@ class AdventureManager:
 
             if failed_items:
                 failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
-                loss_report.append(
-                    f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}"
-                )
+                loss_report.append(f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}")
 
             self.db.end_adventure_session(discord_id)
 
@@ -198,9 +188,7 @@ class AdventureManager:
             if not row:
                 return None
 
-            session = AdventureSession(
-                self.db, self.quest_system, self.inventory_manager, discord_id, row
-            )
+            session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
             total_exp = session.loot.pop("exp", 0)
             total_aurum = session.loot.pop("aurum", 0)
 
@@ -259,9 +247,7 @@ class AdventureManager:
             # --- EXPLORATION ACHIEVEMENTS ---
             try:
                 # 1. Update Stats
-                self.db.update_exploration_stats(
-                    discord_id, row.get("location_id", "unknown")
-                )
+                self.db.update_exploration_stats(discord_id, row.get("location_id", "unknown"))
 
                 # 2. Check Achievements
                 ach_system = AchievementSystem(self.db)
@@ -374,9 +360,7 @@ class AdventureManager:
                     "end_time": end.isoformat(),
                     "duration_minutes": -1,
                     "active": 1,
-                    "logs": json.dumps(
-                        [f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]
-                    ),
+                    "logs": json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
                     "loot_collected": "{}",
                     "active_monster_json": json.dumps(active_monster),
                     "version": 1,

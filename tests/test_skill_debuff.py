@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
+
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
@@ -57,15 +58,9 @@ class TestToxicBlade(unittest.TestCase):
         monster["HP"] = result1["monster_hp"]
 
         # Check Debuff Applied
-        self.assertEqual(
-            len(monster["debuffs"]), 1, "Turn 1: Monster should be poisoned"
-        )
-        self.assertEqual(
-            monster["debuffs"][0]["damage"], 7, "Turn 1: Poison damage should be 7"
-        )
-        self.assertEqual(
-            monster["debuffs"][0]["duration"], 3, "Turn 1: Duration should be 3"
-        )
+        self.assertEqual(len(monster["debuffs"]), 1, "Turn 1: Monster should be poisoned")
+        self.assertEqual(monster["debuffs"][0]["damage"], 7, "Turn 1: Poison damage should be 7")
+        self.assertEqual(monster["debuffs"][0]["duration"], 3, "Turn 1: Duration should be 3")
 
         self.assertLess(
             monster["HP"],
@@ -107,9 +102,7 @@ class TestToxicBlade(unittest.TestCase):
 
         # Duration check
         # Duration decrements in _process_monster_debuffs
-        self.assertEqual(
-            monster["debuffs"][0]["duration"], 2, "Turn 2: Duration should be 2"
-        )
+        self.assertEqual(monster["debuffs"][0]["duration"], 2, "Turn 2: Duration should be 2")
 
         # --- TURN 3: Poison Tick ---
         engine3 = CombatEngine(
@@ -128,9 +121,7 @@ class TestToxicBlade(unittest.TestCase):
             hp_after_tick - 7,
             "Turn 3: Monster should take 7 poison damage",
         )
-        self.assertEqual(
-            monster["debuffs"][0]["duration"], 1, "Turn 3: Duration should be 1"
-        )
+        self.assertEqual(monster["debuffs"][0]["duration"], 1, "Turn 3: Duration should be 1")
 
         # --- TURN 4: Poison Tick & Expire ---
         engine4 = CombatEngine(

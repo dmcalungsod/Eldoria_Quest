@@ -97,9 +97,7 @@ class DamageFormula:
         return max(1, damage), is_crit, event_type
 
     @staticmethod
-    def player_heal(
-        player_stats, current_hp: int, skill_data: dict, skill_level: int
-    ) -> tuple[int, int, str]:
+    def player_heal(player_stats, current_hp: int, skill_data: dict, skill_level: int) -> tuple[int, int, str]:
         base_heal = float(skill_data.get("heal_power", 0))
 
         # Use scaling stat if available (default MAG)
@@ -181,9 +179,7 @@ class DamageFormula:
             return 0, False, "dodge"
 
         # Base calculation uses standard attack logic
-        damage, is_crit, event_type = DamageFormula.monster_attack(
-            monster, player_stats
-        )
+        damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats)
 
         # Apply Skill Multiplier
         multiplier = float(skill_data.get("power", 1.5))
@@ -192,9 +188,7 @@ class DamageFormula:
         return damage, is_crit, event_type
 
     @staticmethod
-    def monster_heal(
-        monster_max_hp: int, current_hp: int, skill_data: dict
-    ) -> tuple[int, int, str]:
+    def monster_heal(monster_max_hp: int, current_hp: int, skill_data: dict) -> tuple[int, int, str]:
         """
         Calculates monster healing.
         """

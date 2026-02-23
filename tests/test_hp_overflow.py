@@ -51,9 +51,7 @@ class MockDatabaseManager:
                 "item_source_table": "equipment",
             }
         }
-        self.equipment_data = {
-            1: {"id": 1, "end_bonus": 10, "rarity": "Common", "level_req": 1}
-        }
+        self.equipment_data = {1: {"id": 1, "end_bonus": 10, "rarity": "Common", "level_req": 1}}
 
     def get_player(self, discord_id):
         return self.players.get(discord_id)
@@ -68,11 +66,7 @@ class MockDatabaseManager:
             self.stats[discord_id]["stats_json"] = json.dumps(stats_dict)
 
     def get_equipped_items(self, discord_id):
-        return [
-            i
-            for i in self.inventory.values()
-            if i["discord_id"] == discord_id and i["equipped"] == 1
-        ]
+        return [i for i in self.inventory.values() if i["discord_id"] == discord_id and i["equipped"] == 1]
 
     def get_inventory_item(self, discord_id, item_id):
         return self.inventory.get(item_id)
@@ -123,11 +117,7 @@ class MockDatabaseManager:
 
     def get_equipped_in_slot(self, discord_id, slot):
         for item in self.inventory.values():
-            if (
-                item["discord_id"] == discord_id
-                and item.get("slot") == slot
-                and item.get("equipped") == 1
-            ):
+            if item["discord_id"] == discord_id and item.get("slot") == slot and item.get("equipped") == 1:
                 return item
         return None
 
@@ -175,9 +165,7 @@ class TestHPOverflow(unittest.TestCase):
         print(f"Current HP after unequip: {current_hp}")
 
         # BUG: Current HP is likely still 250 because unequip_item doesn't clamp
-        self.assertLessEqual(
-            current_hp, 150, f"HP Overflow! Current: {current_hp}, Max allowed: 150"
-        )
+        self.assertLessEqual(current_hp, 150, f"HP Overflow! Current: {current_hp}, Max allowed: 150")
 
 
 if __name__ == "__main__":

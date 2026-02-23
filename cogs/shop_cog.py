@@ -17,8 +17,8 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
-from game_systems.items.inventory_manager import InventoryManager
 from game_systems.data.shop_data import SHOP_INVENTORY
+from game_systems.items.inventory_manager import InventoryManager
 
 from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
@@ -59,14 +59,10 @@ class ShopView(View):
         return interaction.user.id == self.interaction_user.id
 
     def build_item_select(self) -> Select:
-        item_select = Select(
-            placeholder="Select provisions...", min_values=1, max_values=1, row=0
-        )
+        item_select = Select(placeholder="Select provisions...", min_values=1, max_values=1, row=0)
 
         if not self.inventory:
-            item_select.add_option(
-                label="Out of Stock", value="disabled", emoji=E.ERROR
-            )
+            item_select.add_option(label="Out of Stock", value="disabled", emoji=E.ERROR)
             item_select.disabled = True
             return item_select
 
@@ -120,14 +116,10 @@ class ShopView(View):
                 return (False, "Item data missing.", 0)
 
             # Delegate to DatabaseManager for atomic execution with refund support
-            success, result, new_balance = self.db.purchase_item(
-                self.interaction_user.id, item_key, item_data, price
-            )
+            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, price)
 
             if success:
-                logger.info(
-                    f"User {self.interaction_user.id} bought {item_key} for {price}"
-                )
+                logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
 
             return (success, result, new_balance)
 
@@ -151,15 +143,11 @@ class ShopView(View):
 
         item_key = values[0].split(":")[0]
 
-        success, result, new_aurum = await asyncio.to_thread(
-            self._execute_purchase, item_key
-        )
+        success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key)
 
         # SECURITY FIX: Always fetch fresh stats to prevent stale state.
         # This prevents the UI from showing incorrect balance if it changed externally.
-        fresh_player = await asyncio.to_thread(
-            self.db.get_player, self.interaction_user.id
-        )
+        fresh_player = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         current_aurum = fresh_player["aurum"] if fresh_player else 0
 
         embed = discord.Embed(
@@ -172,16 +160,10 @@ class ShopView(View):
             color=discord.Color.green() if success else discord.Color.red(),
         )
 
-        msg = (
-            f"{E.CHECK} Secured **1x {result['name']}**."
-            if success
-            else f"{E.ERROR} {result}"
-        )
+        msg = f"{E.CHECK} Secured **1x {result['name']}**." if success else f"{E.ERROR} {result}"
         embed.add_field(name="Transaction Receipt", value=msg)
 
-        new_view = ShopView(
-            self.db, self.interaction_user, current_aurum, self.inventory
-        )
+        new_view = ShopView(self.db, self.interaction_user, current_aurum, self.inventory)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=new_view)

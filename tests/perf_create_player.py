@@ -115,27 +115,21 @@ def benchmark_create_player_synthetic():
 
     # --- Run Benchmarks ---
     iterations = 50
-    print(
-        f"Benchmarking with {iterations} iterations (Simulated Latency: {LATENCY_PER_OP * 1000}ms/op)..."
-    )
+    print(f"Benchmarking with {iterations} iterations (Simulated Latency: {LATENCY_PER_OP * 1000}ms/op)...")
 
     # Measure Loop
     start_time = time.time()
     for i in range(iterations):
         create_player_loop(1000 + i)
     loop_duration = time.time() - start_time
-    print(
-        f"Loop implementation: {loop_duration:.4f} seconds ({loop_duration / iterations * 1000:.2f} ms/op)"
-    )
+    print(f"Loop implementation: {loop_duration:.4f} seconds ({loop_duration / iterations * 1000:.2f} ms/op)")
 
     # Measure Batch
     start_time = time.time()
     for i in range(iterations):
         create_player_batch(2000 + i)
     batch_duration = time.time() - start_time
-    print(
-        f"Batch implementation: {batch_duration:.4f} seconds ({batch_duration / iterations * 1000:.2f} ms/op)"
-    )
+    print(f"Batch implementation: {batch_duration:.4f} seconds ({batch_duration / iterations * 1000:.2f} ms/op)")
 
     # Calculate improvement
     if loop_duration > 0:

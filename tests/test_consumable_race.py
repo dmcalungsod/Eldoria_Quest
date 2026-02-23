@@ -12,9 +12,7 @@ class TestConsumableRace(unittest.TestCase):
         self.db = DatabaseManager()
         self.db._client = MagicMock()
         self.db.db = MagicMock()
-        self.db._col = (
-            MagicMock()
-        )  # This returns a mock collection when called with name
+        self.db._col = MagicMock()  # This returns a mock collection when called with name
 
         self.manager = ConsumableManager(self.db)
 
@@ -54,9 +52,7 @@ class TestConsumableRace(unittest.TestCase):
         )
 
         # 2. get_player_vitals and stats
-        self.db.get_player_vitals = MagicMock(
-            return_value={"current_hp": 10, "current_mp": 10}
-        )
+        self.db.get_player_vitals = MagicMock(return_value={"current_hp": 10, "current_mp": 10})
         self.db.get_player_stats_json = MagicMock(
             return_value={
                 "HP": {"base": 100, "bonus": 0},
@@ -101,12 +97,8 @@ class TestConsumableRace(unittest.TestCase):
                 "count": 1,
             }
         )
-        self.db.get_player_vitals = MagicMock(
-            return_value={"current_hp": 10, "current_mp": 10}
-        )
-        self.db.get_player_stats_json = MagicMock(
-            return_value={"HP": {"base": 100, "bonus": 0}}
-        )
+        self.db.get_player_vitals = MagicMock(return_value={"current_hp": 10, "current_mp": 10})
+        self.db.get_player_stats_json = MagicMock(return_value={"HP": {"base": 100, "bonus": 0}})
 
         # Consume succeeds
         self.db.consume_item_atomic = MagicMock(return_value=True)

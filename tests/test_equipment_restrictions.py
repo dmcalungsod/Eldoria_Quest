@@ -135,9 +135,7 @@ class TestEquipmentRestrictions(unittest.TestCase):
         self.assertIn("Req: Lvl 50", msg)
 
     @patch("game_systems.character.ui.inventory_view.InventoryManager")
-    @patch(
-        "game_systems.character.ui.inventory_view.EquipmentManager"
-    )  # This patches the CLASS
+    @patch("game_systems.character.ui.inventory_view.EquipmentManager")  # This patches the CLASS
     def test_inventory_view_ui_logic(self, MockEqManagerClass, MockInvManagerClass):
         # Setup mocks
         mock_user = MagicMock()

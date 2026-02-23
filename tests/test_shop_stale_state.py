@@ -79,9 +79,7 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         # Mock get_player_or_error helper used in callback
         # Since we imported ShopView directly, we need to patch it where it's used in the module
         # Use patch.object to avoid import errors with string paths in some environments
-        with patch.object(
-            shop_cog, "get_player_or_error", new_callable=AsyncMock
-        ) as mock_get_player:
+        with patch.object(shop_cog, "get_player_or_error", new_callable=AsyncMock) as mock_get_player:
             mock_get_player.return_value = True
 
             # Execute callback

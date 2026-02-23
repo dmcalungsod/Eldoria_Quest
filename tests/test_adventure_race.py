@@ -103,9 +103,7 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         async def guarded_simulation(interaction, action=None):
             nonlocal sim_count
             if view.processing:
-                await interaction.response.send_message(
-                    "Please wait...", ephemeral=True
-                )
+                await interaction.response.send_message("Please wait...", ephemeral=True)
                 return
             view.processing = True
             sim_count += 1

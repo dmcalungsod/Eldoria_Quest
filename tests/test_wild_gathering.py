@@ -108,9 +108,7 @@ class TestWildGathering(unittest.TestCase):
         """Test that AdventureSession passes location_id correctly."""
         from unittest.mock import ANY
 
-        session = AdventureSession(
-            self.db, self.quest_system, self.inventory_manager, self.discord_id
-        )
+        session = AdventureSession(self.db, self.quest_system, self.inventory_manager, self.discord_id)
         session.events = MagicMock()
         session.events.resolve_non_combat.return_value = {"log": [], "dead": False}
 

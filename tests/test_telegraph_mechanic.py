@@ -18,9 +18,7 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestTelegraphMechanic(unittest.TestCase):
     def setUp(self):
-        self.stats = PlayerStats(
-            str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10
-        )
+        self.stats = PlayerStats(str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10)
         self.player_wrapper = MagicMock(spec=LevelUpSystem)
         self.player_wrapper.stats = self.stats
         self.player_wrapper.level = 1
@@ -93,9 +91,7 @@ class TestTelegraphMechanic(unittest.TestCase):
             log_str = " ".join(result["phrases"])
             # Updated to match new CombatPhrases
             self.assertTrue(
-                "gathering dark energy" in log_str
-                or "Dark energy gathers" in log_str
-                or "INTERRUPT" in log_str
+                "gathering dark energy" in log_str or "Dark energy gathers" in log_str or "INTERRUPT" in log_str
             )
             self.assertIn("Annihilate", log_str)
 

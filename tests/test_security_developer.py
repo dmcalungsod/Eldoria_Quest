@@ -7,12 +7,11 @@ mocked discord (Cog base class, app_commands.command decorator, ui classes)
 to be real objects, then reimports ``cogs.developer_cog`` in a clean state.
 """
 
-import asyncio
 import importlib
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -114,7 +113,6 @@ def _load_developer_cog():
 
 
 class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
-
     async def test_dev_panel_access_denied_for_non_owner(self):
         """Verify that dev_panel denies access to non-owners."""
         DeveloperCog = _load_developer_cog()
@@ -138,9 +136,7 @@ class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
         await cog.dev_panel(interaction)
 
         bot.is_owner.assert_awaited_once_with(interaction.user)
-        interaction.response.send_message.assert_awaited_with(
-            "⛔ You are not the bot owner.", ephemeral=True
-        )
+        interaction.response.send_message.assert_awaited_with("⛔ You are not the bot owner.", ephemeral=True)
         interaction.response.defer.assert_not_awaited()
 
     async def test_dev_panel_access_granted_for_owner(self):

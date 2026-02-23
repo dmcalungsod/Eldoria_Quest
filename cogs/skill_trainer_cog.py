@@ -41,9 +41,7 @@ class SkillTrainerView(View):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
-        self.player_data = (
-            dict(player_data) if not isinstance(player_data, dict) else player_data
-        )
+        self.player_data = dict(player_data) if not isinstance(player_data, dict) else player_data
 
         self.vestige_pool = self.player_data["vestige_pool"]
         self.player_class_id = self.player_data["class_id"]
@@ -76,9 +74,7 @@ class SkillTrainerView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This session is not yours.", ephemeral=True
-            )
+            await interaction.response.send_message("This session is not yours.", ephemeral=True)
             return False
         return True
 
@@ -159,9 +155,7 @@ class SkillTrainerView(View):
             )
 
         if not has_upgradable:
-            upgrade_select.add_option(
-                label="Max level reached or not upgradable.", value="disabled"
-            )
+            upgrade_select.add_option(label="Max level reached or not upgradable.", value="disabled")
             upgrade_select.disabled = True
 
         upgrade_select.callback = self.upgrade_skill_callback
@@ -199,9 +193,7 @@ class SkillTrainerView(View):
             base_cost = skill_data["upgrade_cost"]
             scaled_cost = get_upgrade_cost(base_cost, current_level)
 
-            return self.db.upgrade_skill(
-                self.interaction_user.id, skill_key, scaled_cost
-            )
+            return self.db.upgrade_skill(self.interaction_user.id, skill_key, scaled_cost)
         except Exception as e:
             logger.error(f"Upgrade skill error: {e}")
             return False, "System error.", 0
@@ -218,9 +210,7 @@ class SkillTrainerView(View):
         await self._refresh_ui(interaction, success, msg, skill_key)
 
         if success:
-            ach_msg = await asyncio.to_thread(
-                self.achievements.check_skill_achievements, interaction.user.id
-            )
+            ach_msg = await asyncio.to_thread(self.achievements.check_skill_achievements, interaction.user.id)
             if ach_msg:
                 await interaction.followup.send(ach_msg, ephemeral=True)
 
@@ -228,15 +218,11 @@ class SkillTrainerView(View):
         await interaction.response.defer()
         skill_key = interaction.data["values"][0].split(":")[0]
 
-        success, msg, new_level = await asyncio.to_thread(
-            self._execute_upgrade, skill_key
-        )
+        success, msg, new_level = await asyncio.to_thread(self._execute_upgrade, skill_key)
         await self._refresh_ui(interaction, success, msg, skill_key, new_level)
 
         if success:
-            ach_msg = await asyncio.to_thread(
-                self.achievements.check_skill_achievements, interaction.user.id
-            )
+            ach_msg = await asyncio.to_thread(self.achievements.check_skill_achievements, interaction.user.id)
             if ach_msg:
                 await interaction.followup.send(ach_msg, ephemeral=True)
 
@@ -244,9 +230,7 @@ class SkillTrainerView(View):
         """Common refresh logic."""
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
 
-        embed = self.build_skill_embed(
-            dict(p_data), msg if success else f"Error: {msg}"
-        )
+        embed = self.build_skill_embed(dict(p_data), msg if success else f"Error: {msg}")
 
         new_view = SkillTrainerView(self.db, self.interaction_user, p_data)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)

@@ -1,7 +1,6 @@
 import os
 import sys
 import unittest
-from unittest.mock import patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,10 +24,10 @@ class TestDamageScaling(unittest.TestCase):
         # Mock random to avoid variance and crits
         import unittest.mock
 
-        with unittest.mock.patch(
-            "random.uniform", return_value=1.0
-        ), unittest.mock.patch("random.random", return_value=0.5):
-
+        with (
+            unittest.mock.patch("random.uniform", return_value=1.0),
+            unittest.mock.patch("random.random", return_value=0.5),
+        ):
             # Mock skill using STR scaling
             skill_str = {
                 "key_id": "test_strike",
@@ -38,9 +37,7 @@ class TestDamageScaling(unittest.TestCase):
             }
 
             # Damage should be based on STR (10) * 2.0 * 1.0 = 20 (roughly, before variance)
-            dmg, _, _ = DamageFormula.player_skill(
-                self.stats, self.monster, skill_str, 1
-            )
+            dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_str, 1)
             # With variance 0.9-1.1, expected around 18-22
             self.assertTrue(15 <= dmg <= 25, f"Expected damage around 20, got {dmg}")
 
@@ -53,19 +50,17 @@ class TestDamageScaling(unittest.TestCase):
             }
 
             # Damage should be based on MAG (20) * 2.0 * 1.0 = 40 (roughly)
-            dmg, _, _ = DamageFormula.player_skill(
-                self.stats, self.monster, skill_mag, 1
-            )
+            dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_mag, 1)
             self.assertTrue(30 <= dmg <= 50, f"Expected damage around 40, got {dmg}")
 
     def test_dynamic_scaling_factor(self):
         # Mock random to ensure consistent damage (no crits, variance 1.0)
         import unittest.mock
 
-        with unittest.mock.patch(
-            "random.uniform", return_value=1.0
-        ), unittest.mock.patch("random.random", return_value=0.5):
-
+        with (
+            unittest.mock.patch("random.uniform", return_value=1.0),
+            unittest.mock.patch("random.random", return_value=0.5),
+        ):
             # Mock skill with high factor
             skill_heavy = {
                 "key_id": "heavy_hit",
@@ -74,9 +69,7 @@ class TestDamageScaling(unittest.TestCase):
                 "power_multiplier": 1.0,
             }
 
-            dmg, _, _ = DamageFormula.player_skill(
-                self.stats, self.monster, skill_heavy, 1
-            )
+            dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_heavy, 1)
             self.assertTrue(48 <= dmg <= 52, f"Expected damage around 50, got {dmg}")
 
     def test_player_heal_max_hp_logic(self):
@@ -101,9 +94,7 @@ class TestDamageScaling(unittest.TestCase):
         # Verify it respects max hp
         # Set current HP to max-1
         max_hp = self.stats.max_hp
-        healed, new_hp, _ = DamageFormula.player_heal(
-            self.stats, max_hp - 1, skill_heal, 1
-        )
+        healed, new_hp, _ = DamageFormula.player_heal(self.stats, max_hp - 1, skill_heal, 1)
         self.assertEqual(new_hp, max_hp)
         self.assertEqual(healed, 1)
 

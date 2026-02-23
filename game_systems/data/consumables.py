@@ -35,23 +35,17 @@ def load_consumables():
         # Check required keys
         missing_keys = required_keys - item.keys()
         if missing_keys:
-            logger.warning(
-                f"Consumable '{key}' missing required keys: {missing_keys}. Skipping."
-            )
+            logger.warning(f"Consumable '{key}' missing required keys: {missing_keys}. Skipping.")
             continue
 
         # Additional Type Checks
         if not isinstance(item["effect"], dict):
-            logger.warning(
-                f"Consumable '{key}': 'effect' must be a dictionary. Skipping."
-            )
+            logger.warning(f"Consumable '{key}': 'effect' must be a dictionary. Skipping.")
             continue
 
         validated_consumables[key] = item
 
-    logger.info(
-        f"Loaded {len(validated_consumables)} consumables from {data_path.name}"
-    )
+    logger.info(f"Loaded {len(validated_consumables)} consumables from {data_path.name}")
     return validated_consumables
 
 

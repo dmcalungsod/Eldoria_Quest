@@ -108,9 +108,7 @@ class EquipmentManager:
                 return data.get("allowed_slots", [])
         return []
 
-    def check_requirements(
-        self, item_data: dict, player_data: dict
-    ) -> tuple[bool, str | None]:
+    def check_requirements(self, item_data: dict, player_data: dict) -> tuple[bool, str | None]:
         """
         Validates if a player can equip an item based on Level, Rank, and Class.
         player_data must contain: 'level', 'rank' (from guild), 'class_name'.
@@ -162,9 +160,7 @@ class EquipmentManager:
                 try:
                     item_id = int(item["item_key"])
                 except ValueError:
-                    logger.warning(
-                        f"Skipping invalid item key '{item.get('item_key')}' for user {discord_id}"
-                    )
+                    logger.warning(f"Skipping invalid item key '{item.get('item_key')}' for user {discord_id}")
                     continue
 
                 item_data = self.db._col(table).find_one({"id": item_id}, {"_id": 0})
@@ -195,11 +191,7 @@ class EquipmentManager:
 
             for p_skill in player_skills:
                 skill_data = SKILLS.get(p_skill["skill_key"])
-                if (
-                    skill_data
-                    and skill_data.get("type") == "Passive"
-                    and "passive_bonus" in skill_data
-                ):
+                if skill_data and skill_data.get("type") == "Passive" and "passive_bonus" in skill_data:
                     level = p_skill["skill_level"]
 
                     for stat_key, percent in skill_data["passive_bonus"].items():
@@ -270,9 +262,7 @@ class EquipmentManager:
 
             # Resolve Class Name
             class_id = player.get("class_id")
-            class_name = next(
-                (k for k, v in CLASSES.items() if v["id"] == class_id), None
-            )
+            class_name = next((k for k, v in CLASSES.items() if v["id"] == class_id), None)
 
             player_data = {
                 "level": player.get("level", 1),
@@ -347,16 +337,12 @@ class EquipmentManager:
                         self._unequip_logic(discord_id, eq_item["id"])
                         conflicts_msg += f" (Unequipped {eq_item['item_name']})"
                     except Exception as e:
-                        logger.error(
-                            f"Failed to auto-unequip {eq_item['item_name']}: {e}"
-                        )
+                        logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
 
             # Equip the new item
             if item.get("count", 1) > 1:
                 # Split stack safely with compensation
-                if not self.db.split_stack_to_equipped(
-                    discord_id, inventory_db_id, item
-                ):
+                if not self.db.split_stack_to_equipped(discord_id, inventory_db_id, item):
                     return False, "Failed to process equipment split. Please try again."
             else:
                 try:
@@ -401,9 +387,7 @@ class EquipmentManager:
         )
 
         if stack:
-            self.db._col("inventory").update_one(
-                {"id": stack["id"]}, {"$inc": {"count": 1}}
-            )
+            self.db._col("inventory").update_one({"id": stack["id"]}, {"$inc": {"count": 1}})
             self.db._col("inventory").delete_one({"id": inv_id})
         else:
             self.db.set_item_equipped(inv_id, 0)

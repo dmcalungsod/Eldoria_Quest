@@ -64,9 +64,7 @@ class RankProgressView(View, GuildViewMixin):
 
         try:
             # Re-check eligibility (threaded DB call)
-            eligible = await asyncio.to_thread(
-                self.rank_system.check_promotion_eligibility, self.interaction_user.id
-            )
+            eligible = await asyncio.to_thread(self.rank_system.check_promotion_eligibility, self.interaction_user.id)
             if not eligible:
                 await interaction.followup.send(
                     f"{E.WARNING} You no longer meet the promotion requirements.",
@@ -75,9 +73,7 @@ class RankProgressView(View, GuildViewMixin):
                 return
 
             # Fetch current rank info to determine the target rank
-            player_info = await asyncio.to_thread(
-                self.rank_system.get_rank_info, self.interaction_user.id
-            )
+            player_info = await asyncio.to_thread(self.rank_system.get_rank_info, self.interaction_user.id)
             current_rank = player_info.get("rank", "F")
             next_rank_key = self.rank_system.get_next_rank(current_rank)
 
@@ -88,9 +84,7 @@ class RankProgressView(View, GuildViewMixin):
                 )
                 return
 
-            next_rank_title = self.rank_system.RANKS.get(next_rank_key, {}).get(
-                "title", next_rank_key
-            )
+            next_rank_title = self.rank_system.RANKS.get(next_rank_key, {}).get("title", next_rank_key)
 
             # Build confirmation embed (clear, thematic, and explicit)
             embed = discord.Embed(
@@ -106,9 +100,7 @@ class RankProgressView(View, GuildViewMixin):
                 color=discord.Color.orange(),
             )
 
-            view = RankTrialConfirmationView(
-                self.db, self.interaction_user, next_rank_key
-            )
+            view = RankTrialConfirmationView(self.db, self.interaction_user, next_rank_key)
             await interaction.edit_original_response(embed=embed, view=view)
 
         except Exception as e:
@@ -116,9 +108,7 @@ class RankProgressView(View, GuildViewMixin):
                 f"Promotion callback error for {self.interaction_user.id}: {e}",
                 exc_info=True,
             )
-            await interaction.followup.send(
-                "An error occurred checking eligibility.", ephemeral=True
-            )
+            await interaction.followup.send("An error occurred checking eligibility.", ephemeral=True)
 
 
 class RankTrialConfirmationView(View, GuildViewMixin):
@@ -167,9 +157,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
         # Obtain AdventureCommands cog and its manager
         adventure_cog = interaction.client.get_cog("AdventureCommands")
         if not adventure_cog:
-            await interaction.followup.send(
-                f"{E.ERROR} Adventure system is currently offline.", ephemeral=True
-            )
+            await interaction.followup.send(f"{E.ERROR} Adventure system is currently offline.", ephemeral=True)
             return
 
         # Start the promotion trial session in a thread-safe manner
@@ -181,9 +169,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             )
         except Exception as exc:
             logger.error(f"Failed to start trial for {self.interaction_user.id}: {exc}")
-            await interaction.followup.send(
-                f"{E.ERROR} Failed to start promotion trial.", ephemeral=True
-            )
+            await interaction.followup.send(f"{E.ERROR} Failed to start promotion trial.", ephemeral=True)
             return
 
         # Local imports to avoid circular dependencies and keep startup fast
@@ -193,19 +179,11 @@ class RankTrialConfirmationView(View, GuildViewMixin):
 
         try:
             # Gather data required to build the Exploration embed/view
-            stats_json = await asyncio.to_thread(
-                self.db.get_player_stats_json, self.interaction_user.id
-            )
+            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
             stats = PlayerStats.from_dict(stats_json)
-            vitals = await asyncio.to_thread(
-                self.db.get_player_vitals, self.interaction_user.id
-            )
-            session_row = await asyncio.to_thread(
-                adventure_cog.manager.get_active_session, self.interaction_user.id
-            )
-            player_data = await asyncio.to_thread(
-                self.db.get_player, self.interaction_user.id
-            )
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+            session_row = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
+            player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
             class_id = player_data["class_id"] if player_data else 1
 
             import json
@@ -217,9 +195,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
             # Compose embed describing the start of the trial
             embed = AdventureEmbeds.build_exploration_embed(
                 location_id="guild_arena",
-                log=[
-                    "You step into the arena. The Examiner's presence hangs heavy in the air."
-                ],
+                log=["You step into the arena. The Examiner's presence hangs heavy in the air."],
                 player_stats=stats,
                 vitals=vitals,
                 active_monster=active_monster,
@@ -242,9 +218,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
 
         except Exception as e:
             logger.error(f"Trial UI load error: {e}", exc_info=True)
-            await interaction.followup.send(
-                "Error loading arena interface.", ephemeral=True
-            )
+            await interaction.followup.send("Error loading arena interface.", ephemeral=True)
 
     async def cancel_callback(self, interaction: discord.Interaction):
         """
@@ -259,21 +233,13 @@ class RankTrialConfirmationView(View, GuildViewMixin):
         rank_system = SystemCache.get_rank_system(self.db)
 
         # Re-check eligibility and fetch player rank info
-        eligible = await asyncio.to_thread(
-            rank_system.check_promotion_eligibility, self.interaction_user.id
-        )
-        player_info = await asyncio.to_thread(
-            rank_system.get_rank_info, self.interaction_user.id
-        )
+        eligible = await asyncio.to_thread(rank_system.check_promotion_eligibility, self.interaction_user.id)
+        player_info = await asyncio.to_thread(rank_system.get_rank_info, self.interaction_user.id)
         current_rank = player_info.get("rank", "F")
         next_rank_key = rank_system.RANKS.get(current_rank, {}).get("next_rank")
 
         # Build a compact progress embed for returning
-        next_rank_title = (
-            rank_system.RANKS.get(next_rank_key, {}).get("title")
-            if next_rank_key
-            else "—"
-        )
+        next_rank_title = rank_system.RANKS.get(next_rank_key, {}).get("title") if next_rank_key else "—"
         embed = discord.Embed(
             title=f"{E.MEDAL} Promotion Evaluation: {current_rank} → {next_rank_key or 'N/A'}",
             description=f"Progress toward the title **{next_rank_title}**.",
@@ -285,9 +251,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
         progress_lines = []
         for req, required_value in requirements.items():
             current_value = player_info.get(req, 0)
-            progress_lines.append(
-                f"• **{req.replace('_', ' ').title()}:** {current_value} / {required_value}"
-            )
+            progress_lines.append(f"• **{req.replace('_', ' ').title()}:** {current_value} / {required_value}")
 
         embed.add_field(
             name="Current Progress",
@@ -297,9 +261,7 @@ class RankTrialConfirmationView(View, GuildViewMixin):
 
         if eligible:
             embed.color = discord.Color.green()
-            embed.set_footer(
-                text="You meet the requirements. When ready, attempt the Promotion Trial."
-            )
+            embed.set_footer(text="You meet the requirements. When ready, attempt the Promotion Trial.")
 
         # Rebuild RankProgressView and set its back button to point back to QuestsMenu (safe callback)
         view = RankProgressView(self.db, eligible, self.interaction_user)

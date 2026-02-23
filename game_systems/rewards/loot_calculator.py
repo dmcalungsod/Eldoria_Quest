@@ -16,9 +16,7 @@ class LootCalculator:
     """
 
     @staticmethod
-    def calculate_drop_chance(
-        base_chance: float, rarity: str, luck: int, loot_boost: float = 1.0
-    ) -> float:
+    def calculate_drop_chance(base_chance: float, rarity: str, luck: int, loot_boost: float = 1.0) -> float:
         """
         Calculates the final drop chance as a percentage (0-100).
 
@@ -47,9 +45,7 @@ class LootCalculator:
         return min(100.0, max(0.0, final_chance))
 
     @staticmethod
-    def roll_drops(
-        drops_list: list[tuple[str, float]], luck: int, loot_boost: float = 1.0
-    ) -> list[str]:
+    def roll_drops(drops_list: list[tuple[str, float]], luck: int, loot_boost: float = 1.0) -> list[str]:
         """
         Processes a list of potential drops and returns the keys of items that dropped.
 
@@ -67,9 +63,7 @@ class LootCalculator:
             mat = MATERIALS.get(drop_key, {})
             rarity = mat.get("rarity", "Common")
 
-            final_chance = LootCalculator.calculate_drop_chance(
-                base_chance, rarity, luck, loot_boost
-            )
+            final_chance = LootCalculator.calculate_drop_chance(base_chance, rarity, luck, loot_boost)
 
             # Use uniform distribution to support fractional percentages (e.g., 0.5% chance)
             # random.uniform(0, 100) returns a float between 0.0 and 100.0

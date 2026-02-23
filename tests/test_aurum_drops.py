@@ -4,8 +4,8 @@ Tests for Aurum Drops
 Verifies that monsters now drop Aurum based on tier/level.
 """
 
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
 

@@ -12,7 +12,7 @@ from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.materials import MATERIALS
-from game_systems.data.recipes import RECIPES, HIDDEN_RECIPES
+from game_systems.data.recipes import HIDDEN_RECIPES, RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
 
@@ -67,9 +67,7 @@ class CraftingSystem:
 
         return tiers[current_index]
 
-    def craft_item(
-        self, discord_id: int, recipe_id: str
-    ) -> tuple[bool, str, dict | None]:
+    def craft_item(self, discord_id: int, recipe_id: str) -> tuple[bool, str, dict | None]:
         """
         Executes the crafting process safely.
         Returns: (Success, Message, ResultItemData)
@@ -86,9 +84,7 @@ class CraftingSystem:
         materials = recipe.get("materials", {})
         output_key = recipe["output_key"]
         output_amount = recipe.get("output_amount", 1)
-        recipe_type = recipe.get(
-            "type", "consumable"
-        )  # Default to consumable for legacy recipes
+        recipe_type = recipe.get("type", "consumable")  # Default to consumable for legacy recipes
 
         try:
             # 1. Deduct Gold
@@ -97,9 +93,7 @@ class CraftingSystem:
             # 2. Remove Materials
             for mat_key, amount in materials.items():
                 if not self.db.remove_inventory_item(discord_id, mat_key, amount):
-                    logger.error(
-                        f"CRITICAL: Failed to remove {mat_key} during crafting for {discord_id}"
-                    )
+                    logger.error(f"CRITICAL: Failed to remove {mat_key} during crafting for {discord_id}")
                     # Continue best effort
 
             # 3. Add Output Item
@@ -137,9 +131,7 @@ class CraftingSystem:
                     }
                     prefix = prefix_map.get(new_rarity, "Improved")
                     final_name = f"{prefix} {final_name}"
-                    success_msg_extras = (
-                        f"\n✨ **Critical Success!** Upgraded to **{new_rarity}**!"
-                    )
+                    success_msg_extras = f"\n✨ **Critical Success!** Upgraded to **{new_rarity}**!"
 
                 self.db.add_inventory_item(
                     discord_id,
@@ -229,9 +221,7 @@ class CraftingSystem:
         mat_key = fallback_map.get(rarity, "iron_ore")
         return {mat_key: 1}
 
-    def dismantle_item(
-        self, discord_id: int, inv_id: int
-    ) -> tuple[bool, str, dict | None]:
+    def dismantle_item(self, discord_id: int, inv_id: int) -> tuple[bool, str, dict | None]:
         """
         Dismantles a specific inventory item into materials.
         Returns: (Success, Message, RewardsDict)
@@ -305,9 +295,7 @@ class CraftingSystem:
             logger.error(f"Dismantle error for {discord_id}: {e}", exc_info=True)
             return False, "An error occurred during dismantling.", None
 
-    def experiment(
-        self, discord_id: int, material_inv_ids: list[int]
-    ) -> tuple[bool, str, dict | None]:
+    def experiment(self, discord_id: int, material_inv_ids: list[int]) -> tuple[bool, str, dict | None]:
         """
         Attempts to discover a recipe by combining materials.
         material_inv_ids: List of inventory IDs (primary keys) to consume.
@@ -341,9 +329,7 @@ class CraftingSystem:
             # 3. Consume Materials (Atomic-ish)
             for inv_id in material_inv_ids:
                 if not self.db.consume_item_atomic(inv_id, 1):
-                    logger.error(
-                        f"Failed to consume {inv_id} during experiment for {discord_id}"
-                    )
+                    logger.error(f"Failed to consume {inv_id} during experiment for {discord_id}")
 
             if match:
                 # 4. Success Logic
@@ -376,9 +362,7 @@ class CraftingSystem:
                     output_amount,
                 )
 
-                logger.info(
-                    f"User {discord_id} discovered {output_key} via experiment."
-                )
+                logger.info(f"User {discord_id} discovered {output_key} via experiment.")
                 return (
                     True,
                     f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!",

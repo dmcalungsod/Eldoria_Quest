@@ -61,15 +61,9 @@ class TestInventoryFiltering(unittest.TestCase):
         # But InventoryView imports them from their modules.
         # We can patch them via the module path used in inventory_view.py
 
-        self.inv_manager_patcher = patch(
-            "game_systems.character.ui.inventory_view.InventoryManager"
-        )
-        self.eq_manager_patcher = patch(
-            "game_systems.character.ui.inventory_view.EquipmentManager"
-        )
-        self.con_manager_patcher = patch(
-            "game_systems.character.ui.inventory_view.ConsumableManager"
-        )
+        self.inv_manager_patcher = patch("game_systems.character.ui.inventory_view.InventoryManager")
+        self.eq_manager_patcher = patch("game_systems.character.ui.inventory_view.EquipmentManager")
+        self.con_manager_patcher = patch("game_systems.character.ui.inventory_view.ConsumableManager")
 
         self.mock_inv_cls = self.inv_manager_patcher.start()
         self.mock_eq_cls = self.eq_manager_patcher.start()
@@ -99,9 +93,7 @@ class TestInventoryFiltering(unittest.TestCase):
 
         # Mock Equipment Data (used in check_requirements)
         self.mock_eq_manager.check_requirements.return_value = (True, None)
-        self.mock_eq_manager.get_slot_display_name.side_effect = lambda x: x.replace(
-            "_", " "
-        ).title()
+        self.mock_eq_manager.get_slot_display_name.side_effect = lambda x: x.replace("_", " ").title()
 
     def tearDown(self):
         self.inv_manager_patcher.stop()
@@ -133,9 +125,7 @@ class TestInventoryFiltering(unittest.TestCase):
 
         # Need to patch EQUIPMENT_DATA to avoid lookup errors
         with patch("game_systems.character.ui.inventory_view.EQUIPMENT_DATA", {}):
-            view = InventoryView(
-                self.mock_db, self.mock_user, None, current_filter="Weapon"
-            )
+            view = InventoryView(self.mock_db, self.mock_user, None, current_filter="Weapon")
 
         # Check Equip Select Options
         options = view.equip_select.options
@@ -161,9 +151,7 @@ class TestInventoryFiltering(unittest.TestCase):
         self.mock_inv_manager.get_inventory.return_value = items
 
         with patch("game_systems.character.ui.inventory_view.EQUIPMENT_DATA", {}):
-            view = InventoryView(
-                self.mock_db, self.mock_user, None, current_filter="Consumable"
-            )
+            view = InventoryView(self.mock_db, self.mock_user, None, current_filter="Consumable")
 
         # Equip Select should be disabled
         self.assertTrue(view.equip_select.disabled)
@@ -190,9 +178,7 @@ class TestInventoryFiltering(unittest.TestCase):
         self.mock_eq_manager.check_requirements.return_value = (False, "Req: Lvl 99")
 
         with patch("game_systems.character.ui.inventory_view.EQUIPMENT_DATA", {}):
-            view = InventoryView(
-                self.mock_db, self.mock_user, None, current_filter="Weapon"
-            )
+            view = InventoryView(self.mock_db, self.mock_user, None, current_filter="Weapon")
 
         options = view.equip_select.options
         self.assertEqual(len(options), 1)
@@ -215,9 +201,7 @@ class TestInventoryFiltering(unittest.TestCase):
         self.mock_inv_manager.get_inventory.return_value = items
 
         with patch("game_systems.character.ui.inventory_view.EQUIPMENT_DATA", {}):
-            view = InventoryView(
-                self.mock_db, self.mock_user, None, current_filter="All"
-            )
+            view = InventoryView(self.mock_db, self.mock_user, None, current_filter="All")
 
         # Equip Select has Sword
         self.assertFalse(view.equip_select.disabled)

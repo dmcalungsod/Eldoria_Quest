@@ -4,13 +4,12 @@ faction_system.py
 Manages Faction membership, reputation, and progression.
 """
 
-import datetime
 import logging
 
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
 from game_systems.data.emojis import ERROR, SUCCESS, WARNING
 from game_systems.data.factions import FACTIONS
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.factions")
 
@@ -105,9 +104,7 @@ class FactionSystem:
             logger.error(f"Error leaving faction: {e}")
             return False, f"{ERROR} System error."
 
-    def add_reputation(
-        self, discord_id: int, amount: int
-    ) -> tuple[bool, str, list[str]]:
+    def add_reputation(self, discord_id: int, amount: int) -> tuple[bool, str, list[str]]:
         """
         Adds reputation and checks for rank-up.
         Returns: (success, message, list_of_rank_up_messages)
@@ -137,9 +134,7 @@ class FactionSystem:
             for t in range(old_tier + 1, new_tier + 1):
                 rank_data = faction_def["ranks"][t]
                 title = rank_data["title"]
-                rank_up_msgs.append(
-                    f"{SUCCESS} **Rank Up!** You are now a **{title}** of {faction_def['name']}!"
-                )
+                rank_up_msgs.append(f"{SUCCESS} **Rank Up!** You are now a **{title}** of {faction_def['name']}!")
 
                 # Auto-claim rewards? Or manual claim?
                 # For simplicity, let's auto-claim item rewards here.
@@ -167,23 +162,17 @@ class FactionSystem:
                 rarity="Rare",  # Default
                 amount=amount,
             )
-            logs.append(
-                f"Received reward: {amount}x {item_key.replace('_', ' ').title()}"
-            )
+            logs.append(f"Received reward: {amount}x {item_key.replace('_', ' ').title()}")
 
         elif r_type == "buff":
-            logs.append(
-                f"Unlocked Passive Buff: {reward['key']} (Effect applied automatically)"
-            )
+            logs.append(f"Unlocked Passive Buff: {reward['key']} (Effect applied automatically)")
 
         elif r_type == "title":
             title = reward["value"]
             self.db.add_title(discord_id, title)
             logs.append(f"Unlocked Title: **{title}**")
 
-    def grant_reputation_for_kill(
-        self, discord_id: int, monster_data: dict
-    ) -> list[str]:
+    def grant_reputation_for_kill(self, discord_id: int, monster_data: dict) -> list[str]:
         """
         Calculates and grants reputation based on monster kill.
         """
@@ -216,9 +205,7 @@ class FactionSystem:
 
         return []
 
-    def grant_reputation_for_adventure(
-        self, discord_id: int, duration_minutes: int, location_id: str
-    ) -> list[str]:
+    def grant_reputation_for_adventure(self, discord_id: int, duration_minutes: int, location_id: str) -> list[str]:
         """
         Grants reputation for completing an adventure.
         """

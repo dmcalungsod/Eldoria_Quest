@@ -48,9 +48,7 @@ class CombatHandler:
             if conditionals:
                 # OPTIMIZATION: Use passed level if available, otherwise fetch from DB
                 if player_level is None:
-                    player_level = (
-                        self.db.get_player_field(self.discord_id, "level") or 1
-                    )
+                    player_level = self.db.get_player_field(self.discord_id, "level") or 1
 
                 for cond in conditionals:
                     if player_level >= cond.get("min_level", 1):
@@ -95,18 +93,14 @@ class CombatHandler:
                     buff_mult = modifiers.get("monster_buff", 1.0)
                     if buff_mult > 1.0:
                         active_monster["HP"] = int(active_monster["HP"] * buff_mult)
-                        active_monster["max_hp"] = int(
-                            active_monster["max_hp"] * buff_mult
-                        )
+                        active_monster["max_hp"] = int(active_monster["max_hp"] * buff_mult)
                         active_monster["ATK"] = int(active_monster["ATK"] * buff_mult)
 
                     # 2. Event Specific Flavor
                     if event["type"] == WorldEventSystem.BLOOD_MOON:
                         # 30% chance for Blood-Crazed prefix
                         if random.random() < 0.30:
-                            active_monster["name"] = (
-                                f"Blood-Crazed {active_monster['name']}"
-                            )
+                            active_monster["name"] = f"Blood-Crazed {active_monster['name']}"
                             active_monster["xp"] = int(active_monster["xp"] * 1.5)
                             # Add Blood Shard drop (30% chance)
                             # drops is a list of tuples (key, chance)
@@ -154,9 +148,7 @@ class CombatHandler:
             return active_monster, phrase
 
         except Exception as e:
-            logger.error(
-                f"Combat init failed for {self.discord_id}: {e}", exc_info=True
-            )
+            logger.error(f"Combat init failed for {self.discord_id}: {e}", exc_info=True)
             return None, "An error occurred while tracking the enemy."
 
     def resolve_turn(
@@ -212,9 +204,7 @@ class CombatHandler:
                 boosts = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
 
             # 3. Setup Wrappers & Fast-Forward State
-            player_wrapper = LevelUpSystem(
-                player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"]
-            )
+            player_wrapper = LevelUpSystem(player_stats, p_row["level"], p_row["experience"], p_row["exp_to_next"])
 
             # Apply session XP so leveling logic is up to date
             if accumulated_exp > 0:

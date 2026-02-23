@@ -17,9 +17,7 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 class TestCombatSkillSelection(unittest.TestCase):
     def setUp(self):
-        self.stats = PlayerStats(
-            str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10
-        )
+        self.stats = PlayerStats(str_base=10, end_base=10, dex_base=10, agi_base=10, mag_base=10)
         self.player_wrapper = MagicMock(spec=LevelUpSystem)
         self.player_wrapper.stats = self.stats
         self.player_wrapper.level = 1
@@ -87,17 +85,11 @@ class TestCombatSkillSelection(unittest.TestCase):
         self.assertEqual(result["mp_current"], 10, "Fireball should cost 10 MP")
 
         # Check that skill was used (log or damage)
-        self.assertIn(
-            "mag_hits", result["turn_report"], "Fireball should register as mag_hit"
-        )
-        self.assertTrue(
-            result["turn_report"]["skills_used"] > 0, "Skill usage should be tracked"
-        )
+        self.assertIn("mag_hits", result["turn_report"], "Fireball should register as mag_hit")
+        self.assertTrue(result["turn_report"]["skills_used"] > 0, "Skill usage should be tracked")
 
         # Verify damage > 0
-        self.assertTrue(
-            result["monster_hp"] < 1000, "Monster should take damage from fireball"
-        )
+        self.assertTrue(result["monster_hp"] < 1000, "Monster should take damage from fireball")
 
     def test_explicit_heal_usage(self):
         """Test that action='skill:minor_heal' heals the player."""
@@ -124,9 +116,7 @@ class TestCombatSkillSelection(unittest.TestCase):
 
         # Check Healing
         self.assertTrue(result["hp_current"] > 50, "Player should be healed")
-        self.assertIn(
-            "Minor Heal", str(result["phrases"]), "Log should mention restoration"
-        )
+        self.assertIn("Minor Heal", str(result["phrases"]), "Log should mention restoration")
 
     def test_insufficient_mp_fallback(self):
         """Test fallback to basic attack if MP is insufficient."""
@@ -152,9 +142,7 @@ class TestCombatSkillSelection(unittest.TestCase):
 
         # Should be a basic attack (str_hits or mag_hits depending on class default attack, Mage is mag)
         # But specifically not a skill usage
-        self.assertEqual(
-            result["turn_report"]["skills_used"], 0, "Skill should not be used"
-        )
+        self.assertEqual(result["turn_report"]["skills_used"], 0, "Skill should not be used")
 
         # Log should mention failure
         log_str = "".join([str(p) for p in result["phrases"]])
@@ -180,9 +168,7 @@ class TestCombatSkillSelection(unittest.TestCase):
                 result = engine.run_combat_turn()
 
         self.assertEqual(result["mp_current"], 20, "MP should not change")
-        self.assertEqual(
-            result["turn_report"]["skills_used"], 0, "Skill should not be used"
-        )
+        self.assertEqual(result["turn_report"]["skills_used"], 0, "Skill should not be used")
 
         log_str = "".join([str(p) for p in result["phrases"]])
         self.assertIn("Skill Failed", log_str, "Log should warn about unknown skill")

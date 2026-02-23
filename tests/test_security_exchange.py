@@ -28,9 +28,7 @@ class TestGuildExchangeSecurity(unittest.TestCase):
         self.mock_collection = MagicMock()
         self.mock_db._col.return_value = self.mock_collection
         self.mock_db.db = MagicMock()  # Mock the db attribute
-        self.mock_db.db.__getitem__.return_value = (
-            self.mock_collection
-        )  # Mock db['collection']
+        self.mock_db.db.__getitem__.return_value = self.mock_collection  # Mock db['collection']
 
         # Patch DatabaseManager to avoid actual init
         with patch("database.database_manager.MongoClient"):
@@ -80,22 +78,14 @@ class TestGuildExchangeSecurity(unittest.TestCase):
 
             # Verify DB calls
             # 1. find called to get IDs
-            self.mock_collection.find.assert_called_with(
-                {"discord_id": discord_id, "item_type": "material"}
-            )
+            self.mock_collection.find.assert_called_with({"discord_id": discord_id, "item_type": "material"})
 
             # 2. find_one_and_delete called for each item
-            self.mock_collection.find_one_and_delete.assert_any_call(
-                {"id": 1, "discord_id": discord_id}
-            )
-            self.mock_collection.find_one_and_delete.assert_any_call(
-                {"id": 2, "discord_id": discord_id}
-            )
+            self.mock_collection.find_one_and_delete.assert_any_call({"id": 1, "discord_id": discord_id})
+            self.mock_collection.find_one_and_delete.assert_any_call({"id": 2, "discord_id": discord_id})
 
             # 3. increment_player_fields called with correct amount
-            self.mock_db.increment_player_fields.assert_called_with(
-                discord_id, aurum=50
-            )
+            self.mock_db.increment_player_fields.assert_called_with(discord_id, aurum=50)
 
 
 if __name__ == "__main__":

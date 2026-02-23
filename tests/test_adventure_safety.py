@@ -51,9 +51,7 @@ class TestAdventureDataLoss(unittest.TestCase):
 
         # Mock database methods to track call order
         manager_mock = MagicMock()
-        self.mock_db.end_adventure_session.side_effect = (
-            manager_mock.end_adventure_session
-        )
+        self.mock_db.end_adventure_session.side_effect = manager_mock.end_adventure_session
 
         # Configure add_inventory_items_bulk to return empty list (no failures)
         # We use side_effect to track the call on manager_mock, but also return []

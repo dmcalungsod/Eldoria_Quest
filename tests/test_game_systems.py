@@ -45,9 +45,7 @@ class TestGameSystems(unittest.TestCase):
         import game_systems.adventure.adventure_manager
 
         importlib.reload(game_systems.adventure.adventure_manager)
-        self.AdventureManager = (
-            game_systems.adventure.adventure_manager.AdventureManager
-        )
+        self.AdventureManager = game_systems.adventure.adventure_manager.AdventureManager
 
         import game_systems.combat.combat_engine
 
@@ -84,9 +82,7 @@ class TestGameSystems(unittest.TestCase):
 
     def test_player_stats(self):
         """Test PlayerStats class."""
-        stats = self.PlayerStats(
-            str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10
-        )
+        stats = self.PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
 
         self.assertEqual(stats.strength, 15)
         self.assertEqual(stats.endurance, 12)
@@ -181,9 +177,7 @@ class TestGameSystems(unittest.TestCase):
 
     def test_damage_formulas(self):
         """Test damage calculation formulas."""
-        player_stats = self.PlayerStats(
-            str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10
-        )
+        player_stats = self.PlayerStats(str_base=15, end_base=12, dex_base=10, agi_base=8, mag_base=5, lck_base=10)
         monster = {"DEF": 5, "Level": 1}
 
         # Use mock for randomness to make tests deterministic if needed,
@@ -206,9 +200,7 @@ class TestGameSystems(unittest.TestCase):
             "exp_to_next": 2000,
             "class_id": 1,
         }
-        stats_json = (
-            '{"STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10}'
-        )
+        stats_json = '{"STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10}'
 
         self.mock_db.get_player.return_value = player_data
         self.mock_db.get_player_stats_json.return_value = stats_json
@@ -298,9 +290,7 @@ class TestGameSystems(unittest.TestCase):
         self.mock_db.get_player_field.return_value = 1
 
         # Mock Session
-        with patch(
-            "game_systems.adventure.adventure_manager.AdventureSession"
-        ) as MockSession:
+        with patch("game_systems.adventure.adventure_manager.AdventureSession") as MockSession:
             session = MockSession.return_value
             session.loot = {"exp": 10}
             session.discord_id = discord_id
@@ -325,9 +315,7 @@ class TestGameSystems(unittest.TestCase):
             args, kwargs = self.mock_db.update_player_mixed.call_args
             set_fields = kwargs.get("set_fields")
             self.assertIsNotNone(set_fields)
-            self.assertEqual(
-                set_fields["current_mp"], stats.max_mp, "MP should reset on level up"
-            )
+            self.assertEqual(set_fields["current_mp"], stats.max_mp, "MP should reset on level up")
 
 
 if __name__ == "__main__":

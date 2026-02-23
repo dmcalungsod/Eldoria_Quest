@@ -73,9 +73,7 @@ class AdventureSetupView(View):
         self.add_item(self.location_select)
 
         # Back Button
-        self.back_btn = Button(
-            label="Return to Ledger", style=discord.ButtonStyle.grey, row=1
-        )
+        self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=1)
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
 
@@ -96,18 +94,14 @@ class AdventureSetupView(View):
                 return False
         except ValueError:
             # Fallback if rank is unknown (shouldn't happen)
-            logger.warning(
-                f"Unknown rank encountered: {self.player_rank} or {req_rank}"
-            )
+            logger.warning(f"Unknown rank encountered: {self.player_rank} or {req_rank}")
             return False
 
         return True
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "This is not your adventure.", ephemeral=True
-            )
+            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
             return False
         return True
 
@@ -133,24 +127,16 @@ class AdventureSetupView(View):
 
         try:
             # 1. Start the adventure in DB (Threaded)
-            success = await asyncio.to_thread(
-                self.manager.start_adventure, interaction.user.id, loc_id, -1
-            )
+            success = await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, -1)
 
             if not success:
-                await interaction.followup.send(
-                    "Failed to start adventure. Please try again.", ephemeral=True
-                )
+                await interaction.followup.send("Failed to start adventure. Please try again.", ephemeral=True)
                 return
 
             # 2. Fetch all necessary context in one query (Optimization)
-            bundle = await asyncio.to_thread(
-                self.db.get_combat_context_bundle, interaction.user.id
-            )
+            bundle = await asyncio.to_thread(self.db.get_combat_context_bundle, interaction.user.id)
             if not bundle:
-                await interaction.followup.send(
-                    "Error loading combat context.", ephemeral=True
-                )
+                await interaction.followup.send("Error loading combat context.", ephemeral=True)
                 return
 
             player_data = bundle["player"]
@@ -193,6 +179,4 @@ class AdventureSetupView(View):
 
         except Exception as e:
             logger.error(f"Location setup error: {e}", exc_info=True)
-            await interaction.followup.send(
-                "An error occurred starting the expedition.", ephemeral=True
-            )
+            await interaction.followup.send("An error occurred starting the expedition.", ephemeral=True)

@@ -77,14 +77,10 @@ class TestQuestRaceCondition(unittest.TestCase):
 
         # VERIFY
         print(f"\n[TEST] Success: {success}, Message: {message}")
-        print(
-            f"[TEST] Rewards Granted Call Count: {self.quest_system.reward_system.grant_rewards.call_count}"
-        )
+        print(f"[TEST] Rewards Granted Call Count: {self.quest_system.reward_system.grant_rewards.call_count}")
 
         if self.quest_system.reward_system.grant_rewards.call_count > 0:
-            print(
-                "[VULNERABLE] Rewards were granted despite update failure (Race Condition Exploit Successful)."
-            )
+            print("[VULNERABLE] Rewards were granted despite update failure (Race Condition Exploit Successful).")
         else:
             print("[SECURE] Rewards were NOT granted when update failed.")
 

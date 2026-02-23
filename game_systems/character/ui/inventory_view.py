@@ -58,19 +58,11 @@ class InventoryView(View):
         # UI Components
         self.create_filter_buttons()
 
-        self.equip_select = Select(
-            placeholder="Equip...", min_values=1, max_values=1, row=1
-        )
-        self.unequip_select = Select(
-            placeholder="Unequip...", min_values=1, max_values=1, row=2
-        )
-        self.use_select = Select(
-            placeholder="Use Item...", min_values=1, max_values=1, row=3
-        )
+        self.equip_select = Select(placeholder="Equip...", min_values=1, max_values=1, row=1)
+        self.unequip_select = Select(placeholder="Unequip...", min_values=1, max_values=1, row=2)
+        self.use_select = Select(placeholder="Use Item...", min_values=1, max_values=1, row=3)
 
-        self.back_button = Button(
-            label=self.previous_view_label, style=discord.ButtonStyle.secondary, row=4
-        )
+        self.back_button = Button(label=self.previous_view_label, style=discord.ButtonStyle.secondary, row=4)
 
         self._populate_ui()
 
@@ -89,11 +81,7 @@ class InventoryView(View):
         """Creates filter buttons for the inventory."""
         filters = ["All", "Weapon", "Armor", "Accessory", "Consumable"]
         for f in filters:
-            style = (
-                discord.ButtonStyle.primary
-                if f == self.current_filter
-                else discord.ButtonStyle.secondary
-            )
+            style = discord.ButtonStyle.primary if f == self.current_filter else discord.ButtonStyle.secondary
             btn = Button(label=f, style=style, custom_id=f"filter_{f}", row=0)
             btn.callback = self.filter_callback
             self.add_item(btn)
@@ -105,10 +93,7 @@ class InventoryView(View):
 
         # Equipment logic
         slot = item.get("slot", "")
-        if (
-            slot in EquipmentManager.TWO_HANDED_SLOTS
-            or slot in EquipmentManager.MAIN_HAND_SLOTS
-        ):
+        if slot in EquipmentManager.TWO_HANDED_SLOTS or slot in EquipmentManager.MAIN_HAND_SLOTS:
             return "Weapon"
         if slot in EquipmentManager.OFF_HAND_SLOTS:
             if slot == "shield":
@@ -125,9 +110,7 @@ class InventoryView(View):
             # Fetch player data for validation
             player = self.db.get_player(self.interaction_user.id)
             guild_rank = self.db.get_guild_rank(self.interaction_user.id) or "F"
-            allowed_slots = self.eq_manager._get_player_allowed_slots(
-                self.interaction_user.id
-            )
+            allowed_slots = self.eq_manager._get_player_allowed_slots(self.interaction_user.id)
         except Exception:
             player = None
             guild_rank = "F"
@@ -137,9 +120,7 @@ class InventoryView(View):
         class_name = None
         if player:
             class_id = player.get("class_id")
-            class_name = next(
-                (k for k, v in CLASSES.items() if v["id"] == class_id), None
-            )
+            class_name = next((k for k, v in CLASSES.items() if v["id"] == class_id), None)
 
         player_data = {
             "level": player.get("level", 1) if player else 1,
@@ -162,18 +143,14 @@ class InventoryView(View):
                 slot_name = self.eq_manager.get_slot_display_name(item["slot"])
                 label = f"{item['item_name']} ({slot_name})"
                 if item.get("equipped"):
-                    unequip_opts.append(
-                        discord.SelectOption(label=label, value=val, emoji="🛡️")
-                    )
+                    unequip_opts.append(discord.SelectOption(label=label, value=val, emoji="🛡️"))
                 else:
                     # Check requirements for UI feedback
                     static_data = EQUIPMENT_DATA.get(item["item_key"])
                     full_item_data = (static_data or {}).copy()
                     full_item_data.update(item)
 
-                    can_equip, reason = self.eq_manager.check_requirements(
-                        full_item_data, player_data
-                    )
+                    can_equip, reason = self.eq_manager.check_requirements(full_item_data, player_data)
 
                     # Also check slot restrictions
                     if can_equip and item["slot"] not in allowed_slots:
@@ -181,9 +158,7 @@ class InventoryView(View):
                         reason = f"Class restricted ({slot_name})"
 
                     if can_equip:
-                        equip_opts.append(
-                            discord.SelectOption(label=label, value=val, emoji="⚔️")
-                        )
+                        equip_opts.append(discord.SelectOption(label=label, value=val, emoji="⚔️"))
                     else:
                         # Greyed-out / Locked UI
                         locked_label = f"🔒 {label[:80]}"  # Truncate to ensure fit
@@ -198,33 +173,25 @@ class InventoryView(View):
 
             elif item["item_type"] == "consumable":
                 label = f"{item['item_name']} (x{item['count']})"
-                use_opts.append(
-                    discord.SelectOption(label=label, value=val, emoji="🧪")
-                )
+                use_opts.append(discord.SelectOption(label=label, value=val, emoji="🧪"))
 
         # Configure Dropdowns
         # Dynamically enable/disable based on filter context
 
         # Equip Select: Only for equipment filters or All
         show_equip = self.current_filter in ["All", "Weapon", "Armor", "Accessory"]
-        self._set_options(
-            self.equip_select, equip_opts, "No gear to equip.", visible=show_equip
-        )
+        self._set_options(self.equip_select, equip_opts, "No gear to equip.", visible=show_equip)
 
         # Unequip Select: Always show unless viewing Consumables
         show_unequip = self.current_filter != "Consumable"
         # Note: If filtering by "Weapon", we might only want to show equipped weapons?
         # Current logic iterates ALL items and filters them. So unequip_opts only contains filtered items.
         # This is correct.
-        self._set_options(
-            self.unequip_select, unequip_opts, "No gear equipped.", visible=show_unequip
-        )
+        self._set_options(self.unequip_select, unequip_opts, "No gear equipped.", visible=show_unequip)
 
         # Use Select: Only for Consumables or All
         show_use = self.current_filter in ["All", "Consumable"]
-        self._set_options(
-            self.use_select, use_opts, "No consumables.", visible=show_use
-        )
+        self._set_options(self.use_select, use_opts, "No consumables.", visible=show_use)
 
     def _set_options(self, select, options, empty_msg, visible=True):
         if not visible:
@@ -243,9 +210,7 @@ class InventoryView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message(
-                "Not your inventory.", ephemeral=True
-            )
+            await interaction.response.send_message("Not your inventory.", ephemeral=True)
             return False
         return True
 
@@ -260,11 +225,7 @@ class InventoryView(View):
 
         # Update button styles
         for child in self.children:
-            if (
-                isinstance(child, Button)
-                and child.custom_id
-                and child.custom_id.startswith("filter_")
-            ):
+            if isinstance(child, Button) and child.custom_id and child.custom_id.startswith("filter_"):
                 child.style = (
                     discord.ButtonStyle.primary
                     if child.custom_id == f"filter_{new_filter}"
@@ -281,9 +242,7 @@ class InventoryView(View):
         inv_id = int(interaction.data["values"][0])
 
         # Run DB operation in thread
-        success, msg = await asyncio.to_thread(
-            self.eq_manager.equip_item, self.interaction_user.id, inv_id
-        )
+        success, msg = await asyncio.to_thread(self.eq_manager.equip_item, self.interaction_user.id, inv_id)
 
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
@@ -292,9 +251,7 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_id = int(interaction.data["values"][0])
 
-        success, msg = await asyncio.to_thread(
-            self.eq_manager.unequip_item, self.interaction_user.id, inv_id
-        )
+        success, msg = await asyncio.to_thread(self.eq_manager.unequip_item, self.interaction_user.id, inv_id)
 
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
@@ -303,20 +260,14 @@ class InventoryView(View):
         await interaction.response.defer()
         inv_id = int(interaction.data["values"][0])
 
-        success, msg = await asyncio.to_thread(
-            self.con_manager.use_item, self.interaction_user.id, inv_id
-        )
+        success, msg = await asyncio.to_thread(self.con_manager.use_item, self.interaction_user.id, inv_id)
 
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
 
     async def _refresh(self, interaction: discord.Interaction):
-        items = await asyncio.to_thread(
-            self.inv_manager.get_inventory, self.interaction_user.id
-        )
-        max_slots = await asyncio.to_thread(
-            self.db.calculate_inventory_limit, self.interaction_user.id
-        )
+        items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
+        max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
         embed = build_inventory_embed(items, max_slots)
 
         # Pass current filter to new view to maintain state

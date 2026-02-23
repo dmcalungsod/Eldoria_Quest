@@ -21,9 +21,7 @@ class TestDatabaseTitles(unittest.TestCase):
         # Support db['collection'] syntax
         self.mock_db.__getitem__.side_effect = lambda name: getattr(self.mock_db, name)
 
-        self.mongo_patcher = patch(
-            "database.database_manager.MongoClient", return_value=self.mock_client
-        )
+        self.mongo_patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
         self.mongo_patcher.start()
 
         DatabaseManager._instance = None
@@ -46,9 +44,7 @@ class TestDatabaseTitles(unittest.TestCase):
         result = self.db.add_title(discord_id, title)
 
         self.assertTrue(result)
-        self.mock_db.players.update_one.assert_called_with(
-            {"discord_id": discord_id}, {"$addToSet": {"titles": title}}
-        )
+        self.mock_db.players.update_one.assert_called_with({"discord_id": discord_id}, {"$addToSet": {"titles": title}})
 
     def test_get_titles(self):
         discord_id = 123
@@ -95,18 +91,14 @@ class TestDatabaseTitles(unittest.TestCase):
         self.assertFalse(result)
         # Verify update_one was NOT called to set title
         calls = self.mock_db.players.update_one.call_args_list
-        set_calls = [
-            c for c in calls if "$set" in c[0][1] and "active_title" in c[0][1]["$set"]
-        ]
+        set_calls = [c for c in calls if "$set" in c[0][1] and "active_title" in c[0][1]["$set"]]
         self.assertEqual(len(set_calls), 0)
 
     def test_set_active_title_none(self):
         discord_id = 123
         result = self.db.set_active_title(discord_id, None)
         self.assertTrue(result)
-        self.mock_db.players.update_one.assert_called_with(
-            {"discord_id": discord_id}, {"$set": {"active_title": None}}
-        )
+        self.mock_db.players.update_one.assert_called_with({"discord_id": discord_id}, {"$set": {"active_title": None}})
 
     def test_get_active_title(self):
         discord_id = 123

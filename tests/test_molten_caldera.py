@@ -36,9 +36,7 @@ class TestMoltenCaldera(unittest.TestCase):
         self.assertTrue(hasattr(AdventureEvents, "REGEN_PHRASES_MAGMA"))
 
         # Test regeneration logic
-        logs = AdventureEvents.regeneration(
-            location_id="molten_caldera", hp_percent=1.0
-        )
+        logs = AdventureEvents.regeneration(location_id="molten_caldera", hp_percent=1.0)
         # Should return at least one log from magma phrases or generic fallback
         # Since we mock nothing, it uses real random.
         # But we can check if the output string contains the volcano emoji if it picked a magma phrase

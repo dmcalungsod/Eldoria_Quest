@@ -14,8 +14,8 @@ from discord.ext import commands, tasks
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
 from game_systems.events.world_event_system import WorldEventSystem
+from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.cogs.events")
 
@@ -51,13 +51,9 @@ class EventCog(commands.Cog):
                 # Grand Harvest Festival: Oct 1st - Oct 7th
                 # Only auto-start on Oct 1st (to avoid spamming starts if manually ended)
                 if now.month == 10 and now.day == 1 and now.hour == 12:
-                    success = self.system.start_event(
-                        WorldEventSystem.HARVEST_FESTIVAL, 24 * 7
-                    )
+                    success = self.system.start_event(WorldEventSystem.HARVEST_FESTIVAL, 24 * 7)
                     if success:
-                        config = self.system.EVENT_CONFIGS[
-                            WorldEventSystem.HARVEST_FESTIVAL
-                        ]
+                        config = self.system.EVENT_CONFIGS[WorldEventSystem.HARVEST_FESTIVAL]
                         await self._announce(
                             f"🍂 **SEASONAL EVENT STARTED!** 🍂\n\n"
                             f"**{config['name']}**\n"
@@ -90,9 +86,7 @@ class EventCog(commands.Cog):
     # USER COMMANDS
     # ==================================================================
 
-    @app_commands.command(
-        name="event_status", description="View the current active World Event."
-    )
+    @app_commands.command(name="event_status", description="View the current active World Event.")
     async def event_status(self, interaction: discord.Interaction):
         """Displays the current world event status."""
         active = self.system.get_current_event()
@@ -117,9 +111,7 @@ class EventCog(commands.Cog):
             description=active["description"],
             color=discord.Color.red(),
         )
-        embed.add_field(
-            name="Ends In", value=f"{days}d {hours}h {minutes}m", inline=True
-        )
+        embed.add_field(name="Ends In", value=f"{days}d {hours}h {minutes}m", inline=True)
 
         modifiers = []
         for key, val in active.get("modifiers", {}).items():
@@ -128,9 +120,7 @@ class EventCog(commands.Cog):
             modifiers.append(f"• **{name}**: {val_str}")
 
         if modifiers:
-            embed.add_field(
-                name="Global Effects", value="\n".join(modifiers), inline=False
-            )
+            embed.add_field(name="Global Effects", value="\n".join(modifiers), inline=False)
 
         await interaction.response.send_message(embed=embed)
 
@@ -138,17 +128,13 @@ class EventCog(commands.Cog):
     # ADMIN COMMANDS
     # ==================================================================
 
-    @app_commands.command(
-        name="admin_event_start", description="[Admin] Manually start a world event."
-    )
+    @app_commands.command(name="admin_event_start", description="[Admin] Manually start a world event.")
     @app_commands.describe(
         event_type="Type of event (blood_moon, celestial_convergence, void_incursion, elemental_surge)",
         hours="Duration in hours",
     )
     @app_commands.checks.has_permissions(administrator=True)
-    async def admin_start(
-        self, interaction: discord.Interaction, event_type: str, hours: int = 24
-    ):
+    async def admin_start(self, interaction: discord.Interaction, event_type: str, hours: int = 24):
         """Manually starts an event."""
         if event_type not in self.system.EVENT_CONFIGS:
             await interaction.response.send_message(
@@ -172,9 +158,7 @@ class EventCog(commands.Cog):
                 f"Check `/event_status` for details!"
             )
         else:
-            await interaction.response.send_message(
-                f"{E.ERROR} Failed to start event.", ephemeral=True
-            )
+            await interaction.response.send_message(f"{E.ERROR} Failed to start event.", ephemeral=True)
 
     @app_commands.command(
         name="admin_event_end",
@@ -184,9 +168,7 @@ class EventCog(commands.Cog):
     async def admin_end(self, interaction: discord.Interaction):
         """Manually ends the event."""
         self.system.end_current_event()
-        await interaction.response.send_message(
-            f"{E.CHECK} Event ended manually.", ephemeral=True
-        )
+        await interaction.response.send_message(f"{E.CHECK} Event ended manually.", ephemeral=True)
         await self._announce("✅ **The world returns to normal.** The event has ended.")
 
 

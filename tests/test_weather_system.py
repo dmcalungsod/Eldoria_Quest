@@ -42,9 +42,7 @@ class TestWeatherSystem:
         Ensure different locations *can* have different weather at the same time.
         """
         with patch("game_systems.world_time.datetime") as mock_datetime:
-            mock_datetime.datetime.now.return_value = datetime.datetime(
-                2023, 10, 27, 10, 0, 0
-            )
+            mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, 10, 0, 0)
 
             results = set()
             locations = [
@@ -65,15 +63,11 @@ class TestWeatherSystem:
 
         with patch("game_systems.world_time.datetime") as mock_datetime:
             # Hour 10
-            mock_datetime.datetime.now.return_value = datetime.datetime(
-                2023, 10, 27, 10, 0, 0
-            )
+            mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, 10, 0, 0)
             w1 = WorldTime.get_current_weather(location_id)
 
             # Hour 11
-            mock_datetime.datetime.now.return_value = datetime.datetime(
-                2023, 10, 27, 11, 0, 0
-            )
+            mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, 11, 0, 0)
             w2 = WorldTime.get_current_weather(location_id)
 
             assert isinstance(w1, Weather)
@@ -89,9 +83,7 @@ class TestWeatherSystem:
         # Run 50 trials with different hours
         for i in range(50):
             with patch("game_systems.world_time.datetime") as mock_datetime:
-                mock_datetime.datetime.now.return_value = datetime.datetime(
-                    2023, 10, 27, i % 24, 0, 0
-                )
+                mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, i % 24, 0, 0)
 
                 weather = WorldTime.get_current_weather(location_id)
                 assert weather in [

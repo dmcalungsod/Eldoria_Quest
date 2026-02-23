@@ -1,9 +1,8 @@
-import asyncio
+import importlib
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
-import importlib
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -35,9 +34,7 @@ class MockButton:
 
 
 class MockSelect:
-    def __init__(
-        self, placeholder=None, min_values=1, max_values=1, row=None, disabled=False
-    ):
+    def __init__(self, placeholder=None, min_values=1, max_values=1, row=None, disabled=False):
         self.callback = None
         self.options = []
         self.disabled = disabled
@@ -107,9 +104,7 @@ class TestSkillUpgradeCost(unittest.TestCase):
         # Let's check the code or just verify it's > 0
 
         self.mock_db.get_player.return_value = self.player_data
-        self.mock_db.get_all_player_skills.return_value = [
-            {"skill_key": "power_strike", "skill_level": 1}
-        ]
+        self.mock_db.get_all_player_skills.return_value = [{"skill_key": "power_strike", "skill_level": 1}]
         self.mock_db.get_player_skill_row.return_value = {
             "skill_key": "power_strike",
             "skill_level": 1,

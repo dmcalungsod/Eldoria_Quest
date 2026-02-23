@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,9 +13,7 @@ from game_systems.player.player_stats import PlayerStats
 class TestCombatDefenseCurve(unittest.TestCase):
     def setUp(self):
         # Setup basic player stats
-        self.stats = PlayerStats(
-            str_base=10, end_base=10, mag_base=10, dex_base=10, agi_base=10, lck_base=10
-        )
+        self.stats = PlayerStats(str_base=10, end_base=10, mag_base=10, dex_base=10, agi_base=10, lck_base=10)
         # STR=10 -> Bonus = 10 * 2.0 = 20
         # DEX=10 -> Bonus = 10 * 1.0 = 10
         # MAG=10 -> Bonus = 10 * 0.5 = 5
@@ -36,10 +34,7 @@ class TestCombatDefenseCurve(unittest.TestCase):
 
         test_cases = [(0, 35), (50, 15), (100, 1), (200, 1)]  # 35 - 50 < 1 -> 1
 
-        with patch("random.uniform", return_value=1.0), patch(
-            "random.random", return_value=0.5
-        ):  # No crit
-
+        with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):  # No crit
             for def_val, expected_dmg in test_cases:
                 monster = {"DEF": def_val}
                 dmg, is_crit, _ = DamageFormula.player_attack(self.stats, monster)
@@ -82,10 +77,7 @@ class TestCombatDefenseCurve(unittest.TestCase):
 
         test_cases = [(10, 95), (100, 25), (200, 5)]  # Chip damage floor
 
-        with patch("random.uniform", return_value=1.0), patch(
-            "random.random", return_value=0.5
-        ):  # No dodge, no crit
-
+        with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):  # No dodge, no crit
             for end_val, expected_dmg in test_cases:
                 # Update stats
                 self.stats._stats["END"].base = end_val
@@ -110,16 +102,11 @@ class TestCombatDefenseCurve(unittest.TestCase):
         # If END=200, Red=168.
         self.stats._stats["END"].base = 200
 
-        with patch("random.uniform", return_value=1.0), patch(
-            "random.random", return_value=0.5
-        ):
-
+        with patch("random.uniform", return_value=1.0), patch("random.random", return_value=0.5):
             dmg, _, _ = DamageFormula.monster_attack(monster, self.stats)
 
             expected_chip = int(100 * 0.05)  # 5
-            self.assertEqual(
-                dmg, expected_chip, f"Chip damage should be {expected_chip}, got {dmg}"
-            )
+            self.assertEqual(dmg, expected_chip, f"Chip damage should be {expected_chip}, got {dmg}")
 
     def test_crit_multiplier(self):
         """
@@ -131,10 +118,10 @@ class TestCombatDefenseCurve(unittest.TestCase):
         # Force Crit
         # Damage = 35 * 1.75 = 61.25 -> 61
 
-        with patch("random.uniform", return_value=1.0), patch(
-            "random.random", return_value=0.0
+        with (
+            patch("random.uniform", return_value=1.0),
+            patch("random.random", return_value=0.0),
         ):  # Force Crit (0.0 < chance)
-
             dmg, is_crit, event = DamageFormula.player_attack(self.stats, monster)
 
             self.assertTrue(is_crit)
