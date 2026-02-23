@@ -30,7 +30,7 @@ mock_ui.View = MockView
 sys.modules["discord.ui"] = mock_ui
 mock_discord.ui = mock_ui
 
-from game_systems.data.shop_data import SHOP_INVENTORY
+from game_systems.data.shop_data import SHOP_INVENTORY  # noqa: E402
 from cogs.shop_cog import ShopView  # noqa: E402
 
 
