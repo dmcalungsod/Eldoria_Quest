@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 # Mock pymongo before importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
 
@@ -20,20 +21,21 @@ class TestRankProgression(unittest.TestCase):
         # 1. Test Ineligibility (Low Stats)
         self.mock_db.get_guild_member.return_value = {
             "rank": "S",
-            "quests_completed": 100,  # Requirement: 500
-            "boss_kills": 0,  # Requirement: 20
-            "elite_kills": 0,  # Requirement: 50
+            "quests_completed": 10,
+            "boss_kills": 0,
+            "elite_kills": 0,
         }
 
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertFalse(eligible, "Rank S should NOT be eligible with low stats.")
 
         # 2. Test Eligibility (Met Requirements)
+        # S -> SS Reqs: 60 Quests, 35 Boss, 120 Elite
         self.mock_db.get_guild_member.return_value = {
             "rank": "S",
-            "quests_completed": 501,
-            "boss_kills": 21,
-            "elite_kills": 51,
+            "quests_completed": 60,
+            "boss_kills": 35,
+            "elite_kills": 120,
         }
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertTrue(eligible, "Rank S SHOULD be eligible with sufficient stats.")
@@ -45,20 +47,21 @@ class TestRankProgression(unittest.TestCase):
         # 1. Test Ineligibility (Low Stats)
         self.mock_db.get_guild_member.return_value = {
             "rank": "SS",
-            "quests_completed": 999,  # Requirement: 1000
-            "boss_kills": 49,  # Requirement: 50
-            "elite_kills": 99,  # Requirement: 100
+            "quests_completed": 60,
+            "boss_kills": 49,
+            "elite_kills": 199,
         }
 
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertFalse(eligible, "Rank SS should NOT be eligible with low stats.")
 
         # 2. Test Eligibility (Met Requirements)
+        # SS -> SSS Reqs: 65 Quests, 50 Boss, 200 Elite
         self.mock_db.get_guild_member.return_value = {
             "rank": "SS",
-            "quests_completed": 1001,
-            "boss_kills": 51,
-            "elite_kills": 101,
+            "quests_completed": 65,
+            "boss_kills": 50,
+            "elite_kills": 200,
         }
         eligible = self.rank_system.check_promotion_eligibility(discord_id)
         self.assertTrue(eligible, "Rank SS SHOULD be eligible with sufficient stats.")
