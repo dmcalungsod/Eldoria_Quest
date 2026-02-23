@@ -77,7 +77,7 @@ class CombatHandler:
                 "ATK": template["atk"],
                 "DEF": template["def"],
                 "xp": template["xp"],
-                "drops": template.get("drops", []),
+                "drops": list(template.get("drops", [])),
                 "skills": list(template.get("skills", [])),
             }
 
