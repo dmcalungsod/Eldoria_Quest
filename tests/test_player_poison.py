@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -14,10 +14,11 @@ mock_pymongo.errors = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-from game_systems.combat.combat_engine import CombatEngine
-from game_systems.player.level_up import LevelUpSystem
-from game_systems.player.player_stats import PlayerStats
-from game_systems.items.consumable_manager import ConsumableManager
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
+from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
+from game_systems.player.level_up import LevelUpSystem  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
+
 
 class TestPlayerPoison(unittest.TestCase):
     def test_01_combat_engine_applies_poison(self):
