@@ -255,17 +255,13 @@ class QuestSystem:
             if not self.check_completion(progress, objectives):
                 return False, f"{WARNING} Objectives not met."
 
-            # Grant rewards
-            reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
-
-            # Check if reward granting failed
-            if reward_msg.startswith(ERROR):
-                return False, reward_msg
-
             self.db._col("player_quests").update_one(
                 {"discord_id": discord_id, "quest_id": quest_id},
                 {"$set": {"status": "completed"}},
             )
+
+            # Grant rewards
+            reward_msg = self.reward_system.grant_rewards(discord_id, quest_id)
 
             # --- TOURNAMENT HOOK ---
             try:

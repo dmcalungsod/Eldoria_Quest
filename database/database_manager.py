@@ -1807,65 +1807,11 @@ class DatabaseManager:
     # SHOP (New methods for external call sites)
     # ============================================================
 
-    def get_shop_stock(self, discord_id: int) -> dict:
-        """Fetches the player's current shop stock. Returns empty dict if not found."""
-        doc = self._col("shop_stock").find_one({"discord_id": discord_id}, {"_id": 0, "stock": 1})
-        return doc.get("stock", {}) if doc else {}
-
-    def restock_shop(self, discord_id: int, limits_dict: dict):
-        """Restocks the shop to the given limits."""
-        self._col("shop_stock").update_one(
-            {"discord_id": discord_id},
-            {"$set": {"stock": limits_dict}},
-            upsert=True,
-        )
-
-    def purchase_item(
-        self,
-        discord_id: int,
-        item_key: str,
-        item_data: dict,
-        price: int,
-        stock_limits: dict | None = None,
-    ) -> tuple[bool, Any, int]:
-        """Atomic purchase: checks stock, deducts gold, and adds item. Includes refund on failure."""
-        # 0. Check & Decrement Stock (if limits enabled for this item)
-        stock_decremented = False
-        if stock_limits and item_key in stock_limits:
-            # Attempt to decrement existing stock
-            res = self._col("shop_stock").update_one(
-                {"discord_id": discord_id, f"stock.{item_key}": {"$gt": 0}},
-                {"$inc": {f"stock.{item_key}": -1}},
-            )
-
-            if res.modified_count > 0:
-                stock_decremented = True
-            else:
-                # Check if record exists
-                doc = self._col("shop_stock").find_one({"discord_id": discord_id}, {"_id": 1})
-                if not doc:
-                    # Initialize with full limits
-                    new_stock = stock_limits.copy()
-                    if new_stock.get(item_key, 0) > 0:
-                        new_stock[item_key] -= 1
-                        self._col("shop_stock").insert_one(
-                            {"discord_id": discord_id, "stock": new_stock}
-                        )
-                        stock_decremented = True
-                    else:
-                        return (False, "Item out of stock.", 0)
-                else:
-                    # Record exists, so stock must be 0
-                    return (False, "Item out of stock.", 0)
-
+    def purchase_item(self, discord_id: int, item_key: str, item_data: dict, price: int) -> tuple[bool, Any, int]:
+        """Atomic purchase: deducts gold and adds item. Includes refund on failure."""
         # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
         if new_aurum is None:
-            # Refund Stock
-            if stock_decremented:
-                self._col("shop_stock").update_one(
-                    {"discord_id": discord_id}, {"$inc": {f"stock.{item_key}": 1}}
-                )
             return (False, "Insufficient Aurum.", 0)
 
         # 2. Add item to inventory with Refund Logic
@@ -1882,32 +1828,22 @@ class DatabaseManager:
             if success:
                 return (True, item_data, new_aurum)
             else:
-                # Inventory Full -> Refund Aurum & Stock
+                # Inventory Full -> Refund
                 self._col("players").update_one(
                     {"discord_id": discord_id},
                     {"$inc": {"aurum": price}},
                 )
-                if stock_decremented:
-                    self._col("shop_stock").update_one(
-                        {"discord_id": discord_id}, {"$inc": {f"stock.{item_key}": 1}}
-                    )
-
                 refunded_balance = new_aurum + price
                 return (False, "Inventory Full.", refunded_balance)
 
         except Exception as e:
             logger.error(f"Purchase failed for {discord_id}, refunding {price}: {e}")
 
-            # REFUND Aurum & Stock
+            # REFUND
             self._col("players").update_one(
                 {"discord_id": discord_id},
                 {"$inc": {"aurum": price}},
             )
-            if stock_decremented:
-                self._col("shop_stock").update_one(
-                    {"discord_id": discord_id}, {"$inc": {f"stock.{item_key}": 1}}
-                )
-
             # Re-calculate balance manually since we refunded
             refunded_balance = new_aurum + price
 

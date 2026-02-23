@@ -160,7 +160,6 @@ class CombatHandler:
         persist_vitals: bool = True,
         action: str = "auto",
         stance: str = "balanced",
-        weather_modifiers: dict = None,
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
@@ -169,7 +168,6 @@ class CombatHandler:
             context: Optional pre-fetched data to avoid DB calls.
             persist_vitals: Whether to write HP/MP to DB immediately.
             stance: Player's current combat stance (aggressive, balanced, defensive).
-            weather_modifiers: Optional dict of weather effects.
         """
         vitals = None
         try:
@@ -225,7 +223,6 @@ class CombatHandler:
                 stats_dict=stats_dict,
                 action=action,
                 player_stance=stance,
-                weather_modifiers=weather_modifiers,
             )
 
             result = engine.run_combat_turn()

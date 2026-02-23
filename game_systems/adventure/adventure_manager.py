@@ -14,7 +14,6 @@ from game_systems.world_time import WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
-from game_systems.data.shop_data import SHOP_STOCK_LIMITS
 from game_systems.achievement_system import AchievementSystem
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
@@ -196,11 +195,6 @@ class AdventureManager:
             # Apply Aurum
             if total_aurum > 0:
                 self.db.increment_player_fields(discord_id, aurum=total_aurum)
-
-            # --- SHOP RESTOCK ---
-            if total_exp > 0:
-                self.db.restock_shop(discord_id, SHOP_STOCK_LIMITS)
-            # --------------------
 
             # Capture state before rewards
             old_level = self.db.get_player_field(discord_id, "level")
