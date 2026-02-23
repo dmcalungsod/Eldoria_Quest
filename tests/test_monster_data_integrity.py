@@ -9,11 +9,13 @@ sys.modules["discord"] = MagicMock()
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
-import unittest
-from unittest.mock import patch
+import unittest  # noqa: E402
+from unittest.mock import patch  # noqa: E402
+
 # Import after mocking
-from game_systems.adventure.combat_handler import CombatHandler
-from game_systems.data.monsters import MONSTERS
+from game_systems.adventure.combat_handler import CombatHandler  # noqa: E402
+from game_systems.data.monsters import MONSTERS  # noqa: E402
+
 
 class TestMonsterDataIntegrity(unittest.TestCase):
     def setUp(self):
