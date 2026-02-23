@@ -391,3 +391,88 @@ class EquipmentManager:
             self.db._col("inventory").delete_one({"id": inv_id})
         else:
             self.db.set_item_equipped(inv_id, 0)
+
+    def save_loadout(self, discord_id: int, name: str) -> tuple[bool, str]:
+        """Saves the current equipped items as a loadout."""
+        equipped_items = self.db.get_equipped_items(discord_id)
+        if not equipped_items:
+            return False, "No items equipped."
+
+        items_dict = {}
+        for item in equipped_items:
+            items_dict[item["slot"]] = {
+                "item_key": item["item_key"],
+                "rarity": item["rarity"],
+                "item_name": item["item_name"],
+                "item_source_table": item.get("item_source_table"),
+            }
+
+        self.db.save_equipment_set(discord_id, name, items_dict)
+        return True, f"Loadout '{name}' saved."
+
+    def delete_loadout(self, discord_id: int, name: str) -> tuple[bool, str]:
+        """Deletes a saved loadout."""
+        self.db.delete_equipment_set(discord_id, name)
+        return True, f"Loadout '{name}' deleted."
+
+    def equip_loadout(self, discord_id: int, name: str) -> tuple[bool, str]:
+        """
+        Attempts to equip a saved loadout.
+        Finds best matching items in inventory.
+        """
+        loadout = self.db.get_equipment_set(discord_id, name)
+        if not loadout:
+            return False, "Loadout not found."
+
+        items_to_equip = loadout.get("items", {})
+        if not items_to_equip:
+            return False, "Loadout is empty."
+
+        success_count = 0
+        missing_items = []
+
+        current_equipped = {item["slot"]: item for item in self.db.get_equipped_items(discord_id)}
+
+        for slot, target_data in items_to_equip.items():
+            target_key = target_data["item_key"]
+            target_rarity = target_data["rarity"]
+
+            # Check if already equipped
+            current_item = current_equipped.get(slot)
+            if (
+                current_item
+                and current_item["item_key"] == target_key
+                and current_item["rarity"] == target_rarity
+            ):
+                success_count += 1
+                continue
+
+            # Not equipped, look for unequipped match in inventory
+            # We search for ANY unequipped item matching key/rarity/slot
+            match = self.db._col("inventory").find_one(
+                {
+                    "discord_id": discord_id,
+                    "item_key": target_key,
+                    "rarity": target_rarity,
+                    "slot": slot,
+                    "equipped": 0,
+                }
+            )
+
+            if match:
+                ok, msg = self.equip_item(discord_id, match["id"])
+                if ok:
+                    success_count += 1
+                else:
+                    missing_items.append(f"{target_data['item_name']} (Error: {msg})")
+            else:
+                missing_items.append(target_data["item_name"])
+
+        msg = f"Equipped {success_count} items."
+        if missing_items:
+            details = ", ".join(missing_items[:3])
+            if len(missing_items) > 3:
+                details += f" and {len(missing_items)-3} more"
+            msg += f" Missing/Failed: {details}"
+
+        return True, msg
