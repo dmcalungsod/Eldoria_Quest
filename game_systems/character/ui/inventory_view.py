@@ -75,6 +75,11 @@ class InventoryView(View):
         self.add_item(self.equip_select)
         self.add_item(self.unequip_select)
         self.add_item(self.use_select)
+
+        self.loadout_btn = Button(label="Loadouts", style=discord.ButtonStyle.primary, row=4)
+        self.loadout_btn.callback = self.loadouts_callback
+        self.add_item(self.loadout_btn)
+
         self.add_item(self.back_button)
 
     def create_filter_buttons(self):
@@ -264,6 +269,25 @@ class InventoryView(View):
 
         await interaction.followup.send(msg, ephemeral=True)
         await self._refresh(interaction)
+
+    async def loadouts_callback(self, interaction: discord.Interaction):
+        from game_systems.character.ui.loadout_view import LoadoutView
+
+        await interaction.response.defer()
+
+        # Callback to return to THIS view (InventoryView)
+        async def back_to_inventory(interaction: discord.Interaction):
+            await self._refresh(interaction)
+
+        view = LoadoutView(self.db, self.interaction_user, back_to_inventory)
+
+        embed = discord.Embed(
+            title="⚔️ Equipment Loadouts",
+            description="Manage your gear sets. Select a loadout to equip or delete, or save your current gear.",
+            color=discord.Color.dark_teal(),
+        )
+
+        await interaction.edit_original_response(embed=embed, view=view)
 
     async def _refresh(self, interaction: discord.Interaction):
         items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)

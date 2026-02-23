@@ -2338,3 +2338,45 @@ class DatabaseManager:
             {"$set": {"active": 0}},
         )
         self._world_event_cache_time = 0.0  # Invalidate cache
+
+    # ============================================================
+    # EQUIPMENT SETS
+    # ============================================================
+
+    def save_equipment_set(self, discord_id: int, name: str, items: dict[str, dict]):
+        """
+        Saves a named equipment set.
+        Items dict structure: {slot: {"item_key": key, "rarity": rarity, "name": name}}
+        """
+        self._col("equipment_sets").update_one(
+            {"discord_id": discord_id, "name": name},
+            {
+                "$set": {
+                    "discord_id": discord_id,
+                    "name": name,
+                    "items": items,
+                    "updated_at": WorldTime.now().isoformat(),
+                }
+            },
+            upsert=True,
+        )
+
+    def get_equipment_sets(self, discord_id: int) -> list[dict]:
+        """Fetches all saved equipment sets for a player."""
+        return list(
+            self._col("equipment_sets").find(
+                {"discord_id": discord_id},
+                {"_id": 0},
+            )
+        )
+
+    def get_equipment_set(self, discord_id: int, name: str) -> dict | None:
+        """Fetches a specific equipment set."""
+        return self._col("equipment_sets").find_one(
+            {"discord_id": discord_id, "name": name},
+            {"_id": 0},
+        )
+
+    def delete_equipment_set(self, discord_id: int, name: str):
+        """Deletes a specific equipment set."""
+        self._col("equipment_sets").delete_one({"discord_id": discord_id, "name": name})
