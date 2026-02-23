@@ -1,4 +1,5 @@
 import datetime
+import importlib
 import json
 import os
 import sys
@@ -30,6 +31,9 @@ class TestAdventureStatusEmbed(unittest.TestCase):
 
         # Now we can import the module
         import game_systems.adventure.ui.adventure_embeds
+        # RELOAD to ensure we use the fresh mocks from this setUp
+        importlib.reload(game_systems.adventure.ui.adventure_embeds)
+
         self.AdventureEmbeds = game_systems.adventure.ui.adventure_embeds.AdventureEmbeds
         self.WorldTime = game_systems.adventure.ui.adventure_embeds.WorldTime
 
