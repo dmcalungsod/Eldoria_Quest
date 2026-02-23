@@ -59,6 +59,7 @@ importlib.reload(game_systems.guild_system.ui.services_menu)
 from game_systems.guild_system.ui.services_menu import GuildServicesView  # noqa: E402
 from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 from game_systems.data.shop_data import MYSTIC_MERCHANT_INVENTORY  # noqa: E402
+from unittest.mock import patch
 
 class TestMysticMerchantEvent(unittest.TestCase):
     def setUp(self):
@@ -73,9 +74,10 @@ class TestMysticMerchantEvent(unittest.TestCase):
             "start_time": "2023-01-01T00:00:00",
             "end_time": "2099-01-01T00:00:00"
         }
-        self.mock_db.get_active_world_event.return_value = event_data
 
-        view = GuildServicesView(self.mock_db, self.mock_user)
+        # Patch get_current_event directly to bypass time/expiration logic
+        with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=event_data):
+            view = GuildServicesView(self.mock_db, self.mock_user)
 
         # Check if Mystic Merchant button is in children
         mystic_btn = None
@@ -88,9 +90,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
         self.assertEqual(mystic_btn.label, "Mystic Merchant")
 
     def test_button_missing_when_no_event(self):
-        self.mock_db.get_active_world_event.return_value = None
-
-        view = GuildServicesView(self.mock_db, self.mock_user)
+        # Patch get_current_event directly
+        with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=None):
+            view = GuildServicesView(self.mock_db, self.mock_user)
 
         mystic_btn = None
         for item in view.children:
@@ -106,9 +108,8 @@ class TestMysticMerchantEvent(unittest.TestCase):
         mock_shop_cog.ShopView = MockShopViewClass
 
         # Ensure __init__ doesn't crash on event check
-        self.mock_db.get_active_world_event.return_value = None
-
-        view = GuildServicesView(self.mock_db, self.mock_user)
+        with patch("game_systems.events.world_event_system.WorldEventSystem.get_current_event", return_value=None):
+            view = GuildServicesView(self.mock_db, self.mock_user)
 
         # Prepare interaction
         mock_interaction = MagicMock()
