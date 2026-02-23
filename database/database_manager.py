@@ -810,8 +810,8 @@ class DatabaseManager:
             return BASE_INVENTORY_SLOTS
 
     def get_inventory_slot_count(self, discord_id: int) -> int:
-        """Counts the number of distinct item slots (documents) used."""
-        return self._col("inventory").count_documents({"discord_id": discord_id})
+        """Counts the number of distinct item slots (documents) used (excluding equipped)."""
+        return self._col("inventory").count_documents({"discord_id": discord_id, "equipped": {"$ne": 1}})
 
     def get_inventory_items(
         self, discord_id: int, item_type: str | None = None, equipped: int | None = None

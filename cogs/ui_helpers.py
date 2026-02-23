@@ -46,7 +46,8 @@ def get_health_status_emoji(current: int, max_val: int) -> str:
 
 def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> discord.Embed:
     """Constructs the inventory display."""
-    slot_count = len(items)
+    # Only count unequipped items (backpack slots)
+    slot_count = len([i for i in items if not i.get("equipped")])
     embed = discord.Embed(
         title=f"{E.BACKPACK} Backpack ({slot_count}/{max_slots})",
         color=discord.Color.dark_orange(),
