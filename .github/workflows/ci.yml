@@ -36,7 +36,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install ruff pytest pytest-cov pip-audit bandit safety
+        pip install ruff pytest pytest-cov pip-audit bandit
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     # 4. Dependency Security Audit
@@ -77,11 +77,7 @@ jobs:
     - name: Run Bandit security linter
       run: bandit -r . -ll
 
-    # 9. Security Scan (Safety)
-    - name: Check dependencies with Safety
-      run: safety check
-
-    # 10. Database Schema Validation (No SQLite allowed)
+    # 9. Database Schema Validation (No SQLite allowed)
     - name: Validate Database Technology
       run: |
         if grep -r "import sqlite3" database/; then
@@ -89,7 +85,7 @@ jobs:
           exit 1
         fi
 
-    # 11. Upload Coverage Report
+    # 10. Upload Coverage Report
     - name: Upload Coverage Report
       if: always()
       uses: actions/upload-artifact@v4
