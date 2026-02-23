@@ -45,8 +45,8 @@ class TestCraftingQuality(unittest.TestCase):
 
     @patch("random.random")
     def test_roll_quality_cascade(self, mock_random):
-        # Upgrade twice: 0.05, 0.05, 0.5
-        mock_random.side_effect = [0.05, 0.05, 0.5]
+        # Upgrade twice: 0.05, 0.04 (below 0.05 threshold), 0.5
+        mock_random.side_effect = [0.05, 0.04, 0.5]
 
         new_rarity = self.crafting._roll_quality("Common")
         self.assertEqual(new_rarity, "Rare")

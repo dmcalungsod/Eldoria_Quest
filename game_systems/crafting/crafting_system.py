@@ -16,10 +16,68 @@ from game_systems.data.recipes import HIDDEN_RECIPES, RECIPES
 
 logger = logging.getLogger("eldoria.crafting")
 
+# XP Rewards for crafting
+CRAFTING_XP_REWARDS = {
+    "Common": 10,
+    "Uncommon": 25,
+    "Rare": 50,
+    "Epic": 100,
+    "Legendary": 250,
+    "Mythical": 500,
+}
+
+
+def calculate_crafting_xp_req(level: int) -> int:
+    """Calculates XP needed for the next crafting level."""
+    return int(50 * (level**1.3))
+
 
 class CraftingSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
+
+    def _add_crafting_xp(self, discord_id: int, rarity: str, is_discovery: bool = False) -> str:
+        """
+        Awards Crafting XP and handles level ups.
+        Returns a message string (empty if no level up/significant event).
+        """
+        # Calculate XP Amount
+        base_xp = CRAFTING_XP_REWARDS.get(rarity, 5)
+        if is_discovery:
+            base_xp *= 5  # Large bonus for discovery
+
+        # Fetch current progress
+        player = self.db.get_player(discord_id)
+        if not player:
+            return ""
+
+        current_level = player.get("crafting_level", 1)
+        current_xp = player.get("crafting_xp", 0)
+
+        # Add XP
+        current_xp += base_xp
+        msg_extras = ""
+        leveled_up = False
+
+        # Level Up Check
+        req_xp = calculate_crafting_xp_req(current_level)
+        while current_xp >= req_xp:
+            current_xp -= req_xp
+            current_level += 1
+            req_xp = calculate_crafting_xp_req(current_level)
+            leveled_up = True
+
+        if leveled_up:
+            msg_extras = f"\n⚒️ **Crafting Level Up!** You are now Level **{current_level}**!"
+
+        # Update DB
+        self.db.update_player_fields(
+            discord_id,
+            crafting_level=current_level,
+            crafting_xp=current_xp,
+        )
+
+        return f" (+{base_xp} Craft XP){msg_extras}"
 
     def get_recipes(self, discord_id: int) -> dict:
         """Returns all available recipes for the player."""
@@ -49,20 +107,30 @@ class CraftingSystem:
 
         return True, "Ready to craft."
 
-    def _roll_quality(self, base_rarity: str) -> str:
-        """Rolls for a quality upgrade (10% chance per tier)."""
+    def _roll_quality(self, base_rarity: str, discord_id: int | None = None) -> str:
+        """
+        Rolls for a quality upgrade (10% chance per tier + Crafting Level bonus).
+        """
         tiers = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"]
         try:
             current_index = tiers.index(base_rarity)
         except ValueError:
             return base_rarity
 
-        # 10% chance to upgrade
-        if random.random() < 0.10:
+        # Calculate Chance
+        base_chance = 0.10
+        if discord_id:
+            player = self.db.get_player(discord_id)
+            if player:
+                level = player.get("crafting_level", 1)
+                base_chance += level * 0.005  # +0.5% per level
+
+        # Roll
+        if random.random() < base_chance:
             if current_index + 1 < len(tiers):
                 current_index += 1
-                # Cascade: 10% chance for another upgrade
-                while random.random() < 0.10 and current_index + 1 < len(tiers):
+                # Cascade: 50% reduced chance for subsequent upgrades
+                while random.random() < (base_chance * 0.5) and current_index + 1 < len(tiers):
                     current_index += 1
 
         return tiers[current_index]
@@ -117,7 +185,7 @@ class CraftingSystem:
 
                 # --- QUALITY ROLL ---
                 base_rarity = item_data.get("rarity", "Common")
-                new_rarity = self._roll_quality(base_rarity)
+                new_rarity = self._roll_quality(base_rarity, discord_id)
 
                 final_name = item_data["name"]
 
@@ -182,10 +250,13 @@ class CraftingSystem:
                     None,
                 )
 
+            # Add XP
+            xp_msg = self._add_crafting_xp(discord_id, item_data.get("rarity", "Common"))
+
             logger.info(f"User {discord_id} crafted {output_amount}x {output_key}")
             return (
                 True,
-                f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}",
+                f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}{xp_msg}",
                 item_data,
             )
 
@@ -362,10 +433,13 @@ class CraftingSystem:
                     output_amount,
                 )
 
+                # Add XP (Discovery Bonus)
+                xp_msg = self._add_crafting_xp(discord_id, item_data.get("rarity", "Common"), is_discovery=True)
+
                 logger.info(f"User {discord_id} discovered {output_key} via experiment.")
                 return (
                     True,
-                    f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!",
+                    f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!{xp_msg}",
                     item_data,
                 )
 

@@ -25,6 +25,9 @@ class TestCraftingExperiment(unittest.TestCase):
         self.system = CraftingSystem(self.mock_db)
         self.discord_id = 12345
 
+        # Mock player for XP calculations
+        self.mock_db.get_player.return_value = {"crafting_level": 1, "crafting_xp": 0}
+
     def test_experiment_success(self):
         """Test a successful experiment using the 'volatile_brew' recipe."""
         # Recipe: slime_gel + fire_essence + obsidian_shard -> volatile_brew

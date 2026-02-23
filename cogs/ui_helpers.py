@@ -14,6 +14,7 @@ import discord
 
 import game_systems.data.emojis as E
 from database.database_manager import MAX_INVENTORY_SLOTS, DatabaseManager
+from game_systems.crafting.crafting_system import calculate_crafting_xp_req
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.player.player_stats import PlayerStats
@@ -234,6 +235,18 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
         # Rank
         rank = guild_data["rank"] if guild_data else "Unregistered"
         embed.add_field(name="Guild Rank", value=f"**{rank}**", inline=True)
+
+        # Crafting
+        craft_level = player.get("crafting_level", 1)
+        craft_xp = player.get("crafting_xp", 0)
+        craft_req = calculate_crafting_xp_req(craft_level)
+        craft_bar = make_progress_bar(craft_xp, craft_req, length=8)
+
+        embed.add_field(
+            name="🛠️ Crafting",
+            value=f"**Level {craft_level}**\n`{craft_bar}` {craft_xp}/{craft_req}",
+            inline=True,
+        )
 
         # Stats
         stat_block = (

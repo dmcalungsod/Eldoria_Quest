@@ -146,6 +146,8 @@ class DatabaseManager:
                 "aurum": 0,
                 "titles": [],
                 "active_title": None,
+                "crafting_level": 1,
+                "crafting_xp": 0,
             }
         )
         self._col("stats").insert_one(
@@ -2087,6 +2089,8 @@ class DatabaseManager:
                 "aurum": 0,
                 "titles": [],
                 "active_title": None,
+                "crafting_level": 1,
+                "crafting_xp": 0,
             }
         )
 
