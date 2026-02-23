@@ -387,6 +387,39 @@ LOCATIONS = {
         ],
         "special_events": ["trap_pit", "ancient_shrine"],
     },
+    "celestial_archipelago": {
+        "name": "The Celestial Archipelago",
+        "emoji": "☁️",
+        "min_rank": "B",
+        "level_req": 28,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_141", 30),  # Arcane Sentinel
+            ("monster_142", 30),  # Aether Wisp
+            ("monster_143", 25),  # Sky-Ray
+            ("monster_144", 15),  # Ruin Stalker
+        ],
+        "night_monsters": [
+            ("monster_144", 40),  # Ruin Stalker (Active at night)
+            ("monster_143", 30),  # Sky-Ray
+            ("monster_142", 30),
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_145",  # The Celestial Arbiter (Boss)
+                "weight": 5,
+                "min_level": 32,
+            }
+        ],
+        "description": "Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.",
+        "gatherables": [
+            ("aether_stone", 40),
+            ("star_metal_fragment", 30),
+            ("ancient_tablet", 20),
+            ("magic_stone_large", 10),
+        ],
+        "special_events": ["trap_pit", "safe_room", "ancient_shrine"],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",

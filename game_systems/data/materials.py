@@ -387,4 +387,29 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1200,
     },
+    # --- Celestial Archipelago Materials (Rank B) ---
+    "aether_stone": {
+        "name": "Aether Stone",
+        "description": "A stone infused with the raw magic of the upper atmosphere.",
+        "rarity": "Common",
+        "value": 20,
+    },
+    "star_metal_fragment": {
+        "name": "Star Metal Fragment",
+        "description": "A shard of metal that fell from the stars, cold and heavy.",
+        "rarity": "Uncommon",
+        "value": 45,
+    },
+    "ancient_tablet": {
+        "name": "Ancient Tablet",
+        "description": "A stone tablet inscribed with pre-Sundering runes.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "celestial_core": {
+        "name": "Celestial Core",
+        "description": "The beating heart of a high-altitude construct.",
+        "rarity": "Epic",
+        "value": 1000,
+    },
 }

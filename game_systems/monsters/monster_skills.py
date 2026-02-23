@@ -213,4 +213,29 @@ MONSTER_SKILLS = {
         "type": "magical",
         "desc_key": "magic",
     },
+    # Celestial Skills
+    "arcane_pulse": {
+        "key_id": "arcane_pulse",
+        "name": "Arcane Pulse",
+        "power": 1.5,
+        "mp_cost": 8,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "gravity_crush": {
+        "key_id": "gravity_crush",
+        "name": "Gravity Crush",
+        "power": 1.7,
+        "mp_cost": 10,
+        "type": "physical",
+        "desc_key": "special_hit",
+    },
+    "celestial_beam": {
+        "key_id": "celestial_beam",
+        "name": "Celestial Beam",
+        "power": 1.9,
+        "mp_cost": 12,
+        "type": "magical",
+        "desc_key": "magic",
+    },
 }
