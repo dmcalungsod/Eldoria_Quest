@@ -37,6 +37,7 @@ sys.modules["discord.ext.commands"] = MagicMock()
 # ShopView imports DatabaseManager class, so we let it import the real class (which uses mocked pymongo).
 
 # Now import the class under test
+from cogs import shop_cog  # noqa: E402
 from cogs.shop_cog import ShopView  # noqa: E402
 
 
@@ -71,7 +72,9 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         mock_db.get_player.return_value = {"aurum": 5}
 
         # Mock get_player_or_error helper used in callback
-        with patch("cogs.shop_cog.get_player_or_error", new_callable=AsyncMock) as mock_get_player:
+        # Since we imported ShopView directly, we need to patch it where it's used in the module
+        # Use patch.object to avoid import errors with string paths in some environments
+        with patch.object(shop_cog, "get_player_or_error", new_callable=AsyncMock) as mock_get_player:
             mock_get_player.return_value = True
 
             # Execute callback
