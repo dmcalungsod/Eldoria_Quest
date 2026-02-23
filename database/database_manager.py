@@ -717,6 +717,7 @@ class DatabaseManager:
                 "logs": "[]",
                 "loot_collected": "{}",
                 "active_monster_json": None,
+                "steps_completed": 0,
                 "version": 1,
             }
         )
@@ -756,6 +757,7 @@ class DatabaseManager:
         active: int,
         active_monster_json: str | None,
         previous_version: int,
+        steps_completed: int | None = None,
     ) -> bool:
         """
         Updates an active adventure session with optimistic locking.
@@ -770,17 +772,20 @@ class DatabaseManager:
         else:
             query["version"] = previous_version
 
+        update_fields = {
+            "logs": logs,
+            "loot_collected": loot_collected,
+            "active": active,
+            "active_monster_json": active_monster_json,
+            "version": previous_version + 1,
+        }
+
+        if steps_completed is not None:
+            update_fields["steps_completed"] = steps_completed
+
         result = self._col("adventure_sessions").update_one(
             query,
-            {
-                "$set": {
-                    "logs": logs,
-                    "loot_collected": loot_collected,
-                    "active": active,
-                    "active_monster_json": active_monster_json,
-                    "version": previous_version + 1,
-                }
-            },
+            {"$set": update_fields},
         )
         return result.modified_count > 0
 
