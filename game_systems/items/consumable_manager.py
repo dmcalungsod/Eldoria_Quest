@@ -108,11 +108,15 @@ class ConsumableManager:
                 for key, val in effect.items():
                     if key not in ignored_keys:
                         # Defer DB write until after consumption
-                        buffs_to_apply.append({"key": key, "val": val, "duration": duration})
+                        buffs_to_apply.append(
+                            {"key": key, "val": val, "duration": duration}
+                        )
                         buff_names_for_msg.append(f"{key.upper()} +{val}")
 
                 if buff_names_for_msg:
-                    message_lines.append(f"Buffs applied: {', '.join(buff_names_for_msg)} ({duration}s).")
+                    message_lines.append(
+                        f"Buffs applied: {', '.join(buff_names_for_msg)} ({duration}s)."
+                    )
                     item_used = True
 
             if not item_used:
@@ -136,13 +140,22 @@ class ConsumableManager:
 
                 # 7. Apply Buffs (Deferred)
                 for b in buffs_to_apply:
-                    self.db.add_active_buff(discord_id, item_key, item_data["name"], b["key"], b["val"], b["duration"])
+                    self.db.add_active_buff(
+                        discord_id,
+                        item_key,
+                        item_data["name"],
+                        b["key"],
+                        b["val"],
+                        b["duration"],
+                    )
 
                 return True, " ".join(message_lines)
 
             except Exception as e:
                 # Rollback: Refund item if effect application fails
-                logger.error(f"Item use error for {discord_id} (Refunding): {e}", exc_info=True)
+                logger.error(
+                    f"Item use error for {discord_id} (Refunding): {e}", exc_info=True
+                )
                 self.db.increment_inventory_count(inventory_db_id, 1)
                 # Re-raise to be caught by outer block for generic error message
                 raise e

@@ -24,7 +24,9 @@ class TestFactionSystem(unittest.TestCase):
         self.mock_db._col.return_value.insert_one.assert_called_once()
 
     def test_join_faction_already_member(self):
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders"}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders"
+        }
 
         success, msg = self.system.join_faction(self.discord_id, "iron_vanguard")
 
@@ -36,7 +38,9 @@ class TestFactionSystem(unittest.TestCase):
         self.assertFalse(success)
 
     def test_leave_faction(self):
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders"}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders"
+        }
 
         success, msg = self.system.leave_faction(self.discord_id)
 
@@ -44,7 +48,10 @@ class TestFactionSystem(unittest.TestCase):
         self.mock_db.leave_faction.assert_called_once_with(self.discord_id)
 
     def test_add_reputation_simple(self):
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders", "reputation": 100}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders",
+            "reputation": 100,
+        }
         self.mock_db.update_faction_reputation.return_value = 200
 
         success, msg, ranks = self.system.add_reputation(self.discord_id, 100)
@@ -55,7 +62,10 @@ class TestFactionSystem(unittest.TestCase):
     def test_add_reputation_rank_up(self):
         # Initial: 100 rep (Tier 1)
         # Add 400 -> 500 rep (Tier 2, Scout)
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders", "reputation": 100}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders",
+            "reputation": 100,
+        }
 
         # Simulate update returning new total
         self.mock_db.update_faction_reputation.return_value = 500
@@ -97,7 +107,10 @@ class TestFactionSystem(unittest.TestCase):
         self.mock_db.update_faction_reputation.assert_called_with(self.discord_id, 150)
 
     def test_grant_reputation_for_adventure(self):
-        self.mock_db.get_player_faction_data.return_value = {"faction_id": "pathfinders", "reputation": 0}
+        self.mock_db.get_player_faction_data.return_value = {
+            "faction_id": "pathfinders",
+            "reputation": 0,
+        }
 
         # Duration 30 mins -> 6 base rep
         # Multiplier: 1.0 + 1.5 (exploration) = 2.5
@@ -105,7 +118,9 @@ class TestFactionSystem(unittest.TestCase):
 
         self.mock_db.update_faction_reputation.return_value = 15
 
-        logs = self.system.grant_reputation_for_adventure(self.discord_id, 30, "any_loc")
+        logs = self.system.grant_reputation_for_adventure(
+            self.discord_id, 30, "any_loc"
+        )
 
         self.mock_db.update_faction_reputation.assert_called_with(self.discord_id, 15)
 

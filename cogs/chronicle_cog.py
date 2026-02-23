@@ -35,13 +35,19 @@ class TitleSelect(Select):
         sorted_titles = sorted(titles)
 
         for title in sorted_titles:
-            options.append(discord.SelectOption(label=title, value=title, default=(title == current_active)))
+            options.append(
+                discord.SelectOption(
+                    label=title, value=title, default=(title == current_active)
+                )
+            )
 
         # Truncate if too many (Discord limit 25 options)
         if len(options) > 25:
             options = options[:25]
 
-        super().__init__(placeholder="Choose a title...", min_values=1, max_values=1, options=options)
+        super().__init__(
+            placeholder="Choose a title...", min_values=1, max_values=1, options=options
+        )
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
@@ -50,11 +56,14 @@ class TitleSelect(Select):
         title_to_set = None if selected == "None" else selected
 
         db = DatabaseManager()
-        success = await asyncio.to_thread(db.set_active_title, interaction.user.id, title_to_set)
+        success = await asyncio.to_thread(
+            db.set_active_title, interaction.user.id, title_to_set
+        )
 
         if success:
             await interaction.followup.send(
-                f"Title set to: **{selected if selected != 'None' else 'None'}**", ephemeral=True
+                f"Title set to: **{selected if selected != 'None' else 'None'}**",
+                ephemeral=True,
             )
         else:
             await interaction.followup.send("Failed to set title.", ephemeral=True)
@@ -78,7 +87,9 @@ class ChronicleCog(commands.Cog):
         self.bot = bot
         self.db = DatabaseManager()
 
-    @app_commands.command(name="chronicles", description="View and manage your earned titles.")
+    @app_commands.command(
+        name="chronicles", description="View and manage your earned titles."
+    )
     async def chronicles(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
@@ -87,7 +98,9 @@ class ChronicleCog(commands.Cog):
         # Check if player exists
         exists = await asyncio.to_thread(self.db.player_exists, discord_id)
         if not exists:
-            await interaction.followup.send("You do not have a character profile.", ephemeral=True)
+            await interaction.followup.send(
+                "You do not have a character profile.", ephemeral=True
+            )
             return
 
         titles = await asyncio.to_thread(self.db.get_titles, discord_id)
@@ -95,16 +108,28 @@ class ChronicleCog(commands.Cog):
 
         description = "*Your deeds are etched in history.*"
 
-        embed = discord.Embed(title="🏆 Chronicles & Titles", description=description, color=discord.Color.gold())
+        embed = discord.Embed(
+            title="🏆 Chronicles & Titles",
+            description=description,
+            color=discord.Color.gold(),
+        )
 
-        embed.add_field(name="Active Title", value=f"**{active_title}**" if active_title else "*None*", inline=False)
+        embed.add_field(
+            name="Active Title",
+            value=f"**{active_title}**" if active_title else "*None*",
+            inline=False,
+        )
 
         if titles:
             titles.sort()
             titles_str = ", ".join([f"`{t}`" for t in titles])
-            embed.add_field(name=f"Unlocked Titles ({len(titles)})", value=titles_str, inline=False)
+            embed.add_field(
+                name=f"Unlocked Titles ({len(titles)})", value=titles_str, inline=False
+            )
         else:
-            embed.add_field(name="Unlocked Titles", value="*No titles earned yet.*", inline=False)
+            embed.add_field(
+                name="Unlocked Titles", value="*No titles earned yet.*", inline=False
+            )
 
         view = ChroniclesView(self.db, interaction.user, titles, active_title)
 

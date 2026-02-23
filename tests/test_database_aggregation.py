@@ -23,7 +23,9 @@ class TestDatabaseAggregation(unittest.TestCase):
         self.mock_db.__getitem__.side_effect = get_collection
 
         # Patch MongoClient
-        self.mongo_patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
+        self.mongo_patcher = patch(
+            "database.database_manager.MongoClient", return_value=self.mock_client
+        )
         self.mongo_patcher.start()
 
         # Reset singleton
@@ -65,7 +67,14 @@ class TestDatabaseAggregation(unittest.TestCase):
         self.mock_db["players"].aggregate.return_value = mock_agg_result
 
         # Ensure skill cache is populated so we can resolve the skill
-        self.db._skill_cache = {"fireball": {"key_id": "fireball", "name": "Fireball", "type": "Active", "mp_cost": 10}}
+        self.db._skill_cache = {
+            "fireball": {
+                "key_id": "fireball",
+                "name": "Fireball",
+                "type": "Active",
+                "mp_cost": 10,
+            }
+        }
 
         # Execute
         result = self.db.get_combat_context_bundle(discord_id)
@@ -79,13 +88,35 @@ class TestDatabaseAggregation(unittest.TestCase):
         print(f"players.find_one: {self.collections['players'].find_one.call_count}")
         print(f"stats.find_one: {self.collections['stats'].find_one.call_count}")
         print(f"active_buffs.find: {self.collections['active_buffs'].find.call_count}")
-        print(f"player_skills.find: {self.collections['player_skills'].find.call_count}")
+        print(
+            f"player_skills.find: {self.collections['player_skills'].find.call_count}"
+        )
 
-        self.assertEqual(self.collections["players"].aggregate.call_count, 1, "Should use aggregation")
-        self.assertEqual(self.collections["players"].find_one.call_count, 0, "Should not use find_one on players")
-        self.assertEqual(self.collections["stats"].find_one.call_count, 0, "Should not use find_one on stats")
-        self.assertEqual(self.collections["active_buffs"].find.call_count, 0, "Should not use find on active_buffs")
-        self.assertEqual(self.collections["player_skills"].find.call_count, 0, "Should not use find on player_skills")
+        self.assertEqual(
+            self.collections["players"].aggregate.call_count,
+            1,
+            "Should use aggregation",
+        )
+        self.assertEqual(
+            self.collections["players"].find_one.call_count,
+            0,
+            "Should not use find_one on players",
+        )
+        self.assertEqual(
+            self.collections["stats"].find_one.call_count,
+            0,
+            "Should not use find_one on stats",
+        )
+        self.assertEqual(
+            self.collections["active_buffs"].find.call_count,
+            0,
+            "Should not use find on active_buffs",
+        )
+        self.assertEqual(
+            self.collections["player_skills"].find.call_count,
+            0,
+            "Should not use find on player_skills",
+        )
 
         # Check Result correctness
         self.assertIsNotNone(result)
@@ -119,40 +150,62 @@ class TestDatabaseAggregation(unittest.TestCase):
 
         # Check for stats lookup projection
         stats_lookup = next(
-            stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "stats_docs"
+            stage["$lookup"]
+            for stage in pipeline
+            if stage.get("$lookup", {}).get("as") == "stats_docs"
         )
         self.assertIn("pipeline", stats_lookup)
         stats_pipeline = stats_lookup["pipeline"]
         self.assertTrue(
-            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in stats_pipeline),
+            any(
+                "$project" in stage and stage["$project"] == {"_id": 0}
+                for stage in stats_pipeline
+            ),
             "Stats lookup should project out _id",
         )
 
         # Check for buffs lookup projection
-        buffs_lookup = next(stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "buffs")
+        buffs_lookup = next(
+            stage["$lookup"]
+            for stage in pipeline
+            if stage.get("$lookup", {}).get("as") == "buffs"
+        )
         buffs_pipeline = buffs_lookup["pipeline"]
         self.assertTrue(
-            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in buffs_pipeline),
+            any(
+                "$project" in stage and stage["$project"] == {"_id": 0}
+                for stage in buffs_pipeline
+            ),
             "Buffs lookup should project out _id",
         )
 
         # Check for player_skills lookup projection
         skills_lookup = next(
-            stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "player_skills"
+            stage["$lookup"]
+            for stage in pipeline
+            if stage.get("$lookup", {}).get("as") == "player_skills"
         )
         skills_pipeline = skills_lookup["pipeline"]
         self.assertTrue(
-            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in skills_pipeline),
+            any(
+                "$project" in stage and stage["$project"] == {"_id": 0}
+                for stage in skills_pipeline
+            ),
             "Skills lookup should project out _id",
         )
 
         # Check for active_session lookup projection
         session_lookup = next(
-            stage["$lookup"] for stage in pipeline if stage.get("$lookup", {}).get("as") == "active_session"
+            stage["$lookup"]
+            for stage in pipeline
+            if stage.get("$lookup", {}).get("as") == "active_session"
         )
         session_pipeline = session_lookup["pipeline"]
         self.assertTrue(
-            any("$project" in stage and stage["$project"] == {"_id": 0} for stage in session_pipeline),
+            any(
+                "$project" in stage and stage["$project"] == {"_id": 0}
+                for stage in session_pipeline
+            ),
             "Session lookup should project out _id",
         )
 

@@ -67,7 +67,9 @@ class CraftingSystem:
 
         return tiers[current_index]
 
-    def craft_item(self, discord_id: int, recipe_id: str) -> tuple[bool, str, dict | None]:
+    def craft_item(
+        self, discord_id: int, recipe_id: str
+    ) -> tuple[bool, str, dict | None]:
         """
         Executes the crafting process safely.
         Returns: (Success, Message, ResultItemData)
@@ -84,7 +86,9 @@ class CraftingSystem:
         materials = recipe.get("materials", {})
         output_key = recipe["output_key"]
         output_amount = recipe.get("output_amount", 1)
-        recipe_type = recipe.get("type", "consumable")  # Default to consumable for legacy recipes
+        recipe_type = recipe.get(
+            "type", "consumable"
+        )  # Default to consumable for legacy recipes
 
         try:
             # 1. Deduct Gold
@@ -93,7 +97,9 @@ class CraftingSystem:
             # 2. Remove Materials
             for mat_key, amount in materials.items():
                 if not self.db.remove_inventory_item(discord_id, mat_key, amount):
-                    logger.error(f"CRITICAL: Failed to remove {mat_key} during crafting for {discord_id}")
+                    logger.error(
+                        f"CRITICAL: Failed to remove {mat_key} during crafting for {discord_id}"
+                    )
                     # Continue best effort
 
             # 3. Add Output Item
@@ -109,7 +115,11 @@ class CraftingSystem:
                 # Resolve DB ID
                 db_id = self.db.get_equipment_id_by_name(item_data["name"])
                 if not db_id:
-                    return False, f"System Error: Equipment '{item_data['name']}' not found in database.", None
+                    return (
+                        False,
+                        f"System Error: Equipment '{item_data['name']}' not found in database.",
+                        None,
+                    )
 
                 # --- QUALITY ROLL ---
                 base_rarity = item_data.get("rarity", "Common")
@@ -127,7 +137,9 @@ class CraftingSystem:
                     }
                     prefix = prefix_map.get(new_rarity, "Improved")
                     final_name = f"{prefix} {final_name}"
-                    success_msg_extras = f"\n✨ **Critical Success!** Upgraded to **{new_rarity}**!"
+                    success_msg_extras = (
+                        f"\n✨ **Critical Success!** Upgraded to **{new_rarity}**!"
+                    )
 
                 self.db.add_inventory_item(
                     discord_id,
@@ -179,7 +191,11 @@ class CraftingSystem:
                 )
 
             logger.info(f"User {discord_id} crafted {output_amount}x {output_key}")
-            return True, f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}", item_data
+            return (
+                True,
+                f"Successfully crafted **{final_name}** x{output_amount}!{success_msg_extras}",
+                item_data,
+            )
 
         except Exception as e:
             logger.error(f"Crafting system error for {discord_id}: {e}", exc_info=True)
@@ -213,7 +229,9 @@ class CraftingSystem:
         mat_key = fallback_map.get(rarity, "iron_ore")
         return {mat_key: 1}
 
-    def dismantle_item(self, discord_id: int, inv_id: int) -> tuple[bool, str, dict | None]:
+    def dismantle_item(
+        self, discord_id: int, inv_id: int
+    ) -> tuple[bool, str, dict | None]:
         """
         Dismantles a specific inventory item into materials.
         Returns: (Success, Message, RewardsDict)
@@ -287,7 +305,9 @@ class CraftingSystem:
             logger.error(f"Dismantle error for {discord_id}: {e}", exc_info=True)
             return False, "An error occurred during dismantling.", None
 
-    def experiment(self, discord_id: int, material_inv_ids: list[int]) -> tuple[bool, str, dict | None]:
+    def experiment(
+        self, discord_id: int, material_inv_ids: list[int]
+    ) -> tuple[bool, str, dict | None]:
         """
         Attempts to discover a recipe by combining materials.
         material_inv_ids: List of inventory IDs (primary keys) to consume.
@@ -321,7 +341,9 @@ class CraftingSystem:
             # 3. Consume Materials (Atomic-ish)
             for inv_id in material_inv_ids:
                 if not self.db.consume_item_atomic(inv_id, 1):
-                    logger.error(f"Failed to consume {inv_id} during experiment for {discord_id}")
+                    logger.error(
+                        f"Failed to consume {inv_id} during experiment for {discord_id}"
+                    )
 
             if match:
                 # 4. Success Logic
@@ -337,7 +359,11 @@ class CraftingSystem:
                     item_type = "material"
 
                 if not item_data:
-                    return False, f"System Error: Output {output_key} not defined.", None
+                    return (
+                        False,
+                        f"System Error: Output {output_key} not defined.",
+                        None,
+                    )
 
                 final_name = item_data["name"]
 
@@ -350,8 +376,14 @@ class CraftingSystem:
                     output_amount,
                 )
 
-                logger.info(f"User {discord_id} discovered {output_key} via experiment.")
-                return True, f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!", item_data
+                logger.info(
+                    f"User {discord_id} discovered {output_key} via experiment."
+                )
+                return (
+                    True,
+                    f"✨ **Discovery!** You mixed the ingredients and created **{final_name}**!",
+                    item_data,
+                )
 
             else:
                 # 5. Failure Logic (Add Slag)
@@ -365,7 +397,11 @@ class CraftingSystem:
                         slag_data["rarity"],
                         1,
                     )
-                return False, "The mixture turns volatile and collapses into useless slag.", None
+                return (
+                    False,
+                    "The mixture turns volatile and collapses into useless slag.",
+                    None,
+                )
 
         except Exception as e:
             logger.error(f"Experiment error for {discord_id}: {e}", exc_info=True)

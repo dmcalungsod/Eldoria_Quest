@@ -40,7 +40,15 @@ class MockButton:
 
 
 class MockSelect:
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+    def __init__(
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        row=None,
+        custom_id=None,
+    ):
         self.placeholder = placeholder
         self.min_values = min_values
         self.max_values = max_values
@@ -53,7 +61,9 @@ class MockSelect:
 
 
 class MockSelectOption:
-    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+    def __init__(
+        self, label=None, value=None, description=None, emoji=None, default=False
+    ):
         self.label = label
         self.value = value
         self.description = description
@@ -101,7 +111,9 @@ class TestExplorationViewUX(unittest.TestCase):
 
         importlib.reload(game_systems.adventure.ui.exploration_view)
 
-        self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
+        self.ExplorationView = (
+            game_systems.adventure.ui.exploration_view.ExplorationView
+        )
 
         # Import PlayerStats
         from game_systems.player.player_stats import PlayerStats
@@ -159,7 +171,9 @@ class TestExplorationViewUX(unittest.TestCase):
 
         btn = view.children[0]
         self.assertEqual(btn.label, "Forward")
-        self.assertEqual(btn.style, "danger", "Button should be red (danger) when HP is low")
+        self.assertEqual(
+            btn.style, "danger", "Button should be red (danger) when HP is low"
+        )
 
     def test_battle_state(self):
         """Battle state: Active monster overrides HP danger."""

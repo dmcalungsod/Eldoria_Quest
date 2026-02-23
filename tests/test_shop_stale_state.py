@@ -79,7 +79,9 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         # Mock get_player_or_error helper used in callback
         # Since we imported ShopView directly, we need to patch it where it's used in the module
         # Use patch.object to avoid import errors with string paths in some environments
-        with patch.object(shop_cog, "get_player_or_error", new_callable=AsyncMock) as mock_get_player:
+        with patch.object(
+            shop_cog, "get_player_or_error", new_callable=AsyncMock
+        ) as mock_get_player:
             mock_get_player.return_value = True
 
             # Execute callback
@@ -95,4 +97,8 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         print(f"New View Aurum: {new_view.current_aurum}")
 
         # Assert that the new view reflects the fresh state (5), not the stale state (100)
-        self.assertEqual(new_view.current_aurum, 5, "Bug reproduced: View has stale aurum (100) instead of fresh (5)")
+        self.assertEqual(
+            new_view.current_aurum,
+            5,
+            "Bug reproduced: View has stale aurum (100) instead of fresh (5)",
+        )

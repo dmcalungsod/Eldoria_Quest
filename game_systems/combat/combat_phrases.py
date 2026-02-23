@@ -507,7 +507,9 @@ class CombatPhrases:
         return f"**{random.choice(phrase_list).format(name=name)}**"
 
     @staticmethod
-    def player_attack(player, monster: dict, damage: int, is_crit: bool, player_class_id: int) -> str:
+    def player_attack(
+        player, monster: dict, damage: int, is_crit: bool, player_class_id: int
+    ) -> str:
         m_name = str(monster.get("name", "the enemy"))
 
         # Helper to format damage
@@ -731,7 +733,17 @@ class CombatPhrases:
         skill_type = skill.get("type", "physical")
 
         # Magic types -> Interrupt (Attack)
-        if skill_type in ["magical", "fire", "ice", "poison", "water", "wind", "earth", "dark", "holy"]:
+        if skill_type in [
+            "magical",
+            "fire",
+            "ice",
+            "poison",
+            "water",
+            "wind",
+            "earth",
+            "dark",
+            "holy",
+        ]:
             hint = "**INTERRUPT** (Attack!)"
             phrases = [
                 f"⚠️ The {m_name} begins chanting **{skill_name}**! {hint}",

@@ -49,10 +49,16 @@ class TestInfirmaryRace(unittest.TestCase):
         update_op = args[1]
 
         # 1. Verify Optimistic Locking: Filter should include current_hp
-        self.assertEqual(filter_query["current_hp"], 50, "Update should filter by previous HP (Optimistic Locking)")
+        self.assertEqual(
+            filter_query["current_hp"],
+            50,
+            "Update should filter by previous HP (Optimistic Locking)",
+        )
 
         # 2. Verify Atomic Increment: Update should use $inc for aurum
-        self.assertIn("$inc", update_op, "Update should use $inc for atomic balance deduction")
+        self.assertIn(
+            "$inc", update_op, "Update should use $inc for atomic balance deduction"
+        )
         self.assertEqual(update_op["$inc"]["aurum"], -320, "Should deduct 320 aurum")
 
         # 3. Verify Vitals Set: Update should use $set for HP/MP

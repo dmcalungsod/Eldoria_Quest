@@ -16,7 +16,11 @@ class TestEquipmentSlots(unittest.TestCase):
 
         # Setup common mock returns
         self.mock_db.get_player_field.return_value = 2  # Class ID 2 (Mage)
-        self.mock_db.get_player.return_value = {"class_id": 2, "level": 10, "name": "MagePlayer"}
+        self.mock_db.get_player.return_value = {
+            "class_id": 2,
+            "level": 10,
+            "name": "MagePlayer",
+        }
         self.mock_db.get_guild_rank.return_value = "A"
 
         # Mage allowed slots (including new 'wand')
@@ -58,7 +62,9 @@ class TestEquipmentSlots(unittest.TestCase):
 
         self.inventory = {101: self.wand, 102: self.orb, 103: self.staff}
 
-        self.mock_db.get_inventory_item.side_effect = lambda uid, iid: self.inventory.get(iid)
+        self.mock_db.get_inventory_item.side_effect = (
+            lambda uid, iid: self.inventory.get(iid)
+        )
 
         # Mock recalculate and check_requirements
         self.manager.recalculate_player_stats = MagicMock()
@@ -89,7 +95,9 @@ class TestEquipmentSlots(unittest.TestCase):
         success, msg = self.manager.equip_item(1, 102)
 
         self.assertTrue(success)
-        self.assertEqual(self.inventory[101]["equipped"], 1, "Wand should remain equipped")
+        self.assertEqual(
+            self.inventory[101]["equipped"], 1, "Wand should remain equipped"
+        )
         # Note: In real DB, set_item_equipped would be called.
         # But our test doesn't actually update the list returned by get_equipped_items unless we manage state carefully.
         # But 'manager.equip_item' logic calls '_unequip_logic' if conflict.
@@ -100,7 +108,10 @@ class TestEquipmentSlots(unittest.TestCase):
         # Setup: Wand and Orb equipped
         self.inventory[101]["equipped"] = 1
         self.inventory[102]["equipped"] = 1
-        self.mock_db.get_equipped_items.return_value = [self.inventory[101], self.inventory[102]]
+        self.mock_db.get_equipped_items.return_value = [
+            self.inventory[101],
+            self.inventory[102],
+        ]
 
         # Equip Staff
         success, msg = self.manager.equip_item(1, 103)

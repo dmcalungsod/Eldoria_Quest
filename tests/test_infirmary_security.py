@@ -20,7 +20,15 @@ class MockView:
 
 
 class MockButton:
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        custom_id=None,
+        emoji=None,
+        row=None,
+        disabled=False,
+    ):
         self.callback = None
         self.label = label
 
@@ -51,7 +59,9 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # Mock Pymongo
         mock_pymongo = MagicMock()
         mock_pymongo.errors = MagicMock()
-        mock_pymongo.errors.DuplicateKeyError = Exception  # Preserve original mock behavior
+        mock_pymongo.errors.DuplicateKeyError = (
+            Exception  # Preserve original mock behavior
+        )
 
         sys.modules["pymongo"] = mock_pymongo
         sys.modules["pymongo.errors"] = mock_pymongo.errors
@@ -95,7 +105,9 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         """
 
         # 1. Initialize View with initial stats (Max HP 150)
-        view = self.InfirmaryView(self.mock_db, self.user, self.initial_p_data, self.initial_stats)
+        view = self.InfirmaryView(
+            self.mock_db, self.user, self.initial_p_data, self.initial_stats
+        )
 
         old_max_hp = self.initial_stats.max_hp  # 150
         new_max_hp = 200  # Simulated new Max HP in DB
@@ -103,7 +115,10 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         # 2. Simulate DB state where player has changed
 
         # Mock get_player_vitals (Current state)
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 50, "current_mp": 10}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 50,
+            "current_mp": 10,
+        }
         self.mock_db.get_player_field.return_value = 1000  # Aurum
 
         # Mock get_player_stats_json to return FRESH stats (Max HP 200)
@@ -114,12 +129,16 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         view._execute_heal()
 
         # 4. Verify execute_heal called with FRESH Max HP (200)
-        self.mock_db.execute_heal.assert_called_with(self.user.id, new_max_hp, fresh_stats.max_mp, cost=0)
+        self.mock_db.execute_heal.assert_called_with(
+            self.user.id, new_max_hp, fresh_stats.max_mp, cost=0
+        )
 
         # Also ensure it wasn't called with old HP
         args, _ = self.mock_db.execute_heal.call_args
         self.assertEqual(
-            args[1], new_max_hp, f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)"
+            args[1],
+            new_max_hp,
+            f"Vulnerability: Healed to {args[1]} (Stale), expected {new_max_hp} (Fresh)",
         )
 
 

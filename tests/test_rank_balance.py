@@ -1,4 +1,3 @@
-
 import json
 import unittest
 import sys
@@ -14,6 +13,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 from pathlib import Path  # noqa: E402
 from game_systems.guild_system.rank_system import RankSystem  # noqa: E402
+
 
 class TestRankBalance(unittest.TestCase):
     def test_quest_counts_are_achievable(self):
@@ -35,8 +35,9 @@ class TestRankBalance(unittest.TestCase):
                 self.assertLessEqual(
                     quest_req,
                     total_quests_available,
-                    f"Rank {rank} requires {quest_req} quests, but only {total_quests_available} exist!"
+                    f"Rank {rank} requires {quest_req} quests, but only {total_quests_available} exist!",
                 )
+
 
 if __name__ == "__main__":
     unittest.main()

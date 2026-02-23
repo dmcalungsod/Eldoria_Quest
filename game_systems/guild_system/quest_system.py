@@ -40,7 +40,14 @@ class QuestSystem:
             quests = list(
                 self.db._col("quests").find(
                     {"tier": {"$in": allowed_tiers}},
-                    {"_id": 0, "id": 1, "title": 1, "tier": 1, "summary": 1, "prerequisites": 1},
+                    {
+                        "_id": 0,
+                        "id": 1,
+                        "title": 1,
+                        "tier": 1,
+                        "summary": 1,
+                        "prerequisites": 1,
+                    },
                 )
             )
 
@@ -87,7 +94,9 @@ class QuestSystem:
                     else details["objectives"]
                 )
                 details["rewards"] = (
-                    json.loads(details["rewards"]) if isinstance(details["rewards"], str) else details["rewards"]
+                    json.loads(details["rewards"])
+                    if isinstance(details["rewards"], str)
+                    else details["rewards"]
                 )
             except json.JSONDecodeError:
                 details["objectives"] = {}
@@ -110,7 +119,15 @@ class QuestSystem:
             for pq in pq_rows:
                 quest = self.db._col("quests").find_one(
                     {"id": pq["quest_id"]},
-                    {"_id": 0, "id": 1, "title": 1, "summary": 1, "location": 1, "objectives": 1, "flavor_text": 1},
+                    {
+                        "_id": 0,
+                        "id": 1,
+                        "title": 1,
+                        "summary": 1,
+                        "location": 1,
+                        "objectives": 1,
+                        "flavor_text": 1,
+                    },
                 )
                 if not quest:
                     continue
@@ -127,9 +144,15 @@ class QuestSystem:
                 }
 
                 try:
-                    d["progress"] = json.loads(d["progress"]) if isinstance(d["progress"], str) else d["progress"]
+                    d["progress"] = (
+                        json.loads(d["progress"])
+                        if isinstance(d["progress"], str)
+                        else d["progress"]
+                    )
                     d["objectives"] = (
-                        json.loads(d["objectives"]) if isinstance(d["objectives"], str) else d["objectives"]
+                        json.loads(d["objectives"])
+                        if isinstance(d["objectives"], str)
+                        else d["objectives"]
                     )
                 except json.JSONDecodeError:
                     d["progress"] = {}
@@ -148,7 +171,9 @@ class QuestSystem:
             if exists:
                 return False
 
-            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1})
+            quest = self.db._col("quests").find_one(
+                {"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1}
+            )
             if not quest:
                 return False
 
@@ -173,7 +198,9 @@ class QuestSystem:
 
             try:
                 objectives = (
-                    json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
+                    json.loads(quest["objectives"])
+                    if isinstance(quest["objectives"], str)
+                    else quest["objectives"]
                 )
             except json.JSONDecodeError:
                 return False
@@ -199,7 +226,14 @@ class QuestSystem:
             logger.error(f"Accept quest error: {e}", exc_info=True)
             return False
 
-    def update_progress(self, discord_id: int, quest_id: int, obj_type: str, target: str, amount: int = 1) -> bool:
+    def update_progress(
+        self,
+        discord_id: int,
+        quest_id: int,
+        obj_type: str,
+        target: str,
+        amount: int = 1,
+    ) -> bool:
         try:
             row = self.db._col("player_quests").find_one(
                 {"discord_id": discord_id, "quest_id": quest_id},
@@ -209,7 +243,11 @@ class QuestSystem:
                 return False
 
             try:
-                progress = json.loads(row["progress"]) if isinstance(row["progress"], str) else row["progress"]
+                progress = (
+                    json.loads(row["progress"])
+                    if isinstance(row["progress"], str)
+                    else row["progress"]
+                )
             except json.JSONDecodeError:
                 return False
 
@@ -228,13 +266,19 @@ class QuestSystem:
     def complete_quest(self, discord_id: int, quest_id: int) -> tuple[bool, str]:
         try:
             pq = self.db._col("player_quests").find_one(
-                {"discord_id": discord_id, "quest_id": quest_id, "status": "in_progress"},
+                {
+                    "discord_id": discord_id,
+                    "quest_id": quest_id,
+                    "status": "in_progress",
+                },
                 {"_id": 0, "progress": 1},
             )
             if not pq:
                 return False, f"{ERROR} Quest inactive or already completed."
 
-            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "rewards": 1})
+            quest = self.db._col("quests").find_one(
+                {"id": quest_id}, {"_id": 0, "objectives": 1, "rewards": 1}
+            )
             if not quest:
                 return False, f"{ERROR} Quest definition not found."
 
@@ -244,25 +288,40 @@ class QuestSystem:
                     json.loads(quest["rewards"])
             except json.JSONDecodeError:
                 logger.error(f"Critical: Corrupt reward JSON for quest {quest_id}")
-                return False, f"{ERROR} System error: Reward data corrupted. Please report this."
+                return (
+                    False,
+                    f"{ERROR} System error: Reward data corrupted. Please report this.",
+                )
             # ------------------------------------------------
 
-            progress = json.loads(pq["progress"]) if isinstance(pq["progress"], str) else pq["progress"]
+            progress = (
+                json.loads(pq["progress"])
+                if isinstance(pq["progress"], str)
+                else pq["progress"]
+            )
             objectives = (
-                json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
+                json.loads(quest["objectives"])
+                if isinstance(quest["objectives"], str)
+                else quest["objectives"]
             )
 
             if not self.check_completion(progress, objectives):
                 return False, f"{WARNING} Objectives not met."
 
             result = self.db._col("player_quests").update_one(
-                {"discord_id": discord_id, "quest_id": quest_id, "status": "in_progress"},
+                {
+                    "discord_id": discord_id,
+                    "quest_id": quest_id,
+                    "status": "in_progress",
+                },
                 {"$set": {"status": "completed"}},
             )
 
             if result.modified_count == 0:
                 # Race Condition Detected: Status changed between find_one and update_one
-                logger.warning(f"Quest completion race condition prevented for {discord_id}, quest {quest_id}")
+                logger.warning(
+                    f"Quest completion race condition prevented for {discord_id}, quest {quest_id}"
+                )
                 return False, f"{ERROR} Quest already completed or inactive."
 
             # Grant rewards

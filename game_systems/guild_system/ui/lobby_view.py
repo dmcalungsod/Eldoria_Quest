@@ -16,7 +16,12 @@ from .components import EmbedBuilder, GuildViewMixin, ViewFactory
 
 
 class GuildLobbyView(View, GuildViewMixin):
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, rank: str = "F"):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        rank: str = "F",
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -26,7 +31,12 @@ class GuildLobbyView(View, GuildViewMixin):
     def _setup_buttons(self):
         self.add_item(
             ViewFactory.create_button(
-                "Quests", discord.ButtonStyle.success, "lobby_quests", "📜", 0, callback=self._quests_btn_callback
+                "Quests",
+                discord.ButtonStyle.success,
+                "lobby_quests",
+                "📜",
+                0,
+                callback=self._quests_btn_callback,
             )
         )
         self.add_item(
@@ -68,14 +78,18 @@ class GuildLobbyView(View, GuildViewMixin):
 
         await interaction.response.defer()
         view = QuestsMenuView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.quest_menu(), view=view)
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.quest_menu(), view=view
+        )
 
     async def _services_btn_callback(self, interaction: discord.Interaction):
         from .services_menu import GuildServicesView
 
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.services_menu(), view=view
+        )
 
     async def _advisor_callback(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)

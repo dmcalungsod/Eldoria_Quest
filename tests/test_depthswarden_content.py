@@ -38,7 +38,13 @@ class TestDepthsWardenContent(unittest.TestCase):
 
     def test_new_materials_exist(self):
         """Verify new Void materials exist."""
-        new_mats = ["void_dust", "abyssal_shackle", "entropy_crystal", "null_stone", "void_heart"]
+        new_mats = [
+            "void_dust",
+            "abyssal_shackle",
+            "entropy_crystal",
+            "null_stone",
+            "void_heart",
+        ]
         for mat in new_mats:
             self.assertIn(mat, MATERIALS, f"Material {mat} missing")
 

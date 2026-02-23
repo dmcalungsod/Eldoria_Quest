@@ -35,10 +35,20 @@ class ItemManager:
             return {}
 
         try:
-            row = self.db._col(source_table).find_one({"id": int(item_key)}, {"_id": 0})
+            try:
+                item_id = int(item_key)
+            except ValueError:
+                logger.warning(f"Invalid equipment key format: {item_key}")
+                return {}
+
+            row = self.db._col(source_table).find_one({"id": item_id}, {"_id": 0})
             if not row:
                 return {}
-            return {stat: row[key] for key, stat in STAT_MAP.items() if key in row and row[key] != 0}
+            return {
+                stat: row[key]
+                for key, stat in STAT_MAP.items()
+                if key in row and row[key] != 0
+            }
         except Exception as e:
             logger.error(f"Error fetching stats for {item_key}: {e}")
             return {}
@@ -85,7 +95,14 @@ class ItemManager:
     # DROPS & RNG
     # --------------------------------------------------------------------
     def roll_rarity(self):
-        rolls = {"Common": 55, "Uncommon": 25, "Rare": 12, "Epic": 5, "Legendary": 2, "Mythical": 1}
+        rolls = {
+            "Common": 55,
+            "Uncommon": 25,
+            "Rare": 12,
+            "Epic": 5,
+            "Legendary": 2,
+            "Mythical": 1,
+        }
         r = random.randint(1, sum(rolls.values()))
         current = 0
         for rarity, weight in rolls.items():
@@ -138,19 +155,27 @@ class ItemManager:
             results = []
 
             # Equipment
-            for row in self.db._col("equipment").find({"name": regex_filter}, {"_id": 0}):
+            for row in self.db._col("equipment").find(
+                {"name": regex_filter}, {"_id": 0}
+            ):
                 results.append({**row, "table_name": "equipment"})
 
             # Class Equipment
-            for row in self.db._col("class_equipment").find({"name": regex_filter}, {"_id": 0}):
+            for row in self.db._col("class_equipment").find(
+                {"name": regex_filter}, {"_id": 0}
+            ):
                 results.append({**row, "table_name": "class_equipment"})
 
             # Consumables
-            for row in self.db._col("consumables").find({"name": regex_filter}, {"_id": 0}):
+            for row in self.db._col("consumables").find(
+                {"name": regex_filter}, {"_id": 0}
+            ):
                 results.append({**row, "table_name": "consumables"})
 
             # Quest Items
-            for row in self.db._col("quest_items").find({"name": regex_filter}, {"_id": 0}):
+            for row in self.db._col("quest_items").find(
+                {"name": regex_filter}, {"_id": 0}
+            ):
                 results.append({**row, "table_name": "quest_items"})
 
             return results

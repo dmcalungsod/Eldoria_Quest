@@ -42,6 +42,7 @@ discord_mock.Object = MagicMock()
 discord_mock.HTTPException = Exception
 discord_mock.LoginFailure = Exception
 
+
 # Setup MockBotBase
 class MockBotBase:
     def __init__(self, *args, **kwargs):
@@ -55,10 +56,12 @@ class MockBotBase:
         # Mock tree.sync to track calls
         # self.tree.sync is already AsyncMock, which records calls.
 
+
 commands_mock.Bot = MockBotBase
 
 # Now import main
 import main  # noqa: E402
+
 
 async def _test_sync_logic_async():
     print("Testing sync logic...")
@@ -82,8 +85,8 @@ async def _test_sync_logic_async():
 
     for call in bot.tree.sync.call_args_list:
         args, kwargs = call
-        if 'guild' in kwargs or (args and args[0]):
-             guild_sync_called = True
+        if "guild" in kwargs or (args and args[0]):
+            guild_sync_called = True
         else:
             global_sync_called = True
 
@@ -119,9 +122,11 @@ async def _test_sync_logic_async():
     else:
         print("FAIL: Global sync NOT called.")
 
+
 def test_sync_logic():
     """Wrapper to run async test logic in pytest environment without plugins."""
     asyncio.run(_test_sync_logic_async())
+
 
 if __name__ == "__main__":
     test_sync_logic()

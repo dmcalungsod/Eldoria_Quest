@@ -48,7 +48,10 @@ class TestTournamentCaching(unittest.TestCase):
 
     def test_tournament_caching(self):
         # Setup mock return
-        self.mock_db.tournaments.find_one.return_value = {"type": "spectral_tide", "active": 1}
+        self.mock_db.tournaments.find_one.return_value = {
+            "type": "spectral_tide",
+            "active": 1,
+        }
 
         # 1. First Call - Should hit DB
         with patch("time.time", return_value=1000.0):
@@ -66,10 +69,17 @@ class TestTournamentCaching(unittest.TestCase):
         self.assertEqual(tourney2["type"], "spectral_tide")
 
         # Expectation: Call count should remain the same (cached)
-        self.assertEqual(self.mock_db.tournaments.find_one.call_count, call_count_after_first, "DB should not be hit again if cached")
+        self.assertEqual(
+            self.mock_db.tournaments.find_one.call_count,
+            call_count_after_first,
+            "DB should not be hit again if cached",
+        )
 
     def test_cache_expiration(self):
-        self.mock_db.tournaments.find_one.return_value = {"type": "spectral_tide", "active": 1}
+        self.mock_db.tournaments.find_one.return_value = {
+            "type": "spectral_tide",
+            "active": 1,
+        }
 
         # 1. Populate cache
         with patch("time.time", return_value=1000.0):
@@ -85,7 +95,10 @@ class TestTournamentCaching(unittest.TestCase):
         self.mock_db.tournaments.find_one.assert_called_once()
 
     def test_invalidation_create(self):
-        self.mock_db.tournaments.find_one.return_value = {"type": "spectral_tide", "active": 1}
+        self.mock_db.tournaments.find_one.return_value = {
+            "type": "spectral_tide",
+            "active": 1,
+        }
 
         # 1. Populate cache
         with patch("time.time", return_value=1000.0):
@@ -105,7 +118,10 @@ class TestTournamentCaching(unittest.TestCase):
         self.mock_db.tournaments.find_one.assert_called_once()
 
     def test_invalidation_end(self):
-        self.mock_db.tournaments.find_one.return_value = {"type": "spectral_tide", "active": 1}
+        self.mock_db.tournaments.find_one.return_value = {
+            "type": "spectral_tide",
+            "active": 1,
+        }
 
         # 1. Populate cache
         with patch("time.time", return_value=1000.0):
@@ -126,7 +142,11 @@ class TestTournamentCaching(unittest.TestCase):
 
     def test_return_copy(self):
         """Test that the cache returns a copy to prevent mutation."""
-        self.mock_db.tournaments.find_one.return_value = {"type": "spectral_tide", "active": 1, "data": {}}
+        self.mock_db.tournaments.find_one.return_value = {
+            "type": "spectral_tide",
+            "active": 1,
+            "data": {},
+        }
 
         with patch("time.time", return_value=1000.0):
             tourney1 = self.db.get_active_tournament()

@@ -1,4 +1,3 @@
-
 import os
 import sys
 import unittest
@@ -26,15 +25,15 @@ class MockDatabaseManager:
             "discord_id": 123,
             "current_hp": 50,
             "current_mp": 50,
-            "aurum": 1000
+            "aurum": 1000,
         }
         self.stats_data = {
             "STR": {"base": 10},
-            "END": {"base": 5}, # END 5 -> +50 HP -> Total 100 HP
+            "END": {"base": 5},  # END 5 -> +50 HP -> Total 100 HP
             "DEX": {"base": 10},
             "AGI": {"base": 10},
-            "MAG": {"base": 16}, # MAG 16 -> +80 MP -> Total 100 MP
-            "LCK": {"base": 10}
+            "MAG": {"base": 16},  # MAG 16 -> +80 MP -> Total 100 MP
+            "LCK": {"base": 10},
         }
 
     def get_combat_context_bundle(self, discord_id):
@@ -44,7 +43,7 @@ class MockDatabaseManager:
             "stats": self.stats_data,
             "buffs": [],
             "skills": [],
-            "active_session": {}
+            "active_session": {},
         }
 
     def get_active_boosts(self):
@@ -88,6 +87,7 @@ class MockDatabaseManager:
         self.player_data["current_hp"] = new_hp
         self.player_data["current_mp"] = new_mp
 
+
 class TestHealRaceCondition(unittest.TestCase):
     def setUp(self):
         # Need to patch DatabaseManager where AdventureSession uses it
@@ -103,15 +103,38 @@ class TestHealRaceCondition(unittest.TestCase):
         # because they might try to use real DB calls if not careful.
         # AdventureSession instantiates them in __init__.
 
-        with patch("game_systems.adventure.adventure_session.AdventureRewards") as MockRewards, \
-             patch("game_systems.adventure.adventure_session.CombatHandler") as MockCombat, \
-             patch("game_systems.adventure.adventure_session.EventHandler") as MockEvents, \
-             patch("game_systems.adventure.adventure_session.LOCATIONS", {"loc_1": {"name": "Test", "monsters": []}}):
+        with patch(
+            "game_systems.adventure.adventure_session.AdventureRewards"
+        ) as MockRewards, patch(
+            "game_systems.adventure.adventure_session.CombatHandler"
+        ) as MockCombat, patch(
+            "game_systems.adventure.adventure_session.EventHandler"
+        ) as MockEvents, patch(
+            "game_systems.adventure.adventure_session.LOCATIONS",
+            {"loc_1": {"name": "Test", "monsters": []}},
+        ):
 
-            session = AdventureSession(self.db, MagicMock(), MagicMock(), self.user_id, {"location_id": "loc_1", "active": 1, "logs": "[]", "loot_collected": "{}", "active_monster_json": None})
+            session = AdventureSession(
+                self.db,
+                MagicMock(),
+                MagicMock(),
+                self.user_id,
+                {
+                    "location_id": "loc_1",
+                    "active": 1,
+                    "logs": "[]",
+                    "loot_collected": "{}",
+                    "active_monster_json": None,
+                },
+            )
 
             # Mock active monster to force combat logic
-            session.active_monster = {"name": "Goblin", "HP": 50, "max_hp": 50, "tier": "Normal"}
+            session.active_monster = {
+                "name": "Goblin",
+                "HP": 50,
+                "max_hp": 50,
+                "tier": "Normal",
+            }
 
             # 2. Mock Combat Handler to simulate:
             #    a) External Heal happens
@@ -130,12 +153,12 @@ class TestHealRaceCondition(unittest.TestCase):
                 return {
                     "winner": None,
                     "phrases": ["Took 10 damage"],
-                    "hp_current": 40, # 50 - 10
+                    "hp_current": 40,  # 50 - 10
                     "mp_current": 50,
                     "monster_hp": 50,
                     "turn_report": {},
                     "active_boosts": {},
-                    "monster_data": session.active_monster
+                    "monster_data": session.active_monster,
                 }
 
             mock_combat_instance.resolve_turn.side_effect = mock_resolve_turn
@@ -153,8 +176,15 @@ class TestHealRaceCondition(unittest.TestCase):
             # We can inspect call_args_list to see all calls
             for call in mock_combat_instance.resolve_turn.call_args_list:
                 args, kwargs = call
-                self.assertIn("persist_vitals", kwargs, "persist_vitals argument missing in resolve_turn call")
-                self.assertFalse(kwargs["persist_vitals"], "Auto-combat must use persist_vitals=False to prevent double DB updates")
+                self.assertIn(
+                    "persist_vitals",
+                    kwargs,
+                    "persist_vitals argument missing in resolve_turn call",
+                )
+                self.assertFalse(
+                    kwargs["persist_vitals"],
+                    "Auto-combat must use persist_vitals=False to prevent double DB updates",
+                )
 
             # 4. Assert
             final_hp = self.db.player_data["current_hp"]
@@ -168,7 +198,12 @@ class TestHealRaceCondition(unittest.TestCase):
             # 3. Combat: Delta -10
             # 4. Result: 100 - 10 = 90
 
-            self.assertEqual(final_hp, 90, f"Bug Fixed: External heal preserved. Expected 90, got {final_hp}")
+            self.assertEqual(
+                final_hp,
+                90,
+                f"Bug Fixed: External heal preserved. Expected 90, got {final_hp}",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

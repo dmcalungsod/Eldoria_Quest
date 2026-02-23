@@ -18,7 +18,12 @@ logger = logging.getLogger("eldoria.ui.experiment")
 
 
 class ExperimentView(View):
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, back_callback=None):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        back_callback=None,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
@@ -31,14 +36,18 @@ class ExperimentView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This workbench is occupied.", ephemeral=True)
+            await interaction.response.send_message(
+                "This workbench is occupied.", ephemeral=True
+            )
             return False
         return True
 
     def _setup_ui(self):
         # 1. Material Select Menu
         # Fetch materials (limit to 25, sort by count)
-        materials = self.db.get_inventory_items(self.interaction_user.id, item_type="material", equipped=0)
+        materials = self.db.get_inventory_items(
+            self.interaction_user.id, item_type="material", equipped=0
+        )
 
         # Sort by count desc
         materials.sort(key=lambda x: x["count"], reverse=True)
@@ -53,26 +62,41 @@ class ExperimentView(View):
             # But the requirement is "Select 2-3".
             # If len < 2, disable?
             if len(materials) < 2:
-                select = Select(placeholder="Not enough unique materials (need 2+).", disabled=True, row=0)
+                select = Select(
+                    placeholder="Not enough unique materials (need 2+).",
+                    disabled=True,
+                    row=0,
+                )
                 select.add_option(label="Empty", value="empty")
                 self.add_item(select)
             else:
                 max_val = min(3, len(materials))
                 select = Select(
-                    placeholder="Select 2-3 materials to mix...", min_values=2, max_values=max_val, row=0
+                    placeholder="Select 2-3 materials to mix...",
+                    min_values=2,
+                    max_values=max_val,
+                    row=0,
                 )
 
                 for item in materials[:25]:
                     label = f"{item['item_name']} (x{item['count']})"
                     # Value must be string
-                    select.add_option(label=label, value=str(item["id"]), description=item.get("rarity", "Common"))
+                    select.add_option(
+                        label=label,
+                        value=str(item["id"]),
+                        description=item.get("rarity", "Common"),
+                    )
 
                 select.callback = self.material_select_callback
                 self.add_item(select)
 
         # 2. Mix Button
         self.mix_btn = Button(
-            label="Mix Ingredients", style=discord.ButtonStyle.success, disabled=True, row=1, emoji="⚗️"
+            label="Mix Ingredients",
+            style=discord.ButtonStyle.success,
+            disabled=True,
+            row=1,
+            emoji="⚗️",
         )
         self.mix_btn.callback = self.mix_callback
         self.add_item(self.mix_btn)
@@ -102,7 +126,9 @@ class ExperimentView(View):
 
         # Execute Experiment
         success, msg, result_item = await asyncio.to_thread(
-            self.crafting_system.experiment, self.interaction_user.id, self.selected_materials
+            self.crafting_system.experiment,
+            self.interaction_user.id,
+            self.selected_materials,
         )
 
         # Show Result
@@ -128,7 +154,9 @@ class ExperimentView(View):
         embed = discord.Embed(title=title, description=msg, color=color)
         if success and result_item:
             # Add item details
-            embed.add_field(name="Item Created", value=result_item["name"], inline=False)
+            embed.add_field(
+                name="Item Created", value=result_item["name"], inline=False
+            )
             if result_item.get("effect"):
                 # Format effect nicely
                 effects = []

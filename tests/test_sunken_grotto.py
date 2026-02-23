@@ -33,7 +33,13 @@ class TestSunkenGrotto(unittest.TestCase):
                 self.assertIn("abyssal_pearl", drop_keys)
 
     def test_materials_exist(self):
-        new_mats = ["coral_fragment", "bioluminescent_scale", "pearl", "siren_voice_box", "abyssal_pearl"]
+        new_mats = [
+            "coral_fragment",
+            "bioluminescent_scale",
+            "pearl",
+            "siren_voice_box",
+            "abyssal_pearl",
+        ]
         for mat in new_mats:
             self.assertIn(mat, MATERIALS)
 

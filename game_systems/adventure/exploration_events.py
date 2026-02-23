@@ -42,7 +42,12 @@ class ExplorationEvents:
 
         except Exception as e:
             logger.error(f"Error handling event {event_key}: {e}", exc_info=True)
-            return {"log": ["*Something shifts in the darkness, but nothing happens.*"], "vitals": context["vitals"], "loot": {}, "dead": False}
+            return {
+                "log": ["*Something shifts in the darkness, but nothing happens.*"],
+                "vitals": context["vitals"],
+                "loot": {},
+                "dead": False,
+            }
 
     def _handle_safe_room(self, context: dict[str, Any]) -> dict[str, Any]:
         stats = context["player_stats"]
@@ -51,8 +56,12 @@ class ExplorationEvents:
         # Heal 50-100% of Max HP/MP
         heal_percent = random.uniform(0.5, 1.0)
 
-        new_hp = min(stats.max_hp, int(vitals["current_hp"] + stats.max_hp * heal_percent))
-        new_mp = min(stats.max_mp, int(vitals["current_mp"] + stats.max_mp * heal_percent))
+        new_hp = min(
+            stats.max_hp, int(vitals["current_hp"] + stats.max_hp * heal_percent)
+        )
+        new_mp = min(
+            stats.max_mp, int(vitals["current_mp"] + stats.max_mp * heal_percent)
+        )
 
         hp_gain = new_hp - vitals["current_hp"]
         mp_gain = new_mp - vitals["current_mp"]
@@ -66,7 +75,7 @@ class ExplorationEvents:
 
         log = [
             AdventureEvents.special_event_flavor("safe_room"),
-            f"{E.HEAL} Restored **{hp_gain}** HP and **{mp_gain}** MP."
+            f"{E.HEAL} Restored **{hp_gain}** HP and **{mp_gain}** MP.",
         ]
 
         return {"log": log, "vitals": vitals, "loot": {}, "dead": False}
@@ -99,7 +108,7 @@ class ExplorationEvents:
 
         log = [
             AdventureEvents.special_event_flavor("ancient_shrine"),
-            f"{E.EXP} You gain **{amount} XP** from the ancient knowledge."
+            f"{E.EXP} You gain **{amount} XP** from the ancient knowledge.",
         ]
 
         return {"log": log, "vitals": context["vitals"], "loot": loot, "dead": False}
@@ -125,7 +134,9 @@ class ExplorationEvents:
         new_hp = max(0, current_hp - damage)
 
         # Update DB
-        self.db.set_player_vitals(context["player_row"]["discord_id"], new_hp, vitals["current_mp"])
+        self.db.set_player_vitals(
+            context["player_row"]["discord_id"], new_hp, vitals["current_mp"]
+        )
 
         vitals["current_hp"] = new_hp
 
@@ -133,10 +144,7 @@ class ExplorationEvents:
         if mitigated:
             flavor += f"\n{E.DODGE} You reacted quickly, reducing the impact!"
 
-        log = [
-            flavor,
-            f"{E.DAMAGE} You took **{damage}** damage."
-        ]
+        log = [flavor, f"{E.DAMAGE} You took **{damage}** damage."]
 
         dead = new_hp <= 0
 

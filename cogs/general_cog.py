@@ -28,7 +28,9 @@ class GeneralCog(commands.Cog):
             latency_ms = round(self.bot.latency * 1000)
 
             embed = discord.Embed(
-                title="🏓 Pong!", description=f"Latency: **{latency_ms}ms**", color=discord.Color.blue()
+                title="🏓 Pong!",
+                description=f"Latency: **{latency_ms}ms**",
+                color=discord.Color.blue(),
             )
 
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -36,7 +38,9 @@ class GeneralCog(commands.Cog):
 
         except Exception as e:
             logger.error(f"Ping command failed: {e}")
-            await interaction.response.send_message("Error calculating latency.", ephemeral=True)
+            await interaction.response.send_message(
+                "Error calculating latency.", ephemeral=True
+            )
 
 
 async def setup(bot: commands.Bot):

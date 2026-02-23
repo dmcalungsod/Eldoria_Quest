@@ -58,7 +58,15 @@ class MockDatabaseManager:
     def get_active_world_event(self):
         return None
 
-    def update_adventure_session(self, discord_id, logs, loot_collected, active, active_monster_json, previous_version):
+    def update_adventure_session(
+        self,
+        discord_id,
+        logs,
+        loot_collected,
+        active,
+        active_monster_json,
+        previous_version,
+    ):
         if discord_id not in self.sessions:
             return False
 
@@ -103,7 +111,9 @@ class MockDatabaseManager:
         self.players[discord_id]["current_hp"] = hp
         self.players[discord_id]["current_mp"] = mp
 
-    def update_player_vitals_delta(self, discord_id, hp_delta, mp_delta, max_hp, max_mp):
+    def update_player_vitals_delta(
+        self, discord_id, hp_delta, mp_delta, max_hp, max_mp
+    ):
         self.players[discord_id]["current_hp"] += hp_delta
         self.players[discord_id]["current_mp"] += mp_delta
 
@@ -115,7 +125,8 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
 
         # Patch LOCATIONS to ensure simulate_step proceeds
         self.locations_patcher = patch.dict(
-            adventure_session.LOCATIONS, {"loc_1": {"name": "Test Location", "monsters": []}}
+            adventure_session.LOCATIONS,
+            {"loc_1": {"name": "Test Location", "monsters": []}},
         )
         self.locations_patcher.start()
 
@@ -154,11 +165,15 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
 
         # 1. Thread A reads state
         bundle_a = self.db.get_combat_context_bundle(self.user_id)
-        session_a = AdventureSession(self.db, MagicMock(), MagicMock(), self.user_id, bundle_a["active_session"])
+        session_a = AdventureSession(
+            self.db, MagicMock(), MagicMock(), self.user_id, bundle_a["active_session"]
+        )
 
         # 2. Thread B reads state (SAME state)
         bundle_b = self.db.get_combat_context_bundle(self.user_id)
-        session_b = AdventureSession(self.db, MagicMock(), MagicMock(), self.user_id, bundle_b["active_session"])
+        session_b = AdventureSession(
+            self.db, MagicMock(), MagicMock(), self.user_id, bundle_b["active_session"]
+        )
 
         # Mock side effect to simulate damage
         def side_effect_combat(monster, *args, **kwargs):
@@ -226,7 +241,9 @@ class TestAdventureSessionConcurrency(unittest.TestCase):
         }
 
         bundle = self.db.get_combat_context_bundle(legacy_user_id)
-        session = AdventureSession(self.db, MagicMock(), MagicMock(), legacy_user_id, bundle["active_session"])
+        session = AdventureSession(
+            self.db, MagicMock(), MagicMock(), legacy_user_id, bundle["active_session"]
+        )
 
         # Verify session initialized with default version 1
         self.assertEqual(session.version, 1)

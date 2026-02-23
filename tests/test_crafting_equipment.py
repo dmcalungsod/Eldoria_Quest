@@ -48,11 +48,15 @@ class TestCraftingEquipment(unittest.TestCase):
 
         # Verify DB Calls
         # 1. Aurum deducted
-        self.mock_db.increment_player_fields.assert_called_with(self.discord_id, aurum=-recipe["cost"])
+        self.mock_db.increment_player_fields.assert_called_with(
+            self.discord_id, aurum=-recipe["cost"]
+        )
 
         # 2. Materials removed
         for mat, amount in recipe["materials"].items():
-            self.mock_db.remove_inventory_item.assert_any_call(self.discord_id, mat, amount)
+            self.mock_db.remove_inventory_item.assert_any_call(
+                self.discord_id, mat, amount
+            )
 
         # 3. Item Added
         # Note: add_inventory_item args: discord_id, item_key, item_name, item_type, rarity, amount, slot, item_source_table
@@ -87,7 +91,9 @@ class TestCraftingEquipment(unittest.TestCase):
             # Check Output Key exists in EQUIPMENT_DATA
             output_key = recipe["output_key"]
             self.assertIn(
-                output_key, EQUIPMENT_DATA, f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA."
+                output_key,
+                EQUIPMENT_DATA,
+                f"Output key {output_key} for {recipe_id} not found in EQUIPMENT_DATA.",
             )
 
             # Check Name matches EQUIPMENT_DATA name
@@ -101,7 +107,11 @@ class TestCraftingEquipment(unittest.TestCase):
 
             # Check Materials exist in MATERIALS
             for mat_key, amt in recipe["materials"].items():
-                self.assertIn(mat_key, MATERIALS, f"Material {mat_key} for {recipe_id} not found in MATERIALS.")
+                self.assertIn(
+                    mat_key,
+                    MATERIALS,
+                    f"Material {mat_key} for {recipe_id} not found in MATERIALS.",
+                )
 
 
 if __name__ == "__main__":

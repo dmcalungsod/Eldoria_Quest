@@ -38,7 +38,13 @@ class TestClockworkHalls(unittest.TestCase):
                 self.assertIn("clockwork_heart", drop_keys)
 
     def test_materials_exist(self):
-        new_mats = ["brass_gear", "copper_wire", "spring_coil", "steam_core", "clockwork_heart"]
+        new_mats = [
+            "brass_gear",
+            "copper_wire",
+            "spring_coil",
+            "steam_core",
+            "clockwork_heart",
+        ]
         for mat in new_mats:
             self.assertIn(mat, MATERIALS)
 
@@ -59,7 +65,9 @@ class TestClockworkHalls(unittest.TestCase):
         self.assertTrue(len(AdventureEvents.ATMOSPHERE_CLOCKWORK) > 0)
         self.assertTrue(len(AdventureEvents.REGEN_PHRASES_CLOCKWORK) > 0)
 
-        logs = AdventureEvents.regeneration(location_id="clockwork_halls", hp_percent=0.5)
+        logs = AdventureEvents.regeneration(
+            location_id="clockwork_halls", hp_percent=0.5
+        )
         self.assertTrue(len(logs) > 0)
 
         # Test that we can possibly get a clockwork phrase (mocking random would be better but this is a sanity check)

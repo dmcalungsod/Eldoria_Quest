@@ -18,7 +18,10 @@ class MonsterAI:
         try:
             # 0. Check for Charged Skill (Priority 1)
             if "charged_skill" in monster_data:
-                return {"type": "execute_charge", "skill": monster_data["charged_skill"]}
+                return {
+                    "type": "execute_charge",
+                    "skill": monster_data["charged_skill"],
+                }
 
             skills = monster_data.get("skills", [])
             max_hp = monster_data.get("max_hp", 100)
@@ -37,7 +40,11 @@ class MonsterAI:
                         return {"type": "skill", "skill": chosen}
 
             # 2. Offensive Skill Logic
-            offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0 and not s.get("buff_data")]
+            offensive_skills = [
+                s
+                for s in usable_skills
+                if s.get("heal_power", 0) == 0 and not s.get("buff_data")
+            ]
 
             if offensive_skills:
                 # Base chance to use skill over normal attack
@@ -140,7 +147,9 @@ class MonsterAI:
                 stat = buff["stat"]
                 increase = buff["increase"]
                 monster_data[stat] = max(0, monster_data.get(stat, 0) - increase)
-                expired_msgs.append(f"{monster_data.get('name', 'Monster')}'s {buff['name']} wore off.")
+                expired_msgs.append(
+                    f"{monster_data.get('name', 'Monster')}'s {buff['name']} wore off."
+                )
             else:
                 active_buffs.append(buff)
 

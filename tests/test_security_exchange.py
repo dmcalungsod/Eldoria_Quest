@@ -28,7 +28,9 @@ class TestGuildExchangeSecurity(unittest.TestCase):
         self.mock_collection = MagicMock()
         self.mock_db._col.return_value = self.mock_collection
         self.mock_db.db = MagicMock()  # Mock the db attribute
-        self.mock_db.db.__getitem__.return_value = self.mock_collection  # Mock db['collection']
+        self.mock_db.db.__getitem__.return_value = (
+            self.mock_collection
+        )  # Mock db['collection']
 
         # Patch DatabaseManager to avoid actual init
         with patch("database.database_manager.MongoClient"):
@@ -57,7 +59,8 @@ class TestGuildExchangeSecurity(unittest.TestCase):
 
         # Mock MATERIALS data
         with patch(
-            "game_systems.guild_system.guild_exchange.MATERIALS", {"iron_ore": {"value": 10}, "gold_ore": {"value": 50}}
+            "game_systems.guild_system.guild_exchange.MATERIALS",
+            {"iron_ore": {"value": 10}, "gold_ore": {"value": 50}},
         ):
             # Set db on exchange object (it's set in init but let's be sure)
             self.exchange.db = self.mock_db
@@ -68,21 +71,31 @@ class TestGuildExchangeSecurity(unittest.TestCase):
             # Only item1 should contribute to value: 5 * 10 = 50
             # item2 (2 * 50 = 100) should NOT contribute because find_one_and_delete returned None
             self.assertEqual(
-                total_value, 50, f"Expected 50 but got {total_value}. This confirms race condition fix is needed."
+                total_value,
+                50,
+                f"Expected 50 but got {total_value}. This confirms race condition fix is needed.",
             )
             self.assertEqual(len(items), 1)
             self.assertEqual(items[0]["id"], 1)
 
             # Verify DB calls
             # 1. find called to get IDs
-            self.mock_collection.find.assert_called_with({"discord_id": discord_id, "item_type": "material"})
+            self.mock_collection.find.assert_called_with(
+                {"discord_id": discord_id, "item_type": "material"}
+            )
 
             # 2. find_one_and_delete called for each item
-            self.mock_collection.find_one_and_delete.assert_any_call({"id": 1, "discord_id": discord_id})
-            self.mock_collection.find_one_and_delete.assert_any_call({"id": 2, "discord_id": discord_id})
+            self.mock_collection.find_one_and_delete.assert_any_call(
+                {"id": 1, "discord_id": discord_id}
+            )
+            self.mock_collection.find_one_and_delete.assert_any_call(
+                {"id": 2, "discord_id": discord_id}
+            )
 
             # 3. increment_player_fields called with correct amount
-            self.mock_db.increment_player_fields.assert_called_with(discord_id, aurum=50)
+            self.mock_db.increment_player_fields.assert_called_with(
+                discord_id, aurum=50
+            )
 
 
 if __name__ == "__main__":

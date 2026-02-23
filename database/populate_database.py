@@ -27,7 +27,14 @@ DEFAULT_MONGO_URI = "mongodb://localhost:27017"
 DEFAULT_DB_NAME = "eldoria_quest"
 
 try:
-    from game_systems.data import consumables, materials, monsters, quest_data, quest_items, skills_data
+    from game_systems.data import (
+        consumables,
+        materials,
+        monsters,
+        quest_data,
+        quest_items,
+        skills_data,
+    )
     from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
     from game_systems.data.class_equipments import CLASS_EQUIPMENTS
     from game_systems.data.equipments import EQUIPMENT_DATA

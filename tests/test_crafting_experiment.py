@@ -14,7 +14,9 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
 # Add repo root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # noqa: E402
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)  # noqa: E402
 
 from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
 
@@ -33,7 +35,12 @@ class TestCraftingExperiment(unittest.TestCase):
         self.mock_db.get_inventory_item.side_effect = [
             {"item_key": "slime_gel", "item_type": "material", "id": 1, "count": 5},
             {"item_key": "fire_essence", "item_type": "material", "id": 2, "count": 2},
-            {"item_key": "obsidian_shard", "item_type": "material", "id": 3, "count": 10},
+            {
+                "item_key": "obsidian_shard",
+                "item_type": "material",
+                "id": 3,
+                "count": 10,
+            },
         ]
 
         # Mock Consume Success
@@ -89,7 +96,9 @@ class TestCraftingExperiment(unittest.TestCase):
     def test_experiment_invalid_type(self):
         """Test using equipment."""
         self.mock_db.get_inventory_item.return_value = {
-            "item_key": "sword", "item_type": "equipment", "id": 99
+            "item_key": "sword",
+            "item_type": "equipment",
+            "id": 99,
         }
 
         success, msg, result = self.system.experiment(self.discord_id, [99])
@@ -97,5 +106,6 @@ class TestCraftingExperiment(unittest.TestCase):
         self.assertFalse(success)
         self.assertIn("Only materials", msg)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

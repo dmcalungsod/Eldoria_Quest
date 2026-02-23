@@ -102,7 +102,10 @@ STAT_BUDGETS = {
     # -- Armor --
     "heavy_armor": {"END": 0.8, "STR": 0.2},
     "medium_armor": {"END": 0.5, "AGI": 0.5},
-    "rogue_armor": {"AGI": 0.6, "END": 0.4},  # <--- ADDED: Rogue Armor budget (High Agility)
+    "rogue_armor": {
+        "AGI": 0.6,
+        "END": 0.4,
+    },  # <--- ADDED: Rogue Armor budget (High Agility)
     "robe": {"END": 0.5, "MAG": 0.5},
     "vestments": {"END": 0.6, "MAG": 0.4},
     # -- Helmets --
@@ -180,7 +183,9 @@ for class_name in CLASSES:
             for stat, percentage in budget.items():
                 if stat == "MP_MULT":
                     # Special case: Add flat MP based on a multiplier of the budget
-                    stats_bonus["MP"] = ceil(total_stat_budget * percentage * 3)  # 3 is an arbitrary value, feels good
+                    stats_bonus["MP"] = ceil(
+                        total_stat_budget * percentage * 3
+                    )  # 3 is an arbitrary value, feels good
                 else:
                     # Normal stat
                     stats_bonus[stat] = ceil(total_stat_budget * percentage)

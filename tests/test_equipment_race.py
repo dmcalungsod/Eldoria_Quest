@@ -55,7 +55,11 @@ class MockDatabaseManager:
         time.sleep(0.1)
 
         for item in self.inventory.values():
-            if item["discord_id"] == discord_id and item.get("slot") == slot and item.get("equipped") == 1:
+            if (
+                item["discord_id"] == discord_id
+                and item.get("slot") == slot
+                and item.get("equipped") == 1
+            ):
                 return item
         return None
 
@@ -99,7 +103,9 @@ class MockDatabaseManager:
 
     def get_equipped_items(self, discord_id):
         return [
-            item for item in self.inventory.values() if item["discord_id"] == discord_id and item.get("equipped") == 1
+            item
+            for item in self.inventory.values()
+            if item["discord_id"] == discord_id and item.get("equipped") == 1
         ]
 
     def update_player_stats(self, *args):
@@ -175,7 +181,9 @@ class TestEquipmentRaceMock(unittest.IsolatedAsyncioTestCase):
         equipped_count = sum(1 for i in db.inventory.values() if i["equipped"] == 1)
 
         # Verify Fix: Only one item should be equipped
-        self.assertEqual(equipped_count, 1, "Race condition persists! (expected 1 item equipped)")
+        self.assertEqual(
+            equipped_count, 1, "Race condition persists! (expected 1 item equipped)"
+        )
 
         # Verify result: One success, one failure
         results = [fut1.result(), fut2.result()]

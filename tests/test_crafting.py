@@ -35,7 +35,9 @@ class TestDatabaseEnhancements(unittest.TestCase):
 
         self.mock_db.__getitem__.side_effect = get_collection
 
-        patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
+        patcher = patch(
+            "database.database_manager.MongoClient", return_value=self.mock_client
+        )
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -55,7 +57,10 @@ class TestDatabaseEnhancements(unittest.TestCase):
         self.mock_db.inventory.aggregate.return_value = [{"total": 10}]
 
         # Mock stacks: 2 stacks of 5
-        self.mock_db.inventory.find.return_value.sort.return_value = [{"id": 1, "count": 5}, {"id": 2, "count": 5}]
+        self.mock_db.inventory.find.return_value.sort.return_value = [
+            {"id": 1, "count": 5},
+            {"id": 2, "count": 5},
+        ]
 
         # Remove 7
         success = self.db.remove_inventory_item(12345, "herb", 7)
@@ -64,7 +69,9 @@ class TestDatabaseEnhancements(unittest.TestCase):
         # Should delete first stack (5 consumed)
         self.mock_db.inventory.delete_one.assert_called_with({"id": 1})
         # Should update second stack (2 consumed, 3 remaining)
-        self.mock_db.inventory.update_one.assert_called_with({"id": 2}, {"$inc": {"count": -2}})
+        self.mock_db.inventory.update_one.assert_called_with(
+            {"id": 2}, {"$inc": {"count": -2}}
+        )
 
     def test_remove_inventory_item_fail_insufficient(self):
         self.mock_db.inventory.aggregate.return_value = [{"total": 5}]

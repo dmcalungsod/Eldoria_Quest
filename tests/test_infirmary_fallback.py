@@ -21,7 +21,15 @@ class MockView:
 
 
 class MockButton:
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        custom_id=None,
+        emoji=None,
+        row=None,
+        disabled=False,
+    ):
         self.callback = None
         self.label = label
 
@@ -72,7 +80,9 @@ class TestInfirmaryFallbackExploit(unittest.TestCase):
         # Initial stats: Max HP 100
         self.stale_stats = self.PlayerStats(str_base=1, end_base=5)
         # Check max_hp
-        assert self.stale_stats.max_hp == 100, f"Setup error: Expected 100 HP, got {self.stale_stats.max_hp}"
+        assert (
+            self.stale_stats.max_hp == 100
+        ), f"Setup error: Expected 100 HP, got {self.stale_stats.max_hp}"
 
     def tearDown(self):
         self.modules_patcher.stop()
@@ -88,7 +98,9 @@ class TestInfirmaryFallbackExploit(unittest.TestCase):
         """
 
         # 1. Create View with stale stats
-        view = self.InfirmaryView(self.mock_db, self.user, self.initial_p_data, self.stale_stats)
+        view = self.InfirmaryView(
+            self.mock_db, self.user, self.initial_p_data, self.stale_stats
+        )
 
         # 2. Simulate DB failure for stats
         self.mock_db.get_player_stats_json.return_value = None

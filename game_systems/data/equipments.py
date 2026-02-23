@@ -80,10 +80,19 @@ def load_and_validate_equipments():
 
     for key, item in data.items():
         # 1. Check required keys
-        required_keys = {"name", "slot", "rarity", "level_req", "stats_bonus", "description"}
+        required_keys = {
+            "name",
+            "slot",
+            "rarity",
+            "level_req",
+            "stats_bonus",
+            "description",
+        }
         missing_keys = required_keys - item.keys()
         if missing_keys:
-            logger.warning(f"Item '{key}' missing required keys: {missing_keys}. Skipping.")
+            logger.warning(
+                f"Item '{key}' missing required keys: {missing_keys}. Skipping."
+            )
             continue
 
         # 2. Check types
@@ -91,10 +100,14 @@ def load_and_validate_equipments():
             logger.warning(f"Item '{key}': 'name' must be a string. Skipping.")
             continue
         if not isinstance(item["level_req"], int) or item["level_req"] < 1:
-            logger.warning(f"Item '{key}': 'level_req' must be a positive integer. Skipping.")
+            logger.warning(
+                f"Item '{key}': 'level_req' must be a positive integer. Skipping."
+            )
             continue
         if not isinstance(item["stats_bonus"], dict):
-            logger.warning(f"Item '{key}': 'stats_bonus' must be a dictionary. Skipping.")
+            logger.warning(
+                f"Item '{key}': 'stats_bonus' must be a dictionary. Skipping."
+            )
             continue
         if not isinstance(item["description"], str):
             logger.warning(f"Item '{key}': 'description' must be a string. Skipping.")
@@ -102,7 +115,9 @@ def load_and_validate_equipments():
 
         # 3. Check allowed values (Enums)
         if item["rarity"] not in VALID_RARITIES:
-            logger.warning(f"Item '{key}': Invalid rarity '{item['rarity']}'. Valid: {VALID_RARITIES}. Skipping.")
+            logger.warning(
+                f"Item '{key}': Invalid rarity '{item['rarity']}'. Valid: {VALID_RARITIES}. Skipping."
+            )
             continue
 
         if item["slot"] not in VALID_SLOTS:

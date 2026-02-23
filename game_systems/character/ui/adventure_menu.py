@@ -70,7 +70,9 @@ class AdventureView(View):
         Restricts interaction to the original user.
         """
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your session.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your session.", ephemeral=True
+            )
             return False
         return True
 
@@ -88,12 +90,15 @@ class AdventureView(View):
 
         if not adventure_cog:
             await interaction.response.send_message(
-                f"{E.ERROR} The adventure system is currently unavailable.", ephemeral=True
+                f"{E.ERROR} The adventure system is currently unavailable.",
+                ephemeral=True,
             )
             return
 
         # Check if an adventure is already active (threaded)
-        session = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
+        session = await asyncio.to_thread(
+            adventure_cog.manager.get_active_session, self.interaction_user.id
+        )
 
         # --------------------------------------------------------
         # Resume existing adventure
@@ -119,14 +124,24 @@ class AdventureView(View):
 
             # Fetch stats and vitals
             try:
-                stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+                stats_json = await asyncio.to_thread(
+                    self.db.get_player_stats_json, self.interaction_user.id
+                )
                 stats = PlayerStats.from_dict(stats_json)
-                vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
-                player_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-                skills = await asyncio.to_thread(self.db.get_combat_skills, self.interaction_user.id)
+                vitals = await asyncio.to_thread(
+                    self.db.get_player_vitals, self.interaction_user.id
+                )
+                player_data = await asyncio.to_thread(
+                    self.db.get_player, self.interaction_user.id
+                )
+                skills = await asyncio.to_thread(
+                    self.db.get_combat_skills, self.interaction_user.id
+                )
                 class_id = player_data["class_id"] if player_data else 1
 
-                embed = AdventureEmbeds.build_exploration_embed(loc_id, logs, stats, vitals, active_monster)
+                embed = AdventureEmbeds.build_exploration_embed(
+                    loc_id, logs, stats, vitals, active_monster
+                )
 
                 view = ExplorationView(
                     self.db,
@@ -144,7 +159,9 @@ class AdventureView(View):
                 await interaction.edit_original_response(embed=embed, view=view)
             except Exception as e:
                 logger.error(f"Resume adventure failed: {e}", exc_info=True)
-                await interaction.followup.send("Error resuming session.", ephemeral=True)
+                await interaction.followup.send(
+                    "Error resuming session.", ephemeral=True
+                )
             return
 
         # --------------------------------------------------------
@@ -155,7 +172,9 @@ class AdventureView(View):
         try:
             # Parallel fetch of guild rank and player level
             guild_member, player_data = await asyncio.gather(
-                asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
+                asyncio.to_thread(
+                    self.db.get_guild_member_data, self.interaction_user.id
+                ),
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
             )
             rank = guild_member["rank"] if guild_member else "F"
@@ -170,13 +189,17 @@ class AdventureView(View):
                 color=discord.Color.dark_green(),
             )
 
-            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank, level)
+            view = AdventureSetupView(
+                self.db, adventure_cog.manager, self.interaction_user, rank, level
+            )
             view.back_btn.callback = back_to_profile_callback
 
             await interaction.edit_original_response(embed=embed, view=view)
         except Exception as e:
             logger.error(f"Start adventure menu failed: {e}", exc_info=True)
-            await interaction.followup.send("Error loading destinations.", ephemeral=True)
+            await interaction.followup.send(
+                "Error loading destinations.", ephemeral=True
+            )
 
     # ------------------------------------------------------------
 

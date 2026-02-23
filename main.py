@@ -36,8 +36,12 @@ logger = logging.getLogger("eldoria")
 logger.setLevel(logging.INFO)
 
 # File Handler
-file_handler = logging.FileHandler(filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+file_handler = logging.FileHandler(
+    filename=os.path.join(logs_dir, "eldoria.log"), encoding="utf-8", mode="w"
+)
+file_handler.setFormatter(
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+)
 logger.addHandler(file_handler)
 
 # Console Handler
@@ -88,7 +92,10 @@ class EldoriaBot(commands.Bot):
         intents.message_content = True  # Required for reading commands
 
         super().__init__(
-            command_prefix="!", intents=intents, activity=discord.Game(name="Eldoria | /start"), help_command=None
+            command_prefix="!",
+            intents=intents,
+            activity=discord.Game(name="Eldoria | /start"),
+            help_command=None,
         )
 
     async def setup_hook(self):
@@ -105,7 +112,11 @@ class EldoriaBot(commands.Bot):
 
         # Dynamic Cog Loading
         for filename in os.listdir(cogs_dir):
-            if filename.endswith(".py") and not filename.startswith("_") and filename != "ui_helpers.py":
+            if (
+                filename.endswith(".py")
+                and not filename.startswith("_")
+                and filename != "ui_helpers.py"
+            ):
                 cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)

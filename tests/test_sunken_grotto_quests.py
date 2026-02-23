@@ -10,7 +10,9 @@ from game_systems.data.monsters import MONSTERS
 class TestSunkenGrottoQuests(unittest.TestCase):
     def setUp(self):
         # Load quests.json
-        quests_path = os.path.join(os.path.dirname(__file__), "../game_systems/data/quests.json")
+        quests_path = os.path.join(
+            os.path.dirname(__file__), "../game_systems/data/quests.json"
+        )
         with open(quests_path, encoding="utf-8") as f:
             self.quests = json.load(f)
 
@@ -27,7 +29,9 @@ class TestSunkenGrottoQuests(unittest.TestCase):
     def test_new_quests_exist(self):
         """Verify that Quests 56-60 exist."""
         for q_id in range(56, 61):
-            self.assertIn(q_id, self.quest_map, f"Quest ID {q_id} missing from quests.json")
+            self.assertIn(
+                q_id, self.quest_map, f"Quest ID {q_id} missing from quests.json"
+            )
 
     def test_quest_details(self):
         """Verify details for Sunken Grotto quests."""
@@ -87,14 +91,18 @@ class TestSunkenGrottoQuests(unittest.TestCase):
 
             # Verify Target Name Validity
             self.assertIn(
-                details["target"], self.valid_monster_names, f"Monster {details['target']} not defined in MONSTERS"
+                details["target"],
+                self.valid_monster_names,
+                f"Monster {details['target']} not defined in MONSTERS",
             )
 
             # Verify Reward Item Validity (if present)
             if "item" in quest["rewards"]:
                 item_name = quest["rewards"]["item"]
                 self.assertIn(
-                    item_name, self.valid_item_names, f"Reward item {item_name} not found in CONSUMABLES or MATERIALS"
+                    item_name,
+                    self.valid_item_names,
+                    f"Reward item {item_name} not found in CONSUMABLES or MATERIALS",
                 )
 
 

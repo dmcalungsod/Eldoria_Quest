@@ -71,7 +71,9 @@ def create_tables(db=None):
     db["quests"].create_index("tier")
 
     # --- player_quests ---
-    db["player_quests"].create_index([("discord_id", ASCENDING), ("quest_id", ASCENDING)])
+    db["player_quests"].create_index(
+        [("discord_id", ASCENDING), ("quest_id", ASCENDING)]
+    )
     db["player_quests"].create_index("discord_id")
 
     # --- materials ---
@@ -82,7 +84,12 @@ def create_tables(db=None):
     db["inventory"].create_index("id", unique=True)
     db["inventory"].create_index("discord_id")
     db["inventory"].create_index(
-        [("discord_id", ASCENDING), ("item_key", ASCENDING), ("rarity", ASCENDING), ("equipped", ASCENDING)]
+        [
+            ("discord_id", ASCENDING),
+            ("item_key", ASCENDING),
+            ("rarity", ASCENDING),
+            ("equipped", ASCENDING),
+        ]
     )
     db["inventory"].create_index(
         [("discord_id", ASCENDING), ("slot", ASCENDING)],
@@ -92,14 +99,18 @@ def create_tables(db=None):
 
     # --- adventure_sessions ---
     db["adventure_sessions"].create_index("discord_id", unique=True)
-    db["adventure_sessions"].create_index([("discord_id", ASCENDING), ("active", ASCENDING)])
+    db["adventure_sessions"].create_index(
+        [("discord_id", ASCENDING), ("active", ASCENDING)]
+    )
 
     # --- skills ---
     db["skills"].create_index("id", unique=True)
     db["skills"].create_index("key_id", unique=True)
 
     # --- player_skills ---
-    db["player_skills"].create_index([("discord_id", ASCENDING), ("skill_key", ASCENDING)], unique=True)
+    db["player_skills"].create_index(
+        [("discord_id", ASCENDING), ("skill_key", ASCENDING)], unique=True
+    )
     db["player_skills"].create_index("discord_id")
 
     # --- global_boosts ---
@@ -108,7 +119,9 @@ def create_tables(db=None):
 
     # --- active_buffs ---
     db["active_buffs"].create_index("discord_id")
-    db["active_buffs"].create_index([("discord_id", ASCENDING), ("end_time", ASCENDING)])
+    db["active_buffs"].create_index(
+        [("discord_id", ASCENDING), ("end_time", ASCENDING)]
+    )
 
     # --- classes ---
     db["classes"].create_index("id", unique=True)
@@ -125,7 +138,9 @@ def create_tables(db=None):
     db["tournaments"].create_index("end_time")
 
     # --- tournament_scores ---
-    db["tournament_scores"].create_index([("discord_id", ASCENDING), ("tournament_id", ASCENDING)], unique=True)
+    db["tournament_scores"].create_index(
+        [("discord_id", ASCENDING), ("tournament_id", ASCENDING)], unique=True
+    )
     db["tournament_scores"].create_index([("tournament_id", ASCENDING), ("score", -1)])
 
     logger.info("MongoDB collections and indexes verified/created.")

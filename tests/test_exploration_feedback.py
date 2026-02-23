@@ -21,15 +21,20 @@ mock_discord.Color.dark_red.return_value = "dark_red"
 mock_discord.Color.dark_green.return_value = "dark_green"
 mock_discord.Color.dark_grey.return_value = "dark_grey"
 
+
 class MockSelectOption:
-    def __init__(self, label=None, value=None, description=None, emoji=None, default=False):
+    def __init__(
+        self, label=None, value=None, description=None, emoji=None, default=False
+    ):
         self.label = label
         self.value = value
         self.description = description
         self.emoji = emoji
         self.default = default
 
+
 mock_discord.SelectOption = MockSelectOption
+
 
 # Mock Discord UI
 class MockView:
@@ -43,6 +48,7 @@ class MockView:
     def clear_items(self):
         self.children.clear()
 
+
 class MockButton:
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None):
         self.label = label
@@ -53,8 +59,17 @@ class MockButton:
         self.callback = None
         self.disabled = False
 
+
 class MockSelect:
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+    def __init__(
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        row=None,
+        custom_id=None,
+    ):
         self.placeholder = placeholder
         self.min_values = min_values
         self.max_values = max_values
@@ -64,6 +79,7 @@ class MockSelect:
         self.callback = None
         self.disabled = False
         self.values = []
+
 
 mock_ui = MagicMock()
 mock_ui.View = MockView
@@ -105,21 +121,27 @@ mock_ui.Item = object
 # from game_systems.adventure.ui.exploration_view import ExplorationView
 # from game_systems.player.player_stats import PlayerStats
 
+
 class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         # Patch sys.modules contextually
-        self.modules_patcher = patch.dict(sys.modules, {
-            "discord": mock_discord,
-            "discord.ui": mock_ui,
-            "pymongo": MagicMock(),
-            "pymongo.errors": MagicMock(),
-            "cogs.ui_helpers": MagicMock(),
-            "game_systems.adventure.ui.adventure_embeds": MagicMock()
-        })
+        self.modules_patcher = patch.dict(
+            sys.modules,
+            {
+                "discord": mock_discord,
+                "discord.ui": mock_ui,
+                "pymongo": MagicMock(),
+                "pymongo.errors": MagicMock(),
+                "cogs.ui_helpers": MagicMock(),
+                "game_systems.adventure.ui.adventure_embeds": MagicMock(),
+            },
+        )
         self.modules_patcher.start()
 
         # Setup mocks for AdventureEmbeds return value
-        sys.modules["game_systems.adventure.ui.adventure_embeds"].AdventureEmbeds.build_exploration_embed.return_value = MagicMock()
+        sys.modules[
+            "game_systems.adventure.ui.adventure_embeds"
+        ].AdventureEmbeds.build_exploration_embed.return_value = MagicMock()
 
         # Import modules under test INSIDE the patched context
         import game_systems.adventure.ui.exploration_view
@@ -127,9 +149,12 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
 
         # Reload to ensure they use our fresh mocks
         import importlib
+
         importlib.reload(game_systems.adventure.ui.exploration_view)
 
-        self.ExplorationView = game_systems.adventure.ui.exploration_view.ExplorationView
+        self.ExplorationView = (
+            game_systems.adventure.ui.exploration_view.ExplorationView
+        )
         self.PlayerStats = game_systems.player.player_stats.PlayerStats
 
         self.mock_db = MagicMock()
@@ -150,7 +175,7 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
             "dead": False,
             "vitals": {"current_hp": 100, "current_mp": 100},
             "player_stats": self.stats,
-            "active_monster": None
+            "active_monster": None,
         }
 
         active_monster = {"name": "Goblin", "hp": 50}
@@ -163,7 +188,7 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
             self.stats,
             vitals={"current_hp": 100, "current_mp": 100},
             active_monster=active_monster,
-            class_id=1
+            class_id=1,
         )
 
         interaction = MagicMock()
@@ -188,7 +213,9 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
 
         # Assert that 'embed' was passed and contains the new footer
         # Currently expected to fail
-        self.assertIn('embed', kwargs, "Embed should be updated in the first response edit")
+        self.assertIn(
+            "embed", kwargs, "Embed should be updated in the first response edit"
+        )
 
         mock_embed.set_footer.assert_called_with(text="⚔️ Resolving combat...")
 
@@ -199,7 +226,7 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
             "dead": False,
             "vitals": {"current_hp": 100, "current_mp": 100},
             "player_stats": self.stats,
-            "active_monster": None
+            "active_monster": None,
         }
 
         view = self.ExplorationView(
@@ -211,7 +238,7 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
             self.stats,
             vitals={"current_hp": 100, "current_mp": 100},
             active_monster=None,
-            class_id=1
+            class_id=1,
         )
 
         interaction = MagicMock()
@@ -230,6 +257,6 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
         first_call = interaction.edit_original_response.await_args_list[0]
         kwargs = first_call.kwargs
         # Currently expected to fail
-        self.assertIn('embed', kwargs)
+        self.assertIn("embed", kwargs)
 
         mock_embed.set_footer.assert_called_with(text="🥾 Exploring...")

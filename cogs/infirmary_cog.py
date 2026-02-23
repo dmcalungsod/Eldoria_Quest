@@ -30,7 +30,9 @@ def infirmary_cost(missing_hp: int, missing_mp: int) -> int:
 
 
 class InfirmaryView(View):
-    def __init__(self, db: DatabaseManager, user: discord.User, p_data, stats: PlayerStats):
+    def __init__(
+        self, db: DatabaseManager, user: discord.User, p_data, stats: PlayerStats
+    ):
         super().__init__(timeout=180)
         self.db = db
         self.user = user
@@ -46,19 +48,35 @@ class InfirmaryView(View):
         # Heal Button
         disabled = self.missing_hp <= 0 and self.missing_mp <= 0
         label = f"Heal ({self.cost} G)" if not disabled else "Fully Restored"
-        style = discord.ButtonStyle.primary if not disabled else discord.ButtonStyle.secondary
+        style = (
+            discord.ButtonStyle.primary
+            if not disabled
+            else discord.ButtonStyle.secondary
+        )
 
         # Disable if broke
         if self.p_data["aurum"] < self.cost:
             disabled = True
             label = "Insufficient Funds"
 
-        self.heal_btn = Button(label=label, style=style, custom_id="heal_btn", emoji="❤️", row=0, disabled=disabled)
+        self.heal_btn = Button(
+            label=label,
+            style=style,
+            custom_id="heal_btn",
+            emoji="❤️",
+            row=0,
+            disabled=disabled,
+        )
         self.heal_btn.callback = self.heal_callback
         self.add_item(self.heal_btn)
 
         # Back Button
-        self.back_button = Button(label="Return to Hall", style=discord.ButtonStyle.grey, custom_id="back", row=1)
+        self.back_button = Button(
+            label="Return to Hall",
+            style=discord.ButtonStyle.grey,
+            custom_id="back",
+            row=1,
+        )
         self.back_button.callback = back_to_guild_hall_callback
         self.add_item(self.back_button)
 
@@ -152,7 +170,9 @@ class InfirmaryView(View):
             description += "You stand in peak condition; no treatment is required."
 
         embed = discord.Embed(
-            title="🏥 Adventurer's Guild — Infirmary", description=description, color=discord.Color.dark_grey()
+            title="🏥 Adventurer's Guild — Infirmary",
+            description=description,
+            color=discord.Color.dark_grey(),
         )
 
         if msg:

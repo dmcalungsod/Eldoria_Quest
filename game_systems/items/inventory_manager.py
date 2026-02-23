@@ -37,22 +37,35 @@ class InventoryManager:
         Uses DatabaseManager methods for stack merging or insertion.
         """
         if amount <= 0:
-            logger.warning(f"Attempted to add invalid amount {amount} of {item_key} for {discord_id}")
+            logger.warning(
+                f"Attempted to add invalid amount {amount} of {item_key} for {discord_id}"
+            )
             return False
 
         try:
             success = self.db.add_inventory_item(
-                discord_id, item_key, item_name, item_type, rarity, amount, slot, item_source_table
+                discord_id,
+                item_key,
+                item_name,
+                item_type,
+                rarity,
+                amount,
+                slot,
+                item_source_table,
             )
             if success:
                 logger.info(f"Added {amount}x {item_key} for user {discord_id}")
                 return True
             else:
-                logger.warning(f"Inventory full for {discord_id}, could not add {item_key}")
+                logger.warning(
+                    f"Inventory full for {discord_id}, could not add {item_key}"
+                )
                 return False
 
         except Exception as e:
-            logger.error(f"Failed to add item {item_key} for {discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Failed to add item {item_key} for {discord_id}: {e}", exc_info=True
+            )
             return False
 
     def add_items_bulk(self, discord_id: int, items: list[dict]) -> list[dict]:
@@ -77,7 +90,9 @@ class InventoryManager:
         try:
             return self.db.remove_inventory_item(discord_id, item_key, amount)
         except Exception as e:
-            logger.error(f"Failed to remove item {item_key} for {discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Failed to remove item {item_key} for {discord_id}: {e}", exc_info=True
+            )
             return False
 
     def get_inventory(self, discord_id: int) -> list[dict[str, Any]]:
@@ -85,5 +100,7 @@ class InventoryManager:
         try:
             return self.db.get_inventory_items(discord_id)
         except Exception as e:
-            logger.error(f"Failed to fetch inventory for {discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Failed to fetch inventory for {discord_id}: {e}", exc_info=True
+            )
             return []

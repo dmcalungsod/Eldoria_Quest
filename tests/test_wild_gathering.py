@@ -57,7 +57,10 @@ class TestWildGathering(unittest.TestCase):
         # Mock MATERIALS to include test_herb
         with (
             patch("game_systems.adventure.event_handler.LOCATIONS", mock_locations),
-            patch.dict("game_systems.adventure.event_handler.MATERIALS", {"test_herb": {"name": "Test Herb"}}),
+            patch.dict(
+                "game_systems.adventure.event_handler.MATERIALS",
+                {"test_herb": {"name": "Test Herb"}},
+            ),
         ):
             # Mock randoms
             # randint(1, 100) -> 80 (skip regen)
@@ -105,7 +108,9 @@ class TestWildGathering(unittest.TestCase):
         """Test that AdventureSession passes location_id correctly."""
         from unittest.mock import ANY
 
-        session = AdventureSession(self.db, self.quest_system, self.inventory_manager, self.discord_id)
+        session = AdventureSession(
+            self.db, self.quest_system, self.inventory_manager, self.discord_id
+        )
         session.events = MagicMock()
         session.events.resolve_non_combat.return_value = {"log": [], "dead": False}
 
@@ -115,7 +120,10 @@ class TestWildGathering(unittest.TestCase):
         session.location_id = "test_forest"
 
         # Mock LOCATIONS
-        with patch("game_systems.adventure.adventure_session.LOCATIONS", {"test_forest": {"name": "Forest"}}):
+        with patch(
+            "game_systems.adventure.adventure_session.LOCATIONS",
+            {"test_forest": {"name": "Forest"}},
+        ):
             # Force non-combat
             with patch("random.randint", return_value=10):
                 session.simulate_step()

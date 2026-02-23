@@ -41,7 +41,15 @@ _Item = object
 class _Button(_Item):
     """Minimal stand-in for discord.ui.Button."""
 
-    def __init__(self, label=None, style=None, emoji=None, row=None, custom_id=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        emoji=None,
+        row=None,
+        custom_id=None,
+        disabled=False,
+    ):
         self.label = label
         self.style = style
         self.emoji = emoji
@@ -57,7 +65,15 @@ class _Button(_Item):
 class _Select(_Item):
     """Minimal stand-in for discord.ui.Select."""
 
-    def __init__(self, placeholder=None, min_values=1, max_values=1, options=None, row=None, custom_id=None):
+    def __init__(
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        row=None,
+        custom_id=None,
+    ):
         self.placeholder = placeholder
         self.min_values = min_values
         self.max_values = max_values
@@ -104,13 +120,17 @@ def _patch_duplicate_key_error():
         if mod is None:
             continue
         target = mod if key == "pymongo.errors" else getattr(mod, "errors", None)
-        if target is not None and not _is_real_exc(getattr(target, "DuplicateKeyError", None)):
+        if target is not None and not _is_real_exc(
+            getattr(target, "DuplicateKeyError", None)
+        ):
             target.DuplicateKeyError = _DuplicateKeyError
 
     # 2. Patch the locally-bound reference inside production modules.
     for mod_name in ("database.database_manager",):
         mod = sys.modules.get(mod_name)
-        if mod is not None and not _is_real_exc(getattr(mod, "DuplicateKeyError", None)):
+        if mod is not None and not _is_real_exc(
+            getattr(mod, "DuplicateKeyError", None)
+        ):
             mod.DuplicateKeyError = _DuplicateKeyError
 
     # 3. Patch equipment_manager's pymongo reference.
@@ -119,7 +139,9 @@ def _patch_duplicate_key_error():
         pymongo_ref = getattr(em, "pymongo", None)
         if pymongo_ref is not None:
             errors_ref = getattr(pymongo_ref, "errors", None)
-            if errors_ref is not None and not _is_real_exc(getattr(errors_ref, "DuplicateKeyError", None)):
+            if errors_ref is not None and not _is_real_exc(
+                getattr(errors_ref, "DuplicateKeyError", None)
+            ):
                 errors_ref.DuplicateKeyError = _DuplicateKeyError
 
 
@@ -181,7 +203,9 @@ def _patch_app_commands():
     import asyncio
     import importlib
 
-    for mod_name, class_name, method_name in (("cogs.developer_cog", "DeveloperCog", "dev_panel"),):
+    for mod_name, class_name, method_name in (
+        ("cogs.developer_cog", "DeveloperCog", "dev_panel"),
+    ):
         mod = sys.modules.get(mod_name)
         if mod is None:
             continue

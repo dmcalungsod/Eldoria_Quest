@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 # Add repo root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Mock pymongo before importing modules that use it
 sys.modules["pymongo"] = MagicMock()
@@ -14,6 +14,7 @@ sys.modules["pymongo.results"] = MagicMock()
 
 from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 from game_systems.achievement_system import AchievementSystem  # noqa: E402
+
 
 class TestExplorationAchievements(unittest.TestCase):
     def setUp(self):
@@ -36,7 +37,7 @@ class TestExplorationAchievements(unittest.TestCase):
             "version": 1,
             "loot_collected": "{}",
             "logs": "[]",
-            "active_monster_json": None
+            "active_monster_json": None,
         }
 
         # Mock player stats json
@@ -47,7 +48,7 @@ class TestExplorationAchievements(unittest.TestCase):
             "AGI": {"base": 10},
             "MAG": {"base": 10},
             "LCK": {"base": 10},
-            "DEF": 0
+            "DEF": 0,
         }
         self.mock_db.get_player.return_value = {
             "level": 1,
@@ -56,23 +57,31 @@ class TestExplorationAchievements(unittest.TestCase):
             "current_hp": 100,
             "current_mp": 50,
             "vestige_pool": 0,
-            "aurum": 0
+            "aurum": 0,
         }
 
         self.mock_db.get_player_field.return_value = 1
 
         # Mock AchievementSystem (internal to AdventureManager)
         # We patch where it is IMPORTED
-        with patch('game_systems.adventure.adventure_manager.AchievementSystem') as MockAchievementSystem:
+        with patch(
+            "game_systems.adventure.adventure_manager.AchievementSystem"
+        ) as MockAchievementSystem:
             mock_ach_system_instance = MockAchievementSystem.return_value
-            mock_ach_system_instance.check_exploration_achievements.return_value = "🏆 Title Unlocked: Pathfinder"
+            mock_ach_system_instance.check_exploration_achievements.return_value = (
+                "🏆 Title Unlocked: Pathfinder"
+            )
 
             # Execute
             summary = self.adventure_manager.end_adventure(discord_id)
 
             # Verify
-            self.mock_db.update_exploration_stats.assert_called_with(discord_id, location_id)
-            mock_ach_system_instance.check_exploration_achievements.assert_called_with(discord_id)
+            self.mock_db.update_exploration_stats.assert_called_with(
+                discord_id, location_id
+            )
+            mock_ach_system_instance.check_exploration_achievements.assert_called_with(
+                discord_id
+            )
 
             self.assertIsNotNone(summary)
             self.assertEqual(summary.get("new_titles"), "🏆 Title Unlocked: Pathfinder")
@@ -85,7 +94,7 @@ class TestExplorationAchievements(unittest.TestCase):
         # Case 1: 10 Expeditions (Pathfinder)
         self.mock_db.get_exploration_stats.return_value = {
             "unique_locations": ["loc1"],
-            "total_expeditions": 10
+            "total_expeditions": 10,
         }
         # Simulate add_title returning True (new title)
         self.mock_db.add_title.return_value = True
@@ -98,7 +107,7 @@ class TestExplorationAchievements(unittest.TestCase):
         # Case 2: 5 Locations (Scout)
         self.mock_db.get_exploration_stats.return_value = {
             "unique_locations": ["1", "2", "3", "4", "5"],
-            "total_expeditions": 5
+            "total_expeditions": 5,
         }
         self.mock_db.add_title.reset_mock()
 
@@ -107,5 +116,6 @@ class TestExplorationAchievements(unittest.TestCase):
         self.mock_db.add_title.assert_any_call(discord_id, "Scout")
         self.assertIn("Scout", msg)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

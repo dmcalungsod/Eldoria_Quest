@@ -101,8 +101,12 @@ class DevPanelView(View):
     # --- Actions ---
     def _grant(self, exp=0, aurum=0, vestige=0):
         try:
-            self.db.admin_grant(self.interaction_user.id, exp=exp, aurum=aurum, vestige=vestige)
-            logger.warning(f"ADMIN GRANT: {self.interaction_user.name} gave self {exp}XP, {aurum}G, {vestige}V")
+            self.db.admin_grant(
+                self.interaction_user.id, exp=exp, aurum=aurum, vestige=vestige
+            )
+            logger.warning(
+                f"ADMIN GRANT: {self.interaction_user.name} gave self {exp}XP, {aurum}G, {vestige}V"
+            )
         except Exception as e:
             logger.error(f"Grant failed: {e}")
 
@@ -119,44 +123,66 @@ class DevPanelView(View):
             logger.error(f"Clear boosts failed: {e}")
 
     # --- Buttons Row 0: Grants ---
-    @discord.ui.button(label="Give 10k XP/Vestige", style=discord.ButtonStyle.success, emoji="✨", row=0)
+    @discord.ui.button(
+        label="Give 10k XP/Vestige",
+        style=discord.ButtonStyle.success,
+        emoji="✨",
+        row=0,
+    )
     async def exp_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await asyncio.to_thread(self._grant, exp=10000, vestige=10000)
         await self._refresh_view(interaction)
 
-    @discord.ui.button(label="Give 5k Aurum", style=discord.ButtonStyle.primary, emoji=E.AURUM, row=0)
+    @discord.ui.button(
+        label="Give 5k Aurum", style=discord.ButtonStyle.primary, emoji=E.AURUM, row=0
+    )
     async def aurum_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await asyncio.to_thread(self._grant, aurum=5000)
         await self._refresh_view(interaction)
 
     # --- Buttons Row 1: Boosts ---
-    @discord.ui.button(label="+100% EXP (1h)", style=discord.ButtonStyle.success, emoji="🚀", row=1)
+    @discord.ui.button(
+        label="+100% EXP (1h)", style=discord.ButtonStyle.success, emoji="🚀", row=1
+    )
     async def boost_exp_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await asyncio.to_thread(self._set_boost, "exp_boost", 2.0, 1)
         await self._refresh_view(interaction)
 
-    @discord.ui.button(label="+50% Loot (1h)", style=discord.ButtonStyle.primary, emoji="📦", row=1)
+    @discord.ui.button(
+        label="+50% Loot (1h)", style=discord.ButtonStyle.primary, emoji="📦", row=1
+    )
     async def boost_loot_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await asyncio.to_thread(self._set_boost, "loot_boost", 1.5, 1)
         await self._refresh_view(interaction)
 
     # --- Buttons Row 2: Utility ---
-    @discord.ui.button(label="Full Heal", style=discord.ButtonStyle.danger, emoji="❤️", row=2)
+    @discord.ui.button(
+        label="Full Heal", style=discord.ButtonStyle.danger, emoji="❤️", row=2
+    )
     async def heal_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         try:
-            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+            stats_json = await asyncio.to_thread(
+                self.db.get_player_stats_json, self.interaction_user.id
+            )
             stats = PlayerStats.from_dict(stats_json)
-            await asyncio.to_thread(self.db.set_player_vitals, self.interaction_user.id, stats.max_hp, stats.max_mp)
+            await asyncio.to_thread(
+                self.db.set_player_vitals,
+                self.interaction_user.id,
+                stats.max_hp,
+                stats.max_mp,
+            )
             await self._refresh_view(interaction)
         except Exception as e:
             logger.error(f"Admin heal error: {e}")
 
-    @discord.ui.button(label="Clear Boosts", style=discord.ButtonStyle.secondary, emoji="🚫", row=2)
+    @discord.ui.button(
+        label="Clear Boosts", style=discord.ButtonStyle.secondary, emoji="🚫", row=2
+    )
     async def clear_boost_btn(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await asyncio.to_thread(self._clear_boosts)
@@ -168,12 +194,16 @@ class DeveloperCog(commands.Cog):
         self.bot = bot
         self.db = DatabaseManager()
 
-    @app_commands.command(name="devpanel", description="[Owner Only] Developer Controls")
+    @app_commands.command(
+        name="devpanel", description="[Owner Only] Developer Controls"
+    )
     async def dev_panel(self, interaction: discord.Interaction):
         # SECURITY: Manual check to ensure only the owner can access this panel.
         # This is more robust than relying solely on decorators for app_commands.
         if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("⛔ You are not the bot owner.", ephemeral=True)
+            await interaction.response.send_message(
+                "⛔ You are not the bot owner.", ephemeral=True
+            )
             return
 
         await interaction.response.defer(ephemeral=True)
@@ -195,7 +225,8 @@ class DeveloperCog(commands.Cog):
         logger.error(f"Dev panel error: {error}", exc_info=True)
         if not interaction.response.is_done():
             await interaction.response.send_message(
-                "❌ An error occurred while loading the developer panel.", ephemeral=True
+                "❌ An error occurred while loading the developer panel.",
+                ephemeral=True,
             )
 
 

@@ -22,7 +22,11 @@ logger = logging.getLogger("eldoria.ui")
 
 
 def make_progress_bar(
-    current: int, max_val: int, length: int = 10, empty_char: str = "░", filled_char: str = "█"
+    current: int,
+    max_val: int,
+    length: int = 10,
+    empty_char: str = "░",
+    filled_char: str = "█",
 ) -> str:
     """Generates a visual progress bar string."""
     percent = max(0, min(1, current / max(max_val, 1)))
@@ -44,7 +48,9 @@ def get_health_status_emoji(current: int, max_val: int) -> str:
     return "🔴"
 
 
-def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> discord.Embed:
+def build_inventory_embed(
+    items: list, max_slots: int = MAX_INVENTORY_SLOTS
+) -> discord.Embed:
     """Constructs the inventory display."""
     # Only count unequipped items (backpack slots)
     slot_count = len([i for i in items if not i.get("equipped")])
@@ -81,10 +87,13 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
 
             # Categorize Slot
             cat = "Armor"  # Default
-            if slot_key in EquipmentManager.TWO_HANDED_SLOTS or slot_key in EquipmentManager.MAIN_HAND_SLOTS:
+            if (
+                slot_key in EquipmentManager.TWO_HANDED_SLOTS
+                or slot_key in EquipmentManager.MAIN_HAND_SLOTS
+            ):
                 cat = "Weapon"
             elif slot_key in EquipmentManager.OFF_HAND_SLOTS:
-                 # Shields are armor, others are weapons
+                # Shields are armor, others are weapons
                 if slot_key == "shield":
                     cat = "Armor"
                 else:
@@ -92,7 +101,9 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
             elif slot_key == "accessory":
                 cat = "Accessory"
 
-            equipped_groups[cat].append(get_rarity_ansi(rarity, f"• {name} ({slot_display})"))
+            equipped_groups[cat].append(
+                get_rarity_ansi(rarity, f"• {name} ({slot_display})")
+            )
         else:
             key = (itype, name, rarity)
             unequipped_counts[key] = unequipped_counts.get(key, 0) + item["count"]
@@ -108,7 +119,9 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
         if equipped_groups["Accessory"]:
             val += "**Accessories**\n" + "\n".join(equipped_groups["Accessory"]) + "\n"
 
-        embed.add_field(name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False)
+        embed.add_field(
+            name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False
+        )
 
     # --- INVENTORY SECTION ---
     for (itype, name, rarity), count in sorted(unequipped_counts.items()):
@@ -127,7 +140,9 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
 
 
 async def get_player_or_error(
-    interaction: discord.Interaction, db: DatabaseManager, content: str = "Character record not found."
+    interaction: discord.Interaction,
+    db: DatabaseManager,
+    content: str = "Character record not found.",
 ) -> dict | None:
     """
     Fetches the player record. If not found, sends an ephemeral error message.
@@ -144,7 +159,9 @@ async def get_player_or_error(
 
 
 async def get_profile_bundle_or_error(
-    interaction: discord.Interaction, db: DatabaseManager, content: str = "Character record not found."
+    interaction: discord.Interaction,
+    db: DatabaseManager,
+    content: str = "Character record not found.",
 ) -> dict | None:
     """
     Fetches the profile bundle. If not found, sends an ephemeral error message.
@@ -160,7 +177,9 @@ async def get_profile_bundle_or_error(
     return bundle
 
 
-async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
+async def back_to_profile_callback(
+    interaction: discord.Interaction, is_new_message: bool = False
+):
     """Navigation: Returns to Character Profile."""
     from game_systems.character.ui.profile_view import CharacterTabView
 
@@ -198,7 +217,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
         )
 
         embed = discord.Embed(
-            title=f"{E.SCROLL} Character Status", description=description, color=discord.Color.dark_red()
+            title=f"{E.SCROLL} Character Status",
+            description=description,
+            color=discord.Color.dark_red(),
         )
 
         if interaction.user.avatar:
@@ -242,7 +263,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
     except Exception as e:
         logger.error(f"Profile load error for {discord_id}: {e}", exc_info=True)
         if not interaction.response.is_done():
-            await interaction.response.send_message("Error loading profile.", ephemeral=True)
+            await interaction.response.send_message(
+                "Error loading profile.", ephemeral=True
+            )
 
 
 async def back_to_guild_hall_callback(interaction: discord.Interaction):
@@ -260,7 +283,9 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
 
         card = await asyncio.to_thread(db.get_guild_card_data, interaction.user.id)
         if not card:
-            await interaction.followup.send("You are not a guild member.", ephemeral=True)
+            await interaction.followup.send(
+                "You are not a guild member.", ephemeral=True
+            )
             return
 
         embed = discord.Embed(
@@ -273,9 +298,15 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
             color=discord.Color.dark_gold(),
         )
 
-        embed.add_field(name="📜 Quest Board", value="Review available contracts and report successes.", inline=False)
         embed.add_field(
-            name="⚙️ Guild Services", value="Access the Shop, Exchange, Infirmary, or Training Grounds.", inline=False
+            name="📜 Quest Board",
+            value="Review available contracts and report successes.",
+            inline=False,
+        )
+        embed.add_field(
+            name="⚙️ Guild Services",
+            value="Access the Shop, Exchange, Infirmary, or Training Grounds.",
+            inline=False,
         )
 
         view = GuildLobbyView(db, interaction.user, rank=card["rank"])

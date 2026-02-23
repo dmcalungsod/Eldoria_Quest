@@ -1,4 +1,3 @@
-
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -19,6 +18,7 @@ sys.modules["pymongo.errors"] = mock_pymongo.errors
 from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
 from game_systems.data.consumables import CONSUMABLES  # noqa: E402
 
+
 class TestDualConsumableBug(unittest.TestCase):
     def setUp(self):
         self.mock_db = MagicMock()
@@ -35,7 +35,7 @@ class TestDualConsumableBug(unittest.TestCase):
             "type": "potion",
             "effect": {"heal": 50, "mana": 50},
             "rarity": "Common",
-            "description": "Restores both HP and MP."
+            "description": "Restores both HP and MP.",
         }
 
     def test_use_dual_item_full_hp_missing_mp(self):
@@ -53,12 +53,12 @@ class TestDualConsumableBug(unittest.TestCase):
 
         self.mock_db.get_inventory_item.return_value = {
             "item_key": self.test_item_key,
-            "item_type": "consumable"
+            "item_type": "consumable",
         }
 
         self.mock_db.get_player_vitals.return_value = {
             "current_hp": 100,
-            "current_mp": 0
+            "current_mp": 0,
         }
 
         # Mock PlayerStats to return max values
@@ -67,8 +67,12 @@ class TestDualConsumableBug(unittest.TestCase):
         stats_mock.max_mp = 100
 
         # We need to mock PlayerStats.from_dict
-        with patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats, \
-             patch.dict("game_systems.items.consumable_manager.CONSUMABLES", {self.test_item_key: self.test_item_data}):
+        with patch(
+            "game_systems.items.consumable_manager.PlayerStats"
+        ) as MockPlayerStats, patch.dict(
+            "game_systems.items.consumable_manager.CONSUMABLES",
+            {self.test_item_key: self.test_item_data},
+        ):
 
             MockPlayerStats.from_dict.return_value = stats_mock
 
@@ -80,11 +84,15 @@ class TestDualConsumableBug(unittest.TestCase):
             # Assertions
             # This should BE True if fixed. Currently expected to be False.
             if not success and "already at full health" in message:
-                print("BUG REPRODUCED: Item failed because HP is full, ignoring MP restoration.")
+                print(
+                    "BUG REPRODUCED: Item failed because HP is full, ignoring MP restoration."
+                )
             elif success:
                 print("BUG NOT REPRODUCED: Item worked correctly.")
 
-            self.assertTrue(success, "Item usage should succeed because MP needs restoring.")
+            self.assertTrue(
+                success, "Item usage should succeed because MP needs restoring."
+            )
             self.assertIn("restored", message.lower())
 
     def test_use_dual_item_full_hp_full_mp(self):
@@ -97,20 +105,24 @@ class TestDualConsumableBug(unittest.TestCase):
 
         self.mock_db.get_inventory_item.return_value = {
             "item_key": self.test_item_key,
-            "item_type": "consumable"
+            "item_type": "consumable",
         }
 
         self.mock_db.get_player_vitals.return_value = {
             "current_hp": 100,
-            "current_mp": 100
+            "current_mp": 100,
         }
 
         stats_mock = MagicMock()
         stats_mock.max_hp = 100
         stats_mock.max_mp = 100
 
-        with patch("game_systems.items.consumable_manager.PlayerStats") as MockPlayerStats, \
-             patch.dict("game_systems.items.consumable_manager.CONSUMABLES", {self.test_item_key: self.test_item_data}):
+        with patch(
+            "game_systems.items.consumable_manager.PlayerStats"
+        ) as MockPlayerStats, patch.dict(
+            "game_systems.items.consumable_manager.CONSUMABLES",
+            {self.test_item_key: self.test_item_data},
+        ):
 
             MockPlayerStats.from_dict.return_value = stats_mock
 
@@ -120,6 +132,7 @@ class TestDualConsumableBug(unittest.TestCase):
 
             self.assertFalse(success)
             self.assertEqual(message, "You are already at full health and mana.")
+
 
 if __name__ == "__main__":
     unittest.main()

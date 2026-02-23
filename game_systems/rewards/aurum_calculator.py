@@ -8,11 +8,7 @@ import random
 
 
 class AurumCalculator:
-    TIER_MULTIPLIER = {
-        "Normal": 1.5,
-        "Elite": 5.0,
-        "Boss": 20.0
-    }
+    TIER_MULTIPLIER = {"Normal": 1.5, "Elite": 5.0, "Boss": 20.0}
 
     @staticmethod
     def calculate_drop(monster_level: int, tier: str, luck: int = 0) -> int:

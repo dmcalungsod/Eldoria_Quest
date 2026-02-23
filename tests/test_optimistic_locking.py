@@ -77,13 +77,22 @@ class TestOptimisticLocking(unittest.TestCase):
         # Configure Mock DB
         self.mock_db.get_player_field.return_value = 100
         self.mock_db.get_player_stats_row.return_value = self.mock_stats_row
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 100,
+            "current_mp": 50,
+        }
 
         # Instantiate View
         # Note: StatusUpdateView calls self._get_class_starting_stats which uses CLASSES constant
         # We might need to mock game_systems.data.class_data if it causes issues, but it should be fine.
 
-        self.view = StatusUpdateView(self.mock_db, self.mock_user, self.p_data, self.real_stats, self.mock_stats_row)
+        self.view = StatusUpdateView(
+            self.mock_db,
+            self.mock_user,
+            self.p_data,
+            self.real_stats,
+            self.mock_stats_row,
+        )
 
     def test_upgrade_success(self):
         """Verify successful upgrade flow."""

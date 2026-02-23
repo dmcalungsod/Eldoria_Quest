@@ -83,7 +83,9 @@ class TestCraftingQuality(unittest.TestCase):
         # Force upgrade to Uncommon
         mock_random.side_effect = [0.05, 0.5]
 
-        success, msg, item = self.crafting.craft_item(self.discord_id, "craft_rusted_sword")
+        success, msg, item = self.crafting.craft_item(
+            self.discord_id, "craft_rusted_sword"
+        )
 
         self.assertTrue(success)
         self.assertIn("Critical Success", msg)
@@ -115,7 +117,10 @@ class TestCraftingQuality(unittest.TestCase):
         self.mock_db.get_equipped_items.return_value = [inventory_item]
 
         # Mock vitals and skills to prevent MagicMock comparison errors
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 100,
+            "current_mp": 50,
+        }
         self.mock_db.get_all_player_skills.return_value = []
 
         # Run recalculation

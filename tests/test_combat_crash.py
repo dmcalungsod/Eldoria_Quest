@@ -27,7 +27,9 @@ class TestCombatCrash(unittest.TestCase):
         db_mock = MagicMock(spec=DatabaseManager)
 
         # Simulate DB failure early in the process
-        db_mock.get_player_stats_json.side_effect = Exception("Database Connection Failed")
+        db_mock.get_player_stats_json.side_effect = Exception(
+            "Database Connection Failed"
+        )
 
         handler = CombatHandler(db_mock, 12345)
 
@@ -38,13 +40,15 @@ class TestCombatCrash(unittest.TestCase):
             result = handler.resolve_turn(
                 active_monster=active_monster,
                 battle_report=battle_report,
-                accumulated_exp=0
+                accumulated_exp=0,
             )
 
             # If we reach here, we check if the result is valid
             print(f"Result: {result}")
             self.assertIsNone(result["winner"])
-            self.assertEqual(result["phrases"][0], "*Something disrupts the flow of battle...*")
+            self.assertEqual(
+                result["phrases"][0], "*Something disrupts the flow of battle...*"
+            )
 
         except UnboundLocalError as e:
             # THIS IS EXPECTED TO FAIL currently
@@ -52,6 +56,7 @@ class TestCombatCrash(unittest.TestCase):
             raise  # Re-raise to fail the test and confirm the bug
         except Exception as e:
             self.fail(f"CombatHandler crashed with unexpected exception: {e}")
+
 
 if __name__ == "__main__":
     unittest.main()

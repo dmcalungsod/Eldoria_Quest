@@ -64,26 +64,44 @@ class ExplorationView(View):
 
             # 1. Attack
             attack_btn = Button(
-                label="Attack", style=discord.ButtonStyle.danger, emoji=E.SWORDS, row=0, custom_id="attack"
+                label="Attack",
+                style=discord.ButtonStyle.danger,
+                emoji=E.SWORDS,
+                row=0,
+                custom_id="attack",
             )
             attack_btn.callback = self.action_attack
             self.add_item(attack_btn)
 
             # 2. Defend
             defend_btn = Button(
-                label="Defend", style=discord.ButtonStyle.secondary, emoji=E.SHIELD, row=0, custom_id="defend"
+                label="Defend",
+                style=discord.ButtonStyle.secondary,
+                emoji=E.SHIELD,
+                row=0,
+                custom_id="defend",
             )
             defend_btn.callback = self.action_defend
             self.add_item(defend_btn)
 
             # 3. Flee
-            flee_btn = Button(label="Flee", style=discord.ButtonStyle.secondary, emoji="🏃", row=0, custom_id="flee")
+            flee_btn = Button(
+                label="Flee",
+                style=discord.ButtonStyle.secondary,
+                emoji="🏃",
+                row=0,
+                custom_id="flee",
+            )
             flee_btn.callback = self.action_flee
             self.add_item(flee_btn)
 
             # 4. Pack (Row 1)
             inv_btn = Button(
-                label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=1, custom_id="pack"
+                label="Pack",
+                style=discord.ButtonStyle.secondary,
+                emoji=E.BACKPACK,
+                row=1,
+                custom_id="pack",
             )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
@@ -100,7 +118,11 @@ class ExplorationView(View):
             spec = specials.get(self.class_id, {"label": "Special", "emoji": "⚡"})
 
             special_btn = Button(
-                label=spec["label"], style=discord.ButtonStyle.primary, emoji=spec["emoji"], row=1, custom_id="special"
+                label=spec["label"],
+                style=discord.ButtonStyle.primary,
+                emoji=spec["emoji"],
+                row=1,
+                custom_id="special",
             )
             special_btn.callback = self.action_special
             self.add_item(special_btn)
@@ -112,21 +134,24 @@ class ExplorationView(View):
                     value="aggressive",
                     description="⚔️ +20% Dmg / +20% Taken",
                     emoji="⚔️",
-                    default=self.active_monster.get("player_stance", "balanced") == "aggressive",
+                    default=self.active_monster.get("player_stance", "balanced")
+                    == "aggressive",
                 ),
                 discord.SelectOption(
                     label="Balanced",
                     value="balanced",
                     description="⚖️ Standard Combat",
                     emoji="⚖️",
-                    default=self.active_monster.get("player_stance", "balanced") == "balanced",
+                    default=self.active_monster.get("player_stance", "balanced")
+                    == "balanced",
                 ),
                 discord.SelectOption(
                     label="Defensive",
                     value="defensive",
                     description="🛡️ -20% Dmg / -20% Taken",
                     emoji="🛡️",
-                    default=self.active_monster.get("player_stance", "balanced") == "defensive",
+                    default=self.active_monster.get("player_stance", "balanced")
+                    == "defensive",
                 ),
             ]
             stance_select = Select(
@@ -187,20 +212,30 @@ class ExplorationView(View):
                 label, style, emoji = "Forward", discord.ButtonStyle.success, "🥾"
 
             # 1. Forward
-            forward_btn = Button(label=label, style=style, emoji=emoji, row=0, custom_id="forward")
+            forward_btn = Button(
+                label=label, style=style, emoji=emoji, row=0, custom_id="forward"
+            )
             forward_btn.callback = self.explore_callback
             self.add_item(forward_btn)
 
             # 2. Pack
             inv_btn = Button(
-                label="Pack", style=discord.ButtonStyle.secondary, emoji=E.BACKPACK, row=0, custom_id="pack"
+                label="Pack",
+                style=discord.ButtonStyle.secondary,
+                emoji=E.BACKPACK,
+                row=0,
+                custom_id="pack",
             )
             inv_btn.callback = self.inventory_callback
             self.add_item(inv_btn)
 
             # 3. Return
             leave_btn = Button(
-                label="Return to Town", style=discord.ButtonStyle.primary, emoji="🏠", row=0, custom_id="leave"
+                label="Return to Town",
+                style=discord.ButtonStyle.primary,
+                emoji="🏠",
+                row=0,
+                custom_id="leave",
             )
             leave_btn.callback = self.leave_callback
             self.add_item(leave_btn)
@@ -231,22 +266,30 @@ class ExplorationView(View):
 
     async def action_stance(self, interaction: discord.Interaction):
         selected_stance = interaction.data["values"][0]
-        await self._perform_simulation(interaction, action=f"set_stance:{selected_stance}")
+        await self._perform_simulation(
+            interaction, action=f"set_stance:{selected_stance}"
+        )
 
     async def action_skill(self, interaction: discord.Interaction):
         # Retrieve selected skill key
         selected_skill = interaction.data["values"][0]
         await self._perform_simulation(interaction, action=f"skill:{selected_skill}")
 
-    async def _perform_simulation(self, interaction: discord.Interaction, action: str = None):
+    async def _perform_simulation(
+        self, interaction: discord.Interaction, action: str = None
+    ):
         if self.processing:
             await interaction.response.send_message("Please wait...", ephemeral=True)
             return
 
         # --- SECURITY FIX: DoS Protection ---
         if action and len(action) > 64:
-            logger.warning(f"DoS Attempt: Action too long from {self.interaction_user.id}: {action[:20]}...")
-            await interaction.response.send_message("Invalid action data.", ephemeral=True)
+            logger.warning(
+                f"DoS Attempt: Action too long from {self.interaction_user.id}: {action[:20]}..."
+            )
+            await interaction.response.send_message(
+                "Invalid action data.", ephemeral=True
+            )
             return
 
         self.processing = True
@@ -260,7 +303,11 @@ class ExplorationView(View):
             try:
                 # Retrieve current embed to update footer for feedback
                 embed = interaction.message.embeds[0]
-                status_text = "⚔️ Resolving combat..." if self.active_monster else "🥾 Exploring..."
+                status_text = (
+                    "⚔️ Resolving combat..."
+                    if self.active_monster
+                    else "🥾 Exploring..."
+                )
                 embed.set_footer(text=status_text)
                 await interaction.edit_original_response(embed=embed, view=self)
             except Exception:
@@ -268,7 +315,9 @@ class ExplorationView(View):
                 await interaction.edit_original_response(view=self)
 
             # 2. Run Simulation Thread
-            result = await asyncio.to_thread(self.manager.simulate_adventure_step, self.interaction_user.id, action)
+            result = await asyncio.to_thread(
+                self.manager.simulate_adventure_step, self.interaction_user.id, action
+            )
             sequence = result.get("sequence", [])
             is_dead = result.get("dead", False)
 
@@ -287,7 +336,11 @@ class ExplorationView(View):
 
                 # Prepare UI state
                 embed = AdventureEmbeds.build_exploration_embed(
-                    self.location_id, self.log, self.player_stats, vitals, self.active_monster
+                    self.location_id,
+                    self.log,
+                    self.player_stats,
+                    vitals,
+                    self.active_monster,
                 )
 
                 is_last_frame = i == len(sequence) - 1
@@ -338,11 +391,20 @@ class ExplorationView(View):
 
             await interaction.response.defer()
 
-            items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
-            max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
+            items = await asyncio.to_thread(
+                self.inv_manager.get_inventory, self.interaction_user.id
+            )
+            max_slots = await asyncio.to_thread(
+                self.db.calculate_inventory_limit, self.interaction_user.id
+            )
             embed = build_inventory_embed(items, max_slots)
 
-            view = InventoryView(self.db, self.interaction_user, self.return_from_inventory, "Return to Adventure")
+            view = InventoryView(
+                self.db,
+                self.interaction_user,
+                self.return_from_inventory,
+                "Return to Adventure",
+            )
             await interaction.edit_original_response(embed=embed, view=view)
         finally:
             self.processing = False
@@ -357,10 +419,16 @@ class ExplorationView(View):
             await interaction.response.defer()
 
             # Refresh state on return
-            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+            vitals = await asyncio.to_thread(
+                self.db.get_player_vitals, self.interaction_user.id
+            )
             self.vitals = vitals or {}
-            session = await asyncio.to_thread(self.manager.get_active_session, self.interaction_user.id)
-            self.skills = await asyncio.to_thread(self.db.get_combat_skills, self.interaction_user.id)
+            session = await asyncio.to_thread(
+                self.manager.get_active_session, self.interaction_user.id
+            )
+            self.skills = await asyncio.to_thread(
+                self.db.get_combat_skills, self.interaction_user.id
+            )
 
             # Update monster state from session
             if session and session.get("active_monster_json"):
@@ -372,7 +440,11 @@ class ExplorationView(View):
                 self.active_monster = None
 
             embed = AdventureEmbeds.build_exploration_embed(
-                self.location_id, self.log, self.player_stats, vitals, self.active_monster
+                self.location_id,
+                self.log,
+                self.player_stats,
+                vitals,
+                self.active_monster,
             )
 
             # Reset my buttons
@@ -393,7 +465,9 @@ class ExplorationView(View):
         self.processing = True
         try:
             await interaction.response.defer()
-            summary = await asyncio.to_thread(self.manager.end_adventure, self.interaction_user.id)
+            summary = await asyncio.to_thread(
+                self.manager.end_adventure, self.interaction_user.id
+            )
 
             if summary:
                 # UX Upgrade: Show Mission Report instead of silent return
@@ -401,7 +475,11 @@ class ExplorationView(View):
 
                 # Configure view for Summary Mode
                 self.clear_items()
-                btn_return = Button(label="Return to Profile", style=discord.ButtonStyle.primary, emoji="👤")
+                btn_return = Button(
+                    label="Return to Profile",
+                    style=discord.ButtonStyle.primary,
+                    emoji="👤",
+                )
                 btn_return.callback = back_to_profile_callback
                 self.add_item(btn_return)
 

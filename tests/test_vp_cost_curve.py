@@ -1,4 +1,3 @@
-
 import math
 import sys
 import unittest
@@ -18,6 +17,7 @@ sys.modules["pymongo.results"] = MagicMock()
 # Also mock database.database_manager if needed, but we want to import it for StatusUpdateView to work
 # However, StatusUpdateView imports DatabaseManager. Let's let it import, but with mocked pymongo it should be fine.
 
+
 # Mock discord.ui.View
 class MockView:
     def __init__(self, timeout=None):
@@ -25,6 +25,7 @@ class MockView:
 
     def add_item(self, item):
         pass
+
 
 mock_ui = MagicMock()
 mock_ui.View = MockView
@@ -66,7 +67,14 @@ class TestVPCostCurve(unittest.TestCase):
 
     def test_cost_curve_exponential(self):
         # Mock get_base_stats_dict to return integers BEFORE instantiation
-        self.mock_stats.get_base_stats_dict.return_value = {"STR": 1, "END": 1, "DEX": 1, "AGI": 1, "MAG": 1, "LCK": 1}
+        self.mock_stats.get_base_stats_dict.return_value = {
+            "STR": 1,
+            "END": 1,
+            "DEX": 1,
+            "AGI": 1,
+            "MAG": 1,
+            "LCK": 1,
+        }
 
         # Create instance
         view = StatusUpdateView(
@@ -74,12 +82,19 @@ class TestVPCostCurve(unittest.TestCase):
             self.mock_user,
             self.mock_p_data,
             self.mock_stats,
-            self.mock_stats_row
+            self.mock_stats_row,
         )
 
         # Override starting stats for deterministic testing
         # Assume all stats start at 1 for simplicity, unless specified
-        view.starting_stats = {"STR": 1, "END": 1, "DEX": 1, "AGI": 1, "MAG": 1, "LCK": 1}
+        view.starting_stats = {
+            "STR": 1,
+            "END": 1,
+            "DEX": 1,
+            "AGI": 1,
+            "MAG": 1,
+            "LCK": 1,
+        }
 
         # Test Case 1: STR (Base Cost 10)
         stat = "STR"
@@ -99,30 +114,57 @@ class TestVPCostCurve(unittest.TestCase):
         # "Point 1: floor(10 * 1^1.5) = 10".
         # If this is the FIRST point you buy, then invested is 0?
         # Yes.
-        self.assertEqual(view._calculate_single_point_cost(stat, 1), expected_cost(0), "Cost for 1st point (invested 0) mismatch")
+        self.assertEqual(
+            view._calculate_single_point_cost(stat, 1),
+            expected_cost(0),
+            "Cost for 1st point (invested 0) mismatch",
+        )
 
         # Invested 1 (Current 2) -> Cost for point 2
-        self.assertEqual(view._calculate_single_point_cost(stat, 2), expected_cost(1), "Cost for 2nd point (invested 1) mismatch")
+        self.assertEqual(
+            view._calculate_single_point_cost(stat, 2),
+            expected_cost(1),
+            "Cost for 2nd point (invested 1) mismatch",
+        )
 
         # Invested 9 (Current 10) -> Cost for point 10
-        self.assertEqual(view._calculate_single_point_cost(stat, 10), expected_cost(9), "Cost for 10th point (invested 9) mismatch")
+        self.assertEqual(
+            view._calculate_single_point_cost(stat, 10),
+            expected_cost(9),
+            "Cost for 10th point (invested 9) mismatch",
+        )
 
         # Invested 49 (Current 50) -> Cost for point 50
-        self.assertEqual(view._calculate_single_point_cost(stat, 50), expected_cost(49), "Cost for 50th point (invested 49) mismatch")
+        self.assertEqual(
+            view._calculate_single_point_cost(stat, 50),
+            expected_cost(49),
+            "Cost for 50th point (invested 49) mismatch",
+        )
 
         # Invested 99 (Current 100) -> Cost for point 100
-        self.assertEqual(view._calculate_single_point_cost(stat, 100), expected_cost(99), "Cost for 100th point (invested 99) mismatch")
+        self.assertEqual(
+            view._calculate_single_point_cost(stat, 100),
+            expected_cost(99),
+            "Cost for 100th point (invested 99) mismatch",
+        )
 
     def test_luck_cost_curve(self):
         # LCK has base cost 20
-        self.mock_stats.get_base_stats_dict.return_value = {"STR": 1, "END": 1, "DEX": 1, "AGI": 1, "MAG": 1, "LCK": 1}
+        self.mock_stats.get_base_stats_dict.return_value = {
+            "STR": 1,
+            "END": 1,
+            "DEX": 1,
+            "AGI": 1,
+            "MAG": 1,
+            "LCK": 1,
+        }
 
         view = StatusUpdateView(
             self.mock_db,
             self.mock_user,
             self.mock_p_data,
             self.mock_stats,
-            self.mock_stats_row
+            self.mock_stats_row,
         )
         view.starting_stats = {"LCK": 1}
 
@@ -135,6 +177,7 @@ class TestVPCostCurve(unittest.TestCase):
 
         self.assertEqual(view._calculate_single_point_cost(stat, 1), expected_cost(0))
         self.assertEqual(view._calculate_single_point_cost(stat, 10), expected_cost(9))
+
 
 if __name__ == "__main__":
     unittest.main()

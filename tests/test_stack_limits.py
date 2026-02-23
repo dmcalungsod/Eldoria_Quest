@@ -12,7 +12,10 @@ sys.modules["pymongo.MongoClient"] = MagicMock()
 sys.modules["pymongo.UpdateOne"] = MagicMock()
 sys.modules["pymongo.InsertOne"] = MagicMock()
 
-from database.database_manager import MAX_STACK_CONSUMABLE, DatabaseManager  # noqa: E402
+from database.database_manager import (
+    MAX_STACK_CONSUMABLE,
+    DatabaseManager,
+)  # noqa: E402
 
 
 class TestStackLimits(unittest.TestCase):
@@ -48,7 +51,9 @@ class TestStackLimits(unittest.TestCase):
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
         with patch.object(self.db, "calculate_inventory_limit", return_value=20):
-            success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 12)
+            success = self.db.add_inventory_item(
+                self.discord_id, "hp_potion", "Potion", "consumable", "Common", 12
+            )
 
         self.assertTrue(success)
 
@@ -72,11 +77,15 @@ class TestStackLimits(unittest.TestCase):
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
         with patch.object(self.db, "calculate_inventory_limit", return_value=20):
-            success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 10)
+            success = self.db.add_inventory_item(
+                self.discord_id, "hp_potion", "Potion", "consumable", "Common", 10
+            )
 
         self.assertTrue(success)
 
-        self.inventory_col.update_one.assert_called_with({"id": 10}, {"$inc": {"count": 3}})
+        self.inventory_col.update_one.assert_called_with(
+            {"id": 10}, {"$inc": {"count": 3}}
+        )
 
         self.inventory_col.insert_many.assert_called_once()
         inserted_docs = self.inventory_col.insert_many.call_args[0][0]
@@ -94,7 +103,9 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 19
 
         with patch.object(self.db, "calculate_inventory_limit", return_value=20):
-            success = self.db.add_inventory_item(self.discord_id, "hp_potion", "Potion", "consumable", "Common", 6)
+            success = self.db.add_inventory_item(
+                self.discord_id, "hp_potion", "Potion", "consumable", "Common", 6
+            )
 
         self.assertFalse(success)
         self.inventory_col.insert_many.assert_not_called()
@@ -109,7 +120,9 @@ class TestStackLimits(unittest.TestCase):
         self.counters_col.find_one_and_update.return_value = {"seq": 100}
 
         with patch.object(self.db, "calculate_inventory_limit", return_value=20):
-            success = self.db.add_inventory_item(self.discord_id, "sword", "Sword", "equipment", "Common", 2)
+            success = self.db.add_inventory_item(
+                self.discord_id, "sword", "Sword", "equipment", "Common", 2
+            )
 
         self.assertTrue(success)
 
@@ -137,7 +150,13 @@ class TestStackLimits(unittest.TestCase):
         ]
 
         # Mock find returning existing stack
-        existing_doc = {"id": 50, "count": 2, "item_key": "hp_potion", "rarity": "Common", "equipped": 0}
+        existing_doc = {
+            "id": 50,
+            "count": 2,
+            "item_key": "hp_potion",
+            "rarity": "Common",
+            "equipped": 0,
+        }
 
         # Mock find().sort() chain
         cursor = MagicMock()

@@ -23,7 +23,9 @@ class TestStatDuplication(unittest.TestCase):
 
         # 2. Setup equipped item (+5 STR)
         # Mock get_equipped_items to return one item
-        self.mock_db.get_equipped_items.return_value = [{"item_key": "101", "item_source_table": "equipment"}]
+        self.mock_db.get_equipped_items.return_value = [
+            {"item_key": "101", "item_source_table": "equipment"}
+        ]
 
         # Mock item data lookup
         # item_source_table is 'equipment', so it calls _col('equipment').find_one
@@ -38,7 +40,10 @@ class TestStatDuplication(unittest.TestCase):
         self.mock_db.get_player_field.return_value = 1  # class_id
 
         # Prevent MagicMock comparison errors in recalculate_player_stats
-        self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 50}
+        self.mock_db.get_player_vitals.return_value = {
+            "current_hp": 100,
+            "current_mp": 50,
+        }
         self.mock_db.get_all_player_skills.return_value = []
 
         # 3. First Recalculation

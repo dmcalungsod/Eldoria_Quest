@@ -44,7 +44,9 @@ class EventHandler:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(context, location_id, weather, event_type)
+                return self._perform_regeneration(
+                    context, location_id, weather, event_type
+                )
             else:
                 # --- SPECIAL EXPLORATION EVENT (15% Chance) ---
                 if location_id and location_id in LOCATIONS:
@@ -60,7 +62,9 @@ class EventHandler:
 
                 return self._perform_quest_event(context, location_name, location_id)
         except Exception as e:
-            logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Event resolution error for {self.discord_id}: {e}", exc_info=True
+            )
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 
@@ -86,7 +90,9 @@ class EventHandler:
             # If already full, prevent SURGE exploit (infinite farming)
             if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
                 return {
-                    "log": ["\n**You are already fully rested.** The moment of peace passes."],
+                    "log": [
+                        "\n**You are already fully rested.** The moment of peace passes."
+                    ],
                     "dead": False,
                 }
 
@@ -203,7 +209,9 @@ class EventHandler:
                                 if success:
                                     # Check for custom flavor text
                                     flavor_key = f"{obj_type}:{task}"
-                                    flavor = quest.get("flavor_text", {}).get(flavor_key)
+                                    flavor = quest.get("flavor_text", {}).get(
+                                        flavor_key
+                                    )
 
                                     if flavor:
                                         event_text = f"\n{E.QUEST_SCROLL} **{flavor}**"

@@ -28,7 +28,15 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 # Mock button and view
 class MockButton:
-    def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
+    def __init__(
+        self,
+        label=None,
+        style=None,
+        custom_id=None,
+        emoji=None,
+        row=None,
+        disabled=False,
+    ):
         self.label = label
         self.custom_id = custom_id
         self.callback = None
@@ -74,7 +82,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
 
         # Mock cogs.shop_cog specifically for this test class to avoid collision with other tests
         self.mock_shop_cog = MagicMock()
-        self.shop_cog_patcher = patch.dict(sys.modules, {"cogs.shop_cog": self.mock_shop_cog})
+        self.shop_cog_patcher = patch.dict(
+            sys.modules, {"cogs.shop_cog": self.mock_shop_cog}
+        )
         self.shop_cog_patcher.start()
 
     def tearDown(self):
@@ -89,7 +99,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
         }
 
         # Patch WorldEventSystem in the services_menu module to ensure interception
-        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES:
+        with patch(
+            "game_systems.guild_system.ui.services_menu.WorldEventSystem"
+        ) as MockWES:
             # Setup constant on the class
             MockWES.MYSTIC_MERCHANT = "mystic_merchant"
             # Setup instance method return value
@@ -109,7 +121,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
 
     def test_button_missing_when_no_event(self):
         # Patch WorldEventSystem in services_menu
-        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES:
+        with patch(
+            "game_systems.guild_system.ui.services_menu.WorldEventSystem"
+        ) as MockWES:
             MockWES.return_value.get_current_event.return_value = None
             view = GuildServicesView(self.mock_db, self.mock_user)
 
@@ -127,7 +141,9 @@ class TestMysticMerchantEvent(unittest.TestCase):
         self.mock_shop_cog.ShopView = MockShopViewClass
 
         # Ensure __init__ doesn't crash on event check using patch
-        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES:
+        with patch(
+            "game_systems.guild_system.ui.services_menu.WorldEventSystem"
+        ) as MockWES:
             MockWES.return_value.get_current_event.return_value = None
             view = GuildServicesView(self.mock_db, self.mock_user)
 

@@ -85,7 +85,11 @@ class TestDayNightCycle(unittest.TestCase):
             self.assertIn("Night", phrase)
 
     def test_night_encounter_fallback(self):
-        location_no_night = {"name": "Sunny Plains", "monsters": [("monster_001", 100)], "conditional_monsters": []}
+        location_no_night = {
+            "name": "Sunny Plains",
+            "monsters": [("monster_001", 100)],
+            "conditional_monsters": [],
+        }
 
         with patch("game_systems.adventure.combat_handler.WorldTime") as MockWorldTime:
             MockWorldTime.is_night.return_value = True

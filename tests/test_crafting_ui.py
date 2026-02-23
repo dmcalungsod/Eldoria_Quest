@@ -34,7 +34,14 @@ class MockButton:
 
 class MockSelect:
     def __init__(
-        self, placeholder=None, min_values=1, max_values=1, options=None, disabled=False, row=None, custom_id=None
+        self,
+        placeholder=None,
+        min_values=1,
+        max_values=1,
+        options=None,
+        disabled=False,
+        row=None,
+        custom_id=None,
     ):
         self.placeholder = placeholder
         self.options = options or []
@@ -43,7 +50,9 @@ class MockSelect:
         self.callback = None
 
     def add_option(self, label, value, description=None, emoji=None):
-        self.options.append({"label": label, "value": value, "description": description, "emoji": emoji})
+        self.options.append(
+            {"label": label, "value": value, "description": description, "emoji": emoji}
+        )
 
 
 class TestCraftingUI(unittest.TestCase):
@@ -96,8 +105,18 @@ class TestCraftingUI(unittest.TestCase):
 
         # Mock recipes
         self.recipes = {
-            "potion_1": {"name": "Health Potion", "cost": 10, "type": "consumable", "materials": {"herb": 1}},
-            "sword_1": {"name": "Iron Sword", "cost": 50, "type": "equipment", "materials": {"iron": 2}},
+            "potion_1": {
+                "name": "Health Potion",
+                "cost": 10,
+                "type": "consumable",
+                "materials": {"herb": 1},
+            },
+            "sword_1": {
+                "name": "Iron Sword",
+                "cost": 50,
+                "type": "equipment",
+                "materials": {"iron": 2},
+            },
         }
 
         # We need to make sure the instance returns these recipes
@@ -105,7 +124,9 @@ class TestCraftingUI(unittest.TestCase):
         self.mock_crafting_system.can_craft.return_value = (True, "Ready")
 
         # Patch CraftingSystem constructor
-        patcher = unittest.mock.patch("game_systems.crafting.ui.crafting_view.CraftingSystem")
+        patcher = unittest.mock.patch(
+            "game_systems.crafting.ui.crafting_view.CraftingSystem"
+        )
         self.MockCraftingSystemClass = patcher.start()
         self.MockCraftingSystemClass.return_value = self.mock_crafting_system
         self.addCleanup(patcher.stop)

@@ -155,7 +155,11 @@ EQUIPMENT_RECIPES = {
         "output_key": "gen_staff_007",
         "type": "equipment",
         "rarity": "Epic",
-        "materials": {"ironwood_heart": 1, "magic_stone_flawless": 1, "ancient_wood": 10},
+        "materials": {
+            "ironwood_heart": 1,
+            "magic_stone_flawless": 1,
+            "ancient_wood": 10,
+        },
         "cost": 1200,
         "description": "Humming with the life force of the forest.",
     },

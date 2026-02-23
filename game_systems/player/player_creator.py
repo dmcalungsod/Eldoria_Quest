@@ -20,7 +20,14 @@ class PlayerCreator:
     def __init__(self, db):
         self.db = db
 
-    def create_player(self, discord_id: int, username: str, class_id: int, race: str = None, gender: str = None):
+    def create_player(
+        self,
+        discord_id: int,
+        username: str,
+        class_id: int,
+        race: str = None,
+        gender: str = None,
+    ):
         """
         Creates a player profile.
         ATOMIC: Creates player, stats, and default skills in one transaction.

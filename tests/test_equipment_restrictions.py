@@ -135,7 +135,9 @@ class TestEquipmentRestrictions(unittest.TestCase):
         self.assertIn("Req: Lvl 50", msg)
 
     @patch("game_systems.character.ui.inventory_view.InventoryManager")
-    @patch("game_systems.character.ui.inventory_view.EquipmentManager")  # This patches the CLASS
+    @patch(
+        "game_systems.character.ui.inventory_view.EquipmentManager"
+    )  # This patches the CLASS
     def test_inventory_view_ui_logic(self, MockEqManagerClass, MockInvManagerClass):
         # Setup mocks
         mock_user = MagicMock()
@@ -168,7 +170,10 @@ class TestEquipmentRestrictions(unittest.TestCase):
         # Since we patched the Class, self.eq_manager IS mock_eq_instance.
 
         # Also need to patch EQUIPMENT_DATA in inventory_view to avoid KeyErrors or empty dicts
-        with patch("game_systems.character.ui.inventory_view.EQUIPMENT_DATA", {"god_sword": {"level_req": 99}}):
+        with patch(
+            "game_systems.character.ui.inventory_view.EQUIPMENT_DATA",
+            {"god_sword": {"level_req": 99}},
+        ):
             view = InventoryView(self.mock_db, mock_user, None)
 
         # Check Dropdown Options

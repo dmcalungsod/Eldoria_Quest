@@ -34,7 +34,11 @@ class TestLevelCurve(unittest.TestCase):
             if level == 1:
                 # Level 1 is the starting state, check default
                 system = LevelUpSystem(stats, level=1, exp=0, exp_to_next=1000)
-                self.assertEqual(system.exp_to_next, expected_xp, f"Level {level} XP Requirement mismatch")
+                self.assertEqual(
+                    system.exp_to_next,
+                    expected_xp,
+                    f"Level {level} XP Requirement mismatch",
+                )
             else:
                 # Create system just before target level
                 system = LevelUpSystem(stats, level=level - 1, exp=0, exp_to_next=1000)
