@@ -60,7 +60,6 @@ class ConsumableManager:
             item_used = False
             message_lines = []
             buffs_to_apply = []
-            debuffs_to_clear = []
 
             # -- Heal Logic --
             if "heal" in effect:
@@ -74,11 +73,9 @@ class ConsumableManager:
                     message_lines.append(f"You healed for {healed_for} HP.")
                     item_used = True
 
-            # -- Mana Logic (and Stamina conversion) --
-            # Treat 'stamina' as MP recovery for now, as Stamina system isn't live.
-            mana_amount = effect.get("mana", 0) + effect.get("stamina", 0)
-
-            if mana_amount > 0:
+            # -- Mana Logic --
+            if "mana" in effect:
+                mana_amount = effect["mana"]
                 if current_mp < max_mp:
                     old_mp = current_mp
                     new_mp = min(current_mp + mana_amount, max_mp)
@@ -87,20 +84,6 @@ class ConsumableManager:
                     current_mp = new_mp
                     message_lines.append(f"You restored {restored_for} MP.")
                     item_used = True
-
-            # -- Cure Logic --
-            # Check for active debuffs (stored as buffs with special stat keys)
-            if "cure_poison" in effect or "cure_bleed" in effect:
-                active_buffs = self.db.get_active_buffs(discord_id)
-                for buff in active_buffs:
-                    if effect.get("cure_poison") and buff["stat"] == "poison":
-                        debuffs_to_clear.append(buff["buff_id"])
-                        message_lines.append("You cured your Poison!")
-                        item_used = True
-                    elif effect.get("cure_bleed") and buff["stat"] == "bleed":
-                        debuffs_to_clear.append(buff["buff_id"])
-                        message_lines.append("You stopped the Bleeding!")
-                        item_used = True
 
             # -- Buff Logic --
             is_buff_item = item_data.get("type") == "buff"
@@ -112,7 +95,6 @@ class ConsumableManager:
                 ignored_keys = {
                     "heal",
                     "mana",
-                    "stamina",
                     "duration_s",
                     "cure_poison",
                     "cure_bleed",
@@ -134,13 +116,11 @@ class ConsumableManager:
                     item_used = True
 
             if not item_used:
-                if "cure_poison" in effect or "cure_bleed" in effect:
-                    return False, "You are not suffering from that ailment."
-                if "heal" in effect and ("mana" in effect or "stamina" in effect):
+                if "heal" in effect and "mana" in effect:
                     return False, "You are already at full health and mana."
                 elif "heal" in effect:
                     return False, "You are already at full health."
-                elif "mana" in effect or "stamina" in effect:
+                elif "mana" in effect:
                     return False, "You are already at full mana."
                 else:
                     return False, "This item has no usable effect right now."
@@ -163,12 +143,6 @@ class ConsumableManager:
                         b["key"],
                         b["val"],
                         b["duration"],
-                    )
-
-                # 8. Clear Debuffs
-                if debuffs_to_clear:
-                    self.db.db["active_buffs"].delete_many(
-                        {"discord_id": discord_id, "buff_id": {"$in": debuffs_to_clear}}
                     )
 
                 return True, " ".join(message_lines)

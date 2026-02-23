@@ -1,7 +1,7 @@
 """
 game_systems/adventure/ui/setup_view.py
 
-The preparation screen where players select their destination.
+The preparation screen where players select their destination and duration.
 Hardened: Async initialization and safe session creation.
 """
 
@@ -16,10 +16,9 @@ from cogs.ui_helpers import back_to_profile_callback, get_player_or_error
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.player.player_stats import PlayerStats
 
 from .adventure_embeds import AdventureEmbeds
-from .exploration_view import ExplorationView
+from .status_view import AdventureStatusView
 
 logger = logging.getLogger("eldoria.ui.setup")
 
@@ -42,13 +41,16 @@ class AdventureSetupView(View):
         self.player_rank = player_rank
         self.player_level = player_level
 
+        self.selected_location = None
+        self.selected_duration = None
+
+        # 1. Location Select
         self.location_select = Select(
             placeholder="Select Destination...",
             min_values=1,
             max_values=1,
             row=0,
         )
-
         # Populate Locations
         for loc_id, loc_data in LOCATIONS.items():
             is_unlocked = self._is_unlocked(loc_data)
@@ -72,8 +74,45 @@ class AdventureSetupView(View):
         self.location_select.callback = self.location_callback
         self.add_item(self.location_select)
 
-        # Back Button
-        self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=1)
+        # 2. Duration Select
+        self.duration_select = Select(
+            placeholder="Select Duration...",
+            min_values=1,
+            max_values=1,
+            row=1,
+            options=[
+                discord.SelectOption(
+                    label="30 Minutes", value="30", description="Short patrol", emoji="⏲️"
+                ),
+                discord.SelectOption(
+                    label="1 Hour", value="60", description="Standard expedition", emoji="⏲️"
+                ),
+                discord.SelectOption(
+                    label="4 Hours", value="240", description="Extended journey", emoji="⛺"
+                ),
+                discord.SelectOption(
+                    label="8 Hours", value="480", description="Full day trek", emoji="🌙"
+                ),
+            ],
+        )
+        self.duration_select.callback = self.duration_callback
+        self.add_item(self.duration_select)
+
+        # 3. Start Button
+        self.start_btn = Button(
+            label="Begin Expedition",
+            style=discord.ButtonStyle.success,
+            row=2,
+            disabled=True,
+            emoji="⚔️",
+        )
+        self.start_btn.callback = self.start_callback
+        self.add_item(self.start_btn)
+
+        # 4. Back Button
+        self.back_btn = Button(
+            label="Return to Ledger", style=discord.ButtonStyle.grey, row=2
+        )
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
 
@@ -94,19 +133,29 @@ class AdventureSetupView(View):
                 return False
         except ValueError:
             # Fallback if rank is unknown (shouldn't happen)
-            logger.warning(f"Unknown rank encountered: {self.player_rank} or {req_rank}")
+            logger.warning(
+                f"Unknown rank encountered: {self.player_rank} or {req_rank}"
+            )
             return False
 
         return True
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your adventure.", ephemeral=True
+            )
             return False
         return True
 
     async def back_callback(self, interaction: discord.Interaction):
         await back_to_profile_callback(interaction, is_new_message=False)
+
+    def _update_start_button(self):
+        if self.selected_location and self.selected_duration:
+            self.start_btn.disabled = False
+        else:
+            self.start_btn.disabled = True
 
     async def location_callback(self, interaction: discord.Interaction):
         loc_id = self.location_select.values[0]
@@ -119,6 +168,17 @@ class AdventureSetupView(View):
             )
             return
 
+        self.selected_location = loc_id
+        self._update_start_button()
+
+        await interaction.response.edit_message(view=self)
+
+    async def duration_callback(self, interaction: discord.Interaction):
+        self.selected_duration = int(self.duration_select.values[0])
+        self._update_start_button()
+        await interaction.response.edit_message(view=self)
+
+    async def start_callback(self, interaction: discord.Interaction):
         # Validate player before starting adventure
         if not await get_player_or_error(interaction, self.db):
             return
@@ -127,56 +187,38 @@ class AdventureSetupView(View):
 
         try:
             # 1. Start the adventure in DB (Threaded)
-            success = await asyncio.to_thread(self.manager.start_adventure, interaction.user.id, loc_id, -1)
-
-            if not success:
-                await interaction.followup.send("Failed to start adventure. Please try again.", ephemeral=True)
-                return
-
-            # 2. Fetch all necessary context in one query (Optimization)
-            bundle = await asyncio.to_thread(self.db.get_combat_context_bundle, interaction.user.id)
-            if not bundle:
-                await interaction.followup.send("Error loading combat context.", ephemeral=True)
-                return
-
-            player_data = bundle["player"]
-            vitals = {
-                "current_hp": player_data["current_hp"],
-                "current_mp": player_data["current_mp"],
-            }
-            session_row = bundle["active_session"]
-            stats_data = bundle["stats"]
-            skills = bundle["skills"]
-
-            class_id = player_data["class_id"]
-            player_stats = PlayerStats.from_dict(stats_data)
-
-            # 3. Initial Log
-            initial_log = [
-                f"You step beyond the walls into **{loc_data['name']}**.",
-                "The air shifts. You are now in the wilds.",
-            ]
-
-            # 4. Build Embed
-            embed = AdventureEmbeds.build_exploration_embed(
-                loc_id, initial_log, player_stats, vitals, active_monster=None
+            success = await asyncio.to_thread(
+                self.manager.start_adventure,
+                interaction.user.id,
+                self.selected_location,
+                self.selected_duration,
             )
 
-            # 5. Transition to Exploration View
-            view = ExplorationView(
-                self.db,
-                self.manager,
-                loc_id,
-                initial_log,
-                self.interaction_user,
-                player_stats,
-                vitals=vitals,
-                active_monster=None,
-                class_id=class_id,
-                skills=skills,
+            if not success:
+                await interaction.followup.send(
+                    "Failed to start adventure. Please try again.", ephemeral=True
+                )
+                return
+
+            # 2. Get new session data
+            session = await asyncio.to_thread(
+                self.manager.get_active_session, interaction.user.id
+            )
+            if not session:
+                await interaction.followup.send("Error starting session.", ephemeral=True)
+                return
+
+            # 3. Build Status Embed
+            embed = AdventureEmbeds.build_adventure_status_embed(session)
+
+            # 4. Switch View
+            view = AdventureStatusView(
+                self.db, self.manager, self.interaction_user, session
             )
             await interaction.edit_original_response(embed=embed, view=view)
 
         except Exception as e:
-            logger.error(f"Location setup error: {e}", exc_info=True)
-            await interaction.followup.send("An error occurred starting the expedition.", ephemeral=True)
+            logger.error(f"Adventure start error: {e}", exc_info=True)
+            await interaction.followup.send(
+                "An error occurred starting the expedition.", ephemeral=True
+            )

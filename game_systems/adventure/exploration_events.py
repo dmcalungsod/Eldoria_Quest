@@ -14,7 +14,6 @@ from typing import Any
 
 import game_systems.data.emojis as E
 from game_systems.data.materials import MATERIALS
-from game_systems.world_time import Weather, TimePhase
 
 from .adventure_events import AdventureEvents
 
@@ -25,35 +24,19 @@ class ExplorationEvents:
     def __init__(self, db: Any):
         self.db = db
 
-    def handle_event(
-        self,
-        event_key: str,
-        context: dict[str, Any],
-        location_id: str | None = None,
-        time_phase: TimePhase | None = None,
-        weather: Weather | None = None,
-        event_type: str | None = None,
-    ) -> dict[str, Any]:
+    def handle_event(self, event_key: str, context: dict[str, Any]) -> dict[str, Any]:
         """
         Dispatches to specific event handlers based on key.
         """
         try:
             if event_key == "safe_room":
-                return self._handle_safe_room(
-                    context, location_id, time_phase, weather, event_type
-                )
+                return self._handle_safe_room(context)
             elif event_key == "hidden_stash":
-                return self._handle_hidden_stash(
-                    context, location_id, time_phase, weather, event_type
-                )
+                return self._handle_hidden_stash(context)
             elif event_key == "ancient_shrine":
-                return self._handle_ancient_shrine(
-                    context, location_id, time_phase, weather, event_type
-                )
+                return self._handle_ancient_shrine(context)
             elif event_key == "trap_pit":
-                return self._handle_trap(
-                    context, location_id, time_phase, weather, event_type
-                )
+                return self._handle_trap(context)
 
             # Fallback
             return {"log": [], "vitals": context["vitals"], "loot": {}, "dead": False}
@@ -67,26 +50,15 @@ class ExplorationEvents:
                 "dead": False,
             }
 
-    def _handle_safe_room(
-        self,
-        context: dict[str, Any],
-        location_id: str | None,
-        time_phase: TimePhase | None,
-        weather: Weather | None,
-        event_type: str | None,
-    ) -> dict[str, Any]:
+    def _handle_safe_room(self, context: dict[str, Any]) -> dict[str, Any]:
         stats = context["player_stats"]
         vitals = context["vitals"]
 
         # Heal 50-100% of Max HP/MP
         heal_percent = random.uniform(0.5, 1.0)
 
-        new_hp = min(
-            stats.max_hp, int(vitals["current_hp"] + stats.max_hp * heal_percent)
-        )
-        new_mp = min(
-            stats.max_mp, int(vitals["current_mp"] + stats.max_mp * heal_percent)
-        )
+        new_hp = min(stats.max_hp, int(vitals["current_hp"] + stats.max_hp * heal_percent))
+        new_mp = min(stats.max_mp, int(vitals["current_mp"] + stats.max_mp * heal_percent))
 
         hp_gain = new_hp - vitals["current_hp"]
         mp_gain = new_mp - vitals["current_mp"]
@@ -99,29 +71,16 @@ class ExplorationEvents:
         vitals["current_mp"] = new_mp
 
         log = [
-            AdventureEvents.special_event_flavor(
-                "safe_room", location_id, time_phase, weather, event_type
-            ),
+            AdventureEvents.special_event_flavor("safe_room"),
             f"{E.HEAL} Restored **{hp_gain}** HP and **{mp_gain}** MP.",
         ]
 
         return {"log": log, "vitals": vitals, "loot": {}, "dead": False}
 
-    def _handle_hidden_stash(
-        self,
-        context: dict[str, Any],
-        location_id: str | None,
-        time_phase: TimePhase | None,
-        weather: Weather | None,
-        event_type: str | None,
-    ) -> dict[str, Any]:
+    def _handle_hidden_stash(self, context: dict[str, Any]) -> dict[str, Any]:
         # Aurum or Material
         loot = {}
-        log = [
-            AdventureEvents.special_event_flavor(
-                "hidden_stash", location_id, time_phase, weather, event_type
-            )
-        ]
+        log = [AdventureEvents.special_event_flavor("hidden_stash")]
 
         if random.random() < 0.6:
             # Aurum
@@ -139,35 +98,19 @@ class ExplorationEvents:
 
         return {"log": log, "vitals": context["vitals"], "loot": loot, "dead": False}
 
-    def _handle_ancient_shrine(
-        self,
-        context: dict[str, Any],
-        location_id: str | None,
-        time_phase: TimePhase | None,
-        weather: Weather | None,
-        event_type: str | None,
-    ) -> dict[str, Any]:
+    def _handle_ancient_shrine(self, context: dict[str, Any]) -> dict[str, Any]:
         # Grant XP
         amount = random.randint(100, 300)
         loot = {"exp": amount}
 
         log = [
-            AdventureEvents.special_event_flavor(
-                "ancient_shrine", location_id, time_phase, weather, event_type
-            ),
+            AdventureEvents.special_event_flavor("ancient_shrine"),
             f"{E.EXP} You gain **{amount} XP** from the ancient knowledge.",
         ]
 
         return {"log": log, "vitals": context["vitals"], "loot": loot, "dead": False}
 
-    def _handle_trap(
-        self,
-        context: dict[str, Any],
-        location_id: str | None,
-        time_phase: TimePhase | None,
-        weather: Weather | None,
-        event_type: str | None,
-    ) -> dict[str, Any]:
+    def _handle_trap(self, context: dict[str, Any]) -> dict[str, Any]:
         stats = context["player_stats"]
         vitals = context["vitals"]
 
@@ -188,15 +131,11 @@ class ExplorationEvents:
         new_hp = max(0, current_hp - damage)
 
         # Update DB
-        self.db.set_player_vitals(
-            context["player_row"]["discord_id"], new_hp, vitals["current_mp"]
-        )
+        self.db.set_player_vitals(context["player_row"]["discord_id"], new_hp, vitals["current_mp"])
 
         vitals["current_hp"] = new_hp
 
-        flavor = AdventureEvents.special_event_flavor(
-            "trap_pit", location_id, time_phase, weather, event_type
-        )
+        flavor = AdventureEvents.special_event_flavor("trap_pit")
         if mitigated:
             flavor += f"\n{E.DODGE} You reacted quickly, reducing the impact!"
 

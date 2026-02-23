@@ -79,7 +79,6 @@ MONSTER_SKILLS = {
         "mp_cost": 5,
         "type": "physical",
         "desc_key": "poison",
-        "debuff": {"poison": 5, "duration": 3},
     },
     "ice_shard": {
         "key_id": "ice_shard",

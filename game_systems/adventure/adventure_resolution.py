@@ -95,22 +95,32 @@ class AdventureResolutionEngine:
 
     def _handle_death(self, discord_id: int, session: AdventureSession):
         """Resolves death: penalties, inventory update, and marks session failed."""
-        # Penalize but KEEP ACTIVE so player can see the report
-        loss_msg = self.adventure_manager._handle_death_rewards(discord_id, session, deactivate=False)
+        loss_msg = self.adventure_manager._handle_death_rewards(discord_id, session)
 
         # Append loss message to logs if available
         if loss_msg:
+            # We need to manually append to logs in DB since _handle_death_rewards ended the session
+            # but didn't save the log update (it modified session.loot only usually).
+            # Actually _handle_death_rewards calls db.end_adventure_session.
+            # We should probably update the log with the loss report.
+
+            # Fetch closed session to append log?
+            # Or assume _handle_death_rewards does enough.
+            # _handle_death_rewards in AdventureManager returns a string but doesn't save it to session logs explicitly?
+            # It seems it expects the caller to display it.
+
+            # Let's save it to the session logs.
             session.logs.append(loss_msg)
+            # Use raw update because session is now inactive
+            trimmed_logs = session.logs[-30:]
+            self.db.update_adventure_session(
+                discord_id,
+                logs=json.dumps(trimmed_logs),
+                loot_collected=json.dumps(session.loot),
+                active=0, # Ensure inactive
+                active_monster_json=None,
+                previous_version=session.version, # Hope version matches
+                steps_completed=session.steps_completed
+            )
 
-        # Update logs, save loot changes, and MARK FAILED (but keep active=1)
-        trimmed_logs = session.logs[-30:]
-
-        # We manually update session fields because save_state() might not be flexible enough
-        # to handle the status change we want implicitly, and we want to ensure "failed" status.
-        self.db.set_adventure_failed(
-            discord_id=discord_id,
-            logs=json.dumps(trimmed_logs),
-            loot_collected=json.dumps(session.loot),
-            steps_completed=session.steps_completed,
-            previous_version=session.version
-        )
+        self.db.update_adventure_status(discord_id, "failed")

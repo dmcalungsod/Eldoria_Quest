@@ -37,33 +37,12 @@ class DamageFormula:
         mag_val = DamageFormula._get_stat(player_stats, "MAG")
         luck_val = DamageFormula._get_stat(player_stats, "LCK")
 
-        # --- REBALANCED BASIC ATTACK ---
-        # Adaptive Offense: Uses the highest stat to determine damage scaling.
-        # This allows DEX and MAG classes to have viable basic attacks without
-        # relying solely on MP or being forced to build STR.
+        # Attack
+        str_bonus = calculate_tiered_bonus(str_val, 2.0)
+        dex_bonus = calculate_tiered_bonus(dex_val, 1.0)
+        mag_bonus = calculate_tiered_bonus(mag_val, 0.5)
 
-        # 1. Identify Primary Stat
-        stats = {"STR": str_val, "DEX": dex_val, "MAG": mag_val}
-        primary_stat = max(stats, key=stats.get)
-        primary_val = stats[primary_stat]
-
-        # 2. Calculate Primary Bonus
-        # STR/DEX get 2.0x (Physical weapons are impactful)
-        # MAG gets 1.5x (Magic bolts are weaker than steel but consistent)
-        if primary_stat == "MAG":
-            primary_mult = 1.5
-        else:
-            primary_mult = 2.0
-
-        primary_bonus = calculate_tiered_bonus(primary_val, primary_mult)
-
-        # 3. Calculate Secondary Bonus (0.5x for other stats)
-        secondary_bonus = 0
-        for stat, val in stats.items():
-            if stat != primary_stat:
-                secondary_bonus += calculate_tiered_bonus(val, 0.5)
-
-        attack_power = primary_bonus + secondary_bonus
+        attack_power = str_bonus + dex_bonus + mag_bonus
 
         # Defense
         monster_def = monster.get("DEF", 0)

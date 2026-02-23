@@ -28,7 +28,7 @@ class TestExplorationAchievements(unittest.TestCase):
         location_id = "forest_outskirts"
 
         # Mock active adventure
-        active_session = {
+        self.mock_db.get_active_adventure.return_value = {
             "discord_id": discord_id,
             "location_id": location_id,
             "start_time": "2023-10-26T12:00:00",
@@ -39,8 +39,6 @@ class TestExplorationAchievements(unittest.TestCase):
             "logs": "[]",
             "active_monster_json": None,
         }
-        self.mock_db.get_active_adventure.return_value = active_session
-        self.mock_db.mark_adventure_claiming.return_value = active_session
 
         # Mock player stats json
         self.mock_db.get_player_stats_json.return_value = {

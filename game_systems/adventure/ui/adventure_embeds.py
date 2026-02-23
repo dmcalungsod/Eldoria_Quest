@@ -5,6 +5,7 @@ Handles the creation of Discord embeds for the adventure system.
 Hardened: Robust JSON parsing and layout stability.
 """
 
+import datetime
 import json
 import logging
 import random
@@ -184,6 +185,72 @@ class AdventureEmbeds:
         return embed
 
     @staticmethod
+    def build_adventure_status_embed(session: dict) -> discord.Embed:
+        """
+        Builds the status embed for an active auto-adventure.
+        """
+        loc_id = session.get("location_id")
+        loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone", "emoji": E.MAP})
+
+        # Calculate Times
+        start_time = datetime.datetime.fromisoformat(session["start_time"])
+        end_time = datetime.datetime.fromisoformat(session["end_time"])
+        now = WorldTime.now()
+
+        remaining = end_time - now
+
+        # Format duration strings
+        def fmt_delta(d):
+            seconds = int(d.total_seconds())
+            if seconds < 0:
+                return "0m"
+            hours, remainder = divmod(seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+            if hours > 0:
+                return f"{hours}h {minutes}m"
+            return f"{minutes}m"
+
+        remaining_str = fmt_delta(remaining)
+        if remaining.total_seconds() <= 0:
+            remaining_str = "Complete!"
+            status_text = "Ready to Return"
+            color = discord.Color.gold()
+        else:
+            status_text = "In Progress"
+            color = discord.Color.blue()
+
+        embed = discord.Embed(
+            title=f"{loc_data.get('emoji', '')} {loc_data.get('name')}",
+            description=f"**Status:** {status_text}",
+            color=color,
+        )
+
+        embed.add_field(name="⏳ Time Remaining", value=f"`{remaining_str}`", inline=True)
+        embed.add_field(
+            name="👣 Steps Taken", value=f"`{session.get('steps_completed', 0)}`", inline=True
+        )
+
+        # Loot Count
+        try:
+            loot_raw = session.get("loot_collected", "{}")
+            loot = json.loads(loot_raw) if isinstance(loot_raw, str) else loot_raw
+            # Filter out non-item keys like 'exp' or 'aurum' if they are in loot dict
+            # AdventureSession stores actual items in loot dict, exp/aurum are special but check anyway
+            loot_count = sum(v for k, v in loot.items() if k not in ("exp", "aurum"))
+        except Exception:
+            loot_count = 0
+
+        embed.add_field(name="🎒 Loot Gathered", value=f"`{loot_count}` items", inline=True)
+
+        # Flavor footer
+        embed.set_footer(text="Your party is exploring automatically.")
+
+        return embed
+
+    # Alias for compatibility with tests expecting 'build_status_embed'
+    build_status_embed = build_adventure_status_embed
+
+    @staticmethod
     def build_summary_embed(summary: dict, location_id: str) -> discord.Embed:
         """Constructs the mission report embed."""
         s = summary
@@ -215,7 +282,11 @@ class AdventureEmbeds:
 
         embed = discord.Embed(title=title, description=f"*{flavor_text}*", color=color)
 
-        # 2. Rewards
+        # 2. Stats (Steps/Battles) - If available
+        if (steps := s.get("steps_completed")) is not None:
+            embed.add_field(name="👣 Distance Traveled", value=f"{steps} Steps", inline=True)
+
+        # 3. Rewards
         rewards = []
         if (xp := s.get("xp_gained", 0)) > 0:
             rewards.append(f"{E.EXP} **+{xp} XP**")
@@ -265,124 +336,4 @@ class AdventureEmbeds:
             embed.add_field(name="🏆 Achievements Unlocked", value=new_titles, inline=False)
 
         embed.set_footer(text="Your journey is recorded in the archives.")
-        return embed
-
-    @staticmethod
-    def build_status_embed(
-        session: dict,
-        location_data: dict,
-        time_remaining: str,
-        steps_completed: int,
-    ) -> discord.Embed:
-        """
-        Displays the status of an active background adventure.
-        """
-        location_name = location_data.get("name", "Unknown Zone")
-        emoji = location_data.get("emoji", E.MAP)
-
-        embed = discord.Embed(
-            title=f"{emoji} Expedition in Progress: {location_name}",
-            description="*The party is currently exploring the wilds...*",
-            color=discord.Color.blue(),
-        )
-
-        embed.add_field(name="⏳ Time Remaining", value=f"**{time_remaining}**", inline=True)
-        embed.add_field(name="👣 Progress", value=f"**{steps_completed} Steps**", inline=True)
-
-        # Combat Stance (If active monster)
-        try:
-            am_json = session.get("active_monster_json")
-            if am_json:
-                active_monster = json.loads(am_json)
-                if active_monster:
-                    stance = active_monster.get("player_stance", "balanced")
-
-                    # Stance formatting
-                    stance_emoji = "⚖️"
-                    stance_desc = "Standard"
-                    if stance == "aggressive":
-                        stance_emoji = "⚔️"
-                        stance_desc = "High Dmg"
-                    elif stance == "defensive":
-                        stance_emoji = "🛡️"
-                        stance_desc = "High Def"
-
-                    embed.add_field(
-                        name="⚔️ Tactics",
-                        value=f"{stance_emoji} **{stance.capitalize()}**\n*({stance_desc})*",
-                        inline=True,
-                    )
-        except (json.JSONDecodeError, TypeError):
-            pass
-        except Exception as e:
-            logger.warning(f"Error parsing stance: {e}")
-
-        # Loot Preview
-        try:
-            loot_collected = json.loads(session.get("loot_collected", "{}"))
-            loot_count = sum(loot_collected.values())
-            embed.add_field(
-                name=f"{E.ITEM_BOX} Loot Gathered",
-                value=f"**{loot_count} Items**",
-                inline=True,
-            )
-        except Exception:
-            embed.add_field(name=f"{E.ITEM_BOX} Loot Gathered", value="*Unknown*", inline=True)
-
-        # Show last log entry for flavor
-        try:
-            logs = json.loads(session.get("logs", "[]"))
-            if logs:
-                last_log = logs[-1]
-                # If it's a list (combat sequence), take the last string
-                if isinstance(last_log, list):
-                    last_log = last_log[-1]
-                embed.add_field(name="📝 Latest Report", value=f"*{last_log}*", inline=False)
-        except Exception:
-            pass
-
-        embed.set_footer(text="Check back later for the full report.")
-        return embed
-
-    @staticmethod
-    def build_death_embed(session: dict, location_data: dict) -> discord.Embed:
-        """
-        Displays the death report for a failed adventure.
-        """
-        location_name = location_data.get("name", "Unknown Zone")
-
-        embed = discord.Embed(
-            title=f"{E.SKULL} Expedition Failed: {location_name}",
-            description="**You have fallen in battle.**\n*Your body was recovered, but at a great cost.*",
-            color=discord.Color.dark_red(),
-        )
-
-        # Parse logs to find the death cause (or show last few lines)
-        try:
-            logs = json.loads(session.get("logs", "[]"))
-            # Get last few lines to show what happened
-            death_log = []
-
-            # Walk backwards to find relevant logs
-            count = 0
-            for entry in reversed(logs):
-                if count >= 5:
-                    break
-                if isinstance(entry, list):
-                    for sub_entry in reversed(entry):
-                         if count >= 5:
-                             break
-                         death_log.insert(0, AdventureEmbeds._format_log_line(sub_entry))
-                         count += 1
-                else:
-                    death_log.insert(0, AdventureEmbeds._format_log_line(entry))
-                    count += 1
-
-            log_text = "```ansi\n" + "\n".join(death_log) + "\n```"
-            embed.add_field(name="💀 Cause of Death", value=log_text, inline=False)
-
-        except Exception:
-            embed.add_field(name="💀 Cause of Death", value="*The records are lost...*", inline=False)
-
-        embed.set_footer(text="Rest and recover at the Infirmary.")
         return embed

@@ -8,7 +8,6 @@ import logging
 import random
 
 from database.database_manager import DatabaseManager
-from game_systems.achievement_system import AchievementSystem
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
@@ -36,7 +35,6 @@ def calculate_crafting_xp_req(level: int) -> int:
 class CraftingSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
-        self.achievement_system = AchievementSystem(db_manager)
 
     def _add_crafting_xp(self, discord_id: int, rarity: str, is_discovery: bool = False) -> str:
         """
@@ -78,11 +76,6 @@ class CraftingSystem:
             crafting_level=current_level,
             crafting_xp=current_xp,
         )
-
-        # Check Achievements
-        ach_msg = self.achievement_system.check_crafting_achievements(discord_id, current_level)
-        if ach_msg:
-            msg_extras += f"\n{ach_msg}"
 
         return f" (+{base_xp} Craft XP){msg_extras}"
 
