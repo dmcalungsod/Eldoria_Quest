@@ -52,7 +52,9 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         # Force reload cogs.shop_cog to ensure ShopView uses our mocks
         if "cogs.shop_cog" in sys.modules:
-            importlib.reload(sys.modules["cogs.shop_cog"])
+            # Re-import to handle namespace package issues during reload
+            shop_cog = sys.modules["cogs.shop_cog"]
+            importlib.reload(shop_cog)
 
         from cogs.shop_cog import ShopView as SV
         self.ShopView = SV

@@ -18,30 +18,26 @@ import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.items.inventory_manager import InventoryManager
+from game_systems.data.shop_data import SHOP_INVENTORY
 
 from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
 logger = logging.getLogger("eldoria.shop")
 
-SHOP_INVENTORY = {
-    "hp_potion_1": 40,
-    "mp_potion_1": 40,
-    "antidote_basic": 40,
-    "smoke_pellet": 45,
-    "food_ration": 15,
-    "hp_potion_2": 90,
-    "mp_potion_2": 90,
-    "strength_brew": 120,
-    "dex_elixir": 120,
-}
-
 
 class ShopView(View):
-    def __init__(self, db_manager: DatabaseManager, interaction_user: discord.User, current_aurum: int):
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        current_aurum: int,
+        inventory: dict = None,
+    ):
         super().__init__(timeout=180)
         self.db = db_manager
         self.interaction_user = interaction_user
         self.current_aurum = current_aurum
+        self.inventory = inventory or SHOP_INVENTORY
         self.inv_manager = InventoryManager(self.db)
 
         self.add_item(self.build_item_select())
@@ -62,13 +58,13 @@ class ShopView(View):
     def build_item_select(self) -> Select:
         item_select = Select(placeholder="Select provisions...", min_values=1, max_values=1, row=0)
 
-        if not SHOP_INVENTORY:
+        if not self.inventory:
             item_select.add_option(label="Out of Stock", value="disabled", emoji=E.ERROR)
             item_select.disabled = True
             return item_select
 
         can_afford_any = False
-        for item_key, price in SHOP_INVENTORY.items():
+        for item_key, price in self.inventory.items():
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 continue
@@ -108,7 +104,7 @@ class ShopView(View):
         """Atomic purchase transaction."""
         try:
             # SECURITY: Fetch price from server inventory, do not trust client
-            price = SHOP_INVENTORY.get(item_key)
+            price = self.inventory.get(item_key)
             if price is None:
                 return (False, "Item not available.", 0)
 
@@ -164,7 +160,7 @@ class ShopView(View):
         msg = f"{E.CHECK} Secured **1x {result['name']}**." if success else f"{E.ERROR} {result}"
         embed.add_field(name="Transaction Receipt", value=msg)
 
-        new_view = ShopView(self.db, self.interaction_user, current_aurum)
+        new_view = ShopView(self.db, self.interaction_user, current_aurum, self.inventory)
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=new_view)

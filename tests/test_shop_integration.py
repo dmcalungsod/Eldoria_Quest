@@ -30,7 +30,15 @@ mock_ui.View = MockView
 sys.modules["discord.ui"] = mock_ui
 mock_discord.ui = mock_ui
 
-from cogs.shop_cog import SHOP_INVENTORY, ShopView  # noqa: E402
+
+from game_systems.data.shop_data import SHOP_INVENTORY  # noqa: E402
+
+# Force reload to ensure ShopView uses the MockView defined above
+# We delete from sys.modules to handle cases where it might be mocked
+if "cogs.shop_cog" in sys.modules:
+    del sys.modules["cogs.shop_cog"]
+
+from cogs.shop_cog import ShopView  # noqa: E402
 
 
 class TestShopViewIntegration(unittest.TestCase):
@@ -80,6 +88,30 @@ class TestShopViewIntegration(unittest.TestCase):
         self.assertFalse(success)
         self.assertEqual(result, "Insufficient Aurum.")
         self.assertEqual(new_aurum, 0)
+
+    def test_shop_view_with_custom_inventory(self):
+        mock_db = MagicMock()
+        mock_user = MagicMock()
+        mock_user.id = 12345
+        current_aurum = 1000
+
+        # Custom inventory with modified price for an existing item
+        custom_inv = {"hp_potion_1": 999}
+
+        view = ShopView(mock_db, mock_user, current_aurum, inventory=custom_inv)
+
+        item_key = "hp_potion_1"
+        price = custom_inv[item_key]  # 999
+
+        # Mock purchase_item return
+        mock_db.purchase_item.return_value = (True, {"name": "Dewfall Tonic"}, 1)
+
+        success, result, new_aurum = view._execute_purchase(item_key)
+
+        # Verify call used the custom price
+        mock_db.purchase_item.assert_called_once()
+        args, _ = mock_db.purchase_item.call_args
+        self.assertEqual(args[3], price)
 
 
 if __name__ == "__main__":

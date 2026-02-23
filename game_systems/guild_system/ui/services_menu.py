@@ -14,6 +14,8 @@ from discord.ui import Button, View
 import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_guild_hall_callback
 from database.database_manager import DatabaseManager
+from game_systems.data.shop_data import MYSTIC_MERCHANT_INVENTORY
+from game_systems.events.world_event_system import WorldEventSystem
 
 from .components import EmbedBuilder, GuildViewMixin, SystemCache, ViewFactory
 
@@ -56,6 +58,21 @@ class GuildServicesView(View, GuildViewMixin):
                 "Alchemist", discord.ButtonStyle.secondary, "g_alchemist", "⚗️", 1, callback=self.alchemist_callback
             )
         )
+
+        # Check for Mystic Merchant Event
+        self.event_system = WorldEventSystem(self.db)
+        active_event = self.event_system.get_current_event()
+        if active_event and active_event.get("type") == WorldEventSystem.MYSTIC_MERCHANT:
+            self.add_item(
+                ViewFactory.create_button(
+                    "Mystic Merchant",
+                    discord.ButtonStyle.success,
+                    "g_mystic",
+                    "🔮",
+                    1,
+                    callback=self.mystic_merchant_callback,
+                )
+            )
 
         self.back_btn = ViewFactory.create_button(
             "Back to Guild Lobby", discord.ButtonStyle.grey, "back_lobby", row=2, callback=back_to_guild_hall_callback
@@ -143,6 +160,25 @@ class GuildServicesView(View, GuildViewMixin):
         view = CraftingView(self.db, self.interaction_user)
         embed = view.build_embed()
 
+        view.set_back_button(self.back_to_services, "Back to Services")
+        await interaction.edit_original_response(embed=embed, view=view)
+
+    async def mystic_merchant_callback(self, interaction: discord.Interaction, button: Button = None):
+        from cogs.shop_cog import ShopView
+
+        await interaction.response.defer()
+        p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+        if not p_data:
+            return
+
+        aurum = p_data["aurum"]
+
+        embed = discord.Embed(
+            title="🔮 Mystic Merchant",
+            description=f"A cloaked figure displays wares that shimmer with strange energy.\n\nFunds: {aurum} Aurum",
+            color=discord.Color.purple(),
+        )
+        view = ShopView(self.db, self.interaction_user, aurum, inventory=MYSTIC_MERCHANT_INVENTORY)
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 

@@ -22,6 +22,7 @@ class WorldEventSystem:
     VOID_INCURSION = "void_incursion"
     HARVEST_FESTIVAL = "harvest_festival"
     ELEMENTAL_SURGE = "elemental_surge"
+    MYSTIC_MERCHANT = "mystic_merchant"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -69,6 +70,13 @@ class WorldEventSystem:
                 "loot_boost": 1.3,
                 "exp_boost": 1.2,
                 "monster_buff": 1.2,
+            },
+        },
+        MYSTIC_MERCHANT: {
+            "name": "The Mystic Merchant",
+            "description": "A mysterious traveler has arrived, offering rare goods for those with coin.",
+            "modifiers": {
+                "loot_boost": 1.2,
             },
         },
     }
