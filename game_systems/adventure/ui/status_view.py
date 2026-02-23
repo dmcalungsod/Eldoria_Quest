@@ -9,7 +9,7 @@ import datetime
 import logging
 
 import discord
-from discord.ui import Button, View
+from discord.ui import Button, View, Select
 
 import game_systems.data.emojis as E
 from cogs.ui_helpers import back_to_profile_callback
@@ -20,6 +20,69 @@ from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.ui.status")
+
+
+class TacticsView(View):
+    def __init__(self, manager: AdventureManager, discord_id: int):
+        super().__init__(timeout=60)
+        self.manager = manager
+        self.discord_id = discord_id
+
+        self.select = Select(
+            placeholder="Choose your Combat Stance...",
+            min_values=1,
+            max_values=1,
+            options=[
+                discord.SelectOption(
+                    label="Aggressive",
+                    value="aggressive",
+                    description="High Damage, High Risk (+20% Dmg Dealt/Taken)",
+                    emoji="⚔️"
+                ),
+                discord.SelectOption(
+                    label="Balanced",
+                    value="balanced",
+                    description="Standard Combat (No modifiers)",
+                    emoji="⚖️",
+                    default=True
+                ),
+                discord.SelectOption(
+                    label="Defensive",
+                    value="defensive",
+                    description="Safety First (-20% Dmg Dealt/Taken)",
+                    emoji="🛡️"
+                ),
+            ]
+        )
+        self.select.callback = self.select_callback
+        self.add_item(self.select)
+
+    async def select_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        stance = self.select.values[0]
+
+        try:
+            # Simulate step with stance change action
+            # Note: This is synchronous, matching local pattern
+            result = self.manager.simulate_adventure_step(self.discord_id, action=f"set_stance:{stance}")
+
+            # Check result for confirmation
+            if result and result.get("sequence"):
+                # sequence is [[msg]]
+                # Flatten log to find relevant message
+                msgs = [m for sublist in result["sequence"] for m in sublist]
+                last_msg = msgs[-1] if msgs else "Stance updated."
+
+                # Check if it was actually a stance update or an error/generic msg
+                if "shift into" in last_msg or "stance" in last_msg:
+                    await interaction.followup.send(f"✅ {last_msg}", ephemeral=True)
+                else:
+                    await interaction.followup.send("Stance update processed, but combat state may have changed.", ephemeral=True)
+            else:
+                await interaction.followup.send("Failed to update stance. Are you in active combat?", ephemeral=True)
+        except Exception as e:
+            logger.error(f"Tactics error: {e}")
+            await interaction.followup.send("An error occurred while changing tactics.", ephemeral=True)
 
 
 class AdventureStatusView(View):
@@ -45,6 +108,17 @@ class AdventureStatusView(View):
         )
         self.btn_refresh.callback = self.refresh_callback
         self.add_item(self.btn_refresh)
+
+        # Tactics Button
+        self.btn_tactics = Button(
+            label="Tactics",
+            style=discord.ButtonStyle.secondary,
+            custom_id="adv_tactics",
+            emoji="⚔️",
+            row=0
+        )
+        self.btn_tactics.callback = self.tactics_callback
+        self.add_item(self.btn_tactics)
 
         # Retreat Button
         self.btn_retreat = Button(
@@ -102,6 +176,11 @@ class AdventureStatusView(View):
 
         embed = AdventureEmbeds.build_status_embed(session, loc_data, time_str, steps)
         await interaction.edit_original_response(embed=embed, view=self)
+
+    async def tactics_callback(self, interaction: discord.Interaction):
+        # Ephemeral view to choose stance
+        view = TacticsView(self.manager, interaction.user.id)
+        await interaction.response.send_message("Select your combat stance:", view=view, ephemeral=True)
 
     async def retreat_callback(self, interaction: discord.Interaction):
         # Confirm retreat? For now, direct action as per ONE UI (fast interaction)
