@@ -12,10 +12,10 @@ sys.modules["pymongo.MongoClient"] = MagicMock()
 sys.modules["pymongo.UpdateOne"] = MagicMock()
 sys.modules["pymongo.InsertOne"] = MagicMock()
 
-from database.database_manager import (
+from database.database_manager import (  # noqa: E402
     MAX_STACK_CONSUMABLE,
     DatabaseManager,
-)  # noqa: E402
+)
 
 
 class TestStackLimits(unittest.TestCase):
