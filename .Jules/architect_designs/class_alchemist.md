@@ -1,87 +1,129 @@
 # Class Design: Alchemist
 
-## 🎭 Concept
-**"While mages study the stars, I study the dirt."**
+## 🧪 Concept
+A pragmatic survivor who views the Sundering not as a curse, but a chemical reaction to be understood. While Mages channel the Veil and Clerics pray to it, Alchemists bottle it. They use volatile mixtures to control the battlefield, stripping enemy defenses and turning the environment against them.
 
-The Alchemist is a pragmatic survivor who uses the remnants of the world to fight back against the darkness. They are not magical in the traditional sense; their power comes from knowledge of monster anatomy, volatile compounds, and desperate ingenuity. They are a mid-range fighter who excels at weakening enemies and dealing consistent damage through chemical warfare.
+**Role:** Utility / DoT / Debuffer.
+**Theme:** "Science in a world of Magic." Glass, fumes, and calculated risk.
 
 ## 📜 Lore (for StoryWeaver)
-In the wake of the Sundering, traditional magic became erratic and dangerous. Those who refused to rely on fickle leylines turned to the physical world—extracting venom from slain beasts, distilling explosive salts from the earth, and stitching wounds with sterile thread. Alchemists are often viewed with suspicion, seen as scavengers or graverobbers, but when a plague spreads or a beast needs to be brought down, their concoctions are worth more than gold.
+> "The gods didn't save us when the sky cracked. Steel rusted, and prayers went unanswered. But the rot... the rot was honest. It taught me that everything breaks down if you apply the right catalyst. I am not a hero; I am just the one who knows the formula for your undoing."
+> — *Kaelen, First Alchemist of the Grey Ward*
+
+Alchemists are often former scholars, apothecaries, or survivalists who realized that the warped mana of the world could be distilled into physical forms. They are respected for their ability to cure the incurable, but feared for their ability to liquefy armor.
 
 ## 📊 Base Stats (for GameBalancer)
-The Alchemist relies on **DEX** (precision in throwing/mixing) and **MAG** (knowledge of potency), with decent **LCK** (finding ingredients). They are less durable than a Warrior but hardier than a Mage due to their chemical enhancements.
+*   **HP:** Medium (1.1x Rogue base) - *Hardy from exposure to fumes.*
+*   **MP:** Medium (0.8x Mage base) - *Uses mana to stabilize volatile compounds.*
+*   **STR:** 3
+*   **END:** 5
+*   **DEX:** 6 - *Precision throwing.*
+*   **AGI:** 4
+*   **MAG:** 7 - *Understanding of magical properties.*
+*   **LCK:** 4 - *Experimental success requires luck.*
 
-- **STR**: 3 (Low)
-- **END**: 5 (Medium)
-- **DEX**: 7 (High - Primary Offensive Stat)
-- **AGI**: 4 (Medium-Low)
-- **MAG**: 6 (High - Potency Stat)
-- **LCK**: 5 (High - Scavenging)
+## 🎒 Starting Equipment (for GameForge)
+*   **Weapon:** "Cracked Pestle" (Mace type) or "Rusty Scalpel" (Dagger type)
+*   **Armor:** "Stained Apron" (Light/Medium Armor)
+*   **Accessory:** "Basic Vial Pouch"
+*   **Consumables:** 2x *Minor Acid Vial* (New Item), 1x *Antidote*
 
-**Starting Equipment:**
-- **Weapon**: Rusty Dagger (or "Alchemist's Scalpel")
-- **Offhand**: Cracked Vial (if dual-wield logic allows)
-- **Armor**: Leather Apron (Medium Armor)
-- **Misc**: Basic Bandages
-
-## ⚔️ Skill Tree: The Chemist's Art
+## ⚔️ Skill Tree: The Volatile Path (for Tactician)
 
 ### Tier 1 (Rank F)
-#### **Acid Flask** (Active)
-*Throw a vial of corrosive acid that burns the target and weakens their armor.*
-- **Type**: Active
-- **Cost**: 8 MP
-- **Scaling**: DEX (Aim) + MAG (Potency)
-- **Effect**: Moderate Damage + **Defense Break** (Reduces target DEF by 20% for 3 turns).
-- **Narrative**: "Glass shatters, and the hiss of dissolving metal fills the air."
+**1. Corrosive Flask (Active)**
+*Description:* Hurls a flask of concentrated acid that burns the target and weakens their armor.
+*Mechanics:* Deals initial damage and applies a "Corroded" debuff (-10% END/Defense) for 3 turns.
+```python
+"corrosive_flask": {
+    "key_id": "corrosive_flask",
+    "name": "Corrosive Flask",
+    "description": "Shatters a vial of acid, dealing damage and eroding armor.",
+    "type": "Active",
+    "class_id": 6,
+    "mp_cost": 8,
+    "power_multiplier": 1.2,
+    "debuff": {"END_percent": -0.1, "duration": 3},  # Requires Tactician to implement negative buffs
+    "learn_cost": 0,
+    "upgrade_cost": 200,
+    "scaling_stat": "DEX",  # Accuracy of the throw
+    "scaling_factor": 2.4,
+}
+```
 
-#### **Field Triage** (Active)
-*Quickly apply a healing salve to close wounds.*
-- **Type**: Active (Heal)
-- **Cost**: 10 MP
-- **Scaling**: MAG
-- **Effect**: Restores HP (Moderate).
-- **Narrative**: "A sharp sting of alcohol, then the bleeding stops."
+**2. Field Medic (Passive)**
+*Description:* Years of handling dangerous substances have made you efficient at applying remedies.
+*Mechanics:* Increases the potency of healing items used on self by 20%.
+```python
+"field_medic": {
+    "key_id": "field_medic",
+    "name": "Field Medic",
+    "description": "Increases the effectiveness of healing items.",
+    "type": "Passive",
+    "class_id": 6,
+    "passive_bonus": {"healing_item_potency": 0.2}, # New modifier for ItemManager
+    "learn_cost": 500,
+    "scaling_stat": "MAG",
+    "scaling_factor": 1.0,
+}
+```
 
-### Tier 2 (Rank D)
-#### **Volatile Brew** (Active)
-*Hurl an unstable mixture that explodes on impact.*
-- **Type**: Active (AoE)
-- **Cost**: 15 MP
-- **Scaling**: MAG
-- **Effect**: High Damage to all enemies.
-- **Narrative**: "You shake the flask until it glows, then throw it before it takes your hand off."
+### Tier 2 (Rank E - Proposed)
+**3. Volatile Mixture (Active)**
+*Description:* Mixes unstable reagents to create a sudden explosion.
+*Mechanics:* AoE Fire damage with a chance to Stun.
+```python
+"volatile_mixture": {
+    "key_id": "volatile_mixture",
+    "name": "Volatile Mixture",
+    "description": "Throw a volatile cocktail that explodes on impact.",
+    "type": "Active",
+    "class_id": 6,
+    "mp_cost": 15,
+    "power_multiplier": 1.0, # Lower multi because AoE
+    "is_aoe": True,
+    "status_effect": {"stun_chance": 0.2},
+    "learn_cost": 1500,
+    "scaling_stat": "MAG",
+    "scaling_factor": 2.5,
+}
+```
 
-#### **Scavenger's Intuition** (Passive)
-*You know exactly where to look for the good stuff.*
-- **Type**: Passive
-- **Effect**: +15% LCK.
-- **Narrative**: "One man's trash is an Alchemist's arsenal."
+**4. Catalyst (Passive)**
+*Description:* Your understanding of magical reactions amplifies your mixtures.
+*Mechanics:* Increases MAG stat by 10%.
+```python
+"catalyst": {
+    "key_id": "catalyst",
+    "name": "Catalyst",
+    "description": "Deep knowledge of reactions boosts magical potency.",
+    "type": "Passive",
+    "class_id": 6,
+    "passive_bonus": {"MAG_percent": 0.1},
+    "learn_cost": 1000,
+    "scaling_stat": "MAG",
+    "scaling_factor": 1.0,
+}
+```
 
-### Tier 3 (Rank C)
-#### **Adrenal Injector** (Active)
-*Inject a risky stimulant to boost physical performance.*
-- **Type**: Active (Buff)
-- **Cost**: 20 MP
-- **Effect**: +30% STR, +30% AGI for 3 turns. Self-inflict minor damage (10 HP)?
-- **Narrative**: "The heart hammers like a drum, and the world moves in slow motion."
+### Ultimate (Rank B - Proposed)
+**5. Elixir of Transmutation**
+*Description:* Drink a dangerous concoction that mutates the body for combat.
+*Mechanics:* +30% STR/AGI/END for 3 turns, but takes 10% Max HP damage per turn.
 
 ## 🔗 Integration Notes
 
-### 🧠 Tactician (Combat Systems)
-- **New Mechanic Needed**: **Player-Inflicted Debuffs**.
-  - Currently, `CombatEngine` does not parse `debuff` keys from player skills effectively (unlike `MonsterAI`).
-  - Please implement support for `defense_break` (reducing monster DEF) in `CombatEngine` and `DamageFormula`.
-- **New Mechanic Needed**: **Self-Damage Costs**.
-  - `Adrenal Injector` suggests a "HP Cost" or self-damage component for high-risk buffs.
+### 🛠️ For GameForge
+1.  **New Item:** "Alchemist's Satchel" (Accessory). Effect: +5% Potion Duration.
+2.  **Class Quest:** "The Magnum Opus".
+    *   *Objective:* Collect `Volatile Slime` (from Slimes), `Sulfur` (from Rock Elementals), and `Moonleaf` (Herb).
+    *   *Reward:* Unlock the *Volatile Mixture* skill or a unique "Ever-Filling Flask" (1/day potion).
+3.  **Crafting Hook:** Alchemists should have a 10% chance to *not consume materials* when crafting Potions (requires update to `CraftingSystem`).
 
-### 🛠️ GameForge (Items & Monsters)
-- **New Weapon Type**: Consider adding "Satchels" or "Vials" as a weapon type, or skin Daggers as "Scalpels".
-- **Class Quest**: "The Alchemist's Debt" – A quest to collect rare monster parts to brew a cure for a dying NPC.
+### 🧠 For Tactician
+1.  **Debuff Logic:** Ensure `CombatEngine` supports negative percentage modifiers in `debuff` (e.g., `"END_percent": -0.1`).
+2.  **Item Potency:** Ensure `ItemManager.use_item` checks for `healing_item_potency` passive bonus.
 
-### 📖 ChronicleKeeper (Achievements)
-- **Achievement**: "Mad Science" – Kill 50 enemies with `Volatile Brew`.
-- **Title**: "Plague Doctor" – Unlock all Alchemist skills.
-
-### ⚖️ Grimwarden (Tone Check)
-- Ensure skill descriptions emphasize the *chemical/physical* nature, not magical. It's about reactions, not incantations.
+### 📚 For ChronicleKeeper
+1.  **Achievement:** "Better Living Through Chemistry" - Craft 50 potions.
+2.  **Title:** "Plague Doctor" - Unlock all Alchemist skills.

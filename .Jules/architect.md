@@ -68,3 +68,21 @@ Major Content Expansion: The Eldoria Codex (Bestiary, Atlas, Armory).
 **Next Steps:**
 - Notify `DatabaseManager` to implement schema.
 - Notify `CodexKeeper` (or `ChronicleKeeper`) to begin UI implementation.
+
+## 2026-03-15 — Blueprint Finalization: Alchemist Class
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/class_alchemist.md`
+
+**Key Mechanics:**
+- **Hybrid Stats:** High MAG (Potency) + DEX (Accuracy). Breaks the single-stat dependency seen in Warrior/Mage.
+- **Potion Efficiency:** Introduced "Field Medic" passive to scale item healing, adding value to the Crafting loop.
+- **Resource Management:** Skills consume MP *and* Items (conceptually), reinforcing the survival theme.
+
+**Integration Directives:**
+- **Tactician:** Provided exact JSON schema for `corrosive_flask` (Debuff: END -10%) and `volatile_mixture` (AoE Stun).
+- **GameForge:** Specified "Alchemist's Satchel" accessory to boost potion duration.
+- **Quest:** "The Magnum Opus" designed to gate the class ultimate behind a crafting challenge.
+
+**Status:**
+Blueprint ready for implementation.
