@@ -1858,7 +1858,22 @@ class DatabaseManager:
     # INFIRMARY (New methods for external call sites)
     # ============================================================
 
-    def execute_heal(self, discord_id: int, max_hp: int, max_mp: int, cost: int) -> tuple[bool, str]:
+    @staticmethod
+    def calculate_heal_cost(current_hp: int, current_mp: int, max_hp: int, max_mp: int) -> int:
+        """
+        Calculates the Aurum cost to restore HP and MP.
+        Formula: 2.0 Aurum per missing HP, 3.0 Aurum per missing MP.
+        Magic is biologically taxing to restore.
+        """
+        missing_hp = max(0, max_hp - current_hp)
+        missing_mp = max(0, max_mp - current_mp)
+
+        if missing_hp <= 0 and missing_mp <= 0:
+            return 0
+
+        return max(1, math.ceil(missing_hp * 2.0 + missing_mp * 3.0))
+
+    def execute_heal(self, discord_id: int, max_hp: int, max_mp: int) -> tuple[bool, str]:
         """Atomically heals a player and deducts gold."""
         player = self._col("players").find_one(
             {"discord_id": discord_id},
@@ -1867,20 +1882,14 @@ class DatabaseManager:
         if not player:
             return False, "Player not found."
 
-        missing_hp = max(0, max_hp - player["current_hp"])
-        missing_mp = max(0, max_mp - player["current_mp"])
+        current_hp = player["current_hp"]
+        current_mp = player["current_mp"]
 
-        if missing_hp == 0 and missing_mp == 0:
+        if current_hp >= max_hp and current_mp >= max_mp:
             return False, "You are already healthy."
 
-        # Recalculate cost from fresh data
-        # Use math.ceil for consistent rounding (aligns with InfirmaryCog)
-        # Cost is 2.0 Aurum per missing HP, 3.0 Aurum per missing MP
-        # Magic is biologically taxing to restore.
-        if missing_hp > 0 or missing_mp > 0:
-            actual_cost = max(1, math.ceil(missing_hp * 2.0 + missing_mp * 3.0))
-        else:
-            actual_cost = 0
+        # Recalculate cost from fresh data using centralized formula
+        actual_cost = self.calculate_heal_cost(current_hp, current_mp, max_hp, max_mp)
 
         if player["aurum"] < actual_cost:
             return False, "Insufficient funds."

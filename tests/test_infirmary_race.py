@@ -38,7 +38,7 @@ class TestInfirmaryRace(unittest.TestCase):
         # Target: 150 HP (Missing 100). Cost should be 200 (2.0 * 100)
         # Target: 50 MP (Missing 40). Cost should be 120 (3.0 * 40)
         # Total Cost: 320
-        result, msg = self.db.execute_heal(12345, max_hp=150, max_mp=50, cost=0)
+        result, msg = self.db.execute_heal(12345, max_hp=150, max_mp=50)
 
         self.assertTrue(result)
         self.assertIn("Restored HP/MP", msg)
@@ -81,7 +81,7 @@ class TestInfirmaryRace(unittest.TestCase):
         self.db._col("players").update_one.return_value = mock_result
 
         # Call execute_heal
-        result, msg = self.db.execute_heal(12345, max_hp=150, max_mp=50, cost=0)
+        result, msg = self.db.execute_heal(12345, max_hp=150, max_mp=50)
 
         # Should return False because update failed
         self.assertFalse(result)

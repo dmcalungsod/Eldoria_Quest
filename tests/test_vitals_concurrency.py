@@ -54,7 +54,7 @@ class MockDatabaseManager:
         self.player_data["current_hp"] = hp
         self.player_data["current_mp"] = mp
 
-    def execute_heal(self, discord_id, max_hp, max_mp, cost):
+    def execute_heal(self, discord_id, max_hp, max_mp):
         # Simulates external heal
         self.player_data["current_hp"] = max_hp
         self.player_data["current_mp"] = max_mp
@@ -142,7 +142,7 @@ class TestHealRaceCondition(unittest.TestCase):
             def mock_resolve_turn(*args, **kwargs):
                 # A. Simulate External Heal (e.g. via Infirmary)
                 # Player was at 50 HP. Heals to 100.
-                self.db.execute_heal(self.user_id, 100, 100, 10)
+                self.db.execute_heal(self.user_id, 100, 100)
 
                 # B. Combat calculates result based on OLD context (HP 50)
                 # Takes 10 damage -> 40 HP

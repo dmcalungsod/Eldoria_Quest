@@ -80,6 +80,7 @@ class TestInfirmaryStateIssue(unittest.TestCase):
 
         # Setup test objects
         self.mock_db = MagicMock(spec=self.DatabaseManager)
+        self.mock_db.calculate_heal_cost.return_value = 100
         self.user = MagicMock()
         self.user.id = 12345
 
@@ -125,7 +126,7 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         view._execute_heal()
 
         # 4. Verify execute_heal called with FRESH Max HP (200)
-        self.mock_db.execute_heal.assert_called_with(self.user.id, new_max_hp, fresh_stats.max_mp, cost=0)
+        self.mock_db.execute_heal.assert_called_with(self.user.id, new_max_hp, fresh_stats.max_mp)
 
         # Also ensure it wasn't called with old HP
         args, _ = self.mock_db.execute_heal.call_args

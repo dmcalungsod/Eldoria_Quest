@@ -23,12 +23,6 @@ from .ui_helpers import back_to_guild_hall_callback, make_progress_bar
 logger = logging.getLogger("eldoria.infirmary")
 
 
-def infirmary_cost(missing_hp: int, missing_mp: int) -> int:
-    if missing_hp <= 0 and missing_mp <= 0:
-        return 0
-    return max(1, math.ceil(missing_hp * 2.0 + missing_mp * 3.0))
-
-
 class InfirmaryView(View):
     def __init__(self, db: DatabaseManager, user: discord.User, p_data, stats: PlayerStats):
         super().__init__(timeout=180)
@@ -41,7 +35,11 @@ class InfirmaryView(View):
         current_mp = self.p_data["current_mp"]
         self.missing_hp = max(0, stats.max_hp - current_hp)
         self.missing_mp = max(0, stats.max_mp - current_mp)
-        self.cost = infirmary_cost(self.missing_hp, self.missing_mp)
+
+        # Use centralized cost calculation from DatabaseManager
+        self.cost = DatabaseManager.calculate_heal_cost(
+            current_hp, current_mp, stats.max_hp, stats.max_mp
+        )
 
         # Heal Button
         disabled = self.missing_hp <= 0 and self.missing_mp <= 0
@@ -94,7 +92,7 @@ class InfirmaryView(View):
             max_mp = fresh_stats.max_mp
 
             # Delegate to DatabaseManager for atomic execution
-            return self.db.execute_heal(self.user.id, max_hp, max_mp, cost=0)
+            return self.db.execute_heal(self.user.id, max_hp, max_mp)
         except Exception as e:
             logger.error(f"Heal error: {e}")
             return False, "System error."
@@ -122,7 +120,11 @@ class InfirmaryView(View):
         p = dict(p_data) if not isinstance(p_data, dict) else p_data
         hp_miss = max(0, stats.max_hp - p["current_hp"])
         mp_miss = max(0, stats.max_mp - p["current_mp"])
-        cost = infirmary_cost(hp_miss, mp_miss)
+
+        # Use centralized cost calculation
+        cost = DatabaseManager.calculate_heal_cost(
+            p["current_hp"], p["current_mp"], stats.max_hp, stats.max_mp
+        )
 
         hp_bar = make_progress_bar(p["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(p["current_mp"], stats.max_mp)

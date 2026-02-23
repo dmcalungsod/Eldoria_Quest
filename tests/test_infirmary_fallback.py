@@ -73,6 +73,7 @@ class TestInfirmaryFallbackExploit(unittest.TestCase):
         self.PlayerStats = PlayerStats
 
         self.mock_db = MagicMock()
+        self.mock_db.calculate_heal_cost.return_value = 100
         self.user = MagicMock()
         self.user.id = 12345
         self.initial_p_data = {"current_hp": 10, "current_mp": 10, "aurum": 1000}
