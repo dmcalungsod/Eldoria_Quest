@@ -17,7 +17,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.class_data import CLASSES
 from game_systems.data.materials import MATERIALS
-from game_systems.world_time import Weather, WorldTime
+from game_systems.world_time import Weather, TimePhase
 
 from .adventure_events import AdventureEvents
 from .exploration_events import ExplorationEvents
@@ -39,12 +39,15 @@ class EventHandler:
         regen_chance: int = 70,
         location_name: str | None = None,
         weather: Weather = Weather.CLEAR,
+        time_phase: TimePhase = TimePhase.DAY,
         event_type: str | None = None,
     ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(context, location_id, weather, event_type)
+                return self._perform_regeneration(
+                    context, location_id, weather, time_phase, event_type
+                )
             else:
                 # --- SPECIAL EXPLORATION EVENT (15% Chance) ---
                 if location_id and location_id in LOCATIONS:
@@ -52,23 +55,35 @@ class EventHandler:
                     # 15% chance to trigger a special event if available
                     if special_events and random.random() < 0.15:
                         event_key = random.choice(special_events)
-                        result = self.exploration.handle_event(event_key, context)
+                        result = self.exploration.handle_event(
+                            event_key, context, location_id, time_phase, weather, event_type
+                        )
                         # Prepend newline to first log for formatting
                         if result["log"]:
                             result["log"][0] = f"\n{result['log'][0]}"
                         return result
 
-                return self._perform_quest_event(context, location_name, location_id)
+                return self._perform_quest_event(
+                    context, location_name, location_id, time_phase, weather, event_type
+                )
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
-            return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
+            return {
+                "log": [
+                    AdventureEvents.no_event_found(
+                        location_id, time_phase, weather, event_type
+                    )
+                ],
+                "dead": False,
+            }
 
     def _perform_regeneration(
         self,
         context: dict[str, Any],
         location_id: str | None = None,
         weather: Weather = Weather.CLEAR,
+        time_phase: TimePhase = TimePhase.DAY,
         event_type: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -124,15 +139,12 @@ class EventHandler:
             # Calculate HP Percent for Narrative
             hp_percent = new_hp / max(stats.max_hp, 1)
 
-            # Get Time Phase for atmosphere
-            current_phase = WorldTime.get_current_phase()
-
             # Build Log Messages
             base_logs = AdventureEvents.regeneration(
                 location_id,
                 class_name,
                 hp_percent,
-                time_phase=current_phase,
+                time_phase=time_phase,
                 weather=weather,
                 event_type=event_type,
             )
@@ -159,6 +171,9 @@ class EventHandler:
         context: dict[str, Any],
         location_name: str | None,
         location_id: str | None,
+        time_phase: TimePhase = TimePhase.DAY,
+        weather: Weather = Weather.CLEAR,
+        event_type: str | None = None,
     ) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
@@ -208,7 +223,7 @@ class EventHandler:
                                     if flavor:
                                         event_text = f"\n{E.QUEST_SCROLL} **{flavor}**"
                                     else:
-                                        event_text = f"\n{AdventureEvents.quest_event(obj_type, task)}"
+                                        event_text = f"\n{AdventureEvents.quest_event(obj_type, task, location_id, time_phase, weather, event_type)}"
 
                                     return {
                                         "log": [
@@ -219,14 +234,29 @@ class EventHandler:
                                     }
 
             # If no matching quest event was found, try wild gathering
-            return self._perform_wild_gathering(context, location_id)
+            return self._perform_wild_gathering(
+                context, location_id, 0, time_phase, weather, event_type
+            )
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
-            return {"log": ["*The path ahead is unclear.*"], "dead": False}
+            return {
+                "log": [
+                    AdventureEvents.no_event_found(
+                        location_id, time_phase, weather, event_type
+                    )
+                ],
+                "dead": False,
+            }
 
     def _perform_wild_gathering(
-        self, context: dict[str, Any], location_id: str | None, bonus_chance: int = 0
+        self,
+        context: dict[str, Any],
+        location_id: str | None,
+        bonus_chance: int = 0,
+        time_phase: TimePhase = TimePhase.DAY,
+        weather: Weather = Weather.CLEAR,
+        event_type: str | None = None,
     ) -> dict[str, Any]:
         """
         Attempts to find wild materials if no quest event triggered.
@@ -282,7 +312,7 @@ class EventHandler:
                 if gathering_mult > 1.0:
                     display_name += f" {E.BUFF} (Bonus)"
 
-                event_text = f"\n{AdventureEvents.wild_gather_event(display_name)}"
+                event_text = f"\n{AdventureEvents.wild_gather_event(display_name, location_id, time_phase, weather, event_type)}"
                 return {
                     "log": [event_text],
                     "dead": False,
@@ -294,10 +324,10 @@ class EventHandler:
         if random.random() < 0.5:
             # Aurum
             amount = random.randint(1, 5)
-            msg = f"\n{AdventureEvents.scavenge_event('aurum', amount)}"
+            msg = f"\n{AdventureEvents.scavenge_event('aurum', amount, location_id, time_phase, weather, event_type)}"
             return {"log": [msg], "dead": False, "loot": {"aurum": amount}}
         else:
             # XP
             amount = random.randint(5, 10)
-            msg = f"\n{AdventureEvents.scavenge_event('exp', amount)}"
+            msg = f"\n{AdventureEvents.scavenge_event('exp', amount, location_id, time_phase, weather, event_type)}"
             return {"log": [msg], "dead": False, "loot": {"exp": amount}}

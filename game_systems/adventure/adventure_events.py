@@ -234,6 +234,61 @@ class AdventureEvents:
         "Your skin feels dry and tight from the oppressive heat.",
     ]
 
+    ATMOSPHERE_FEN = [
+        "Mist curls around your ankles like a living thing.",
+        "The ground squelches beneath your boots, threatening to pull you down.",
+        "Strange, pale lights bob in the distance, leading nowhere.",
+        "The air smells of stagnant water and ancient decay.",
+        "Shadows stretch long and thin in the fog.",
+        "A distant splash breaks the eerie silence.",
+        "The reeds whisper secrets to the wind.",
+        "You feel the weight of the water pressing in from all sides.",
+    ]
+
+    ATMOSPHERE_FROSTFALL = [
+        "The wind howls like a dying beast, cutting through your furs.",
+        "Snow crunches loudly in the frozen silence.",
+        "Your breath freezes instantly in the biting air.",
+        "Ice crystals form on your eyelashes, blurring your vision.",
+        "The world is a blinding white expanse.",
+        "A deep rumble echoes from beneath the ice.",
+        "The cold seeps into your bones, relentless and numbing.",
+        "Dark shapes move against the white horizon.",
+    ]
+
+    ATMOSPHERE_VOID = [
+        "Silence here is absolute, pressing against your ears.",
+        "The darkness seems to have a texture, thick and suffocating.",
+        "Reality ripples at the edges of your vision.",
+        "Stars blink out of existence as you watch.",
+        "Gravity feels inconsistent, pulling you in strange directions.",
+        "Whispers echo in your mind, speaking in no known tongue.",
+        "The ground beneath you feels insubstantial, like walking on smoke.",
+        "Colors here are wrong, shifting into shades that shouldn't exist.",
+    ]
+
+    ATMOSPHERE_HEIGHTS = [
+        "The wind threatens to tear you from the mountainside.",
+        "Clouds drift below you, a sea of white.",
+        "The air is thin, making every breath a struggle.",
+        "Lightning arcs between the peaks, close enough to smell the ozone.",
+        "Stones rattle down the cliff face, falling into the abyss.",
+        "The view is breathtaking, if you dare to look down.",
+        "Eagles circle below, riding the updrafts.",
+        "The cold is sharp and clean, unlike the damp below.",
+    ]
+
+    ATMOSPHERE_CELESTIAL = [
+        "Floating islands drift lazily in the endless blue.",
+        "Waterfalls cascade into the open sky, turning to mist.",
+        "The light here is golden and eternal.",
+        "Ancient ruins hang suspended in the air, defying gravity.",
+        "Feathers float on the breeze, remnants of winged guardians.",
+        "The air hums with raw magical energy.",
+        "You step carefully across a bridge of hard light.",
+        "Clouds are your floor, soft and yielding.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -474,6 +529,91 @@ class AdventureEvents:
     ]
 
     @staticmethod
+    def _get_atmosphere_line(
+        location_id: str | None,
+        time_phase: TimePhase | None,
+        weather: Weather | None,
+        event_type: str | None,
+    ) -> str | None:
+        """
+        Helper to select an atmospheric line based on context.
+        Returns None if no line is selected (RNG).
+        """
+        # 40% chance to add an atmospheric intro line
+        if random.random() > 0.40:
+            return None
+
+        atmosphere_pool = AdventureEvents.ATMOSPHERE_FOREST  # Default
+
+        # Location Mapping
+        if location_id == "whispering_thicket":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_THICKET
+        elif location_id == "deepgrove_roots":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
+        elif location_id == "crystal_caverns":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
+        elif location_id == "molten_caldera":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
+        elif location_id == "sunken_grotto":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_GROTTO
+        elif location_id == "clockwork_halls":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_CLOCKWORK
+        elif location_id == "guild_arena":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
+        elif location_id == "the_ashlands":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_ASHLANDS
+        elif location_id == "shrouded_fen":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_FEN
+        elif location_id == "frostfall_expanse":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_FROSTFALL
+        elif location_id == "void_sanctum":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_VOID
+        elif location_id == "gale_scarred_heights":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_HEIGHTS
+        elif location_id == "celestial_archipelago":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_CELESTIAL
+        elif location_id == "forest_outskirts":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_FOREST
+
+        # Event Override (High Priority)
+        if event_type == "blood_moon":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
+        elif event_type == "harvest_festival":
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_HARVEST
+
+        # Time Phase Override (30% chance)
+        elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
+        elif time_phase == TimePhase.DAWN and random.random() < 0.3:
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
+        elif time_phase == TimePhase.DUSK and random.random() < 0.3:
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
+
+        # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
+        weather_chance = 0.3
+        if weather in (Weather.STORM, Weather.ASH):
+            weather_chance = 0.5
+
+        if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+            atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
+
+        return random.choice(atmosphere_pool)
+
+    @staticmethod
+    def _prepend_atmosphere(
+        text: str,
+        location_id: str | None = None,
+        time_phase: TimePhase | None = None,
+        weather: Weather | None = None,
+        event_type: str | None = None,
+    ) -> str:
+        """Helper to prepend atmosphere to a string."""
+        atmosphere = AdventureEvents._get_atmosphere_line(location_id, time_phase, weather, event_type)
+        if atmosphere:
+            return f"{atmosphere}\n{text}"
+        return text
+
+    @staticmethod
     def regeneration(
         location_id: str | None = None,
         class_name: str = "Adventurer",
@@ -520,91 +660,90 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES)]
 
         # --- ATMOSPHERIC PREPEND ---
-        # 40% chance to add an atmospheric intro line
-        if random.random() < 0.40:
-            atmosphere_pool = AdventureEvents.ATMOSPHERE_FOREST  # Default
-
-            if location_id == "whispering_thicket":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_THICKET
-            elif location_id == "deepgrove_roots":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
-            elif location_id == "crystal_caverns":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
-            elif location_id == "molten_caldera":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
-            elif location_id == "sunken_grotto":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_GROTTO
-            elif location_id == "clockwork_halls":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_CLOCKWORK
-            elif location_id == "guild_arena":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
-            elif location_id == "the_ashlands":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ASHLANDS
-
-            # Event Override (High Priority)
-            if event_type == "blood_moon":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
-            elif event_type == "harvest_festival":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_HARVEST
-
-            # Time Phase Override (30% chance)
-            elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
-            elif time_phase == TimePhase.DAWN and random.random() < 0.3:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
-            elif time_phase == TimePhase.DUSK and random.random() < 0.3:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
-
-            # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
-            weather_chance = 0.3
-            if weather in (Weather.STORM, Weather.ASH):
-                weather_chance = 0.5
-
-            if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
-
-            # Select and prepend
-            atmospheric_line = random.choice(atmosphere_pool)
+        # Reuse central logic
+        atmospheric_line = AdventureEvents._get_atmosphere_line(location_id, time_phase, weather, event_type)
+        if atmospheric_line:
             base_logs.insert(0, atmospheric_line)
 
         return base_logs
 
     @staticmethod
-    def quest_event(objective_type: str, target_name: str) -> str:
+    def quest_event(
+        objective_type: str,
+        target_name: str,
+        location_id: str | None = None,
+        time_phase: TimePhase | None = None,
+        weather: Weather | None = None,
+        event_type: str | None = None,
+    ) -> str:
         if objective_type == "gather":
-            return random.choice(AdventureEvents.GATHER_PHRASES).format(target_name)
-        if objective_type == "locate":
-            return random.choice(AdventureEvents.LOCATE_PHRASES).format(target_name)
-        if objective_type in ("examine", "survey"):
-            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
-        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+            base_text = random.choice(AdventureEvents.GATHER_PHRASES).format(target_name)
+        elif objective_type == "locate":
+            base_text = random.choice(AdventureEvents.LOCATE_PHRASES).format(target_name)
+        elif objective_type in ("examine", "survey"):
+            base_text = random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
+        else:
+            base_text = random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+
+        return AdventureEvents._prepend_atmosphere(base_text, location_id, time_phase, weather, event_type)
 
     @staticmethod
-    def wild_gather_event(item_name: str) -> str:
-        return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
+    def wild_gather_event(
+        item_name: str,
+        location_id: str | None = None,
+        time_phase: TimePhase | None = None,
+        weather: Weather | None = None,
+        event_type: str | None = None,
+    ) -> str:
+        base_text = random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
+        return AdventureEvents._prepend_atmosphere(base_text, location_id, time_phase, weather, event_type)
 
     @staticmethod
     def surge_event() -> str:
         return random.choice(AdventureEvents.SURGE_PHRASES)
 
     @staticmethod
-    def scavenge_event(reward_type: str, amount: int) -> str:
+    def scavenge_event(
+        reward_type: str,
+        amount: int,
+        location_id: str | None = None,
+        time_phase: TimePhase | None = None,
+        weather: Weather | None = None,
+        event_type: str | None = None,
+    ) -> str:
         if reward_type == "aurum":
-            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
-        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+            base_text = random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
+        else:
+            base_text = random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+        return AdventureEvents._prepend_atmosphere(base_text, location_id, time_phase, weather, event_type)
 
     @staticmethod
-    def special_event_flavor(event_key: str) -> str:
+    def special_event_flavor(
+        event_key: str,
+        location_id: str | None = None,
+        time_phase: TimePhase | None = None,
+        weather: Weather | None = None,
+        event_type: str | None = None,
+    ) -> str:
         if event_key == "safe_room":
-            return random.choice(AdventureEvents.SAFE_ROOM_PHRASES)
+            base_text = random.choice(AdventureEvents.SAFE_ROOM_PHRASES)
         elif event_key == "hidden_stash":
-            return random.choice(AdventureEvents.HIDDEN_STASH_PHRASES)
+            base_text = random.choice(AdventureEvents.HIDDEN_STASH_PHRASES)
         elif event_key == "ancient_shrine":
-            return random.choice(AdventureEvents.ANCIENT_SHRINE_PHRASES)
+            base_text = random.choice(AdventureEvents.ANCIENT_SHRINE_PHRASES)
         elif event_key == "trap_pit":
-            return random.choice(AdventureEvents.TRAP_PHRASES)
-        return "*A strange event occurs.*"
+            base_text = random.choice(AdventureEvents.TRAP_PHRASES)
+        else:
+            base_text = "*A strange event occurs.*"
+
+        return AdventureEvents._prepend_atmosphere(base_text, location_id, time_phase, weather, event_type)
 
     @staticmethod
-    def no_event_found() -> str:
-        return random.choice(AdventureEvents.NO_EVENT_PHRASES)
+    def no_event_found(
+        location_id: str | None = None,
+        time_phase: TimePhase | None = None,
+        weather: Weather | None = None,
+        event_type: str | None = None,
+    ) -> str:
+        base_text = random.choice(AdventureEvents.NO_EVENT_PHRASES)
+        return AdventureEvents._prepend_atmosphere(base_text, location_id, time_phase, weather, event_type)
