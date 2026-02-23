@@ -41,6 +41,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 # Import normally (it will use the mock)
 try:
+    # ruff: noqa: F401
     import cogs.shop_cog
     from cogs.shop_cog import ShopView
 except ImportError:
