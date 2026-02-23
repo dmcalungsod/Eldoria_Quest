@@ -7,7 +7,7 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
-from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
+from game_systems.adventure.adventure_resolution import AdventureResolutionEngine  # noqa: E402
 
 @pytest.fixture
 def mock_db():
