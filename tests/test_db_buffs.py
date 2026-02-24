@@ -10,7 +10,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Ensure we can import game modules
 sys.path.append('.')
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
 
 class TestDBBuffs(unittest.TestCase):
     def setUp(self):
