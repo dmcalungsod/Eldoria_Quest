@@ -107,6 +107,12 @@ SKILL_LEVEL_MILESTONES = {
     20: ("Paragon", "Reached skill level 20."),
 }
 
+DURATION_MILESTONES = {
+    60: ("Day Tripper", "Completed an adventure lasting at least 1 hour."),
+    240: ("Endurance Runner", "Completed an adventure lasting at least 4 hours."),
+    480: ("Marathoner", "Completed an adventure lasting at least 8 hours."),
+}
+
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -323,4 +329,30 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking skill achievements for {discord_id}: {e}")
+            return None
+
+    def check_duration_achievements(self, discord_id: int, duration_minutes: int) -> str | None:
+        """
+        Checks if the player has reached an adventure duration milestone.
+        Returns a success message if a new title is awarded, else None.
+        """
+        try:
+            newly_awarded = []
+
+            for minutes, (title, desc) in DURATION_MILESTONES.items():
+                if duration_minutes >= minutes:
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
+            if newly_awarded:
+                if len(newly_awarded) == 1:
+                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
+                else:
+                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Error checking duration achievements for {discord_id}: {e}")
             return None
