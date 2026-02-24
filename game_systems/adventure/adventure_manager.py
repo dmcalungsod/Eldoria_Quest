@@ -56,6 +56,9 @@ class AdventureManager:
             # Perform buff cleanup before starting new session
             self.db.clear_expired_buffs(discord_id)
 
+            # Apply Passive Regeneration (heal before adventure starts)
+            self.db.apply_passive_regen(discord_id)
+
             # Cleanup old sessions and create new one
             self.db.delete_adventure_session(discord_id, active=0)
             self.db.insert_adventure_session(
@@ -342,6 +345,7 @@ class AdventureManager:
                 "exp_to_next": level_sys.exp_to_next,
                 "current_hp": target_hp,
                 "current_mp": target_mp,
+                "last_regen_time": WorldTime.now().isoformat(),  # Reset regen timer
             },
             inc_fields={"vestige_pool": total_exp},
         )

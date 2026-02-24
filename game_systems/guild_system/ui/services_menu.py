@@ -153,6 +153,9 @@ class GuildServicesView(View, GuildViewMixin):
 
         await interaction.response.defer()
 
+        # Apply Passive Regeneration first so user sees updated stats
+        await asyncio.to_thread(self.db.apply_passive_regen, self.interaction_user.id)
+
         # Parallel fetch
         try:
             p_data, s_json = await asyncio.gather(

@@ -162,6 +162,9 @@ async def get_profile_bundle_or_error(
     Fetches the profile bundle. If not found, sends an ephemeral error message.
     Returns the bundle dict or None.
     """
+    # Apply passive regeneration before fetching profile
+    await asyncio.to_thread(db.apply_passive_regen, interaction.user.id)
+
     bundle = await asyncio.to_thread(db.get_profile_bundle, interaction.user.id)
     if not bundle:
         if not interaction.response.is_done():
