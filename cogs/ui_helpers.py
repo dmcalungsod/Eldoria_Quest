@@ -215,6 +215,10 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
         if interaction.user.avatar:
             embed.set_thumbnail(url=interaction.user.avatar.url)
 
+        # Fetch Inventory Count (Async)
+        inv_count = await asyncio.to_thread(db.get_inventory_slot_count, discord_id)
+        max_slots = stats.max_inventory_slots
+
         # Vitals & Level (FIXED)
         hp_bar = make_progress_bar(player["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(player["current_mp"], stats.max_mp)
@@ -227,7 +231,8 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
                 f"**Level:** {player['level']}\n"
                 f"**EXP:** `{exp_bar}` {player['experience']} / {player['exp_to_next']}\n"
                 f"{E.HP} **HP:** `{hp_bar}` {player['current_hp']} / {stats.max_hp}\n"
-                f"{E.MP} **MP:** `{mp_bar}` {player['current_mp']} / {stats.max_mp}"
+                f"{E.MP} **MP:** `{mp_bar}` {player['current_mp']} / {stats.max_mp}\n"
+                f"{E.BACKPACK} **Bag:** {inv_count} / {max_slots}"
             ),
             inline=True,
         )
