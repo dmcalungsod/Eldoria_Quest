@@ -23,7 +23,7 @@ from database.database_manager import DatabaseManager
 from game_systems.guild_system.quest_system import QuestSystem
 
 # --- Local Imports ---
-from .ui_helpers import (
+from .utils.ui_helpers import (
     back_to_guild_hall_callback,
     back_to_profile_callback,
     make_progress_bar,

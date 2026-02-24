@@ -10,7 +10,7 @@ import logging
 from typing import Any
 
 from database.database_manager import DatabaseManager
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.events")
 

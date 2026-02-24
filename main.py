@@ -108,7 +108,7 @@ class EldoriaBot(commands.Bot):
 
         # Dynamic Cog Loading
         for filename in os.listdir(cogs_dir):
-            if filename.endswith(".py") and not filename.startswith("_") and filename != "ui_helpers.py":
+            if filename.endswith(".py") and not filename.startswith("_"):
                 cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)

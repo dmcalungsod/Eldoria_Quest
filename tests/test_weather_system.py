@@ -7,7 +7,7 @@ Verifies the functionality of the dynamic weather system.
 import datetime
 from unittest.mock import patch
 
-from game_systems.world_time import Weather, WorldTime
+from game_systems.core.world_time import Weather, WorldTime
 
 
 class TestWeatherSystem:
@@ -24,7 +24,7 @@ class TestWeatherSystem:
         location_id = "forest_outskirts"
 
         # Freeze time to a specific hour
-        with patch("game_systems.world_time.datetime") as mock_datetime:
+        with patch("game_systems.core.world_time.datetime") as mock_datetime:
             # Create a mock datetime object
             mock_now = datetime.datetime(2023, 10, 27, 10, 0, 0)
             mock_datetime.datetime.now.return_value = mock_now
@@ -41,7 +41,7 @@ class TestWeatherSystem:
         """
         Ensure different locations *can* have different weather at the same time.
         """
-        with patch("game_systems.world_time.datetime") as mock_datetime:
+        with patch("game_systems.core.world_time.datetime") as mock_datetime:
             mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, 10, 0, 0)
 
             results = set()
@@ -61,7 +61,7 @@ class TestWeatherSystem:
         """Ensure weather changes over time for the same location."""
         location_id = "forest_outskirts"
 
-        with patch("game_systems.world_time.datetime") as mock_datetime:
+        with patch("game_systems.core.world_time.datetime") as mock_datetime:
             # Hour 10
             mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, 10, 0, 0)
             w1 = WorldTime.get_current_weather(location_id)
@@ -82,7 +82,7 @@ class TestWeatherSystem:
 
         # Run 50 trials with different hours
         for i in range(50):
-            with patch("game_systems.world_time.datetime") as mock_datetime:
+            with patch("game_systems.core.world_time.datetime") as mock_datetime:
                 mock_datetime.datetime.now.return_value = datetime.datetime(2023, 10, 27, i % 24, 0, 0)
 
                 weather = WorldTime.get_current_weather(location_id)

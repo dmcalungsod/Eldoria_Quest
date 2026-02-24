@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 # Mock pymongo BEFORE importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
 
-from game_systems.achievement_system import AchievementSystem  # noqa: E402
+from game_systems.player.achievement_system import AchievementSystem  # noqa: E402
 
 
 class TestMonsterAchievements(unittest.TestCase):

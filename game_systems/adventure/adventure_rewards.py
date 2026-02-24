@@ -12,7 +12,7 @@ from collections import defaultdict
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.achievement_system import AchievementSystem
+from game_systems.player.achievement_system import AchievementSystem
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.materials import MATERIALS
 from game_systems.guild_system.faction_system import FactionSystem

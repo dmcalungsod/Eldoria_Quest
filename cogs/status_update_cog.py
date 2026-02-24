@@ -19,7 +19,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES
 from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold
 
-from .ui_helpers import back_to_profile_callback, make_progress_bar
+from .utils.ui_helpers import back_to_profile_callback, make_progress_bar
 
 logger = logging.getLogger("eldoria.status")
 

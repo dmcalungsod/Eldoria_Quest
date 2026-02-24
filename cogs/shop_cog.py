@@ -20,7 +20,7 @@ from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.shop_data import SHOP_INVENTORY
 from game_systems.items.inventory_manager import InventoryManager
 
-from .ui_helpers import back_to_guild_hall_callback, get_player_or_error
+from .utils.ui_helpers import back_to_guild_hall_callback, get_player_or_error
 
 logger = logging.getLogger("eldoria.shop")
 

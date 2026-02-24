@@ -43,9 +43,9 @@ class TestNarrativeEmbeds(unittest.TestCase):
 
         # Mock other dependencies
         sys.modules["cogs"] = MagicMock()
-        sys.modules["cogs.ui_helpers"] = MagicMock()
+        sys.modules["cogs.utils.ui_helpers"] = MagicMock()
         sys.modules["game_systems.player.player_stats"] = MagicMock()
-        sys.modules["game_systems.world_time"] = MagicMock()
+        sys.modules["game_systems.core.world_time"] = MagicMock()
 
         # Ensure we can import the module under test
         # We need to make sure 'game_systems' package is importable

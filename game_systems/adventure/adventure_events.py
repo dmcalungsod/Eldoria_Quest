@@ -8,7 +8,7 @@ Optimized for performance and future biome expansion.
 import random
 
 import game_systems.data.emojis as E
-from game_systems.world_time import TimePhase, Weather
+from game_systems.core.world_time import TimePhase, Weather
 
 
 class AdventureEvents:

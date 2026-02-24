@@ -12,7 +12,7 @@ import discord
 from discord.ui import View
 
 import game_systems.data.emojis as E
-from cogs.ui_helpers import back_to_guild_hall_callback
+from cogs.utils.ui_helpers import back_to_guild_hall_callback
 from database.database_manager import DatabaseManager
 
 from .components import GuildViewMixin, SystemCache, ViewFactory

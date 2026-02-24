@@ -27,7 +27,7 @@ class TestAdventureStatusEmbed(unittest.TestCase):
         sys.modules["pymongo.errors"] = MagicMock()
 
         # Mock other dependencies if needed
-        # We need game_systems.world_time which is imported inside the module usually
+        # We need game_systems.core.world_time which is imported inside the module usually
 
         # Now we can import the module
         import game_systems.adventure.ui.adventure_embeds

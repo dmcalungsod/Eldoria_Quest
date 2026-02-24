@@ -9,7 +9,7 @@ import logging
 from database.database_manager import DatabaseManager
 from game_systems.data.emojis import ERROR, SUCCESS, WARNING
 from game_systems.data.factions import FACTIONS
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.factions")
 

@@ -17,7 +17,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.class_data import CLASSES
 from game_systems.data.materials import MATERIALS
-from game_systems.world_time import Weather, WorldTime
+from game_systems.core.world_time import Weather, WorldTime
 
 from .adventure_events import AdventureEvents
 from .exploration_events import ExplorationEvents

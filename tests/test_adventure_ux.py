@@ -56,7 +56,7 @@ class TestAdventureUX(unittest.TestCase):
 
         # Mock dependencies
         sys.modules["cogs"] = MagicMock()
-        sys.modules["cogs.ui_helpers"] = MagicMock()
+        sys.modules["cogs.utils.ui_helpers"] = MagicMock()
         sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
         sys.modules["game_systems.adventure.ui.exploration_view"] = MagicMock()
         sys.modules["game_systems.adventure.ui.setup_view"] = MagicMock()

@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.loop")
 

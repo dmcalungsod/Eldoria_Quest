@@ -20,8 +20,8 @@ if "discord" not in sys.modules or not isinstance(sys.modules["discord"], MagicM
     sys.modules["discord.ui"] = MagicMock()
 
 # Import the module to test
-import cogs.ui_helpers  # noqa: E402
-from cogs.ui_helpers import build_inventory_embed, make_progress_bar  # noqa: E402
+import cogs.utils.ui_helpers  # noqa: E402
+from cogs.utils.ui_helpers import build_inventory_embed, make_progress_bar  # noqa: E402
 
 
 class MockEmbed:
@@ -46,9 +46,9 @@ class TestUIHelpers(unittest.TestCase):
 
         # Reload module to ensure it uses this mock (if it was holding an old one)
         global build_inventory_embed, make_progress_bar
-        importlib.reload(cogs.ui_helpers)
-        build_inventory_embed = cogs.ui_helpers.build_inventory_embed
-        make_progress_bar = cogs.ui_helpers.make_progress_bar
+        importlib.reload(cogs.utils.ui_helpers)
+        build_inventory_embed = cogs.utils.ui_helpers.build_inventory_embed
+        make_progress_bar = cogs.utils.ui_helpers.make_progress_bar
 
     def test_progress_bar_logic(self):
         """Test progress bar logic directly."""

@@ -13,7 +13,7 @@ import discord
 from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
-from cogs.ui_helpers import back_to_profile_callback, build_inventory_embed
+from cogs.utils.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.items.inventory_manager import InventoryManager

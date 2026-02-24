@@ -18,7 +18,7 @@ from pymongo import InsertOne, MongoClient, UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from game_systems.data.skills_data import SKILLS as SKILL_DEFINITIONS
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 # Configure logging
 logger = logging.getLogger("eldoria.db")

@@ -20,7 +20,7 @@ from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 from game_systems.data.messages import WELCOME_MESSAGE, WELCOME_TITLE
 from game_systems.player.player_creator import PlayerCreator
 
-from .ui_helpers import back_to_profile_callback
+from .utils.ui_helpers import back_to_profile_callback
 
 logger = logging.getLogger("eldoria.onboarding")
 

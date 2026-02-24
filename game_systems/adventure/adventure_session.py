@@ -14,7 +14,7 @@ from database.database_manager import DatabaseManager
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import TimePhase, Weather, WorldTime
+from game_systems.core.world_time import TimePhase, Weather, WorldTime
 
 # Subsystems
 from .adventure_rewards import AdventureRewards

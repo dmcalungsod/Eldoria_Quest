@@ -85,7 +85,7 @@ class TestCraftingUI(unittest.TestCase):
 
         # Mock other dependencies
         sys.modules["cogs"] = MagicMock()
-        sys.modules["cogs.ui_helpers"] = MagicMock()
+        sys.modules["cogs.utils.ui_helpers"] = MagicMock()
 
         # Import module under test
         import game_systems.crafting.ui.crafting_view

@@ -17,7 +17,7 @@ from game_systems.data.monsters import MONSTERS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.combat")
 

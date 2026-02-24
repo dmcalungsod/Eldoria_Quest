@@ -10,7 +10,7 @@ import logging
 import discord
 from discord.ui import Button, View
 
-import cogs.ui_helpers as ui_helpers
+import cogs.utils.ui_helpers as ui_helpers
 from database.database_manager import DatabaseManager
 
 logger = logging.getLogger("eldoria.ui.settings")
