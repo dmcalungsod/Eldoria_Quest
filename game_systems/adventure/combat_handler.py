@@ -13,11 +13,11 @@ from typing import Any
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.combat_phrases import CombatPhrases
+from game_systems.core.world_time import WorldTime
 from game_systems.data.monsters import MONSTERS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.combat")
 
@@ -160,6 +160,7 @@ class CombatHandler:
         persist_vitals: bool = True,
         action: str = "auto",
         stance: str = "balanced",
+        fatigue_multiplier: float = 1.0,
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
@@ -168,6 +169,7 @@ class CombatHandler:
             context: Optional pre-fetched data to avoid DB calls.
             persist_vitals: Whether to write HP/MP to DB immediately.
             stance: Player's current combat stance (aggressive, balanced, defensive).
+            fatigue_multiplier: Multiplier for monster damage based on adventure duration.
         """
         vitals = None
         try:
@@ -226,6 +228,7 @@ class CombatHandler:
                 base_stats_dict=base_stats_dict,
                 action=action,
                 player_stance=stance,
+                monster_dmg_mult=fatigue_multiplier,
             )
 
             result = engine.run_combat_turn()
