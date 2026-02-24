@@ -1258,5 +1258,92 @@
       "aurum": 1200,
       "item": "Magic Stone (Large)"
     }
+  },
+  {
+    "id": 67,
+    "title": "The Clockwork Heart: Anomaly",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls",
+    "summary": "Investigate a malfunctioning Brass Golem.",
+    "description": "Artificer Jolen beckons you over, his face illuminated by the blue glow of a holo-map. 'Adventurer, I have a puzzle. My sensors picked up a Brass Golem, Unit 734, in Sector 4. It's not patrolling. It's... loitering. And its core signature is fluctuating rhythmically. Like a heartbeat. I need eyes on it. If it's malfunctioning, it could endanger the whole sector. Go find it, but clear out the scavengers targeting it first.'",
+    "prerequisites": [
+      64
+    ],
+    "objectives": {
+      "locate": "Unit 734",
+      "defeat": {
+        "Scavenger Spider": 5
+      },
+      "scan": "Unit 734"
+    },
+    "flavor_text": {
+      "locate:Unit 734": "You find the golem standing motionless in a quiet alcove, cradling a small, oil-stained flower.",
+      "defeat:Scavenger Spider": "The spider hisses and crumples, its sensors dimming.",
+      "scan:Unit 734": "The scanner hums. The golem tilts its head, watching you with strange, flickering curiosity."
+    },
+    "rewards": {
+      "exp": 2200,
+      "aurum": 650,
+      "item": "Encrypted Log Cylinder"
+    }
+  },
+  {
+    "id": 68,
+    "title": "The Clockwork Heart: Dismantle",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls",
+    "summary": "Dismantle the unstable golem. (Option A)",
+    "description": "Jolen reviews the data with a frown. 'This is bad. The corruption rewrote its code to prioritize preservation, but its core is unstable. It's a walking bomb. Look, I know it seems harmless, but we can't risk a detonation in the main support strata. The safe play is to **dismantle it**. We can use the parts to reinforce the lift. It's tough, but it's necessary.'",
+    "prerequisites": [
+      67
+    ],
+    "exclusive_group": "clockwork_heart_choice",
+    "objectives": {
+      "defeat": {
+        "Unit 734": 1
+      },
+      "retrieve": {
+        "Pristine Gear Heart": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Unit 734": "The golem raises its arms to shield the flower, not itself. As it falls, the light in its eyes fades, resigned.",
+      "retrieve:Pristine Gear Heart": "The core is warm and pulses faintly before going cold."
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 800,
+      "item": "Artificer's Alloy"
+    }
+  },
+  {
+    "id": 69,
+    "title": "The Clockwork Heart: Stabilize",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls",
+    "summary": "Stabilize the golem's core. (Option B)",
+    "description": "Jolen reviews the data. 'Incredible. It's developed empathy. But it's unstable. I can write a patch to regulate the power draw, but you'll have to upload it while it's active. It's dangerous—the signal will attract every security bot in the sector. You'd be risking your life for a glitch. But... if it works, we save a unique life form. If you want to **save it**, take this patch.'",
+    "prerequisites": [
+      67
+    ],
+    "exclusive_group": "clockwork_heart_choice",
+    "objectives": {
+      "defeat": {
+        "Security Drone": 8
+      },
+      "upload": "Stabilization Patch"
+    },
+    "flavor_text": {
+      "defeat:Security Drone": "Another drone crashes down. Unit 734 shudders as the patch rewrites its core.",
+      "upload:Stabilization Patch": "Upload complete. Unit 734 stabilizes, offering you a single gear in thanks before returning to its flower."
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 500,
+      "item": "Heart of the Machine"
+    }
   }
 ]

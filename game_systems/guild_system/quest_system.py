@@ -47,20 +47,38 @@ class QuestSystem:
                         "tier": 1,
                         "summary": 1,
                         "prerequisites": 1,
+                        "exclusive_group": 1,
                     },
                 )
             )
 
-            # Fetch completed quest IDs for prerequisite checking
-            completed_docs = self.db._col("player_quests").find(
-                {"discord_id": discord_id, "status": "completed"},
-                {"_id": 0, "quest_id": 1},
+            # Fetch all player quest IDs (active + completed) to determine locked groups
+            all_pq_docs = self.db._col("player_quests").find(
+                {"discord_id": discord_id},
+                {"_id": 0, "quest_id": 1, "status": 1},
             )
-            completed_ids = {d["quest_id"] for d in completed_docs}
+
+            all_player_quests = list(all_pq_docs)
+            completed_ids = {d["quest_id"] for d in all_player_quests if d.get("status") == "completed"}
+            all_ids = [d["quest_id"] for d in all_player_quests]
+
+            # Find groups the player is already locked into
+            locked_groups = set()
+            if all_ids:
+                group_docs = self.db._col("quests").find(
+                    {"id": {"$in": all_ids}, "exclusive_group": {"$ne": None}},
+                    {"exclusive_group": 1},
+                )
+                locked_groups = {d["exclusive_group"] for d in group_docs if d.get("exclusive_group")}
 
             available = []
             for q in quests:
                 if q["id"] in taken_ids:
+                    continue
+
+                # Check exclusive group
+                grp = q.get("exclusive_group")
+                if grp and grp in locked_groups:
                     continue
 
                 # Check prerequisites
@@ -163,9 +181,29 @@ class QuestSystem:
             if exists:
                 return False
 
-            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1})
+            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1, "exclusive_group": 1})
             if not quest:
                 return False
+
+            # --- EXCLUSIVE GROUP CHECK ---
+            exclusive_group = quest.get("exclusive_group")
+            if exclusive_group:
+                # Find all quest IDs in this group
+                group_docs = self.db._col("quests").find(
+                    {"exclusive_group": exclusive_group},
+                    {"id": 1}
+                )
+                group_ids = [d["id"] for d in group_docs]
+
+                # Check if player has accepted or completed any
+                existing_group_quest = self.db._col("player_quests").find_one(
+                    {"discord_id": discord_id, "quest_id": {"$in": group_ids}},
+                    {"_id": 1}
+                )
+                if existing_group_quest:
+                    logger.warning(f"Rejecting Quest {quest_id} for User {discord_id}: Exclusive group conflict ({exclusive_group})")
+                    return False
+            # -----------------------------
 
             # --- SECURITY CHECK ---
             player_rank = self.db.get_guild_member_field(discord_id, "rank")

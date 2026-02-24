@@ -219,6 +219,9 @@ def insert_quests(db):
                 "description": q["description"],
                 "objectives": q["objectives"],
                 "rewards": q["rewards"],
+                "prerequisites": q.get("prerequisites", []),
+                "flavor_text": q.get("flavor_text", {}),
+                "exclusive_group": q.get("exclusive_group"),
             }
         )
     _upsert_many(db["quests"], "id", quests)
