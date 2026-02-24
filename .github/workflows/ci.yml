@@ -68,6 +68,9 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     needs: lint
+    permissions:
+      contents: read
+      pull-requests: write
     services:
       mongodb:
         image: mongo:5.0
@@ -89,6 +92,11 @@ jobs:
           pip install pytest pytest-cov
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      - name: Audit Dependencies for CVEs
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt --progress-spinner off || true
+
       - name: Run Eldoria Test Suite
         env:
           DISCORD_BOT_TOKEN: "mock_token_for_testing"
@@ -100,20 +108,30 @@ jobs:
             --cov=. \
             --cov-report=term-missing \
             --cov-report=html \
+            --cov-report=xml \
             --cov-fail-under=60 \
-            -v | tee pytest_output.txt
+            -v | tee pytest-coverage.txt
 
       - name: Generate Test Summary
         if: always()
         run: |
           echo "### 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
-          if [ -f pytest_output.txt ]; then
-            summary_line=$(grep -E "=== .* ===" pytest_output.txt | tail -n 1)
+          if [ -f pytest-coverage.txt ]; then
+            summary_line=$(grep -E "=== .* ===" pytest-coverage.txt | tail -n 1)
             echo "\`$summary_line\`" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ Tests failed to run or crashed." >> $GITHUB_STEP_SUMMARY
           fi
           echo "📊 Coverage Report: Attached as artifact \`coverage-report\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Post Coverage Comment
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./coverage.xml
+          title: '📊 Eldoria Quest – Coverage Report'
 
       - name: Upload Coverage Report
         if: always()
