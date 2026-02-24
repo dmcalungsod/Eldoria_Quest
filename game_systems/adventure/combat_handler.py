@@ -180,6 +180,7 @@ class CombatHandler:
                 p_row = context["player_row"]
                 skills = context["skills"]
                 boosts = context.get("active_boosts", {})
+                active_buffs = context.get("buffs", [])
             else:
                 stats_json = self.db.get_player_stats_json(self.discord_id)
                 player_stats = PlayerStats.from_dict(stats_json)
@@ -222,6 +223,7 @@ class CombatHandler:
                 player_mp=vitals["current_mp"],
                 player_class_id=p_row["class_id"],
                 active_boosts=boosts,
+                active_buffs=active_buffs,
                 stats_dict=stats_dict,
                 base_stats_dict=base_stats_dict,
                 action=action,
@@ -263,6 +265,11 @@ class CombatHandler:
                     amount=buff.get("amount"),
                     duration_s=duration_s,
                 )
+
+            # 8. Award Titles
+            new_titles = result.get("new_titles", [])
+            for title in new_titles:
+                self.db.add_title(self.discord_id, title)
 
             return result
 
