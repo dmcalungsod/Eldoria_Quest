@@ -111,7 +111,10 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
         if equipped_groups["Armor"]:
             val += "**Armor**\n" + "\n".join(equipped_groups["Armor"]) + "\n"
         if equipped_groups["Accessory"]:
-            val += "**Accessories**\n" + "\n".join(equipped_groups["Accessory"]) + "\n"
+            # Display capacity for accessories
+            acc_count = len(equipped_groups["Accessory"])
+            limit = EquipmentManager.MAX_ACCESSORY_SLOTS
+            val += f"**Accessories ({acc_count}/{limit})**\n" + "\n".join(equipped_groups["Accessory"]) + "\n"
 
         embed.add_field(name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False)
 

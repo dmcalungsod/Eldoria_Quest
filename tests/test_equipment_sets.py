@@ -111,6 +111,7 @@ class TestEquipmentSets(unittest.TestCase):
 
         self.mock_db.inventory.find.return_value = []  # No equipped
         self.mock_db.inventory.find_one.return_value = None  # Not found in inventory
+        self.mock_db.inventory.count_documents.return_value = 0  # Not equipped either
 
         success, msg = self.eq_manager.equip_loadout(self.discord_id, "Battle Set")
 

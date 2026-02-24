@@ -21,6 +21,7 @@ logger = logging.getLogger("eldoria.equipment")
 
 class EquipmentManager:
     VALID_TABLES = {"equipment", "class_equipment"}
+    MAX_ACCESSORY_SLOTS = 2
 
     RANK_VALUES = {
         "F": 1,
@@ -276,10 +277,6 @@ class EquipmentManager:
 
             # Fallback to DB lookup if not in static dict (e.g. dynamic items)
             if not static_data and item.get("item_source_table"):
-                # Note: get_item_from_source_table uses ID (int), but item_key is usually string in JSON
-                # However, inventory 'item_key' matches 'key' in JSON.
-                # DB lookup usually expects 'id'.
-                # Let's rely on item_key matching JSON keys for now as primary method.
                 pass
 
             # Merge inventory data over static data (in case of dynamic overrides)
@@ -301,43 +298,64 @@ class EquipmentManager:
             slots_to_check = set()
             target_slot = item["slot"]
 
-            if target_slot in self.TWO_HANDED_SLOTS:
-                slots_to_check.update(self.MAIN_HAND_SLOTS)
-                slots_to_check.update(self.OFF_HAND_SLOTS)
-                slots_to_check.update(self.TWO_HANDED_SLOTS)
-            elif target_slot in self.MAIN_HAND_SLOTS:
-                slots_to_check.update(self.MAIN_HAND_SLOTS)
-                slots_to_check.update(self.TWO_HANDED_SLOTS)
-            elif target_slot in self.OFF_HAND_SLOTS:
-                slots_to_check.update(self.OFF_HAND_SLOTS)
-                slots_to_check.update(self.TWO_HANDED_SLOTS)
+            equipped_items = self.db.get_equipped_items(discord_id)
 
-            # Check Armor Groups
-            elif target_slot in self.HEAD_SLOTS:
-                slots_to_check.update(self.HEAD_SLOTS)
-            elif target_slot in self.BODY_SLOTS:
-                slots_to_check.update(self.BODY_SLOTS)
-            elif target_slot in self.HAND_SLOTS:
-                slots_to_check.update(self.HAND_SLOTS)
-            elif target_slot in self.LEG_SLOTS:
-                slots_to_check.update(self.LEG_SLOTS)
-            elif target_slot in self.FOOT_SLOTS:
-                slots_to_check.update(self.FOOT_SLOTS)
+            # --- MULTI-SLOT LOGIC FOR ACCESSORIES ---
+            if target_slot == "accessory":
+                # Get current accessories
+                current_accessories = [i for i in equipped_items if i.get("slot") == "accessory"]
+
+                # Check 1: Unique Equipped (Can't equip duplicate item_key)
+                for acc in current_accessories:
+                    if acc["item_key"] == item["item_key"]:
+                        return False, "You cannot equip two of the same accessory."
+
+                # Check 2: Capacity
+                if len(current_accessories) >= self.MAX_ACCESSORY_SLOTS:
+                    return False, f"Accessory slots full ({self.MAX_ACCESSORY_SLOTS}/{self.MAX_ACCESSORY_SLOTS}). Unequip one first."
+
+                # If we have space, we DO NOT add "accessory" to slots_to_check
+                # This prevents auto-unequipping existing accessories
+                pass
 
             else:
-                # Normal armor/accessory slot - just check self
-                slots_to_check.add(target_slot)
+                # Normal conflict logic
+                if target_slot in self.TWO_HANDED_SLOTS:
+                    slots_to_check.update(self.MAIN_HAND_SLOTS)
+                    slots_to_check.update(self.OFF_HAND_SLOTS)
+                    slots_to_check.update(self.TWO_HANDED_SLOTS)
+                elif target_slot in self.MAIN_HAND_SLOTS:
+                    slots_to_check.update(self.MAIN_HAND_SLOTS)
+                    slots_to_check.update(self.TWO_HANDED_SLOTS)
+                elif target_slot in self.OFF_HAND_SLOTS:
+                    slots_to_check.update(self.OFF_HAND_SLOTS)
+                    slots_to_check.update(self.TWO_HANDED_SLOTS)
+
+                # Check Armor Groups
+                elif target_slot in self.HEAD_SLOTS:
+                    slots_to_check.update(self.HEAD_SLOTS)
+                elif target_slot in self.BODY_SLOTS:
+                    slots_to_check.update(self.BODY_SLOTS)
+                elif target_slot in self.HAND_SLOTS:
+                    slots_to_check.update(self.HAND_SLOTS)
+                elif target_slot in self.LEG_SLOTS:
+                    slots_to_check.update(self.LEG_SLOTS)
+                elif target_slot in self.FOOT_SLOTS:
+                    slots_to_check.update(self.FOOT_SLOTS)
+                else:
+                    # Normal armor slot
+                    slots_to_check.add(target_slot)
 
             # Find and unequip conflicting items
-            equipped_items = self.db.get_equipped_items(discord_id)
-            for eq_item in equipped_items:
-                eq_slot = eq_item.get("slot")
-                if eq_slot in slots_to_check:
-                    try:
-                        self._unequip_logic(discord_id, eq_item["id"])
-                        conflicts_msg += f" (Unequipped {eq_item['item_name']})"
-                    except Exception as e:
-                        logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
+            if slots_to_check:
+                for eq_item in equipped_items:
+                    eq_slot = eq_item.get("slot")
+                    if eq_slot in slots_to_check:
+                        try:
+                            self._unequip_logic(discord_id, eq_item["id"])
+                            conflicts_msg += f" (Unequipped {eq_item['item_name']})"
+                        except Exception as e:
+                            logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
 
             # Equip the new item
             if item.get("count", 1) > 1:
@@ -399,12 +417,24 @@ class EquipmentManager:
             return False, "No items equipped."
 
         items_dict = {}
+        accessory_count = 0
+
         for item in equipped_items:
-            items_dict[item["slot"]] = {
+            slot = item["slot"]
+
+            # Handle multiple accessories by suffixing keys
+            if slot == "accessory":
+                accessory_count += 1
+                save_key = f"accessory_{accessory_count}"
+            else:
+                save_key = slot
+
+            items_dict[save_key] = {
                 "item_key": item["item_key"],
                 "rarity": item["rarity"],
                 "item_name": item["item_name"],
                 "item_source_table": item.get("item_source_table"),
+                "slot": slot  # Preserve original slot data
             }
 
         self.db.save_equipment_set(discord_id, name, items_dict)
@@ -433,24 +463,55 @@ class EquipmentManager:
 
         current_equipped = {item["slot"]: item for item in self.db.get_equipped_items(discord_id)}
 
-        for slot, target_data in items_to_equip.items():
+        for slot_key, target_data in items_to_equip.items():
             target_key = target_data["item_key"]
             target_rarity = target_data["rarity"]
 
-            # Check if already equipped
-            current_item = current_equipped.get(slot)
-            if current_item and current_item["item_key"] == target_key and current_item["rarity"] == target_rarity:
-                success_count += 1
-                continue
+            # Determine actual slot to search (handle suffixes)
+            # Use preserved 'slot' if available, otherwise strip suffix if accessory
+            target_slot = target_data.get("slot")
+            if not target_slot:
+                if "accessory" in slot_key:
+                    target_slot = "accessory"
+                else:
+                    target_slot = slot_key
 
-            # Not equipped, look for unequipped match in inventory
-            # We search for ANY unequipped item matching key/rarity/slot
+            # Check if already equipped
+            # Note: For accessories, we just check if *any* equipped item matches this key+rarity+slot
+            # This is a bit simplified; strictly we might want to ensure *enough* are equipped.
+            # But iterating through the loadout means we check for *each* required item.
+
+            # We can't use simple dictionary lookup for duplicate slots like accessory
+            # So we iterate current_equipped values.
+            already_equipped = False
+            for eq_item in current_equipped.values():
+                if (eq_item["slot"] == target_slot and
+                    eq_item["item_key"] == target_key and
+                    eq_item["rarity"] == target_rarity):
+
+                    # Found a match. To prevent counting same item for multiple loadout entries,
+                    # we should track used IDs?
+                    # But for now, simple check is okay, loadout equipping is best-effort.
+                    # Actually, if loadout has 2 rings, and we have 1 ring equipped,
+                    # both iterations will find "already equipped".
+                    # So we skip equipping the second ring. BAD.
+
+                    # Fix: We should check if we need to equip MORE.
+                    # But equip_item() handles "already equipped" check internally via "equipped": 1 status.
+                    # So maybe we should just ALWAYS try to equip from inventory?
+                    # If it's already equipped, it won't be in inventory with equipped=0.
+                    pass
+
+            # Better approach: Search inventory for UN-EQUIPPED item.
+            # If found, equip it.
+            # If NOT found, verify if it's already equipped.
+
             match = self.db._col("inventory").find_one(
                 {
                     "discord_id": discord_id,
                     "item_key": target_key,
                     "rarity": target_rarity,
-                    "slot": slot,
+                    "slot": target_slot,
                     "equipped": 0,
                 }
             )
@@ -462,7 +523,31 @@ class EquipmentManager:
                 else:
                     missing_items.append(f"{target_data['item_name']} (Error: {msg})")
             else:
-                missing_items.append(target_data["item_name"])
+                # Not found in unequipped inventory. Check if already equipped.
+                # We need to find *how many* of this item are currently equipped vs how many needed?
+                # This gets complex.
+                # Simple check: Is at least ONE matching item equipped?
+                # If loadout has 2 identical rings, and we have 1 equipped and 0 in inventory...
+                # We report missing.
+
+                # Check actual count in inventory (equipped=1)
+                equipped_count = self.db._col("inventory").count_documents({
+                    "discord_id": discord_id,
+                    "item_key": target_key,
+                    "rarity": target_rarity,
+                    "slot": target_slot,
+                    "equipped": 1
+                })
+
+                # We can't easily know if this specific iteration of the loop corresponds to
+                # the 1st or 2nd ring without tracking.
+                # But since we just want to report success/fail...
+                if equipped_count > 0:
+                    # Assume success if at least one is equipped.
+                    # This might be slightly inaccurate for duplicates but acceptable.
+                    success_count += 1
+                else:
+                    missing_items.append(target_data["item_name"])
 
         msg = f"Equipped {success_count} items."
         if missing_items:
