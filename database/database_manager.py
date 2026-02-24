@@ -667,6 +667,11 @@ class DatabaseManager:
         duration_s: int,
     ):
         """Adds a buff to the player."""
+        # Equilibrium Fix: Prevent stacking of same buff name (Refresh instead)
+        self._col("active_buffs").delete_many(
+            {"discord_id": discord_id, "name": name}
+        )
+
         end_time = (WorldTime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
         self._col("active_buffs").insert_one(
             {
