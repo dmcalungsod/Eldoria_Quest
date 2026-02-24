@@ -20,9 +20,6 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 
 | Agent | Schedule (GMT+8) | Primary Role |
 |-------|------------------|--------------|
-| **Bolt** | 09:30 AM | Performance optimization |
-| **Palette** | 12:00 PM | UX & accessibility |
-| **Sentinel** | 01:00 PM | Security & exploit prevention |
 | **GameForge** | 12:00 AM | Content creation (monsters, items, quests) |
 | **GameBalancer** | 12:30 AM | Economy & progression balance |
 | **SystemSmith** | 01:00 AM | Architecture & systems refinement |
@@ -36,9 +33,13 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 | **Lorekeeper** | 05:00 AM | World canon & consistency |
 | **Mentor** | 05:30 AM | Player onboarding & tutorials |
 | **Namewright** | 06:00 AM | Naming & lore‑friendly titles |
+| **Foreman** | 09:00 AM | Project management & milestone tracking |
+| **Bolt** | 09:30 AM | Performance optimization |
 | **DepthsWarden** | 10:00 AM | Dungeon floors & factions |
 | **ProgressionBalancer** | 11:00 AM | Rank advancement & progression |
 | **EventHerald** | 11:30 AM | World & guild events |
+| **Palette** | 12:00 PM | UX & accessibility |
+| **Sentinel** | 01:00 PM | Security & exploit prevention |
 | **SkillWeaver** | 01:30 PM | Class skill formulas & implementation |
 | **Carrier** | 03:00 PM | Inventory capacity & stat integration |
 | **Architect** | 05:00 PM | Class & expansion design (blueprints) |
@@ -49,26 +50,19 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 | **Regression Hunter** | 08:00 PM | Regression testing & test suite maintenance |
 | **Realmwright** | 08:30 PM | World expansion (new regions) |
 | **Questweaver** | 09:00 PM | Storyline & dialogue design |
+| **Issue Crafter** | 09:30 PM | Issue creation from logs & feedback |
+| **Timeweaver** | 10:00 PM | Auto‑adventure overhaul design & oversight |
+| **Codex Keeper** | 10:30 PM | Bestiary & lore compendium design & oversight |
+| **Party System Designer** | 11:00 PM | Multiplayer features design & oversight |
+| **Guild Halls Architect** | 11:30 PM | Player housing design & oversight |
 
 ## 📆 Weekly / Monthly Agents
 
 | Agent | Schedule | Role |
 |-------|----------|------|
+| **Repo Auditor** | Weekly on Sunday | Comprehensive codebase inspection |
 | **Visionary** | Weekly on Sunday | Strategic planning & coordination |
 | **Chronicler** | Monthly on 1st | Monthly update summaries & webhook posting |
-| **Repo Auditor** | (inactive) | Comprehensive codebase inspection |
-| **Foreman** | (inactive) | Project management & milestone tracking |
-
-## 🆕 One‑Time Design Agents (Blueprints)
-
-These agents produce design documents that other agents implement.
-
-| Agent | Purpose |
-|-------|---------|
-| **Timeweaver** | Auto‑adventure overhaul design |
-| **Codex Keeper** | Bestiary & lore compendium design |
-| **Party System Designer** | Multiplayer features (planned) |
-| **Guild Halls Architect** | Player housing (planned) |
 
 ## 📝 Journal Files
 
