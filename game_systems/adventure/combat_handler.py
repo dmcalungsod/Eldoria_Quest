@@ -161,6 +161,8 @@ class CombatHandler:
         action: str = "auto",
         stance: str = "balanced",
         fatigue_multiplier: float = 1.0,
+        weather=None,
+        time_phase=None,
     ) -> dict[str, Any]:
         """
         Executes a full combat round (Player vs Monster).
@@ -170,9 +172,17 @@ class CombatHandler:
             persist_vitals: Whether to write HP/MP to DB immediately.
             stance: Player's current combat stance (aggressive, balanced, defensive).
             fatigue_multiplier: Multiplier for monster damage based on adventure duration.
+            weather: Current Weather condition.
+            time_phase: Current TimePhase.
         """
         vitals = None
         try:
+            # Ensure Weather/Time are set
+            if weather is None:
+                weather = WorldTime.get_current_weather("default")
+            if time_phase is None:
+                time_phase = WorldTime.get_current_phase()
+
             # 1. Load Data
             if context:
                 player_stats = context["player_stats"]
@@ -231,6 +241,8 @@ class CombatHandler:
                 action=action,
                 player_stance=stance,
                 monster_dmg_mult=fatigue_multiplier,
+                weather=weather,
+                time_phase=time_phase,
             )
 
             result = engine.run_combat_turn()

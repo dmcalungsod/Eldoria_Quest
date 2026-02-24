@@ -222,6 +222,10 @@ class AdventureSession:
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
 
+            # --- Weather & Time System Check ---
+            weather = WorldTime.get_current_weather(self.location_id)
+            time_phase = WorldTime.get_current_phase()
+
             # --- 1. Continue Combat ---
             if self.active_monster:
                 if action and action.startswith("set_stance:"):
@@ -239,10 +243,10 @@ class AdventureSession:
                     return self._attempt_flee(context, persist=persist)
 
                 if action == "defend":
-                    return self._process_combat_turn(context, action="defend", persist=persist)
+                    return self._process_combat_turn(context, action="defend", persist=persist, weather=weather, time_phase=time_phase)
 
                 if action == "special_ability":
-                    return self._process_combat_turn(context, action="special_ability", persist=persist)
+                    return self._process_combat_turn(context, action="special_ability", persist=persist, weather=weather, time_phase=time_phase)
 
                 should_auto = self._check_auto_condition(context)
 
@@ -260,19 +264,15 @@ class AdventureSession:
                             # Auto-Flee logic
                             return self._attempt_flee(context, persist=persist)
 
-                    return self._resolve_auto_combat(context, background=True, persist=persist)
+                    return self._resolve_auto_combat(context, background=True, persist=persist, weather=weather, time_phase=time_phase)
 
                 # If explicit attack or implicit auto, and eligible -> Auto
                 if (action == "attack" or not action) and should_auto:
-                    return self._resolve_auto_combat(context, persist=persist)
+                    return self._resolve_auto_combat(context, persist=persist, weather=weather, time_phase=time_phase)
 
                 # Otherwise manual single turn
                 final_action = action if action else "attack"
-                return self._process_combat_turn(context, action=final_action, persist=persist)
-
-            # --- Weather & Time System Check ---
-            weather = WorldTime.get_current_weather(self.location_id)
-            time_phase = WorldTime.get_current_phase()
+                return self._process_combat_turn(context, action=final_action, persist=persist, weather=weather, time_phase=time_phase)
 
             # Dynamic Combat Threshold based on Weather and Time
             # Base REGEN_CHANCE is 40 (meaning 60% combat).
@@ -416,6 +416,8 @@ class AdventureSession:
         context: dict[str, Any] | None = None,
         background: bool = False,
         persist: bool = True,
+        weather=None,
+        time_phase=None,
     ) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
@@ -457,6 +459,8 @@ class AdventureSession:
                 persist_vitals=False,
                 stance=stance,
                 fatigue_multiplier=fatigue_mult,
+                weather=weather,
+                time_phase=time_phase,
             )
             turn_reports.append(result.get("turn_report", {}))
 
@@ -539,6 +543,8 @@ class AdventureSession:
         action: str = "attack",
         prepend_logs: list = None,
         persist: bool = True,
+        weather=None,
+        time_phase=None,
     ) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
@@ -566,6 +572,8 @@ class AdventureSession:
             stance=stance,
             persist_vitals=False,  # FIX: Defer vital update
             fatigue_multiplier=fatigue_mult,
+            weather=weather,
+            time_phase=time_phase,
         )
 
         # Update context vitals from combat result
