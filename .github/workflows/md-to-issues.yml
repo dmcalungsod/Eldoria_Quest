@@ -1,0 +1,29 @@
+name: MD to Issues
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.Jules/**/*.md'
+      - '.Jules/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Parse .Jules MD files and create GitHub Issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: python3 scripts/parse_jules_issues.py
