@@ -280,13 +280,21 @@ class AdventureManager:
             # --- EXPLORATION ACHIEVEMENTS ---
             try:
                 # 1. Update Stats
-                self.db.update_exploration_stats(discord_id, row.get("location_id", "unknown"))
+                self.db.update_exploration_stats(discord_id, row.get("location_id", "unknown"), duration_min)
 
                 # 2. Check Achievements
                 ach_system = AchievementSystem(self.db)
                 new_title_msg = ach_system.check_exploration_achievements(discord_id)
+                new_duration_msg = ach_system.check_duration_achievements(discord_id, duration_min)
+
+                msgs = []
                 if new_title_msg:
-                    summary["new_titles"] = new_title_msg
+                    msgs.append(new_title_msg)
+                if new_duration_msg:
+                    msgs.append(new_duration_msg)
+
+                if msgs:
+                    summary["new_titles"] = "\n".join(msgs)
             except Exception as e:
                 logger.error(
                     f"Error checking exploration achievements for {discord_id}: {e}",

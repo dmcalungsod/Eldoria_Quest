@@ -2218,15 +2218,19 @@ class DatabaseManager:
     # EXPLORATION STATS (New methods for external call sites)
     # ============================================================
 
-    def update_exploration_stats(self, discord_id: int, location_id: str):
+    def update_exploration_stats(self, discord_id: int, location_id: str, duration_minutes: int = 0):
         """
-        Updates exploration stats: unique locations visited and total expeditions.
+        Updates exploration stats: unique locations visited, total expeditions, and duration records.
         """
         self._col("stats").update_one(
             {"discord_id": discord_id},
             {
                 "$addToSet": {"unique_locations": location_id},
-                "$inc": {"total_expeditions": 1},
+                "$inc": {
+                    "total_expeditions": 1,
+                    "total_adventure_minutes": duration_minutes,
+                },
+                "$max": {"longest_adventure_minutes": duration_minutes},
             },
             upsert=True,
         )

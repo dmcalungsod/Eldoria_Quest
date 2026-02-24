@@ -67,13 +67,15 @@ class TestExplorationAchievements(unittest.TestCase):
         with patch("game_systems.adventure.adventure_manager.AchievementSystem") as MockAchievementSystem:
             mock_ach_system_instance = MockAchievementSystem.return_value
             mock_ach_system_instance.check_exploration_achievements.return_value = "🏆 Title Unlocked: Pathfinder"
+            mock_ach_system_instance.check_duration_achievements.return_value = None
 
             # Execute
             summary = self.adventure_manager.end_adventure(discord_id)
 
             # Verify
-            self.mock_db.update_exploration_stats.assert_called_with(discord_id, location_id)
+            self.mock_db.update_exploration_stats.assert_called_with(discord_id, location_id, 60)
             mock_ach_system_instance.check_exploration_achievements.assert_called_with(discord_id)
+            mock_ach_system_instance.check_duration_achievements.assert_called_with(discord_id, 60)
 
             self.assertIsNotNone(summary)
             self.assertEqual(summary.get("new_titles"), "🏆 Title Unlocked: Pathfinder")
