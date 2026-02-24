@@ -1,0 +1,32 @@
+name: Cleanup Old Workflow Runs
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly on Sunday at 3 AM UTC
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old workflow runs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Keep the last 30 days of runs, delete everything older
+          CUTOFF=$(date -d '30 days ago' --iso-8601=seconds)
+          echo "Deleting workflow runs older than $CUTOFF..."
+
+          gh api repos/${{ github.repository }}/actions/runs \
+            --paginate \
+            --jq ".workflow_runs[] | select(.created_at < \"$CUTOFF\") | .id" \
+            | while read run_id; do
+                echo "Deleting run $run_id"
+                gh api -X DELETE repos/${{ github.repository }}/actions/runs/$run_id
+              done
+
+          echo "### 🧹 Workflow Run Cleanup" >> $GITHUB_STEP_SUMMARY
+          echo "Deleted runs older than 30 days." >> $GITHUB_STEP_SUMMARY
