@@ -14,17 +14,29 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Mirror
+      - name: Clone source repo
         run: |
           git clone --mirror https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
+
+      - name: Push to mirror
+        id: push_mirror
+        continue-on-error: true
+        run: |
           git push --prune https://${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot.git +refs/heads/*:refs/heads/* +refs/tags/*:refs/tags/*
 
       - name: Log Summary
         if: always()
         run: |
           echo "### 🪞 Mirror Status" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-             echo "✅ Mirror sync completed successfully." >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.push_mirror.outcome }}" == "success" ]; then
+            echo "✅ Mirror sync completed successfully to \`DeeEmSea/Eldoria-Quest-Bot\`." >> $GITHUB_STEP_SUMMARY
           else
-             echo "❌ Mirror sync failed." >> $GITHUB_STEP_SUMMARY
+            echo "❌ Mirror sync failed." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Likely cause:** The \`MIRROR_TOKEN\` secret may be expired or missing." >> $GITHUB_STEP_SUMMARY
+            echo "👉 Check: Settings → Secrets → \`MIRROR_TOKEN\`" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Fail if mirror failed
+        if: steps.push_mirror.outcome == 'failure'
+        run: exit 1
