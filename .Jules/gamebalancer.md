@@ -9,3 +9,9 @@
 **Learning:** The `LootCalculator` restricted Luck scaling exclusively to "High Rarity" items (Epic, Legendary, Mythical). This rendered the LCK stat effectively useless for 90% of gameplay, as it did not improve drop rates for Common, Uncommon, or Rare materials—the core components of the "Material-Driven Survival" economy. Players investing in Luck saw no return on investment for general farming.
 
 **Action:** Removed the rarity restriction in `LootCalculator`. Luck now applies its multiplier `(1 + Luck/1000)` to ALL item drops. This ensures that Luck builds are viable for resource gathering without breaking the economy, as the scaling factor is conservative (e.g., 100 Luck = 1.1x multiplier).
+
+## 2026-03-02 — Auto-Adventure Fatigue Scaling
+
+**Learning:** Auto-adventures lacking dynamic difficulty scaling allowed players to farm indefinitely with sufficient healing, bypassing the intended "risk vs reward" curve of long expeditions. Static monster stats meant the 10th hour was no more dangerous than the 1st.
+
+**Action:** Implemented a fatigue system in `AdventureSession`. Expeditions longer than 4 hours now incur a +5% monster damage multiplier per subsequent hour. This creates a soft cap on session length, forcing players to weigh the risk of extended farming against the escalating danger, reinforcing the survival theme. The scaling is transient (calculated per step) to avoid permanently buffing monster records in the database.

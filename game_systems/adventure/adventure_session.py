@@ -11,10 +11,10 @@ import random
 from typing import Any
 
 from database.database_manager import DatabaseManager
+from game_systems.core.world_time import TimePhase, Weather, WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.core.world_time import TimePhase, Weather, WorldTime
 
 # Subsystems
 from .adventure_rewards import AdventureRewards
@@ -93,6 +93,22 @@ class AdventureSession:
             "player_stats": context["player_stats"] if context else None,
             "active_monster": self.active_monster,
         }
+
+    def _calculate_fatigue_multiplier(self) -> float:
+        """
+        Calculates monster damage multiplier based on session duration.
+        Logic: > 4 hours (16 steps) -> +5% damage per hour (4 steps).
+        """
+        steps = getattr(self, "steps_completed", 0)
+        if steps <= 16:
+            return 1.0
+
+        # Steps past threshold
+        excess_steps = steps - 16
+
+        # 5% per hour (4 steps) => 1.25% per step
+        bonus = (excess_steps / 4.0) * 0.05
+        return 1.0 + bonus
 
     # ======================================================================
     # MAIN STEP LOGIC
@@ -429,6 +445,8 @@ class AdventureSession:
 
         # Max 8 turns to avoid infinite loops
         stance = self.active_monster.get("player_stance", "balanced")
+        fatigue_mult = self._calculate_fatigue_multiplier()
+
         for _ in range(8):
             # FIX: Pass session XP
             result = self.combat.resolve_turn(
@@ -438,6 +456,7 @@ class AdventureSession:
                 context=context,
                 persist_vitals=False,
                 stance=stance,
+                fatigue_multiplier=fatigue_mult,
             )
             turn_reports.append(result.get("turn_report", {}))
 
@@ -536,6 +555,8 @@ class AdventureSession:
         initial_hp = context["vitals"]["current_hp"] if context else 0
         initial_mp = context["vitals"]["current_mp"] if context else 0
 
+        fatigue_mult = self._calculate_fatigue_multiplier()
+
         result = self.combat.resolve_turn(
             self.active_monster,
             report,
@@ -544,6 +565,7 @@ class AdventureSession:
             action=action,
             stance=stance,
             persist_vitals=False,  # FIX: Defer vital update
+            fatigue_multiplier=fatigue_mult,
         )
 
         # Update context vitals from combat result

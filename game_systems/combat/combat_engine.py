@@ -87,6 +87,7 @@ class CombatEngine:
         base_stats_dict: dict = None,
         action: str = "auto",
         player_stance: str = "balanced",
+        monster_dmg_mult: float = 1.0,
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -131,6 +132,9 @@ class CombatEngine:
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
         self.action = action
+
+        # Fatigue / Monster Buff Logic
+        self.monster_dmg_mult = monster_dmg_mult
 
         # Stance Logic
         self.player_stance = player_stance
@@ -297,6 +301,10 @@ class CombatEngine:
                 if action["type"] == "attack":
                     dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.stats_dict)
 
+                    # Apply Fatigue / Monster Buff Multiplier
+                    if self.monster_dmg_mult != 1.0:
+                        dmg = int(dmg * self.monster_dmg_mult)
+
                     # Apply Stance Multiplier
                     if self.dmg_taken_mult != 1.0:
                         dmg = int(dmg * self.dmg_taken_mult)
@@ -332,6 +340,10 @@ class CombatEngine:
                     else:
                         # --- Monster Offensive Skill ---
                         dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+
+                        # Apply Fatigue / Monster Buff Multiplier
+                        if self.monster_dmg_mult != 1.0:
+                            dmg = int(dmg * self.monster_dmg_mult)
 
                         # Apply Stance Multiplier
                         if self.dmg_taken_mult != 1.0:
@@ -373,6 +385,10 @@ class CombatEngine:
                     self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
 
                     dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+
+                    # Apply Fatigue / Monster Buff Multiplier
+                    if self.monster_dmg_mult != 1.0:
+                        dmg = int(dmg * self.monster_dmg_mult)
 
                     # Apply Stance Multiplier
                     if self.dmg_taken_mult != 1.0:
