@@ -3,495 +3,74 @@ adventure_locations.py
 
 Defines the exploration zones available to adventurers.
 Each location dictates the monster pool, difficulty, and rewards.
+
+This file now loads data from 'adventure_locations.json' for better maintainability.
 """
 
-LOCATIONS = {
-    "forest_outskirts": {
-        "name": "Willowcreek Outskirts",
-        "emoji": "🌲",
-        "min_rank": "F",
-        "level_req": 1,
-        "duration_options": [15, 30, 60],
-        "monsters": [
-            ("monster_001", 40),  # Verdant Slime
-            ("monster_002", 40),  # Glimmer Slime
-            ("monster_003", 20),  # Goblin Grunt
-        ],
-        "night_monsters": [
-            ("monster_003", 60),  # Goblin Grunt (More active at night)
-            ("monster_007", 40),  # Hollow Spiderling (Nocturnal)
-        ],
-        # --- NEW: High level spawn for stronger players ---
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_007",  # Hollow Spiderling (Lvl 5 Elite)
-                "weight": 10,  # ~10% spawn chance if added
-                "min_level": 3,  # Only appears for Level 3+
-            }
-        ],
-        "description": "The safe edge of the forest. Slimes and weak goblins lurk here.",
-        "gatherables": [
-            ("medicinal_herb", 70),
-            ("magic_stone_fragment", 30),
-        ],
-        "special_events": ["safe_room", "hidden_stash"],
-    },
-    "whispering_thicket": {
-        "name": "Whispering Thicket",
-        "emoji": "🍃",
-        "min_rank": "E",
-        "level_req": 5,
-        "duration_options": [30, 60, 120],
-        "monsters": [
-            ("monster_004", 30),  # Goblin Scout
-            ("monster_005", 30),  # Bramble Goblin
-            ("monster_006", 20),  # Forest Wolf Pup
-            ("monster_008", 10),  # Thicket Spider
-        ],
-        "night_monsters": [
-            ("monster_008", 40),  # Thicket Spider (Nocturnal hunter)
-            ("monster_005", 20),  # Bramble Goblin
-            ("monster_006", 20),  # Forest Wolf Pup
-            ("monster_010", 20),  # Briar Hound (Roams at night)
-        ],
-        "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs.",
-        "gatherables": [
-            ("medicinal_herb", 40),
-            ("ancient_wood", 40),
-            ("magic_stone_small", 20),
-        ],
-        "special_events": ["hidden_stash", "trap_pit"],
-    },
-    "deepgrove_roots": {
-        "name": "Deepgrove Roots",
-        "emoji": "🍄",
-        "min_rank": "D",
-        "level_req": 10,
-        "duration_options": [60, 120, 240],
-        "monsters": [
-            ("monster_010", 25),  # Briar Hound
-            ("monster_016", 25),  # Young Treant
-            ("monster_017", 15),  # Feral Stag (Boss-like)
-            ("monster_020", 20),  # Ravaged Boar
-        ],
-        "night_monsters": [
-            ("monster_010", 40),  # Briar Hound (More active at night)
-            ("monster_020", 40),  # Ravaged Boar
-            ("monster_016", 20),
-        ],
-        "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot.",
-        "gatherables": [
-            ("ancient_wood", 50),
-            ("iron_ore", 30),
-            ("magic_stone_medium", 20),
-        ],
-        "special_events": ["trap_pit", "ancient_shrine"],
-    },
-    "the_ashlands": {
-        "name": "The Ashlands",
-        "emoji": "🌋",
-        "min_rank": "D",
-        "level_req": 12,
-        "duration_options": [60, 120, 240],
-        "monsters": [
-            ("monster_131", 30),  # Ash Rat
-            ("monster_132", 30),  # Cinder Mite
-            ("monster_133", 25),  # Ember Fox
-            ("monster_134", 15),  # Scorched Scavenger
-        ],
-        "night_monsters": [
-            ("monster_133", 40),  # Ember Fox (Active at night)
-            ("monster_134", 40),  # Scorched Scavenger
-            ("monster_132", 20),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_135",  # Slag Golem (Boss)
-                "weight": 5,
-                "min_level": 16,
-            }
-        ],
-        "description": "A grey wasteland of volcanic ash and skeletal trees. The heat is oppressive.",
-        "gatherables": [
-            ("obsidian_shard", 40),
-            ("ash_blossom", 30),
-            ("iron_ore", 20),
-            ("magic_stone_medium", 10),
-        ],
-        "special_events": ["trap_pit", "hidden_stash", "safe_room"],
-    },
-    "shrouded_fen": {
-        "name": "The Shrouded Fen",
-        "emoji": "🌫️",
-        "min_rank": "C",
-        "level_req": 15,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_022", 30),  # Marsh Crawler
-            ("monster_023", 20),  # Sporeling
-            ("monster_025", 20),  # Stormling
-            ("monster_027", 15),  # Mire Lurker
-        ],
-        "night_monsters": [
-            ("monster_027", 50),  # Mire Lurker (Lurks in darkness)
-            ("monster_022", 30),  # Marsh Crawler
-            ("monster_025", 20),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_028",  # Duskling (Elite)
-                "weight": 10,
-                "min_level": 16,
-            },
-            {
-                "monster_key": "monster_034",  # Glade Empress (Boss)
-                "weight": 5,
-                "min_level": 18,
-            },
-        ],
-        "description": "A mist-choked wetland where the veil is thin. Shadows move in the fog, and the ground hungers for the unwary.",
-        "gatherables": [
-            ("medicinal_herb", 30),
-            ("ancient_wood", 30),
-            ("iron_ore", 20),
-            ("magic_stone_medium", 20),
-        ],
-        "special_events": ["safe_room", "trap_pit"],
-    },
-    "sunken_grotto": {
-        "name": "The Sunken Grotto",
-        "emoji": "🌊",
-        "min_rank": "C",
-        "level_req": 18,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_121", 30),  # Coral Golem
-            ("monster_122", 30),  # Abyssal Eel
-            ("monster_123", 25),  # Tide Siren
-            ("monster_124", 15),  # Deep Crawler
-        ],
-        "night_monsters": [
-            ("monster_122", 40),  # Abyssal Eel
-            ("monster_124", 40),  # Deep Crawler (Comes out in dark)
-            ("monster_123", 20),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_125",  # Leviathan (Boss)
-                "weight": 5,
-                "min_level": 23,
-            }
-        ],
-        "description": "A submerged cavern network lit by bioluminescence. The water here is deep and cold.",
-        "gatherables": [
-            ("coral_fragment", 40),
-            ("pearl", 30),
-            ("magic_stone_medium", 20),
-            ("bioluminescent_scale", 10),
-        ],
-        "special_events": ["hidden_stash", "ancient_shrine"],
-    },
-    "crystal_caverns": {
-        "name": "The Crystal Caverns",
-        "emoji": "💎",
-        "min_rank": "B",
-        "level_req": 20,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_101", 30),  # Crystal Golem
-            ("monster_102", 30),  # Prism Spider
-            ("monster_103", 25),  # Shard Wisp
-            ("monster_104", 15),  # Obsidian Gargoyle
-        ],
-        "night_monsters": [
-            ("monster_104", 40),  # Obsidian Gargoyle (Blends with dark)
-            ("monster_103", 30),  # Shard Wisp
-            ("monster_102", 30),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_105",  # Crystalline Guardian (Boss)
-                "weight": 5,
-                "min_level": 25,
-            }
-        ],
-        "description": "A breathtaking subterranean world of glowing crystals and ancient technology.",
-        "gatherables": [
-            ("luminescent_crystal", 40),
-            ("mithril_ore", 30),
-            ("magic_stone_medium", 30),
-        ],
-        "special_events": ["safe_room", "ancient_shrine"],
-    },
-    "clockwork_halls": {
-        "name": "The Clockwork Halls",
-        "emoji": "⚙️",
-        "min_rank": "B",
-        "level_req": 22,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_126", 30),  # Cogwork Spider
-            ("monster_127", 30),  # Brass Golem
-            ("monster_128", 25),  # Steam Wisp
-            ("monster_129", 15),  # Automaton Knight
-        ],
-        "night_monsters": [
-            ("monster_126", 40),  # Cogwork Spider
-            ("monster_128", 40),  # Steam Wisp
-            ("monster_129", 20),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_130",  # The Gear Warden
-                "weight": 5,
-                "min_level": 26,
-            }
-        ],
-        "description": "A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.",
-        "gatherables": [
-            ("brass_gear", 40),
-            ("copper_wire", 30),
-            ("spring_coil", 20),
-            ("magic_stone_medium", 10),
-        ],
-        "special_events": ["trap_pit", "hidden_stash"],
-    },
-    "forgotten_ossuary": {
-        "name": "The Forgotten Ossuary",
-        "emoji": "💀",
-        "min_rank": "B",
-        "level_req": 24,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_051", 30),  # Crypt Walker
-            ("monster_052", 30),  # Bone Archer
-            ("monster_053", 25),  # Tomb Wraith
-            ("monster_054", 15),  # Lich Apprentice
-        ],
-        "night_monsters": [
-            ("monster_053", 40),  # Tomb Wraith (More active)
-            ("monster_054", 30),  # Lich Apprentice
-            ("monster_052", 30),  # Bone Archer
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_055",  # Malakor the Eternal (Boss)
-                "weight": 5,
-                "min_level": 26,
-            }
-        ],
-        "description": "A silent labyrinth of bone and shadow. The air is cold and smells of ancient dust.",
-        "gatherables": [
-            ("bone_shard", 40),
-            ("grave_dust", 30),
-            ("magic_stone_medium", 30),
-        ],
-        "special_events": ["trap_pit", "hidden_stash", "ancient_shrine"],
-    },
-    "molten_caldera": {
-        "name": "The Molten Caldera",
-        "emoji": "🌋",
-        "min_rank": "A",
-        "level_req": 30,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_106", 30),  # Fire Elemental
-            ("monster_107", 30),  # Magma Golem
-            ("monster_108", 25),  # Ember Salamander
-            ("monster_109", 15),  # Lava Drake (Elite)
-        ],
-        "night_monsters": [
-            ("monster_108", 40),  # Ember Salamander
-            ("monster_109", 30),  # Lava Drake
-            ("monster_106", 30),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_110",  # Ignis (Boss)
-                "weight": 5,
-                "min_level": 35,
-            }
-        ],
-        "description": "A churning lake of fire and obsidian. The heat alone is enough to kill the unprepared.",
-        "gatherables": [
-            ("obsidian_shard", 40),
-            ("fire_essence", 30),
-            ("magma_core", 20),
-            ("magic_stone_large", 10),
-        ],
-        "special_events": ["trap_pit", "safe_room"],
-    },
-    "frostfall_expanse": {
-        "name": "The Frostfall Expanse",
-        "emoji": "❄️",
-        "min_rank": "A",
-        "level_req": 25,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_111", 30),  # Frost Wolf
-            ("monster_112", 25),  # Ice Golem
-            ("monster_113", 30),  # Chill Wisp
-            ("monster_114", 15),  # Glacial Drake
-        ],
-        "night_monsters": [
-            ("monster_111", 40),  # Frost Wolf (Hunts at night)
-            ("monster_113", 30),  # Chill Wisp
-            ("monster_114", 30),  # Glacial Drake
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_115",  # Cryon
-                "weight": 5,
-                "min_level": 29,
-            }
-        ],
-        "description": "A frozen wasteland where the wind cuts like a knife and only the strong survive.",
-        "gatherables": [
-            ("frost_crystal", 40),
-            ("winter_wolf_pelt", 30),
-            ("magic_stone_medium", 30),
-        ],
-        "special_events": ["safe_room", "hidden_stash"],
-    },
-    "void_sanctum": {
-        "name": "The Void Sanctum",
-        "emoji": "⚫",
-        "min_rank": "S",
-        "level_req": 40,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_116", 30),  # Void Stalker
-            ("monster_118", 30),  # Null Wisp
-            ("monster_117", 25),  # Abyssal Construct
-            ("monster_119", 15),  # Entropy Drake
-        ],
-        "night_monsters": [
-            ("monster_116", 50),  # Void Stalker
-            ("monster_119", 30),  # Entropy Drake
-            ("monster_118", 20),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_120",  # Omega (Boss)
-                "weight": 5,
-                "min_level": 44,
-            }
-        ],
-        "description": "A realm where reality frays and silence screams. The final frontier of the known world.",
-        "gatherables": [
-            ("void_dust", 40),
-            ("abyssal_shackle", 30),
-            ("entropy_crystal", 20),
-            ("magic_stone_flawless", 10),
-        ],
-        "special_events": ["trap_pit", "ancient_shrine"],
-    },
-    "gale_scarred_heights": {
-        "name": "Gale-Scarred Heights",
-        "emoji": "🌪️",
-        "min_rank": "A",
-        "level_req": 35,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_136", 30),  # Zephyr Wisp
-            ("monster_137", 30),  # Cloud Ray
-            ("monster_138", 25),  # Storm Griffin (Elite)
-            ("monster_139", 15),  # Thunder Roc (Elite)
-        ],
-        "night_monsters": [
-            ("monster_138", 40),  # Storm Griffin
-            ("monster_139", 30),  # Thunder Roc
-            ("monster_137", 30),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_140",  # Tempest Guardian (Boss)
-                "weight": 5,
-                "min_level": 39,
-            }
-        ],
-        "description": "High peaks where the wind howls like a living thing. Only the sure-footed survive.",
-        "gatherables": [
-            ("cloud_wisp", 40),
-            ("mithril_ore", 30),
-            ("magic_stone_large", 20),
-            ("charged_core", 10),
-        ],
-        "special_events": ["trap_pit", "ancient_shrine"],
-    },
-    "celestial_archipelago": {
-        "name": "The Celestial Archipelago",
-        "emoji": "☁️",
-        "min_rank": "B",
-        "level_req": 28,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_141", 30),  # Arcane Sentinel
-            ("monster_142", 30),  # Aether Wisp
-            ("monster_143", 25),  # Sky-Ray
-            ("monster_144", 15),  # Ruin Stalker
-        ],
-        "night_monsters": [
-            ("monster_144", 40),  # Ruin Stalker (Active at night)
-            ("monster_143", 30),  # Sky-Ray
-            ("monster_142", 30),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_145",  # The Celestial Arbiter (Boss)
-                "weight": 5,
-                "min_level": 32,
-            }
-        ],
-        "description": "Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.",
-        "gatherables": [
-            ("aether_stone", 40),
-            ("star_metal_fragment", 30),
-            ("ancient_tablet", 20),
-            ("magic_stone_large", 10),
-        ],
-        "special_events": ["trap_pit", "safe_room", "ancient_shrine"],
-    },
-    "shimmering_wastes": {
-        "name": "The Shimmering Wastes",
-        "emoji": "✨",
-        "min_rank": "A",
-        "level_req": 37,
-        "duration_options": [60, 120, 240, 480],
-        "monsters": [
-            ("monster_151", 30),  # Glass Serpent
-            ("monster_152", 30),  # Prism Golem
-            ("monster_153", 25),  # Mirage Spirit
-            ("monster_154", 15),  # Sun-Scorched Wraith
-        ],
-        "night_monsters": [
-            ("monster_153", 40),  # Mirage Spirit (More active at night/twilight)
-            ("monster_154", 30),  # Sun-Scorched Wraith
-            ("monster_151", 30),
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "monster_155",  # The Radiance (Boss)
-                "weight": 5,
-                "min_level": 40,
-            }
-        ],
-        "description": "A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.",
-        "gatherables": [
-            ("prism_shard", 40),
-            ("concentrated_light", 30),
-            ("magic_stone_flawless", 20),
-            ("obsidian_shard", 10),
-        ],
-        "special_events": ["trap_pit", "ancient_shrine"],
-    },
-    "guild_arena": {
-        "name": "Guild Proving Grounds",
-        "emoji": "🏟️",
-        "min_rank": "F",
-        "level_req": 1,
-        "duration_options": [],
-        "monsters": [],  # Boss is custom-spawned
-        "description": "The dedicated arena for Adventurer rank examinations.",
-    },
-}
+import json
+import logging
+from pathlib import Path
+
+from game_systems.data.data_validator import DataValidator
+
+logger = logging.getLogger("eldoria.data")
+
+
+def load_locations():
+    """
+    Loads location data from JSON file, validates it, and processes it
+    for backward compatibility (converting lists to tuples).
+    """
+    data_path = Path(__file__).parent / "adventure_locations.json"
+
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        logger.error(f"CRITICAL: adventure_locations.json not found at {data_path}")
+        return {}
+    except json.JSONDecodeError as e:
+        logger.error(f"CRITICAL: adventure_locations.json is invalid JSON: {e}")
+        return {}
+
+    # Validate Schema
+    errors = DataValidator.validate_location_schema(data)
+    if errors:
+        for err in errors:
+            logger.error(f"Validation Error: {err}")
+        # We might want to raise an error or continue with partial data.
+        # For now, we log errors but try to proceed if possible, though schema errors usually mean broken data.
+        logger.warning("Loaded location data contains schema errors.")
+
+    processed_locations = {}
+
+    for loc_id, loc_data in data.items():
+        # Convert lists back to tuples for backward compatibility
+        # 'monsters', 'night_monsters', 'gatherables' are defined as lists of lists in JSON
+        # effectively [[id, weight], ...]
+        # We convert them to [(id, weight), ...]
+
+        if "monsters" in loc_data and isinstance(loc_data["monsters"], list):
+            loc_data["monsters"] = [tuple(m) for m in loc_data["monsters"]]
+
+        if "night_monsters" in loc_data and isinstance(loc_data["night_monsters"], list):
+            loc_data["night_monsters"] = [tuple(m) for m in loc_data["night_monsters"]]
+
+        if "gatherables" in loc_data and isinstance(loc_data["gatherables"], list):
+            loc_data["gatherables"] = [tuple(g) for g in loc_data["gatherables"]]
+
+        # 'conditional_monsters' is a list of dicts, which is fine as is.
+        # 'duration_options' is a list of ints, fine as is.
+        # 'special_events' is list of strings, fine as is.
+
+        processed_locations[loc_id] = loc_data
+
+    logger.info(
+        f"Loaded {len(processed_locations)} adventure locations from {data_path.name}"
+    )
+    return processed_locations
+
+
+LOCATIONS = load_locations()
+
+__all__ = ["LOCATIONS"]
