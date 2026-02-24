@@ -41,6 +41,16 @@ jobs:
           # Parse JSON to get numbers
           echo "$PR_LIST" | jq -r '.[] | .number' | while read pr_number; do
             if [ "$pr_number" != "null" ] && [ -n "$pr_number" ]; then
+              echo "Checking PR #$pr_number..."
+
+              # Skip draft PRs
+              is_draft=$(gh pr view "$pr_number" --json isDraft --jq '.isDraft')
+              if [ "$is_draft" == "true" ]; then
+                echo "PR #$pr_number is a draft, skipping."
+                echo "- ⏭️ Skipped PR #$pr_number (still a draft)" >> $GITHUB_STEP_SUMMARY
+                continue
+              fi
+
               echo "Merging PR #$pr_number..."
               if gh pr merge "$pr_number" --squash; then
                 echo "- ✅ Merged PR #$pr_number" >> $GITHUB_STEP_SUMMARY
