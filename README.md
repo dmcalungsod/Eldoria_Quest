@@ -11,19 +11,19 @@ Inspired by:
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-private%20project-darkred?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/built_for-personal%20use-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/not_open_source-grey?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/status-private%20project-darkred?style=flat"/>
+  <img src="https://img.shields.io/badge/built_for-personal%20use-blue?style=flat"/>
+  <img src="https://img.shields.io/badge/not_open_source-grey?style=flat"/>
 </p>
 
 <p align="center">
   <a href="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml">
     <img src="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml/badge.svg" alt="CI Status"/>
   </a>
-  <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10"/>
-  <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/>
+  <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white" alt="Python 3.10"/>
+  <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white" alt="MongoDB"/>
   <a href="https://github.com/astral-sh/ruff">
-    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=for-the-badge" alt="Ruff"/>
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=flat" alt="Ruff"/>
   </a>
 </p>
 
