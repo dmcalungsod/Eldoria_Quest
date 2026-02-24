@@ -333,5 +333,9 @@ class AdventureEmbeds:
         if new_titles := s.get("new_titles"):
             embed.add_field(name="🏆 Achievements Unlocked", value=new_titles, inline=False)
 
+        # 7. Penalties (if any)
+        if penalty_logs := s.get("penalty_logs"):
+            embed.add_field(name="⚠️ Penalties", value="\n".join(penalty_logs), inline=False)
+
         embed.set_footer(text="Your journey is recorded in the archives.")
         return embed

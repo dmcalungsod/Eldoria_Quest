@@ -189,6 +189,38 @@ class AdventureManager:
                 return None
 
             session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
+
+            # --- EXPLOIT FIX: Retreating while in Combat ---
+            # If the player manually ends the adventure (Retreat) while an active monster is present,
+            # they are fleeing in panic. We apply a 25% material penalty (Emergency Extraction).
+            penalty_logs = []
+            if session.active_monster:
+                monster_name = session.active_monster.get("name", "Unknown Enemy")
+                penalty_logs.append(f"⚠️ **Emergency Extraction!** You fled from {monster_name}, losing supplies in the chaos.")
+
+                # Apply 25% penalty to gathered materials
+                keys_to_remove = []
+                for item_key, count in session.loot.items():
+                    # Skip exp/aurum (handled separately below)
+                    if item_key in ("exp", "aurum"):
+                        continue
+
+                    kept_amount = int(count * 0.75)  # Keep 75%, Lose 25%
+                    lost_amount = count - kept_amount
+
+                    if lost_amount > 0:
+                        mat = MATERIALS.get(item_key)
+                        name = mat["name"] if mat else item_key
+                        penalty_logs.append(f"• -{lost_amount}x {name} (Panic)")
+
+                    if kept_amount > 0:
+                        session.loot[item_key] = kept_amount
+                    else:
+                        keys_to_remove.append(item_key)
+
+                for k in keys_to_remove:
+                    del session.loot[k]
+
             total_exp = session.loot.pop("exp", 0)
             total_aurum = session.loot.pop("aurum", 0)
 
@@ -227,6 +259,7 @@ class AdventureManager:
                 "new_level": new_level,
                 "leveled_up": new_level > old_level,
                 "faction_logs": faction_logs,
+                "penalty_logs": penalty_logs,
             }
 
             bulk_items = [
