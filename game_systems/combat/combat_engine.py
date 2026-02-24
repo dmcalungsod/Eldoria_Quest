@@ -150,6 +150,33 @@ class CombatEngine:
             self.dmg_dealt_mult = 0.8
             self.dmg_taken_mult = 0.8
 
+    def _get_effective_monster_stats(self):
+        """
+        Calculates monster stats with active debuffs applied.
+        Returns a copy of the monster dict with modified stats.
+        """
+        eff_monster = self.monster.copy()
+
+        if "debuffs" in self.monster:
+            for debuff in self.monster["debuffs"]:
+                if debuff.get("type") == "stat_mod":
+                    # Apply percentage modifiers
+                    for stat in ["ATK", "DEF", "AGI", "DEX"]:
+                        key = f"{stat}_percent"
+                        if key in debuff:
+                            mod = float(debuff[key])
+                            base_val = eff_monster.get(stat, 0)
+                            # Apply modifier (additive compounding? No, simple multiplicative for now)
+                            # If multiple debuffs affect same stat, order matters if we chain.
+                            # Better: Sum modifiers then apply?
+                            # Current logic: Iterative multiplication.
+                            # e.g. -20% -> * 0.8. Two -20% -> 0.8 * 0.8 = 0.64 (-36%)
+                            # This is acceptable for RPG mechanics.
+                            new_val = max(0, int(base_val * (1.0 + mod)))
+                            eff_monster[stat] = new_val
+
+        return eff_monster
+
     def run_combat_turn(self):
         """
         Runs ONE turn of combat.
@@ -299,10 +326,13 @@ class CombatEngine:
             log.append(f"💫 The {self.monster.get('name', 'enemy')} is reeling and misses its turn!")
             return False
 
-        action = MonsterAI.choose_action(self.monster, self.monster_hp, self.monster.get("MP", 0))
+        # Use effective stats for AI decision and damage calculation
+        effective_monster = self._get_effective_monster_stats()
+
+        action = MonsterAI.choose_action(effective_monster, self.monster_hp, self.monster.get("MP", 0))
 
         if action["type"] == "attack":
-            dmg, crit, event_type = DamageFormula.monster_attack(self.monster, self.stats_dict)
+            dmg, crit, event_type = DamageFormula.monster_attack(effective_monster, self.stats_dict)
 
             # Apply Fatigue / Monster Buff Multiplier
             if self.monster_dmg_mult != 1.0:
@@ -342,7 +372,7 @@ class CombatEngine:
                 log.append(CombatPhrases.monster_heal(self.monster, skill, heal))
             else:
                 # --- Monster Offensive Skill ---
-                dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+                dmg, crit, event_type = DamageFormula.monster_skill(effective_monster, self.stats_dict, skill)
 
                 # Apply Fatigue / Monster Buff Multiplier
                 if self.monster_dmg_mult != 1.0:
@@ -387,7 +417,7 @@ class CombatEngine:
             mp_cost = skill.get("mp_cost", 0)
             self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
 
-            dmg, crit, event_type = DamageFormula.monster_skill(self.monster, self.stats_dict, skill)
+            dmg, crit, event_type = DamageFormula.monster_skill(effective_monster, self.stats_dict, skill)
 
             # Apply Fatigue / Monster Buff Multiplier
             if self.monster_dmg_mult != 1.0:
@@ -495,8 +525,11 @@ class CombatEngine:
         self.player_mp -= cost
         log.append(f"{spec['emoji']} **{spec['name']}**: {spec['log']}")
 
+        # Use effective stats for defense calculation
+        effective_monster = self._get_effective_monster_stats()
+
         # Base Damage Calculation
-        base_dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+        base_dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, effective_monster)
 
         if force_crit:
             crit = True
@@ -569,7 +602,10 @@ class CombatEngine:
 
         else:
             # --- Offensive Skill ---
-            dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, self.monster, skill, skill_level)
+            # Use effective stats for defense calculation
+            effective_monster = self._get_effective_monster_stats()
+
+            dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, effective_monster, skill, skill_level)
 
             if force_crit:
                 crit = True
@@ -613,12 +649,19 @@ class CombatEngine:
         active_debuffs = []
 
         for debuff in self.monster["debuffs"]:
-            dmg = debuff["damage"]
-            name = debuff["name"]
+            debuff_type = debuff.get("type")
 
-            # Apply Damage
-            self.monster_hp -= dmg
-            msgs.append(f"☠️ **{self.monster.get('name', 'Enemy')}** takes {dmg} {name.lower()} damage!")
+            # Legacy Support: If type is missing but damage exists, treat as poison
+            if not debuff_type and "damage" in debuff:
+                debuff_type = "poison"
+
+            name = debuff.get("name", "Debuff")
+
+            if debuff_type == "poison":
+                dmg = debuff.get("damage", 0)
+                # Apply Damage
+                self.monster_hp -= dmg
+                msgs.append(f"☠️ **{self.monster.get('name', 'Enemy')}** takes {dmg} {name.lower()} damage!")
 
             # Decrement Duration
             debuff["duration"] -= 1
@@ -632,7 +675,7 @@ class CombatEngine:
 
     def _apply_monster_debuff(self, skill):
         """
-        Applies a debuff to the monster (e.g., Poison).
+        Applies a debuff to the monster (e.g., Poison, Stat Down).
         Scales damage based on player stats.
         """
         debuff_data = skill.get("debuff", {})
@@ -675,11 +718,39 @@ class CombatEngine:
                 )
                 return f"☠️ **{self.monster.get('name', 'Enemy')}** is poisoned for {scaled_dmg} dmg/turn!"
 
+        # Check for Stat Modifiers (ATK_percent, DEF_percent, etc.)
+        stat_mods = {}
+        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent"]:
+            if key in debuff_data:
+                stat_mods[key] = debuff_data[key]
+
+        if stat_mods:
+            duration = int(debuff_data.get("duration", 3))
+            name = skill.get("name", "Debuff")
+
+            # Avoid duplicate stacking of the SAME skill (refresh duration)
+            existing = next((d for d in self.monster["debuffs"] if d.get("name") == name and d.get("type") == "stat_mod"), None)
+
+            if existing:
+                existing["duration"] = duration
+                # Update magnitude if new one is stronger? For now, we assume same skill = same magnitude.
+                return f"💢 **{self.monster.get('name', 'Enemy')}**'s {name} is refreshed!"
+            else:
+                new_debuff = {
+                    "type": "stat_mod",
+                    "duration": duration,
+                    "name": name,
+                }
+                new_debuff.update(stat_mods)
+                self.monster["debuffs"].append(new_debuff)
+                return f"💢 **{self.monster.get('name', 'Enemy')}** is weakened by {name}!"
+
         return None
 
     def _perform_basic_attack(self, log, turn_report, force_crit=False):
         # --- Basic Attack ---
-        dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, self.monster)
+        effective_monster = self._get_effective_monster_stats()
+        dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, effective_monster)
 
         if force_crit:
             crit = True
