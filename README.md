@@ -16,6 +16,17 @@ Inspired by:
   <img src="https://img.shields.io/badge/not_open_source-grey?style=for-the-badge"/>
 </p>
 
+<p align="center">
+  <a href="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/dmcalungsod/Eldoria_Quest/ci.yml?branch=main&label=CI&style=for-the-badge" alt="CI Status"/>
+  </a>
+  <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10"/>
+  <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/>
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=for-the-badge" alt="Ruff"/>
+  </a>
+</p>
+
 ---
 
 # 🜁 **World & Theme**
