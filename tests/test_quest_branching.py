@@ -11,7 +11,8 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.guild_system.quest_system import QuestSystem
+from game_systems.guild_system.quest_system import QuestSystem  # noqa: E402
+
 
 class TestQuestBranching(unittest.TestCase):
     def setUp(self):
@@ -116,9 +117,12 @@ class TestQuestBranching(unittest.TestCase):
         # Mock finding the quest to accept
         def mock_find_one(query, projection=None):
             q_id = query.get("id")
-            if q_id == 68: return self.quest_choice_a
-            if q_id == 69: return self.quest_choice_b
-            if q_id == 67: return self.quest_base
+            if q_id == 68:
+                return self.quest_choice_a
+            if q_id == 69:
+                return self.quest_choice_b
+            if q_id == 67:
+                return self.quest_base
 
             # Check for existing accepted quest (first check in accept_quest)
             if "discord_id" in query and "quest_id" in query and isinstance(query["quest_id"], int):
@@ -162,7 +166,8 @@ class TestQuestBranching(unittest.TestCase):
 
         def mock_find_one_clean(query, projection=None):
             q_id = query.get("id")
-            if q_id == 69: return self.quest_choice_b
+            if q_id == 69:
+                return self.quest_choice_b
 
             # No existing quests found
             return None
