@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 sys.modules["pymongo"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
-from game_systems.combat.combat_engine import CombatEngine
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
 
 
 class TestCombatBuffScaling(unittest.TestCase):
