@@ -1,5 +1,5 @@
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 
 import pytest
 
@@ -126,3 +126,56 @@ def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_b
     # Should simulate remaining 2 steps
     assert mock_session.simulate_step.call_count == 2
     mock_db.update_adventure_status.assert_called_with(123, "completed")
+
+
+@patch("game_systems.adventure.adventure_resolution.AdventureSession")
+@patch("game_systems.adventure.adventure_resolution.QuestSystem")
+@patch("game_systems.adventure.adventure_resolution.InventoryManager")
+@patch("game_systems.adventure.adventure_resolution.AdventureManager")
+def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
+    """
+    Verifies that player vitals are updated in the context bundle between simulation steps.
+    This prevents the 'infinite healing' bug where vitals would reset to initial state.
+    """
+    engine = AdventureResolutionEngine(mock_bot, mock_db)
+    mock_session = mock_session_cls.return_value
+    mock_session.steps_completed = 0
+
+    # Setup context bundle
+    mock_db.get_combat_context_bundle.return_value = {
+        "player": {"current_hp": 100, "current_mp": 100},
+        "stats": {"HP": 100, "MP": 100},
+    }
+
+    # Side effect: Reduce HP by 10 each step
+    def simulate_side_effect(context_bundle, background, persist):
+        current_hp = context_bundle["player"]["current_hp"]
+        new_hp = current_hp - 10
+        return {
+            "dead": False,
+            "vitals": {"current_hp": new_hp, "current_mp": 100},
+            "player_stats": MagicMock(max_hp=100, max_mp=100)
+        }
+
+    mock_session.simulate_step.side_effect = simulate_side_effect
+
+    session_doc = {
+        "discord_id": 123,
+        "duration_minutes": 30,  # 2 steps
+        "steps_completed": 0,
+    }
+
+    # Execute
+    engine.resolve_session(session_doc)
+
+    # Verify calls
+    assert mock_session.simulate_step.call_count == 2
+
+    # Check that the final call received the updated HP
+    # Step 1: 100 -> 90. Bundle updated to 90.
+    # Step 2: 90 -> 80. Bundle updated to 80.
+    calls = mock_session.simulate_step.call_args_list
+    final_bundle = calls[-1].kwargs['context_bundle']
+
+    # The bundle object is mutated in place, so we check its final state
+    assert final_bundle["player"]["current_hp"] == 80
