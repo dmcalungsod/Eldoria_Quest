@@ -146,6 +146,149 @@
         ],
         "description": "A predator twisted by the Veil, its eyes glowing with unnatural hunger."
     },
+    "monster_051": {
+        "id": 51,
+        "name": "Crypt Walker",
+        "level": 23,
+        "tier": "Normal",
+        "hp": 750,
+        "atk": 50,
+        "def": 30,
+        "xp": 550,
+        "drops": [
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "bone_shard",
+                50
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "regenerate"
+        ],
+        "description": "An animated skeleton that moves with a rattling, purposeful gait."
+    },
+    "monster_052": {
+        "id": 52,
+        "name": "Bone Archer",
+        "level": 23,
+        "tier": "Normal",
+        "hp": 650,
+        "atk": 65,
+        "def": 20,
+        "xp": 550,
+        "drops": [
+            [
+                "bone_shard",
+                60
+            ],
+            [
+                "grave_dust",
+                30
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "heavy_blow"
+        ],
+        "description": "A skeletal marksman whose arrows are tipped with necrotic energy."
+    },
+    "monster_053": {
+        "id": 53,
+        "name": "Tomb Wraith",
+        "level": 24,
+        "tier": "Normal",
+        "hp": 700,
+        "atk": 70,
+        "def": 15,
+        "xp": 600,
+        "drops": [
+            [
+                "ectoplasm",
+                60
+            ],
+            [
+                "shadow_essence",
+                20
+            ],
+            [
+                "magic_stone_medium",
+                50
+            ]
+        ],
+        "skills": [
+            "ember",
+            "void_slash"
+        ],
+        "description": "A mournful spirit that drains the warmth from the living."
+    },
+    "monster_054": {
+        "id": 54,
+        "name": "Lich Apprentice",
+        "level": 25,
+        "tier": "Elite",
+        "hp": 1800,
+        "atk": 90,
+        "def": 40,
+        "xp": 2500,
+        "drops": [
+            [
+                "necrotic_essence",
+                40
+            ],
+            [
+                "ancient_tablet",
+                30
+            ],
+            [
+                "magic_stone_large",
+                20
+            ]
+        ],
+        "skills": [
+            "arcane_pulse",
+            "ice_shard",
+            "mend"
+        ],
+        "description": "A spellcaster who sought eternal life but found only eternal servitude."
+    },
+    "monster_055": {
+        "id": 55,
+        "name": "Malakor the Eternal",
+        "level": 26,
+        "tier": "Boss",
+        "hp": 6000,
+        "atk": 130,
+        "def": 70,
+        "xp": 9000,
+        "drops": [
+            [
+                "lich_skull",
+                100
+            ],
+            [
+                "necrotic_essence",
+                80
+            ],
+            [
+                "magic_stone_flawless",
+                50
+            ],
+            [
+                "ancient_tablet",
+                50]
+        ],
+        "skills": [
+            "void_slash",
+            "ice_shard",
+            "regenerate",
+            "arcane_pulse"
+        ],
+        "description": "An ancient necromancer who rules the ossuary from a throne of skulls."
+    },
     "monster_007": {
         "id": 7,
         "name": "Hollow Spiderling",

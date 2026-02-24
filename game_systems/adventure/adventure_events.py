@@ -234,6 +234,21 @@ class AdventureEvents:
         "Your skin feels dry and tight from the oppressive heat.",
     ]
 
+    ATMOSPHERE_OSSUARY = [
+        "The rattle of bones echoes down the long, dark corridor.",
+        "Dust motes dance in the pale light of a necromantic torch.",
+        "You feel the weight of a thousand years of silence.",
+        "Empty eye sockets seem to watch you from the walls.",
+        "The air is cold and still, smelling of preservatives and decay.",
+        "Shadows stretch and twist, mimicking the shapes of the dead.",
+        "A cold draft chills you to the bone.",
+        "You step on a loose tile, the sound echoing like a gunshot.",
+        "Whispers drift from the darkness, unintelligible but menacing.",
+        "The ossuary is a monument to death, vast and unending.",
+        "Bones crunch underfoot, the only sound in the suffocating silence.",
+        "A spectral chill passes through you, leaving frost on your armor.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -319,6 +334,16 @@ class AdventureEvents:
         f"{E.VOLCANO} Huddled in a shallow depression, you wait for the dust to settle.",
         f"{E.VOLCANO} The heat is draining, but you force yourself to focus.",
         f"{E.VOLCANO} You inspect your gear for signs of melting or corrosion.",
+    ]
+
+    REGEN_PHRASES_OSSUARY = [
+        f"{E.SKULL} You find a quiet alcove free of bones and rest.",
+        f"{E.SKULL} The silence is oppressive, but you manage to catch your breath.",
+        f"{E.SKULL} You lean against a sarcophagus, grateful for the respite.",
+        f"{E.SKULL} You clear a space on the dusty floor and sit.",
+        f"{E.SKULL} Ignoring the staring skulls, you bandage your wounds.",
+        f"{E.SKULL} The cold air numbs your pain as you rest.",
+        f"{E.SKULL} You find a moment of peace in the house of the dead.",
     ]
 
     REGEN_LOW_HP = [
@@ -514,6 +539,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
         elif location_id == "the_ashlands":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ASHLANDS)]
+        elif location_id == "forgotten_ossuary":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_OSSUARY)]
 
         # 5. Generic Fallback
         else:
@@ -540,6 +567,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
             elif location_id == "the_ashlands":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ASHLANDS
+            elif location_id == "forgotten_ossuary":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_OSSUARY
 
             # Event Override (High Priority)
             if event_type == "blood_moon":

@@ -130,6 +130,31 @@ MATERIALS = {
         "rarity": "Uncommon",
         "value": 25,
     },
+    # --- The Forgotten Ossuary Materials (Rank B) ---
+    "bone_shard": {
+        "name": "Bone Shard",
+        "description": "A sharp, jagged fragment of ancient bone.",
+        "rarity": "Common",
+        "value": 20,
+    },
+    "grave_dust": {
+        "name": "Grave Dust",
+        "description": "Cold, grey dust gathered from the deepest tombs.",
+        "rarity": "Common",
+        "value": 25,
+    },
+    "necrotic_essence": {
+        "name": "Necrotic Essence",
+        "description": "A swirling vial of death energy.",
+        "rarity": "Uncommon",
+        "value": 55,
+    },
+    "lich_skull": {
+        "name": "Lich Skull",
+        "description": "The grinning skull of an undying mage, still whispering secrets.",
+        "rarity": "Epic",
+        "value": 900,
+    },
     # --- The Sunken Grotto Materials (Rank C) ---
     "coral_fragment": {
         "name": "Coral Fragment",
