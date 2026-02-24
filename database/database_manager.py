@@ -1547,6 +1547,8 @@ class DatabaseManager:
     def update_stat_exp(
         self,
         discord_id: int,
+        old_stats_json_str: str,
+        old_exps: dict[str, float],
         stats_json_str: str,
         str_exp: float,
         end_exp: float,
@@ -1554,10 +1556,19 @@ class DatabaseManager:
         agi_exp: float,
         mag_exp: float,
         lck_exp: float,
-    ):
-        """Updates stats JSON and all practice EXP columns."""
-        self._col("stats").update_one(
-            {"discord_id": discord_id},
+    ) -> bool:
+        """
+        Updates stats JSON and all practice EXP columns with optimistic locking.
+        Returns True if successful, False if stats_json OR exp values changed concurrently.
+        """
+        query = {
+            "discord_id": discord_id,
+            "stats_json": old_stats_json_str,
+        }
+        query.update(old_exps)  # Add expected previous exp values to filter
+
+        result = self._col("stats").update_one(
+            query,
             {
                 "$set": {
                     "stats_json": stats_json_str,
@@ -1570,6 +1581,7 @@ class DatabaseManager:
                 }
             },
         )
+        return result.modified_count > 0
 
     # ============================================================
     # PLAYER UPDATES (New methods for external call sites)
