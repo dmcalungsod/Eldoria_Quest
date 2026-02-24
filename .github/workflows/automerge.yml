@@ -2,7 +2,7 @@ name: Auto-Merge and Cleanup
 
 on:
   workflow_run:
-    workflows: ["Eldoria CI"]
+    workflows: ["CI"]
     types:
       - completed
   schedule:

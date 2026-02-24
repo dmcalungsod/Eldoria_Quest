@@ -2,7 +2,7 @@ pull_request_rules:
   - name: Automatic merge for Renovate
     conditions:
       - author=renovate[bot]
-      - check-success=Eldoria CI / build-and-test
+      - check-success=CI / Run Tests
     actions:
       merge:
         method: squash
