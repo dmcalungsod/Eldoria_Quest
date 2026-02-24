@@ -9,8 +9,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
-from game_systems.combat.combat_engine import CombatEngine
-from game_systems.core.world_time import Weather, TimePhase
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
+from game_systems.core.world_time import Weather, TimePhase  # noqa: E402
 
 class TestWeatherCombat(unittest.TestCase):
     def setUp(self):
