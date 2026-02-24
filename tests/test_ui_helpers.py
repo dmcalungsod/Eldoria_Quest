@@ -125,7 +125,8 @@ class TestUIHelpers(unittest.TestCase):
         self.assertIn("Wooden Shield", val)
 
         # Check Accessory Section
-        self.assertIn("**Accessories**", val)
+        # Updated to check for new format with capacity
+        self.assertIn("**Accessories (1/2)**", val)
         self.assertIn("Magic Ring", val)
 
     def test_inventory_embed_unequipped(self):
