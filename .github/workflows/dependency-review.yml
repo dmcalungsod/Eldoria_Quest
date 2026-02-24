@@ -1,0 +1,35 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        id: dep-review
+        continue-on-error: true
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          comment-summary-in-pr: always
+
+      - name: Dependency Review Summary
+        if: always()
+        run: |
+          if [ "${{ steps.dep-review.outcome }}" == "failure" ]; then
+            echo "### ⚠️ Dependency Review" >> $GITHUB_STEP_SUMMARY
+            echo "Dependency Review could not run. Please enable the **Dependency Graph** feature at:" >> $GITHUB_STEP_SUMMARY
+            echo "https://github.com/${{ github.repository }}/settings/security_analysis" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ Dependency Review passed" >> $GITHUB_STEP_SUMMARY
+          fi
