@@ -45,7 +45,7 @@
 - "The" is avoided for most names, except "The Frostfall Expanse" (Location) and "The Glacial Rift" (Feature).
 - Names emphasize the harsh, survival aspect ("Grim", "Blighted", "Hollow").
 
-## 2026-02-21 — The Alchemist Class
+## 2026-02-21 — The Alchemist Class (Proposal)
 
 **Request:** Proactive (based on Architect's Design for Alchemist Class)
 **Context:** Grim Science, Medical Horror, Pragmatism.
@@ -71,3 +71,35 @@
 ### 📝 Notes
 - "Potion" is too generic/fantasy. Use "Phial", "Draught", "Serum".
 - Names should sound like they belong in a field hospital or a lab, not a wizard's tower.
+
+## 2026-03-03 — Finalized Alchemist, Warrior Titles, Travel Supplies
+
+**Request:** Execution Phase (Implementer: GameForge, Equipper, ChronicleKeeper)
+**Context:** Finalizing names for code implementation.
+
+### 📜 Finalized Names
+
+#### 🧪 Alchemist (Code-Ready)
+*   **Vitriol Bomb** (Active Skill)
+*   **Triage** (Passive Skill)
+*   **Fulminating Compound** (Active Skill)
+*   **Equivalent Exchange** (Passive Skill)
+*   **Mutagenic Serum** (Ultimate)
+*   **Iron Pestle** / **Chirurgeon's Scalpel** (Weapons)
+*   **Phial of Vitriol** / **Bitter Panacea** (Consumables)
+*   **The Great Work** (Class Quest)
+
+#### ⚔️ Warrior Titles
+*   **Ironclad** (Juggernaut Mastery)
+*   **Reaver** (Berserker Mastery)
+*   **Titan** (Ultimate Usage)
+
+#### 🎒 Travel Supplies
+*   **Hardtack** (Ration)
+*   **Pitch Torch** (Light)
+*   **Sunrod** (Magic Light)
+
+### 📝 Learnings
+*   Shifted "Phial" to "Bomb" for the active skill to imply impact/aggression, kept "Phial" for the item.
+*   "Equivalent Exchange" resonates strongly with the "Science/Trade" theme of Alchemy.
+*   Warrior titles kept short (one word) to feel punchy and legendary.

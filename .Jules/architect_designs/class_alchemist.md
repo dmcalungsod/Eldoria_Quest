@@ -23,21 +23,21 @@ Alchemists are often former scholars, apothecaries, or survivalists who realized
 *   **LCK:** 4 - *Experimental success requires luck.*
 
 ## 🎒 Starting Equipment (for GameForge)
-*   **Weapon:** "Cracked Pestle" (Mace type) or "Rusty Scalpel" (Dagger type)
-*   **Armor:** "Stained Apron" (Light/Medium Armor)
-*   **Accessory:** "Basic Vial Pouch"
-*   **Consumables:** 2x *Minor Acid Vial* (New Item), 1x *Antidote*
+*   **Weapon:** "Iron Pestle" (Mace type) or "Chirurgeon's Scalpel" (Dagger type)
+*   **Armor:** "Apothecary's Leathers" (Light/Medium Armor)
+*   **Accessory:** "Bandolier of Vials"
+*   **Consumables:** 2x *Phial of Vitriol* (New Item), 1x *Bitter Panacea* (Antidote)
 
 ## ⚔️ Skill Tree: The Volatile Path (for Tactician)
 
 ### Tier 1 (Rank F)
-**1. Corrosive Flask (Active)**
+**1. Vitriol Bomb (Active)** (Previously: Corrosive Flask)
 *Description:* Hurls a flask of concentrated acid that burns the target and weakens their armor.
 *Mechanics:* Deals initial damage and applies a "Corroded" debuff (-10% END/Defense) for 3 turns.
 ```python
-"corrosive_flask": {
-    "key_id": "corrosive_flask",
-    "name": "Corrosive Flask",
+"vitriol_bomb": {
+    "key_id": "vitriol_bomb",
+    "name": "Vitriol Bomb",
     "description": "Shatters a vial of acid, dealing damage and eroding armor.",
     "type": "Active",
     "class_id": 6,
@@ -51,13 +51,13 @@ Alchemists are often former scholars, apothecaries, or survivalists who realized
 }
 ```
 
-**2. Field Medic (Passive)**
+**2. Triage (Passive)** (Previously: Field Medic)
 *Description:* Years of handling dangerous substances have made you efficient at applying remedies.
 *Mechanics:* Increases the potency of healing items used on self by 20%.
 ```python
-"field_medic": {
-    "key_id": "field_medic",
-    "name": "Field Medic",
+"triage": {
+    "key_id": "triage",
+    "name": "Triage",
     "description": "Increases the effectiveness of healing items.",
     "type": "Passive",
     "class_id": 6,
@@ -69,13 +69,13 @@ Alchemists are often former scholars, apothecaries, or survivalists who realized
 ```
 
 ### Tier 2 (Rank E - Proposed)
-**3. Volatile Mixture (Active)**
+**3. Fulminating Compound (Active)** (Previously: Volatile Mixture)
 *Description:* Mixes unstable reagents to create a sudden explosion.
 *Mechanics:* AoE Fire damage with a chance to Stun.
 ```python
-"volatile_mixture": {
-    "key_id": "volatile_mixture",
-    "name": "Volatile Mixture",
+"fulminating_compound": {
+    "key_id": "fulminating_compound",
+    "name": "Fulminating Compound",
     "description": "Throw a volatile cocktail that explodes on impact.",
     "type": "Active",
     "class_id": 6,
@@ -89,13 +89,13 @@ Alchemists are often former scholars, apothecaries, or survivalists who realized
 }
 ```
 
-**4. Catalyst (Passive)**
+**4. Equivalent Exchange (Passive)** (Previously: Catalyst)
 *Description:* Your understanding of magical reactions amplifies your mixtures.
 *Mechanics:* Increases MAG stat by 10%.
 ```python
-"catalyst": {
-    "key_id": "catalyst",
-    "name": "Catalyst",
+"equivalent_exchange": {
+    "key_id": "equivalent_exchange",
+    "name": "Equivalent Exchange",
     "description": "Deep knowledge of reactions boosts magical potency.",
     "type": "Passive",
     "class_id": 6,
@@ -107,17 +107,17 @@ Alchemists are often former scholars, apothecaries, or survivalists who realized
 ```
 
 ### Ultimate (Rank B - Proposed)
-**5. Elixir of Transmutation**
+**5. Mutagenic Serum** (Previously: Elixir of Transmutation)
 *Description:* Drink a dangerous concoction that mutates the body for combat.
 *Mechanics:* +30% STR/AGI/END for 3 turns, but takes 10% Max HP damage per turn.
 
 ## 🔗 Integration Notes
 
 ### 🛠️ For GameForge
-1.  **New Item:** "Alchemist's Satchel" (Accessory). Effect: +5% Potion Duration.
-2.  **Class Quest:** "The Magnum Opus".
-    *   *Objective:* Collect `Volatile Slime` (from Slimes), `Sulfur` (from Rock Elementals), and `Moonleaf` (Herb).
-    *   *Reward:* Unlock the *Volatile Mixture* skill or a unique "Ever-Filling Flask" (1/day potion).
+1.  **New Item:** "Field Kit" (Accessory). Effect: +5% Potion Duration.
+2.  **Class Quest:** "The Great Work".
+    *   *Objective:* Collect `Primordial Ooze` (from Slimes), `Brimstone` (from Rock Elementals), and `Lunawort` (Herb).
+    *   *Reward:* Unlock the *Fulminating Compound* skill or a unique "Ever-Filling Flask" (1/day potion).
 3.  **Crafting Hook:** Alchemists should have a 10% chance to *not consume materials* when crafting Potions (requires update to `CraftingSystem`).
 
 ### 🧠 For Tactician
@@ -125,5 +125,5 @@ Alchemists are often former scholars, apothecaries, or survivalists who realized
 2.  **Item Potency:** Ensure `ItemManager.use_item` checks for `healing_item_potency` passive bonus.
 
 ### 📚 For ChronicleKeeper
-1.  **Achievement:** "Better Living Through Chemistry" - Craft 50 potions.
-2.  **Title:** "Plague Doctor" - Unlock all Alchemist skills.
+1.  **Achievement:** "Experimenter" - Craft 50 potions.
+2.  **Title:** "Transmuter" - Unlock all Alchemist skills.
