@@ -2,7 +2,7 @@ name: Mirror Repo
 
 on:
   workflow_run:
-    workflows: ["Eldoria CI"]
+    workflows: ["CI"]
     types: [completed]
 
 jobs:
