@@ -99,6 +99,7 @@ jobs:
             --cov=. \
             --cov-report=term-missing \
             --cov-report=html \
+            --cov-fail-under=60 \
             -v | tee pytest_output.txt
 
       - name: Generate Test Summary
