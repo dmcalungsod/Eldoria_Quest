@@ -90,3 +90,55 @@
   - Ensure consistent visual style.
 - **Labels:** `enhancement`, `ui`, `ux`
 - **Assignee:** @Palette
+
+## 9. [Feature] Warrior Skill Tree Expansion
+**Description:**
+- **Source:** Architect Design (2026-02-27)
+- **Details:** Transform the Warrior class with two distinct playstyles: Juggernaut (Tank) and Berserker (DPS). Introduce 7 new skills and new combat mechanics.
+- **Acceptance Criteria:**
+  - Implement 7 new skills in `skills_data.py` including Shield Bash, Reckless Swing, Iron Skin, Bloodlust, Taunt, Whirlwind, and Unstoppable Force.
+  - Update `CombatEngine` to support new mechanics: `self_damage_percent` (recoil), `kill_heal_percent` (heal on kill), and `status_immunity`.
+  - Add titles/achievements for mastering paths ("Ironclad", "Ravager", "Unstoppable").
+- **Labels:** `feature`, `class`, `mechanic`
+- **Assignee:** @GameForge, @Tactician, @ChronicleKeeper
+
+## 10. [Security] Critical pip Vulnerability (CVE-2026-1703)
+**Description:**
+- **Source:** Repo Auditor (2026-03-01)
+- **Details:** A critical vulnerability exists in `pip` version 25.3 (CVE-2026-1703), allowing potential arbitrary code execution.
+- **Acceptance Criteria:**
+  - Upgrade `pip` to version 26.0 or later immediately.
+  - Verify environment stability after upgrade.
+- **Labels:** `security`, `dependency`, `priority-critical`
+- **Assignee:** @Sentinel
+
+## 11. [Tech Debt] Refactor CombatEngine.run_combat_turn
+**Description:**
+- **Source:** Repo Auditor (2026-03-01)
+- **Details:** Cyclomatic Complexity Score of F (43) detected in `CombatEngine.run_combat_turn`. The method is too complex and prone to bugs.
+- **Acceptance Criteria:**
+  - Refactor `run_combat_turn` into smaller helper methods (e.g., `_resolve_status_effects`, `_calculate_damage`, `_process_turn_phases`).
+  - Ensure logic remains functionally identical.
+  - Reduce complexity score below 15.
+- **Labels:** `refactoring`, `tech-debt`, `priority-high`
+- **Assignee:** @SystemSmith
+
+## 12. [Tech Debt] Refactor AdventureEvents.regeneration
+**Description:**
+- **Source:** Repo Auditor (2026-03-01)
+- **Details:** Cyclomatic Complexity Score of E (35) detected in `AdventureEvents.regeneration`. Logic for flavor text and calculations is intertwined.
+- **Acceptance Criteria:**
+  - Split logic into `_calculate_regen` (mechanics) and `_get_regen_flavor` (text).
+  - Reduce complexity score below 15.
+- **Labels:** `refactoring`, `tech-debt`
+- **Assignee:** @SystemSmith
+
+## 13. [Tech Debt] Refactor AdventureSession.simulate_step
+**Description:**
+- **Source:** Repo Auditor (2026-03-01)
+- **Details:** Cyclomatic Complexity Score of E detected in `AdventureSession.simulate_step`. The core adventure loop is becoming a monolithic method.
+- **Acceptance Criteria:**
+  - Decompose step simulation into distinct phases (e.g., `_handle_event`, `_handle_combat`, `_handle_loot`).
+  - Ensure maintainability of the core loop.
+- **Labels:** `refactoring`, `tech-debt`
+- **Assignee:** @SystemSmith

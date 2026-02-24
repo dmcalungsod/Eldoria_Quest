@@ -19,3 +19,21 @@
 **Notes:**
 - The Auto-Adventure project is progressing well (Phase 2/3), but these issues are critical for the final polish.
 - The Codex System is a major new feature that will address player feedback for "More Lore".
+
+## 2026-03-02
+**Summary:**
+- Scanned recent agent logs (2026-02-27), audit reports (2026-03-01), and design documents.
+- Identified 5 new issues: 1 major feature expansion, 1 critical security vulnerability, and 3 high-priority technical debt items.
+- Appended issues #9-#13 to `NEW_ISSUES.md`.
+
+**Created Issues:**
+9.  **[Feature] Warrior Skill Tree Expansion** (Source: Architect Design)
+10. **[Security] Critical pip Vulnerability** (Source: Repo Auditor)
+11. **[Tech Debt] Refactor CombatEngine.run_combat_turn** (Source: Repo Auditor)
+12. **[Tech Debt] Refactor AdventureEvents.regeneration** (Source: Repo Auditor)
+13. **[Tech Debt] Refactor AdventureSession.simulate_step** (Source: Repo Auditor)
+
+**Notes:**
+- The Warrior Skill Tree expansion is ready for implementation by GameForge and Tactician.
+- The pip vulnerability is critical and should be addressed immediately by Sentinel.
+- Technical debt in core systems (Combat, Adventure) is reaching critical levels (Complexity F) and requires refactoring by SystemSmith.
