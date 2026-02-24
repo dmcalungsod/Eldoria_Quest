@@ -52,7 +52,7 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 | **Questweaver** | 09:00 PM | Storyline & dialogue design |
 | **Issue Crafter** | 09:30 PM | Issue creation from logs & feedback |
 | **Timeweaver** | 10:00 PM | Auto‑adventure overhaul design & oversight |
-| **Codex Keeper** | 10:30 PM | Bestiary & lore compendium design & oversight |
+| **Codex Keeper** | One Time | Bestiary & lore compendium design & oversight |
 | **Party System Designer** | 11:00 PM | Multiplayer features design & oversight |
 | **Guild Halls Architect** | 11:30 PM | Player housing design & oversight |
 
