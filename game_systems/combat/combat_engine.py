@@ -82,6 +82,7 @@ class CombatEngine:
         player_mp: int,
         player_class_id: int,
         active_boosts: dict = None,
+        active_buffs: list = None,
         stats_dict: dict = None,
         base_stats_dict: dict = None,
         action: str = "auto",
@@ -94,6 +95,7 @@ class CombatEngine:
         player_mp → Player's current MP
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
         active_boosts → Dict of active global boosts
+        active_buffs -> List of active buffs on the player
         stats_dict → Cached dictionary of player stats to avoid property overhead
         base_stats_dict → Cached dictionary of BASE stats (for buff calculation)
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
@@ -125,6 +127,7 @@ class CombatEngine:
 
         # Process boosts safely
         self.active_boosts_dict = active_boosts or {}
+        self.active_buffs = active_buffs or []
         self.exp_boost = float(self.active_boosts_dict.get("exp_boost", 1.0))
         self.loot_boost = float(self.active_boosts_dict.get("loot_boost", 1.0))
         self.action = action
@@ -134,6 +137,7 @@ class CombatEngine:
         self.dmg_dealt_mult = 1.0
         self.dmg_taken_mult = 1.0
         self.new_buffs = []
+        self.new_titles = []
 
         if self.player_stance == "aggressive":
             self.dmg_dealt_mult = 1.2
@@ -407,6 +411,7 @@ class CombatEngine:
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
                 "new_buffs": self.new_buffs,
+                "new_titles": self.new_titles,
             }
 
         except Exception as e:
@@ -421,6 +426,7 @@ class CombatEngine:
                 "turn_report": turn_report,
                 "active_boosts": self.active_boosts_dict,
                 "new_buffs": self.new_buffs,
+                "new_titles": self.new_titles,
             }
 
     def _resolve_special_ability(self, log, turn_report, force_crit=False):
@@ -494,6 +500,10 @@ class CombatEngine:
         turn_report["skills_used"] = 1
         turn_report["skill_key_used"] = skill_key
 
+        # Ultimate Title Trigger (ChronicleKeeper)
+        if skill.get("key_id") == "unstoppable_force":
+            self.new_titles.append("Unstoppable")
+
         if skill.get("heal_power", 0) > 0:
             # --- Healing Skill ---
             heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
@@ -523,6 +533,13 @@ class CombatEngine:
 
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
+
+            # Recoil Mechanics (Tactician)
+            recoil_pct = skill.get("self_damage_percent")
+            if recoil_pct:
+                recoil_dmg = max(1, int(dmg * recoil_pct))
+                self.player_hp = max(0, self.player_hp - recoil_dmg)
+                log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
 
             # Apply Debuffs (if any)
             if skill.get("debuff"):
@@ -680,7 +697,11 @@ class CombatEngine:
                 if bonus > 0:
                     add_buff(stat_code, bonus)
 
-            # Potential future handling for "mana_shield" or other non-stat buffs could go here.
+            elif key == "status_immunity":
+                # Handle Status Immunity List (e.g. ["stun", "slow"])
+                # Creates individual buffs like immunity_stun, immunity_slow
+                for status in val:
+                    add_buff(f"immunity_{status}", 1)
 
     def _tag_damage_type(self, skill, report):
         """Helper to categorize skill damage for stat growth."""
@@ -739,6 +760,17 @@ class CombatEngine:
         drops = self.monster.get("drops", [])
         leveled_up = self.player.add_exp(exp)
 
+        # Passive Mechanics: Kill Heal (Bloodlust)
+        for skill in self.player_skills:
+            if skill.get("type") == "Passive" and "passive_bonus" in skill:
+                bonuses = skill["passive_bonus"]
+                if "kill_heal_percent" in bonuses:
+                    heal_pct = bonuses["kill_heal_percent"]
+                    max_hp = self.stats_dict.get("HP", self.player.stats.max_hp)
+                    heal_amt = int(max_hp * heal_pct)
+                    self.player_hp = min(max_hp, self.player_hp + heal_amt)
+                    log.append(f"🩸 **Bloodlust:** You recover {heal_amt} HP from the kill!")
+
         log.append(CombatPhrases.player_victory(self.monster, exp, aurum, leveled_up, self.player.level))
 
         return {
@@ -753,6 +785,8 @@ class CombatEngine:
             "monster_data": self.monster,
             "turn_report": turn_report,
             "active_boosts": self.active_boosts_dict,
+            "new_buffs": self.new_buffs,
+            "new_titles": self.new_titles,
         }
 
     def _monster_victory(self, log, turn_report):
