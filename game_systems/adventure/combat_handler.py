@@ -175,6 +175,7 @@ class CombatHandler:
             if context:
                 player_stats = context["player_stats"]
                 stats_dict = context.get("stats_dict")
+                base_stats_dict = context.get("base_stats_dict") or player_stats.get_base_stats_dict()
                 vitals = context["vitals"]
                 p_row = context["player_row"]
                 skills = context["skills"]
@@ -191,6 +192,7 @@ class CombatHandler:
 
                 # Generate cached stats dict
                 stats_dict = player_stats.get_total_stats_dict()
+                base_stats_dict = player_stats.get_base_stats_dict()
 
                 vitals = self.db.get_player_vitals(self.discord_id)
 
@@ -221,6 +223,7 @@ class CombatHandler:
                 player_class_id=p_row["class_id"],
                 active_boosts=boosts,
                 stats_dict=stats_dict,
+                base_stats_dict=base_stats_dict,
                 action=action,
                 player_stance=stance,
             )

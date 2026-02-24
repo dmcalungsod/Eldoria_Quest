@@ -83,6 +83,7 @@ class CombatEngine:
         player_class_id: int,
         active_boosts: dict = None,
         stats_dict: dict = None,
+        base_stats_dict: dict = None,
         action: str = "auto",
         player_stance: str = "balanced",
     ):
@@ -94,6 +95,7 @@ class CombatEngine:
         player_class_id -> The player's class ID (1=War, 2=Mage, etc.)
         active_boosts → Dict of active global boosts
         stats_dict → Cached dictionary of player stats to avoid property overhead
+        base_stats_dict → Cached dictionary of BASE stats (for buff calculation)
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
         player_stance -> "aggressive", "balanced", or "defensive"
         """
@@ -108,6 +110,13 @@ class CombatEngine:
         else:
             # Fallback to generating it (e.g. if caller didn't provide it)
             self.stats_dict = self.player.stats.get_total_stats_dict()
+
+        # Handle base stats for buff calculations (Equilibrium Fix)
+        if base_stats_dict:
+            self.base_stats_dict = base_stats_dict
+        else:
+            # Fallback to total stats if base not provided
+            self.base_stats_dict = self.stats_dict
 
         # Safe property access
         self.player_hp = getattr(player, "hp_current", 1)
@@ -656,7 +665,8 @@ class CombatEngine:
             if key == "all_stats_percent":
                 # Apply to all primary stats
                 for stat_code in ["STR", "END", "DEX", "AGI", "MAG", "LCK"]:
-                    current_val = self.stats_dict.get(stat_code, 10)
+                    # Equilibrium Fix: Use base stats for % calculation to prevent compounding
+                    current_val = self.base_stats_dict.get(stat_code, 10)
                     bonus = current_val * float(val)
                     if bonus > 0:
                         add_buff(stat_code, bonus)
@@ -664,7 +674,8 @@ class CombatEngine:
             elif key.endswith("_percent"):
                 # e.g., "END_percent": 0.25 -> +25% END
                 stat_code = key.replace("_percent", "").upper()
-                current_val = self.stats_dict.get(stat_code, 10)
+                # Equilibrium Fix: Use base stats for % calculation to prevent compounding
+                current_val = self.base_stats_dict.get(stat_code, 10)
                 bonus = current_val * float(val)
                 if bonus > 0:
                     add_buff(stat_code, bonus)
