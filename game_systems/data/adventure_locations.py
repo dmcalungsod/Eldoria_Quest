@@ -256,6 +256,38 @@ LOCATIONS = {
         ],
         "special_events": ["trap_pit", "hidden_stash"],
     },
+    "forgotten_ossuary": {
+        "name": "The Forgotten Ossuary",
+        "emoji": "💀",
+        "min_rank": "B",
+        "level_req": 24,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_051", 30),  # Crypt Walker
+            ("monster_052", 30),  # Bone Archer
+            ("monster_053", 25),  # Tomb Wraith
+            ("monster_054", 15),  # Lich Apprentice
+        ],
+        "night_monsters": [
+            ("monster_053", 40),  # Tomb Wraith (More active)
+            ("monster_054", 30),  # Lich Apprentice
+            ("monster_052", 30),  # Bone Archer
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_055",  # Malakor the Eternal (Boss)
+                "weight": 5,
+                "min_level": 26,
+            }
+        ],
+        "description": "A silent labyrinth of bone and shadow. The air is cold and smells of ancient dust.",
+        "gatherables": [
+            ("bone_shard", 40),
+            ("grave_dust", 30),
+            ("magic_stone_medium", 30),
+        ],
+        "special_events": ["trap_pit", "hidden_stash", "ancient_shrine"],
+    },
     "molten_caldera": {
         "name": "The Molten Caldera",
         "emoji": "🌋",
