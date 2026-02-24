@@ -86,3 +86,25 @@ Detailed Design Document: `.Jules/architect_designs/class_alchemist.md`
 
 **Status:**
 Blueprint ready for implementation.
+
+## 2026-03-27 — Class Expansion: Warrior Skill Tree
+
+**Design Choice:**
+Skill Tree Expansion for the Warrior Class.
+
+**Reasoning:**
+- **Depth:** Current classes are shallow (3 skills). A skill tree adds meaningful progression and choice.
+- **Identity:** Splits the generic "Warrior" into distinct "Juggernaut" (Tank) and "Berserker" (DPS) archetypes.
+- **Foundation:** Establishes a pattern for other classes (Mage: Pyromancer vs Cryomancer, etc.).
+
+**Theme Alignment:**
+- "Survive or Destroy": Fits the grim tone.
+- **Risk/Reward:** The Berserker path introduces self-damage mechanics, reinforcing the survival aspect.
+
+**Integration Notes:**
+- **CombatEngine:** Requires new mechanics: `self_damage_percent` (Recoil) and `kill_heal_percent` (Lifesteal on kill).
+- **GameForge:** Needs 7 new skills added to `skills_data.py`.
+- **ChronicleKeeper:** Titles for mastering paths encourage replayability.
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/skill_tree_warrior.md`
