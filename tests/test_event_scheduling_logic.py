@@ -1,14 +1,13 @@
-
-import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-import sys
-import os
-import datetime
 import asyncio
-import importlib
+import datetime
+import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 # Define a pass-through mock for tasks.loop
 def mock_loop(*args, **kwargs):
@@ -17,7 +16,9 @@ def mock_loop(*args, **kwargs):
         func.cancel = MagicMock()
         func.before_loop = MagicMock()
         return func
+
     return decorator
+
 
 class TestEventScheduling(unittest.TestCase):
     def setUp(self):
@@ -67,6 +68,7 @@ class TestEventScheduling(unittest.TestCase):
             del sys.modules["cogs.event_cog"]
 
         import cogs.event_cog
+
         self.EventCog = cogs.event_cog.EventCog
 
         # 4. Initialize Cog
@@ -79,10 +81,7 @@ class TestEventScheduling(unittest.TestCase):
         self.cog._announce = AsyncMock()
 
         self.cog.system.EVENT_CONFIGS = {
-            "mystic_merchant": {
-                "name": "The Mystic Merchant",
-                "description": "Test Description"
-            }
+            "mystic_merchant": {"name": "The Mystic Merchant", "description": "Test Description"}
         }
 
     @patch("game_systems.world_time.WorldTime")
@@ -122,6 +121,7 @@ class TestEventScheduling(unittest.TestCase):
         asyncio.run(self.cog.check_event_cycle())
 
         self.cog.system.start_event.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

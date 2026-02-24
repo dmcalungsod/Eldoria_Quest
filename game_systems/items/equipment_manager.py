@@ -312,7 +312,10 @@ class EquipmentManager:
 
                 # Check 2: Capacity
                 if len(current_accessories) >= self.MAX_ACCESSORY_SLOTS:
-                    return False, f"Accessory slots full ({self.MAX_ACCESSORY_SLOTS}/{self.MAX_ACCESSORY_SLOTS}). Unequip one first."
+                    return (
+                        False,
+                        f"Accessory slots full ({self.MAX_ACCESSORY_SLOTS}/{self.MAX_ACCESSORY_SLOTS}). Unequip one first.",
+                    )
 
                 # If we have space, we DO NOT add "accessory" to slots_to_check
                 # This prevents auto-unequipping existing accessories
@@ -434,7 +437,7 @@ class EquipmentManager:
                 "rarity": item["rarity"],
                 "item_name": item["item_name"],
                 "item_source_table": item.get("item_source_table"),
-                "slot": slot  # Preserve original slot data
+                "slot": slot,  # Preserve original slot data
             }
 
         self.db.save_equipment_set(discord_id, name, items_dict)
@@ -485,10 +488,11 @@ class EquipmentManager:
             # So we iterate current_equipped values.
             already_equipped = False
             for eq_item in current_equipped.values():
-                if (eq_item["slot"] == target_slot and
-                    eq_item["item_key"] == target_key and
-                    eq_item["rarity"] == target_rarity):
-
+                if (
+                    eq_item["slot"] == target_slot
+                    and eq_item["item_key"] == target_key
+                    and eq_item["rarity"] == target_rarity
+                ):
                     # Found a match. To prevent counting same item for multiple loadout entries,
                     # we should track used IDs?
                     # But for now, simple check is okay, loadout equipping is best-effort.
@@ -531,13 +535,15 @@ class EquipmentManager:
                 # We report missing.
 
                 # Check actual count in inventory (equipped=1)
-                equipped_count = self.db._col("inventory").count_documents({
-                    "discord_id": discord_id,
-                    "item_key": target_key,
-                    "rarity": target_rarity,
-                    "slot": target_slot,
-                    "equipped": 1
-                })
+                equipped_count = self.db._col("inventory").count_documents(
+                    {
+                        "discord_id": discord_id,
+                        "item_key": target_key,
+                        "rarity": target_rarity,
+                        "slot": target_slot,
+                        "equipped": 1,
+                    }
+                )
 
                 # We can't easily know if this specific iteration of the loop corresponds to
                 # the 1st or 2nd ring without tracking.

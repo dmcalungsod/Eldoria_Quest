@@ -9,8 +9,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 
 
 class TestAccessorySlots(unittest.TestCase):
@@ -36,9 +36,14 @@ class TestAccessorySlots(unittest.TestCase):
 
         # New item
         new_item = {
-            "id": 101, "item_key": "ring_1", "slot": "accessory",
-            "item_name": "Ring One", "rarity": "Common", "item_source_table": "equipment",
-            "item_type": "equipment", "equipped": 0
+            "id": 101,
+            "item_key": "ring_1",
+            "slot": "accessory",
+            "item_name": "Ring One",
+            "rarity": "Common",
+            "item_source_table": "equipment",
+            "item_type": "equipment",
+            "equipped": 0,
         }
         self.db.get_inventory_item.return_value = new_item
 
@@ -55,17 +60,26 @@ class TestAccessorySlots(unittest.TestCase):
         """Test equipping a second accessory is allowed."""
         # 1 equipped
         existing = {
-            "id": 101, "item_key": "ring_1", "slot": "accessory",
-            "item_name": "Ring One", "rarity": "Common", "item_source_table": "equipment",
-            "equipped": 1
+            "id": 101,
+            "item_key": "ring_1",
+            "slot": "accessory",
+            "item_name": "Ring One",
+            "rarity": "Common",
+            "item_source_table": "equipment",
+            "equipped": 1,
         }
         self.db.get_equipped_items.return_value = [existing]
 
         # New item (different key)
         new_item = {
-            "id": 102, "item_key": "ring_2", "slot": "accessory",
-            "item_name": "Ring Two", "rarity": "Common", "item_source_table": "equipment",
-            "item_type": "equipment", "equipped": 0
+            "id": 102,
+            "item_key": "ring_2",
+            "slot": "accessory",
+            "item_name": "Ring Two",
+            "rarity": "Common",
+            "item_source_table": "equipment",
+            "item_type": "equipment",
+            "equipped": 0,
         }
         self.db.get_inventory_item.return_value = new_item
 
@@ -79,20 +93,33 @@ class TestAccessorySlots(unittest.TestCase):
         """Test equipping a third accessory fails due to capacity."""
         # 2 equipped
         existing1 = {
-            "id": 101, "item_key": "ring_1", "slot": "accessory",
-            "item_name": "Ring One", "rarity": "Common", "equipped": 1
+            "id": 101,
+            "item_key": "ring_1",
+            "slot": "accessory",
+            "item_name": "Ring One",
+            "rarity": "Common",
+            "equipped": 1,
         }
         existing2 = {
-            "id": 102, "item_key": "ring_2", "slot": "accessory",
-            "item_name": "Ring Two", "rarity": "Common", "equipped": 1
+            "id": 102,
+            "item_key": "ring_2",
+            "slot": "accessory",
+            "item_name": "Ring Two",
+            "rarity": "Common",
+            "equipped": 1,
         }
         self.db.get_equipped_items.return_value = [existing1, existing2]
 
         # New item
         new_item = {
-            "id": 103, "item_key": "ring_3", "slot": "accessory",
-            "item_name": "Ring Three", "rarity": "Common", "item_source_table": "equipment",
-            "item_type": "equipment", "equipped": 0
+            "id": 103,
+            "item_key": "ring_3",
+            "slot": "accessory",
+            "item_name": "Ring Three",
+            "rarity": "Common",
+            "item_source_table": "equipment",
+            "item_type": "equipment",
+            "equipped": 0,
         }
         self.db.get_inventory_item.return_value = new_item
 
@@ -107,16 +134,25 @@ class TestAccessorySlots(unittest.TestCase):
         """Test equipping a duplicate accessory key fails."""
         # 1 equipped
         existing = {
-            "id": 101, "item_key": "ring_1", "slot": "accessory",
-            "item_name": "Ring One", "rarity": "Common", "equipped": 1
+            "id": 101,
+            "item_key": "ring_1",
+            "slot": "accessory",
+            "item_name": "Ring One",
+            "rarity": "Common",
+            "equipped": 1,
         }
         self.db.get_equipped_items.return_value = [existing]
 
         # New item (same key "ring_1")
         new_item = {
-            "id": 102, "item_key": "ring_1", "slot": "accessory",
-            "item_name": "Ring One (Copy)", "rarity": "Common", "item_source_table": "equipment",
-            "item_type": "equipment", "equipped": 0
+            "id": 102,
+            "item_key": "ring_1",
+            "slot": "accessory",
+            "item_name": "Ring One (Copy)",
+            "rarity": "Common",
+            "item_source_table": "equipment",
+            "item_type": "equipment",
+            "equipped": 0,
         }
         self.db.get_inventory_item.return_value = new_item
 
@@ -128,12 +164,20 @@ class TestAccessorySlots(unittest.TestCase):
     def test_save_loadout_multi_accessory(self):
         """Test saving loadout handles multiple accessories correctly."""
         acc1 = {
-            "id": 101, "item_key": "ring_1", "slot": "accessory",
-            "item_name": "Ring One", "rarity": "Common", "equipped": 1
+            "id": 101,
+            "item_key": "ring_1",
+            "slot": "accessory",
+            "item_name": "Ring One",
+            "rarity": "Common",
+            "equipped": 1,
         }
         acc2 = {
-            "id": 102, "item_key": "ring_2", "slot": "accessory",
-            "item_name": "Ring Two", "rarity": "Common", "equipped": 1
+            "id": 102,
+            "item_key": "ring_2",
+            "slot": "accessory",
+            "item_name": "Ring Two",
+            "rarity": "Common",
+            "equipped": 1,
         }
         self.db.get_equipped_items.return_value = [acc1, acc2]
 
@@ -155,7 +199,7 @@ class TestAccessorySlots(unittest.TestCase):
         # Loadout data
         loadout_items = {
             "accessory_1": {"item_key": "ring_1", "rarity": "Common", "item_name": "Ring One", "slot": "accessory"},
-            "accessory_2": {"item_key": "ring_2", "rarity": "Common", "item_name": "Ring Two", "slot": "accessory"}
+            "accessory_2": {"item_key": "ring_2", "rarity": "Common", "item_name": "Ring Two", "slot": "accessory"},
         }
         self.db.get_equipment_set.return_value = {"items": loadout_items}
 

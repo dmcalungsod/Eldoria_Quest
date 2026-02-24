@@ -1,4 +1,3 @@
-
 import os
 
 # Patching to avoid import errors if environment is not perfect
@@ -7,17 +6,17 @@ import unittest
 from unittest.mock import MagicMock
 
 # Ensure project root is in path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Create a mock for pymongo if not already mocked in sys.modules
-if 'pymongo' not in sys.modules:
+if "pymongo" not in sys.modules:
     mock_pymongo = MagicMock()
     mock_pymongo.errors = MagicMock()
-    sys.modules['pymongo'] = mock_pymongo
-    sys.modules['pymongo.errors'] = mock_pymongo.errors
+    sys.modules["pymongo"] = mock_pymongo
+    sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-if 'discord' not in sys.modules:
-    sys.modules['discord'] = MagicMock()
+if "discord" not in sys.modules:
+    sys.modules["discord"] = MagicMock()
 
 from game_systems.crafting.crafting_system import CraftingSystem
 from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
@@ -33,12 +32,7 @@ class TestClockworkCrafting(unittest.TestCase):
 
     def test_clockwork_recipes_exist(self):
         """Verifies that the new Clockwork recipes are loaded."""
-        new_recipes = [
-            "craft_clockwork_bow",
-            "craft_clockwork_maul",
-            "craft_artificer_lenses",
-            "craft_brass_plate"
-        ]
+        new_recipes = ["craft_clockwork_bow", "craft_clockwork_maul", "craft_artificer_lenses", "craft_brass_plate"]
 
         for recipe_id in new_recipes:
             self.assertIn(recipe_id, EQUIPMENT_RECIPES, f"Recipe {recipe_id} not found in EQUIPMENT_RECIPES")
@@ -103,9 +97,10 @@ class TestClockworkCrafting(unittest.TestCase):
         # Inspect call args to ensure correct slot/stats logic isn't broken
         call_args = self.mock_db.add_inventory_item.call_args
         self.assertEqual(call_args[0][0], self.discord_id)
-        self.assertEqual(call_args[0][1], "555") # ID
+        self.assertEqual(call_args[0][1], "555")  # ID
         self.assertIn("Clockwork Repeating Crossbow", call_args[0][2])
-        self.assertEqual(call_args[0][6], "bow") # Slot
+        self.assertEqual(call_args[0][6], "bow")  # Slot
+
 
 if __name__ == "__main__":
     unittest.main()

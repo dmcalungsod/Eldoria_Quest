@@ -184,7 +184,20 @@ def create_issue(title: str, body: str, labels_csv: str, repo: str) -> bool:
         label_args += ["--label", label.strip()]
     try:
         subprocess.run(
-            ["gh", "issue", "create", "--repo", repo, "--title", title, "--body", body, "--assignee", "google-labs-jules"] + label_args,
+            [
+                "gh",
+                "issue",
+                "create",
+                "--repo",
+                repo,
+                "--title",
+                title,
+                "--body",
+                body,
+                "--assignee",
+                "google-labs-jules",
+            ]
+            + label_args,
             capture_output=True,
             text=True,
             check=True,
