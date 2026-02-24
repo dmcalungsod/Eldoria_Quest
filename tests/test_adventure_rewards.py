@@ -132,10 +132,10 @@ class TestAdventureRewards(unittest.TestCase):
         inv_manager = MagicMock()
         session_loot = {}
 
+        # Mock optimistic locking success
+        self.mock_db.update_stat_exp.return_value = True
+
         # Run process_victory
-        # We need to mock _process_loot_and_quests to avoid complexity there for this test
-        # But wait, we want integration?
-        # Ideally I should mock `LootCalculator.roll_drops` to return empty list.
         with patch(
             "game_systems.rewards.loot_calculator.LootCalculator.roll_drops",
             return_value=[],
@@ -153,16 +153,28 @@ class TestAdventureRewards(unittest.TestCase):
         args = self.mock_db.update_stat_exp.call_args
         self.assertIsNotNone(args)
 
-        # update_stat_exp(discord_id, stats_json, str_exp, end_exp, dex_exp, agi_exp, mag_exp, lck_exp)
+        # update_stat_exp(discord_id, old_stats_json, old_exps, stats_json, str_exp, end_exp, dex_exp, agi_exp, mag_exp, lck_exp)
         call_args = args.args
         self.assertEqual(call_args[0], self.discord_id)
-        # Check XP values (indices 2-7 correspond to str, end, dex, agi, mag, lck)
-        self.assertEqual(call_args[2], 4.0, "STR XP mismatch")
-        self.assertEqual(call_args[3], 20.0, "END XP mismatch")
-        self.assertEqual(call_args[4], 7.0, "DEX XP mismatch")
-        self.assertEqual(call_args[5], 6.0, "AGI XP mismatch")
-        self.assertEqual(call_args[6], 5.0, "MAG XP mismatch")
-        self.assertEqual(call_args[7], 3.5, "LCK XP mismatch")
+
+        # Verify old_stats_json passed (index 1)
+        self.assertEqual(call_args[1], json.dumps(stats_json))
+
+        # Verify old_exps passed (index 2)
+        # We mocked get_stat_exp_row to return 0 for all exp values
+        expected_old_exps = {
+            "str_exp": 0, "end_exp": 0, "dex_exp": 0,
+            "agi_exp": 0, "mag_exp": 0, "lck_exp": 0
+        }
+        self.assertEqual(call_args[2], expected_old_exps)
+
+        # Check XP values (indices 4-9 correspond to str, end, dex, agi, mag, lck)
+        self.assertEqual(call_args[4], 4.0, "STR XP mismatch")
+        self.assertEqual(call_args[5], 20.0, "END XP mismatch")
+        self.assertEqual(call_args[6], 7.0, "DEX XP mismatch")
+        self.assertEqual(call_args[7], 6.0, "AGI XP mismatch")
+        self.assertEqual(call_args[8], 5.0, "MAG XP mismatch")
+        self.assertEqual(call_args[9], 3.5, "LCK XP mismatch")
 
     def test_process_victory_skill_xp(self):
         """Verify skill XP increments based on usage."""

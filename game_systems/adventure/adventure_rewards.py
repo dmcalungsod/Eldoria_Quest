@@ -314,66 +314,81 @@ class AdventureRewards:
         gains = {k: fn(br) for k, fn in STAT_EXP_GAINS.items()}
 
         try:
-            row = self.db.get_stat_exp_row(self.discord_id)
+            # SECURITY: Retry Loop for Optimistic Locking
+            attempts = 0
+            while attempts < 3:
+                row = self.db.get_stat_exp_row(self.discord_id)
 
-            if not row:
-                return
+                if not row:
+                    return
 
-            stats_data = json.loads(row["stats_json"])
-            base_stats = {k: v.get("base", 1) for k, v in stats_data.items()}
+                original_json_str = row["stats_json"]
+                stats_data = json.loads(original_json_str)
+                base_stats = {k: v.get("base", 1) for k, v in stats_data.items()}
 
-            # Mutable exp dict
-            curr_exp = {k: row[k] for k in STAT_EXP_GAINS.keys()}
-            level_up_msgs = []
+                # Capture original values for optimistic lock
+                original_exps = {k: row[k] for k in STAT_EXP_GAINS.keys()}
 
-            for exp_key, gain in gains.items():
-                if gain <= 0:
-                    continue
+                # Mutable exp dict
+                curr_exp = original_exps.copy()
+                level_up_msgs = []
 
-                stat_key = exp_key.split("_")[0].upper()
-                current_val = base_stats[stat_key]
-                current_exp_val = curr_exp[exp_key] + gain
+                for exp_key, gain in gains.items():
+                    if gain <= 0:
+                        continue
 
-                levels_gained = 0
+                    stat_key = exp_key.split("_")[0].upper()
+                    current_val = base_stats[stat_key]
+                    current_exp_val = curr_exp[exp_key] + gain
 
-                # Dynamic Threshold Check
-                while True:
-                    threshold = calculate_practice_threshold(current_val)
-                    if current_exp_val >= threshold:
-                        current_exp_val -= threshold
-                        levels_gained += 1
-                        current_val += 1
-                    else:
-                        break
+                    levels_gained = 0
 
-                curr_exp[exp_key] = current_exp_val
-                base_stats[stat_key] = current_val
+                    # Dynamic Threshold Check
+                    while True:
+                        threshold = calculate_practice_threshold(current_val)
+                        if current_exp_val >= threshold:
+                            current_exp_val -= threshold
+                            levels_gained += 1
+                            current_val += 1
+                        else:
+                            break
 
-                if levels_gained > 0:
-                    if stat_key in STAT_UP_MESSAGES:
-                        # Append message only once per stat type to avoid spam, or repeat?
-                        # Original code appended once per level. Let's keep it simple.
-                        # Assuming usually 1 level at a time.
-                        for _ in range(levels_gained):
-                            level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
+                    curr_exp[exp_key] = current_exp_val
+                    base_stats[stat_key] = current_val
 
-            # Save updates
-            for s, v in base_stats.items():
-                stats_data[s]["base"] = v
+                    if levels_gained > 0:
+                        if stat_key in STAT_UP_MESSAGES:
+                            # Append message only once per stat type to avoid spam, or repeat?
+                            # Original code appended once per level. Let's keep it simple.
+                            # Assuming usually 1 level at a time.
+                            for _ in range(levels_gained):
+                                level_up_msgs.append(STAT_UP_MESSAGES[stat_key])
 
-            self.db.update_stat_exp(
-                self.discord_id,
-                json.dumps(stats_data),
-                curr_exp["str_exp"],
-                curr_exp["end_exp"],
-                curr_exp["dex_exp"],
-                curr_exp["agi_exp"],
-                curr_exp["mag_exp"],
-                curr_exp["lck_exp"],
-            )
+                # Save updates
+                for s, v in base_stats.items():
+                    stats_data[s]["base"] = v
 
-            if level_up_msgs:
-                logs.append("\n" + "\n".join(level_up_msgs))
+                # Optimistic Update
+                success = self.db.update_stat_exp(
+                    self.discord_id,
+                    original_json_str,
+                    original_exps,
+                    json.dumps(stats_data),
+                    curr_exp["str_exp"],
+                    curr_exp["end_exp"],
+                    curr_exp["dex_exp"],
+                    curr_exp["agi_exp"],
+                    curr_exp["mag_exp"],
+                    curr_exp["lck_exp"],
+                )
+
+                if success:
+                    if level_up_msgs:
+                        logs.append("\n" + "\n".join(level_up_msgs))
+                    break
+
+                attempts += 1
+                logger.warning(f"Stat XP race condition for {self.discord_id}. Retrying ({attempts}/3)...")
 
         except Exception as e:
             logger.error(f"Stat XP error: {e}")
