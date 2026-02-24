@@ -19,3 +19,13 @@ jobs:
             --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🤖 Jules Assignment" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Issue #${{ github.event.issue.number }} — **${{ github.event.issue.title }}** assigned to \`google-labs-jules\`." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Failed to assign Issue #${{ github.event.issue.number }} to \`google-labs-jules\`." >> $GITHUB_STEP_SUMMARY
+          fi

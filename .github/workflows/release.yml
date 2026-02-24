@@ -23,3 +23,14 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🚀 Release" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Release created for tag \`${{ github.ref_name }}\`." >> $GITHUB_STEP_SUMMARY
+            echo "🔗 [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Release creation failed for tag \`${{ github.ref_name }}\`." >> $GITHUB_STEP_SUMMARY
+          fi
