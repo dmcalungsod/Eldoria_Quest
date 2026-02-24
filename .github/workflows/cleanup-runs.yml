@@ -20,20 +20,22 @@ jobs:
           CUTOFF=$(date -d '30 days ago' --iso-8601=seconds)
           echo "Deleting workflow runs older than $CUTOFF..."
 
-          gh api repos/${{ github.repository }}/actions/runs \
+          deleted_count=0
+          run_ids=$(gh api repos/${{ github.repository }}/actions/runs \
             --paginate \
-            --jq ".workflow_runs[] | select(.created_at < \"$CUTOFF\") | .id" \
-            | while read run_id; do
-                echo "Deleting run $run_id"
-                gh api -X DELETE repos/${{ github.repository }}/actions/runs/$run_id
-              done
+            --jq ".workflow_runs[] | select(.created_at < \"$CUTOFF\") | .id")
 
-      - name: Summary
-        if: always()
-        run: |
-          echo "### 🧹 Workflow Run Cleanup" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deleted runs older than 30 days." >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r run_id; do
+            [ -z "$run_id" ] && continue
+            echo "Deleting run $run_id"
+            if gh api -X DELETE repos/${{ github.repository }}/actions/runs/$run_id; then
+              deleted_count=$((deleted_count + 1))
+            fi
+          done <<< "$run_ids"
+
+          echo "### 🗑️ Workflow Run Cleanup" >> $GITHUB_STEP_SUMMARY
+          if [ "$deleted_count" -eq 0 ]; then
+            echo "✅ No runs found older than the retention threshold. Nothing to clean up." >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ Workflow run cleanup failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+            echo "✅ Deleted **$deleted_count** workflow run(s) older than the retention threshold." >> $GITHUB_STEP_SUMMARY
           fi
