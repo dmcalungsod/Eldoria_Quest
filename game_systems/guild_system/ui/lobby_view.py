@@ -91,12 +91,7 @@ class GuildLobbyView(View, GuildViewMixin):
     async def _advisor_callback(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         advisor = GuildAdvisor(self.db, self.interaction_user.id)
-        # Run blocking DB calls in a thread
-        advice = await asyncio.to_thread(advisor.get_advice)
 
-        embed = discord.Embed(
-            title="🗣️ Guild Advisor",
-            description=f"*An old veteran leans against a pillar, eyeing you up and down.*\n\n“{advice}”",
-            color=discord.Color.light_grey(),
-        )
+        # For Rank F/E, show the interactive checklist
+        embed = await asyncio.to_thread(advisor.get_checklist_embed)
         await interaction.followup.send(embed=embed, ephemeral=True)

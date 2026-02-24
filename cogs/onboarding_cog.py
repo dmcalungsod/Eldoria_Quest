@@ -18,6 +18,7 @@ import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES as CLASS_DEFINITIONS
 from game_systems.data.messages import WELCOME_MESSAGE, WELCOME_TITLE
+from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.player.player_creator import PlayerCreator
 
 from .utils.ui_helpers import back_to_profile_callback
@@ -310,9 +311,7 @@ class CombatTutorialView(View):
     async def complete_callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        # Grant a small reward - Minor Potions (simulated logic, just calling add item)
-        # We assume potion_minor exists. If not, it fails silently or logs error, but we should be safe.
-        # "potion_minor" | "Minor Health Potion" | "consumable" | "Common"
+        # Grant a small reward - Minor Potions
         try:
             await asyncio.to_thread(
                 self.db.add_inventory_item,
@@ -325,6 +324,61 @@ class CombatTutorialView(View):
             )
         except Exception as e:
             logger.error(f"Failed to grant tutorial reward: {e}")
+
+        # --- GRANT STARTER WEAPON ---
+        player = await asyncio.to_thread(self.db.get_player, self.user.id)
+        class_id = player.get("class_id") if player else None
+        weapon_msg = ""
+
+        # Class ID -> (Item Key, Item Name, Slot)
+        mapping = {
+            1: ("gen_sword_001", "Rusted Shortsword", "sword"),
+            2: ("gen_wand_001", "Apprentice Wand", "wand"),
+            3: ("gen_dagger_001", "Iron Shiv", "dagger"),
+            4: ("gen_mace_001", "Acolyte's Mace", "mace"),
+            5: ("gen_bow_001", "Hunter's Bow", "bow"),
+        }
+
+        if class_id in mapping:
+            key, name, slot = mapping[class_id]
+
+            # Add to Inventory
+            await asyncio.to_thread(
+                self.db.add_inventory_item,
+                self.user.id,
+                key,
+                name,
+                "equipment",
+                "Common",
+                1,
+                slot,
+                "equipment",  # source table
+            )
+
+            # Find the item to equip (unequipped)
+            item = await asyncio.to_thread(
+                self.db.find_stackable_item,
+                self.user.id,
+                key,
+                "Common",
+                slot,
+                "equipment",
+                equipped=0,
+            )
+
+            if item:
+                # Auto-Equip
+                equip_mgr = EquipmentManager(self.db)
+                ok, msg = await asyncio.to_thread(equip_mgr.equip_item, self.user.id, item["id"])
+                if ok:
+                    weapon_msg = f"\n⚔️ **Bonus:** Received and equipped **{name}**!"
+                else:
+                    weapon_msg = f"\n⚔️ **Bonus:** Received **{name}**! (Check Inventory)"
+
+        await interaction.followup.send(
+            f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}",
+            ephemeral=True,
+        )
 
         await transition_to_guild_lobby(interaction, self.db, self.user)
 

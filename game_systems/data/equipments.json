@@ -30,6 +30,37 @@
         },
         "description": "A simple wooden wand carved with basic runes."
     },
+    "gen_dagger_001": {
+        "name": "Iron Shiv",
+        "slot": "dagger",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "DEX": 2
+        },
+        "description": "A crude iron blade, sharp enough to cut a purse or a throat."
+    },
+    "gen_bow_001": {
+        "name": "Hunter's Bow",
+        "slot": "bow",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "DEX": 2
+        },
+        "description": "A simple wooden bow used for hunting small game."
+    },
+    "gen_mace_001": {
+        "name": "Acolyte's Mace",
+        "slot": "mace",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "STR": 1,
+            "MAG": 1
+        },
+        "description": "A sturdy mace, balanced for both combat and ceremony."
+    },
     "gen_wand_005": {
         "name": "Crystal Focus",
         "slot": "wand",
