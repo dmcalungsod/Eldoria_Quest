@@ -42,6 +42,38 @@ class LoadoutNameModal(Modal, title="Save Loadout"):
             await interaction.followup.send(f"Error: {msg}", ephemeral=True)
 
 
+class ConfirmDeleteView(View):
+    def __init__(self, user: discord.User, target_name: str, confirm_callback, cancel_callback):
+        super().__init__(timeout=60)
+        self.user = user
+        self.target_name = target_name
+        self.confirm_callback = confirm_callback
+        self.cancel_callback = cancel_callback
+
+    @discord.ui.button(label="Confirm Delete", style=discord.ButtonStyle.danger, emoji="🗑️")
+    async def confirm(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message("Not your confirmation.", ephemeral=True)
+            return
+
+        await interaction.response.defer()
+        # Disable buttons to prevent double click
+        for child in self.children:
+            child.disabled = True
+        await interaction.edit_original_response(view=self)
+
+        await self.confirm_callback(interaction)
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+    async def cancel(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message("Not your confirmation.", ephemeral=True)
+            return
+
+        await interaction.response.defer()
+        await self.cancel_callback(interaction)
+
+
 class LoadoutView(View):
     def __init__(
         self,
@@ -130,10 +162,20 @@ class LoadoutView(View):
             return
 
         await interaction.response.defer()
+
+        # Feedback: Show loading state
+        original_label = self.equip_btn.label
+        self.equip_btn.label = "Equipping... ⏳"
+        self.equip_btn.disabled = True
+        await interaction.edit_original_response(view=self)
+
         success, msg = self.eq_manager.equip_loadout(self.interaction_user.id, self.selected_loadout)
+
+        # Restore button state
+        self._setup_ui() # Resets buttons based on selection
+        await interaction.edit_original_response(view=self)
+
         await interaction.followup.send(msg, ephemeral=True)
-        # We might want to refresh inventory view, but we are in LoadoutView.
-        # User can click "Back" to verify.
 
     async def save_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.interaction_user.id:
@@ -152,12 +194,36 @@ class LoadoutView(View):
         if not self.selected_loadout:
             return
 
-        success, msg = self.eq_manager.delete_loadout(self.interaction_user.id, self.selected_loadout)
+        # Prepare confirmation logic
+        target_loadout = self.selected_loadout
 
-        self.selected_loadout = None
-        self._setup_ui()  # Refresh list
-        await interaction.response.edit_message(view=self)
-        await interaction.followup.send(msg, ephemeral=True)
+        async def on_confirm(interaction: discord.Interaction):
+            success, msg = self.eq_manager.delete_loadout(self.interaction_user.id, target_loadout)
+
+            # Reset selection and refresh UI
+            self.selected_loadout = None
+            self._setup_ui()
+
+            # Restore the main view
+            await interaction.edit_original_response(content=None, view=self)
+            await interaction.followup.send(msg, ephemeral=True)
+
+        async def on_cancel(interaction: discord.Interaction):
+            # Just restore the main view
+            await interaction.edit_original_response(content=None, view=self)
+
+        # Show confirmation view
+        confirm_view = ConfirmDeleteView(
+            self.interaction_user,
+            target_loadout,
+            on_confirm,
+            on_cancel
+        )
+
+        await interaction.response.edit_message(
+            content=f"⚠️ **Are you sure you want to delete loadout '{target_loadout}'?**\nThis cannot be undone.",
+            view=confirm_view
+        )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.interaction_user.id
