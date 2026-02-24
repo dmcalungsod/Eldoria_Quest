@@ -145,7 +145,8 @@ def main():
     sorted_locations = sorted(LOCATIONS.items(), key=lambda x: x[1].get("level_req", 1))
 
     for key, data in sorted_locations:
-        if key == "guild_arena": continue # Skip arena
+        if key == "guild_arena":
+            continue  # Skip arena
 
         stats = calculate_expected_value(key, data)
 
