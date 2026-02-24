@@ -1,53 +1,84 @@
-# ⏳ TimeWeaver Journal
+# Timeweaver Journal
 
 ## Mission
-To reimagine Eldoria Quest as a time-based auto-adventure game while preserving its dark fantasy survival roots.
+Design a time-based auto-adventure system for Eldoria Quest.
 
-## Initial Research & Codebase Exploration
+## Initial Thoughts
+The current system is manual, step-by-step. The new system needs to be "fire and forget" but with strategic depth.
 
-### Current System (`AdventureManager`, `AdventureSession`)
-- Currently uses a "simulate step" approach where the user manually triggers steps or auto-resolves combat in small chunks.
-- Data is stored in `adventure_sessions` collection in MongoDB.
-- Existing fields: `start_time`, `end_time`, `duration_minutes`, `active`, `logs`, `loot_collected`.
-- This structure is actually very close to what is needed for time-based adventures. The `duration_minutes` field is already there.
+### Key Decisions
+1.  **Coexistence**: Auto-adventures will run alongside manual play. They serve different needs (active engagement vs. passive progression).
+2.  **Time as Currency**: The primary cost is time. The secondary cost is supplies (HP/Food/Torches).
+3.  **Simulation Fidelity**: We should reuse `CombatEngine` logic where possible but simplify the execution.
+    -   *Decision*: Use a "Fast Simulation" approach. Calculate Average Damage Per Round (DPR) for both entities. Determine rounds to kill. Apply variance. This is faster than full turn-by-turn simulation with logs, but more accurate than a simple "Win %" check.
+4.  **Risk/Reward**: Longer adventures reach "deeper floors" (higher difficulty modifiers) for exclusive rewards.
+    -   *Mechanic*: Risk increases by +5% per hour. Loot quality increases by +5% per hour.
 
-### Locations (`adventure_locations.py`)
-- Locations already define `duration_options` (e.g., [30, 60, 120] minutes).
-- Monster tables and gatherables are well-structured for RNG generation.
+### Challenges
+-   **Discord Limits**: We can't update a message every minute. We need a "check status" command or a final notification.
+-   **State Management**: If the bot restarts, adventures must resume. The database schema needs `start_time`, `duration`, and `end_time`.
+-   **Economy**: Auto-farming could inflate the economy.
+    -   *Solution*: **Adventure Slots**. Starts at 1. Players can unlock a second slot at higher ranks (e.g., Rank B). Max 2 slots.
+    -   *Stamina*: No stamina system, but "Fatigue" applies to the *character* if they go back-to-back? Maybe keep it simple: Just time.
 
-### Database (`DatabaseManager`)
-- Robust singleton pattern.
-- `adventure_sessions` collection can be reused.
-- Need to ensure `get_active_adventure` is efficient for the background task if we have many players.
+### Integration Points
+-   `LOCATIONS`: Already has `duration_options`. We can use these.
+-   `CombatEngine`: Needs an `auto_resolve` method or a wrapper.
+-   `Inventory`: Needs to support "Supplies" that are consumed automatically (Potions, Rations).
+    -   *Idea*: Players can "pack" items. If HP < 30%, use Potion. If Hunger > 50%, use Ration.
 
-## Design Decisions
+## Detailed Design Notes
 
-### 1. The Core Loop
-- **Start:** User selects location -> Selects Duration (Short/Medium/Long) -> Embarks.
-- **Wait:** The bot calculates the end time.
-- **End:** A background task checks for `end_time <= now`. It triggers a "Completion" process.
-- **Resolution:**
-    - I will implement a "Resolution Engine" that simulates the adventure in one go upon completion.
-    - It will calculate:
-        - Total Encounters = Duration / X minutes.
-        - Total Loot = Encounters * Loot Chance.
-        - Total Damage Taken = Encounters * Monster Damage (mitigated by DEF/Skills).
-        - XP/Aurum.
-    - **Survival Aspect:** If `Total Damage > Player HP`, the adventure "Failures" or "Retreats". The player returns with reduced loot (e.g., 50%) and 1 HP.
+### Core Loop
+1.  **Start**: Player uses `/adventure auto`.
+2.  **Setup**: Select Location -> Duration (e.g., 30m, 1h, 4h, 8h).
+3.  **Prep**: Select Loadout (Potions, Food). Shows "Win Probability" estimate based on stats vs location difficulty.
+4.  **Go**: Bot confirms start. Database stores `end_time`.
+5.  **Wait**: Player can check `/adventure status`.
+6.  **End**: Bot sends DM or pings in channel. "Your adventure in the Whispering Thicket is complete!"
 
-### 2. Time vs. Steps
-- Instead of simulating every second, I'll abstract it to "1 Step per 15 Minutes".
-- 30m Adventure = 2 Steps.
-- 8h Adventure = 32 Steps.
-- Each step has a chance for: Combat, Gathering, Event, or Empty.
+### Auto-Resolution Engine
+-   **Step Interval**: 1 Step = 10 Minutes of Real Time.
+-   **Step Logic**:
+    -   Roll for Event (Combat, Gather, Flavor, Nothing).
+    -   If Combat:
+        -   Fetch Monster from Location pool.
+        -   Simulate Fight (Fast Sim).
+        -   If Win: Loot + XP. Consume HP/MP.
+        -   If Lose: Adventure Ends. 50% Loot Lost. 10% Aurum Lost.
+    -   If Gather:
+        -   Roll Loot Table.
+        -   Add to temporary "Bag".
+-   **Completion**:
+    -   Sum up all rewards.
+    -   Apply to Player (DB Update).
+    -   Generate Summary Report.
 
-### 3. Risk/Reward
-- **Short Adventures:** Safer, good for quick materials.
-- **Long Adventures:** Higher chance of "Deep" exploration (better loot tables), but fatigue mechanics or escalating damage could apply.
+### Database Schema (`auto_adventures`)
+-   `_id`: UUID
+-   `discord_id`: Long (Index)
+-   `start_time`: ISO Date
+-   `end_time`: ISO Date
+-   `location_id`: String
+-   `duration_minutes`: Int
+-   `status`: 'active', 'completed', 'failed'
+-   `supplies`: JSON { "potion_hp_small": 5, ... }
+-   `log`: Array of Strings (Summary)
+-   `loot`: JSON { "item_key": count }
 
-### 4. Integration
-- **Economy:** Auto-adventures will flood the economy with materials. I need to ensure sinks (crafting, guild projects) are robust. *Note for GameBalancer.*
-- **Guilds:** Reputation is already hooked in `end_adventure`.
+### UI/UX
+-   **Setup Embed**: Shows Location Info, Recommended Level.
+-   **Status Embed**: Progress Bar (Time Elapsed / Total). "Current Loot: 5x Herb, 2x Pelt". "Current HP: 80%".
+-   **Result Embed**:
+    -   Header: "Adventure Complete: [Location]"
+    -   Body: "You survived 4 hours. Defeated 12 enemies. Gathered 25 items."
+    -   Loot: List of items.
+    -   XP/Aurum: Gained.
 
-## Next Steps
-- Draft the full design document in `.Jules/timeweaver_design.md`.
+### Coordination
+-   **SystemSmith**: Needs to build the `TaskScheduler` to check for `end_time <= now()`.
+-   **Tactician**: Needs to write the `FastCombatSim` logic.
+-   **GameBalancer**: Needs to tune the `EncounterRate` (how many monsters per hour?).
+
+## Final Thoughts
+This system respects the player's time while keeping the "Survival" aspect (you can die and lose loot). The "Supplies" mechanic adds strategy—bringing more potions allows longer/riskier runs.

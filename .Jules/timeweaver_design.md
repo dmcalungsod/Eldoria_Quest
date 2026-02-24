@@ -1,195 +1,224 @@
-# ⏳ Timeweaver: Auto-Adventure Overhaul Design
+# ⏳ TIMEWEAVER: Auto-Adventure System Design
 
-## 1. Overview & Goals
-**Mission:** Transform Eldoria Quest from a manual turn-based exploration system into a time-based auto-adventure experience.
-**Core Idea:** Players dispatch their characters on expeditions that resolve in real-time. Upon return, they receive a detailed report of their journey, including battles fought, loot gathered, and any injuries sustained.
+**Version:** 1.0
+**Status:** Draft
+**Author:** Timeweaver (AI Agent)
+**Date:** 2025-05-15
 
-**Goals:**
-*   **Respect Player Time:** Shift from active grinding to strategic management.
-*   **Deepen Strategy:** Choices (Duration, Location, Supplies) matter more than button mashing.
-*   **Preserve Tone:** Maintain the dark fantasy survival feel through risk of failure and resource scarcity.
-*   **Scalability:** Design a system that can handle thousands of concurrent adventures without lag.
+---
 
-## 2. Core Player Flow
+## 1. 🎯 Executive Summary
+The **Auto-Adventure System** transforms Eldoria Quest by introducing a parallel progression path where players send their characters on time-based expeditions. Unlike manual play, which requires turn-by-turn input, auto-adventures run in the background, simulating exploration, combat, and resource gathering over real-world time.
 
-### A. Starting an Adventure
-1.  **Command:** `/adventure`
-2.  **UI:** An embed displays available locations (unlocked by Rank/Level).
-    *   **Dropdown:** Select Destination (e.g., "🌲 Willowcreek Outskirts").
-    *   **Dropdown:** Select Duration (e.g., "Short (30m)", "Long (8h)").
-    *   **Button:** "Embark" (Starts the timer).
-3.  **Feedback:** Bot confirms: *"You venture into the wilds. Return in 30 minutes."*
+This system is designed to:
+-   **Respect Player Time**: Allow meaningful progression during busy periods.
+-   **Enhance Strategy**: Shift focus from tactical combat to preparation (loadouts, risk assessment).
+-   **Preserve Tension**: Maintain the risk of death and loss, ensuring "idle" doesn't mean "safe".
 
-### B. The Journey (Passive)
-*   The character is locked in the `adventure_sessions` database.
-*   Status commands (`/status`, `/profile`) show: *"Currently Adventuring in [Location] (Returns: [Time])"*
-*   Players cannot duel, craft, or change gear while adventuring.
+---
 
-### C. Cancellation (Retreating Early)
-*   **Action:** Players can use `/adventure cancel` or click a "Retreat" button on the status embed.
-*   **Consequence:** The adventure is resolved immediately up to the current time elapsed.
-*   **Penalty:**
-    *   **Loot:** 50% of loot gathered so far is lost (dropped in haste).
-    *   **XP:** 50% XP penalty.
-    *   **Cooldown:** Player cannot embark again for 15 minutes (to prevent spamming short cancels).
-    *   *Reasoning:* Prevents players from checking for "good RNG" starts and cancelling immediately, while allowing legitimate retreats if they need their character for a raid/event.
+## 2. 🔄 Core Loop
 
-### D. Completion & Results
-1.  **Notification:** When the timer expires, the bot sends a DM or pings in a specific channel: *"Your adventure in Willowcreek is complete!"*
-2.  **Claim:** Player uses `/adventure` again or clicks "Complete" on the notification.
-3.  **Resolution:** The bot calculates the entire journey's outcome instantly based on stats + RNG.
-4.  **Report:** An embed summarizes:
-    *   **Encounters:** "Defeated 5 Goblins, fled from 1 Elite."
-    *   **Loot:** List of materials/items found.
-    *   **Vitals:** HP/MP lost (or gained via regen).
-    *   **Rewards:** XP, Aurum, Reputation.
+### 2.1 The Flow
+1.  **Preparation**: Player selects a destination, duration, and supplies (potions, food).
+2.  **Departure**: Character is locked into the adventure state. They cannot manually explore or fight elsewhere.
+3.  **Simulation**: The server calculates progress in real-time chunks (e.g., 10-minute "ticks").
+    -   *Events*: Combat, Gathering, Random Encounters occur based on location data.
+    -   *Resource Drain*: HP/MP fluctuates; supplies are consumed automatically if critical.
+4.  **Completion**:
+    -   **Success**: Timer ends. Player receives a notification and a summary of loot/XP.
+    -   **Failure**: Character hits 0 HP. Adventure ends early. Partial loot is lost.
+    -   **Recall**: Player manually cancels. Returns immediately with whatever was gathered so far (no penalty, just time spent).
 
-## 3. Adventure Resolution Engine
-The engine simulates the adventure in "Steps" to ensure consistency and fairness.
+### 2.2 Constraints
+-   **One Active Adventure**: Players can only have one character adventuring at a time (Auto OR Manual).
+    -   *Note*: Future expansion could allow "Retainers" or "Mercenaries" for parallel slots.
+-   **Cooldowns**: None by default, but "Fatigue" mechanics (see Balance) may apply to limit 24/7 farming.
 
-**Simulation Logic:**
-1.  **Calculate Steps:** `Steps = Duration (min) / 15`. (e.g., 60m = 4 steps).
-2.  **Iterate Steps:** For each step:
-    *   **Event Roll:** Roll d100.
-        *   01-10: **Rare Event** (Treasure, Trap, NPC).
-        *   11-50: **Combat** (Draw monster from location pool).
-        *   51-80: **Gathering** (Materials based on location).
-        *   81-100: **Quiet** (Regen HP/MP).
-    *   **Resolution:**
-        *   *Combat:* Compare Player Power vs. Monster Power. Calculate damage taken and loot dropped. If HP < 0, **Retreat**.
-        *   *Gathering:* Add items to temporary loot bag.
-        *   *Event:* Apply specific logic (e.g., "Found Shrine: +Buff").
-3.  **Retreat Condition:** If Player HP drops to 0 during any step:
-    *   Adventure ends immediately at that step.
-    *   **Penalty:** 50% of gathered loot is lost. 10% Aurum lost. Player returns with 1 HP.
-    *   Status: "Failed (Rescued by Guild)".
+---
 
-## 4. Time & Scheduling
-**Tracking:**
-*   **Database:** `adventure_sessions` collection.
-    *   Fields: `discord_id`, `start_time`, `end_time`, `duration_minutes`, `location_id`, `active` (1).
-*   **Scheduler:** A background task (`cogs/adventure_loop.py`) runs every minute.
-    *   Query: `db.get_adventures_ending_before(now)`
-    *   Action: Mark `notification_sent = True` (if not already), send DM/Ping.
-    *   *Note:* We do NOT auto-resolve. The player must "Claim" to trigger the heavy calculation and see the result. This prevents DB locking issues and ensures the player sees the result.
+## 3. ⏳ Time Mechanics
 
-**Durations:**
-*   **Quick (30m):** 2 Steps. Low risk. Good for dailies.
-*   **Standard (2h):** 8 Steps. Standard rewards.
-*   **Long (8h):** 32 Steps. High risk (cumulative damage), but high reward (deeper floor loot tables).
-*   **Expedition (24h):** 96 Steps. Only for well-geared players.
+### 3.1 Durations
+Players choose from fixed duration tiers. Longer trips offer better efficiency but higher risk.
 
-## 5. Risk & Reward Tables
-**Risk Scaling:**
-*   **Fatigue:** For adventures > 4 hours, enemy damage increases by 5% per hour.
-*   **Supplies:** Players can equip "Rations" (consumables) to auto-heal between steps.
+| Tier | Duration | Risk Modifier | Loot Quality | Recommended For |
+| :--- | :--- | :--- | :--- | :--- |
+| **Scout** | 30 Mins | 1.0x (Base) | Standard | Quick material runs |
+| **Patrol** | 2 Hours | 1.1x (+10%) | +5% Rare | Daily tasks |
+| **Expedition**| 8 Hours | 1.25x (+25%)| +15% Rare | Overnight farming |
+| **Odyssey** | 24 Hours | 1.5x (+50%) | +30% Rare, Boss Chance | Weekend progression |
 
-**Reward Scaling:**
-*   **Deep Loot:** Steps beyond #20 (5 hours) have a 2x chance for Rare materials.
-*   **Experience:** Base XP per step + Bonus for completion.
+### 3.2 Real-Time Processing
+-   **Server-Side**: The system does *not* need a running loop for every player.
+-   **Calculation**:
+    -   *On Check/Complete*: The system calculates `(Current Time - Start Time) / Tick Rate` to determine how many "steps" have occurred.
+    -   *State Update*: It updates the database with the new state (HP, Loot) and the `last_processed_time`.
 
-## 6. Integration with Existing Systems
-*   **Inventory:** Loot is added directly to inventory upon "Claim". Overflow items are discarded or put in a temporary "overflow" stash (if implemented).
-*   **Economy:**
-    *   *Input:* Materials from adventures.
-    *   *Sink:* Crafting, Repairs, Guild Projects.
-    *   *Balance:* Adjust drop rates in `adventure_locations.py` if inflation occurs.
-*   **Guilds:**
-    *   **Rank:** Adventure completion counts towards "Quests Completed" or a new "Expeditions" metric.
-    *   **Reputation:** Granted based on duration and location difficulty.
-*   **Dungeon Floors:**
-    *   Higher floors = Higher difficulty locations.
-    *   "Floors" can be represented as different Location IDs (e.g., `dungeon_floor_1`, `dungeon_floor_5`).
-*   **Achievements & Factions:**
-    *   **Achievements:** New time-based badges (e.g., "The Wanderer" for 100h total adventure time, "Iron Lung" for completing 24h expedition without dying).
-    *   **Factions:** Factions may control certain zones. Adventuring in a zone controlled by an opposing faction increases combat risk but grants specific Faction Reputation.
+---
 
-## 7. UI/UX Specifications
+## 4. ⚙️ Auto-Resolution Engine
 
-### Adventure Start Embed
-**Title:** 🌲 Willowcreek Outskirts
-**Description:** *The safe edge of the forest. Slimes and weak goblins lurk here.*
-**Fields:**
-*   **Difficulty:** ⭐ (Rank F)
-*   **Est. Duration:** 30m - 8h
-*   **Supplies:** [Rations: 0] [Torches: 0]
+### 4.1 The "Tick" System
+-   **Tick Rate**: 10 Minutes of Real Time = 1 Adventure Step.
+-   **Step Logic**:
+    1.  **Regen Check**: Apply natural HP/MP regen (modified by environment).
+    2.  **Event Roll**:
+        -   60% **Combat** (Encounter a monster from the location pool).
+        -   30% **Gathering** (Find materials).
+        -   10% **Flavor/Empty** (Narrative event, safe spot).
 
-**Components:**
-*   `SelectMenu` (Duration): "30 Minutes", "1 Hour", "4 Hours", "8 Hours"
-*   `Button` (Green): "Embark"
-*   `Button` (Grey): "Change Location"
+### 4.2 Combat Simulation (Fast-Sim)
+To avoid heavy processing, combat is resolved via a deterministic simulation rather than turn-by-turn AI.
 
-### Adventure Report Embed
-**Title:** 📜 Adventure Report: Willowcreek
-**Description:** *You return weary but triumphant.*
-**Fields:**
-*   **Summary:** 8 Steps | 4 Battles | 3 Harvests
-*   **Loot:** 🪵 Ancient Wood (x5), 🌿 Herb (x3)
-*   **XP/Aurum:** +150 XP | +50 🪙
-*   **Health:** 100/100 HP (Used 1 Ration)
+**Formula:**
+1.  **Player Power** = `Attack * (1 + Crit%) + Defense + Speed`
+2.  **Monster Power** = `ATK + DEF + Level * 5`
+3.  **Win Probability** = `Player Power / (Player Power + Monster Power)`
+    -   *Modifiers*: Elemental advantage, Skills (abstracted as +10% Power).
+4.  **Outcome**:
+    -   **Win**: Player takes `Damage = (Monster ATK * Rounds) - (Player DEF * Rounds)`.
+        -   *Rounds* = `Monster HP / Player DPS`.
+    -   **Loss**: Player takes lethal damage. Adventure Fails.
 
-## 8. Database Schema
-**Collection:** `adventure_sessions` (Update)
+### 4.3 Supply Usage
+Players define a "Threshold" for using items (e.g., "Use Potion if HP < 30%").
+-   The simulation checks HP *after* every combat.
+-   If `HP < Threshold` AND `Potion in Supplies`, consume 1 Potion and restore HP.
+
+### 4.4 Death & Failure
+-   **Condition**: HP <= 0.
+-   **Penalty**:
+    -   **Loot**: Lose 50% of gathered materials (randomly selected).
+    -   **Aurum**: Lose 10% of carried Aurum (standard death tax).
+    -   **XP**: Retain 100% of earned XP (time invested is never fully wasted).
+-   **State**: Adventure status updates to `Failed`. Player must "Rescue" (command) to retrieve character.
+
+---
+
+## 5. 🔗 Integration with Existing Systems
+
+### 5.1 Database Schema (`auto_adventures`)
+A new MongoDB collection to track active sessions.
+
 ```json
 {
   "discord_id": 123456789,
-  "location_id": "forest_outskirts",
   "start_time": "ISO-8601",
   "end_time": "ISO-8601",
-  "duration_minutes": 60,
-  "active": 1,
-  "status": "in_progress", // or "completed", "claimed"
-  "supplies": {
-      "rations": 2,
-      "torches": 1
+  "last_processed": "ISO-8601",
+  "location_id": "forest_outskirts",
+  "duration_minutes": 120,
+  "status": "active",
+  "config": {
+    "risk_level": 1,
+    "use_potion_threshold": 30
   },
-  "log": [] // Only for specialized debugging, main log generated at end
+  "state": {
+    "current_hp": 150,
+    "current_mp": 50,
+    "loot": {"herb": 5, "pelt": 2},
+    "log": ["Started journey...", "Fought Wolf...", "Found Herbs..."]
+  }
 }
 ```
 
-## 9. Technical Implementation Plan
-**Phase 1: Database & Logic (SystemSmith)**
-*   Update `AdventureManager` to handle time-based starts.
-*   Implement `AdventureResolutionEngine` class.
-*   Update `DatabaseManager` schema.
+### 5.2 Inventory & Economy
+-   **Loot Tables**: Use the existing `AdventureRewards` tables but scaled by duration.
+-   **Inventory Space**: Auto-adventures respect inventory limits. If full, new items are discarded (highest value kept).
+-   **Durability**: Gear durability decreases by 1 per combat encounter.
 
-**Phase 2: UI & Commands (Palette)**
-*   Create `AdventureSetupView`.
-*   Create `AdventureReportEmbed`.
-*   Update `/adventure` command.
+### 5.3 Ranks & Quests
+-   **Rank Progression**: Kills in auto-adventures count towards Rank Requirements at a 50% rate (to encourage manual play for promotion).
+-   **Quests**: "Fetch" quests work normally. "Kill" quests work at 50% rate.
 
-**Phase 3: Background Tasks (SystemSmith)**
-*   Implement `check_adventure_completion` loop.
-*   Add notification logic.
+### 5.4 Factions & Achievements
+-   **Factions**: Completing auto-adventures grants Reputation with the relevant local faction (e.g., *The Verdant Guard* for forest zones).
+    -   *Rate*: 1 Rep per 30 minutes of successful adventuring.
+-   **Achievements**: Time spent in auto-adventures counts towards specific "Explorer" achievements.
+    -   *Examples*: "Marathon Runner" (100 hours total), "Survivor" (24h trip without damage).
+    -   *Note*: Combat achievements (e.g., "Slayer") count at 50% rate.
 
-**Phase 4: Integration (GameBalancer)**
-*   Tune drop rates for time-based yields.
-*   Adjust monster damage for auto-resolution balance.
+---
 
-## 10. Balance & Tuning Guidelines
-*   **Initial Tuning:** Aim for 80% success rate for on-level content without supplies.
-*   **Supply Usage:** Rations should be almost mandatory for Long (8h) adventures.
-*   **XP Rate:** Auto-adventure XP/hour should be ~60% of active manual play to encourage active play but reward idle time.
+## 6. 🎨 UI/UX Design
 
-## 11. Future Expansions
-*   **Party Adventures:** Send multiple characters (alts or guildmates).
-*   **Dynamic Events:** "Goblin Raid" event boosts loot for 24h.
-*   **Caravans:** Trade missions (High risk, High Aurum, No XP).
+### 6.1 Setup Command (`/adventure auto`)
+A streamlined menu using Discord Select Menus:
+1.  **Location**: Dropdown of unlocked zones.
+2.  **Duration**: Buttons [30m] [2h] [8h] [24h].
+3.  **Supplies**: Multi-select menu (Potion x5, Ration x2).
+4.  **Confirm**: Shows "Estimated Survival Chance: 85%".
 
-## 12. Agent Coordination
-This design overhaul touches every system. Assignments are as follows:
+### 6.2 Status Dashboard (`/adventure status`)
+Displays an embed that updates on command or refresh (via button):
+-   **Progress Bar**: `[▓▓▓▓▓░░░░░] 50%`
+-   **Vitals**: HP: 120/200 | MP: 40/100
+-   **Loot Sack**: 🌿 x12, 🦴 x4, 💰 150
+-   **Latest Log**: "10:45 - Defeated Moss Golem (-15 HP)"
 
-*   **GameForge:** Design new adventure locations (e.g., specialized resource nodes) and event tables.
-*   **DepthsWarden:** Map Dungeon Floors 1-100 to Adventure Duration/Difficulty tiers. Provide monster pools for deep delves.
-*   **Tactician:** Provide the combat formulas for the `Resolution Engine`. Needs to be stateless (Power Rating vs. Monster Rating).
-*   **GameBalancer:** Calibrate the economy. Ensure the influx of materials from 8h adventures doesn't crash the market. Adjust "Fatigue" penalties.
-*   **ProgressionBalancer:** Set Rank requirements for new adventure durations (e.g., 24h unlocks at Rank A).
-*   **Grimwarden:** Define death penalties and "Rescue" mechanics. Ensure the "Survival" tone persists even in auto-mode.
-*   **StoryWeaver:** Write flavor text for the Adventure Reports (e.g., "You narrowly escaped a rockslide", "The campfire burned low...").
-*   **ChronicleKeeper:** Create new Achievements for time milestones (e.g., "The Marathoner").
-*   **Equipper:** Design "Travel Supplies" (Rations, Tent, Torches) that boost success rates.
-*   **DataSteward:** Manage the static data files for `LOCATIONS` and `LOOT_TABLES`.
-*   **SystemSmith:** Lead developer for the Scheduler, Database schema updates, and Background Task Loop.
-*   **Palette:** Design the "Start Adventure" and "Adventure Report" embeds/views.
-*   **BugHunter:** Stress test the scheduler with simulated 10k users. Test "Cancel" mechanics for exploits.
-*   **Visionary:** Oversee the transition from manual to auto, gathering player feedback to adjust "Fun vs. Wait" balance.
+### 6.3 Completion Notification
+When time is up, the bot DMs the user (or pings in a specific channel):
+> **🌟 Adventure Complete!**
+> You returned from **Whispering Thicket**.
+> **Time**: 2h 00m
+> **Loot**:
+> - 🌿 Medicinal Herb x8
+> - 🐺 Wolf Pelt x3
+> - 💎 Magic Stone x1
+>
+> *Use `/adventure claim` to secure your rewards.*
+
+---
+
+## 7. ⚖️ Balance & Anti-Abuse
+
+### 7.1 The "Lazy" Tax
+Auto-adventures are roughly **70% as efficient** as optimal manual play per minute.
+-   *Reason*: Manual players can use skills perfectly, kite enemies, and optimize routing. Auto is a "brute force" simulation.
+
+### 7.2 Safety Valves
+-   **Daily Limit**: Max 24 hours of auto-adventure time per rolling 24h window (prevents multi-account bot farms from infinite scaling).
+-   **Bot Restarts**: The system calculates progress based on timestamps (`now - last_processed`), so downtime doesn't break adventures. They just "catch up" instantly when the bot comes back online.
+
+---
+
+## 8. 🛠️ Implementation Plan (Agent Coordination)
+
+### Phase 1: Foundation (SystemSmith & DataSteward)
+-   Create `auto_adventures` collection.
+-   Implement `AutoAdventureManager` class.
+-   Set up the "Tick" processor (background task).
+
+### Phase 2: Simulation Logic (Tactician & GameBalancer)
+-   Develop the `FastCombatSim` algorithm.
+-   Calibrate "Win %" against real player stats.
+-   Tune loot drop rates for auto-mode.
+
+### Phase 3: UI & Interface (Palette)
+-   Build `AutoSetupView` and `AutoStatusView`.
+-   Create the "Claim Rewards" interface.
+
+### Phase 4: Integration (DepthsWarden & ProgressionBalancer)
+-   Link Location data to Auto-mode.
+-   Apply Rank XP penalties/bonuses.
+
+### Phase 5: Content & Polish
+-   **GameForge**: Define "Auto-Only" events or rare drops for long durations.
+-   **StoryWeaver**: Write narrative templates for adventure logs (e.g., "Found a hidden glen...", "Ambushed by goblins...").
+-   **Grimwarden**: Verify death penalties feel fair but punishing. Ensure "Rescue" mechanics work.
+-   **ChronicleKeeper**: Implement tracking for time-based achievements.
+-   **BugHunter**: Stress test with 1000 concurrent "virtual" adventures to check database load.
+-   **Visionary**: Review final player feedback loop and adjust "Lazy Tax" if needed.
+
+---
+
+## 9. 🔮 Future Expansions
+-   **Party Mode**: Send multiple characters together for boosted safety.
+-   **Mercenaries**: Hire NPCs to guard you during auto-adventures.
+-   **Offline Defense**: Auto-adventures could be intercepted by "Raiding" monsters (World Events).
+
+---
+
+## 🔚 Final Design Note
+This system shifts Eldoria from a "play only when active" game to a "living world" where your character grows while you sleep. The key is **Preparation**: the game becomes about *planning* the expedition rather than just *clicking* through it.
