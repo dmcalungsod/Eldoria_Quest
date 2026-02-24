@@ -1,5 +1,5 @@
 import sys
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -51,9 +51,7 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     assert mock_session.simulate_step.call_count == 2
     # Should be called with bundle and persist=False
     mock_session.simulate_step.assert_called_with(
-        context_bundle=mock_db.get_combat_context_bundle.return_value,
-        background=True,
-        persist=False
+        context_bundle=mock_db.get_combat_context_bundle.return_value, background=True, persist=False
     )
     # Should save state 1 time (only at end)
     assert mock_session.save_state.call_count == 1
@@ -154,7 +152,7 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
         return {
             "dead": False,
             "vitals": {"current_hp": new_hp, "current_mp": 100},
-            "player_stats": MagicMock(max_hp=100, max_mp=100)
+            "player_stats": MagicMock(max_hp=100, max_mp=100),
         }
 
     mock_session.simulate_step.side_effect = simulate_side_effect
@@ -175,7 +173,7 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
     # Step 1: 100 -> 90. Bundle updated to 90.
     # Step 2: 90 -> 80. Bundle updated to 80.
     calls = mock_session.simulate_step.call_args_list
-    final_bundle = calls[-1].kwargs['context_bundle']
+    final_bundle = calls[-1].kwargs["context_bundle"]
 
     # The bundle object is mutated in place, so we check its final state
     assert final_bundle["player"]["current_hp"] == 80

@@ -452,6 +452,39 @@ LOCATIONS = {
         ],
         "special_events": ["trap_pit", "safe_room", "ancient_shrine"],
     },
+    "shimmering_wastes": {
+        "name": "The Shimmering Wastes",
+        "emoji": "✨",
+        "min_rank": "A",
+        "level_req": 37,
+        "duration_options": [60, 120, 240, 480],
+        "monsters": [
+            ("monster_151", 30),  # Glass Serpent
+            ("monster_152", 30),  # Prism Golem
+            ("monster_153", 25),  # Mirage Spirit
+            ("monster_154", 15),  # Sun-Scorched Wraith
+        ],
+        "night_monsters": [
+            ("monster_153", 40),  # Mirage Spirit (More active at night/twilight)
+            ("monster_154", 30),  # Sun-Scorched Wraith
+            ("monster_151", 30),
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_155",  # The Radiance (Boss)
+                "weight": 5,
+                "min_level": 40,
+            }
+        ],
+        "description": "A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.",
+        "gatherables": [
+            ("prism_shard", 40),
+            ("concentrated_light", 30),
+            ("magic_stone_flawless", 20),
+            ("obsidian_shard", 10),
+        ],
+        "special_events": ["trap_pit", "ancient_shrine"],
+    },
     "guild_arena": {
         "name": "Guild Proving Grounds",
         "emoji": "🏟️",

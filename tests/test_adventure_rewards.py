@@ -162,10 +162,7 @@ class TestAdventureRewards(unittest.TestCase):
 
         # Verify old_exps passed (index 2)
         # We mocked get_stat_exp_row to return 0 for all exp values
-        expected_old_exps = {
-            "str_exp": 0, "end_exp": 0, "dex_exp": 0,
-            "agi_exp": 0, "mag_exp": 0, "lck_exp": 0
-        }
+        expected_old_exps = {"str_exp": 0, "end_exp": 0, "dex_exp": 0, "agi_exp": 0, "mag_exp": 0, "lck_exp": 0}
         self.assertEqual(call_args[2], expected_old_exps)
 
         # Check XP values (indices 4-9 correspond to str, end, dex, agi, mag, lck)

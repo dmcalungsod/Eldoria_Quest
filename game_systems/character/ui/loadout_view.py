@@ -172,7 +172,7 @@ class LoadoutView(View):
         success, msg = self.eq_manager.equip_loadout(self.interaction_user.id, self.selected_loadout)
 
         # Restore button state
-        self._setup_ui() # Resets buttons based on selection
+        self._setup_ui()  # Resets buttons based on selection
         await interaction.edit_original_response(view=self)
 
         await interaction.followup.send(msg, ephemeral=True)
@@ -213,16 +213,11 @@ class LoadoutView(View):
             await interaction.edit_original_response(content=None, view=self)
 
         # Show confirmation view
-        confirm_view = ConfirmDeleteView(
-            self.interaction_user,
-            target_loadout,
-            on_confirm,
-            on_cancel
-        )
+        confirm_view = ConfirmDeleteView(self.interaction_user, target_loadout, on_confirm, on_cancel)
 
         await interaction.response.edit_message(
             content=f"⚠️ **Are you sure you want to delete loadout '{target_loadout}'?**\nThis cannot be undone.",
-            view=confirm_view
+            view=confirm_view,
         )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:

@@ -1,16 +1,16 @@
-
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Mock pymongo modules BEFORE importing database_manager
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
 # Ensure we can import game modules
-sys.path.append('.')
+sys.path.append(".")
 
 from database.database_manager import DatabaseManager  # noqa: E402
+
 
 class TestDBBuffs(unittest.TestCase):
     def setUp(self):
@@ -32,14 +32,7 @@ class TestDBBuffs(unittest.TestCase):
         db._col = MagicMock(return_value=mock_col)
 
         # Call add_active_buff
-        db.add_active_buff(
-            discord_id=123,
-            buff_id="buff1",
-            name="Rage",
-            stat="STR",
-            amount=50,
-            duration_s=60
-        )
+        db.add_active_buff(discord_id=123, buff_id="buff1", name="Rage", stat="STR", amount=50, duration_s=60)
 
         # Verify delete_many was called
         # Note: In database_manager.py:
@@ -49,12 +42,11 @@ class TestDBBuffs(unittest.TestCase):
         db._col.assert_any_call("active_buffs")
 
         # Check calls on the mock_col returned by _col
-        mock_col.delete_many.assert_called_with(
-            {"discord_id": 123, "name": "Rage"}
-        )
+        mock_col.delete_many.assert_called_with({"discord_id": 123, "name": "Rage"})
 
         # Verify insert_one was called
         mock_col.insert_one.assert_called()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

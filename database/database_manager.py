@@ -101,16 +101,18 @@ class DatabaseManager:
         # This prevents stale database records (e.g., missing scaling stats) from breaking logic.
         for key, code_def in SKILL_DEFINITIONS.items():
             if key in self._skill_cache:
-                self._skill_cache[key].update({
-                    "name": code_def.get("name"),
-                    "description": code_def.get("description"),
-                    "scaling_stat": code_def.get("scaling_stat", "MAG"),
-                    "scaling_factor": code_def.get("scaling_factor", 1.0),
-                    "power_multiplier": code_def.get("power_multiplier", 1.0),
-                    "mp_cost": code_def.get("mp_cost", 0),
-                    "heal_power": code_def.get("heal_power", 0),
-                    "buff_data": code_def.get("buff_data"),
-                })
+                self._skill_cache[key].update(
+                    {
+                        "name": code_def.get("name"),
+                        "description": code_def.get("description"),
+                        "scaling_stat": code_def.get("scaling_stat", "MAG"),
+                        "scaling_factor": code_def.get("scaling_factor", 1.0),
+                        "power_multiplier": code_def.get("power_multiplier", 1.0),
+                        "mp_cost": code_def.get("mp_cost", 0),
+                        "heal_power": code_def.get("heal_power", 0),
+                        "buff_data": code_def.get("buff_data"),
+                    }
+                )
 
     def _col(self, name: str):
         """Shorthand to get a collection."""
@@ -668,9 +670,7 @@ class DatabaseManager:
     ):
         """Adds a buff to the player."""
         # Equilibrium Fix: Prevent stacking of same buff name (Refresh instead)
-        self._col("active_buffs").delete_many(
-            {"discord_id": discord_id, "name": name}
-        )
+        self._col("active_buffs").delete_many({"discord_id": discord_id, "name": name})
 
         end_time = (WorldTime.now() + datetime.timedelta(seconds=duration_s)).isoformat()
         self._col("active_buffs").insert_one(

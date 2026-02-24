@@ -20,16 +20,7 @@ class TestCombatBuffScaling(unittest.TestCase):
         # Define distinct base and total stats to test scaling logic
         # Base stats = 100 (original stats)
         # Total stats = 200 (e.g. from gear or existing buffs)
-        self.base_stats = {
-            "STR": 100,
-            "END": 100,
-            "DEX": 100,
-            "AGI": 100,
-            "MAG": 100,
-            "LCK": 100,
-            "HP": 100,
-            "MP": 100
-        }
+        self.base_stats = {"STR": 100, "END": 100, "DEX": 100, "AGI": 100, "MAG": 100, "LCK": 100, "HP": 100, "MP": 100}
 
         self.total_stats = {
             "STR": 200,
@@ -39,7 +30,7 @@ class TestCombatBuffScaling(unittest.TestCase):
             "MAG": 200,
             "LCK": 200,
             "HP": 200,
-            "MP": 200
+            "MP": 200,
         }
 
         # Initialize CombatEngine with explicit stats dicts
@@ -50,7 +41,7 @@ class TestCombatBuffScaling(unittest.TestCase):
             player_mp=100,
             player_class_id=1,
             stats_dict=self.total_stats,
-            base_stats_dict=self.base_stats
+            base_stats_dict=self.base_stats,
         )
 
     def test_percentage_buff_uses_base_stats(self):
@@ -59,13 +50,7 @@ class TestCombatBuffScaling(unittest.TestCase):
         not total stats. This prevents exponential compounding.
         """
         # Skill that grants +50% STR
-        skill = {
-            "name": "Rage",
-            "buff_data": {
-                "STR_percent": 0.5,
-                "duration": 3
-            }
-        }
+        skill = {"name": "Rage", "buff_data": {"STR_percent": 0.5, "duration": 3}}
 
         # Apply the buff logic (directly calling the internal method for unit testing)
         self.engine._apply_skill_buffs(skill)
@@ -78,21 +63,16 @@ class TestCombatBuffScaling(unittest.TestCase):
 
         str_buff = buffs[0]
         self.assertEqual(str_buff["stat"], "STR")
-        self.assertEqual(str_buff["amount"], 50,
-            f"Expected buff amount to be 50 (0.5 * base 100), but got {str_buff['amount']}")
+        self.assertEqual(
+            str_buff["amount"], 50, f"Expected buff amount to be 50 (0.5 * base 100), but got {str_buff['amount']}"
+        )
 
     def test_all_stats_buff_uses_base_stats(self):
         """
         Verify that 'all_stats_percent' buffs calculate based on BASE stats.
         """
         # Skill that grants +10% to all stats
-        skill = {
-            "name": "Limit Break",
-            "buff_data": {
-                "all_stats_percent": 0.1,
-                "duration": 3
-            }
-        }
+        skill = {"name": "Limit Break", "buff_data": {"all_stats_percent": 0.1, "duration": 3}}
 
         self.engine._apply_skill_buffs(skill)
 
@@ -102,23 +82,21 @@ class TestCombatBuffScaling(unittest.TestCase):
 
         for buff in buffs:
             expected_amount = 10  # 10% of base 100
-            self.assertEqual(buff["amount"], expected_amount,
-                f"Expected {buff['stat']} buff amount to be 10, but got {buff['amount']}")
+            self.assertEqual(
+                buff["amount"],
+                expected_amount,
+                f"Expected {buff['stat']} buff amount to be 10, but got {buff['amount']}",
+            )
 
     def test_buff_duration_parsing(self):
         """Verify duration is parsed correctly from skill data."""
-        skill = {
-            "name": "Short Burst",
-            "buff_data": {
-                "STR_percent": 0.1,
-                "duration": 5
-            }
-        }
+        skill = {"name": "Short Burst", "buff_data": {"STR_percent": 0.1, "duration": 5}}
 
         self.engine._apply_skill_buffs(skill)
 
         buff = self.engine.new_buffs[0]
         self.assertEqual(buff["duration"], 5)
+
 
 if __name__ == "__main__":
     unittest.main()

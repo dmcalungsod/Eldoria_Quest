@@ -437,4 +437,23 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1000,
     },
+    # --- The Shimmering Wastes Materials (Rank A) ---
+    "prism_shard": {
+        "name": "Prism Shard",
+        "description": "A sharp, multi-faceted shard that splits light into a rainbow.",
+        "rarity": "Common",
+        "value": 35,
+    },
+    "concentrated_light": {
+        "name": "Concentrated Light",
+        "description": "A vial of blindingly bright liquid mana.",
+        "rarity": "Uncommon",
+        "value": 60,
+    },
+    "glass_heart": {
+        "name": "Glass Heart",
+        "description": "The transparent core of a light-based entity, warm to the touch.",
+        "rarity": "Epic",
+        "value": 1300,
+    },
 }

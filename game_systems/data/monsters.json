@@ -2623,5 +2623,136 @@
             "regenerate"
         ],
         "description": "The central defense mechanism of the Archipelago. It judges intruders with the weight of stars."
+    },
+    "monster_151": {
+        "id": 151,
+        "name": "Glass Serpent",
+        "level": 37,
+        "tier": "Normal",
+        "hp": 2600,
+        "atk": 130,
+        "def": 40,
+        "xp": 4000,
+        "drops": [
+            [
+                "prism_shard",
+                60
+            ],
+            [
+                "magic_stone_large",
+                40
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "rapid_strike"
+        ],
+        "description": "A snake with transparent scales that is nearly invisible until it strikes."
+    },
+    "monster_152": {
+        "id": 152,
+        "name": "Prism Golem",
+        "level": 37,
+        "tier": "Normal",
+        "hp": 3500,
+        "atk": 110,
+        "def": 120,
+        "xp": 4200,
+        "drops": [
+            [
+                "prism_shard",
+                70
+            ],
+            [
+                "obsidian_shard",
+                30
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "prism_beam"
+        ],
+        "description": "A construct of jagged crystal that reflects magic attacks."
+    },
+    "monster_153": {
+        "id": 153,
+        "name": "Mirage Spirit",
+        "level": 36,
+        "tier": "Normal",
+        "hp": 1500,
+        "atk": 140,
+        "def": 20,
+        "xp": 3800,
+        "drops": [
+            [
+                "magic_stone_large",
+                50
+            ],
+            [
+                "concentrated_light",
+                30
+            ]
+        ],
+        "skills": [
+            "ember",
+            "arcane_pulse"
+        ],
+        "description": "A wisp that creates duplicates of itself to confuse prey."
+    },
+    "monster_154": {
+        "id": 154,
+        "name": "Sun-Scorched Wraith",
+        "level": 35,
+        "tier": "Normal",
+        "hp": 2000,
+        "atk": 120,
+        "def": 30,
+        "xp": 3600,
+        "drops": [
+            [
+                "magic_stone_medium",
+                60
+            ],
+            [
+                "concentrated_light",
+                20
+            ]
+        ],
+        "skills": [
+            "flame_breath",
+            "ember"
+        ],
+        "description": "The burning spirit of a traveler who died of thirst and exposure."
+    },
+    "monster_155": {
+        "id": 155,
+        "name": "The Radiance",
+        "level": 39,
+        "tier": "Boss",
+        "hp": 15000,
+        "atk": 190,
+        "def": 110,
+        "xp": 25000,
+        "drops": [
+            [
+                "glass_heart",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                80
+            ],
+            [
+                "prism_shard",
+                100
+            ]
+        ],
+        "skills": [
+            "prism_beam",
+            "flame_breath",
+            "regenerate",
+            "arcane_pulse"
+        ],
+        "description": "A blindingly bright entity of pure light and heat, residing at the peak of the Prism Spire."
     }
 }
