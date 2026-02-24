@@ -13,14 +13,14 @@ class RankSystem:
         "F": {
             "title": "Initiate",
             "next_rank": "E",
-            "requirements": {"quests_completed": 3, "normal_kills": 25},
+            "requirements": {"quests_completed": 3, "normal_kills": 40},
         },
         "E": {
             "title": "Novice",
             "next_rank": "D",
             "requirements": {
                 "quests_completed": 10,
-                "normal_kills": 75,
+                "normal_kills": 120,
                 "elite_kills": 5,
             },
         },
@@ -49,6 +49,7 @@ class RankSystem:
             "next_rank": "A",
             "requirements": {
                 "quests_completed": 40,
+                "normal_kills": 600,
                 "boss_kills": 10,
                 "elite_kills": 65,
             },
@@ -58,6 +59,7 @@ class RankSystem:
             "next_rank": "S",
             "requirements": {
                 "quests_completed": 50,
+                "normal_kills": 800,
                 "boss_kills": 20,
                 "elite_kills": 80,
             },
@@ -67,6 +69,7 @@ class RankSystem:
             "next_rank": "SS",
             "requirements": {
                 "quests_completed": 60,
+                "normal_kills": 1000,
                 "boss_kills": 35,
                 "elite_kills": 120,
             },
@@ -76,6 +79,7 @@ class RankSystem:
             "next_rank": "SSS",
             "requirements": {
                 "quests_completed": 65,
+                "normal_kills": 1500,
                 "boss_kills": 50,
                 "elite_kills": 200,
             },
