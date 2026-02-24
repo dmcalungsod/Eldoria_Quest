@@ -109,7 +109,7 @@ jobs:
             --cov-report=term-missing \
             --cov-report=html \
             --cov-report=xml \
-            --cov-fail-under=60 \
+            --cov-fail-under=70 \
             -v | tee pytest-coverage.txt
 
       - name: Generate Test Summary
