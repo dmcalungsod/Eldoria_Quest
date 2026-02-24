@@ -596,13 +596,13 @@ class AdventureEvents:
     @staticmethod
     def special_event_flavor(event_key: str) -> str:
         if event_key == "safe_room":
-            return random.choice(AdventureEvents.SAFE_ROOM_PHRASES)
+            return random.choice(AdventureEvents.SAFE_ROOM_PHRASES)  # nosec B311
         elif event_key == "hidden_stash":
-            return random.choice(AdventureEvents.HIDDEN_STASH_PHRASES)
+            return random.choice(AdventureEvents.HIDDEN_STASH_PHRASES)  # nosec B311
         elif event_key == "ancient_shrine":
-            return random.choice(AdventureEvents.ANCIENT_SHRINE_PHRASES)
+            return random.choice(AdventureEvents.ANCIENT_SHRINE_PHRASES)  # nosec B311
         elif event_key == "trap_pit":
-            return random.choice(AdventureEvents.TRAP_PHRASES)
+            return random.choice(AdventureEvents.TRAP_PHRASES)  # nosec B311
         return "*A strange event occurs.*"
 
     @staticmethod
