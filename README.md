@@ -17,14 +17,10 @@ Inspired by:
 </p>
 
 <p align="center">
-  <a href="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml">
-    <img src="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml/badge.svg" alt="CI Status"/>
-  </a>
+  <a href="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml"><img src="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml/badge.svg" alt="CI Status"/></a>
   <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white" alt="Python 3.10"/>
   <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white" alt="MongoDB"/>
-  <a href="https://github.com/astral-sh/ruff">
-    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=flat" alt="Ruff"/>
-  </a>
+  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=flat" alt="Ruff"/></a>
 </p>
 
 ---
