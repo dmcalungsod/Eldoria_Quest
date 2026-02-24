@@ -70,22 +70,82 @@ class AdventureResolutionEngine:
 
         logger.info(f"Simulating {steps_remaining} steps for {discord_id} (Total: {total_steps})")
 
+        # OPTIMIZATION: Fetch context ONCE and persist only at the end
+        bundle = self.db.get_combat_context_bundle(discord_id)
+        initial_hp = 0
+        initial_mp = 0
+        max_hp = 100  # Fallback
+        max_mp = 100  # Fallback
+
+        if bundle and "player" in bundle:
+            initial_hp = bundle["player"].get("current_hp", 0)
+            initial_mp = bundle["player"].get("current_mp", 0)
+
+            # Extract Max HP/MP from stats if available for delta calculation
+            # Note: AdventureSession extracts this internally, but we need it for final delta
+            # We can rely on the last result's context if available, or fetch now.
+            # Let's try to extract it from bundle["stats"]
+            if bundle.get("stats"):
+                # Use simple extraction, exact logic matches PlayerStats defaults
+                max_hp = bundle["stats"].get("HP", 100)
+                max_mp = bundle["stats"].get("MP", 100)
+
+        final_vitals = None
+
         # 3. Simulation Loop
         for _ in range(steps_remaining):
-            result = session.simulate_step(background=True)
+            # Pass bundle and persist=False to avoid DB writes per step
+            result = session.simulate_step(context_bundle=bundle, background=True, persist=False)
 
             # Increment step counter
             session.steps_completed += 1
-
-            # Save intermediate state (logs, loot, vitals, step count)
-            session.save_state()
+            final_vitals = result.get("vitals")
 
             if result.get("dead", False):
                 logger.info(f"Player {discord_id} died during simulation step {session.steps_completed}.")
+
+                # Save state immediately on death
+                session.save_state()
+
+                # Apply Vital Updates (Dead)
+                if final_vitals:
+                    current_hp = final_vitals.get("current_hp", 0)
+                    current_mp = final_vitals.get("current_mp", 0)
+
+                    # Update Max HP from player_stats if available
+                    if result.get("player_stats"):
+                        p_stats = result["player_stats"]
+                        max_hp = p_stats.max_hp
+                        max_mp = p_stats.max_mp
+
+                    delta_hp = current_hp - initial_hp
+                    delta_mp = current_mp - initial_mp
+                    if delta_hp != 0 or delta_mp != 0:
+                        self.db.update_player_vitals_delta(discord_id, delta_hp, delta_mp, max_hp, max_mp)
+
                 self._handle_death(discord_id, session)
                 return True
 
         # 4. Finalize Success
+        # Save state ONCE at the end
+        session.save_state()
+
+        # Apply Vital Updates (Final)
+        if final_vitals:
+            current_hp = final_vitals.get("current_hp", initial_hp)
+            current_mp = final_vitals.get("current_mp", initial_mp)
+
+            # Check for PlayerStats in result to get accurate Max HP/MP (handling buffs)
+            if result.get("player_stats"):
+                p_stats = result["player_stats"]
+                max_hp = p_stats.max_hp
+                max_mp = p_stats.max_mp
+
+            delta_hp = current_hp - initial_hp
+            delta_mp = current_mp - initial_mp
+            if delta_hp != 0 or delta_mp != 0:
+                self.db.update_player_vitals_delta(discord_id, delta_hp, delta_mp, max_hp, max_mp)
+
         self._mark_complete(discord_id)
         return True
 

@@ -184,7 +184,11 @@ class AdventureSession:
             return False
 
     def simulate_step(
-        self, context_bundle: dict | None = None, action: str = None, background: bool = False
+        self,
+        context_bundle: dict | None = None,
+        action: str = None,
+        background: bool = False,
+        persist: bool = True,
     ) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
@@ -209,19 +213,20 @@ class AdventureSession:
                     self.active_monster["player_stance"] = stance
                     msg = f"You shift into an **{stance.capitalize()}** stance!"
                     self.logs.append(msg)
-                    self.save_state()
+                    if persist:
+                        self.save_state()
                     # Return immediate result to update UI without processing turn
                     # We wrap the msg in a list to match sequence format [[msg]]
                     return self._build_result([[msg]], False, context)
 
                 if action == "flee":
-                    return self._attempt_flee(context)
+                    return self._attempt_flee(context, persist=persist)
 
                 if action == "defend":
-                    return self._process_combat_turn(context, action="defend")
+                    return self._process_combat_turn(context, action="defend", persist=persist)
 
                 if action == "special_ability":
-                    return self._process_combat_turn(context, action="special_ability")
+                    return self._process_combat_turn(context, action="special_ability", persist=persist)
 
                 should_auto = self._check_auto_condition(context)
 
@@ -237,17 +242,17 @@ class AdventureSession:
 
                         if (current_hp / max_hp) < 0.30:
                             # Auto-Flee logic
-                            return self._attempt_flee(context)
+                            return self._attempt_flee(context, persist=persist)
 
-                    return self._resolve_auto_combat(context, background=True)
+                    return self._resolve_auto_combat(context, background=True, persist=persist)
 
                 # If explicit attack or implicit auto, and eligible -> Auto
                 if (action == "attack" or not action) and should_auto:
-                    return self._resolve_auto_combat(context)
+                    return self._resolve_auto_combat(context, persist=persist)
 
                 # Otherwise manual single turn
                 final_action = action if action else "attack"
-                return self._process_combat_turn(context, action=final_action)
+                return self._process_combat_turn(context, action=final_action, persist=persist)
 
             # --- Weather & Time System Check ---
             weather = WorldTime.get_current_weather(self.location_id)
@@ -299,20 +304,23 @@ class AdventureSession:
                         max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
                         max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
 
-                        self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
+                        if persist:
+                            self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
                         phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
                     # Start new combat
                     self.active_monster = monster
                     self.logs.append(phrase)
-                    self.save_state()
+                    if persist:
+                        self.save_state()
                     return self._build_result([[phrase]], False, context)
 
                 # Location has no monster this tick
                 msg = phrase or "The path is clear for now."
                 self.logs.append(msg)
-                self.save_state()
+                if persist:
+                    self.save_state()
                 return self._build_result([[msg]], False, context)
 
             # --- 3. Non-Combat Event ---
@@ -333,7 +341,8 @@ class AdventureSession:
                 for item_key, amount in result["loot"].items():
                     self.loot[item_key] = self.loot.get(item_key, 0) + amount
 
-            self.save_state()
+            if persist:
+                self.save_state()
 
             # Event handler might have updated vitals (e.g. regeneration)
             # Ensure context reflects this for return
@@ -350,7 +359,7 @@ class AdventureSession:
                 None,
             )
 
-    def _attempt_flee(self, context: dict[str, Any]) -> dict[str, Any]:
+    def _attempt_flee(self, context: dict[str, Any], persist: bool = True) -> dict[str, Any]:
         """
         Calculates flee chance based on Agility vs Monster Level.
         """
@@ -374,18 +383,24 @@ class AdventureSession:
             self.active_monster = None
             msg = [f"🏃 **You fled!** (Chance: {chance}%) - You escape into the shadows."]
             self.logs.extend(msg)
-            self.save_state()
+            if persist:
+                self.save_state()
             return self._build_result([msg], False, context)
         else:
             # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
             fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
-            return self._process_combat_turn(context, action="flee_failed", prepend_logs=[fail_msg])
+            return self._process_combat_turn(context, action="flee_failed", prepend_logs=[fail_msg], persist=persist)
 
     # ======================================================================
     # AUTO COMBAT SEQUENCE
     # ======================================================================
 
-    def _resolve_auto_combat(self, context: dict[str, Any] | None = None, background: bool = False) -> dict[str, Any]:
+    def _resolve_auto_combat(
+        self,
+        context: dict[str, Any] | None = None,
+        background: bool = False,
+        persist: bool = True,
+    ) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
         """
@@ -487,10 +502,11 @@ class AdventureSession:
         for frame in sequence:
             self.logs.extend(frame)
 
-        self.save_state()
+        if persist:
+            self.save_state()
 
-        # Update vitals only after successful save
-        self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
+            # Update vitals only after successful save
+            self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
         return self._build_result(sequence, is_dead, context)
 
@@ -503,6 +519,7 @@ class AdventureSession:
         context: dict[str, Any] | None = None,
         action: str = "attack",
         prepend_logs: list = None,
+        persist: bool = True,
     ) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
@@ -561,23 +578,25 @@ class AdventureSession:
             turn_logs.extend(reward_texts)
 
         self.logs.extend(turn_logs)
-        self.save_state()
 
-        # Update vitals only after successful save
-        if context:
-            final_hp = context["vitals"]["current_hp"]
-            final_mp = context["vitals"]["current_mp"]
-            delta_hp = final_hp - initial_hp
-            delta_mp = final_mp - initial_mp
+        if persist:
+            self.save_state()
 
-            # Get max stats safely
-            player_stats = context["player_stats"]
-            stats_dict = context.get("stats_dict")
-            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
-            max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
+            # Update vitals only after successful save
+            if context:
+                final_hp = context["vitals"]["current_hp"]
+                final_mp = context["vitals"]["current_mp"]
+                delta_hp = final_hp - initial_hp
+                delta_mp = final_mp - initial_mp
 
-            if delta_hp != 0 or delta_mp != 0:
-                self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
+                # Get max stats safely
+                player_stats = context["player_stats"]
+                stats_dict = context.get("stats_dict")
+                max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
+                max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
+
+                if delta_hp != 0 or delta_mp != 0:
+                    self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
         return self._build_result([turn_logs], is_dead, context)
 
