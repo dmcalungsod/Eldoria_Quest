@@ -10,7 +10,7 @@ import json
 import logging
 
 from database.database_manager import DatabaseManager
-from game_systems.achievement_system import AchievementSystem
+from game_systems.player.achievement_system import AchievementSystem
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
@@ -19,7 +19,7 @@ from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 from .adventure_session import AdventureSession
 

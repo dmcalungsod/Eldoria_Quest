@@ -14,7 +14,7 @@ from discord.ui import Button, View
 import game_systems.data.emojis as E
 
 # Modular imports
-from cogs.ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
+from cogs.utils.ui_helpers import back_to_guild_hall_callback, back_to_profile_callback
 from database.database_manager import DatabaseManager
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
 from game_systems.adventure.ui.setup_view import AdventureSetupView

@@ -27,7 +27,7 @@ class TestAdventureEmbeds(unittest.TestCase):
         mock_ui_helpers = MagicMock()
         mock_ui_helpers.make_progress_bar.return_value = "[|||||]"
         mock_ui_helpers.get_health_status_emoji.return_value = "💚"
-        sys.modules["cogs.ui_helpers"] = mock_ui_helpers
+        sys.modules["cogs.utils.ui_helpers"] = mock_ui_helpers
 
         # Mock Pymongo
         sys.modules["pymongo"] = MagicMock()

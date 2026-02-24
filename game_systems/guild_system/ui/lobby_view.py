@@ -9,7 +9,7 @@ import asyncio
 import discord
 from discord.ui import View
 
-from cogs.ui_helpers import back_to_profile_callback
+from cogs.utils.ui_helpers import back_to_profile_callback
 from database.database_manager import DatabaseManager
 from game_systems.guild_system.advisor import GuildAdvisor
 

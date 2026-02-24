@@ -18,7 +18,7 @@ except ImportError:
 import unittest
 
 from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.world_time import TimePhase, Weather
+from game_systems.core.world_time import TimePhase, Weather
 
 
 class TestAdventureDayNight(unittest.TestCase):

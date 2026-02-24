@@ -16,10 +16,10 @@ from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.achievement_system import AchievementSystem
+from game_systems.player.achievement_system import AchievementSystem
 from game_systems.data.skills_data import SKILLS
 
-from .ui_helpers import back_to_guild_hall_callback
+from .utils.ui_helpers import back_to_guild_hall_callback
 
 logger = logging.getLogger("eldoria.ui.trainer")
 

@@ -51,7 +51,7 @@ class TestEventScheduling(unittest.TestCase):
         sys.modules["game_systems.data.emojis"] = mock_gs.data.emojis
 
         mock_wt_module = MagicMock()
-        sys.modules["game_systems.world_time"] = mock_wt_module
+        sys.modules["game_systems.core.world_time"] = mock_wt_module
 
         mock_wes_module = MagicMock()
         sys.modules["game_systems.events.world_event_system"] = mock_wes_module
@@ -84,7 +84,7 @@ class TestEventScheduling(unittest.TestCase):
             "mystic_merchant": {"name": "The Mystic Merchant", "description": "Test Description"}
         }
 
-    @patch("game_systems.world_time.WorldTime")
+    @patch("game_systems.core.world_time.WorldTime")
     @patch("random.random")
     def test_mystic_merchant_starts_on_roll(self, mock_random, mock_world_time):
         # 1. Setup
@@ -102,7 +102,7 @@ class TestEventScheduling(unittest.TestCase):
         args, _ = self.cog._announce.call_args
         self.assertIn("Mystic", args[0])
 
-    @patch("game_systems.world_time.WorldTime")
+    @patch("game_systems.core.world_time.WorldTime")
     @patch("random.random")
     def test_mystic_merchant_does_not_start_on_fail(self, mock_random, mock_world_time):
         self.cog.system.get_current_event.return_value = None
@@ -113,7 +113,7 @@ class TestEventScheduling(unittest.TestCase):
 
         self.cog.system.start_event.assert_not_called()
 
-    @patch("game_systems.world_time.WorldTime")
+    @patch("game_systems.core.world_time.WorldTime")
     @patch("random.random")
     def test_no_event_start_if_active(self, mock_random, mock_world_time):
         self.cog.system.get_current_event.return_value = {"type": "blood_moon"}

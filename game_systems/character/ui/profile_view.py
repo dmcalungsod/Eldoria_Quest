@@ -13,7 +13,7 @@ import discord
 from discord.ui import Button, View
 
 # Helper imports (careful: avoid circular dependencies)
-import cogs.ui_helpers as ui_helpers
+import cogs.utils.ui_helpers as ui_helpers
 import game_systems.data.emojis as E
 from cogs.status_update_cog import StatusUpdateView
 from database.database_manager import DatabaseManager

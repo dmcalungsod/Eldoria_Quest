@@ -12,7 +12,7 @@ import discord
 from discord.ui import Button, View
 
 import game_systems.data.emojis as E
-from cogs.ui_helpers import back_to_guild_hall_callback
+from cogs.utils.ui_helpers import back_to_guild_hall_callback
 from database.database_manager import DatabaseManager
 from game_systems.data.shop_data import MYSTIC_MERCHANT_INVENTORY
 from game_systems.events.world_event_system import WorldEventSystem

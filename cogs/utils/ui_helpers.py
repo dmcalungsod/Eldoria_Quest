@@ -1,5 +1,5 @@
 """
-cogs/ui_helpers.py
+cogs.utils.ui_helpers.py
 
 Shared UI components and navigation callbacks.
 Hardened: Async data fetching.

@@ -95,7 +95,7 @@ mock_ui.Item = object
 
 # Actually, to prevent pollution, we should NOT set sys.modules['cogs'] = MagicMock() globally
 # if we can avoid it.
-# However, if ExplorationView imports cogs.ui_helpers, and we want to mock it...
+# However, if ExplorationView imports cogs.utils.ui_helpers, and we want to mock it...
 
 # Strategy: Use unittest.mock.patch.dict on sys.modules context manager around the import?
 # No, the import persists.
@@ -111,8 +111,8 @@ mock_ui.Item = object
 # mock_cogs.__path__ = []
 
 # But better: Just Don't Mock 'cogs' globally if it exists!
-# The code imports `cogs.ui_helpers`.
-# Let's mock `cogs.ui_helpers` specifically, NOT `cogs`.
+# The code imports `cogs.utils.ui_helpers`.
+# Let's mock `cogs.utils.ui_helpers` specifically, NOT `cogs`.
 
 # We defer imports to setUp to avoid global sys.modules pollution
 # from game_systems.adventure.ui.exploration_view import ExplorationView
@@ -129,7 +129,7 @@ class TestExplorationFeedback(unittest.IsolatedAsyncioTestCase):
                 "discord.ui": mock_ui,
                 "pymongo": MagicMock(),
                 "pymongo.errors": MagicMock(),
-                "cogs.ui_helpers": MagicMock(),
+                "cogs.utils.ui_helpers": MagicMock(),
                 "game_systems.adventure.ui.adventure_embeds": MagicMock(),
             },
         )

@@ -11,7 +11,7 @@ import logging
 import discord
 from discord.ui import Button, View
 
-from cogs.ui_helpers import back_to_profile_callback
+from cogs.utils.ui_helpers import back_to_profile_callback
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
 
 logger = logging.getLogger("eldoria.ui.status_view")

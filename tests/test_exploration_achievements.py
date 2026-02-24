@@ -12,7 +12,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.results"] = MagicMock()
 
-from game_systems.achievement_system import AchievementSystem  # noqa: E402
+from game_systems.player.achievement_system import AchievementSystem  # noqa: E402
 from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 
 

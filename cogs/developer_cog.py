@@ -18,7 +18,7 @@ from discord.ui import Button, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
-from game_systems.world_time import WorldTime
+from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.admin")
 

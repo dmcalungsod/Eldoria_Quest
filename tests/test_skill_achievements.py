@@ -25,7 +25,7 @@ class TestSkillAchievements(unittest.TestCase):
         self.mock_db_module.DatabaseManager = MagicMock()
 
         # Import System Under Test inside setUp to use patched modules
-        from game_systems.achievement_system import AchievementSystem
+        from game_systems.player.achievement_system import AchievementSystem
 
         self.AchievementSystem = AchievementSystem
         self.mock_db = MagicMock()

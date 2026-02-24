@@ -31,12 +31,12 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
 
         importlib.reload(database.database_manager)
 
-        # We need to ensure cogs.ui_helpers is loaded/reloaded with mocked discord
-        import cogs.ui_helpers
+        # We need to ensure cogs.utils.ui_helpers is loaded/reloaded with mocked discord
+        import cogs.utils.ui_helpers
 
-        importlib.reload(cogs.ui_helpers)
+        importlib.reload(cogs.utils.ui_helpers)
 
-        self.get_player_or_error = cogs.ui_helpers.get_player_or_error
+        self.get_player_or_error = cogs.utils.ui_helpers.get_player_or_error
         self.DatabaseManager = database.database_manager.DatabaseManager
 
         self.mock_db = MagicMock(spec=self.DatabaseManager)

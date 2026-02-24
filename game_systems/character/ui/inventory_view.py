@@ -12,7 +12,7 @@ import logging
 import discord
 from discord.ui import Button, Select, View
 
-from cogs.ui_helpers import build_inventory_embed
+from cogs.utils.ui_helpers import build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.data.class_data import CLASSES
 from game_systems.data.equipments import EQUIPMENT_DATA

@@ -17,7 +17,7 @@ import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.player.player_stats import PlayerStats
 
-from .ui_helpers import back_to_guild_hall_callback, make_progress_bar
+from .utils.ui_helpers import back_to_guild_hall_callback, make_progress_bar
 
 logger = logging.getLogger("eldoria.infirmary")
 
