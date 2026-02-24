@@ -1,0 +1,21 @@
+name: Auto-assign Issues to Jules
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'auto-generated')
+    steps:
+      - name: Assign to Jules
+        run: |
+          gh issue edit ${{ github.event.issue.number }} \
+            --add-assignee "google-labs-jules" \
+            --repo ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
