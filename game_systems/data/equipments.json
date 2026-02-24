@@ -354,6 +354,50 @@
         },
         "description": "A pulsating magma core set in gold. It beats in time with your heart."
     },
+    "gen_bow_clockwork": {
+        "name": "Clockwork Repeating Crossbow",
+        "slot": "bow",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "DEX": 35,
+            "AGI": 15
+        },
+        "description": "A mechanical crossbow with a self-loading mechanism."
+    },
+    "gen_mace_clockwork": {
+        "name": "Piston-Driven Greatmaul",
+        "slot": "mace",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "STR": 40,
+            "END": 10
+        },
+        "description": "A massive hammer powered by a steam piston."
+    },
+    "gen_heavyarmor_clockwork": {
+        "name": "Reinforced Brass Plate",
+        "slot": "heavy_armor",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "END": 45,
+            "STR": 5
+        },
+        "description": "Heavy brass plating riveted over steel."
+    },
+    "gen_accessory_clockwork": {
+        "name": "Artificer's Lenses",
+        "slot": "accessory",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "MAG": 15,
+            "DEX": 15
+        },
+        "description": "Goggles that reveal the flow of magic and mechanism."
+    },
     "acc_warrior_ring": {
         "name": "Ring of Iron Will",
         "slot": "accessory",
