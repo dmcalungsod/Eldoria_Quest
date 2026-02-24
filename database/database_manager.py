@@ -166,6 +166,7 @@ class DatabaseManager:
                 "active_title": None,
                 "crafting_level": 1,
                 "crafting_xp": 0,
+                "last_regen_time": WorldTime.now().isoformat(),
             }
         )
         self._col("stats").insert_one(
@@ -422,6 +423,104 @@ class DatabaseManager:
             {"discord_id": discord_id},
             {"$set": {"current_hp": hp, "current_mp": mp}},
         )
+
+    def apply_passive_regen(self, discord_id: int) -> tuple[int, int]:
+        """
+        Calculates and applies passive HP/MP regeneration based on time elapsed.
+        Rate: 5% Max HP per hour, 10% Max MP per hour.
+        Updates last_regen_time to now.
+        """
+        # Avoid circular import
+        from game_systems.player.player_stats import PlayerStats
+
+        now = WorldTime.now()
+
+        # 1. Fetch current state
+        player = self._col("players").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "current_hp": 1, "current_mp": 1, "last_regen_time": 1},
+        )
+        if not player:
+            return 0, 0
+
+        # Migration: If last_regen_time is missing, set to now and return (no free heal on first run)
+        if "last_regen_time" not in player:
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$set": {"last_regen_time": now.isoformat()}},
+            )
+            return 0, 0
+
+        last_regen_str = player["last_regen_time"]
+        try:
+            last_regen = datetime.datetime.fromisoformat(last_regen_str)
+        except ValueError:
+            # Corrupted time, reset
+            self._col("players").update_one(
+                {"discord_id": discord_id},
+                {"$set": {"last_regen_time": now.isoformat()}},
+            )
+            return 0, 0
+
+        # Calculate elapsed hours
+        elapsed_seconds = (now - last_regen).total_seconds()
+        elapsed_hours = elapsed_seconds / 3600.0
+
+        # Minimum threshold: 1 minute (1/60 hours) to avoid micro-updates
+        if elapsed_hours < (1.0 / 60.0):
+            return 0, 0
+
+        # 2. Fetch Max Stats
+        stats_json = self.get_player_stats_json(discord_id)
+        if not stats_json:
+            return 0, 0
+
+        try:
+            stats = PlayerStats.from_dict(stats_json)
+            max_hp = stats.max_hp
+            max_mp = stats.max_mp
+        except Exception as e:
+            logger.error(f"Error calculating max stats for regen {discord_id}: {e}")
+            return 0, 0
+
+        # 3. Calculate Regeneration
+        # 5% HP per hour, 10% MP per hour
+        hp_regen_amount = int(max_hp * 0.05 * elapsed_hours)
+        mp_regen_amount = int(max_mp * 0.10 * elapsed_hours)
+
+        # Bug Fix: Do NOT update time if gain is 0. This allows time to accumulate.
+        if hp_regen_amount <= 0 and mp_regen_amount <= 0:
+            return 0, 0
+
+        current_hp = player.get("current_hp", 0)
+        current_mp = player.get("current_mp", 0)
+
+        # Clamp to Max
+        new_hp = min(max_hp, current_hp + hp_regen_amount)
+        new_mp = min(max_mp, current_mp + mp_regen_amount)
+
+        actual_hp_gain = new_hp - current_hp
+        actual_mp_gain = new_mp - current_mp
+
+        # 4. Atomic Update
+        # Only update if there's a change or to advance time
+        self._col("players").update_one(
+            {"discord_id": discord_id},
+            {
+                "$set": {
+                    "current_hp": new_hp,
+                    "current_mp": new_mp,
+                    "last_regen_time": now.isoformat(),
+                }
+            },
+        )
+
+        if actual_hp_gain > 0 or actual_mp_gain > 0:
+            logger.info(
+                f"Passive Regen for {discord_id}: +{actual_hp_gain} HP, +{actual_mp_gain} MP ({elapsed_hours:.2f}h)"
+            )
+
+        return actual_hp_gain, actual_mp_gain
 
     def update_player_vitals_delta(self, discord_id: int, hp_delta: int, mp_delta: int, max_hp: int, max_mp: int):
         """
