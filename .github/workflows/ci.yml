@@ -103,9 +103,24 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Audit Dependencies for CVEs
+        id: cve_audit
+        continue-on-error: true
         run: |
           pip install pip-audit
-          pip-audit -r requirements.txt --progress-spinner off || true
+          pip-audit -r requirements.txt --progress-spinner off
+
+      - name: CVE Audit Result
+        if: always()
+        run: |
+          echo "### 🔐 CVE Audit" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.cve_audit.outcome }}" == "success" ]; then
+            echo "✅ No known CVEs found in dependencies." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.cve_audit.outcome }}" == "skipped" ]; then
+            echo "⚠️ CVE audit was skipped." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ CVE audit found potential vulnerabilities. Review the logs above." >> $GITHUB_STEP_SUMMARY
+            echo "This is non-blocking but should be reviewed before merging." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Run Eldoria Test Suite
         env:
