@@ -1,0 +1,17 @@
+| Location                  | Rank | Lvl | Aurum/Hr   | Mat Val/Hr | Total/Hr   |
+|---------------------------|------|-----|------------|------------|------------|
+| Willowcreek Outskirts     | F    | 1   | 13.2       | 26.5       | 39.6       |
+| Whispering Thicket        | E    | 5   | 26.6       | 36.5       | 63.1       |
+| Deepgrove Roots           | D    | 10  | 244.5      | 444.6      | 689.1      |
+| The Ashlands              | D    | 12  | 136.1      | 78.0       | 214.1      |
+| The Shrouded Fen          | C    | 15  | 108.9      | 43.6       | 152.6      |
+| The Sunken Grotto         | C    | 18  | 193.2      | 108.9      | 302.1      |
+| The Crystal Caverns       | B    | 20  | 215.0      | 200.0      | 415.0      |
+| The Clockwork Halls       | B    | 22  | 227.0      | 83.6       | 310.6      |
+| The Forgotten Ossuary     | B    | 24  | 236.4      | 160.2      | 396.7      |
+| The Frostfall Expanse     | A    | 25  | 265.9      | 268.8      | 534.7      |
+| The Celestial Archipelago | B    | 28  | 281.9      | 148.0      | 429.9      |
+| The Molten Caldera        | A    | 30  | 316.8      | 359.8      | 676.6      |
+| Gale-Scarred Heights      | A    | 35  | 518.8      | 249.9      | 768.7      |
+| The Shimmering Wastes     | A    | 37  | 266.6      | 295.6      | 562.2      |
+| The Void Sanctum          | S    | 40  | 416.8      | 358.0      | 774.8      |
