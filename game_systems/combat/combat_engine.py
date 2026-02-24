@@ -11,6 +11,8 @@ import random
 
 import game_systems.data.emojis as E
 
+from game_systems.core.world_time import TimePhase, Weather
+
 from ..monsters.monster_actions import MonsterAI
 from ..player.player_stats import calculate_tiered_bonus
 from ..rewards.aurum_calculator import AurumCalculator
@@ -88,6 +90,8 @@ class CombatEngine:
         action: str = "auto",
         player_stance: str = "balanced",
         monster_dmg_mult: float = 1.0,
+        weather: Weather = Weather.CLEAR,
+        time_phase: TimePhase = TimePhase.DAY,
     ):
         """
         player → LevelUpSystem wrapper (with stats + current HP)
@@ -101,6 +105,8 @@ class CombatEngine:
         base_stats_dict → Cached dictionary of BASE stats (for buff calculation)
         action -> Combat action ("attack", "defend", "flee_failed", "special_ability", "auto")
         player_stance -> "aggressive", "balanced", or "defensive"
+        weather -> The current weather condition (modifies damage/mechanics)
+        time_phase -> The current time of day
         """
         self.player = player
         self.monster = monster
@@ -135,6 +141,10 @@ class CombatEngine:
 
         # Fatigue / Monster Buff Logic
         self.monster_dmg_mult = monster_dmg_mult
+
+        # Weather & Time Logic
+        self.weather = weather
+        self.time_phase = time_phase
 
         # Stance Logic
         self.player_stance = player_stance
@@ -253,7 +263,10 @@ class CombatEngine:
             }
 
     def _handle_start_of_turn(self, log: list):
-        """Processes start-of-turn effects (buffs, debuffs)."""
+        """Processes start-of-turn effects (buffs, debuffs, weather)."""
+        # Weather Events
+        self._handle_weather_events(log)
+
         # Process Buffs
         buff_msgs = MonsterAI.handle_buffs(self.monster)
         if buff_msgs:
@@ -263,6 +276,96 @@ class CombatEngine:
         debuff_msgs = self._process_monster_debuffs()
         if debuff_msgs:
             log.extend(debuff_msgs)
+
+    def _handle_weather_events(self, log: list):
+        """
+        Processes start-of-turn weather effects (e.g., Storm lightning, Ash Storm damage).
+        """
+        if self.weather == Weather.STORM:
+            # 15% Chance for random lightning strike
+            if random.random() < 0.15:
+                # 50/50 to hit Player or Monster
+                target_is_player = random.choice([True, False])
+                dmg = max(10, int(self.stats_dict.get("HP", 100) * 0.05)) if target_is_player else max(10, int(self.monster.get("max_hp", 100) * 0.05))
+
+                if target_is_player:
+                    self.player_hp = max(0, self.player_hp - dmg)
+                    log.append(f"⚡ **STORM:** A lightning bolt strikes YOU for `{dmg}` damage!")
+                else:
+                    self.monster_hp = max(0, self.monster_hp - dmg)
+                    log.append(
+                        f"⚡ **STORM:** A lightning bolt strikes the **{self.monster.get('name', 'Enemy')}** for `{dmg}` damage!"
+                    )
+
+        elif self.weather == Weather.ASH:
+            # Ash Storm: 2% Max HP damage to Player (Choking Ash)
+            dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.02))
+            self.player_hp = max(0, self.player_hp - dmg)
+            log.append(f"🌋 **ASH:** The choking ash burns your lungs! (`{dmg}` dmg)")
+
+    def _detect_element(self, skill: dict) -> str:
+        """Determines the elemental type of a skill."""
+        if not skill:
+            return "physical"
+
+        # Explicit Type
+        s_type = skill.get("type", "").lower()
+        if s_type in ["fire", "ice", "lightning", "water", "wind", "earth", "dark", "holy"]:
+            return s_type
+
+        # Name/Emoji Detection
+        name = skill.get("name", "").lower()
+        emoji = skill.get("emoji", "")
+
+        if "fire" in name or "flame" in name or "burn" in name or emoji == "🔥":
+            return "fire"
+        if "ice" in name or "frost" in name or "freeze" in name or emoji == "❄️":
+            return "ice"
+        if "lightning" in name or "thunder" in name or "shock" in name or emoji == "⚡":
+            return "lightning"
+        if "water" in name or "hydro" in name or emoji == "💧":
+            return "water"
+        if "wind" in name or "gale" in name or emoji == "🌬️":
+            return "wind"
+        if "earth" in name or "rock" in name or emoji == "🪨":
+            return "earth"
+        if "dark" in name or "shadow" in name or emoji == "🌑":
+            return "dark"
+        if "holy" in name or "light" in name or emoji == "✨":
+            return "holy"
+
+        return "physical"
+
+    def _apply_weather_modifiers(self, dmg: int, element: str) -> int:
+        """
+        Applies weather-based damage multipliers.
+        """
+        if self.weather == Weather.RAIN:
+            if element == "fire":
+                return int(dmg * 0.8)
+            if element == "lightning":
+                return int(dmg * 1.2)
+
+        elif self.weather == Weather.FOG:
+            # Glancing Blows: -10% Damage
+            return int(dmg * 0.9)
+
+        elif self.weather == Weather.SNOW:
+            if element == "ice":
+                return int(dmg * 1.2)
+            if element == "fire":
+                return int(dmg * 0.9)
+
+        elif self.weather == Weather.ASH:
+            if element == "fire":
+                return int(dmg * 1.1)
+
+        elif self.weather == Weather.STORM:
+            # High winds affect physical ranged (DEX) if implemented,
+            # but element is usually "physical". We might need skill scaling stat.
+            pass
+
+        return dmg
 
     def _process_player_turn(self, log, turn_report, bonus_crit, player_defending) -> tuple[bool, bool]:
         """
@@ -338,6 +441,9 @@ class CombatEngine:
             if self.monster_dmg_mult != 1.0:
                 dmg = int(dmg * self.monster_dmg_mult)
 
+            # Apply Weather Modifiers
+            dmg = self._apply_weather_modifiers(dmg, "physical")
+
             # Apply Stance Multiplier
             if self.dmg_taken_mult != 1.0:
                 dmg = int(dmg * self.dmg_taken_mult)
@@ -377,6 +483,10 @@ class CombatEngine:
                 # Apply Fatigue / Monster Buff Multiplier
                 if self.monster_dmg_mult != 1.0:
                     dmg = int(dmg * self.monster_dmg_mult)
+
+                # Apply Weather Modifiers
+                element = self._detect_element(skill)
+                dmg = self._apply_weather_modifiers(dmg, element)
 
                 # Apply Stance Multiplier
                 if self.dmg_taken_mult != 1.0:
@@ -422,6 +532,10 @@ class CombatEngine:
             # Apply Fatigue / Monster Buff Multiplier
             if self.monster_dmg_mult != 1.0:
                 dmg = int(dmg * self.monster_dmg_mult)
+
+            # Apply Weather Modifiers
+            element = self._detect_element(skill)
+            dmg = self._apply_weather_modifiers(dmg, element)
 
             # Apply Stance Multiplier
             if self.dmg_taken_mult != 1.0:
@@ -538,6 +652,10 @@ class CombatEngine:
         # Apply Multiplier
         dmg = int(base_dmg * spec["damage_mult"])
 
+        # Apply Weather Modifiers
+        element = self._detect_element(spec)
+        dmg = self._apply_weather_modifiers(dmg, element)
+
         # Apply Stance Multiplier
         if self.dmg_dealt_mult != 1.0:
             dmg = int(dmg * self.dmg_dealt_mult)
@@ -611,6 +729,10 @@ class CombatEngine:
                 crit = True
                 event_type = "crit"
                 dmg = int(dmg * 1.5)
+
+            # Apply Weather Modifiers
+            element = self._detect_element(skill)
+            dmg = self._apply_weather_modifiers(dmg, element)
 
             # Apply Stance Multiplier
             if self.dmg_dealt_mult != 1.0:
@@ -756,6 +878,9 @@ class CombatEngine:
             crit = True
             event_type = "crit"
             dmg = int(dmg * 1.5)
+
+        # Apply Weather Modifiers (Basic attacks are physical)
+        dmg = self._apply_weather_modifiers(dmg, "physical")
 
         # Apply Stance Multiplier
         if self.dmg_dealt_mult != 1.0:
