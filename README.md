@@ -18,7 +18,7 @@ Inspired by:
 
 <p align="center">
   <a href="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/dmcalungsod/Eldoria_Quest/ci.yml?branch=main&label=CI&style=for-the-badge" alt="CI Status"/>
+    <img src="https://github.com/dmcalungsod/Eldoria_Quest/actions/workflows/ci.yml/badge.svg" alt="CI Status"/>
   </a>
   <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10"/>
   <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/>
