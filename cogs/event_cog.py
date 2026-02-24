@@ -7,6 +7,7 @@ Handles scheduling, commands, and announcements for global events like "The Bloo
 
 import datetime
 import logging
+import random
 
 import discord
 from discord import app_commands
@@ -61,6 +62,19 @@ class EventCog(commands.Cog):
                             f"Gathering yields are doubled for the next week! 🌾"
                         )
                         logger.info("Auto-started Harvest Festival.")
+
+                # Mystic Merchant: Random Chance (2%)
+                elif random.random() < 0.02:
+                    success = self.system.start_event(WorldEventSystem.MYSTIC_MERCHANT, 24)
+                    if success:
+                        config = self.system.EVENT_CONFIGS[WorldEventSystem.MYSTIC_MERCHANT]
+                        await self._announce(
+                            f"🔮 **THE MYSTIC MERCHANT ARRIVES!** 🔮\n\n"
+                            f"**{config['name']}**\n"
+                            f"{config['description']}\n\n"
+                            f"Visit the **Guild Services** menu to find the **Mystic Merchant**! 🪙"
+                        )
+                        logger.info("Auto-started Mystic Merchant.")
 
         except Exception as e:
             logger.error(f"Error in event cycle: {e}", exc_info=True)
