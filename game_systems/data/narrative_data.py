@@ -24,6 +24,12 @@ MISSION_FLAVOR_TEXT = {
         "Ancient roots uncoil from your memory as the city gates come into view. You have walked where few dare.",
         "The tangled undergrowth is behind you now, but the smell of damp earth lingers on your gear.",
     ],
+    "the_ashlands": [
+        "Your lungs burn with the memory of sulfur and smoke. The clean air of the city is a balm.",
+        "Grey dust coats every inch of your gear. The Ashlands are behind you, but their desolation lingers in your mind.",
+        "You shake the volcanic grit from your cloak. Survival in the wastes is no small feat.",
+        "The heat of the dormant volcano fades, replaced by the cool breeze of civilized lands.",
+    ],
     "shrouded_fen": [
         "The mist clings to you like a second skin, slowly burning off in the morning sun. You have escaped the Fen.",
         "Mud-slicked and weary, you trudge onto solid ground. The marsh could not pull you down.",
@@ -48,6 +54,12 @@ MISSION_FLAVOR_TEXT = {
         "The rhythm of the city feels chaotic after the precision of the Halls. You have returned to the organic world.",
         "Heat radiates from your armor, a lingering memory of the steam vents. You made it out before the pressure peaked.",
     ],
+    "forgotten_ossuary": [
+        "The silence of the dead is finally broken by the sounds of the living. You leave the tombs behind.",
+        "Bone dust clings to your boots, a grim reminder of where you have walked. The Ossuary sleeps once more.",
+        "You step out of the shadows, grateful for the warmth of the sun. The dead keep their secrets well.",
+        "The chill of the crypt slowly leaves your bones. You have returned from the land of the lost.",
+    ],
     "molten_caldera": [
         "The ash on your cloak is a stark reminder of the fire you walked through. The cool air is a blessing.",
         "You leave the inferno behind, the heat still radiating from your gear. Survival was a trial by fire.",
@@ -66,11 +78,23 @@ MISSION_FLAVOR_TEXT = {
         "Colors seem too bright, sounds too loud. You have looked into the nothingness and returned.",
         "You feel a strange lightness, as if gravity is welcoming you back. The Void has let you go... for now.",
     ],
+    "gale_scarred_heights": [
+        "Your ears stop popping as you descend to lower altitudes. The wind's howl is finally just a memory.",
+        "You find your footing on level ground again. The vertigo of the Heights fades, leaving only adrenaline.",
+        "The storm clouds are far above you now. You have weathered the fury of the peaks.",
+        "You catch your breath in the still air of the valley. The Heights tested you, and you held your ground.",
+    ],
     "celestial_archipelago": [
         "The winds of the high atmosphere release you. You descend from the clouds, pockets full of starlight.",
         "Your feet touch solid ground again, the vertigo of the floating isles fading like a dream.",
         "You shake the celestial dust from your cloak. The ruins still drift above, silent and eternal.",
         "The air feels thick and heavy down here. You have walked among the clouds and returned.",
+    ],
+    "shimmering_wastes": [
+        "The mirages fade, leaving only solid reality. The blinding light of the Wastes is gone.",
+        "You blink away the afterimages of the glass desert. The heat no longer threatens to consume you.",
+        "Sand that sparkles like diamonds falls from your gear. You have walked the mirror lands and returned.",
+        "The disorientation passes as you see the city gates. The Wastes are beautiful, but deadly.",
     ],
     "guild_arena": [
         "The cheers (or jeers) of the crowd fade. You step out of the ring, your test concluded.",
@@ -92,5 +116,8 @@ OUTCOME_FLAVOR_TEXT = {
         "The road back is long, but the weight of your pack makes the journey worth it.",
         "Survival is its own reward, but the loot certainly helps.",
         "You make your way back to the Guild Hall, another tale added to your legend.",
+        "The wilderness has been kind today, or perhaps you were simply stronger than its dangers.",
+        "Dust and glory coat your armor in equal measure. You are home.",
+        "The wilds are vast and unforgiving, but you have carved a path through them once more.",
     ],
 }
