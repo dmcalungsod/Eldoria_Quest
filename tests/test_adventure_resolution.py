@@ -49,9 +49,14 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     mock_session_cls.assert_called_once()
     # Should simulate 2 steps (30 / 15)
     assert mock_session.simulate_step.call_count == 2
-    mock_session.simulate_step.assert_called_with(background=True)
-    # Should save state 2 times
-    assert mock_session.save_state.call_count == 2
+    # Should be called with bundle and persist=False
+    mock_session.simulate_step.assert_called_with(
+        context_bundle=mock_db.get_combat_context_bundle.return_value,
+        background=True,
+        persist=False
+    )
+    # Should save state 1 time (only at end)
+    assert mock_session.save_state.call_count == 1
     # Should update status to completed
     mock_db.update_adventure_status.assert_called_with(123, "completed")
 
