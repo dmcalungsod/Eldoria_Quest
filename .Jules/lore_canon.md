@@ -51,13 +51,18 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 1.  **Willowcreek Outskirts (Rank F):** The "safe" zone. A forest edge corrupted by weak slime and goblin tribes.
 2.  **Whispering Thicket (Rank E):** Dense, dark woods where sunlight fails. Home to pack hunters (wolves, spiders).
 3.  **Deepgrove Roots (Rank D):** The corrupted heart of the forest. Twisted roots, rot, and ancient treants.
-4.  **The Shrouded Fen (Rank C):** A wetland choked by magical fog. Spirits and drowned things lurk here.
-5.  **The Sunken Grotto (Rank C):** A submerged cavern network lit by bioluminescence. The water here is deep and cold.
-6.  **The Crystal Caverns (Rank B):** Subterranean tunnels filled with glowing, sharp crystals and ancient constructs.
-7.  **The Clockwork Halls (Rank B):** A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.
-8.  **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
-9.  **The Frostfall Expanse (Rank A):** A frozen wasteland of eternal winter.
-10. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
+4.  **The Ashlands (Rank D):** A grey wasteland of volcanic ash and skeletal trees. The heat is oppressive.
+5.  **The Shrouded Fen (Rank C):** A wetland choked by magical fog. Spirits and drowned things lurk here.
+6.  **The Sunken Grotto (Rank C):** A submerged cavern network lit by bioluminescence. The water here is deep and cold.
+7.  **The Crystal Caverns (Rank B):** Subterranean tunnels filled with glowing, sharp crystals and ancient constructs.
+8.  **The Clockwork Halls (Rank B):** A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.
+9.  **The Forgotten Ossuary (Rank B):** A silent labyrinth of bone and shadow. The air is cold and smells of ancient dust.
+10. **The Celestial Archipelago (Rank B):** Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.
+11. **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
+12. **The Frostfall Expanse (Rank A):** A frozen wasteland where the wind cuts like a knife and only the strong survive.
+13. **Gale-Scarred Heights (Rank A):** High peaks where the wind howls like a living thing. Only the sure-footed survive.
+14. **The Shimmering Wastes (Rank A):** A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.
+15. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
 
 ---
 
