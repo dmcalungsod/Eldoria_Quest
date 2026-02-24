@@ -64,6 +64,16 @@ jobs:
           bandit -r . -ll
           echo "✅ Bandit Security Scan passed" >> $GITHUB_STEP_SUMMARY
 
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🖌️ Lint & Format" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ All lint and format checks passed." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Lint or format check failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -93,9 +103,24 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Audit Dependencies for CVEs
+        id: cve_audit
+        continue-on-error: true
         run: |
           pip install pip-audit
-          pip-audit -r requirements.txt --progress-spinner off || true
+          pip-audit -r requirements.txt --progress-spinner off
+
+      - name: CVE Audit Result
+        if: always()
+        run: |
+          echo "### 🔐 CVE Audit" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.cve_audit.outcome }}" == "success" ]; then
+            echo "✅ No known CVEs found in dependencies." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.cve_audit.outcome }}" == "skipped" ]; then
+            echo "⚠️ CVE audit was skipped." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ CVE audit found potential vulnerabilities. Review the logs above." >> $GITHUB_STEP_SUMMARY
+            echo "This is non-blocking but should be reviewed before merging." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Run Eldoria Test Suite
         env:
@@ -126,12 +151,18 @@ jobs:
 
       - name: Post Coverage Comment
         if: github.event_name == 'pull_request'
+        id: post-coverage-comment
         continue-on-error: true
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
           junitxml-path: ./coverage.xml
           title: '📊 Eldoria Quest – Coverage Report'
+
+      - name: Coverage Comment Status
+        if: always() && steps.post-coverage-comment.outcome == 'failure'
+        run: |
+          echo "⚠️ Coverage comment could not be posted to the PR." >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Coverage Report
         if: always()
@@ -180,3 +211,13 @@ jobs:
             exit 1
           fi
           echo "✅ Database Check Passed: MongoDB compliance verified." >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🛡️ Security & Audit" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ All security and audit checks passed." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Security or audit check failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
