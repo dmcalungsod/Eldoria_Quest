@@ -78,3 +78,10 @@ Each agent maintains a personal journal in `.Jules/<agent_name>.md` for critical
 - Agents tag each other using `@mention` in logs to signal dependencies or request reviews.
 
 This ecosystem ensures that Eldoria Quest evolves coherently, with every change tracked and every agent aligned to the project's goals.
+
+## ⏰ Temporal Integrity
+
+To ensure all agent operations are anchored to the real-world timeline:
+- **Date Injection**: The `Run Agents` workflow (`.github/workflows/run_agents.yml`) injects the `CURRENT_DATE` environment variable into every agent run.
+- **Prompts**: Agent prompts are stored in `.Jules/agent_prompts/`. Each prompt must use the `{{CURRENT_DATE}}` placeholder, which is automatically replaced by `scripts/run_agents.py` at runtime.
+- **Constraint**: Agents must strictly adhere to the injected date for all logs, reports, and planning documents. Future dating is prohibited.
