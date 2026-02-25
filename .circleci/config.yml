@@ -51,31 +51,8 @@ jobs:
       - run:
           name: Ruff Auto-Fix & Format
           command: |
-            # Skip if last commit was already an auto-fix (prevent loop)
-            if git log -1 --pretty=%s | grep -q "^style: auto-fix"; then
-              echo "⏭️  Last commit was auto-fix, skipping"
-              exit 0
-            fi
             ruff check . --fix
             ruff format .
-      - run:
-          name: Commit Fixes (if any)
-          command: |
-            # Skip if last commit was already an auto-fix (prevent loop)
-            if git log -1 --pretty=%s | grep -q "^style: auto-fix"; then
-              echo "⏭️  Skipping commit step"
-              exit 0
-            fi
-            git config user.name "CircleCI"
-            git config user.email "ci@circleci.com"
-            if [ -n "$(git status --porcelain)" ]; then
-              git add -A
-              git commit -m "style: auto-fix code with Ruff"
-              git push origin "$CIRCLE_BRANCH"
-              echo "✅ Pushed auto-fix commit"
-            else
-              echo "✅ No fixes needed"
-            fi
       - run:
           name: Ruff Strict Check
           command: |
