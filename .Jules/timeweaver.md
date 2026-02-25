@@ -1,84 +1,86 @@
 # Timeweaver Journal
 
 ## Mission
-Design a time-based auto-adventure system for Eldoria Quest.
+Design a comprehensive Time-Based Auto-Adventure System for Eldoria Quest.
+Goal: Transform manual exploration into a deep, strategic idle experience.
 
-## Initial Thoughts
-The current system is manual, step-by-step. The new system needs to be "fire and forget" but with strategic depth.
+## Current State Analysis
+- **Codebase:** `game_systems/adventure/` contains the core logic.
+- **Manager:** `AdventureManager` handles start/end.
+- **Session:** `AdventureSession` handles step simulation (`simulate_step`) and auto-combat (`_resolve_auto_combat`).
+- **Resolution:** `AdventureResolutionEngine` processes due adventures in a loop (15-min steps).
+- **Loop:** `AdventureLoop` checks for completions every minute.
 
-### Key Decisions
-1.  **Coexistence**: Auto-adventures will run alongside manual play. They serve different needs (active engagement vs. passive progression).
-2.  **Time as Currency**: The primary cost is time. The secondary cost is supplies (HP/Food/Torches).
-3.  **Simulation Fidelity**: We should reuse `CombatEngine` logic where possible but simplify the execution.
-    -   *Decision*: Use a "Fast Simulation" approach. Calculate Average Damage Per Round (DPR) for both entities. Determine rounds to kill. Apply variance. This is faster than full turn-by-turn simulation with logs, but more accurate than a simple "Win %" check.
-4.  **Risk/Reward**: Longer adventures reach "deeper floors" (higher difficulty modifiers) for exclusive rewards.
-    -   *Mechanic*: Risk increases by +5% per hour. Loot quality increases by +5% per hour.
+**Gap Analysis:**
+- The current system exists technically but seems to lack the "Game Design" layer of user choice, meaningful risk/reward scaling, and rich feedback.
+- "Manual turn-based" is mentioned as the thing to replace, yet the code shows a hybrid. The goal is to make "Auto" the *primary* interaction.
+- UI needs a full spec (Buttons, Dropdowns).
+- Strategic choices (Supplies, Stance) need to be impactful.
 
-### Challenges
--   **Discord Limits**: We can't update a message every minute. We need a "check status" command or a final notification.
--   **State Management**: If the bot restarts, adventures must resume. The database schema needs `start_time`, `duration`, and `end_time`.
--   **Economy**: Auto-farming could inflate the economy.
-    -   *Solution*: **Adventure Slots**. Starts at 1. Players can unlock a second slot at higher ranks (e.g., Rank B). Max 2 slots.
-    -   *Stamina*: No stamina system, but "Fatigue" applies to the *character* if they go back-to-back? Maybe keep it simple: Just time.
+## Key Design Pillars
+1.  **Time as Resource:** Real-time waiting is the cost.
+2.  **Preparation is Gameplay:** Since the player can't intervene during the adventure, *preparation* (loadout, location, duration) becomes the skill check.
+3.  **Narrative Delivery:** The "Report Card" at the end must be satisfying to read.
 
-### Integration Points
--   `LOCATIONS`: Already has `duration_options`. We can use these.
--   `CombatEngine`: Needs an `auto_resolve` method or a wrapper.
--   `Inventory`: Needs to support "Supplies" that are consumed automatically (Potions, Rations).
-    -   *Idea*: Players can "pack" items. If HP < 30%, use Potion. If Hunger > 50%, use Ration.
+## Brainstorming: Mechanics
 
-## Detailed Design Notes
+### Duration Tiers
+Instead of a slider, offer distinct tiers with clear identities:
+- **Scout (30m):** "Quick look." Low risk. Materials.
+- **Patrol (2h):** "Standard." XP, Monsters.
+- **Expedition (8h):** "High commitment." Bosses, Rare Loot.
+- **Odyssey (24h):** "Extreme." Legendary Artifacts. High death chance.
 
-### Core Loop
-1.  **Start**: Player uses `/adventure auto`.
-2.  **Setup**: Select Location -> Duration (e.g., 30m, 1h, 4h, 8h).
-3.  **Prep**: Select Loadout (Potions, Food). Shows "Win Probability" estimate based on stats vs location difficulty.
-4.  **Go**: Bot confirms start. Database stores `end_time`.
-5.  **Wait**: Player can check `/adventure status`.
-6.  **End**: Bot sends DM or pings in channel. "Your adventure in the Whispering Thicket is complete!"
+### The "Step"
+- Keep the 15-minute step interval. It's granular enough for events but efficient for the server.
+- Each step is a roll:
+    - **Combat:** (Based on Danger Level).
+    - **Event:** (Merchant, Trap, Discovery).
+    - **Gathering:** (Materials).
+    - **Empty:** (Flavor text).
 
-### Auto-Resolution Engine
--   **Step Interval**: 1 Step = 10 Minutes of Real Time.
--   **Step Logic**:
-    -   Roll for Event (Combat, Gather, Flavor, Nothing).
-    -   If Combat:
-        -   Fetch Monster from Location pool.
-        -   Simulate Fight (Fast Sim).
-        -   If Win: Loot + XP. Consume HP/MP.
-        -   If Lose: Adventure Ends. 50% Loot Lost. 10% Aurum Lost.
-    -   If Gather:
-        -   Roll Loot Table.
-        -   Add to temporary "Bag".
--   **Completion**:
-    -   Sum up all rewards.
-    -   Apply to Player (DB Update).
-    -   Generate Summary Report.
+### Combat Resolution
+- Existing `combat_engine` is robust.
+- Auto-combat currently simulates turns. This is good! It respects player build diversity (crit, dodge, tank).
+- **Optimization:** If simulation is too heavy for thousands of players, we might need a simplified "Power vs Power" check, but the memory says "1,100 sessions/sec" throughput, so full sim is likely fine.
+- **Death:** Currently stops adventure.
+    - *Idea:* "Emergency Retreat." If HP < 0, adventure ends, but you keep what you found *up to that point* minus a penalty? Or maybe you lose everything?
+    - *Decision:* Harsh survival tone. Death = Drop loot. But maybe "Insurance" or specific supplies can mitigate this.
 
-### Database Schema (`auto_adventures`)
--   `_id`: UUID
--   `discord_id`: Long (Index)
--   `start_time`: ISO Date
--   `end_time`: ISO Date
--   `location_id`: String
--   `duration_minutes`: Int
--   `status`: 'active', 'completed', 'failed'
--   `supplies`: JSON { "potion_hp_small": 5, ... }
--   `log`: Array of Strings (Summary)
--   `loot`: JSON { "item_key": count }
+### Supplies (Logistics)
+- Food (Fatigue reduction).
+- Torches (Ambush prevention).
+- Potions (Auto-use on low HP).
+- *New:* "Recall Scroll" (allows early exit without penalty? Or automatic escape on death?).
 
-### UI/UX
--   **Setup Embed**: Shows Location Info, Recommended Level.
--   **Status Embed**: Progress Bar (Time Elapsed / Total). "Current Loot: 5x Herb, 2x Pelt". "Current HP: 80%".
--   **Result Embed**:
-    -   Header: "Adventure Complete: [Location]"
-    -   Body: "You survived 4 hours. Defeated 12 enemies. Gathered 25 items."
-    -   Loot: List of items.
-    -   XP/Aurum: Gained.
+## Integration
+- **Guilds:** Contributing to guild stash via adventures?
+- **Factions:** Reputation gains scaled by duration.
 
-### Coordination
--   **SystemSmith**: Needs to build the `TaskScheduler` to check for `end_time <= now()`.
--   **Tactician**: Needs to write the `FastCombatSim` logic.
--   **GameBalancer**: Needs to tune the `EncounterRate` (how many monsters per hour?).
+## UI/UX
+- **Dashboard:** A persistent message in the user's DM or a private channel?
+- "ONE UI" -> Edit the interaction response.
+- Start Adventure -> Select Location (Dropdown) -> Select Duration (Buttons) -> Confirm.
+- Active State -> Show "Time Remaining" and a "Recall" button.
+- Completion -> DM notification? Or just next time they check. "Your adventure has ended."
 
-## Final Thoughts
-This system respects the player's time while keeping the "Survival" aspect (you can die and lose loot). The "Supplies" mechanic adds strategy—bringing more potions allows longer/riskier runs.
+## Plan
+I will structure the design document to cover these points in detail.
+
+## Design Completion Log (2024-10-24)
+
+### Decisions Made
+1.  **Tiered Durations:** Adopted the 4-tier system (Scout, Patrol, Expedition, Odyssey) to give clear risk/reward brackets.
+2.  **Stance System:** Added "Stance" selection (Aggressive, Defensive, Cautious) to give players agency over the auto-combat AI. This solves the "mindless" problem.
+3.  **One UI Policy:** The design mandates editing the interaction response for status updates rather than spamming messages.
+4.  **Death Penalty:** Settled on a "Survival" approach where death means losing 50-75% of *gathered* loot, but not equipped gear. This maintains the stakes without being overly punishing (perma-death).
+5.  **Integration:** Explicitly linked duration to "Dungeon Floors" (DepthsWarden) to ensure deep progression is gated by time investment and risk.
+
+### Agent Coordination
+- Identified **Tactician** as critical for implementing the Stance AI logic.
+- **SystemSmith** needs to update the schema for `duration_type` and `config` (stance).
+- **Palette** is needed for the "Report Card" visual design.
+
+### Reflections
+- The existing codebase is surprisingly robust (`AdventureSession` already has step logic). The main work is in the *wrapper* (UI, selection) and the *tuning* (Duration tiers, Stance logic).
+- The transition from "Manual" to "Auto" is essentially about shifting the decision point from *during* the adventure to *before* the adventure.
