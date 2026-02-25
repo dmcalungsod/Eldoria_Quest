@@ -49,9 +49,12 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 2.1:** Design new Adventure Locations (data).
     - **Agent:** @GameForge
     - **Status:** **Completed** (Verified `adventure_locations.py` contains 12+ locations including Frostfall Expanse).
-- [ ] **Task 2.2:** Configure Loot Tables & Drop Rates.
-    - **Agent:** @DataSteward / @GameBalancer
-    - **Details:** Ensure economy balance (materials vs time). Pending comprehensive review.
+- [ ] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
+    - **Agent:** @GameBalancer
+    - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **(High Priority)**
+    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops).
+    - **Subtask 2.2c:** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives).
+    - **Due:** 2026-03-06
 - [ ] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
     - **Details:** Modify `AdventureResolutionEngine` to increase monster damage scaling for long durations.
@@ -65,9 +68,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 3.2:** Write Flavor Text for Adventure Reports.
     - **Agent:** @StoryWeaver
     - **Status:** **Completed** (`narrative_data.py` populated with location/outcome flavor).
-- [ ] **Task 3.3:** Implement Travel Supplies (Rations/Torches).
+- [ ] **Task 3.3:** Implement Travel Supplies.
     - **Agent:** @Equipper / @SystemSmith
-    - **Details:** Create items, add UI selector in `AdventureSetupView`, implement usage logic in `AdventureSession`.
+    - **Details:** Create items (Hardtack, Pitch Torch, etc.), add UI selector in `AdventureSetupView`, implement usage logic.
     - **Due:** 2026-03-07
 
 ### Phase 4: Testing & Launch
@@ -79,12 +82,39 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ---
 
+## 🛠️ Phase 5: Tech Debt & Maintenance (New)
+**Focus:** Resolving critical issues identified by Issue Crafter.
+- [ ] **Task 5.1:** Fix Critical `pip` Vulnerability (CVE-2026-1703).
+    - **Agent:** @Sentinel
+    - **Due:** **IMMEDIATE**
+- [ ] **Task 5.2:** Refactor High-Complexity Methods.
+    - **Agent:** @SystemSmith
+    - **Subtask 5.2a:** `CombatEngine.run_combat_turn`
+    - **Subtask 5.2b:** `AdventureEvents.regeneration`
+    - **Subtask 5.2c:** `AdventureSession.simulate_step`
+    - **Due:** 2026-03-10
+
+---
+
 ## 🏗️ Parallel Projects
-*   **The Alchemist Class:** Design Phase (Namewright). Pending ID coordination.
-*   **The Frostfall Expanse:** Implemented in `adventure_locations.py` (IDs 111-115).
-*   **Codex & Bestiary:** Proposed (Codex Keeper). Pending approval.
+
+### The Alchemist Class (New)
+**Design:** `.Jules/architect_designs/class_alchemist.md`
+**Status:** **Implementation Phase**
+- [ ] **Task A.1:** Create Alchemist Skills (Vitriol Bomb, Triage, etc.).
+    - **Agent:** @GameForge / @Tactician
+    - **Due:** 2026-03-08
+- [ ] **Task A.2:** Create Alchemist Equipment & Items.
+    - **Agent:** @Equipper
+    - **Due:** 2026-03-08
+- [ ] **Task A.3:** Update Character Creation/Job Selection.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-09
+
+---
 
 ## 📝 Activity Log
+- **2026-02-25 (Update):** Integrated Analyst findings (Task 2.2 split), Namewright updates (Task 3.3/Alchemist), and Issue Crafter reports (Phase 5). Marked Tasks 2.1 and 3.2 as Complete.
 - **2026-02-26:** Confirmed Phase 1 (UI) and key Phase 2/3 tasks (Locations, Death Penalty, Flavor Text) are Complete. Updated plan to reflect rapid progress. Assigned remaining Fatigue and Supply tasks.
 - **2026-02-25:** Phase 0 (Backend) marked Complete. Phase 1 detailed tasks assigned to @Palette and @SystemSmith.
 - **2026-02-24:** Updated plan. Marked Task 0.1 and 2.1 as Complete. Re-assigned blocking Tasks 0.2 and 0.3 to SystemSmith.
