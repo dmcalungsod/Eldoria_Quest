@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Mock dependencies
 sys.modules["pymongo"] = MagicMock()
@@ -20,7 +20,7 @@ class TestAdventureSupplies(unittest.TestCase):
         self.db = MagicMock(spec=DatabaseManager)
         # Mock bundle fetch
         self.db.get_combat_context_bundle.return_value = {
-            "stats": {},
+            "stats": {"HP": 100, "MP": 100},
             "buffs": [],
             "player": {"current_hp": 100, "current_mp": 100},
             "skills": [],
@@ -42,11 +42,12 @@ class TestAdventureSupplies(unittest.TestCase):
         # 20 steps (4 over threshold of 16)
         # Bonus = (4/4) * 0.05 = 0.05. Total 1.05
         session.steps_completed = 20
-        mult = session._calculate_fatigue_multiplier()
+        # Call with default 0.0 bonus
+        mult = session._calculate_fatigue_multiplier(0.0)
         self.assertAlmostEqual(mult, 1.05, places=4)
 
-    def test_hardtack_fatigue(self):
-        """Verify hardtack reduces fatigue buildup."""
+    def test_hardtack_fatigue_calculation(self):
+        """Verify passing reduction bonus works correctly."""
         row_data = {
             "location_id": "test",
             "active": 1,
@@ -60,8 +61,48 @@ class TestAdventureSupplies(unittest.TestCase):
         # 20 steps
         # Bonus = 0.05 * 0.8 = 0.04. Total 1.04
         session.steps_completed = 20
-        mult = session._calculate_fatigue_multiplier()
+
+        # Manually pass 0.2 bonus (simulating hardtack)
+        mult = session._calculate_fatigue_multiplier(0.2)
         self.assertAlmostEqual(mult, 1.04, places=4)
+
+    @patch("game_systems.adventure.adventure_session.WorldEventSystem")
+    @patch("game_systems.adventure.adventure_session.CONSUMABLES", {
+        "hardtack": {"type": "supply", "effect": {"fatigue_reduction": 0.2}},
+        "pitch_torch": {"type": "supply", "effect": {"ambush_reduction": 0.5}}
+    })
+    def test_supply_context_integration(self, MockEventSystem):
+        """Verify _fetch_session_context correctly merges supply effects."""
+        # Mock event system to avoid time/DB calls
+        mock_es = MockEventSystem.return_value
+        mock_es.get_current_event.return_value = None
+
+        row_data = {
+            "location_id": "test",
+            "active": 1,
+            "logs": "[]",
+            "loot_collected": "{}",
+            "active_monster_json": None,
+            "supplies": {"hardtack": 1, "pitch_torch": 1},
+        }
+        session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
+
+        # Ensure context bundle returns mock data
+        self.db.get_combat_context_bundle.return_value = {
+            "stats": {"HP": 100, "MP": 100},
+            "buffs": [],
+            "player": {"current_hp": 100, "current_mp": 100},
+            "skills": [],
+        }
+
+        context = session._fetch_session_context()
+        self.assertIsNotNone(context)
+
+        boosts = context["active_boosts"]
+        self.assertIn("fatigue_reduction", boosts)
+        self.assertAlmostEqual(boosts["fatigue_reduction"], 0.2)
+        self.assertIn("ambush_reduction", boosts)
+        self.assertAlmostEqual(boosts["ambush_reduction"], 0.5)
 
     def test_load_supplies(self):
         """Verify supplies are loaded from row_data."""
