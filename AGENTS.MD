@@ -83,5 +83,14 @@ This ecosystem ensures that Eldoria Quest evolves coherently, with every change 
 
 To ensure all agent operations are anchored to the real-world timeline:
 - **Date Injection**: The `Run Agents` workflow (`.github/workflows/run_agents.yml`) injects the `CURRENT_DATE` environment variable into every agent run.
-- **Prompts**: Agent prompts are stored in `.Jules/agent_prompts/`. Each prompt must use the `{{CURRENT_DATE}}` placeholder, which is automatically replaced by `scripts/run_agents.py` at runtime.
+- **CLI Support**: The `scripts/run_agents.py` tool must be used to execute agents. It accepts a `--prompt` argument and replaces the `{{CURRENT_DATE}}` placeholder with the system date before execution.
 - **Constraint**: Agents must strictly adhere to the injected date for all logs, reports, and planning documents. Future dating is prohibited.
+
+### Integration Guide
+
+If you are running agents via a custom script or command line, pipe the prompt through `scripts/run_agents.py` to inject the correct date:
+
+```bash
+PROMPT=$(python3 scripts/run_agents.py --agent Foreman --prompt "Your prompt..." --stdout)
+# Then use $PROMPT with your LLM tool
+```

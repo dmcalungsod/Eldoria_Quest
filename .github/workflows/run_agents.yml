@@ -37,14 +37,21 @@ jobs:
         id: date
         run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Run Agents
+      - name: Run Agents (Example)
         env:
           CURRENT_DATE: ${{ env.CURRENT_DATE }}
           # Add other secrets here if needed for real implementation
           # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "Running agents for date: $CURRENT_DATE"
-          python3 scripts/run_agents.py
+
+          # Example 1: Generate a prepared prompt file
+          python3 scripts/run_agents.py --agent Foreman \
+            --prompt "## Role: Foreman\nDate: {{CURRENT_DATE}}\nPlan your day."
+
+          # Example 2: Pipe the injected prompt to stdout (for integration)
+          INJECTED_PROMPT=$(python3 scripts/run_agents.py --agent Architect --prompt "Design something for {{CURRENT_DATE}}" --stdout)
+          echo "Injected Prompt: $INJECTED_PROMPT"
 
       - name: Commit Logs (if any)
         # In a real implementation, the script would generate logs.
