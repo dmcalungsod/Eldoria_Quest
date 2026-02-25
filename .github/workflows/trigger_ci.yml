@@ -1,13 +1,16 @@
 name: Trigger CircleCI on PR
 
+# Temporarily disabled automatic PR triggers due to GitHub Actions billing/spending limits.
+# Use manual trigger via "Run workflow" if needed.
 on:
-  pull_request:
-    types: [opened, synchronize]
+  workflow_dispatch:
+  # pull_request:
+  #   types: [opened, synchronize]
 
 jobs:
   trigger:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.pull_request.title, '[skip ci]') && !contains(github.event.pull_request.body, '[skip ci]')"
+    # if: "!contains(github.event.pull_request.title, '[skip ci]') && !contains(github.event.pull_request.body, '[skip ci]')"
     steps:
       - name: Trigger CircleCI Pipeline
         run: |
