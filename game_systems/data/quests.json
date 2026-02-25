@@ -1345,5 +1345,103 @@
       "aurum": 500,
       "item": "Heart of the Machine"
     }
+  },
+  {
+    "id": 70,
+    "title": "Volatile Ingredients",
+    "tier": "F",
+    "quest_giver": "Alchemist Miral",
+    "location": "The Shrouded Fen",
+    "summary": "Gather acidic spores for Miral's research.",
+    "description": "Ah, a fresh face. Listen, I'm on the verge of a breakthrough, but I'm out of reagents. The Sporelings in the fen produce a highly acidic spore cloud when... agitated. I need you to go out there, 'agitate' them, and bring me the residue. Don't breathe it in.",
+    "objectives": {
+      "defeat": {
+        "Sporeling": 5
+      }
+    },
+    "flavor_text": {
+      "defeat:Sporeling": "The creature bursts, leaving behind a sticky, glowing dust. You carefully scrape it into a vial."
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 100,
+      "item": "Dewfall Tonic"
+    }
+  },
+  {
+    "id": 71,
+    "title": "The Great Work: Hypothesis",
+    "tier": "E",
+    "quest_giver": "Alchemist Miral",
+    "location": "The Shrouded Fen",
+    "summary": "Prepare a test subject for the experimental serum.",
+    "description": "The spores were perfect! Now, for the field test. I've synthesized 'Mutagenic Serum 0.1'. It *should* reverse the Veil-sickness. Take this vial and locate a Mire Lurker suitable for testing. However, be warned: Druidess Leira claims this is torture. She may offer... alternative instructions.",
+    "prerequisites": [
+      70
+    ],
+    "objectives": {
+      "defeat": {
+        "Mire Lurker": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Mire Lurker": "The beast collapses, but instead of killing it, you bind its limbs and haul it back to camp for further study."
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 200
+    }
+  },
+  {
+    "id": 72,
+    "title": "The Great Work: Evolution",
+    "tier": "E",
+    "quest_giver": "Alchemist Miral",
+    "location": "The Shrouded Fen",
+    "summary": "Option A: Administer the serum to the Lurker.",
+    "description": "Miral is insistent. 'Pour the serum! We must know if the flesh can be reshaped to reject the Veil!' Choosing this path aligns you with scientific progress, regardless of the cost.",
+    "prerequisites": [
+      71
+    ],
+    "exclusive_group": "alchemist_choice",
+    "objectives": {
+      "defeat": {
+        "Mire Lurker": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Mire Lurker": "You force the serum onto the beast. It spasms violently, glows with unnatural hues, then dissolves into foam. 'Data! Glorious data!' Miral cackles."
+    },
+    "rewards": {
+      "exp": 900,
+      "aurum": 400,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 73,
+    "title": "The Great Work: Preservation",
+    "tier": "E",
+    "quest_giver": "Druidess Leira",
+    "location": "The Shrouded Fen",
+    "summary": "Option B: Mercy-kill the Lurker without mutation.",
+    "description": "Leira pleads with you. 'Do not twist nature further. The beast suffers enough. Grant it a clean death and return its essence to the earth.' Choosing this path aligns you with the natural order.",
+    "prerequisites": [
+      71
+    ],
+    "exclusive_group": "alchemist_choice",
+    "objectives": {
+      "defeat": {
+        "Mire Lurker": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Mire Lurker": "You strike true, ending the beast's suffering swiftly. You sprinkle blessed water over the corpse. Miral scoffs, 'A waste,' but Leira nods."
+    },
+    "rewards": {
+      "exp": 900,
+      "aurum": 400,
+      "item": "Glade Salve Vial"
+    }
   }
 ]
