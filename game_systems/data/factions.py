@@ -38,6 +38,12 @@ FACTIONS = {
             "gathering": 1.2,
             "monster_types": ["Beast", "Plant"],
         },
+        "favored_locations": [
+            "forest_outskirts",
+            "whispering_thicket",
+            "deepgrove_roots",
+            "shrouded_fen",
+        ],
     },
     "iron_vanguard": {
         "name": "The Iron Vanguard",
@@ -71,6 +77,12 @@ FACTIONS = {
             "elite_kills": 1.5,
             "monster_types": ["Undead", "Construct"],
         },
+        "favored_locations": [
+            "forgotten_ossuary",
+            "void_sanctum",
+            "gale_scarred_heights",
+            "deepgrove_roots",
+        ],
     },
     "arcane_assembly": {
         "name": "The Arcane Assembly",
@@ -104,5 +116,49 @@ FACTIONS = {
             "collecting": 1.2,
             "monster_types": ["Elemental", "Demon"],
         },
+        "favored_locations": [
+            "crystal_caverns",
+            "celestial_archipelago",
+            "shimmering_wastes",
+            "sunken_grotto",
+        ],
+    },
+    "stone_harvesters": {
+        "name": "The Stone Harvesters",
+        "emoji": "⛏️",
+        "description": "Hardy miners and smiths who extract the dungeon's material wealth.",
+        "ranks": {
+            1: {"title": "Laborer", "reputation_needed": 0, "reward": None},
+            2: {
+                "title": "Prospector",
+                "reputation_needed": 500,
+                "reward": {"type": "item", "key": "iron_ingot", "amount": 3},
+            },
+            3: {
+                "title": "Excavator",
+                "reputation_needed": 1500,
+                "reward": {"type": "item", "key": "obsidian_shard", "amount": 5},
+            },
+            4: {
+                "title": "Foreman",
+                "reputation_needed": 3000,
+                "reward": {"type": "buff", "key": "gathering_boost", "value": 0.1},
+            },
+            5: {
+                "title": "Geo-Master",
+                "reputation_needed": 5000,
+                "reward": {"type": "title", "value": "Earthshaker"},
+            },
+        },
+        "interests": {
+            "gathering": 1.5,
+            "monster_types": ["Construct", "Elemental"],
+        },
+        "favored_locations": [
+            "molten_caldera",
+            "clockwork_halls",
+            "frostfall_expanse",
+            "the_ashlands",
+        ],
     },
 }

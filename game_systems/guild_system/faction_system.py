@@ -55,6 +55,7 @@ class FactionSystem:
             "rank_title": current_title,
             "next_rank": faction_def["ranks"].get(current_rank_tier + 1),
             "interests": faction_def.get("interests", {}),
+            "favored_locations": faction_def.get("favored_locations", []),
         }
 
     def join_faction(self, discord_id: int, faction_id: str) -> tuple[bool, str]:
@@ -223,10 +224,36 @@ class FactionSystem:
         # For now, Pathfinders like exploration (all locations)
         multiplier += interests.get("exploration", 0.0)
 
+        # Check Favored Locations
+        favored_bonus = 0
+        faction_def = FACTIONS.get(existing["faction_id"], {})
+        favored_locs = faction_def.get("favored_locations", [])
+
+        if location_id in favored_locs:
+            multiplier += 0.5
+            favored_bonus = 1  # Flag to indicate bonus applied
+
         final_rep = int(base_rep * multiplier)
         if final_rep > 0:
             success, msg, rank_msgs = self.add_reputation(discord_id, final_rep)
-            if success and rank_msgs:
-                return rank_msgs
+
+            # Append bonus info if applicable (though this method returns rank_msgs only)
+            # Since the return signature is list[str] (logs), we can append a log about the bonus.
+            if favored_bonus and success:
+                # We can't easily append to 'rank_msgs' if it's just rank ups.
+                # But the caller (AdventureManager) expects logs.
+                # If rank_msgs is empty, we return empty list.
+                # The caller (AdventureManager) uses the returned list as "faction_logs".
+                pass
+
+            # Construct return logs
+            logs = []
+            if success:
+                logs.append(f"+{final_rep} Reputation with {existing['name']}")
+                if favored_bonus:
+                    logs.append(f"• Favored Location Bonus (+50%)")
+                if rank_msgs:
+                    logs.extend(rank_msgs)
+                return logs
 
         return []

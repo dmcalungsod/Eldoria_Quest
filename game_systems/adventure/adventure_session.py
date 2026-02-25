@@ -132,8 +132,19 @@ class AdventureSession:
 
             # Apply Active Buffs (Crucial: Ensures buffs apply to both combat and gathering)
             active_buffs = bundle["buffs"]
+            player_buffs = {}  # Store non-stat buffs here
+
             for buff in active_buffs:
-                player_stats.add_bonus_stat(buff["stat"], buff["amount"])
+                stat_key = buff["stat"]
+                amount = buff["amount"]
+
+                # Check if this is a core stat (STR, END, etc.)
+                if stat_key.upper() in player_stats._stats:
+                    player_stats.add_bonus_stat(stat_key, amount)
+                else:
+                    # Treat as a generic boost (e.g. gathering_boost)
+                    # Accumulate additively
+                    player_buffs[stat_key] = player_buffs.get(stat_key, 0.0) + amount
 
             # Extract vitals from player row
             player_row = bundle["player"]
@@ -147,6 +158,10 @@ class AdventureSession:
             # Global boosts are cached, so this is cheap
             active_boosts_list = self.db.get_active_boosts()
             boosts_dict = {b["boost_key"]: b["multiplier"] for b in active_boosts_list}
+
+            # Merge Player Buffs (Additive to existing multipliers)
+            for key, val in player_buffs.items():
+                boosts_dict[key] = boosts_dict.get(key, 1.0) + val
 
             # --- WORLD EVENT BOOSTS ---
             event_system = WorldEventSystem(self.db)
