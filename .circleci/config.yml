@@ -156,7 +156,7 @@ jobs:
               exit 1
             fi
 
-  trigger-pr-ci:
+  manage-prs:
     docker:
       - image: cimg/base:current
     steps:
@@ -167,29 +167,41 @@ jobs:
             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
             sudo apt-get update && sudo apt-get install gh -y
       - run:
-          name: Trigger CI for Open PR Branches
+          name: Update Branches, Trigger CI, Enable Auto-Merge
           command: |
             export GH_TOKEN="$GITHUB_TOKEN"
+            REPO="dmcalungsod/Eldoria_Quest"
 
-            echo "🔄 Checking open PRs for missing CI..."
+            echo "🤖 Managing open PRs..."
 
-            gh pr list --repo "dmcalungsod/Eldoria_Quest" --state open --json number,headRefName,isDraft --jq '.[] | select(.isDraft == false)' | while read -r pr_json; do
+            gh pr list --repo "$REPO" --state open --json number,headRefName,isDraft --jq '.[] | select(.isDraft == false)' | while read -r pr_json; do
               pr_number=$(echo "$pr_json" | jq -r '.number')
               branch=$(echo "$pr_json" | jq -r '.headRefName')
 
-              # Check if CircleCI checks are still pending
-              checks=$(gh pr checks "$pr_number" --repo "dmcalungsod/Eldoria_Quest" 2>&1 || true)
+              echo ""
+              echo "═══ PR #$pr_number ($branch) ═══"
 
-              if echo "$checks" | grep -q "ci/circleci.*pending\|ci/circleci.*Waiting"; then
-                echo "🚀 Triggering CI for PR #$pr_number ($branch)..."
-                curl -s -X POST "https://circleci.com/api/v2/project/gh/dmcalungsod/Eldoria_Quest/pipeline" \
+              # 1. Auto-update branch with main
+              echo "🔄 Updating branch..."
+              gh api -X PUT "repos/$REPO/pulls/$pr_number/update-branch" \
+                -f update_method="merge" 2>&1 || echo "  (already up to date)"
+
+              # 2. Trigger CircleCI if checks are pending
+              checks=$(gh pr checks "$pr_number" --repo "$REPO" 2>&1 || true)
+              if echo "$checks" | grep -qi "pending\|waiting"; then
+                echo "🚀 Triggering CircleCI..."
+                curl -s -X POST "https://circleci.com/api/v2/project/gh/$REPO/pipeline" \
                   -H "Circle-Token: $CIRCLECI_TOKEN" \
                   -H "Content-Type: application/json" \
                   -d "{\"branch\": \"$branch\"}"
                 echo ""
               else
-                echo "✅ PR #$pr_number already has CI results"
+                echo "✅ All checks already reported"
               fi
+
+              # 3. Enable auto-merge
+              echo "🔀 Enabling auto-merge..."
+              gh pr merge "$pr_number" --repo "$REPO" --squash --auto 2>&1 || echo "  (already enabled)"
             done
 
 # ── Workflows ──────────────────────────────────────────
@@ -214,10 +226,9 @@ workflows:
             - ruff-fix
             - test
 
-  # Scheduled: auto-merge + cleanup + trigger CI for bot PRs
+  # Scheduled: manage PRs + cleanup
   nightly:
     when: << pipeline.parameters.run-schedule >>
     jobs:
-      - trigger-pr-ci
-      - auto-merge
+      - manage-prs
       - cleanup-branches
