@@ -43,7 +43,6 @@ class TestWildGathering(unittest.TestCase):
             "player_stats": self.stats_obj,
             "vitals": {"current_hp": 100, "current_mp": 50},
             "stats_dict": self.stats_obj.get_total_stats_dict(),
-            "active_boosts": {},
         }
 
         # Setup EventHandler

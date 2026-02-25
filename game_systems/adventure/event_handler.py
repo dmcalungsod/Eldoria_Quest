@@ -299,12 +299,5 @@ class EventHandler:
         else:
             # XP
             amount = random.randint(5, 10)
-
-            # Apply Exploration XP Boost (e.g. Cartographer's Ink)
-            boosts = context.get("active_boosts", {})
-            xp_boost = boosts.get("exploration_xp_boost", 0.0)
-            if xp_boost > 0:
-                amount = int(amount * (1.0 + xp_boost))
-
             msg = f"\n{AdventureEvents.scavenge_event('exp', amount)}"
             return {"log": [msg], "dead": False, "loot": {"exp": amount}}
