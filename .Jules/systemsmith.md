@@ -27,3 +27,8 @@
 
 **Learning:** `EquipmentManager` and `ItemManager` were crashing on `int(item_key)` conversion when encountering malformed data (non-numeric item keys), potentially zeroing out player stats on recalculation.
 **Action:** Always wrap type conversions of database keys in `try-except` blocks and log warnings instead of allowing uncaught exceptions to propagate, ensuring system resilience against data corruption.
+
+## 2026-02-27 — AdventureSession Complexity Refactor
+
+**Learning:** `AdventureSession.simulate_step` was a monolithic function (>150 lines) handling combat, events, and persistence in a single flow, making it brittle to changes and hard to test.
+**Action:** Decomposed the method into specialized helpers (`_handle_active_combat`, `_handle_encounter_roll`, `_handle_non_combat`), improving readability and allowing targeted unit testing of specific adventure phases without mocking the entire flow.
