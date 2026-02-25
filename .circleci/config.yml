@@ -1,5 +1,11 @@
 version: 2.1
 
+# ── Parameters (for scheduled pipelines) ───────────────
+parameters:
+  run-schedule:
+    type: boolean
+    default: false
+
 # ── Reusable Commands ──────────────────────────────────
 commands:
   install-ruff:
@@ -23,6 +29,16 @@ commands:
           key: deps-v1-{{ checksum "requirements.txt" }}
           paths:
             - ~/.local
+
+  install-gh:
+    description: Install GitHub CLI
+    steps:
+      - run:
+          name: Install GitHub CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update && sudo apt-get install gh -y
 
 # ── Jobs ───────────────────────────────────────────────
 jobs:
@@ -69,11 +85,105 @@ jobs:
           name: Run Tests
           command: python -m pytest --tb=short -q
 
-# ── Workflow ───────────────────────────────────────────
+  auto-merge:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install-gh
+      - run:
+          name: Auto-Merge PRs
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+
+            echo "🤖 Auto-Merge Report"
+
+            gh pr list --repo "dmcalungsod/Eldoria_Quest" --state open --json number,title,isDraft --jq '.[]' | while read -r pr_json; do
+              pr_number=$(echo "$pr_json" | jq -r '.number')
+              is_draft=$(echo "$pr_json" | jq -r '.isDraft')
+              title=$(echo "$pr_json" | jq -r '.title')
+
+              if [ "$is_draft" == "true" ]; then
+                echo "⏭️  PR #$pr_number ($title) is a draft, skipping."
+                continue
+              fi
+
+              echo "🔍 Checking PR #$pr_number ($title)..."
+
+              checks_output=$(gh pr checks "$pr_number" --repo "dmcalungsod/Eldoria_Quest" 2>&1 || true)
+
+              if echo "$checks_output" | grep -q "GitGuardian Security Checks" && \
+                 echo "$checks_output" | grep -q "CodeRabbit" && \
+                 echo "$checks_output" | grep -q "ci/ruff-fix" && \
+                 echo "$checks_output" | grep -q "ci/test" && \
+                 ! echo "$checks_output" | grep -q "fail" && \
+                 ! echo "$checks_output" | grep -q "pending"; then
+
+                 echo "✅ All checks passed for PR #$pr_number. Merging..."
+                 if gh pr merge "$pr_number" --repo "dmcalungsod/Eldoria_Quest" --squash; then
+                   echo "✅ Merged PR #$pr_number ($title)"
+                 else
+                   echo "❌ Failed to merge PR #$pr_number"
+                 fi
+              else
+                 echo "⏳ PR #$pr_number waiting on checks."
+              fi
+            done
+
+  cleanup-branches:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install-gh
+      - run:
+          name: Prune Merged Branches
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+            python scripts/prune_merged_branches.py
+
+  mirror:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run:
+          name: Clone & Push Mirror
+          command: |
+            git clone --mirror "https://x-access-token:${GITHUB_TOKEN}@github.com/dmcalungsod/Eldoria_Quest" repo-mirror
+            cd repo-mirror
+            if git push --mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/DeeEmSea/Eldoria-Quest-Bot"; then
+              echo "✅ Mirror pushed to DeeEmSea/Eldoria-Quest-Bot"
+            else
+              echo "❌ Mirror push failed"
+              exit 1
+            fi
+
+# ── Workflows ──────────────────────────────────────────
 workflows:
+  # CI: runs on every push/PR
   ci:
+    when:
+      not: << pipeline.parameters.run-schedule >>
     jobs:
       - ruff-fix
       - test:
           requires:
             - ruff-fix
+      - auto-merge:
+          requires:
+            - ruff-fix
+            - test
+      - mirror:
+          filters:
+            branches:
+              only: main
+          requires:
+            - ruff-fix
+            - test
+
+  # Scheduled: daily auto-merge + cleanup
+  nightly:
+    when: << pipeline.parameters.run-schedule >>
+    jobs:
+      - auto-merge
+      - cleanup-branches
