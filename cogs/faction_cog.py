@@ -11,6 +11,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.database_manager import DatabaseManager
+from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.factions import FACTIONS
 from game_systems.guild_system.faction_system import FactionSystem
 
@@ -35,7 +36,16 @@ class FactionCog(commands.Cog):
             desc = data["description"]
             interests = ", ".join(data.get("interests", {}).keys()).replace("_", " ").title()
 
-            embed.add_field(name=name, value=f"{desc}\n*Interests: {interests}*", inline=False)
+            # Resolve location names (truncate if too long)
+            fav_locs = data.get("favored_locations", [])
+            loc_names = [LOCATIONS.get(lid, {}).get("name", lid) for lid in fav_locs]
+            # Show first 2 + count if more
+            if len(loc_names) > 3:
+                loc_str = ", ".join(loc_names[:2]) + f", +{len(loc_names)-2} more"
+            else:
+                loc_str = ", ".join(loc_names) if loc_names else "None"
+
+            embed.add_field(name=name, value=f"{desc}\n*Interests: {interests}*\n*Favored Territory: {loc_str}*", inline=False)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -70,6 +80,13 @@ class FactionCog(commands.Cog):
             inline=True,
         )
         embed.add_field(name="Reputation", value=f"{data['reputation']}", inline=True)
+
+        # Show Favored Locations
+        fav_locs = data.get("favored_locations", [])
+        if fav_locs:
+            loc_names = [LOCATIONS.get(lid, {}).get("name", lid) for lid in fav_locs]
+            loc_str = "\n".join(f"• {name}" for name in loc_names)
+            embed.add_field(name="Favored Territory (+50% Rep)", value=loc_str, inline=False)
 
         next_rank = data.get("next_rank")
         if next_rank:
