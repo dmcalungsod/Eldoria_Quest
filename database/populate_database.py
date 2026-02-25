@@ -46,11 +46,18 @@ except ImportError as e:
 def _upsert_many(col, key_field, docs):
     """Helper: upserts a list of docs by key_field."""
     from pymongo import UpdateOne
+    from pymongo.errors import BulkWriteError
 
     if not docs:
         return
     ops = [UpdateOne({key_field: d[key_field]}, {"$set": d}, upsert=True) for d in docs]
-    col.bulk_write(ops)
+    try:
+        col.bulk_write(ops, ordered=False)
+    except BulkWriteError as bwe:
+        n_errors = len(bwe.details.get("writeErrors", []))
+        logger.warning(
+            f"_upsert_many({col.name}): {n_errors} write error(s) (likely stale unique indexes). Remaining ops succeeded."
+        )
 
 
 def insert_classes(db):
