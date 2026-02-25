@@ -242,6 +242,79 @@ class GuildWelcomeView(View):
         await transition_to_guild_lobby(interaction, self.db, self.user)
 
 
+class StartFirstExpeditionView(View):
+    def __init__(self, db, user):
+        super().__init__(timeout=300)
+        self.db = db
+        self.user = user
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user.id == self.user.id
+
+    @discord.ui.button(label="🗺️ Start First Expedition", style=discord.ButtonStyle.success)
+    async def start_expedition(self, interaction: discord.Interaction, button: Button):
+        # Check for Adventure Cog
+        adventure_cog = interaction.client.get_cog("AdventureCommands")
+        if not adventure_cog:
+            await interaction.response.send_message(
+                "Adventure system unavailable. Proceeding to lobby.", ephemeral=True
+            )
+            await transition_to_guild_lobby(interaction, self.db, self.user)
+            return
+
+        await interaction.response.defer()
+
+        # Fetch Data for Setup View
+        try:
+            guild_member, player_data, supplies, max_slots, current_slots = await asyncio.gather(
+                asyncio.to_thread(self.db.get_guild_member_data, self.user.id),
+                asyncio.to_thread(self.db.get_player, self.user.id),
+                asyncio.to_thread(self.db.get_inventory_items, self.user.id, item_type="supply"),
+                asyncio.to_thread(self.db.calculate_inventory_limit, self.user.id),
+                asyncio.to_thread(self.db.get_inventory_slot_count, self.user.id),
+            )
+            rank = guild_member["rank"] if guild_member else "F"
+            level = player_data["level"] if player_data else 1
+
+            # Import here to avoid circular dependencies if any
+            from game_systems.adventure.ui.setup_view import AdventureSetupView
+
+            embed = discord.Embed(
+                title=f"{E.MAP} First Expedition: The Outskirts",
+                description=(
+                    "**Step 1:** Select a **Location** (e.g., *Mistwood Outskirts*).\n"
+                    "**Step 2:** Choose a **Duration** (start small, maybe 30 minutes).\n"
+                    "**Step 3:** Click **Begin Expedition**.\n\n"
+                    "*Your character will explore automatically. Come back when the timer ends!*"
+                ),
+                color=discord.Color.dark_green(),
+            )
+
+            view = AdventureSetupView(
+                self.db,
+                adventure_cog.manager,
+                self.user,
+                rank,
+                level,
+                supplies=supplies,
+                capacity=(current_slots, max_slots),
+            )
+
+            # Override back button to return to Lobby instead of Profile for this flow?
+            # Actually, standard behavior is fine, but let's just show the view.
+            await interaction.edit_original_response(embed=embed, view=view)
+
+        except Exception as e:
+            logger.error(f"Failed to load first expedition setup: {e}", exc_info=True)
+            await interaction.followup.send("Something went wrong. Heading to lobby...", ephemeral=True)
+            await transition_to_guild_lobby(interaction, self.db, self.user)
+
+    @discord.ui.button(label="🏠 Go to Guild Hall", style=discord.ButtonStyle.secondary)
+    async def skip_to_lobby(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+        await transition_to_guild_lobby(interaction, self.db, self.user)
+
+
 class CombatTutorialView(View):
     def __init__(self, db, user, step=0):
         super().__init__(timeout=300)
@@ -403,7 +476,22 @@ class CombatTutorialView(View):
             ephemeral=True,
         )
 
-        await transition_to_guild_lobby(interaction, self.db, self.user)
+        # Instead of going directly to lobby, offer the first expedition
+        view = StartFirstExpeditionView(self.db, self.user)
+        embed = discord.Embed(
+            title="📜 A New Assignment",
+            description=(
+                f"*The Guild Clerk stamps your registration form with a heavy thud.*\n\n"
+                "**“All official. Now, don't think you can just lounge around.”**\n\n"
+                "She points to a map pinned to the wall.\n\n"
+                "**“We need eyes on the outskirts. Take a patrol contract. It takes time, "
+                "so you can head out and return later to collect your pay.”**"
+            ),
+            color=discord.Color.dark_green(),
+        )
+        embed.set_footer(text="Expeditions run in the background. You can close Discord while they complete.")
+
+        await interaction.edit_original_response(embed=embed, view=view)
 
 
 class OnboardingCog(commands.Cog):
