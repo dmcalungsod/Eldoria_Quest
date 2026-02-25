@@ -237,6 +237,11 @@ class AdventureSession:
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
 
+            # EVENT HOOK: Check for Frostfall Threat Reduction
+            threat_reduction = 1.0
+            if self.location_id == "frostfall_expanse" and context.get("active_boosts"):
+                threat_reduction = float(context["active_boosts"].get("frostfall_threat_reduction", 1.0))
+
             # --- Weather & Time System Check ---
             weather = WorldTime.get_current_weather(self.location_id)
             time_phase = WorldTime.get_current_phase()
@@ -259,12 +264,22 @@ class AdventureSession:
 
                 if action == "defend":
                     return self._process_combat_turn(
-                        context, action="defend", persist=persist, weather=weather, time_phase=time_phase
+                        context,
+                        action="defend",
+                        persist=persist,
+                        weather=weather,
+                        time_phase=time_phase,
+                        threat_reduction=threat_reduction,
                     )
 
                 if action == "special_ability":
                     return self._process_combat_turn(
-                        context, action="special_ability", persist=persist, weather=weather, time_phase=time_phase
+                        context,
+                        action="special_ability",
+                        persist=persist,
+                        weather=weather,
+                        time_phase=time_phase,
+                        threat_reduction=threat_reduction,
                     )
 
                 should_auto = self._check_auto_condition(context)
@@ -284,17 +299,33 @@ class AdventureSession:
                             return self._attempt_flee(context, persist=persist)
 
                     return self._resolve_auto_combat(
-                        context, background=True, persist=persist, weather=weather, time_phase=time_phase
+                        context,
+                        background=True,
+                        persist=persist,
+                        weather=weather,
+                        time_phase=time_phase,
+                        threat_reduction=threat_reduction,
                     )
 
                 # If explicit attack or implicit auto, and eligible -> Auto
                 if (action == "attack" or not action) and should_auto:
-                    return self._resolve_auto_combat(context, persist=persist, weather=weather, time_phase=time_phase)
+                    return self._resolve_auto_combat(
+                        context,
+                        persist=persist,
+                        weather=weather,
+                        time_phase=time_phase,
+                        threat_reduction=threat_reduction,
+                    )
 
                 # Otherwise manual single turn
                 final_action = action if action else "attack"
                 return self._process_combat_turn(
-                    context, action=final_action, persist=persist, weather=weather, time_phase=time_phase
+                    context,
+                    action=final_action,
+                    persist=persist,
+                    weather=weather,
+                    time_phase=time_phase,
+                    threat_reduction=threat_reduction,
                 )
 
             # Dynamic Combat Threshold based on Weather and Time
@@ -441,6 +472,7 @@ class AdventureSession:
         persist: bool = True,
         weather=None,
         time_phase=None,
+        threat_reduction: float = 1.0,
     ) -> dict[str, Any]:
         """
         Plays multiple combat turns automatically.
@@ -470,7 +502,7 @@ class AdventureSession:
 
         # Max 8 turns to avoid infinite loops
         stance = self.active_monster.get("player_stance", "balanced")
-        fatigue_mult = self._calculate_fatigue_multiplier()
+        fatigue_mult = self._calculate_fatigue_multiplier() * threat_reduction
 
         for _ in range(8):
             # FIX: Pass session XP
@@ -535,6 +567,7 @@ class AdventureSession:
                 quest_system=self.quest_system,
                 inventory_manager=self.inventory_manager,
                 session_loot=self.loot,
+                location_id=self.location_id,
             )
             final_block.extend(reward_texts)
 
@@ -568,6 +601,7 @@ class AdventureSession:
         persist: bool = True,
         weather=None,
         time_phase=None,
+        threat_reduction: float = 1.0,
     ) -> dict[str, Any]:
         """
         Executes a single combat turn for manual mode.
@@ -584,7 +618,7 @@ class AdventureSession:
         initial_hp = context["vitals"]["current_hp"] if context else 0
         initial_mp = context["vitals"]["current_mp"] if context else 0
 
-        fatigue_mult = self._calculate_fatigue_multiplier()
+        fatigue_mult = self._calculate_fatigue_multiplier() * threat_reduction
 
         result = self.combat.resolve_turn(
             self.active_monster,
@@ -627,6 +661,7 @@ class AdventureSession:
                 quest_system=self.quest_system,
                 inventory_manager=self.inventory_manager,
                 session_loot=self.loot,
+                location_id=self.location_id,
             )
             turn_logs.extend(reward_texts)
 

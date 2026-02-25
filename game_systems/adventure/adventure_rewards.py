@@ -63,6 +63,7 @@ class AdventureRewards:
         quest_system,
         inventory_manager,
         session_loot,
+        location_id: str | None = None,
     ):
         """
         Master reward processor.
@@ -82,7 +83,7 @@ class AdventureRewards:
 
             # 2. Loot & Quests
             actual_drops = self._process_loot_and_quests(
-                combat_result, quest_system, inventory_manager, session_loot, logs
+                combat_result, quest_system, inventory_manager, session_loot, logs, location_id
             )
 
             # 3. Stat Growth
@@ -143,7 +144,15 @@ class AdventureRewards:
 
         return logs
 
-    def _process_loot_and_quests(self, combat_result, quest_system, inventory_manager, session_loot, logs):
+    def _process_loot_and_quests(
+        self,
+        combat_result,
+        quest_system,
+        inventory_manager,
+        session_loot,
+        logs,
+        location_id=None,
+    ):
         """Calculates drops and updates quest progress."""
         loot_bundle = defaultdict(int)
         exp_gain = combat_result["exp"]
@@ -158,6 +167,11 @@ class AdventureRewards:
         # Determine drops
         stats = PlayerStats.from_dict(self.db.get_player_stats_json(self.discord_id))
         loot_boost = combat_result.get("active_boosts", {}).get("loot_boost", 1.0)
+
+        # EVENT HOOK: Frostfall Loot Bonus
+        if location_id == "frostfall_expanse":
+            frostfall_bonus = combat_result.get("active_boosts", {}).get("frostfall_loot_bonus", 1.0)
+            loot_boost *= float(frostfall_bonus)
 
         # Check for World Event: Elemental Surge
         try:
