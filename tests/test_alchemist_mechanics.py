@@ -1,8 +1,7 @@
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch
-import json
+from unittest.mock import MagicMock
 
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
@@ -11,12 +10,11 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
+from game_systems.data.class_data import CLASSES
 from game_systems.items.consumable_manager import ConsumableManager
 from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.player.player_stats import PlayerStats
-from game_systems.data.skills_data import SKILLS
-from game_systems.data.class_data import CLASSES
+
 
 class TestAlchemistMechanics(unittest.TestCase):
     def setUp(self):
@@ -36,7 +34,7 @@ class TestAlchemistMechanics(unittest.TestCase):
         self.mock_db.get_inventory_item.return_value = {
             "item_key": "hp_potion_1",
             "item_type": "consumable",
-            "name": "Dewfall Tonic"
+            "name": "Dewfall Tonic",
         }
 
         # Mock Player Vitals (injured)
@@ -84,9 +82,7 @@ class TestAlchemistMechanics(unittest.TestCase):
         self.mock_db.get_equipped_items.return_value = []
 
         # Mock Skills
-        self.mock_db.get_all_player_skills.return_value = [
-            {"skill_key": "equivalent_exchange", "skill_level": 1}
-        ]
+        self.mock_db.get_all_player_skills.return_value = [{"skill_key": "equivalent_exchange", "skill_level": 1}]
 
         # Mock DB Vitals (to avoid clamp error)
         self.mock_db.get_player_vitals.return_value = {"current_hp": 100, "current_mp": 100}
@@ -105,6 +101,7 @@ class TestAlchemistMechanics(unittest.TestCase):
         # Reconstruct to check values
         saved_stats = PlayerStats.from_dict(saved_stats_dict)
         self.assertEqual(saved_stats.magic, 11)
+
 
 if __name__ == "__main__":
     unittest.main()

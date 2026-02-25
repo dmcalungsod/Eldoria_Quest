@@ -2387,6 +2387,42 @@ class DatabaseManager:
         }
 
     # ============================================================
+    # CRAFTING & SUPPLY STATS (New methods for external call sites)
+    # ============================================================
+
+    def increment_crafting_stats(self, discord_id: int, amount: int = 1):
+        """Increments the total items crafted count in the stats collection."""
+        self._col("stats").update_one(
+            {"discord_id": discord_id},
+            {"$inc": {"total_items_crafted": amount}},
+            upsert=True,
+        )
+
+    def get_crafting_stats(self, discord_id: int) -> int:
+        """Fetches total items crafted."""
+        doc = self._col("stats").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "total_items_crafted": 1},
+        )
+        return doc.get("total_items_crafted", 0) if doc else 0
+
+    def increment_supply_stats(self, discord_id: int, amount: int):
+        """Increments the total supplies used count in the stats collection."""
+        self._col("stats").update_one(
+            {"discord_id": discord_id},
+            {"$inc": {"total_supplies_used": amount}},
+            upsert=True,
+        )
+
+    def get_supply_stats(self, discord_id: int) -> int:
+        """Fetches total supplies used."""
+        doc = self._col("stats").find_one(
+            {"discord_id": discord_id},
+            {"_id": 0, "total_supplies_used": 1},
+        )
+        return doc.get("total_supplies_used", 0) if doc else 0
+
+    # ============================================================
     # TOURNAMENTS (New methods for external call sites)
     # ============================================================
 
