@@ -2,10 +2,11 @@ import importlib
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 # Helper Mocks
 class MockView:
@@ -16,6 +17,7 @@ class MockView:
     def add_item(self, item):
         self.children.append(item)
 
+
 class MockButton:
     def __init__(self, label=None, style=None, custom_id=None, emoji=None, row=None, disabled=False):
         self.label = label
@@ -25,6 +27,7 @@ class MockButton:
         self.row = row
         self.disabled = disabled
         self.callback = None
+
 
 class MockSelect:
     def __init__(self, placeholder=None, min_values=1, max_values=1, row=None, options=None):
@@ -44,6 +47,7 @@ class MockSelect:
         opt.description = description
         opt.emoji = emoji
         self.options.append(opt)
+
 
 class TestSetupView(unittest.TestCase):
     def setUp(self):
@@ -75,12 +79,11 @@ class TestSetupView(unittest.TestCase):
         sys.modules["game_systems.adventure.ui.status_view"] = MagicMock()
 
         # Mock LOCATIONS
-        self.mock_locations = {
-            "forest": {"name": "Forest", "min_rank": "F", "level_req": 1}
-        }
+        self.mock_locations = {"forest": {"name": "Forest", "min_rank": "F", "level_req": 1}}
 
         with patch("game_systems.adventure.ui.setup_view.LOCATIONS", self.mock_locations):
             import game_systems.adventure.ui.setup_view
+
             importlib.reload(game_systems.adventure.ui.setup_view)
             self.AdventureSetupView = game_systems.adventure.ui.setup_view.AdventureSetupView
 
@@ -94,14 +97,10 @@ class TestSetupView(unittest.TestCase):
         mock_user = MagicMock()
 
         # Case 1: 5 different supplies -> max 3
-        supplies = [
-            {"item_key": f"item_{i}", "item_name": f"Item {i}", "count": 1}
-            for i in range(5)
-        ]
+        supplies = [{"item_key": f"item_{i}", "item_name": f"Item {i}", "count": 1} for i in range(5)]
 
         view = self.AdventureSetupView(
-            mock_db, mock_manager, mock_user,
-            player_rank="F", player_level=1, supplies=supplies
+            mock_db, mock_manager, mock_user, player_rank="F", player_level=1, supplies=supplies
         )
 
         # Supply select is 3rd item (index 2)
@@ -112,12 +111,11 @@ class TestSetupView(unittest.TestCase):
         # Case 2: 2 different supplies -> max 2
         supplies = [
             {"item_key": "item_1", "item_name": "Item 1", "count": 1},
-            {"item_key": "item_2", "item_name": "Item 2", "count": 1}
+            {"item_key": "item_2", "item_name": "Item 2", "count": 1},
         ]
 
         view = self.AdventureSetupView(
-            mock_db, mock_manager, mock_user,
-            player_rank="F", player_level=1, supplies=supplies
+            mock_db, mock_manager, mock_user, player_rank="F", player_level=1, supplies=supplies
         )
 
         supply_select = view.children[2]
@@ -133,8 +131,7 @@ class TestSetupView(unittest.TestCase):
         supplies = [{"item_key": "item_1", "item_name": "Item 1", "count": 1}]
 
         view = self.AdventureSetupView(
-            mock_db, mock_manager, mock_user,
-            player_rank="F", player_level=1, supplies=supplies
+            mock_db, mock_manager, mock_user, player_rank="F", player_level=1, supplies=supplies
         )
 
         interaction = MagicMock()
@@ -145,6 +142,7 @@ class TestSetupView(unittest.TestCase):
         view.supply_select.values = ["item_1"]
 
         import asyncio
+
         loop = asyncio.new_event_loop()
         loop.run_until_complete(view.supply_callback(interaction))
         loop.close()
@@ -161,8 +159,7 @@ class TestSetupView(unittest.TestCase):
         supplies = [{"item_key": "item_1", "item_name": "Item 1", "count": 1}]
 
         view = self.AdventureSetupView(
-            mock_db, mock_manager, mock_user,
-            player_rank="F", player_level=1, supplies=supplies
+            mock_db, mock_manager, mock_user, player_rank="F", player_level=1, supplies=supplies
         )
 
         view.selected_location = "forest"
@@ -181,6 +178,7 @@ class TestSetupView(unittest.TestCase):
 
         with patch("game_systems.adventure.ui.setup_view.get_player_or_error", side_effect=mock_get_player):
             import asyncio
+
             loop = asyncio.new_event_loop()
             loop.run_until_complete(view.start_callback(interaction))
             loop.close()
@@ -191,6 +189,7 @@ class TestSetupView(unittest.TestCase):
             # args: (user_id, loc, duration)
             # kwargs: supplies
             self.assertEqual(kwargs["supplies"], {"item_1": 1})
+
 
 if __name__ == "__main__":
     unittest.main()

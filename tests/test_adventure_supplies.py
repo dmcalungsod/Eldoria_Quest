@@ -67,10 +67,13 @@ class TestAdventureSupplies(unittest.TestCase):
         self.assertAlmostEqual(mult, 1.04, places=4)
 
     @patch("game_systems.adventure.adventure_session.WorldEventSystem")
-    @patch("game_systems.adventure.adventure_session.CONSUMABLES", {
-        "hardtack": {"type": "supply", "effect": {"fatigue_reduction": 0.2}},
-        "pitch_torch": {"type": "supply", "effect": {"ambush_reduction": 0.5}}
-    })
+    @patch(
+        "game_systems.adventure.adventure_session.CONSUMABLES",
+        {
+            "hardtack": {"type": "supply", "effect": {"fatigue_reduction": 0.2}},
+            "pitch_torch": {"type": "supply", "effect": {"ambush_reduction": 0.5}},
+        },
+    )
     def test_supply_context_integration(self, MockEventSystem):
         """Verify _fetch_session_context correctly merges supply effects."""
         # Mock event system to avoid time/DB calls
