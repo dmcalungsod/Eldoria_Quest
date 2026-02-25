@@ -135,15 +135,20 @@ class ConsumableManager:
                 self.db.set_player_vitals(discord_id, current_hp, current_mp)
 
                 # 7. Apply Buffs (Deferred)
-                for b in buffs_to_apply:
-                    self.db.add_active_buff(
-                        discord_id,
-                        item_key,
-                        item_data["name"],
-                        b["key"],
-                        b["val"],
-                        b["duration"],
-                    )
+                if buffs_to_apply:
+                    bulk_list = []
+                    for b in buffs_to_apply:
+                        # Map to add_active_buffs_bulk format
+                        bulk_list.append(
+                            {
+                                "buff_id": item_key,
+                                "name": item_data["name"],
+                                "stat": b["key"],
+                                "amount": b["val"],
+                                "duration_s": b["duration"],
+                            }
+                        )
+                    self.db.add_active_buffs_bulk(discord_id, bulk_list)
 
                 return True, " ".join(message_lines)
 

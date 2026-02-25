@@ -783,6 +783,43 @@ class DatabaseManager:
             }
         )
 
+    def add_active_buffs_bulk(self, discord_id: int, buffs: list[dict]):
+        """
+        Adds multiple buffs to the player in a single transaction.
+        Optimized to replace 2*N queries with 2 queries.
+        buffs structure: [{"buff_id": ..., "name": ..., "stat": ..., "amount": ..., "duration_s": ...}]
+        """
+        if not buffs:
+            return
+
+        # 1. Identify unique buff names to clear (Prevent stacking by name)
+        unique_names = list({b["name"] for b in buffs})
+
+        # 2. Batch Delete existing buffs with these names
+        self._col("active_buffs").delete_many(
+            {"discord_id": discord_id, "name": {"$in": unique_names}}
+        )
+
+        # 3. Calculate End Times and Prepare Documents
+        now = WorldTime.now()
+        docs = []
+        for b in buffs:
+            end_time = (now + datetime.timedelta(seconds=b["duration_s"])).isoformat()
+            docs.append(
+                {
+                    "discord_id": discord_id,
+                    "buff_id": b.get("buff_id"),
+                    "name": b["name"],
+                    "stat": b["stat"],
+                    "amount": b["amount"],
+                    "end_time": end_time,
+                }
+            )
+
+        # 4. Batch Insert
+        if docs:
+            self._col("active_buffs").insert_many(docs)
+
     def get_active_buffs(self, discord_id: int) -> list[dict[str, Any]]:
         """Fetches active buffs for the player."""
         now = WorldTime.now().isoformat()
