@@ -9,6 +9,7 @@ import logging
 
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
+from game_systems.data.skills_data import SKILLS
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.player_stats import PlayerStats
 
@@ -56,6 +57,24 @@ class ConsumableManager:
             max_hp = stats.max_hp
             max_mp = stats.max_mp
 
+            # --- PASSIVE SKILL CHECK (Triage) ---
+            healing_multiplier = 1.0
+            try:
+                skill_levels = self.db.get_player_skill_levels(discord_id)
+                for s_key, s_level in skill_levels.items():
+                    skill_def = SKILLS.get(s_key)
+                    if (
+                        skill_def
+                        and skill_def.get("type") == "Passive"
+                        and "passive_bonus" in skill_def
+                    ):
+                        bonuses = skill_def["passive_bonus"]
+                        if "healing_item_potency" in bonuses:
+                            # 0.2 * level
+                            healing_multiplier += bonuses["healing_item_potency"] * s_level
+            except Exception as e:
+                logger.error(f"Error checking passive skills for {discord_id}: {e}")
+
             # 4. Calculate Effects (In Memory Only)
             item_used = False
             message_lines = []
@@ -63,14 +82,19 @@ class ConsumableManager:
 
             # -- Heal Logic --
             if "heal" in effect:
-                heal_amount = effect["heal"]
+                base_heal = effect["heal"]
+                heal_amount = int(base_heal * healing_multiplier)
+
                 if current_hp < max_hp:
                     old_hp = current_hp
                     new_hp = min(current_hp + heal_amount, max_hp)
                     healed_for = new_hp - old_hp
 
                     current_hp = new_hp
-                    message_lines.append(f"You healed for {healed_for} HP.")
+                    msg = f"You healed for {healed_for} HP."
+                    if healing_multiplier > 1.0:
+                        msg += f" (Boosted x{healing_multiplier:.1f})"
+                    message_lines.append(msg)
                     item_used = True
 
             # -- Mana Logic --

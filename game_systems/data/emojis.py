@@ -82,6 +82,7 @@ MANA = "✨"
 DAGGER = "🗡️"
 HEAL = "⚕️"
 BOW = "🏹"
+ALCHEMIST = "⚗️"
 
 # --- ANSI Color Definitions ---
 RARITY_COLORS = {

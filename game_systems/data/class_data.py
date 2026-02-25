@@ -33,6 +33,32 @@ CLASSES = {
             "accessory",  # Misc
         ],
     },
+    "Alchemist": {
+        "id": 6,
+        "description": (
+            "A pragmatic survivor who views the Sundering not as a curse, but a chemical reaction "
+            "to be understood. While Mages channel the Veil and Clerics pray to it, Alchemists "
+            "bottle it. They use volatile mixtures to control the battlefield, stripping enemy "
+            "defenses and turning the environment against them."
+        ),
+        "stats": {"STR": 3, "END": 5, "DEX": 6, "AGI": 4, "MAG": 7, "LCK": 4},
+        "allowed_slots": [
+            "mace",
+            "dagger",  # Weapons
+            "medium_armor",
+            "medium_gloves",
+            "medium_boots",
+            "medium_legs",
+            "leather_cap",  # Medium Armor
+            "robe",
+            "hood",
+            "gloves",
+            "boots",
+            "legs",  # Light Armor
+            "belt",
+            "accessory",  # Misc
+        ],
+    },
     "Mage": {
         "id": 2,
         "description": (
