@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Dict, Optional, Union
+from typing import Any, List, Dict
 
 logger = logging.getLogger("eldoria.data")
 

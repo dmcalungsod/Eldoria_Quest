@@ -5,7 +5,7 @@ Defines the validation schemas for Eldoria Quest game data.
 These schemas are used by DataValidator to ensure data integrity at startup.
 """
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 
 # Type aliases for schema definition
 SchemaType = Dict[str, Any]

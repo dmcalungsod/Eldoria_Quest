@@ -172,14 +172,6 @@ class CombatEngine:
                     # Apply percentage modifiers
                     for stat in ["ATK", "DEF", "AGI", "DEX"]:
                         key = f"{stat}_percent"
-
-                        # Special Mapping: END_percent -> DEF for monsters
-                        if stat == "DEF" and "END_percent" in debuff:
-                            mod = float(debuff["END_percent"])
-                            base_val = eff_monster.get(stat, 0)
-                            new_val = max(0, int(base_val * (1.0 + mod)))
-                            eff_monster[stat] = new_val
-
                         if key in debuff:
                             mod = float(debuff[key])
                             base_val = eff_monster.get(stat, 0)
@@ -436,15 +428,7 @@ class CombatEngine:
         Executes monster AI and action.
         Returns True if player is defeated.
         """
-        # Check for active Stun debuff (from skills)
-        is_stunned_debuff = False
-        if "debuffs" in self.monster:
-            for d in self.monster["debuffs"]:
-                if d.get("type") == "stun":
-                    is_stunned_debuff = True
-                    break
-
-        if monster_stunned or is_stunned_debuff:
+        if monster_stunned:
             log.append(f"💫 The {self.monster.get('name', 'enemy')} is reeling and misses its turn!")
             return False
 
@@ -722,9 +706,6 @@ class CombatEngine:
         if skill.get("key_id") == "unstoppable_force":
             self.new_titles.append("Unstoppable")
 
-        damage_dealt = 0
-        recoil_based_on_damage = False
-
         if skill.get("heal_power", 0) > 0:
             # --- Healing Skill ---
             heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
@@ -738,8 +719,6 @@ class CombatEngine:
 
         else:
             # --- Offensive Skill ---
-            recoil_based_on_damage = True
-
             # Use effective stats for defense calculation
             effective_monster = self._get_effective_monster_stats()
 
@@ -761,40 +740,24 @@ class CombatEngine:
             if event_type == "crit":
                 turn_report["player_crit"] = 1
 
-            damage_dealt = dmg
-
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
 
+            # Recoil Mechanics (Tactician)
+            recoil_pct = skill.get("self_damage_percent")
+            if recoil_pct:
+                recoil_dmg = max(1, int(dmg * recoil_pct))
+                self.player_hp = max(0, self.player_hp - recoil_dmg)
+                log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
+
+            # Apply Debuffs (if any)
+            if skill.get("debuff"):
+                debuff_msg = self._apply_monster_debuff(skill)
+                if debuff_msg:
+                    log.append(debuff_msg)
+
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
-
-        # --- UNIVERSAL SKILL EFFECTS ---
-
-        # 1. Status Effects (Stun, etc.)
-        if skill.get("status_effect"):
-            self._apply_status_effects(skill, log)
-
-        # 2. Recoil Mechanics
-        recoil_pct = skill.get("self_damage_percent")
-        if recoil_pct:
-            if recoil_based_on_damage:
-                # Offensive Recoil (Based on Damage Dealt)
-                recoil_dmg = max(1, int(damage_dealt * recoil_pct))
-            else:
-                # Utility Recoil (Based on Max HP - e.g. Mutagenic Serum)
-                max_hp = self.stats_dict.get("HP", 100)
-                recoil_dmg = max(1, int(max_hp * recoil_pct))
-
-            self.player_hp = max(0, self.player_hp - recoil_dmg)
-            log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
-
-        # 3. Apply Debuffs (if any)
-        # Note: Vitriol Bomb (Offensive) has debuff.
-        if skill.get("debuff"):
-            debuff_msg = self._apply_monster_debuff(skill)
-            if debuff_msg:
-                log.append(debuff_msg)
 
     def _process_monster_debuffs(self):
         """
@@ -830,30 +793,6 @@ class CombatEngine:
 
         self.monster["debuffs"] = active_debuffs
         return msgs
-
-    def _apply_status_effects(self, skill, log):
-        """
-        Applies status effects like Stun to the monster.
-        """
-        status_data = skill.get("status_effect", {})
-        if not status_data:
-            return
-
-        if "debuffs" not in self.monster:
-            self.monster["debuffs"] = []
-
-        if "stun_chance" in status_data:
-            chance = float(status_data["stun_chance"])
-            if random.random() < chance:  # nosec B311
-                # Add Stun Debuff (Duration 1 = Current Turn)
-                self.monster["debuffs"].append(
-                    {
-                        "type": "stun",
-                        "duration": 1,
-                        "name": "Stun",
-                    }
-                )
-                log.append(f"💫 **{self.monster.get('name', 'Enemy')}** is stunned by the impact!")
 
     def _apply_monster_debuff(self, skill):
         """
@@ -902,13 +841,7 @@ class CombatEngine:
 
         # Check for Stat Modifiers (ATK_percent, DEF_percent, etc.)
         stat_mods = {}
-        # Added support for END_percent, STR_percent, etc.
-        valid_stats = [
-            "ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent",
-            "END_percent", "STR_percent", "MAG_percent", "LCK_percent"
-        ]
-
-        for key in valid_stats:
+        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent"]:
             if key in debuff_data:
                 stat_mods[key] = debuff_data[key]
 
@@ -923,6 +856,7 @@ class CombatEngine:
 
             if existing:
                 existing["duration"] = duration
+                # Update magnitude if new one is stronger? For now, we assume same skill = same magnitude.
                 return f"💢 **{self.monster.get('name', 'Enemy')}**'s {name} is refreshed!"
             else:
                 new_debuff = {
