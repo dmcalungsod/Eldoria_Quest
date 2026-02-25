@@ -1,14 +1,14 @@
-import os
+
 import sys
+import os
 import unittest
 
 # Add repo root to path so we can import game_systems
 sys.path.append(os.getcwd())
 
+from game_systems.data.recipes import RECIPES
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.materials import MATERIALS
-from game_systems.data.recipes import RECIPES
-
 
 class TestCraftingData(unittest.TestCase):
     def test_new_travel_supplies_recipes(self):
@@ -49,10 +49,7 @@ class TestCraftingData(unittest.TestCase):
                     # So we should check if material is in MATERIALS OR CONSUMABLES.
 
                     valid_material = (mat_key in MATERIALS) or (mat_key in CONSUMABLES)
-                    self.assertTrue(
-                        valid_material, f"Material {mat_key} for {recipe_id} not found in MATERIALS or CONSUMABLES."
-                    )
-
+                    self.assertTrue(valid_material, f"Material {mat_key} for {recipe_id} not found in MATERIALS or CONSUMABLES.")
 
 if __name__ == "__main__":
     unittest.main()
