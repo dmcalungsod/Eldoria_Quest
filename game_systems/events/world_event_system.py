@@ -23,6 +23,7 @@ class WorldEventSystem:
     HARVEST_FESTIVAL = "harvest_festival"
     ELEMENTAL_SURGE = "elemental_surge"
     MYSTIC_MERCHANT = "mystic_merchant"
+    FROSTFALL_EXPEDITION = "frostfall_expedition"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -77,6 +78,16 @@ class WorldEventSystem:
             "description": "A mysterious traveler has arrived, offering rare goods for those with coin.",
             "modifiers": {
                 "loot_boost": 1.2,
+            },
+        },
+        FROSTFALL_EXPEDITION: {
+            "name": "The Frostfall Expedition",
+            "description": "The Guild is sponsoring expeditions to the Frostfall Expanse. Danger is high, but the rewards are frozen in time.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.1,
+                "frostfall_threat_reduction": 0.9,  # 10% reduction in damage taken in Frostfall
+                "frostfall_loot_bonus": 1.5,  # 50% more loot from Frostfall
             },
         },
     }
