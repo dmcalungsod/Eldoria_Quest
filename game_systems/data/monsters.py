@@ -10,6 +10,8 @@ import logging
 from pathlib import Path
 
 from game_systems.monsters.monster_skills import MONSTER_SKILLS
+from game_systems.data.data_validator import DataValidator
+from game_systems.data.schemas import MONSTER_SCHEMA
 
 logger = logging.getLogger("eldoria.data")
 
@@ -31,14 +33,25 @@ def load_monsters():
         logger.error(f"CRITICAL: monsters.json is invalid JSON: {e}")
         return {}
 
+    # Validate Schema
+    # Root is dict of {monster_key: monster_data}
+    top_schema = {
+        "type": dict,
+        "values_schema": {
+            "type": dict,
+            "schema": MONSTER_SCHEMA
+        }
+    }
+
+    errors = DataValidator.validate(data, top_schema, "monsters")
+    if errors:
+        for err in errors:
+            logger.error(f"Validation Error: {err}")
+        logger.warning("Loaded monster data contains schema errors.")
+
     validated_monsters = {}
 
     for key, monster_data in data.items():
-        # Basic Validation
-        if "id" not in monster_data or "name" not in monster_data:
-            logger.warning(f"Monster '{key}' missing required fields (id, name). Skipping.")
-            continue
-
         # Rehydrate Skills
         # The JSON contains list of skill keys (strings)
         skill_keys = monster_data.get("skills", [])
