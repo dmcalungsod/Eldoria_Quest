@@ -1,0 +1,40 @@
+name: Mirror to DeeEmSea/Eldoria-Quest-Bot
+
+on:
+  workflow_run:
+    workflows: ["CI (fast)"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Clone mirror
+        run: |
+          git clone --mirror "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" repo-mirror
+
+      - name: Push to mirror
+        id: push_mirror
+        run: |
+          cd repo-mirror
+          git push --mirror "https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot" && echo "mirror_ok=true" >> $GITHUB_OUTPUT || echo "mirror_ok=false" >> $GITHUB_OUTPUT
+
+      - name: Write summary
+        if: always()
+        run: |
+          if [ "${{ steps.push_mirror.outputs.mirror_ok }}" == "true" ]; then
+            echo "### ✅ Mirror succeeded" >> $GITHUB_STEP_SUMMARY
+            echo "Pushed to DeeEmSea/Eldoria-Quest-Bot successfully." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Mirror failed" >> $GITHUB_STEP_SUMMARY
+            echo "Push to DeeEmSea/Eldoria-Quest-Bot failed. Check logs." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if mirror failed
+        if: steps.push_mirror.outputs.mirror_ok != 'true'
+        run: exit 1
