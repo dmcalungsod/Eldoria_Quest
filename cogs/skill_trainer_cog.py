@@ -17,6 +17,7 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.skills_data import SKILLS
+from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.player.achievement_system import AchievementSystem
 
 from .utils.ui_helpers import back_to_guild_hall_callback
@@ -207,6 +208,12 @@ class SkillTrainerView(View):
         skill_key = interaction.data["values"][0].split(":")[0]
 
         success, msg = await asyncio.to_thread(self._execute_learn, skill_key)
+
+        if success:
+            # Recalculate stats to apply potential passive bonuses
+            equip_mgr = EquipmentManager(self.db)
+            await asyncio.to_thread(equip_mgr.recalculate_player_stats, self.interaction_user.id)
+
         await self._refresh_ui(interaction, success, msg, skill_key)
 
         if success:
@@ -219,6 +226,12 @@ class SkillTrainerView(View):
         skill_key = interaction.data["values"][0].split(":")[0]
 
         success, msg, new_level = await asyncio.to_thread(self._execute_upgrade, skill_key)
+
+        if success:
+            # Recalculate stats to apply potential passive bonuses
+            equip_mgr = EquipmentManager(self.db)
+            await asyncio.to_thread(equip_mgr.recalculate_player_stats, self.interaction_user.id)
+
         await self._refresh_ui(interaction, success, msg, skill_key, new_level)
 
         if success:

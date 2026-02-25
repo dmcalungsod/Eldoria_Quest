@@ -190,5 +190,21 @@
         "effect": {"ambush_reduction": 0.5},
         "rarity": "Common",
         "description": "A tar-soaked torch that burns bright, warding off creatures of the dark."
+    },
+    "phial_of_vitriol": {
+        "id": "phial_of_vitriol",
+        "name": "Phial of Vitriol",
+        "type": "throwable",
+        "effect": {"aoe_atk": 20},
+        "rarity": "Common",
+        "description": "A sealed glass vial containing concentrated acid. Explodes on impact."
+    },
+    "bitter_panacea": {
+        "id": "bitter_panacea",
+        "name": "Bitter Panacea",
+        "type": "antidote",
+        "effect": {"cure_poison": true},
+        "rarity": "Common",
+        "description": "A foul-tasting mixture that neutralizes toxins."
     }
 }

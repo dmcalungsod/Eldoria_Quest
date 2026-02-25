@@ -78,6 +78,7 @@ class StartMenuView(View):
             "Rogue": E.DAGGER,
             "Cleric": E.HEAL,
             "Ranger": E.BOW,
+            "Alchemist": E.ALCHEMIST,
         }
 
         for name, data in sorted_classes:
@@ -358,6 +359,7 @@ class CombatTutorialView(View):
             3: ("gen_dagger_001", "Iron Shiv", "dagger"),
             4: ("gen_mace_001", "Acolyte's Mace", "mace"),
             5: ("gen_bow_001", "Hunter's Bow", "bow"),
+            6: ("gen_mace_002", "Iron Pestle", "mace"),
         }
 
         if class_id in mapping:

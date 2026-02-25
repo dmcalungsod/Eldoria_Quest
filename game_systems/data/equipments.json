@@ -61,6 +61,17 @@
         },
         "description": "A sturdy mace, balanced for both combat and ceremony."
     },
+    "gen_mace_002": {
+        "name": "Iron Pestle",
+        "slot": "mace",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "STR": 1,
+            "MAG": 1
+        },
+        "description": "A heavy iron tool used for grinding herbs—and bones."
+    },
     "gen_wand_005": {
         "name": "Crystal Focus",
         "slot": "wand",
@@ -83,6 +94,17 @@
         },
         "description": "Moth-eaten and stained, but it's another layer between you and the world."
     },
+    "gen_mediumarmor_002": {
+        "name": "Apothecary's Leathers",
+        "slot": "medium_armor",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "END": 1,
+            "DEX": 1
+        },
+        "description": "Sturdy leather stained with various chemical reagents."
+    },
     "gen_rogue_armor_001": {
         "name": "Worn Leather Vest",
         "slot": "rogue_armor",
@@ -102,6 +124,16 @@
             "LCK": 1
         },
         "description": "A simple loop of twine. Smells faintly of moss."
+    },
+    "gen_accessory_002": {
+        "name": "Bandolier of Vials",
+        "slot": "accessory",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "MAG": 1
+        },
+        "description": "A leather strap holding several empty glass vials."
     },
     "gen_dagger_003": {
         "name": "Iron Dirk",
