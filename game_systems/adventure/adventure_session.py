@@ -13,6 +13,7 @@ from typing import Any
 from database.database_manager import DatabaseManager
 from game_systems.core.world_time import TimePhase, Weather, WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.consumables import CONSUMABLES
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
 
@@ -98,7 +99,7 @@ class AdventureSession:
             "active_monster": self.active_monster,
         }
 
-    def _calculate_fatigue_multiplier(self) -> float:
+    def _calculate_fatigue_multiplier(self, reduction_bonus: float = 0.0) -> float:
         """
         Calculates monster damage multiplier based on session duration.
         Logic: > 4 hours (16 steps) -> +5% damage per hour (4 steps).
@@ -113,9 +114,9 @@ class AdventureSession:
         # 5% per hour (4 steps) => 1.25% per step
         bonus = (excess_steps / 4.0) * 0.05
 
-        # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
-        if self.supplies.get("hardtack"):
-            bonus *= 0.8
+        # Apply reduction (e.g., Hardtack)
+        if reduction_bonus > 0:
+            bonus *= max(0.0, 1.0 - reduction_bonus)
 
         return 1.0 + bonus
 
@@ -171,6 +172,18 @@ class AdventureSession:
             # Merge Player Buffs (Additive to existing multipliers)
             for key, val in player_buffs.items():
                 boosts_dict[key] = boosts_dict.get(key, 1.0) + val
+
+            # --- SUPPLY EFFECTS (Additive) ---
+            if self.supplies:
+                for item_key, count in self.supplies.items():
+                    item_data = CONSUMABLES.get(item_key)
+                    if item_data and item_data.get("type") == "supply":
+                        effects = item_data.get("effect", {})
+                        for effect_key, effect_val in effects.items():
+                            # Accumulate supply effects
+                            # Note: Most supply effects are additive multipliers (e.g. 0.2 for 20%)
+                            # We just store them in active_boosts to be used by logic
+                            boosts_dict[effect_key] = boosts_dict.get(effect_key, 0.0) + effect_val
 
             # --- WORLD EVENT BOOSTS ---
             event_system = WorldEventSystem(self.db)
@@ -356,6 +369,11 @@ class AdventureSession:
             elif time_phase == TimePhase.DAY:
                 regen_threshold += 5  # Day is safer (-5% Combat Chance)
 
+            # Apply Encounter Reduction (e.g. Warding Incense)
+            encounter_red = context["active_boosts"].get("encounter_reduction", 0.0)
+            if encounter_red > 0:
+                regen_threshold += int(encounter_red * 100)
+
             # --- 2. Trigger New Encounter ---
             if random.randint(1, 100) > regen_threshold:
                 # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
@@ -371,9 +389,10 @@ class AdventureSession:
                     # 20% Chance for monsters to strike first at night
                     ambush_chance = 0.20
 
-                    # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
-                    if self.supplies.get("pitch_torch"):
-                        ambush_chance *= 0.5
+                    # Apply Ambush Reduction (e.g. Pitch Torch)
+                    ambush_red = context["active_boosts"].get("ambush_reduction", 0.0)
+                    if ambush_red > 0:
+                        ambush_chance *= max(0.0, 1.0 - ambush_red)
 
                     if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:
                         monster_atk = monster.get("ATK", 10)
@@ -461,6 +480,12 @@ class AdventureSession:
         bonus = (agi - monster_level) * 2
         chance = max(10, min(90, 50 + bonus))
 
+        # Apply Flee Boost (e.g. Scout's Spyglass)
+        flee_boost = context["active_boosts"].get("flee_chance_boost", 0.0)
+        if flee_boost > 0:
+            chance += int(flee_boost * 100)
+            chance = min(95, chance)  # Cap at 95%
+
         roll = random.randint(1, 100)
 
         if roll <= chance:
@@ -517,7 +542,8 @@ class AdventureSession:
 
         # Max 8 turns to avoid infinite loops
         stance = self.active_monster.get("player_stance", "balanced")
-        fatigue_mult = self._calculate_fatigue_multiplier() * threat_reduction
+        fatigue_reduction = context["active_boosts"].get("fatigue_reduction", 0.0) if context else 0.0
+        fatigue_mult = self._calculate_fatigue_multiplier(fatigue_reduction) * threat_reduction
 
         for _ in range(8):
             # FIX: Pass session XP
@@ -633,7 +659,8 @@ class AdventureSession:
         initial_hp = context["vitals"]["current_hp"] if context else 0
         initial_mp = context["vitals"]["current_mp"] if context else 0
 
-        fatigue_mult = self._calculate_fatigue_multiplier() * threat_reduction
+        fatigue_reduction = context["active_boosts"].get("fatigue_reduction", 0.0) if context else 0.0
+        fatigue_mult = self._calculate_fatigue_multiplier(fatigue_reduction) * threat_reduction
 
         result = self.combat.resolve_turn(
             self.active_monster,

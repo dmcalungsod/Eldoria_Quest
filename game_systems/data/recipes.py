@@ -177,6 +177,24 @@ RECIPES = {
         "cost": 350,
         "description": "A scholar's secret: sharp as a quill.",
     },
+    "craft_hardtack": {
+        "id": "craft_hardtack",
+        "name": "Hardtack",
+        "output_key": "hardtack",
+        "output_amount": 2,
+        "materials": {"medicinal_herb": 3, "slime_gel": 1},
+        "cost": 10,
+        "description": "Bake herbs and binding gel into dense, non-perishable biscuits.",
+    },
+    "craft_pitch_torch": {
+        "id": "craft_pitch_torch",
+        "name": "Pitch Torch",
+        "output_key": "pitch_torch",
+        "output_amount": 2,
+        "materials": {"treant_branch": 1, "slime_gel": 2},
+        "cost": 15,
+        "description": "Wrap a branch in slime-soaked rags to create a long-burning torch.",
+    },
     # --- Refinement Recipes ---
     "refine_iron_ingot": {
         "id": "refine_iron_ingot",
