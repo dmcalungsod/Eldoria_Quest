@@ -32,7 +32,7 @@ class MockDatabase:
             "player": {"current_hp": 100, "current_mp": 100},
             "stats": {"HP": 100, "MP": 100},
             "buffs": [],
-            "skills": []
+            "skills": [],
         }
 
     def update_adventure_status(self, discord_id, status):
@@ -48,7 +48,9 @@ class MockDatabase:
         pass
 
     # Add other methods if needed by AdventureResolutionEngine initialization
-    def _col(self, name): return MagicMock()
+    def _col(self, name):
+        return MagicMock()
+
 
 class FastAdventureSession:
     def __init__(self, db, quest, inv, discord_id, row_data=None):
@@ -66,6 +68,7 @@ class FastAdventureSession:
     def save_state(self):
         pass
 
+
 def run_stress_test():
     logger.info("Initializing Stress Test (Scheduler Only)...")
 
@@ -76,13 +79,15 @@ def run_stress_test():
     NUM_SESSIONS = 10000
     sessions = []
     for i in range(NUM_SESSIONS):
-        sessions.append({
-            "discord_id": 100000 + i,
-            "duration_minutes": 60,
-            "steps_completed": 0,
-            "start_time": "2023-01-01T00:00:00",
-            # ... other fields ignored by mocked session
-        })
+        sessions.append(
+            {
+                "discord_id": 100000 + i,
+                "duration_minutes": 60,
+                "steps_completed": 0,
+                "start_time": "2023-01-01T00:00:00",
+                # ... other fields ignored by mocked session
+            }
+        )
 
     logger.info(f"Generated {NUM_SESSIONS} sessions.")
 
@@ -108,6 +113,7 @@ def run_stress_test():
         # Verification
         assert len(mock_db.status_updates) == NUM_SESSIONS
         logger.info("✅ Verified: All sessions updated.")
+
 
 if __name__ == "__main__":
     run_stress_test()
