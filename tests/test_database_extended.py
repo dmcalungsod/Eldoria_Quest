@@ -4,11 +4,11 @@ Extended Database Tests for Eldoria Quest
 Covers additional database operations not included in test_database.py.
 """
 
-import datetime
-import os
-import sys
 import unittest
 from unittest.mock import MagicMock, patch
+import sys
+import os
+import datetime
 
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
@@ -58,12 +58,14 @@ class TestDatabaseManagerExtended(unittest.TestCase):
             self.mock_db.players.find_one.return_value = {
                 "current_hp": 50,
                 "current_mp": 20,
-                "last_regen_time": last_regen,
+                "last_regen_time": last_regen
             }
 
             # 2. Mock Stats (Max HP/MP)
             # returning a stats json
-            self.mock_db.stats.find_one.return_value = {"stats_json": '{"STR": 10}'}
+            self.mock_db.stats.find_one.return_value = {
+                "stats_json": '{"STR": 10}'
+            }
 
             # 3. Mock PlayerStats class
             with patch("game_systems.player.player_stats.PlayerStats") as MockPlayerStats:
@@ -85,8 +87,8 @@ class TestDatabaseManagerExtended(unittest.TestCase):
                 # Check update called
                 self.assertTrue(self.mock_db.players.update_one.called)
                 args, _ = self.mock_db.players.update_one.call_args
-                self.assertEqual(args[1]["$set"]["current_hp"], 55)  # 50 + 5
-                self.assertEqual(args[1]["$set"]["current_mp"], 30)  # 20 + 10
+                self.assertEqual(args[1]["$set"]["current_hp"], 55) # 50 + 5
+                self.assertEqual(args[1]["$set"]["current_mp"], 30) # 20 + 10
 
     def test_update_player_vitals_delta(self):
         # Test positive delta
@@ -105,10 +107,14 @@ class TestDatabaseManagerExtended(unittest.TestCase):
 
     def test_get_player_skills(self):
         # Mock skill cache to avoid DB lookup for definitions
-        self.db._skill_cache = {"fireball": {"key_id": "fireball", "name": "Fireball", "type": "Active"}}
+        self.db._skill_cache = {
+            "fireball": {"key_id": "fireball", "name": "Fireball", "type": "Active"}
+        }
 
         # Mock player skills DB return
-        mock_skills = [{"discord_id": 12345, "skill_key": "fireball", "skill_level": 2, "skill_exp": 100}]
+        mock_skills = [
+            {"discord_id": 12345, "skill_key": "fireball", "skill_level": 2, "skill_exp": 100}
+        ]
         self.mock_db.player_skills.find.return_value = mock_skills
 
         # Test
@@ -157,8 +163,8 @@ class TestDatabaseManagerExtended(unittest.TestCase):
         self.assertTrue(success)
         self.assertEqual(new_level, 2)
         # Verify calls
-        self.mock_db.players.update_one.assert_called()  # Vestige deduction
-        self.mock_db.player_skills.update_one.assert_called()  # Level up
+        self.mock_db.players.update_one.assert_called() # Vestige deduction
+        self.mock_db.player_skills.update_one.assert_called() # Level up
 
     # ============================================================
     # ADVENTURE
@@ -170,7 +176,7 @@ class TestDatabaseManagerExtended(unittest.TestCase):
             location_id="forest",
             start_time="2023-01-01T12:00:00",
             end_time="2023-01-01T13:00:00",
-            duration_minutes=60,
+            duration_minutes=60
         )
 
         # Should delete existing first, then insert
@@ -191,7 +197,7 @@ class TestDatabaseManagerExtended(unittest.TestCase):
             active=1,
             active_monster_json=None,
             previous_version=1,
-            steps_completed=5,
+            steps_completed=5
         )
 
         self.assertTrue(success)
@@ -201,7 +207,10 @@ class TestDatabaseManagerExtended(unittest.TestCase):
     def test_end_adventure_session(self):
         self.db.end_adventure_session(12345)
 
-        self.mock_db.adventure_sessions.update_many.assert_called_with({"discord_id": 12345}, {"$set": {"active": 0}})
+        self.mock_db.adventure_sessions.update_many.assert_called_with(
+            {"discord_id": 12345},
+            {"$set": {"active": 0}}
+        )
 
     # ============================================================
     # INVENTORY EXTENDED
@@ -213,7 +222,10 @@ class TestDatabaseManagerExtended(unittest.TestCase):
         self.mock_db.inventory.aggregate.return_value = [{"total": 5}]
 
         # Mock find stacks
-        stacks = [{"id": 101, "count": 2, "equipped": 0}, {"id": 102, "count": 3, "equipped": 0}]
+        stacks = [
+            {"id": 101, "count": 2, "equipped": 0},
+            {"id": 102, "count": 3, "equipped": 0}
+        ]
         # Cursor mock
         mock_cursor = MagicMock()
         mock_cursor.sort.return_value = stacks
@@ -264,13 +276,15 @@ class TestDatabaseManagerExtended(unittest.TestCase):
         # Second call: should be cached (within 60s)
         t2 = self.db.get_active_tournament()
         self.assertEqual(t2, mock_t)
-        self.mock_db.tournaments.find_one.assert_called_once()  # Call count should not increase
+        self.mock_db.tournaments.find_one.assert_called_once() # Call count should not increase
 
     def test_update_tournament_score(self):
         self.db.update_tournament_score(12345, 1, 100)
 
         self.mock_db.tournament_scores.update_one.assert_called_with(
-            {"discord_id": 12345, "tournament_id": 1}, {"$inc": {"score": 100}}, upsert=True
+            {"discord_id": 12345, "tournament_id": 1},
+            {"$inc": {"score": 100}},
+            upsert=True
         )
 
     # ============================================================
@@ -282,7 +296,7 @@ class TestDatabaseManagerExtended(unittest.TestCase):
         self.db.set_active_world_event("invasion", "start", "end", {"power": 10})
 
         # Verify deactivate old and insert new
-        self.assertTrue(self.mock_db.world_events.update_many.called)  # end_active_world_event
+        self.assertTrue(self.mock_db.world_events.update_many.called) # end_active_world_event
         self.assertTrue(self.mock_db.world_events.insert_one.called)
 
         # Get event (mock return)
@@ -324,10 +338,10 @@ class TestDatabaseManagerExtended(unittest.TestCase):
                     "faction_id": "faction_a",
                     "reputation": 0,
                     # We can't easily match the exact time string in mock, so we check keys
-                    "join_date": unittest.mock.ANY,
+                    "join_date": unittest.mock.ANY
                 }
             },
-            upsert=True,
+            upsert=True
         )
 
     def test_update_faction_reputation(self):
