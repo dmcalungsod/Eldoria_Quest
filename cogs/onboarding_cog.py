@@ -72,8 +72,21 @@ class StartMenuView(View):
 
     def _init_buttons(self):
         sorted_classes = sorted(CLASS_DEFINITIONS.items(), key=lambda x: x[1]["id"])
+        class_emojis = {
+            "Warrior": E.SWORDS,
+            "Mage": E.MAG,
+            "Rogue": E.DAGGER,
+            "Cleric": E.HEAL,
+            "Ranger": E.BOW,
+        }
+
         for name, data in sorted_classes:
-            btn = Button(label=name, custom_id=f"cls_{data['id']}")
+            btn = Button(
+                label=name,
+                custom_id=f"cls_{data['id']}",
+                emoji=class_emojis.get(name),
+                style=discord.ButtonStyle.primary,
+            )
             btn.callback = self.class_select_callback
             self.add_item(btn)
 
@@ -91,7 +104,20 @@ class StartMenuView(View):
             return
 
         # Format Stats with descriptions
-        stats_str = "\n".join([f"`{k}: {v}`" for k, v in class_info["stats"].items()])
+        stat_emojis = {
+            "STR": E.STR,
+            "END": E.END,
+            "DEX": E.DEX,
+            "AGI": E.AGI,
+            "MAG": E.MAG,
+            "LCK": E.LCK,
+        }
+        stats_str = "\n".join(
+            [
+                f"{stat_emojis.get(k, '•')} **{k}**: `{v}`"
+                for k, v in class_info["stats"].items()
+            ]
+        )
 
         embed = discord.Embed(
             title=f"Class: {class_name}",

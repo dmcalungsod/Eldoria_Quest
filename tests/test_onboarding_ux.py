@@ -33,7 +33,16 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         # Mock discord
         mock_discord = MagicMock()
         mock_discord.ui.View = MockView
-        mock_discord.ui.Button = MagicMock()
+
+        class MockButton:
+            def __init__(self, label=None, custom_id=None, emoji=None, style=None):
+                self.label = label
+                self.custom_id = custom_id
+                self.emoji = emoji
+                self.style = style
+                self.callback = None
+
+        mock_discord.ui.Button = MockButton
         mock_discord.ButtonStyle = MagicMock()
         mock_discord.ext = MagicMock()
         mock_discord.ext.commands = MagicMock()
@@ -56,9 +65,25 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
 
         self.GuildWelcomeView = cogs.onboarding_cog.GuildWelcomeView
         self.CombatTutorialView = cogs.onboarding_cog.CombatTutorialView
+        self.StartMenuView = cogs.onboarding_cog.StartMenuView
 
     def tearDown(self):
         self.modules_patcher.stop()
+
+    async def test_start_menu_view_init(self):
+        """Test that StartMenuView initializes with class buttons containing emojis."""
+        db = MagicMock()
+        user = MagicMock()
+        view = self.StartMenuView(db, user)
+
+        # Check if buttons are created
+        self.assertTrue(len(view.children) > 0, "No buttons created in StartMenuView")
+
+        # Verify buttons have emojis
+        mock_discord = sys.modules["discord"]
+        for btn in view.children:
+            self.assertIsNotNone(btn.emoji, f"Button {btn.label} is missing an emoji")
+            self.assertEqual(btn.style, mock_discord.ButtonStyle.primary, f"Button {btn.label} has wrong style")
 
     async def test_guild_welcome_view_init(self):
         """Test that GuildWelcomeView initializes with correct buttons."""
