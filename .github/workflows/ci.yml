@@ -24,9 +24,14 @@ jobs:
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -39,6 +44,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Ruff Fix
+        run: |
+          ruff check . --fix
+          ruff format .
+
+      - name: Commit Ruff Fixes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-fix code with Ruff"
+          branch: ${{ github.head_ref || github.ref_name }}
+          file_pattern: "*.py"
 
       - name: Run Ruff Format Check
         run: ruff format --check .
