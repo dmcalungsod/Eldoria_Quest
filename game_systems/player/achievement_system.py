@@ -113,18 +113,6 @@ DURATION_MILESTONES = {
     480: ("Marathoner", "Completed an adventure lasting at least 8 hours."),
 }
 
-CRAFTING_MILESTONES = {
-    10: ("Apprentice Smith", "Crafted 10 items."),
-    50: ("Artisan", "Crafted 50 items."),
-    100: ("Master Crafter", "Crafted 100 items."),
-}
-
-SUPPLY_MILESTONES = {
-    10: ("Prepared", "Used 10 supplies in adventures."),
-    50: ("Provisioner", "Used 50 supplies in adventures."),
-    100: ("Logistics Expert", "Used 100 supplies in adventures."),
-}
-
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -151,6 +139,10 @@ class AchievementSystem:
 
             field, milestones = field_map[kill_type]
             current_count = member_data.get(field, 0)
+
+            # Check for milestones met exactly or passed (in case of jumps, though usually incremental)
+            # But we only award if they don't have it.
+            # However, "check all milestones <= current_count" is safer.
 
             newly_awarded = []
 
@@ -363,54 +355,4 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking duration achievements for {discord_id}: {e}")
-            return None
-
-    def check_crafting_achievements(self, discord_id: int) -> str | None:
-        """
-        Checks if the player has reached a crafting milestone.
-        Returns a success message if a new title is awarded, else None.
-        """
-        try:
-            count = self.db.get_crafting_stats(discord_id)
-            newly_awarded = []
-
-            for milestone, (title, desc) in CRAFTING_MILESTONES.items():
-                if count >= milestone:
-                    if self.db.add_title(discord_id, title):
-                        newly_awarded.append(title)
-                        logger.info(f"Awarded title '{title}' to {discord_id}")
-
-            if newly_awarded:
-                if len(newly_awarded) == 1:
-                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
-                else:
-                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
-            return None
-        except Exception as e:
-            logger.error(f"Error checking crafting achievements for {discord_id}: {e}")
-            return None
-
-    def check_supply_achievements(self, discord_id: int) -> str | None:
-        """
-        Checks if the player has reached a supply usage milestone.
-        Returns a success message if a new title is awarded, else None.
-        """
-        try:
-            count = self.db.get_supply_stats(discord_id)
-            newly_awarded = []
-
-            for milestone, (title, desc) in SUPPLY_MILESTONES.items():
-                if count >= milestone:
-                    if self.db.add_title(discord_id, title):
-                        newly_awarded.append(title)
-                        logger.info(f"Awarded title '{title}' to {discord_id}")
-
-            if newly_awarded:
-                if len(newly_awarded) == 1:
-                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
-                else:
-                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
-            return None
-        except Exception as e:
-            logger.error(f"Error checking supply achievements for {discord_id}: {e}")
             return None

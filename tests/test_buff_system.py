@@ -1,12 +1,6 @@
-import sys
 import time
 import unittest
 from unittest.mock import MagicMock, patch
-
-# Mock modules before importing project modules
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["discord"] = MagicMock()
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.combat_handler import CombatHandler

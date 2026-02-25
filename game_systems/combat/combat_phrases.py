@@ -539,22 +539,6 @@ class CombatPhrases:
             "A rain of arrows darkens the sky as you use **{skill_name}**!",
             "You fire in rapid succession, turning the air into a deadly volley!",
         ],
-        # --- ALCHEMIST ---
-        "vitriol_bomb": [
-            "You lob a **{skill_name}**, the glass shattering to release a cloud of eating fumes!",
-            "The **{skill_name}** hisses as it coats the {m_name} in liquid agony!",
-            "Smoke rises from the {m_name}'s armor as **{skill_name}** dissolves its protection!",
-        ],
-        "mutagenic_serum": [
-            "You down the **{skill_name}**, veins bulging as raw power floods your system.",
-            "A primal roar escapes your lips—**{skill_name}** twists your form into a weapon.",
-            "Pain and power surge together; **{skill_name}** has begun its work.",
-        ],
-        "fulminating_compound": [
-            "You toss the **{skill_name}** and dive for cover—BOOM!",
-            "A blinding flash and a thunderous report! **{skill_name}** devastates the area!",
-            "The **{skill_name}** turns the ground beneath the {m_name} into a crater.",
-        ],
     }
 
     @staticmethod
@@ -670,23 +654,6 @@ class CombatPhrases:
                     f"Your bow sings—the {m_name} recoils from the hit. {d_str}",
                     f"You loose an arrow, catching the {m_name} in the flank. {d_str}",
                     f"You snap-fire a shot, hitting the {m_name} in stride. {d_str}",
-                ]
-
-        # --- ALCHEMIST (ID 6) ---
-        elif player_class_id == 6:
-            if is_crit:
-                pool = [
-                    f"A perfect reaction! The {m_name} is engulfed in a consuming alchemical fire! {d_str}",
-                    f"The flask shatters directly on a weak point, melting through the {m_name}'s defenses! {d_str}",
-                    f"Unstable energies chain-react, tearing the {m_name} apart from the inside! {d_str}",
-                ]
-            else:
-                pool = [
-                    f"You hurl a flask of volatile liquid that bursts against the {m_name}. {d_str}",
-                    f"A chemical hiss fills the air as your mixture burns the {m_name}. {d_str}",
-                    f"You splash a caustic reagent onto the {m_name}, causing it to recoil. {d_str}",
-                    f"Your carefully measured compound detonates on the {m_name}. {d_str}",
-                    f"You throw a heavy ceramic pot, cracking it against the {m_name}'s skull. {d_str}",
                 ]
 
         # --- DEFAULT ---
