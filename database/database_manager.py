@@ -2400,13 +2400,13 @@ class DatabaseManager:
         )
         return counter["seq"]
 
-    def create_tournament(self, type: str, start_time: str, end_time: str) -> int:
+    def create_tournament(self, tournament_type: str, start_time: str, end_time: str) -> int:
         """Creates a new active tournament."""
         new_id = self._next_tournament_id()
         self._col("tournaments").insert_one(
             {
                 "id": new_id,
-                "type": type,
+                "type": tournament_type,
                 "start_time": start_time,
                 "end_time": end_time,
                 "active": 1,
