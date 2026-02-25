@@ -17,7 +17,7 @@ Inspired by:
 </p>
 
 <p align="center">
-  <a href="https://dl.circleci.com/status-badge/redirect/gh/dmcalungsod/Eldoria_Quest/tree/main"><img src="https://dl.circleci.com/status-badge/img/gh/dmcalungsod/Eldoria_Quest/tree/main.svg?style=svg" alt="CircleCI"/></a>
+  <a href="https://dl.circleci.com/status-badge/redirect/gh/dmcalungsod/Eldoria_Quest/tree/main"><img src="https://dl.circleci.com/status-badge/img/gh/dmcalungsod/Eldoria_Quest/tree/main.svg?style=svg&circle-token=CCIPRJ_9M56X9ZWuVCBH6HgePZiii_8d4a7f362aeded36ad82ee40441697f4075770a3" alt="CircleCI"/></a>
   <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white" alt="Python 3.10"/>
   <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white" alt="MongoDB"/>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=flat" alt="Ruff"/></a>
