@@ -1997,7 +1997,7 @@ class DatabaseManager:
                 discord_id,
                 item_key,
                 item_data["name"],
-                "consumable",
+                item_data.get("type", "consumable"),
                 item_data["rarity"],
                 1,
             )

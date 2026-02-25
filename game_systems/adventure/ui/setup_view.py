@@ -33,6 +33,8 @@ class AdventureSetupView(View):
         interaction_user: discord.User,
         player_rank: str,
         player_level: int,
+        supplies: list = None,
+        capacity: tuple = None,
     ):
         super().__init__(timeout=180)
         self.db = db
@@ -40,9 +42,12 @@ class AdventureSetupView(View):
         self.interaction_user = interaction_user
         self.player_rank = player_rank
         self.player_level = player_level
+        self.supplies_list = supplies or []
+        self.capacity = capacity
 
         self.selected_location = None
         self.selected_duration = None
+        self.selected_supply = None
 
         # 1. Location Select
         self.location_select = Select(
@@ -90,19 +95,50 @@ class AdventureSetupView(View):
         self.duration_select.callback = self.duration_callback
         self.add_item(self.duration_select)
 
-        # 3. Start Button
+        # 3. Supply Select
+        self.supply_select = Select(
+            placeholder="Select Supplies (Optional)...",
+            min_values=0,
+            max_values=1,
+            row=2,
+        )
+
+        # Consolidate supplies
+        supply_options = {}
+        for item in self.supplies_list:
+            key = item["item_key"]
+            if key not in supply_options:
+                supply_options[key] = {"name": item["item_name"], "count": 0}
+            supply_options[key]["count"] += item["count"]
+
+        if supply_options:
+            for key, data in supply_options.items():
+                self.supply_select.add_option(
+                    label=f"{data['name']} (x{data['count']})",
+                    value=key,
+                    description="Take 1 unit.",
+                    emoji="🎒"
+                )
+        else:
+            self.supply_select.add_option(label="No Supplies", value="none")
+            self.supply_select.disabled = True
+
+        self.supply_select.callback = self.supply_callback
+        self.add_item(self.supply_select)
+
+        # 4. Start Button
         self.start_btn = Button(
             label="Begin Expedition",
             style=discord.ButtonStyle.success,
-            row=2,
+            row=3,
             disabled=True,
             emoji="⚔️",
         )
         self.start_btn.callback = self.start_callback
         self.add_item(self.start_btn)
 
-        # 4. Back Button
-        self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=2)
+        # 5. Back Button
+        self.back_btn = Button(label="Return to Ledger", style=discord.ButtonStyle.grey, row=3)
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
 
@@ -164,12 +200,23 @@ class AdventureSetupView(View):
         self._update_start_button()
         await interaction.response.edit_message(view=self)
 
+    async def supply_callback(self, interaction: discord.Interaction):
+        if self.supply_select.values:
+            self.selected_supply = self.supply_select.values[0]
+        else:
+            self.selected_supply = None
+        await interaction.response.edit_message(view=self)
+
     async def start_callback(self, interaction: discord.Interaction):
         # Validate player before starting adventure
         if not await get_player_or_error(interaction, self.db):
             return
 
         await interaction.response.defer()
+
+        supplies_dict = {}
+        if self.selected_supply and self.selected_supply != "none":
+            supplies_dict[self.selected_supply] = 1
 
         try:
             # 1. Start the adventure in DB (Threaded)
@@ -178,6 +225,7 @@ class AdventureSetupView(View):
                 interaction.user.id,
                 self.selected_location,
                 self.selected_duration,
+                supplies=supplies_dict,
             )
 
             if not success:

@@ -140,24 +140,42 @@ class AdventureView(View):
         await interaction.response.defer()
 
         try:
-            # Parallel fetch of guild rank and player level
-            guild_member, player_data = await asyncio.gather(
+            # Parallel fetch of guild rank, player level, and inventory data
+            guild_member, player_data, supplies, max_slots, current_slots = await asyncio.gather(
                 asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
+                asyncio.to_thread(self.db.get_inventory_items, self.interaction_user.id, item_type="supply"),
+                asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id),
+                asyncio.to_thread(self.db.get_inventory_slot_count, self.interaction_user.id),
             )
             rank = guild_member["rank"] if guild_member else "F"
             level = player_data["level"] if player_data else 1
 
+            # Capacity Check Flavor
+            capacity_str = f"🎒 **Pack:** {current_slots}/{max_slots}"
+            if current_slots >= max_slots:
+                capacity_str += " (FULL! You cannot carry loot.)"
+            elif current_slots >= max_slots - 2:
+                capacity_str += " (Heavy)"
+
             embed = discord.Embed(
                 title=f"{E.MAP} Prepare for Expedition",
                 description=(
-                    "*The great gates of the city loom overhead, iron-bound and weathered by countless journeys.*\n\n"
+                    f"*The great gates of the city loom overhead.*\n\n{capacity_str}\n"
                     "Select a destination and duration to begin."
                 ),
                 color=discord.Color.dark_green(),
             )
 
-            view = AdventureSetupView(self.db, adventure_cog.manager, self.interaction_user, rank, level)
+            view = AdventureSetupView(
+                self.db,
+                adventure_cog.manager,
+                self.interaction_user,
+                rank,
+                level,
+                supplies=supplies,
+                capacity=(current_slots, max_slots)
+            )
             view.back_btn.callback = back_to_profile_callback
 
             await interaction.edit_original_response(embed=embed, view=view)
