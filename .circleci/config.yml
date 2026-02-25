@@ -151,6 +151,8 @@ jobs:
           command: |
             git clone --mirror "https://x-access-token:${GITHUB_TOKEN}@github.com/dmcalungsod/Eldoria_Quest" repo-mirror
             cd repo-mirror
+            # Remove PR refs — GitHub rejects pushes to hidden refs
+            git for-each-ref --format='delete %(refname)' refs/pull | git update-ref --stdin
             if git push --mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/DeeEmSea/Eldoria-Quest-Bot"; then
               echo "✅ Mirror pushed to DeeEmSea/Eldoria-Quest-Bot"
             else
