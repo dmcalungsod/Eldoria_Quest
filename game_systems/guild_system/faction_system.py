@@ -251,7 +251,7 @@ class FactionSystem:
             if success:
                 logs.append(f"+{final_rep} Reputation with {existing['name']}")
                 if favored_bonus:
-                    logs.append(f"• Favored Location Bonus (+50%)")
+                    logs.append("• Favored Location Bonus (+50%)")
                 if rank_msgs:
                     logs.extend(rank_msgs)
                 return logs

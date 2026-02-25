@@ -1,6 +1,6 @@
+import datetime
 import sys
 import unittest
-import datetime
 from unittest.mock import MagicMock, patch
 
 # Mock modules before importing
@@ -8,9 +8,10 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
-from game_systems.events.world_event_system import WorldEventSystem
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.adventure.adventure_rewards import AdventureRewards
+from game_systems.adventure.adventure_rewards import AdventureRewards  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
+
 
 class TestFrostfallEvent(unittest.TestCase):
     def setUp(self):
@@ -34,9 +35,7 @@ class TestFrostfallEvent(unittest.TestCase):
         success = self.system.start_event(WorldEventSystem.FROSTFALL_EXPEDITION, 24)
         self.assertTrue(success)
         self.mock_db.set_active_world_event.assert_called_with(
-            WorldEventSystem.FROSTFALL_EXPEDITION,
-            unittest.mock.ANY,
-            unittest.mock.ANY
+            WorldEventSystem.FROSTFALL_EXPEDITION, unittest.mock.ANY, unittest.mock.ANY
         )
 
         # Mock DB returning the event
@@ -59,14 +58,14 @@ class TestFrostfallEvent(unittest.TestCase):
         discord_id = 123
         session = AdventureSession(self.mock_db, self.mock_quest, self.mock_inv, discord_id)
         session.location_id = "frostfall_expanse"
-        session.active_monster = {"name": "Test Monster"} # Active monster needed for combat
+        session.active_monster = {"name": "Test Monster"}  # Active monster needed for combat
 
         # Mock Context Bundle
         bundle = {
             "stats": {"HP": 100, "MP": 100},
             "buffs": [],
             "player": {"current_hp": 100, "current_mp": 100},
-            "skills": []
+            "skills": [],
         }
         self.mock_db.get_combat_context_bundle.return_value = bundle
 
@@ -89,7 +88,7 @@ class TestFrostfallEvent(unittest.TestCase):
             "monster_hp": 0,
             "turn_report": {},
             "monster_data": {"name": "Test"},
-            "phrases": ["Combat happens"]
+            "phrases": ["Combat happens"],
         }
 
         # Mock Rewards
@@ -111,14 +110,14 @@ class TestFrostfallEvent(unittest.TestCase):
         """Verify AdventureSession DOES NOT apply threat reduction elsewhere."""
         discord_id = 123
         session = AdventureSession(self.mock_db, self.mock_quest, self.mock_inv, discord_id)
-        session.location_id = "forest_outskirts" # NOT Frostfall
+        session.location_id = "forest_outskirts"  # NOT Frostfall
         session.active_monster = {"name": "Test Monster"}
 
         bundle = {
             "stats": {"HP": 100, "MP": 100},
             "buffs": [],
             "player": {"current_hp": 100, "current_mp": 100},
-            "skills": []
+            "skills": [],
         }
         self.mock_db.get_combat_context_bundle.return_value = bundle
 
@@ -137,7 +136,7 @@ class TestFrostfallEvent(unittest.TestCase):
             "monster_hp": 0,
             "turn_report": {},
             "monster_data": {"name": "Test"},
-            "phrases": ["Combat happens"]
+            "phrases": ["Combat happens"],
         }
 
         mock_rewards_instance = mock_rewards.return_value
@@ -160,9 +159,9 @@ class TestFrostfallEvent(unittest.TestCase):
             "drops": ["item1"],
             "monster_data": {"name": "Test", "tier": "Normal"},
             "active_boosts": {
-                "loot_boost": 1.25, # Base event boost
-                "frostfall_loot_bonus": 1.5 # Specific bonus
-            }
+                "loot_boost": 1.25,  # Base event boost
+                "frostfall_loot_bonus": 1.5,  # Specific bonus
+            },
         }
 
         self.mock_db.get_player_stats_json.return_value = {"luck": 10}
@@ -176,7 +175,7 @@ class TestFrostfallEvent(unittest.TestCase):
             quest_system=self.mock_quest,
             inventory_manager=self.mock_inv,
             session_loot={},
-            location_id="frostfall_expanse"
+            location_id="frostfall_expanse",
         )
 
         # Verify LootCalculator called with combined boost
@@ -194,10 +193,7 @@ class TestFrostfallEvent(unittest.TestCase):
             "exp": 100,
             "drops": ["item1"],
             "monster_data": {"name": "Test", "tier": "Normal"},
-            "active_boosts": {
-                "loot_boost": 1.25,
-                "frostfall_loot_bonus": 1.5
-            }
+            "active_boosts": {"loot_boost": 1.25, "frostfall_loot_bonus": 1.5},
         }
 
         self.mock_db.get_player_stats_json.return_value = {"luck": 10}
@@ -210,12 +206,13 @@ class TestFrostfallEvent(unittest.TestCase):
             quest_system=self.mock_quest,
             inventory_manager=self.mock_inv,
             session_loot={},
-            location_id="forest_outskirts" # NOT Frostfall
+            location_id="forest_outskirts",  # NOT Frostfall
         )
 
         # Verify LootCalculator called with base boost only (1.25)
         args, kwargs = mock_loot_calc.roll_drops.call_args
         self.assertAlmostEqual(args[2], 1.25)
+
 
 if __name__ == "__main__":
     unittest.main()

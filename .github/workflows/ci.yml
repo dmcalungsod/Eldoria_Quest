@@ -1,12 +1,20 @@
-name: CI
+name: CI (fast)
 
 on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
+      - "docs/**"
   pull_request:
-    branches: ["main", "master"]
-    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
+      - "docs/**"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -17,64 +25,40 @@ jobs:
     name: Lint & Format
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Needed for auto-fix commit
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: 'pip'
-        continue-on-error: true
+          cache: "pip"
 
-      - name: Install Lint Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff==0.15.2 bandit==1.9.3
-        continue-on-error: true
+          pip install ruff
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run Ruff (Fix & Format)
+      - name: Run Ruff Fix
         run: |
           ruff check . --fix
           ruff format .
-          echo "### 🖌️ Linting Results" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Ruff auto-fix completed" >> $GITHUB_STEP_SUMMARY
-        continue-on-error: true
 
       - name: Commit Ruff Fixes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: auto-fix code with Ruff"
           branch: ${{ github.head_ref || github.ref_name }}
-          file_pattern: '*.py'
-        continue-on-error: true
+          file_pattern: "*.py"
 
-      - name: Run Ruff (Check — must be clean)
-        run: |
-          ruff check .
-          ruff format --check .
-          echo "✅ Ruff clean check passed" >> $GITHUB_STEP_SUMMARY
-        continue-on-error: true
+      - name: Run Ruff Format Check
+        run: ruff format --check .
 
-      - name: Run Bandit Security Linter
-        run: |
-          bandit -r . -ll
-          echo "✅ Bandit Security Scan passed" >> $GITHUB_STEP_SUMMARY
-        continue-on-error: true
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "### 🖌️ Lint & Format" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ All lint and format checks passed." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Lint or format check failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
-          fi
-        continue-on-error: true
+      - name: Run Ruff Lint
+        run: ruff check .

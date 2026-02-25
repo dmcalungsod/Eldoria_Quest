@@ -796,9 +796,7 @@ class DatabaseManager:
         unique_names = list({b["name"] for b in buffs})
 
         # 2. Batch Delete existing buffs with these names
-        self._col("active_buffs").delete_many(
-            {"discord_id": discord_id, "name": {"$in": unique_names}}
-        )
+        self._col("active_buffs").delete_many({"discord_id": discord_id, "name": {"$in": unique_names}})
 
         # 3. Calculate End Times and Prepare Documents
         now = WorldTime.now()

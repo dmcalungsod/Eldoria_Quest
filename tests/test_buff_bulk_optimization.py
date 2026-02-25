@@ -1,7 +1,6 @@
-
 import sys
 import unittest
-from unittest.mock import MagicMock, call, ANY
+from unittest.mock import MagicMock
 
 # Mock pymongo modules BEFORE importing database_manager
 sys.modules["pymongo"] = MagicMock()
@@ -10,7 +9,8 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Ensure we can import game modules
 sys.path.append(".")
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
+
 
 class TestBuffBulkOptimization(unittest.TestCase):
     def setUp(self):
@@ -63,6 +63,7 @@ class TestBuffBulkOptimization(unittest.TestCase):
         self.assertEqual(docs[0]["name"], "Blessing")
         self.assertEqual(docs[1]["name"], "Blessing")
         self.assertEqual(docs[2]["name"], "Shield")
+
 
 if __name__ == "__main__":
     unittest.main()
