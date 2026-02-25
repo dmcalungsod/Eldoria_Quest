@@ -12,6 +12,7 @@ import logging
 from pathlib import Path
 
 from game_systems.data.data_validator import DataValidator
+from game_systems.data.schemas import LOCATION_SCHEMA
 
 logger = logging.getLogger("eldoria.data")
 
@@ -34,12 +35,19 @@ def load_locations():
         return {}
 
     # Validate Schema
-    errors = DataValidator.validate_location_schema(data)
+    # The root is a dict of {location_id: location_data}
+    top_schema = {
+        "type": dict,
+        "values_schema": {
+            "type": dict,
+            "schema": LOCATION_SCHEMA
+        }
+    }
+
+    errors = DataValidator.validate(data, top_schema, "adventure_locations")
     if errors:
         for err in errors:
             logger.error(f"Validation Error: {err}")
-        # We might want to raise an error or continue with partial data.
-        # For now, we log errors but try to proceed if possible, though schema errors usually mean broken data.
         logger.warning("Loaded location data contains schema errors.")
 
     processed_locations = {}
@@ -58,10 +66,6 @@ def load_locations():
 
         if "gatherables" in loc_data and isinstance(loc_data["gatherables"], list):
             loc_data["gatherables"] = [tuple(g) for g in loc_data["gatherables"]]
-
-        # 'conditional_monsters' is a list of dicts, which is fine as is.
-        # 'duration_options' is a list of ints, fine as is.
-        # 'special_events' is list of strings, fine as is.
 
         processed_locations[loc_id] = loc_data
 
