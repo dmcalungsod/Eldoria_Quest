@@ -530,12 +530,12 @@
         "xp": 4125,
         "drops": [
             [
-                "magic_stone_large",
+                "magic_stone_medium",
                 100
             ],
             [
-                "magic_stone_flawless",
-                25
+                "magic_stone_large",
+                15
             ],
             [
                 "boss_talon",
