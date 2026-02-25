@@ -32,6 +32,9 @@ class TestAdventureFatigue:
             session, AdventureSession
         )
 
+        # Mock supplies (new requirement)
+        session.supplies = {}
+
         # Case 1: Under threshold (1 hour = 4 steps)
         session.steps_completed = 4
         assert session._calculate_fatigue_multiplier() == 1.0
