@@ -17,7 +17,7 @@ from discord.ui import Button, Select, View
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
-from game_systems.data.shop_data import SHOP_INVENTORY
+from game_systems.data.shop_data import SHOP_INVENTORY, SHOP_PURCHASE_LIMITS
 from game_systems.items.inventory_manager import InventoryManager
 
 from .utils.ui_helpers import back_to_guild_hall_callback, get_player_or_error
@@ -66,23 +66,48 @@ class ShopView(View):
             item_select.disabled = True
             return item_select
 
-        can_afford_any = False
+        # Fetch daily usage
+        daily_usage = self.db.get_shop_daily_count(self.interaction_user.id)
+
+        has_stock = False
+        has_funds_for_stock = False
+
         for item_key, price in self.inventory.items():
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 continue
 
+            # Check Daily Limit
+            limit = SHOP_PURCHASE_LIMITS.get(item_key, 0)
+            used = daily_usage.get(item_key, 0)
+            remaining = limit - used if limit > 0 else 999
+            is_sold_out = limit > 0 and remaining <= 0
+
             can_afford = self.current_aurum >= price
-            if can_afford:
-                can_afford_any = True
 
-            emoji = E.AURUM if can_afford else E.LOCKED
+            if not is_sold_out:
+                has_stock = True
+                if can_afford:
+                    has_funds_for_stock = True
 
-            # Ensure label does not exceed 100 characters
+            # Determine Emoji
+            if is_sold_out:
+                emoji = E.ERROR
+            elif can_afford:
+                emoji = E.AURUM
+            else:
+                emoji = E.LOCKED
+
+            # Determine Label Suffix
             suffix = f" — {price} G"
-            if not can_afford:
+            if is_sold_out:
+                suffix += " [Sold Out]"
+            elif not can_afford:
                 suffix += " [Too Expensive]"
+            elif limit > 0:
+                suffix += f" ({remaining}/{limit})"
 
+            # Truncate Name
             name = item_data["name"]
             max_name_len = 100 - len(suffix)
             if len(name) > max_name_len:
@@ -95,7 +120,10 @@ class ShopView(View):
                 emoji=emoji,
             )
 
-        if not can_afford_any:
+        if not has_stock:
+            item_select.placeholder = "Daily Rations Exhausted"
+            item_select.disabled = True
+        elif not has_funds_for_stock:
             item_select.placeholder = "Insufficient Funds"
             if self.current_aurum == 0:
                 item_select.disabled = True
@@ -115,8 +143,16 @@ class ShopView(View):
             if not item_data:
                 return (False, "Item data missing.", 0)
 
+            limit = SHOP_PURCHASE_LIMITS.get(item_key, 0)
+
             # Delegate to DatabaseManager for atomic execution with refund support
-            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, price)
+            success, result, new_balance = self.db.purchase_item(
+                self.interaction_user.id,
+                item_key,
+                item_data,
+                price,
+                daily_limit=limit,
+            )
 
             if success:
                 logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
