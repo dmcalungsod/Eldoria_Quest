@@ -1984,87 +1984,14 @@ class DatabaseManager:
     # SHOP (New methods for external call sites)
     # ============================================================
 
-    def get_shop_daily_count(self, discord_id: int) -> dict[str, int]:
-        """
-        Fetches the player's daily shop purchase history.
-        Resets if the date has changed.
-        Returns a dict of {item_key: count}.
-        """
-        doc = self._col("players").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "shop_daily": 1},
-        )
-        if not doc or "shop_daily" not in doc:
-            return {}
-
-        shop_daily = doc["shop_daily"]
-        today = WorldTime.now().date().isoformat()
-
-        if shop_daily.get("date") != today:
-            return {}
-
-        return shop_daily.get("counts", {})
-
-    def increment_shop_daily_count(self, discord_id: int, item_key: str, amount: int = 1):
-        """
-        Increments the daily purchase count for an item.
-        Handles date rotation atomically-ish.
-        """
-        today = WorldTime.now().date().isoformat()
-
-        # Check if we need to reset first
-        # We can use update with upsert/set logic
-        # But simply: If date != today, set entire object. Else inc.
-        # To be atomic, we can use a pipeline update or just unconditional set if missing.
-
-        # Better: use update with filter on date
-        result = self._col("players").update_one(
-            {"discord_id": discord_id, "shop_daily.date": today},
-            {"$inc": {f"shop_daily.counts.{item_key}": amount}},
-        )
-
-        if result.matched_count == 0:
-            # Date mismatch or missing field -> Reset
-            self._col("players").update_one(
-                {"discord_id": discord_id},
-                {
-                    "$set": {
-                        "shop_daily": {
-                            "date": today,
-                            "counts": {item_key: amount},
-                        }
-                    }
-                },
-            )
-
-    def purchase_item(
-        self,
-        discord_id: int,
-        item_key: str,
-        item_data: dict,
-        price: int,
-        daily_limit: int = 0,
-    ) -> tuple[bool, Any, int]:
-        """
-        Atomic purchase: deducts gold and adds item. Includes refund on failure.
-        Enforces daily purchase limits if daily_limit > 0.
-        """
-        # 1. Check Daily Limit
-        if daily_limit > 0:
-            usage = self.get_shop_daily_count(discord_id)
-            current_count = usage.get(item_key, 0)
-            if current_count >= daily_limit:
-                # Fetch current balance for consistent return
-                player = self._col("players").find_one({"discord_id": discord_id}, {"aurum": 1})
-                balance = player.get("aurum", 0) if player else 0
-                return (False, "Daily limit reached.", balance)
-
-        # 2. Atomic Deduction
+    def purchase_item(self, discord_id: int, item_key: str, item_data: dict, price: int) -> tuple[bool, Any, int]:
+        """Atomic purchase: deducts gold and adds item. Includes refund on failure."""
+        # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
         if new_aurum is None:
             return (False, "Insufficient Aurum.", 0)
 
-        # 3. Add item to inventory with Refund Logic
+        # 2. Add item to inventory with Refund Logic
         try:
             success = self.add_inventory_item(
                 discord_id,
@@ -2076,10 +2003,6 @@ class DatabaseManager:
             )
 
             if success:
-                # 4. Increment Daily Count (only on success)
-                if daily_limit > 0:
-                    self.increment_shop_daily_count(discord_id, item_key, 1)
-
                 return (True, item_data, new_aurum)
             else:
                 # Inventory Full -> Refund
@@ -2462,42 +2385,6 @@ class DatabaseManager:
             "unique_locations": doc.get("unique_locations", []),
             "total_expeditions": doc.get("total_expeditions", 0),
         }
-
-    # ============================================================
-    # CRAFTING & SUPPLY STATS (New methods for external call sites)
-    # ============================================================
-
-    def increment_crafting_stats(self, discord_id: int, amount: int = 1):
-        """Increments the total items crafted count in the stats collection."""
-        self._col("stats").update_one(
-            {"discord_id": discord_id},
-            {"$inc": {"total_items_crafted": amount}},
-            upsert=True,
-        )
-
-    def get_crafting_stats(self, discord_id: int) -> int:
-        """Fetches total items crafted."""
-        doc = self._col("stats").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "total_items_crafted": 1},
-        )
-        return doc.get("total_items_crafted", 0) if doc else 0
-
-    def increment_supply_stats(self, discord_id: int, amount: int):
-        """Increments the total supplies used count in the stats collection."""
-        self._col("stats").update_one(
-            {"discord_id": discord_id},
-            {"$inc": {"total_supplies_used": amount}},
-            upsert=True,
-        )
-
-    def get_supply_stats(self, discord_id: int) -> int:
-        """Fetches total supplies used."""
-        doc = self._col("stats").find_one(
-            {"discord_id": discord_id},
-            {"_id": 0, "total_supplies_used": 1},
-        )
-        return doc.get("total_supplies_used", 0) if doc else 0
 
     # ============================================================
     # TOURNAMENTS (New methods for external call sites)

@@ -106,11 +106,6 @@ class AdventureResolutionEngine:
                 bundle["player"]["current_hp"] = final_vitals.get("current_hp", bundle["player"]["current_hp"])
                 bundle["player"]["current_mp"] = final_vitals.get("current_mp", bundle["player"]["current_mp"])
 
-            # FIX: Update bundle with new buffs so they persist to next step
-            added_buffs = result.get("added_buffs", [])
-            if added_buffs and bundle and "buffs" in bundle:
-                bundle["buffs"].extend(added_buffs)
-
             if result.get("dead", False):
                 logger.info(f"Player {discord_id} died during simulation step {session.steps_completed}.")
 

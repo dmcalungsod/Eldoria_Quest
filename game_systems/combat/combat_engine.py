@@ -844,7 +844,7 @@ class CombatEngine:
 
         if "stun_chance" in status_data:
             chance = float(status_data["stun_chance"])
-            if random.random() < chance:
+            if random.random() < chance:  # nosec B311
                 # Add Stun Debuff (Duration 1 = Current Turn)
                 self.monster["debuffs"].append(
                     {
