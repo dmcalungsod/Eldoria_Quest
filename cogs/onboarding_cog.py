@@ -112,12 +112,7 @@ class StartMenuView(View):
             "MAG": E.MAG,
             "LCK": E.LCK,
         }
-        stats_str = "\n".join(
-            [
-                f"{stat_emojis.get(k, '•')} **{k}**: `{v}`"
-                for k, v in class_info["stats"].items()
-            ]
-        )
+        stats_str = "\n".join([f"{stat_emojis.get(k, '•')} **{k}**: `{v}`" for k, v in class_info["stats"].items()])
 
         embed = discord.Embed(
             title=f"Class: {class_name}",

@@ -41,11 +41,13 @@ class FactionCog(commands.Cog):
             loc_names = [LOCATIONS.get(lid, {}).get("name", lid) for lid in fav_locs]
             # Show first 2 + count if more
             if len(loc_names) > 3:
-                loc_str = ", ".join(loc_names[:2]) + f", +{len(loc_names)-2} more"
+                loc_str = ", ".join(loc_names[:2]) + f", +{len(loc_names) - 2} more"
             else:
                 loc_str = ", ".join(loc_names) if loc_names else "None"
 
-            embed.add_field(name=name, value=f"{desc}\n*Interests: {interests}*\n*Favored Territory: {loc_str}*", inline=False)
+            embed.add_field(
+                name=name, value=f"{desc}\n*Interests: {interests}*\n*Favored Territory: {loc_str}*", inline=False
+            )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
