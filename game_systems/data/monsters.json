@@ -531,19 +531,15 @@
         "drops": [
             [
                 "magic_stone_medium",
-                100
-            ],
-            [
-                "magic_stone_large",
-                15
+                50
             ],
             [
                 "boss_talon",
-                100
+                80
             ],
             [
-                "celestial_dust",
-                15
+                "magic_stone_large",
+                5
             ]
         ],
         "skills": [
@@ -661,8 +657,12 @@
         "xp": 420,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                20
+            ],
+            [
+                "slime_gel",
+                40
             ]
         ],
         "skills": [
@@ -681,8 +681,12 @@
         "xp": 420,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                20
+            ],
+            [
+                "medicinal_herb",
+                40
             ]
         ],
         "skills": [
@@ -726,8 +730,12 @@
         "xp": 450,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                20
+            ],
+            [
+                "elemental_mote",
+                25
             ]
         ],
         "skills": [
@@ -774,8 +782,12 @@
         "xp": 510,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                20
+            ],
+            [
+                "slime_gel",
+                40
             ]
         ],
         "skills": [
@@ -1843,11 +1855,15 @@
         "drops": [
             [
                 "void_dust",
-                70
+                80
             ],
             [
                 "magic_stone_large",
-                40
+                50
+            ],
+            [
+                "magic_stone_flawless",
+                5
             ]
         ],
         "skills": [
@@ -1868,11 +1884,11 @@
         "drops": [
             [
                 "abyssal_shackle",
-                60
+                70
             ],
             [
                 "magic_stone_large",
-                50
+                60
             ]
         ],
         "skills": [
@@ -1893,11 +1909,11 @@
         "drops": [
             [
                 "entropy_crystal",
-                50
+                60
             ],
             [
                 "void_dust",
-                40
+                50
             ]
         ],
         "skills": [
@@ -1918,11 +1934,11 @@
         "drops": [
             [
                 "null_stone",
-                40
+                50
             ],
             [
                 "magic_stone_flawless",
-                30
+                40
             ]
         ],
         "skills": [
@@ -2107,11 +2123,11 @@
         "drops": [
             [
                 "brass_gear",
-                60
+                70
             ],
             [
                 "spring_coil",
-                40
+                50
             ]
         ],
         "skills": [
@@ -2132,11 +2148,15 @@
         "drops": [
             [
                 "brass_gear",
-                60
+                70
             ],
             [
                 "copper_wire",
-                40
+                50
+            ],
+            [
+                "iron_ore",
+                30
             ]
         ],
         "skills": [
@@ -2157,11 +2177,11 @@
         "drops": [
             [
                 "magic_stone_medium",
-                70
+                80
             ],
             [
                 "copper_wire",
-                30
+                40
             ]
         ],
         "skills": [
@@ -2182,11 +2202,15 @@
         "drops": [
             [
                 "steam_core",
-                40
+                50
             ],
             [
                 "brass_gear",
-                50
+                60
+            ],
+            [
+                "mithril_ore",
+                20
             ]
         ],
         "skills": [
