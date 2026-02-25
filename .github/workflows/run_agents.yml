@@ -33,9 +33,11 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Calculate Current Date
-        id: date
-        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: Calculate Current Date (GMT+8)
+        run: |
+          export TZ="Asia/Manila"
+          echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          echo "$(date +'%Y-%m-%d')" > .Jules/TODAY.md
 
       - name: Run Agents (Example)
         env:
@@ -60,4 +62,4 @@ jobs:
         with:
           commit_message: "docs(agents): update logs for ${{ env.CURRENT_DATE }}"
           branch: ${{ github.ref_name }}
-          file_pattern: '.Jules/agent_logs/*.md'
+          file_pattern: '.Jules/TODAY.md .Jules/agent_logs/*.md'

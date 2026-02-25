@@ -82,9 +82,11 @@ This ecosystem ensures that Eldoria Quest evolves coherently, with every change 
 ## ⏰ Temporal Integrity
 
 To ensure all agent operations are anchored to the real-world timeline:
-- **Date Injection**: The `Run Agents` workflow (`.github/workflows/run_agents.yml`) injects the `CURRENT_DATE` environment variable into every agent run.
+- **Date Injection**: The `Run Agents` workflow (`.github/workflows/run_agents.yml`) injects the `CURRENT_DATE` environment variable (in GMT+8) into every agent run.
+- **Truth Anchor**: The file `.Jules/TODAY.md` is updated daily by the workflow to reflect the current authorized date. Agents may read this file to confirm the date.
+- **Validation**: The `Validate Logs` workflow ensures no files in `.Jules/agent_logs/` are future-dated.
 - **CLI Support**: The `scripts/run_agents.py` tool must be used to execute agents. It accepts a `--prompt` argument and replaces the `{{CURRENT_DATE}}` placeholder with the system date before execution.
-- **Constraint**: Agents must strictly adhere to the injected date for all logs, reports, and planning documents. Future dating is prohibited.
+- **Prepared Prompts**: Prepared prompt files are temporarily stored in `.Jules/agent_prompts/prepared/` (gitignored) rather than cluttering the logs directory.
 
 ### Integration Guide
 

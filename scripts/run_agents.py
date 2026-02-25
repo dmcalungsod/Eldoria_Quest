@@ -14,7 +14,7 @@ import datetime
 import argparse
 
 # Configuration
-LOGS_DIR = ".Jules/agent_logs"
+PREPARED_DIR = ".Jules/agent_prompts/prepared"
 
 def get_current_date():
     """Retrieves the current date from environment or system clock."""
@@ -42,10 +42,10 @@ def run_agent(agent_name, prompt_content, date_str, stdout=False):
 
     # Write "prepared" prompt to a file for the external agent system to pick up
     output_filename = f"{date_str}_{agent_name}_prepared.md"
-    output_path = os.path.join(LOGS_DIR, output_filename)
+    output_path = os.path.join(PREPARED_DIR, output_filename)
 
-    # Ensure logs directory exists
-    os.makedirs(LOGS_DIR, exist_ok=True)
+    # Ensure directory exists
+    os.makedirs(PREPARED_DIR, exist_ok=True)
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(final_prompt)
