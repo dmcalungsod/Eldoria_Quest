@@ -174,7 +174,7 @@ class AdventureView(View):
                 rank,
                 level,
                 supplies=supplies,
-                capacity=(current_slots, max_slots)
+                capacity=(current_slots, max_slots),
             )
             view.back_btn.callback = back_to_profile_callback
 

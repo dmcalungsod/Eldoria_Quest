@@ -114,10 +114,7 @@ class AdventureSetupView(View):
         if supply_options:
             for key, data in supply_options.items():
                 self.supply_select.add_option(
-                    label=f"{data['name']} (x{data['count']})",
-                    value=key,
-                    description="Take 1 unit.",
-                    emoji="🎒"
+                    label=f"{data['name']} (x{data['count']})", value=key, description="Take 1 unit.", emoji="🎒"
                 )
         else:
             self.supply_select.add_option(label="No Supplies", value="none")

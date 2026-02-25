@@ -1,8 +1,7 @@
-
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock
-import sys
-import os
 
 # Mock dependencies
 sys.modules["pymongo"] = MagicMock()
@@ -12,8 +11,9 @@ sys.modules["discord.ext"] = MagicMock()
 
 sys.path.append(os.getcwd())
 
-from game_systems.adventure.adventure_session import AdventureSession
 from database.database_manager import DatabaseManager
+from game_systems.adventure.adventure_session import AdventureSession
+
 
 class TestAdventureSupplies(unittest.TestCase):
     def setUp(self):
@@ -23,7 +23,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "stats": {},
             "buffs": [],
             "player": {"current_hp": 100, "current_mp": 100},
-            "skills": []
+            "skills": [],
         }
         self.db.get_active_boosts.return_value = []
 
@@ -35,7 +35,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {}
+            "supplies": {},
         }
         session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
 
@@ -53,7 +53,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {"hardtack": 1}
+            "supplies": {"hardtack": 1},
         }
         session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
 
@@ -72,10 +72,11 @@ class TestAdventureSupplies(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": supplies
+            "supplies": supplies,
         }
         session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
         self.assertEqual(session.supplies, supplies)
+
 
 if __name__ == "__main__":
     unittest.main()

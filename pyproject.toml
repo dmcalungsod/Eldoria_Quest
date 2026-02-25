@@ -13,6 +13,9 @@ ignore = [
     "F841",  # unused variable (sometimes useful in development)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402"]  # test files need sys.path manipulation before imports
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
