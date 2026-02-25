@@ -1,3 +1,4 @@
+
 import json
 import logging
 import os
@@ -34,9 +35,12 @@ class RealisticMockDatabase:
                 "class_id": 1,
                 "experience": 500,
                 "exp_to_next": 1000,
-                "name": "TestPlayer",
+                "name": "TestPlayer"
             },
-            "stats": {"HP": 100, "MP": 100, "STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10},
+            "stats": {
+                "HP": 100, "MP": 100,
+                "STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10
+            },
             "buffs": [],
             "skills": [
                 {
@@ -45,7 +49,7 @@ class RealisticMockDatabase:
                     "description": "Simple attack",
                     "damage_scale": 1.0,
                     "type": "physical",
-                    "key": "basic_attack",
+                    "key": "basic_attack"
                 },
                 {
                     "name": "Power Strike",
@@ -53,8 +57,8 @@ class RealisticMockDatabase:
                     "description": "Strong attack",
                     "damage_scale": 1.5,
                     "type": "physical",
-                    "key": "power_strike",
-                },
+                    "key": "power_strike"
+                }
             ],
         }
         self.static_vitals = {"current_hp": 100, "current_mp": 100}
@@ -130,22 +134,8 @@ class RealisticMockDatabase:
     def get_stat_exp_row(self, discord_id):
         # Return mock row for stat exp
         return {
-            "stats_json": json.dumps(
-                {
-                    "STR": {"base": 10},
-                    "DEX": {"base": 10},
-                    "INT": {"base": 10},
-                    "END": {"base": 10},
-                    "LCK": {"base": 10},
-                    "AGI": {"base": 10},
-                }
-            ),
-            "str_exp": 0,
-            "end_exp": 0,
-            "dex_exp": 0,
-            "agi_exp": 0,
-            "mag_exp": 0,
-            "lck_exp": 0,
+            "stats_json": json.dumps({"STR": {"base": 10}, "DEX": {"base": 10}, "INT": {"base": 10}, "END": {"base": 10}, "LCK": {"base": 10}, "AGI": {"base": 10}}),
+            "str_exp": 0, "end_exp": 0, "dex_exp": 0, "agi_exp": 0, "mag_exp": 0, "lck_exp": 0
         }
 
     def update_stat_exp(self, *args, **kwargs):
@@ -174,7 +164,7 @@ class RealisticMockDatabase:
     def _col(self, name):
         # Return a mock collection that can handle find()
         mock_col = MagicMock()
-        mock_col.find.return_value = []  # Return empty list for find
+        mock_col.find.return_value = [] # Return empty list for find
         mock_col.find_one.return_value = None
         return mock_col
 
@@ -198,7 +188,7 @@ def run_realistic_stress_test():
         sessions.append(
             {
                 "discord_id": 100000 + i,
-                "duration_minutes": 60,  # 4 steps (15 min each)
+                "duration_minutes": 60, # 4 steps (15 min each)
                 "steps_completed": 0,
                 "start_time": "2023-01-01T00:00:00",
                 "location_id": location_id,
@@ -207,7 +197,7 @@ def run_realistic_stress_test():
                 "logs": "[]",
                 "loot_collected": "{}",
                 "active_monster_json": None,
-                "supplies": {},
+                "supplies": {}
             }
         )
 
@@ -223,7 +213,7 @@ def run_realistic_stress_test():
 
         if processed_count % 1000 == 0:
             elapsed = time.time() - start_time
-            logger.info(f"Processed {processed_count} sessions... ({processed_count / elapsed:.2f} sess/s)")
+            logger.info(f"Processed {processed_count} sessions... ({processed_count/elapsed:.2f} sess/s)")
 
     end_time = time.time()
     duration = end_time - start_time
@@ -240,7 +230,6 @@ def run_realistic_stress_test():
         logger.warning("⚠️ Throughput is below target (10k/60s = 167/s). Optimization needed.")
     else:
         logger.info("✅ Throughput meets requirements.")
-
 
 if __name__ == "__main__":
     run_realistic_stress_test()
