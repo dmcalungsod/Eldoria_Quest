@@ -7,42 +7,53 @@ The bitter winds of winter are beginning to shift, carrying whispers of change f
 ---
 
 ## 🕰️ The Sands of Time (Auto-Adventure)
-**Agents SystemSmith & DataSteward**
 
-The Chronomancers and Artificers have made a breakthrough. Soon, adventurers will be able to dispatch expeditions that continue even while they rest. The `Adventure Session` framework has been laid, and the `Background Scheduler` now hums with potential. Prepare to explore Eldoria on your own terms.
+The Chronomancer's Guild has made a significant breakthrough in their temporal studies. They have laid the groundwork for a new form of expedition that continues even while adventurers rest.
+
+- **Status:** The rituals of temporal binding are nearing completion. The Great Orrery is aligned, and the spirits of navigation are stirring.
+- **What this means:** Soon, you will be able to dispatch expeditions that progress automatically. Prepare to explore Eldoria on your own terms.
 
 > *"Time waits for no one, but with the right tools, we can make it work for us."* — Chronomancer V.
 
 ---
 
-## ❄️ A Frozen Horizon
-**Agents GameForge & Architect**
+## ❄️ A Frozen Horizon: The Frostfall Expanse
 
-Pathfinders have returned with chilling tales of the **Frostfall Expanse** (IDs 111-115). A land of eternal ice and ancient secrets. While the way is not yet fully open, the maps are being drawn. Prepare your furs and sharpen your blades.
+Pathfinders have returned with chilling tales of a new region: the **Frostfall Expanse** (Floors 111-115). A land of eternal ice and ancient secrets.
+
+- **Status:** The way is not yet fully open, but the maps are being drawn.
+- **Preparation:** Prepare your furs and sharpen your blades. The cold is unforgiving.
 
 ---
 
-## ⚗️ Science in a World of Magic
-**Agents Namewright & GameForge**
+## ⚗️ Science in a World of Magic: The Alchemist
 
-The Apothecary Guild is expanding its ranks. We hear talk of **Vitriol Bombs**, **Fulminating Compounds**, and **Suture & Salve**. A new path for those who prefer science to spellcraft is emerging. The Alchemist class is taking shape.
+The Apothecary Guild is expanding its ranks. Rumors of a new discipline are spreading—one that favors science over spellcraft.
+
+- **New Class in Training:** The **Alchemist**.
+- **Known Techniques:** We hear talk of **Vitriol Bombs**, **Fulminating Compounds**, and **Suture & Salve**.
+- **Philosophy:** "Using the dirt" to survive. A path for the pragmatic.
 
 ---
 
 ## ⚖️ Restoring the Balance
-**Agents Equilibrium & BugHunter**
 
-The mages have stabilized the flow of magic. Enhancements like 'Rage' now settle naturally, preventing the dangerous feedback loops of the past. Power must be earned, not exploited.
+The Mages of the Equilibrium Circle have stabilized the flow of magic to ensure fair combat for all.
+
+- **Magic Stabilization:** Enhancements like 'Rage' now settle naturally, preventing dangerous feedback loops.
+- **Combat Fairness:** Power must be earned through skill, not exploited through unstable magic.
 
 ---
 
 ## 🙏 From the Adventurers
+
 We hear your calls for reliable healing and respite from the endless march. The Alchemists and the new Expedition system are our answer. Patience, for the best brews take time to ferment.
 
 ---
 
 ## 🔮 On the Horizon
-The stars align for a new era of exploration. The **Frostfall Expedition** draws near, and the **Codex** waits to be written.
+
+The stars align for a new era of exploration. The **Frostfall Expedition** draws near, and the Great Archive prepares to unveil a **Codex** of knowledge.
 
 ---
 
