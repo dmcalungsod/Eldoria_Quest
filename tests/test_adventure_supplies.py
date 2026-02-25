@@ -3,13 +3,30 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-# Mock dependencies
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["discord"] = MagicMock()
-sys.modules["discord.ext"] = MagicMock()
+# Add repo root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-sys.path.append(os.getcwd())
+# Mock dependencies before import (consistent with test_adventure_day_night.py)
+try:
+    import pymongo
+    import pymongo.errors
+except ImportError:
+    mock_pymongo = MagicMock()
+    mock_pymongo.errors = MagicMock()
+    sys.modules["pymongo"] = mock_pymongo
+    sys.modules["pymongo.errors"] = mock_pymongo.errors
+    # Ensure DuplicateKeyError is a real exception (handled by conftest usually, but safe here)
+    if not isinstance(mock_pymongo.errors.DuplicateKeyError, type):
+        mock_pymongo.errors.DuplicateKeyError = type("DuplicateKeyError", (Exception,), {})
+
+try:
+    import discord
+    import discord.ext.commands
+except ImportError:
+    mock_discord = MagicMock()
+    mock_discord.ext = MagicMock()
+    sys.modules["discord"] = mock_discord
+    sys.modules["discord.ext"] = mock_discord.ext
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_session import AdventureSession
@@ -33,7 +50,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "event_type": None,
         }
         self.db.get_combat_context_bundle.return_value = {
-            "stats": {"HP": 100, "MP": 100},
+            "stats": {},
             "buffs": [],
             "player": {"current_hp": 100, "current_mp": 100},
             "skills": [],
@@ -55,12 +72,11 @@ class TestAdventureSupplies(unittest.TestCase):
         # 20 steps (4 over threshold of 16)
         # Bonus = (4/4) * 0.05 = 0.05. Total 1.05
         session.steps_completed = 20
-        # Call with default 0.0 bonus
-        mult = session._calculate_fatigue_multiplier(0.0)
+        mult = session._calculate_fatigue_multiplier()
         self.assertAlmostEqual(mult, 1.05, places=4)
 
-    def test_hardtack_fatigue_calculation(self):
-        """Verify passing reduction bonus works correctly."""
+    def test_hardtack_fatigue(self):
+        """Verify hardtack reduces fatigue buildup."""
         row_data = {
             "location_id": "test",
             "active": 1,
@@ -74,51 +90,8 @@ class TestAdventureSupplies(unittest.TestCase):
         # 20 steps
         # Bonus = 0.05 * 0.8 = 0.04. Total 1.04
         session.steps_completed = 20
-
-        # Manually pass 0.2 bonus (simulating hardtack)
-        mult = session._calculate_fatigue_multiplier(0.2)
+        mult = session._calculate_fatigue_multiplier()
         self.assertAlmostEqual(mult, 1.04, places=4)
-
-    @patch("game_systems.adventure.adventure_session.WorldEventSystem")
-    @patch(
-        "game_systems.adventure.adventure_session.CONSUMABLES",
-        {
-            "hardtack": {"type": "supply", "effect": {"fatigue_reduction": 0.2}},
-            "pitch_torch": {"type": "supply", "effect": {"ambush_reduction": 0.5}},
-        },
-    )
-    def test_supply_context_integration(self, MockEventSystem):
-        """Verify _fetch_session_context correctly merges supply effects."""
-        # Mock event system to avoid time/DB calls
-        mock_es = MockEventSystem.return_value
-        mock_es.get_current_event.return_value = None
-
-        row_data = {
-            "location_id": "test",
-            "active": 1,
-            "logs": "[]",
-            "loot_collected": "{}",
-            "active_monster_json": None,
-            "supplies": {"hardtack": 1, "pitch_torch": 1},
-        }
-        session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
-
-        # Ensure context bundle returns mock data
-        self.db.get_combat_context_bundle.return_value = {
-            "stats": {"HP": 100, "MP": 100},
-            "buffs": [],
-            "player": {"current_hp": 100, "current_mp": 100},
-            "skills": [],
-        }
-
-        context = session._fetch_session_context()
-        self.assertIsNotNone(context)
-
-        boosts = context["active_boosts"]
-        self.assertIn("fatigue_reduction", boosts)
-        self.assertAlmostEqual(boosts["fatigue_reduction"], 0.2)
-        self.assertIn("ambush_reduction", boosts)
-        self.assertAlmostEqual(boosts["ambush_reduction"], 0.5)
 
     def test_load_supplies(self):
         """Verify supplies are loaded from row_data."""
@@ -168,7 +141,9 @@ class TestAdventureSupplies(unittest.TestCase):
                 # Force combat trigger (roll 100 > threshold)
                 with patch("random.randint", return_value=100):
                     # Mock initiate_combat to return a monster
-                    session.combat.initiate_combat = MagicMock(return_value=(monster_data, "A wild goblin appears!"))
+                    session.combat.initiate_combat = MagicMock(
+                        return_value=(monster_data, "A wild goblin appears!")
+                    )
 
                     # --- CRITICAL TEST: AMBUSH CHANCE ---
                     # We simulate a roll of 0.15.
@@ -193,7 +168,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {},  # No Torch
+            "supplies": {}, # No Torch
         }
 
         mock_quest = MagicMock()
@@ -209,7 +184,9 @@ class TestAdventureSupplies(unittest.TestCase):
 
             with patch.object(session, "_fetch_session_context", return_value=self.context_mock):
                 with patch("random.randint", return_value=100):
-                    session.combat.initiate_combat = MagicMock(return_value=(monster_data, "A wild goblin appears!"))
+                    session.combat.initiate_combat = MagicMock(
+                        return_value=(monster_data, "A wild goblin appears!")
+                    )
 
                     # Same roll of 0.15
                     # Without Torch (0.20 threshold): 0.15 < 0.20 -> Ambush!

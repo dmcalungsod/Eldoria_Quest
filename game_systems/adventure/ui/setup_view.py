@@ -47,7 +47,7 @@ class AdventureSetupView(View):
 
         self.selected_location = None
         self.selected_duration = None
-        self.selected_supplies = []
+        self.selected_supply = None
 
         # 1. Location Select
         self.location_select = Select(
@@ -96,22 +96,20 @@ class AdventureSetupView(View):
         self.add_item(self.duration_select)
 
         # 3. Supply Select
-        # Consolidate supplies first to determine max_values
+        self.supply_select = Select(
+            placeholder="Select Supplies (Optional)...",
+            min_values=0,
+            max_values=1,
+            row=2,
+        )
+
+        # Consolidate supplies
         supply_options = {}
         for item in self.supplies_list:
             key = item["item_key"]
             if key not in supply_options:
                 supply_options[key] = {"name": item["item_name"], "count": 0}
             supply_options[key]["count"] += item["count"]
-
-        # Allow selecting up to 3 supplies
-        max_supplies = min(3, len(supply_options)) if supply_options else 1
-        self.supply_select = Select(
-            placeholder="Select Supplies (Optional)...",
-            min_values=0,
-            max_values=max_supplies,
-            row=2,
-        )
 
         if supply_options:
             for key, data in supply_options.items():
@@ -201,9 +199,9 @@ class AdventureSetupView(View):
 
     async def supply_callback(self, interaction: discord.Interaction):
         if self.supply_select.values:
-            self.selected_supplies = self.supply_select.values
+            self.selected_supply = self.supply_select.values[0]
         else:
-            self.selected_supplies = []
+            self.selected_supply = None
         await interaction.response.edit_message(view=self)
 
     async def start_callback(self, interaction: discord.Interaction):
@@ -214,10 +212,8 @@ class AdventureSetupView(View):
         await interaction.response.defer()
 
         supplies_dict = {}
-        if self.selected_supplies:
-            for s_key in self.selected_supplies:
-                if s_key != "none":
-                    supplies_dict[s_key] = 1
+        if self.selected_supply and self.selected_supply != "none":
+            supplies_dict[self.selected_supply] = 1
 
         try:
             # 1. Start the adventure in DB (Threaded)

@@ -190,29 +190,5 @@
         "effect": {"ambush_reduction": 0.5},
         "rarity": "Common",
         "description": "A tar-soaked torch that burns bright, warding off creatures of the dark."
-    },
-    "cartographers_ink": {
-        "id": "cartographers_ink",
-        "name": "Cartographer's Ink",
-        "type": "supply",
-        "effect": {"exploration_xp_boost": 0.2},
-        "rarity": "Uncommon",
-        "description": "A small vial of ink used to chart new paths. Increases Exploration XP."
-    },
-    "warding_incense": {
-        "id": "warding_incense",
-        "name": "Warding Incense",
-        "type": "supply",
-        "effect": {"encounter_reduction": 0.2},
-        "rarity": "Common",
-        "description": "Fragrant smoke that repels lesser beasts. Reduces encounter rate."
-    },
-    "scouts_spyglass": {
-        "id": "scouts_spyglass",
-        "name": "Scout's Spyglass",
-        "type": "supply",
-        "effect": {"flee_chance_boost": 0.2},
-        "rarity": "Rare",
-        "description": "Allows spotting danger from afar. Increases chance to flee."
     }
 }
