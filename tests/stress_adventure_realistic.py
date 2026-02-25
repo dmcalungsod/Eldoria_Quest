@@ -1,11 +1,10 @@
 
+import json
+import logging
+import os
 import sys
 import time
-import logging
 from unittest.mock import MagicMock
-import os
-import json
-import random
 
 # Add root to sys.path
 sys.path.append(os.getcwd())
@@ -21,7 +20,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 # Now we can import game systems safely
 from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
-from game_systems.data.class_data import CLASSES
+
 
 class RealisticMockDatabase:
     def __init__(self):
@@ -107,7 +106,8 @@ class RealisticMockDatabase:
         return None
 
     def get_player_field(self, discord_id, field):
-        if field == "level": return 10
+        if field == "level":
+            return 10
         return None
 
     def get_player_stats_json(self, discord_id):
@@ -148,7 +148,8 @@ class RealisticMockDatabase:
         return True
 
     def get_guild_member_field(self, discord_id, field):
-        if field == "rank": return "F"
+        if field == "rank":
+            return "F"
         return None
 
     def add_inventory_item(self, *args, **kwargs):
