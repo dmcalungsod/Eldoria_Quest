@@ -51,26 +51,16 @@ jobs:
       - run:
           name: Ruff Auto-Fix & Format
           command: |
-            # Skip if last commit was already an auto-fix (prevent loop)
-            if git log -1 --pretty=%s | grep -q "^style: auto-fix"; then
-              echo "⏭️  Last commit was auto-fix, skipping"
-              exit 0
-            fi
             ruff check . --fix
             ruff format .
       - run:
           name: Commit Fixes (if any)
           command: |
-            # Skip if last commit was already an auto-fix (prevent loop)
-            if git log -1 --pretty=%s | grep -q "^style: auto-fix"; then
-              echo "⏭️  Skipping commit step"
-              exit 0
-            fi
             git config user.name "CircleCI"
             git config user.email "ci@circleci.com"
             if [ -n "$(git status --porcelain)" ]; then
               git add -A
-              git commit -m "style: auto-fix code with Ruff"
+              git commit -m "style: auto-fix code with Ruff [ci skip]"
               git push origin "$CIRCLE_BRANCH"
               echo "✅ Pushed auto-fix commit"
             else
@@ -156,42 +146,6 @@ jobs:
               exit 1
             fi
 
-  trigger-pr-ci:
-    docker:
-      - image: cimg/base:current
-    steps:
-      - run:
-          name: Install GitHub CLI
-          command: |
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-            sudo apt-get update && sudo apt-get install gh -y
-      - run:
-          name: Trigger CI for Open PR Branches
-          command: |
-            export GH_TOKEN="$GITHUB_TOKEN"
-
-            echo "🔄 Checking open PRs for missing CI..."
-
-            gh pr list --repo "dmcalungsod/Eldoria_Quest" --state open --json number,headRefName,isDraft --jq '.[] | select(.isDraft == false)' | while read -r pr_json; do
-              pr_number=$(echo "$pr_json" | jq -r '.number')
-              branch=$(echo "$pr_json" | jq -r '.headRefName')
-
-              # Check if CircleCI checks are still pending
-              checks=$(gh pr checks "$pr_number" --repo "dmcalungsod/Eldoria_Quest" 2>&1 || true)
-
-              if echo "$checks" | grep -q "ci/circleci.*pending\|ci/circleci.*Waiting"; then
-                echo "🚀 Triggering CI for PR #$pr_number ($branch)..."
-                curl -s -X POST "https://circleci.com/api/v2/project/gh/dmcalungsod/Eldoria_Quest/pipeline" \
-                  -H "Circle-Token: $CIRCLECI_TOKEN" \
-                  -H "Content-Type: application/json" \
-                  -d "{\"branch\": \"$branch\"}"
-                echo ""
-              else
-                echo "✅ PR #$pr_number already has CI results"
-              fi
-            done
-
 # ── Workflows ──────────────────────────────────────────
 workflows:
   # CI: runs on every push/PR
@@ -214,10 +168,9 @@ workflows:
             - ruff-fix
             - test
 
-  # Scheduled: auto-merge + cleanup + trigger CI for bot PRs
+  # Scheduled: daily auto-merge + cleanup
   nightly:
     when: << pipeline.parameters.run-schedule >>
     jobs:
-      - trigger-pr-ci
       - auto-merge
       - cleanup-branches
