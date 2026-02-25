@@ -13,6 +13,7 @@ from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.materials import MATERIALS
 from game_systems.data.recipes import HIDDEN_RECIPES, RECIPES
+from game_systems.player.achievement_system import AchievementSystem
 
 logger = logging.getLogger("eldoria.crafting")
 
@@ -35,6 +36,7 @@ def calculate_crafting_xp_req(level: int) -> int:
 class CraftingSystem:
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
+        self.achievement_system = AchievementSystem(self.db)
 
     def _add_crafting_xp(self, discord_id: int, rarity: str, is_discovery: bool = False) -> str:
         """
@@ -252,6 +254,12 @@ class CraftingSystem:
 
             # Add XP
             xp_msg = self._add_crafting_xp(discord_id, item_data.get("rarity", "Common"))
+
+            # Update Stats & Check Achievements
+            self.db.increment_crafting_stats(discord_id, output_amount)
+            ach_msg = self.achievement_system.check_crafting_achievements(discord_id)
+            if ach_msg:
+                xp_msg += f"\n{ach_msg}"
 
             logger.info(f"User {discord_id} crafted {output_amount}x {output_key}")
             return (

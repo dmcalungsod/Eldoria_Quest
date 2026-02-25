@@ -66,6 +66,11 @@ class AdventureManager:
                     logger.error(f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)")
                     return False
 
+            # Track usage stats
+            total_supplies = sum(supplies.values())
+            if total_supplies > 0:
+                self.db.increment_supply_stats(discord_id, total_supplies)
+
         start_time = WorldTime.now()
         end_time = (
             start_time + datetime.timedelta(days=90)
@@ -312,12 +317,15 @@ class AdventureManager:
                 ach_system = AchievementSystem(self.db)
                 new_title_msg = ach_system.check_exploration_achievements(discord_id)
                 new_duration_msg = ach_system.check_duration_achievements(discord_id, duration_min)
+                new_supply_msg = ach_system.check_supply_achievements(discord_id)
 
                 msgs = []
                 if new_title_msg:
                     msgs.append(new_title_msg)
                 if new_duration_msg:
                     msgs.append(new_duration_msg)
+                if new_supply_msg:
+                    msgs.append(new_supply_msg)
 
                 if msgs:
                     summary["new_titles"] = "\n".join(msgs)

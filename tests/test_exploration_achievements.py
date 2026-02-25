@@ -68,6 +68,7 @@ class TestExplorationAchievements(unittest.TestCase):
             mock_ach_system_instance = MockAchievementSystem.return_value
             mock_ach_system_instance.check_exploration_achievements.return_value = "🏆 Title Unlocked: Pathfinder"
             mock_ach_system_instance.check_duration_achievements.return_value = None
+            mock_ach_system_instance.check_supply_achievements.return_value = None
 
             # Execute
             summary = self.adventure_manager.end_adventure(discord_id)
