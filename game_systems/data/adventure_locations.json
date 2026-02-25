@@ -149,8 +149,8 @@
         "conditional_monsters": [
             {
                 "monster_key": "monster_017",
-                "weight": 5,
-                "min_level": 12
+                "weight": 3,
+                "min_level": 14
             }
         ],
         "night_monsters": [
