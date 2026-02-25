@@ -174,5 +174,21 @@
         "effect": {"AGI": 5, "LCK": 5, "duration_s": 90},
         "rarity": "Rare",
         "description": "A liquid that seems to absorb light, making the drinker hard to track."
+    },
+    "hardtack": {
+        "id": "hardtack",
+        "name": "Hardtack",
+        "type": "supply",
+        "effect": {"fatigue_reduction": 0.2},
+        "rarity": "Common",
+        "description": "Dense, dry biscuit that keeps the hunger at bay on long marches."
+    },
+    "pitch_torch": {
+        "id": "pitch_torch",
+        "name": "Pitch Torch",
+        "type": "supply",
+        "effect": {"ambush_reduction": 0.5},
+        "rarity": "Common",
+        "description": "A tar-soaked torch that burns bright, warding off creatures of the dark."
     }
 }

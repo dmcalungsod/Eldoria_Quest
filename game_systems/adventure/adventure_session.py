@@ -75,6 +75,9 @@ class AdventureSession:
                 )
             except json.JSONDecodeError:
                 self.active_monster = None
+
+            # Load Supplies
+            self.supplies = row_data.get("supplies", {})
         else:
             self.active = False
             self.active_monster = None
@@ -83,6 +86,7 @@ class AdventureSession:
             self.location_id = None
             self.steps_completed = 0
             self.version = 1
+            self.supplies = {}
 
     def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
         """Helper to build the standardized result dictionary."""
@@ -108,6 +112,11 @@ class AdventureSession:
 
         # 5% per hour (4 steps) => 1.25% per step
         bonus = (excess_steps / 4.0) * 0.05
+
+        # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
+        if self.supplies.get("hardtack"):
+            bonus *= 0.8
+
         return 1.0 + bonus
 
     # ======================================================================
@@ -360,7 +369,13 @@ class AdventureSession:
 
                     # --- NIGHT AMBUSH MECHANIC ---
                     # 20% Chance for monsters to strike first at night
-                    if time_phase == TimePhase.NIGHT and random.random() < 0.20:
+                    ambush_chance = 0.20
+
+                    # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
+                    if self.supplies.get("pitch_torch"):
+                        ambush_chance *= 0.5
+
+                    if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:
                         monster_atk = monster.get("ATK", 10)
                         damage = int(monster_atk * 0.8)  # 80% ATK damage
                         damage = max(1, damage)  # Minimum 1 damage

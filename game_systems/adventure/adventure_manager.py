@@ -34,7 +34,13 @@ class AdventureManager:
         self.quest_system = QuestSystem(self.db)
         self.faction_system = FactionSystem(self.db)
 
-    def start_adventure(self, discord_id: int, location_id: str, duration_minutes: int) -> bool:
+    def start_adventure(
+        self,
+        discord_id: int,
+        location_id: str,
+        duration_minutes: int,
+        supplies: dict[str, int] | None = None,
+    ) -> bool:
         # --- SECURITY FIX: Input Validation ---
         if location_id not in LOCATIONS:
             logger.warning(f"Invalid location_id attempted: {location_id} by {discord_id}")
@@ -44,6 +50,21 @@ class AdventureManager:
         if duration_minutes != -1 and not (0 < duration_minutes <= 525600):
             logger.warning(f"Invalid adventure duration: {duration_minutes} by {discord_id}")
             return False
+
+        # Verify and Deduct Supplies
+        if supplies:
+            # 1. Verification Phase
+            for item_key, count in supplies.items():
+                total = self.db.get_inventory_item_count(discord_id, item_key)
+                if total < count:
+                    logger.warning(f"User {discord_id} lacks supply {item_key} (Has {total}, Needs {count})")
+                    return False
+
+            # 2. Deduction Phase
+            for item_key, count in supplies.items():
+                if not self.db.remove_inventory_item(discord_id, item_key, count):
+                    logger.error(f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)")
+                    return False
 
         start_time = WorldTime.now()
         end_time = (
@@ -67,7 +88,7 @@ class AdventureManager:
                 start_time.isoformat(),
                 end_time.isoformat(),
                 duration_minutes,
-                supplies={},
+                supplies=supplies or {},
                 status="in_progress",
             )
             return True
