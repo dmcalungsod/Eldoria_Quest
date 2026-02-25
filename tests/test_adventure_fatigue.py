@@ -1,4 +1,3 @@
-
 import os
 import sys
 from unittest.mock import MagicMock, patch
@@ -20,7 +19,6 @@ from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
 
 
 class TestAdventureFatigue:
-
     def test_calculate_fatigue_multiplier(self):
         """
         Verify that _calculate_fatigue_multiplier returns correct values.
@@ -29,7 +27,9 @@ class TestAdventureFatigue:
         # We can mock AdventureSession to test just this method
         session = MagicMock(spec=AdventureSession)
         # Bind the method to the mock
-        session._calculate_fatigue_multiplier = AdventureSession._calculate_fatigue_multiplier.__get__(session, AdventureSession)
+        session._calculate_fatigue_multiplier = AdventureSession._calculate_fatigue_multiplier.__get__(
+            session, AdventureSession
+        )
 
         # Case 1: Under threshold (1 hour = 4 steps)
         session.steps_completed = 4
@@ -73,12 +73,7 @@ class TestAdventureFatigue:
 
         # Test 1: Normal Multiplier (1.0)
         engine = CombatEngine(
-            player=player,
-            monster=monster,
-            player_skills=skills,
-            player_mp=10,
-            player_class_id=1,
-            monster_dmg_mult=1.0
+            player=player, monster=monster, player_skills=skills, player_mp=10, player_class_id=1, monster_dmg_mult=1.0
         )
 
         # Mock MonsterAI to force attack
@@ -90,12 +85,7 @@ class TestAdventureFatigue:
 
         # Test 2: Fatigue Multiplier (1.5)
         engine_fatigued = CombatEngine(
-            player=player,
-            monster=monster,
-            player_skills=skills,
-            player_mp=10,
-            player_class_id=1,
-            monster_dmg_mult=1.5
+            player=player, monster=monster, player_skills=skills, player_mp=10, player_class_id=1, monster_dmg_mult=1.5
         )
 
         with patch("game_systems.monsters.monster_actions.MonsterAI.choose_action", return_value={"type": "attack"}):
@@ -105,7 +95,9 @@ class TestAdventureFatigue:
         assert result["turn_report"]["damage_taken"] == 15
 
         # Test 3: Skill Damage Multiplier
-        with patch("game_systems.monsters.monster_actions.MonsterAI.choose_action", return_value={"type": "skill", "skill": {}}):
+        with patch(
+            "game_systems.monsters.monster_actions.MonsterAI.choose_action", return_value={"type": "skill", "skill": {}}
+        ):
             result = engine_fatigued.run_combat_turn()
 
         # Verify damage taken = 20 (base skill) * 1.5 = 30

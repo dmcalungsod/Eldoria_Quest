@@ -15,8 +15,8 @@ from discord.ext import commands, tasks
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.core.world_time import WorldTime
+from game_systems.events.world_event_system import WorldEventSystem
 
 logger = logging.getLogger("eldoria.cogs.events")
 

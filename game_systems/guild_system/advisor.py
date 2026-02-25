@@ -183,8 +183,7 @@ class GuildAdvisor:
         if has_weapon and (quests_completed > 0) and has_expedition:
             embed.color = discord.Color.gold()
             embed.description = (
-                "**🎉 INITIATION COMPLETE!**\n"
-                "*You are now a true Adventurer. Rank up to unlock more guild privileges.*"
+                "**🎉 INITIATION COMPLETE!**\n*You are now a true Adventurer. Rank up to unlock more guild privileges.*"
             )
 
         return embed

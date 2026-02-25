@@ -7,15 +7,15 @@ for each adventure location based on drop rates, monster stats, and material val
 Usage: python3 scripts/analysis/analyze_economy.py
 """
 
-import sys
 import os
+import sys
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.monsters import MONSTERS
 from game_systems.data.materials import MATERIALS
+from game_systems.data.monsters import MONSTERS
 
 # Constants
 STEPS_PER_HOUR = 4
@@ -24,6 +24,7 @@ COMBAT_CHANCE = 0.60
 
 # Aurum Multipliers
 TIER_MULTIPLIER = {"Normal": 1.5, "Elite": 5.0, "Boss": 20.0}
+
 
 def calculate_expected_value(location_key, location_data, player_luck=10):
     """
@@ -134,12 +135,13 @@ def calculate_expected_value(location_key, location_data, player_luck=10):
         "hourly_materials": hourly_materials,
         "total_hourly": total_hourly,
         "min_rank": location_data.get("min_rank", "F"),
-        "min_level": location_data.get("level_req", 1)
+        "min_level": location_data.get("level_req", 1),
     }
+
 
 def main():
     print(f"| {'Location':<25} | {'Rank':<4} | {'Lvl':<3} | {'Aurum/Hr':<10} | {'Mat Val/Hr':<10} | {'Total/Hr':<10} |")
-    print(f"|{'-'*27}|{'-'*6}|{'-'*5}|{'-'*12}|{'-'*12}|{'-'*12}|")
+    print(f"|{'-' * 27}|{'-' * 6}|{'-' * 5}|{'-' * 12}|{'-' * 12}|{'-' * 12}|")
 
     # Sort locations by level requirement
     sorted_locations = sorted(LOCATIONS.items(), key=lambda x: x[1].get("level_req", 1))
@@ -150,7 +152,10 @@ def main():
 
         stats = calculate_expected_value(key, data)
 
-        print(f"| {data['name']:<25} | {stats['min_rank']:<4} | {stats['min_level']:<3} | {stats['hourly_aurum']:<10.1f} | {stats['hourly_materials']:<10.1f} | {stats['total_hourly']:<10.1f} |")
+        print(
+            f"| {data['name']:<25} | {stats['min_rank']:<4} | {stats['min_level']:<3} | {stats['hourly_aurum']:<10.1f} | {stats['hourly_materials']:<10.1f} | {stats['total_hourly']:<10.1f} |"
+        )
+
 
 if __name__ == "__main__":
     main()

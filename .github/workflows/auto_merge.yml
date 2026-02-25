@@ -1,0 +1,103 @@
+name: Auto-Merge and Cleanup
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+  schedule:
+    # Run daily at midnight (UTC), which is 8 AM Philippine Standard Time (PST)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Auto-merge PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_LIST: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+        run: |
+          # The workflow_run event provides a list of PRs that triggered the workflow
+          # We iterate through them and merge
+
+          echo "### 🤖 Auto-Merge Report" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$PR_LIST" == "null" ] || [ -z "$PR_LIST" ]; then
+            echo "No PRs associated with this workflow run."
+            echo "No PRs to merge." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          # Parse JSON to get numbers
+          echo "$PR_LIST" | jq -r '.[] | .number' | while read pr_number; do
+            if [ "$pr_number" != "null" ] && [ -n "$pr_number" ]; then
+              echo "Checking PR #$pr_number..."
+
+              # Skip draft PRs
+              is_draft=$(gh pr view "$pr_number" --json isDraft --jq '.isDraft')
+              if [ "$is_draft" == "true" ]; then
+                echo "PR #$pr_number is a draft, skipping."
+                echo "- ⏭️ Skipped PR #$pr_number (still a draft)" >> $GITHUB_STEP_SUMMARY
+                continue
+              fi
+
+              echo "Merging PR #$pr_number..."
+              if gh pr merge "$pr_number" --squash; then
+                echo "- ✅ Merged PR #$pr_number" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "Failed to merge PR #$pr_number"
+                echo "- ❌ Failed to merge PR #$pr_number" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🤖 Auto-Merge Status" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Auto-merge job completed. See per-PR details above." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Auto-merge job failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  cleanup-branches:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Prune Merged Branches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/prune_merged_branches.py
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🧹 Branch Pruning" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Branch pruning completed. See per-branch details above." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Branch pruning failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+          fi

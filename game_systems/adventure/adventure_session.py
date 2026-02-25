@@ -243,10 +243,14 @@ class AdventureSession:
                     return self._attempt_flee(context, persist=persist)
 
                 if action == "defend":
-                    return self._process_combat_turn(context, action="defend", persist=persist, weather=weather, time_phase=time_phase)
+                    return self._process_combat_turn(
+                        context, action="defend", persist=persist, weather=weather, time_phase=time_phase
+                    )
 
                 if action == "special_ability":
-                    return self._process_combat_turn(context, action="special_ability", persist=persist, weather=weather, time_phase=time_phase)
+                    return self._process_combat_turn(
+                        context, action="special_ability", persist=persist, weather=weather, time_phase=time_phase
+                    )
 
                 should_auto = self._check_auto_condition(context)
 
@@ -264,7 +268,9 @@ class AdventureSession:
                             # Auto-Flee logic
                             return self._attempt_flee(context, persist=persist)
 
-                    return self._resolve_auto_combat(context, background=True, persist=persist, weather=weather, time_phase=time_phase)
+                    return self._resolve_auto_combat(
+                        context, background=True, persist=persist, weather=weather, time_phase=time_phase
+                    )
 
                 # If explicit attack or implicit auto, and eligible -> Auto
                 if (action == "attack" or not action) and should_auto:
@@ -272,7 +278,9 @@ class AdventureSession:
 
                 # Otherwise manual single turn
                 final_action = action if action else "attack"
-                return self._process_combat_turn(context, action=final_action, persist=persist, weather=weather, time_phase=time_phase)
+                return self._process_combat_turn(
+                    context, action=final_action, persist=persist, weather=weather, time_phase=time_phase
+                )
 
             # Dynamic Combat Threshold based on Weather and Time
             # Base REGEN_CHANCE is 40 (meaning 60% combat).

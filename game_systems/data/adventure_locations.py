@@ -65,9 +65,7 @@ def load_locations():
 
         processed_locations[loc_id] = loc_data
 
-    logger.info(
-        f"Loaded {len(processed_locations)} adventure locations from {data_path.name}"
-    )
+    logger.info(f"Loaded {len(processed_locations)} adventure locations from {data_path.name}")
     return processed_locations
 
 
