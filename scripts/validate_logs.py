@@ -1,7 +1,7 @@
 """
 scripts/validate_logs.py
 
-Scans `.Jules/agent_logs/` to ensure no files are dated in the future relative to GMT+8.
+Scans `.Jules/agent_logs/` to ensure no files are dated in the future relative to GMT+8 (Asia/Manila).
 Exits with 1 if any future logs are found.
 """
 
@@ -9,21 +9,21 @@ import datetime
 import os
 import re
 import sys
+from zoneinfo import ZoneInfo
 
 LOGS_DIR = ".Jules/agent_logs"
 
 
-def get_current_date_gmt8():
-    """Returns the current date in GMT+8."""
-    # Simple timezone offset: UTC + 8 hours
-    utc_now = datetime.datetime.utcnow()
-    gmt8_now = utc_now + datetime.timedelta(hours=8)
-    return gmt8_now.date()
+def get_current_date_manila():
+    """Returns the current date in Asia/Manila (UTC+8)."""
+    manila_tz = ZoneInfo("Asia/Manila")
+    # datetime.now(tz) returns a timezone-aware datetime
+    return datetime.datetime.now(manila_tz).date()
 
 
 def main():
-    current_date = get_current_date_gmt8()
-    print(f"📅  Validating logs against GMT+8 Date: {current_date}")
+    current_date = get_current_date_manila()
+    print(f"📅  Validating logs against Asia/Manila Date: {current_date}")
 
     # Check if logs directory exists
     if not os.path.exists(LOGS_DIR):
