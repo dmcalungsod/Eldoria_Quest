@@ -24,13 +24,13 @@ class TestRankSystem(unittest.TestCase):
         self.rank_system = RankSystem(self.mock_db)
 
     def test_rank_f_requirements(self):
-        # Rank F -> E requires 3 quests and 40 normal kills
+        # Rank F -> E requires 3 quests and 50 normal kills
 
         # Case 1: Not enough quests
         self.mock_db.get_guild_member.return_value = {
             "rank": "F",
             "quests_completed": 2,
-            "normal_kills": 50,
+            "normal_kills": 60,
             "elite_kills": 0,
             "boss_kills": 0,
         }
@@ -40,7 +40,7 @@ class TestRankSystem(unittest.TestCase):
         self.mock_db.get_guild_member.return_value = {
             "rank": "F",
             "quests_completed": 3,
-            "normal_kills": 39,
+            "normal_kills": 49,
             "elite_kills": 0,
             "boss_kills": 0,
         }
@@ -50,20 +50,20 @@ class TestRankSystem(unittest.TestCase):
         self.mock_db.get_guild_member.return_value = {
             "rank": "F",
             "quests_completed": 3,
-            "normal_kills": 40,
+            "normal_kills": 50,
             "elite_kills": 0,
             "boss_kills": 0,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
     def test_rank_e_requirements(self):
-        # Rank E -> D requires 10 quests, 120 normal kills, 5 elite kills
+        # Rank E -> D requires 10 quests, 150 normal kills, 5 elite kills
 
         # Case 1: Not enough kills
         self.mock_db.get_guild_member.return_value = {
             "rank": "E",
             "quests_completed": 10,
-            "normal_kills": 119,
+            "normal_kills": 149,
             "elite_kills": 5,
             "boss_kills": 0,
         }
@@ -73,7 +73,7 @@ class TestRankSystem(unittest.TestCase):
         self.mock_db.get_guild_member.return_value = {
             "rank": "E",
             "quests_completed": 10,
-            "normal_kills": 120,
+            "normal_kills": 150,
             "elite_kills": 4,
             "boss_kills": 0,
         }
@@ -83,7 +83,7 @@ class TestRankSystem(unittest.TestCase):
         self.mock_db.get_guild_member.return_value = {
             "rank": "E",
             "quests_completed": 10,
-            "normal_kills": 120,
+            "normal_kills": 150,
             "elite_kills": 5,
             "boss_kills": 0,
         }
@@ -113,7 +113,7 @@ class TestRankSystem(unittest.TestCase):
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
     def test_rank_b_requirements(self):
-        # Rank B -> A requires 40 quests, 600 normal kills, 65 elite kills, 10 boss kills
+        # Rank B -> A requires 40 quests, 600 normal kills, 65 elite kills, 4 boss kills
 
         # Case 1: Not enough quests
         self.mock_db.get_guild_member.return_value = {
@@ -121,7 +121,7 @@ class TestRankSystem(unittest.TestCase):
             "quests_completed": 39,
             "normal_kills": 600,
             "elite_kills": 70,
-            "boss_kills": 10,
+            "boss_kills": 4,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
@@ -131,7 +131,7 @@ class TestRankSystem(unittest.TestCase):
             "quests_completed": 40,
             "normal_kills": 599,
             "elite_kills": 65,
-            "boss_kills": 10,
+            "boss_kills": 4,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
 
@@ -141,7 +141,7 @@ class TestRankSystem(unittest.TestCase):
             "quests_completed": 40,
             "normal_kills": 600,
             "elite_kills": 65,
-            "boss_kills": 10,
+            "boss_kills": 4,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
