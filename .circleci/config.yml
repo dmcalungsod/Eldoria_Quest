@@ -26,25 +26,38 @@ commands:
 
 # ── Jobs ───────────────────────────────────────────────
 jobs:
-  ruff-lint:
+  ruff-fix:
     docker:
       - image: cimg/python:3.10
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "${DEPLOY_KEY_FINGERPRINT}"
       - checkout
       - install-ruff
       - run:
-          name: Ruff Lint Check
-          command: ruff check .
-
-  ruff-format:
-    docker:
-      - image: cimg/python:3.10
-    steps:
-      - checkout
-      - install-ruff
+          name: Ruff Auto-Fix & Format
+          command: |
+            ruff check . --fix
+            ruff format .
       - run:
-          name: Ruff Format Check
-          command: ruff format --check .
+          name: Commit Fixes (if any)
+          command: |
+            git config user.name "CircleCI"
+            git config user.email "ci@circleci.com"
+            if [ -n "$(git status --porcelain)" ]; then
+              git add -A
+              git commit -m "style: auto-fix code with Ruff [ci skip]"
+              git push origin "$CIRCLE_BRANCH"
+              echo "✅ Pushed auto-fix commit"
+            else
+              echo "✅ No fixes needed"
+            fi
+      - run:
+          name: Ruff Strict Check
+          command: |
+            ruff check .
+            ruff format --check .
 
   test:
     docker:
@@ -63,9 +76,7 @@ jobs:
 workflows:
   ci:
     jobs:
-      - ruff-lint
-      - ruff-format
+      - ruff-fix
       - test:
           requires:
-            - ruff-lint
-            - ruff-format
+            - ruff-fix

@@ -45,8 +45,7 @@ jobs:
 
             if echo "$checks_output" | grep -q "GitGuardian Security Checks" && \
                echo "$checks_output" | grep -q "CodeRabbit" && \
-               echo "$checks_output" | grep -q "ci/ruff-lint" && \
-               echo "$checks_output" | grep -q "ci/ruff-format" && \
+               echo "$checks_output" | grep -q "ci/ruff-fix" && \
                echo "$checks_output" | grep -q "ci/test" && \
                ! echo "$checks_output" | grep -q "fail" && \
                ! echo "$checks_output" | grep -q "pending"; then
