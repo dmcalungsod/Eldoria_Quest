@@ -1,10 +1,8 @@
 name: Mirror to DeeEmSea/Eldoria-Quest-Bot
 
 on:
-  workflow_run:
-    workflows: ["CI (fast)"]
-    types:
-      - completed
+  push:
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -12,7 +10,6 @@ permissions:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Clone mirror
         run: |
