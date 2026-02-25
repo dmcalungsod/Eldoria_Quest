@@ -7,9 +7,11 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock dependencies before import (consistent with test_adventure_day_night.py)
+# We import these inside try-except to check if they exist.
+# If they exist, we do nothing (they are real modules or already mocked by conftest).
+# If they don't, we mock them to allow imports in subsequent modules to succeed.
 try:
-    import pymongo
-    import pymongo.errors
+    import pymongo  # noqa: F401
 except ImportError:
     mock_pymongo = MagicMock()
     mock_pymongo.errors = MagicMock()
@@ -20,8 +22,7 @@ except ImportError:
         mock_pymongo.errors.DuplicateKeyError = type("DuplicateKeyError", (Exception,), {})
 
 try:
-    import discord
-    import discord.ext.commands
+    import discord  # noqa: F401
 except ImportError:
     mock_discord = MagicMock()
     mock_discord.ext = MagicMock()
@@ -168,7 +169,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {}, # No Torch
+            "supplies": {},  # No Torch
         }
 
         mock_quest = MagicMock()
