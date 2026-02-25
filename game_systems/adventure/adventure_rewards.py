@@ -12,13 +12,13 @@ from collections import defaultdict
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
-from game_systems.player.achievement_system import AchievementSystem
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.materials import MATERIALS
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.rank_system import RankSystem
 from game_systems.guild_system.tournament_system import TournamentSystem
 from game_systems.items.item_manager import item_manager
+from game_systems.player.achievement_system import AchievementSystem
 from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold
 from game_systems.rewards.loot_calculator import LootCalculator
 

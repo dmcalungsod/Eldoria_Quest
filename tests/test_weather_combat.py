@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +10,8 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
 from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
-from game_systems.core.world_time import Weather, TimePhase  # noqa: E402
+from game_systems.core.world_time import Weather  # noqa: E402
+
 
 class TestWeatherCombat(unittest.TestCase):
     def setUp(self):
@@ -29,7 +30,7 @@ class TestWeatherCombat(unittest.TestCase):
             player_skills=[],
             player_mp=100,
             player_class_id=1,
-            stats_dict={"HP": 100}, # Explicitly provide stats_dict to avoid attribute error if mocked player fails
+            stats_dict={"HP": 100},  # Explicitly provide stats_dict to avoid attribute error if mocked player fails
         )
 
     def test_detect_element(self):
@@ -55,12 +56,12 @@ class TestWeatherCombat(unittest.TestCase):
         # Fire reduced
         dmg = 100
         mod_dmg = self.engine._apply_weather_modifiers(dmg, "fire")
-        self.assertEqual(mod_dmg, 80) # 0.8x
+        self.assertEqual(mod_dmg, 80)  # 0.8x
 
         # Lightning boosted
         dmg = 100
         mod_dmg = self.engine._apply_weather_modifiers(dmg, "lightning")
-        self.assertEqual(mod_dmg, 120) # 1.2x
+        self.assertEqual(mod_dmg, 120)  # 1.2x
 
         # Physical unaffected
         dmg = 100
@@ -72,10 +73,10 @@ class TestWeatherCombat(unittest.TestCase):
 
         dmg = 100
         mod_dmg = self.engine._apply_weather_modifiers(dmg, "physical")
-        self.assertEqual(mod_dmg, 90) # 0.9x
+        self.assertEqual(mod_dmg, 90)  # 0.9x
 
         mod_dmg = self.engine._apply_weather_modifiers(dmg, "fire")
-        self.assertEqual(mod_dmg, 90) # 0.9x
+        self.assertEqual(mod_dmg, 90)  # 0.9x
 
     def test_storm_lightning_event(self):
         self.engine.weather = Weather.STORM
@@ -86,9 +87,7 @@ class TestWeatherCombat(unittest.TestCase):
         # 1. < 0.15 check (return 0.1)
         # random.choice([True, False]) calls random.choice
 
-        with patch("random.random", side_effect=[0.1]), \
-             patch("random.choice", return_value=True): # True for player
-
+        with patch("random.random", side_effect=[0.1]), patch("random.choice", return_value=True):  # True for player
             self.engine._handle_weather_events(log)
 
             self.assertTrue(any("lightning bolt strikes YOU" in msg for msg in log))
@@ -102,6 +101,7 @@ class TestWeatherCombat(unittest.TestCase):
 
         self.assertTrue(any("choking ash" in msg for msg in log))
         self.assertLess(self.engine.player_hp, 100)
+
 
 if __name__ == "__main__":
     unittest.main()

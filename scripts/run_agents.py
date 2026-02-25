@@ -8,13 +8,14 @@ Usage: python3 scripts/run_agents.py --agent AGENT_NAME --prompt PROMPT_STRING [
 OR: python3 scripts/run_agents.py --agent AGENT_NAME --prompt-file PATH/TO/PROMPT [--stdout]
 """
 
+import argparse
+import datetime
 import os
 import sys
-import datetime
-import argparse
 
 # Configuration
 PREPARED_DIR = ".Jules/agent_prompts/prepared"
+
 
 def get_current_date():
     """Retrieves the current date from environment or system clock."""
@@ -23,9 +24,11 @@ def get_current_date():
         return env_date
     return datetime.datetime.now().strftime("%Y-%m-%d")
 
+
 def inject_date(content, date_str):
     """Replaces {{CURRENT_DATE}} with the provided date string."""
     return content.replace("{{CURRENT_DATE}}", date_str)
+
 
 def run_agent(agent_name, prompt_content, date_str, stdout=False):
     """
@@ -54,12 +57,15 @@ def run_agent(agent_name, prompt_content, date_str, stdout=False):
     print(f"📝  Prompt Preview (first 100 chars):\n{final_prompt[:100]}...")
     print("-" * 40)
 
+
 def main():
     parser = argparse.ArgumentParser(description="Run an Eldoria Quest agent with date injection.")
     parser.add_argument("--agent", required=True, help="Name of the agent (e.g., Foreman)")
     parser.add_argument("--prompt", help="Inline prompt string")
     parser.add_argument("--prompt-file", help="Path to a file containing the prompt")
-    parser.add_argument("--stdout", action="store_true", help="Print the processed prompt to stdout instead of saving to file")
+    parser.add_argument(
+        "--stdout", action="store_true", help="Print the processed prompt to stdout instead of saving to file"
+    )
 
     args = parser.parse_args()
 
@@ -72,7 +78,7 @@ def main():
         prompt_content = args.prompt
     elif args.prompt_file:
         if os.path.exists(args.prompt_file):
-            with open(args.prompt_file, "r", encoding="utf-8") as f:
+            with open(args.prompt_file, encoding="utf-8") as f:
                 prompt_content = f.read()
         else:
             print(f"❌  Prompt file not found: {args.prompt_file}", file=sys.stderr)
@@ -85,6 +91,7 @@ def main():
 
     if not args.stdout:
         print("🎉  Agent processing complete.")
+
 
 if __name__ == "__main__":
     main()

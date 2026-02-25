@@ -181,7 +181,9 @@ class QuestSystem:
             if exists:
                 return False
 
-            quest = self.db._col("quests").find_one({"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1, "exclusive_group": 1})
+            quest = self.db._col("quests").find_one(
+                {"id": quest_id}, {"_id": 0, "objectives": 1, "tier": 1, "exclusive_group": 1}
+            )
             if not quest:
                 return False
 
@@ -189,19 +191,17 @@ class QuestSystem:
             exclusive_group = quest.get("exclusive_group")
             if exclusive_group:
                 # Find all quest IDs in this group
-                group_docs = self.db._col("quests").find(
-                    {"exclusive_group": exclusive_group},
-                    {"id": 1}
-                )
+                group_docs = self.db._col("quests").find({"exclusive_group": exclusive_group}, {"id": 1})
                 group_ids = [d["id"] for d in group_docs]
 
                 # Check if player has accepted or completed any
                 existing_group_quest = self.db._col("player_quests").find_one(
-                    {"discord_id": discord_id, "quest_id": {"$in": group_ids}},
-                    {"_id": 1}
+                    {"discord_id": discord_id, "quest_id": {"$in": group_ids}}, {"_id": 1}
                 )
                 if existing_group_quest:
-                    logger.warning(f"Rejecting Quest {quest_id} for User {discord_id}: Exclusive group conflict ({exclusive_group})")
+                    logger.warning(
+                        f"Rejecting Quest {quest_id} for User {discord_id}: Exclusive group conflict ({exclusive_group})"
+                    )
                     return False
             # -----------------------------
 

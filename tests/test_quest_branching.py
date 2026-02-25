@@ -1,8 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock
-import sys
-import os
-import json
 
 # Mock pymongo
 sys.modules["pymongo"] = MagicMock()
@@ -22,18 +21,27 @@ class TestQuestBranching(unittest.TestCase):
 
         # Define Quests
         self.quest_base = {
-            "id": 67, "title": "The Clockwork Heart: Anomaly", "tier": "B",
-            "objectives": '{"locate": "Unit 734"}', "prerequisites": []
+            "id": 67,
+            "title": "The Clockwork Heart: Anomaly",
+            "tier": "B",
+            "objectives": '{"locate": "Unit 734"}',
+            "prerequisites": [],
         }
         self.quest_choice_a = {
-            "id": 68, "title": "The Clockwork Heart: Dismantle", "tier": "B",
-            "objectives": '{"defeat": "Unit 734"}', "prerequisites": [67],
-            "exclusive_group": "clockwork_heart_choice"
+            "id": 68,
+            "title": "The Clockwork Heart: Dismantle",
+            "tier": "B",
+            "objectives": '{"defeat": "Unit 734"}',
+            "prerequisites": [67],
+            "exclusive_group": "clockwork_heart_choice",
         }
         self.quest_choice_b = {
-            "id": 69, "title": "The Clockwork Heart: Stabilize", "tier": "B",
-            "objectives": '{"defend": "Unit 734"}', "prerequisites": [67],
-            "exclusive_group": "clockwork_heart_choice"
+            "id": 69,
+            "title": "The Clockwork Heart: Stabilize",
+            "tier": "B",
+            "objectives": '{"defend": "Unit 734"}',
+            "prerequisites": [67],
+            "exclusive_group": "clockwork_heart_choice",
         }
 
         self.all_quests = [self.quest_base, self.quest_choice_a, self.quest_choice_b]
@@ -61,15 +69,16 @@ class TestQuestBranching(unittest.TestCase):
 
         # Mock completed quests query
         mock_col.find.side_effect = None
+
         def mock_find_dynamic(query, projection=None):
             # Query for getting all player quests
             if "discord_id" in query and "quest_id" not in query:
-                 return [{"quest_id": 67, "status": "completed"}]
+                return [{"quest_id": 67, "status": "completed"}]
             if "tier" in query:
                 return self.all_quests
             # Query for getting locked groups (IDs in ...)
             if "id" in query and "$in" in query["id"]:
-                return [self.quest_base] # No exclusive group
+                return [self.quest_base]  # No exclusive group
             return []
 
         mock_col.find.side_effect = mock_find_dynamic
@@ -88,10 +97,7 @@ class TestQuestBranching(unittest.TestCase):
 
         def mock_find_dynamic_2(query, projection=None):
             if "discord_id" in query and "quest_id" not in query:
-                 return [
-                     {"quest_id": 67, "status": "completed"},
-                     {"quest_id": 68, "status": "in_progress"}
-                 ]
+                return [{"quest_id": 67, "status": "completed"}, {"quest_id": 68, "status": "in_progress"}]
             if "tier" in query:
                 return self.all_quests
             if "id" in query and "$in" in query["id"]:
@@ -134,7 +140,7 @@ class TestQuestBranching(unittest.TestCase):
                 ids = query["quest_id"].get("$in", [])
                 # If we are testing Case A, player has 68.
                 if 68 in ids:
-                    return {"_id": 1} # Found conflict
+                    return {"_id": 1}  # Found conflict
                 return None
 
             return None
@@ -179,6 +185,7 @@ class TestQuestBranching(unittest.TestCase):
 
         result = self.quest_system.accept_quest(self.user_id, 69)
         self.assertTrue(result, "Should allow accepting quest if no conflict")
+
 
 if __name__ == "__main__":
     unittest.main()

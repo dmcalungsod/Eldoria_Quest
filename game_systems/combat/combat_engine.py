@@ -10,7 +10,6 @@ import logging
 import random
 
 import game_systems.data.emojis as E
-
 from game_systems.core.world_time import TimePhase, Weather
 
 from ..monsters.monster_actions import MonsterAI
@@ -286,7 +285,11 @@ class CombatEngine:
             if random.random() < 0.15:
                 # 50/50 to hit Player or Monster
                 target_is_player = random.choice([True, False])
-                dmg = max(10, int(self.stats_dict.get("HP", 100) * 0.05)) if target_is_player else max(10, int(self.monster.get("max_hp", 100) * 0.05))
+                dmg = (
+                    max(10, int(self.stats_dict.get("HP", 100) * 0.05))
+                    if target_is_player
+                    else max(10, int(self.monster.get("max_hp", 100) * 0.05))
+                )
 
                 if target_is_player:
                     self.player_hp = max(0, self.player_hp - dmg)
@@ -546,9 +549,7 @@ class CombatEngine:
             else:
                 turn_report["hits_taken"] = 1
                 emoji = skill.get("emoji", "🔥")
-                attack_msg = (
-                    f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
-                )
+                attack_msg = f"{emoji} **{self.monster.get('name', 'Enemy')}** unleashes **{skill.get('name')}**!"
 
                 if player_defending:
                     dmg = int(dmg * 0.5)
@@ -590,9 +591,7 @@ class CombatEngine:
             is_offensive = (
                 self.action in ["attack", "special_ability"]
                 or self.action.startswith("skill:")
-                or (
-                    self.action == "auto"
-                )  # Allow auto to trigger randomly? No, safer to assume auto handles attack
+                or (self.action == "auto")  # Allow auto to trigger randomly? No, safer to assume auto handles attack
             )
 
             # Refine offensive check: Auto often means attack, but we want to reward choice.
@@ -851,7 +850,9 @@ class CombatEngine:
             name = skill.get("name", "Debuff")
 
             # Avoid duplicate stacking of the SAME skill (refresh duration)
-            existing = next((d for d in self.monster["debuffs"] if d.get("name") == name and d.get("type") == "stat_mod"), None)
+            existing = next(
+                (d for d in self.monster["debuffs"] if d.get("name") == name and d.get("type") == "stat_mod"), None
+            )
 
             if existing:
                 existing["duration"] = duration

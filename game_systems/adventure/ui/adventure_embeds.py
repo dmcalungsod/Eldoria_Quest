@@ -15,11 +15,11 @@ import discord
 
 import game_systems.data.emojis as E
 from cogs.utils.ui_helpers import get_health_status_emoji, make_progress_bar
+from game_systems.core.world_time import WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import get_rarity_ansi
 from game_systems.data.narrative_data import MISSION_FLAVOR_TEXT, OUTCOME_FLAVOR_TEXT
 from game_systems.player.player_stats import PlayerStats
-from game_systems.core.world_time import WorldTime
 
 logger = logging.getLogger("eldoria.ui.embeds")
 

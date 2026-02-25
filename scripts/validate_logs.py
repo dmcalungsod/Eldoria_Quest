@@ -5,12 +5,13 @@ Scans `.Jules/agent_logs/` to ensure no files are dated in the future relative t
 Exits with 1 if any future logs are found.
 """
 
-import os
-import sys
 import datetime
+import os
 import re
+import sys
 
 LOGS_DIR = ".Jules/agent_logs"
+
 
 def get_current_date_gmt8():
     """Returns the current date in GMT+8."""
@@ -18,6 +19,7 @@ def get_current_date_gmt8():
     utc_now = datetime.datetime.utcnow()
     gmt8_now = utc_now + datetime.timedelta(hours=8)
     return gmt8_now.date()
+
 
 def main():
     current_date = get_current_date_gmt8()
@@ -50,6 +52,7 @@ def main():
         sys.exit(1)
     else:
         print("✅  All log timestamps are valid.")
+
 
 if __name__ == "__main__":
     main()
