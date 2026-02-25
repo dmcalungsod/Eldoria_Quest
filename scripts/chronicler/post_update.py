@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
-import os
 import json
-import urllib.request
+import os
 import re
 import sys
+import urllib.request
 
 # Configuration
 WEBHOOK_VAR = "EQ_UPDATE_WEBHOOK"
 UPDATE_FILE = "monthly_updates/2026-02_february_chronicle.md"
+
 
 def load_file(filepath):
     """Loads the markdown file."""
     if not os.path.exists(filepath):
         print(f"Error: File not found: {filepath}")
         return None
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         return f.read()
+
 
 def parse_markdown_to_embed(content):
     """Parses a specifically formatted markdown file into a Discord embed."""
-    lines = content.strip().split('\n')
+    lines = content.strip().split("\n")
 
     embed = {
-        "color": 0x5a2e2e,  # Dark Red / Fantasy Theme
+        "color": 0x5A2E2E,  # Dark Red / Fantasy Theme
         "fields": [],
     }
 
@@ -49,14 +51,14 @@ def parse_markdown_to_embed(content):
     # Process Sections (Split by '---')
     remaining_text = "\n".join(lines)
     # Split by separator (allowing for surrounding whitespace)
-    chunks = re.split(r'\n\s*---\s*\n', remaining_text)
+    chunks = re.split(r"\n\s*---\s*\n", remaining_text)
 
     for chunk in chunks:
         chunk = chunk.strip()
         if not chunk:
             continue
 
-        chunk_lines = chunk.split('\n')
+        chunk_lines = chunk.split("\n")
 
         # Check if it's a footer (heuristic: starts with "Until next month")
         if chunk.lower().startswith("until next month"):
@@ -80,27 +82,19 @@ def parse_markdown_to_embed(content):
             if len(field_value) > 1024:
                 field_value = field_value[:1021] + "..."
 
-            embed["fields"].append({
-                "name": field_name,
-                "value": field_value,
-                "inline": False
-            })
+            embed["fields"].append({"name": field_name, "value": field_value, "inline": False})
 
     return embed
 
+
 def send_webhook(webhook_url, embed):
     """Sends the embed to the Discord webhook."""
-    payload = {
-        "username": "Guild Chronicler",
-        "avatar_url": "https://i.imgur.com/4M34hi2.png",
-        "embeds": [embed]
-    }
+    payload = {"username": "Guild Chronicler", "avatar_url": "https://i.imgur.com/4M34hi2.png", "embeds": [embed]}
 
-    data = json.dumps(payload).encode('utf-8')
-    req = urllib.request.Request(webhook_url, data=data, headers={
-        'Content-Type': 'application/json',
-        'User-Agent': 'GuildChronicler/1.0'
-    })
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        webhook_url, data=data, headers={"Content-Type": "application/json", "User-Agent": "GuildChronicler/1.0"}
+    )
 
     try:
         with urllib.request.urlopen(req) as response:
@@ -108,12 +102,13 @@ def send_webhook(webhook_url, embed):
                 print("✅ Successfully sent update via webhook.")
             else:
                 print(f"⚠️ Webhook responded with status: {response.status}")
-                print(response.read().decode('utf-8'))
+                print(response.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         print(f"❌ HTTP Error: {e.code} - {e.reason}")
-        print(e.read().decode('utf-8'))
+        print(e.read().decode("utf-8"))
     except Exception as e:
         print(f"❌ Error sending webhook: {e}")
+
 
 def main():
     webhook_url = os.environ.get(WEBHOOK_VAR)
@@ -129,8 +124,9 @@ def main():
     print(f"📖 Parsing update file: {UPDATE_FILE}...")
     embed = parse_markdown_to_embed(content)
 
-    print(f"🚀 Sending update to Discord...")
+    print("🚀 Sending update to Discord...")
     send_webhook(webhook_url, embed)
+
 
 if __name__ == "__main__":
     main()
