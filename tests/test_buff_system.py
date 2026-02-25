@@ -82,12 +82,15 @@ class TestBuffSystem(unittest.TestCase):
         self.assertIn("Buffs applied", msg)
         self.assertIn("STR +3", msg)
 
-        # Verify buff was added
-        self.mock_db.add_active_buff.assert_called()
-        call_args = self.mock_db.add_active_buff.call_args
-        self.assertEqual(call_args[0][2], "Captains' Ale (Embolden)")  # name
-        self.assertEqual(call_args[0][3], "STR")  # stat
-        self.assertEqual(call_args[0][4], 3)  # amount
+        # Verify buff was added via bulk method
+        self.mock_db.add_active_buffs_bulk.assert_called()
+        call_args = self.mock_db.add_active_buffs_bulk.call_args
+        # args: (discord_id, buffs_list)
+        buffs_list = call_args[0][1]
+        self.assertEqual(len(buffs_list), 1)
+        self.assertEqual(buffs_list[0]["name"], "Captains' Ale (Embolden)")
+        self.assertEqual(buffs_list[0]["stat"], "STR")
+        self.assertEqual(buffs_list[0]["amount"], 3)
 
     def test_combat_handler_applies_buff(self):
         """Tests that CombatHandler applies active buffs to player stats."""
@@ -176,24 +179,24 @@ class TestBuffSystem(unittest.TestCase):
 
             ch.resolve_turn(monster, report, persist_vitals=False)
 
-            # Verify add_active_buff was called
+            # Verify add_active_buffs_bulk was called
             # Duration should be 3 * 60 = 180s
-            self.mock_db.add_active_buff.assert_called()
+            self.mock_db.add_active_buffs_bulk.assert_called()
 
-            # Find the call with our buff
+            # Inspect the bulk list passed
+            call_args = self.mock_db.add_active_buffs_bulk.call_args
+            # call_args[0] -> args tuple. arg[0] is discord_id, arg[1] is list
+            buff_list = call_args[0][1]
+
             found = False
-            for call in self.mock_db.add_active_buff.call_args_list:
-                args, kwargs = call
-                # Check args or kwargs depending on how it was called
-                # CombatHandler calls with keyword args:
-                # discord_id=..., buff_id=..., name=..., stat=..., amount=..., duration_s=...
-                if kwargs.get("name") == "Test Buff" and kwargs.get("stat") == "STR":
-                    self.assertEqual(kwargs["amount"], 5)
-                    self.assertEqual(kwargs["duration_s"], 180)
+            for buff in buff_list:
+                if buff["name"] == "Test Buff" and buff["stat"] == "STR":
+                    self.assertEqual(buff["amount"], 5)
+                    self.assertEqual(buff["duration_s"], 180)
                     found = True
                     break
 
-            self.assertTrue(found, "add_active_buff was not called for the new buff.")
+            self.assertTrue(found, "add_active_buffs_bulk was not called with the correct buff.")
 
 
 if __name__ == "__main__":

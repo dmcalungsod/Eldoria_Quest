@@ -268,18 +268,22 @@ class CombatHandler:
 
             # 7. Persist New Buffs
             new_buffs = result.get("new_buffs", [])
-            for buff in new_buffs:
-                # Convert turn duration to seconds (1 turn = 60s)
-                duration_s = buff.get("duration", 3) * 60
-                buff_id = uuid.uuid4().hex
-                self.db.add_active_buff(
-                    discord_id=self.discord_id,
-                    buff_id=buff_id,
-                    name=buff.get("name"),
-                    stat=buff.get("stat"),
-                    amount=buff.get("amount"),
-                    duration_s=duration_s,
-                )
+            if new_buffs:
+                bulk_buffs = []
+                for buff in new_buffs:
+                    # Convert turn duration to seconds (1 turn = 60s)
+                    duration_s = buff.get("duration", 3) * 60
+                    buff_id = uuid.uuid4().hex
+                    bulk_buffs.append(
+                        {
+                            "buff_id": buff_id,
+                            "name": buff.get("name"),
+                            "stat": buff.get("stat"),
+                            "amount": buff.get("amount"),
+                            "duration_s": duration_s,
+                        }
+                    )
+                self.db.add_active_buffs_bulk(self.discord_id, bulk_buffs)
 
             # 8. Award Titles
             new_titles = result.get("new_titles", [])
