@@ -63,11 +63,7 @@ class ConsumableManager:
                 skill_levels = self.db.get_player_skill_levels(discord_id)
                 for s_key, s_level in skill_levels.items():
                     skill_def = SKILLS.get(s_key)
-                    if (
-                        skill_def
-                        and skill_def.get("type") == "Passive"
-                        and "passive_bonus" in skill_def
-                    ):
+                    if skill_def and skill_def.get("type") == "Passive" and "passive_bonus" in skill_def:
                         bonuses = skill_def["passive_bonus"]
                         if "healing_item_potency" in bonuses:
                             # 0.2 * level
