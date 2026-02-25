@@ -12,17 +12,21 @@ import argparse
 import datetime
 import os
 import sys
+from zoneinfo import ZoneInfo
 
 # Configuration
 PREPARED_DIR = ".Jules/agent_prompts/prepared"
 
 
 def get_current_date():
-    """Retrieves the current date from environment or system clock."""
+    """Retrieves the current date from environment or system clock (Manila time)."""
     env_date = os.environ.get("CURRENT_DATE")
     if env_date:
         return env_date
-    return datetime.datetime.now().strftime("%Y-%m-%d")
+
+    # Enforce Asia/Manila timezone
+    manila_tz = ZoneInfo("Asia/Manila")
+    return datetime.datetime.now(manila_tz).strftime("%Y-%m-%d")
 
 
 def inject_date(content, date_str):
