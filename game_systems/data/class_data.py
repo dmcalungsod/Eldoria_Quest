@@ -36,10 +36,12 @@ CLASSES = {
     "Alchemist": {
         "id": 6,
         "description": (
-            "A pragmatic survivor who views the Sundering not as a curse, but a chemical reaction "
-            "to be understood. While Mages channel the Veil and Clerics pray to it, Alchemists "
-            "bottle it. They use volatile mixtures to control the battlefield, stripping enemy "
-            "defenses and turning the environment against them."
+            "Scholars of the volatile and the forbidden, Alchemists view the Sundering not as a "
+            "tragedy, but as a grand transmutation. Where Mages weave the Veil and Clerics "
+            "beseech it, Alchemists distill it into liquid catastrophe. Burdened by heavy satchels "
+            "of bubbling reagents, they walk the battlefield as walking laboratories—stripping "
+            "armor with caustic vitriol, mending flesh with unstable serums, and proving that "
+            "anything can burn if the mixture is right."
         ),
         "stats": {"STR": 3, "END": 5, "DEX": 6, "AGI": 4, "MAG": 7, "LCK": 4},
         "allowed_slots": [
