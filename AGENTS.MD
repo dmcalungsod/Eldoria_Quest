@@ -78,3 +78,21 @@ Each agent maintains a personal journal in `.Jules/<agent_name>.md` for critical
 - Agents tag each other using `@mention` in logs to signal dependencies or request reviews.
 
 This ecosystem ensures that Eldoria Quest evolves coherently, with every change tracked and every agent aligned to the project's goals.
+
+## ⏰ Temporal Integrity
+
+To ensure all agent operations are anchored to the real-world timeline:
+- **Date Injection**: The `Run Agents` workflow (`.github/workflows/run_agents.yml`) injects the `CURRENT_DATE` environment variable (in GMT+8) into every agent run.
+- **Truth Anchor**: The file `.Jules/TODAY.md` is updated daily by the workflow to reflect the current authorized date. Agents may read this file to confirm the date.
+- **Validation**: The `Validate Logs` workflow ensures no files in `.Jules/agent_logs/` are future-dated.
+- **CLI Support**: The `scripts/run_agents.py` tool must be used to execute agents. It accepts a `--prompt` argument and replaces the `{{CURRENT_DATE}}` placeholder with the system date before execution.
+- **Prepared Prompts**: Prepared prompt files are temporarily stored in `.Jules/agent_prompts/prepared/` (gitignored) rather than cluttering the logs directory.
+
+### Integration Guide
+
+If you are running agents via a custom script or command line, pipe the prompt through `scripts/run_agents.py` to inject the correct date:
+
+```bash
+PROMPT=$(python3 scripts/run_agents.py --agent Foreman --prompt "Your prompt..." --stdout)
+# Then use $PROMPT with your LLM tool
+```

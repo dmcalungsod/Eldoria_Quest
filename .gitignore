@@ -39,3 +39,7 @@ logs/
 
 # Databases
 *.db
+
+# Jules specific
+.Jules/agent_prompts/prepared/*
+!.Jules/agent_prompts/prepared/.gitkeep
