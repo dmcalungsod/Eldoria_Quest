@@ -103,17 +103,6 @@ jobs:
               fi
             done
 
-  cleanup-branches:
-    docker:
-      - image: cimg/python:3.10
-    steps:
-      - checkout
-      - install-gh
-      - run:
-          name: Prune Merged Branches
-          command: |
-            export GH_TOKEN="$GITHUB_TOKEN"
-            python scripts/prune_merged_branches.py
 
   mirror:
     docker:
@@ -203,9 +192,8 @@ workflows:
             - ruff-fix
             - test
 
-  # Scheduled: manage PRs + cleanup
+  # Scheduled: manage PRs
   nightly:
     when: << pipeline.parameters.run-schedule >>
     jobs:
       - manage-prs
-      - cleanup-branches
