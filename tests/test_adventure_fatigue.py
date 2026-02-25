@@ -26,6 +26,7 @@ class TestAdventureFatigue:
         """
         # We can mock AdventureSession to test just this method
         session = MagicMock(spec=AdventureSession)
+        session.supplies = {}
         # Bind the method to the mock
         session._calculate_fatigue_multiplier = AdventureSession._calculate_fatigue_multiplier.__get__(
             session, AdventureSession

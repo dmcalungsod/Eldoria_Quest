@@ -1,26 +1,17 @@
 version: 2.1
 
-jobs:
-  lint:
-    docker:
-      - image: cimg/python:3.10
+# ── Reusable Commands ──────────────────────────────────
+commands:
+  install-ruff:
+    description: Install Ruff linter
     steps:
-      - checkout
       - run:
           name: Install Ruff
           command: pip install ruff
-      - run:
-          name: Ruff Lint Check
-          command: ruff check .
-      - run:
-          name: Ruff Format Check
-          command: ruff format --check .
 
-  test:
-    docker:
-      - image: cimg/python:3.10
+  install-deps:
+    description: Install project dependencies with caching
     steps:
-      - checkout
       - restore_cache:
           keys:
             - deps-v1-{{ checksum "requirements.txt" }}
@@ -32,6 +23,45 @@ jobs:
           key: deps-v1-{{ checksum "requirements.txt" }}
           paths:
             - ~/.local
+
+# ── Jobs ───────────────────────────────────────────────
+jobs:
+  ruff-fix:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install-ruff
+      - run:
+          name: Ruff Auto-Fix & Format
+          command: |
+            ruff check . --fix
+            ruff format .
+      - run:
+          name: Commit Fixes (if any)
+          command: |
+            git config user.name "CircleCI"
+            git config user.email "ci@circleci.com"
+            if [ -n "$(git status --porcelain)" ]; then
+              git add -A
+              git commit -m "style: auto-fix code with Ruff [ci skip]"
+              git push origin "$CIRCLE_BRANCH"
+              echo "✅ Pushed auto-fix commit"
+            else
+              echo "✅ No fixes needed"
+            fi
+      - run:
+          name: Ruff Strict Check
+          command: |
+            ruff check .
+            ruff format --check .
+
+  test:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install-deps
       - run:
           name: Install Test Dependencies
           command: pip install pytest
@@ -39,10 +69,11 @@ jobs:
           name: Run Tests
           command: python -m pytest --tb=short -q
 
+# ── Workflow ───────────────────────────────────────────
 workflows:
   ci:
     jobs:
-      - lint
+      - ruff-fix
       - test:
           requires:
-            - lint
+            - ruff-fix
