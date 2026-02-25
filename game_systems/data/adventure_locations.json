@@ -142,13 +142,16 @@
                 25
             ],
             [
-                "monster_017",
-                15
-            ],
-            [
                 "monster_020",
                 20
             ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_017",
+                "weight": 5,
+                "min_level": 12
+            }
         ],
         "night_monsters": [
             [

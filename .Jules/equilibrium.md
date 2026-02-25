@@ -19,3 +19,26 @@
 - Removes the "infinite power" exploit.
 - Makes buff timing more strategic (refreshing) rather than spam-heavy.
 - Preserves the value of base stat upgrades.
+
+## 2026-03-03 — Deepgrove Roots Boss Farming Exploit
+
+**Learning:** High-tier bosses in low-level zones can break progression if not properly gated.
+**The Imbalance:**
+1.  **Spawn Rate:** The "Feral Stag" (Level 11 Boss) had a 15% base spawn chance in the "Deepgrove Roots" (Level 10) adventure zone. This is excessively high for a boss encounter.
+2.  **Loot:** It dropped `magic_stone_large` (100%) and `magic_stone_flawless` (25%). These are mid-to-end game resources, allowing Level 10 players to bypass intended material progression.
+
+**The Fix:**
+1.  **Spawn Logic:** Removed "Feral Stag" from the regular spawn pool. Added it to the `conditional_monsters` list with a 5% spawn chance and a strict `min_level` requirement of 12.
+2.  **Loot Table:**
+    - Replaced `magic_stone_large` (100%) with `magic_stone_medium` (100%).
+    - Removed `magic_stone_flawless` entirely.
+    - Added `magic_stone_large` as a rare (15%) drop to maintain some excitement.
+
+**Measured Impact:**
+- **Before:** A player running 100 adventures in Deepgrove Roots would encounter ~15 Feral Stags and gain ~15 Large Magic Stones and ~3-4 Flawless Stones.
+- **After:** A player running 100 adventures (if Level 12+) would encounter ~5 Feral Stags and gain ~5 Medium Stones (guaranteed) and ~0-1 Large Stone.
+- **Economic Integrity:** Prevents the market flooding of high-tier upgrade materials from a low-risk zone.
+
+**Player Impact:**
+- Makes the "Feral Stag" feel like a true rare encounter rather than a farming node.
+- Smooths the difficulty curve for new players entering Deepgrove Roots (fewer boss wipes).
