@@ -1,0 +1,16 @@
+name: Trigger CircleCI on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger CircleCI Pipeline
+        run: |
+          curl -s -X POST "https://circleci.com/api/v2/project/gh/dmcalungsod/Eldoria_Quest/pipeline" \
+            -H "Circle-Token: ${{ secrets.CIRCLECI_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"branch\": \"${{ github.head_ref }}\"}"
