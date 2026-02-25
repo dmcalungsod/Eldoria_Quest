@@ -44,6 +44,12 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 *   **Key Interest:** Elemental/Demon monsters, magic stones, ancient texts.
 *   **Motto:** *Knowledge is Power.*
 
+### **Grey Ward** (Order of Resilience)
+*   **Philosophy:** "From rot, resilience. To survive the Veil, we must consume it."
+*   **Focus:** Alchemy, biological research, quarantine enforcement, turning monsters into medicine (and weapons).
+*   **Key Interest:** Mutated fauna, poisonous flora, reagent gathering.
+*   **Motto:** *Adapt or Perish.*
+
 ---
 
 ## 🗺️ **III. Locations (Progression)**
