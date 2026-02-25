@@ -36,10 +36,13 @@ class TestDamageScaling(unittest.TestCase):
                 "power_multiplier": 1.0,
             }
 
-            # Damage should be based on STR (10) * 2.0 * 1.0 = 20 (roughly, before variance)
+            # Damage should be based on STR (10) * 2.0 * 1.0 = 20
+            # PLUS Secondary Stat Bonus (0.5x scaling from other stats)
+            # MAG (20) * 0.5 * 1.0 = 10
+            # DEX (1) * 0.5 * 1.0 = 0.5
+            # Total ~ 30.5
             dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_str, 1)
-            # With variance 0.9-1.1, expected around 18-22
-            self.assertTrue(15 <= dmg <= 25, f"Expected damage around 20, got {dmg}")
+            self.assertTrue(28 <= dmg <= 33, f"Expected damage around 30.5, got {dmg}")
 
             # Mock skill using MAG scaling
             skill_mag = {
@@ -49,9 +52,11 @@ class TestDamageScaling(unittest.TestCase):
                 "power_multiplier": 1.0,
             }
 
-            # Damage should be based on MAG (20) * 2.0 * 1.0 = 40 (roughly)
+            # Damage should be based on MAG (20) * 2.0 * 1.0 = 40
+            # PLUS Secondary Stat Bonus (STR=10->5, DEX=1->0.5) = 5.5
+            # Total ~ 45.5
             dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_mag, 1)
-            self.assertTrue(30 <= dmg <= 50, f"Expected damage around 40, got {dmg}")
+            self.assertTrue(43 <= dmg <= 48, f"Expected damage around 45.5, got {dmg}")
 
     def test_dynamic_scaling_factor(self):
         # Mock random to ensure consistent damage (no crits, variance 1.0)
@@ -69,8 +74,9 @@ class TestDamageScaling(unittest.TestCase):
                 "power_multiplier": 1.0,
             }
 
+            # Base: 50. Secondary (MAG=10, DEX=0.5) = 10.5. Total 60.5.
             dmg, _, _ = DamageFormula.player_skill(self.stats, self.monster, skill_heavy, 1)
-            self.assertTrue(48 <= dmg <= 52, f"Expected damage around 50, got {dmg}")
+            self.assertTrue(58 <= dmg <= 63, f"Expected damage around 60.5, got {dmg}")
 
     def test_player_heal_max_hp_logic(self):
         # Test healing cap and max_hp consistency

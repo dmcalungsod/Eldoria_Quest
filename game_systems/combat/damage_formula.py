@@ -73,6 +73,14 @@ class DamageFormula:
         base_stat_value = DamageFormula._get_stat(player_stats, scaling_stat)
         attack_power = calculate_tiered_bonus(base_stat_value, scaling_factor)
 
+        # --- SECONDARY STAT SCALING ---
+        # Add 0.5x scaling from other core offensive stats (STR, DEX, MAG)
+        # This prevents skills from falling behind normal attacks (which sum all 3 stats)
+        for stat in ["STR", "DEX", "MAG"]:
+            if stat != scaling_stat:
+                val = DamageFormula._get_stat(player_stats, stat)
+                attack_power += calculate_tiered_bonus(val, 0.5)
+
         base_multiplier = float(skill_data.get("power_multiplier", 1.0))
         final_multiplier = base_multiplier + (0.08 * (skill_level - 1))
         attack_power *= final_multiplier
