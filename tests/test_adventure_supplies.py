@@ -168,9 +168,7 @@ class TestAdventureSupplies(unittest.TestCase):
                 # Force combat trigger (roll 100 > threshold)
                 with patch("random.randint", return_value=100):
                     # Mock initiate_combat to return a monster
-                    session.combat.initiate_combat = MagicMock(
-                        return_value=(monster_data, "A wild goblin appears!")
-                    )
+                    session.combat.initiate_combat = MagicMock(return_value=(monster_data, "A wild goblin appears!"))
 
                     # --- CRITICAL TEST: AMBUSH CHANCE ---
                     # We simulate a roll of 0.15.
@@ -195,7 +193,7 @@ class TestAdventureSupplies(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {}, # No Torch
+            "supplies": {},  # No Torch
         }
 
         mock_quest = MagicMock()
@@ -211,9 +209,7 @@ class TestAdventureSupplies(unittest.TestCase):
 
             with patch.object(session, "_fetch_session_context", return_value=self.context_mock):
                 with patch("random.randint", return_value=100):
-                    session.combat.initiate_combat = MagicMock(
-                        return_value=(monster_data, "A wild goblin appears!")
-                    )
+                    session.combat.initiate_combat = MagicMock(return_value=(monster_data, "A wild goblin appears!"))
 
                     # Same roll of 0.15
                     # Without Torch (0.20 threshold): 0.15 < 0.20 -> Ambush!
