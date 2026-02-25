@@ -108,3 +108,26 @@ Skill Tree Expansion for the Warrior Class.
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/skill_tree_warrior.md`
+
+## 2026-02-25 — Expansion Blueprint: Survival & Logistics
+
+**Design Choice:**
+Major Content Expansion: The Survival & Logistics Update.
+
+**Reasoning:**
+- **Strategic Depth:** Moves long adventures from passive waiting to active preparation.
+- **Economy:** Supply consumption creates a necessary material/gold sink.
+- **Theme:** Directly supports the "Grim Survival" pillar—the world itself is dangerous.
+
+**Key Mechanics:**
+- **Fatigue System:** Soft cap on adventure length (16+ steps) via stacking monster buffs.
+- **Regional Hazards:** Environmental debuffs (Cold, Heat, Corruption) requiring specific mitigation.
+- **Supply System:** New loadout slot for consumable tools (Torches, Climbing Kits, Bedrolls).
+
+**Integration Notes:**
+- **Tactician:** Needs to update `AdventureSession` to apply Hazard debuffs and check supply triggers (e.g., auto-rest).
+- **GameForge:** Requires 8 new items and associated crafting recipes.
+- **Palette:** UI needs a "Supply Selection" screen before adventure start.
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/expansion_survival_logistics.md`
