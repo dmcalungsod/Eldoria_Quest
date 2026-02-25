@@ -30,9 +30,6 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "${DEPLOY_KEY_FINGERPRINT}"
       - checkout
       - install-ruff
       - run:
