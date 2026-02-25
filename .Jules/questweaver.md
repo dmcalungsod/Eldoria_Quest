@@ -12,7 +12,6 @@
 *   **Pacing:** Avoiding overly long dialogue dumps keeps the momentum. Break it up with action or choices.
 *   **Consequences:** Visible but subtle consequences (like changed dialogue or unique titles) are highly valued.
 *   **Tone:** Maintaining the grim survival theme while offering moments of hope creates emotional resonance.
-*   **Technical Constraints:** Quests should primarily use `defeat` or `collect` objectives. More complex actions (locate, use, perform) require code support that may not exist. Flavor text is the primary tool for narrative variety.
 
 ## ✨ Favorite Designs
 *   **The Echoing Depths:** Investigation quest with mystery and lore.
@@ -21,18 +20,9 @@
 *   **The Silent Witness:** Solve a murder in the guild by talking to NPCs with secrets.
 *   **The Sundering's Child:** A monster that seems intelligent – do you kill it or try to communicate?
 *   **The Clockwork Heart:** A moral dilemma involving a sentient construct in the Clockwork Halls.
-*   **The Alchemist's Path (The Great Work):** Introduced the Alchemist class through a narrative of dangerous experimentation, using "Defeat" objectives re-flavored as capture and testing.
 
 ## 🚫 Avoids
 *   **Generic fetch/kill quests** without context.
 *   **"Chosen One" narratives** that ignore the player's rank.
 *   **Meaningless choices.**
 *   **Silly rewards** that break immersion.
-*   **Unsupported Objectives:** Do not use `locate`, `use`, or `perform` unless verified by `GameForge`.
-
-## 🔧 Questweaver Design Process
-
-### Alchemist Class Quests (Quests 70-73)
-**Design Goal:** Introduce the Alchemist class concepts narratively.
-**Narrative Hook:** Alchemist Miral is a "mad scientist" type.
-**Mechanics:** Uses standard `defeat` objectives for compatibility, but flavored via text to represent "Capturing", "Testing", and "Releasing".

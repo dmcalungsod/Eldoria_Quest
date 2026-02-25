@@ -1,3 +1,4 @@
+import importlib.util
 import os
 import sys
 import unittest
@@ -7,12 +8,10 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Mock dependencies before import (consistent with test_adventure_day_night.py)
-# We import these inside try-except to check if they exist.
-# If they exist, we do nothing (they are real modules or already mocked by conftest).
-# If they don't, we mock them to allow imports in subsequent modules to succeed.
-try:
-    import pymongo  # noqa: F401
-except ImportError:
+# We use importlib.util.find_spec to check for module availability
+# without triggering F401 (unused import) errors.
+
+if importlib.util.find_spec("pymongo") is None:
     mock_pymongo = MagicMock()
     mock_pymongo.errors = MagicMock()
     sys.modules["pymongo"] = mock_pymongo
@@ -20,14 +19,18 @@ except ImportError:
     # Ensure DuplicateKeyError is a real exception (handled by conftest usually, but safe here)
     if not isinstance(mock_pymongo.errors.DuplicateKeyError, type):
         mock_pymongo.errors.DuplicateKeyError = type("DuplicateKeyError", (Exception,), {})
+else:
+    # If it exists, ensure we don't break subsequent imports
+    # (But typically we don't need to do anything if it's installed)
+    pass
 
-try:
-    import discord  # noqa: F401
-except ImportError:
+if importlib.util.find_spec("discord") is None:
     mock_discord = MagicMock()
     mock_discord.ext = MagicMock()
     sys.modules["discord"] = mock_discord
     sys.modules["discord.ext"] = mock_discord.ext
+else:
+    pass
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_session import AdventureSession
@@ -142,7 +145,9 @@ class TestAdventureSupplies(unittest.TestCase):
                 # Force combat trigger (roll 100 > threshold)
                 with patch("random.randint", return_value=100):
                     # Mock initiate_combat to return a monster
-                    session.combat.initiate_combat = MagicMock(return_value=(monster_data, "A wild goblin appears!"))
+                    session.combat.initiate_combat = MagicMock(
+                        return_value=(monster_data, "A wild goblin appears!")
+                    )
 
                     # --- CRITICAL TEST: AMBUSH CHANCE ---
                     # We simulate a roll of 0.15.
@@ -183,7 +188,9 @@ class TestAdventureSupplies(unittest.TestCase):
 
             with patch.object(session, "_fetch_session_context", return_value=self.context_mock):
                 with patch("random.randint", return_value=100):
-                    session.combat.initiate_combat = MagicMock(return_value=(monster_data, "A wild goblin appears!"))
+                    session.combat.initiate_combat = MagicMock(
+                        return_value=(monster_data, "A wild goblin appears!")
+                    )
 
                     # Same roll of 0.15
                     # Without Torch (0.20 threshold): 0.15 < 0.20 -> Ambush!
