@@ -306,6 +306,27 @@ class CombatEngine:
             self.player_hp = max(0, self.player_hp - dmg)
             log.append(f"🌋 **ASH:** The choking ash burns your lungs! (`{dmg}` dmg)")
 
+        elif self.weather == Weather.BLIZZARD:
+            # Blizzard: 20% Chance for Frostbite (3% Max HP)
+            if random.random() < 0.20:
+                dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.03))
+                self.player_hp = max(0, self.player_hp - dmg)
+                log.append(f"❄️ **BLIZZARD:** The biting cold freezes your marrow! (`{dmg}` dmg)")
+
+        elif self.weather == Weather.SANDSTORM:
+            # Sandstorm: 20% Chance for Buffeting Sands (3% Max HP)
+            if random.random() < 0.20:
+                dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.03))
+                self.player_hp = max(0, self.player_hp - dmg)
+                log.append(f"🌪️ **SANDSTORM:** The abrasive sand flays your skin! (`{dmg}` dmg)")
+
+        elif self.weather == Weather.MIASMA:
+            # Miasma: 25% Chance for Toxic Fumes (2% Max HP)
+            if random.random() < 0.25:
+                dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.02))
+                self.player_hp = max(0, self.player_hp - dmg)
+                log.append(f"☠️ **MIASMA:** You inhale the toxic fumes! (`{dmg}` dmg)")
+
     def _detect_element(self, skill: dict) -> str:
         """Determines the elemental type of a skill."""
         if not skill:
@@ -362,6 +383,31 @@ class CombatEngine:
         elif self.weather == Weather.ASH:
             if element == "fire":
                 return int(dmg * 1.1)
+
+        elif self.weather == Weather.BLIZZARD:
+            if element == "ice":
+                return int(dmg * 1.2)
+            if element == "fire":
+                return int(dmg * 0.8)
+
+        elif self.weather == Weather.SANDSTORM:
+            if element == "earth":
+                return int(dmg * 1.1)
+            if element == "wind":
+                return int(dmg * 1.2)
+
+        elif self.weather == Weather.GALE:
+            if element == "wind":
+                return int(dmg * 1.3)
+            # Gale makes aiming hard -> Nerf Ranged/DEX?
+            # We can check skill type if available, but here we only have element.
+            # Assuming "physical" might cover ranged, but we can't distinguish.
+
+        elif self.weather == Weather.MIASMA:
+            if element in ["poison", "dark"]:
+                return int(dmg * 1.2)
+            if element in ["holy", "light"]:
+                return int(dmg * 0.8)
 
         elif self.weather == Weather.STORM:
             # High winds affect physical ranged (DEX) if implemented,
