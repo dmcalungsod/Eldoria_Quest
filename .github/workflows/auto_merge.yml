@@ -38,15 +38,15 @@ jobs:
 
             echo "Checking PR #$pr_number ($title)..."
 
-            # Check for GitGuardian and CodeRabbit
-            # Note: The exact check names depend on the app installation.
-            # Using 'gh pr checks' to list checks and grep for success.
-            # If checks are pending or failed, we skip merge.
+            # Check for GitGuardian, CodeRabbit, and CircleCI
+            # All required checks must be present and none can be failed/pending.
 
             checks_output=$(gh pr checks "$pr_number")
 
             if echo "$checks_output" | grep -q "GitGuardian Security Checks" && \
                echo "$checks_output" | grep -q "CodeRabbit" && \
+               echo "$checks_output" | grep -q "ci/lint" && \
+               echo "$checks_output" | grep -q "ci/test" && \
                ! echo "$checks_output" | grep -q "fail" && \
                ! echo "$checks_output" | grep -q "pending"; then
 
@@ -57,7 +57,7 @@ jobs:
                  echo "- ❌ Failed to merge PR #$pr_number" >> $GITHUB_STEP_SUMMARY
                fi
             else
-               echo "PR #$pr_number waiting on checks (GitGuardian/CodeRabbit not ready or failed)."
+               echo "PR #$pr_number waiting on checks (GitGuardian/CodeRabbit/CircleCI not ready or failed)."
                echo "- ⏳ PR #$pr_number waiting on checks" >> $GITHUB_STEP_SUMMARY
             fi
           done
