@@ -268,6 +268,7 @@ class CombatHandler:
 
             # 7. Persist New Buffs
             new_buffs = result.get("new_buffs", [])
+            added_buffs = []
             if new_buffs:
                 bulk_buffs = []
                 for buff in new_buffs:
@@ -284,12 +285,14 @@ class CombatHandler:
                         }
                     )
                 self.db.add_active_buffs_bulk(self.discord_id, bulk_buffs)
+                added_buffs = bulk_buffs
 
             # 8. Award Titles
             new_titles = result.get("new_titles", [])
             for title in new_titles:
                 self.db.add_title(self.discord_id, title)
 
+            result["added_buffs"] = added_buffs
             return result
 
         except Exception as e:
