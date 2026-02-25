@@ -156,6 +156,42 @@ jobs:
               exit 1
             fi
 
+  trigger-pr-ci:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run:
+          name: Install GitHub CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update && sudo apt-get install gh -y
+      - run:
+          name: Trigger CI for Open PR Branches
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+
+            echo "🔄 Checking open PRs for missing CI..."
+
+            gh pr list --repo "dmcalungsod/Eldoria_Quest" --state open --json number,headRefName,isDraft --jq '.[] | select(.isDraft == false)' | while read -r pr_json; do
+              pr_number=$(echo "$pr_json" | jq -r '.number')
+              branch=$(echo "$pr_json" | jq -r '.headRefName')
+
+              # Check if CircleCI checks are still pending
+              checks=$(gh pr checks "$pr_number" --repo "dmcalungsod/Eldoria_Quest" 2>&1 || true)
+
+              if echo "$checks" | grep -q "ci/circleci.*pending\|ci/circleci.*Waiting"; then
+                echo "🚀 Triggering CI for PR #$pr_number ($branch)..."
+                curl -s -X POST "https://circleci.com/api/v2/project/gh/dmcalungsod/Eldoria_Quest/pipeline" \
+                  -H "Circle-Token: $CIRCLECI_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"branch\": \"$branch\"}"
+                echo ""
+              else
+                echo "✅ PR #$pr_number already has CI results"
+              fi
+            done
+
 # ── Workflows ──────────────────────────────────────────
 workflows:
   # CI: runs on every push/PR
@@ -178,9 +214,10 @@ workflows:
             - ruff-fix
             - test
 
-  # Scheduled: daily auto-merge + cleanup
+  # Scheduled: auto-merge + cleanup + trigger CI for bot PRs
   nightly:
     when: << pipeline.parameters.run-schedule >>
     jobs:
+      - trigger-pr-ci
       - auto-merge
       - cleanup-branches
