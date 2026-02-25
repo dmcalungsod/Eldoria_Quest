@@ -51,16 +51,26 @@ jobs:
       - run:
           name: Ruff Auto-Fix & Format
           command: |
+            # Skip if last commit was already an auto-fix (prevent loop)
+            if git log -1 --pretty=%s | grep -q "^style: auto-fix"; then
+              echo "⏭️  Last commit was auto-fix, skipping"
+              exit 0
+            fi
             ruff check . --fix
             ruff format .
       - run:
           name: Commit Fixes (if any)
           command: |
+            # Skip if last commit was already an auto-fix (prevent loop)
+            if git log -1 --pretty=%s | grep -q "^style: auto-fix"; then
+              echo "⏭️  Skipping commit step"
+              exit 0
+            fi
             git config user.name "CircleCI"
             git config user.email "ci@circleci.com"
             if [ -n "$(git status --porcelain)" ]; then
               git add -A
-              git commit -m "style: auto-fix code with Ruff [ci skip]"
+              git commit -m "style: auto-fix code with Ruff"
               git push origin "$CIRCLE_BRANCH"
               echo "✅ Pushed auto-fix commit"
             else
@@ -146,6 +156,54 @@ jobs:
               exit 1
             fi
 
+  manage-prs:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run:
+          name: Install GitHub CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update && sudo apt-get install gh -y
+      - run:
+          name: Update Branches, Trigger CI, Enable Auto-Merge
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+            REPO="dmcalungsod/Eldoria_Quest"
+
+            echo "🤖 Managing open PRs..."
+
+            gh pr list --repo "$REPO" --state open --json number,headRefName,isDraft --jq '.[] | select(.isDraft == false)' | while read -r pr_json; do
+              pr_number=$(echo "$pr_json" | jq -r '.number')
+              branch=$(echo "$pr_json" | jq -r '.headRefName')
+
+              echo ""
+              echo "═══ PR #$pr_number ($branch) ═══"
+
+              # 1. Auto-update branch with main
+              echo "🔄 Updating branch..."
+              gh api -X PUT "repos/$REPO/pulls/$pr_number/update-branch" \
+                -f update_method="merge" 2>&1 || echo "  (already up to date)"
+
+              # 2. Trigger CircleCI if checks are pending
+              checks=$(gh pr checks "$pr_number" --repo "$REPO" 2>&1 || true)
+              if echo "$checks" | grep -qi "pending\|waiting"; then
+                echo "🚀 Triggering CircleCI..."
+                curl -s -X POST "https://circleci.com/api/v2/project/gh/$REPO/pipeline" \
+                  -H "Circle-Token: $CIRCLECI_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"branch\": \"$branch\"}"
+                echo ""
+              else
+                echo "✅ All checks already reported"
+              fi
+
+              # 3. Enable auto-merge
+              echo "🔀 Enabling auto-merge..."
+              gh pr merge "$pr_number" --repo "$REPO" --squash --auto 2>&1 || echo "  (already enabled)"
+            done
+
 # ── Workflows ──────────────────────────────────────────
 workflows:
   # CI: runs on every push/PR
@@ -168,9 +226,9 @@ workflows:
             - ruff-fix
             - test
 
-  # Scheduled: daily auto-merge + cleanup
+  # Scheduled: manage PRs + cleanup
   nightly:
     when: << pipeline.parameters.run-schedule >>
     jobs:
-      - auto-merge
+      - manage-prs
       - cleanup-branches
