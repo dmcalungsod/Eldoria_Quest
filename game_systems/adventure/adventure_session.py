@@ -560,6 +560,8 @@ class AdventureSession:
         stance = self.active_monster.get("player_stance", "balanced")
         fatigue_mult = self._calculate_fatigue_multiplier() * threat_reduction
 
+        session_new_buffs = []
+
         for _ in range(8):
             # FIX: Pass session XP
             result = self.combat.resolve_turn(
@@ -574,6 +576,13 @@ class AdventureSession:
                 time_phase=time_phase,
             )
             turn_reports.append(result.get("turn_report", {}))
+
+            # UPDATE CONTEXT WITH NEW BUFFS
+            added_buffs = result.get("added_buffs", [])
+            if added_buffs:
+                if context and "buffs" in context:
+                    context["buffs"].extend(added_buffs)
+                session_new_buffs.extend(added_buffs)
 
             # Update local vitals for next iteration
             context["vitals"]["current_hp"] = result["hp_current"]
@@ -643,7 +652,9 @@ class AdventureSession:
             # Update vitals only after successful save
             self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
-        return self._build_result(sequence, is_dead, context)
+        res = self._build_result(sequence, is_dead, context)
+        res["added_buffs"] = session_new_buffs
+        return res
 
     # ======================================================================
     # MANUAL COMBAT TURN
@@ -742,7 +753,9 @@ class AdventureSession:
                 if delta_hp != 0 or delta_mp != 0:
                     self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
-        return self._build_result([turn_logs], is_dead, context)
+        res = self._build_result([turn_logs], is_dead, context)
+        res["added_buffs"] = result.get("added_buffs", [])
+        return res
 
     # ======================================================================
     # PERSISTENCE
