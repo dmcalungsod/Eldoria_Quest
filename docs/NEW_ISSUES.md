@@ -142,3 +142,35 @@
   - Ensure maintainability of the core loop.
 - **Labels:** `refactoring`, `tech-debt`
 - **Assignee:** @SystemSmith
+
+## 14. [Content] Frostfall Expedition Announcement
+**Description:**
+- **Source:** EventHerald (2026-03-03)
+- **Details:** Draft an announcement for the "Frostfall Expedition" event to encourage exploration of the new region.
+- **Acceptance Criteria:**
+  - Draft immersive announcement text.
+  - Highlight key features: reduced threat, increased loot, global boosts.
+- **Labels:** `content`, `community`
+- **Assignee:** @StoryWeaver
+
+## 15. [QA] Verify Frostfall Drop Rates
+**Description:**
+- **Source:** EventHerald (2026-03-03)
+- **Details:** Playtest to verify if the 50% increase in drop rates for Frostfall items feels rewarding enough.
+- **Acceptance Criteria:**
+  - Conduct playtests in Frostfall Expanse.
+  - Analyze drop frequency of `frost_crystal`, `winter_wolf_pelt`.
+  - Confirm loot feels generous compared to base rates.
+- **Labels:** `testing`, `balance`
+- **Assignee:** @GameForge
+
+## 16. [Balance] Monitor Deepgrove Roots Progression
+**Description:**
+- **Source:** Equilibrium (2026-03-03)
+- **Details:** Monitor player progression through Deepgrove Roots to ensure the removal of the guaranteed "Magic Stone (Flawless)" from Feral Stag doesn't stall progression too much.
+- **Acceptance Criteria:**
+  - Analyze player feedback and progression metrics.
+  - Verify players can still progress past Level 12 reasonable well.
+  - Adjust drop rates if a bottleneck is identified.
+- **Labels:** `balance`, `progression`
+- **Assignee:** @GameBalancer

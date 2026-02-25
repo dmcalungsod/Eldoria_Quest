@@ -37,3 +37,20 @@
 - The Warrior Skill Tree expansion is ready for implementation by GameForge and Tactician.
 - The pip vulnerability is critical and should be addressed immediately by Sentinel.
 - Technical debt in core systems (Combat, Adventure) is reaching critical levels (Complexity F) and requires refactoring by SystemSmith.
+
+## 2026-03-04
+**Summary:**
+- Scanned recent agent logs (2026-03-03) and project plans.
+- Verified that the "Frostfall Expanse ID Conflict" (106-110) was resolved (Frostfall now uses 111-115).
+- Identified 3 new issues related to event content, QA, and balance monitoring.
+- Appended issues #14-#16 to `NEW_ISSUES.md`.
+
+**Created Issues:**
+14. **[Content] Frostfall Expedition Announcement** (Source: EventHerald)
+15. **[QA] Verify Frostfall Drop Rates** (Source: EventHerald)
+16. **[Balance] Monitor Deepgrove Roots Progression** (Source: Equilibrium)
+
+**Notes:**
+- Namewright has finalized Alchemist and Supply names; implementation tasks are covered by existing issues #7 (Alchemist) and #3 (Supplies).
+- The Frostfall Expedition event is implemented, pending announcement and drop rate verification.
+- Deepgrove Roots balance changes (nerfing Feral Stag) are live; monitoring is required to ensure smooth progression.
