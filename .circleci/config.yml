@@ -67,10 +67,17 @@ jobs:
       - install-deps
       - run:
           name: Install Test Dependencies
-          command: pip install pytest
+          command: pip install pytest pytest-cov
       - run:
-          name: Run Tests
-          command: python -m pytest --tb=short -q
+          name: Run Tests with Coverage
+          command: python -m pytest --tb=short -q --cov=. --cov-report=xml:coverage.xml
+      - run:
+          name: Upload Coverage to Codacy
+          command: |
+            export CODACY_ORGANIZATION_PROVIDER=gh
+            export CODACY_USERNAME=dmcalungsod
+            export CODACY_PROJECT_NAME=Eldoria_Quest
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
 
   auto-merge:
     docker:
