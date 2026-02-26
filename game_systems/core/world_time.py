@@ -19,6 +19,13 @@ class TimePhase(Enum):
     NIGHT = "Night"  # 21:00 - 04:59
 
 
+class Season(Enum):
+    SPRING = "Spring"  # Mar - May
+    SUMMER = "Summer"  # Jun - Aug
+    AUTUMN = "Autumn"  # Sep - Nov
+    WINTER = "Winter"  # Dec - Feb
+
+
 class Weather(Enum):
     CLEAR = "Clear"
     RAIN = "Rain"
@@ -97,6 +104,37 @@ LOCATION_WEATHER_WEIGHTS = {
     ],
 }
 
+# Multipliers applied to base weights depending on season
+SEASONAL_MODIFIERS = {
+    Season.WINTER: {
+        Weather.SNOW: 2.0,
+        Weather.BLIZZARD: 1.5,
+        Weather.RAIN: 0.5,
+        Weather.CLEAR: 0.8,
+        # Locations with existing cold weather get boosted
+    },
+    Season.SPRING: {
+        Weather.RAIN: 1.5,
+        Weather.FOG: 1.2,
+        Weather.CLEAR: 1.1,
+        Weather.SNOW: 0.5,
+    },
+    Season.SUMMER: {
+        Weather.CLEAR: 1.5,
+        Weather.STORM: 1.3,
+        Weather.SANDSTORM: 1.2,
+        Weather.ASH: 1.1,  # Heat increases volatility
+        Weather.RAIN: 0.5,
+        Weather.SNOW: 0.1,
+    },
+    Season.AUTUMN: {
+        Weather.GALE: 1.5,
+        Weather.FOG: 1.3,
+        Weather.RAIN: 1.2,
+        Weather.CLEAR: 0.9,
+    },
+}
+
 
 class WorldTime:
     """
@@ -126,6 +164,20 @@ class WorldTime:
             return TimePhase.DUSK
         else:
             return TimePhase.NIGHT
+
+    @staticmethod
+    def get_current_season() -> Season:
+        """Determines the current season based on month."""
+        month = WorldTime.now().month
+
+        if month in [12, 1, 2]:
+            return Season.WINTER
+        elif month in [3, 4, 5]:
+            return Season.SPRING
+        elif month in [6, 7, 8]:
+            return Season.SUMMER
+        else:
+            return Season.AUTUMN
 
     @staticmethod
     def is_night() -> bool:
@@ -165,10 +217,21 @@ class WorldTime:
         rng = random.Random(seed)  # nosec B311
 
         weights = LOCATION_WEATHER_WEIGHTS.get(location_id, LOCATION_WEATHER_WEIGHTS["default"])
-        choices, probabilities = zip(*weights)
+
+        # Apply Seasonal Modifiers
+        season = WorldTime.get_current_season()
+        modifiers = SEASONAL_MODIFIERS.get(season, {})
+
+        modified_weights = []
+        population = []
+
+        for weather_type, weight in weights:
+            mult = modifiers.get(weather_type, 1.0)
+            modified_weights.append(weight * mult)
+            population.append(weather_type)
 
         # Pick one based on weights
-        return rng.choices(choices, weights=probabilities, k=1)[0]
+        return rng.choices(population, weights=modified_weights, k=1)[0]
 
     @staticmethod
     def get_weather_flavor(weather: Weather) -> str:
