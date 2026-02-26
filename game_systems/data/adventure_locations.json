@@ -324,7 +324,7 @@
             ],
             [
                 "ancient_wood",
-                30
+                35
             ],
             [
                 "iron_ore",
@@ -332,7 +332,7 @@
             ],
             [
                 "magic_stone_medium",
-                20
+                30
             ]
         ],
         "special_events": [
@@ -550,7 +550,11 @@
             ],
             [
                 "magic_stone_medium",
-                10
+                25
+            ],
+            [
+                "magic_stone_large",
+                5
             ]
         ],
         "special_events": [
@@ -839,7 +843,7 @@
             ],
             [
                 "magic_stone_flawless",
-                10
+                20
             ]
         ],
         "special_events": [
