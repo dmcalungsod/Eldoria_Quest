@@ -80,6 +80,9 @@ class TestAurumDrops(unittest.TestCase):
         # Mock dependencies
         player = MagicMock()
         player.level = 5
+        # Fix: Ensure hp_current behaves like an int for comparisons
+        player.hp_current = 100
+        player.is_stunned = False
         player.stats.get_total_stats_dict.return_value = {"LCK": 0}
         monster = {"name": "Test", "level": 5, "tier": "Normal", "HP": 10, "drops": []}
 

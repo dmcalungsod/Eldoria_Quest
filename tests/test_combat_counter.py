@@ -12,6 +12,7 @@ from game_systems.combat.combat_engine import CombatEngine
 class TestCombatCounter(unittest.TestCase):
     def setUp(self):
         self.player = MagicMock()
+        self.player.is_stunned = False
         self.player.hp_current = 100
         self.player.stats.max_hp = 100
         self.player.stats.get_total_stats_dict.return_value = {
