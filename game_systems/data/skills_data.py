@@ -324,7 +324,7 @@ SKILLS = {
     "vitriol_bomb": {
         "key_id": "vitriol_bomb",
         "name": "Vitriol Bomb",
-        "description": "Shatters a vial of acid, dealing damage and eroding armor.",
+        "description": "A glass flask filled with pressurized acid. Upon impact, it hisses violently, dissolving steel and flesh into a smoking slurry.",
         "type": "Active",
         "class_id": 6,
         "mp_cost": 8,
@@ -338,7 +338,7 @@ SKILLS = {
     "triage": {
         "key_id": "triage",
         "name": "Triage",
-        "description": "Increases the effectiveness of healing items.",
+        "description": "A practiced eye for anatomy allows for the precise application of salves and stimulants, coaxing the body back from the brink.",
         "type": "Passive",
         "class_id": 6,
         "passive_bonus": {"healing_item_potency": 0.2},
@@ -350,7 +350,7 @@ SKILLS = {
     "fulminating_compound": {
         "key_id": "fulminating_compound",
         "name": "Fulminating Compound",
-        "description": "Throw a volatile cocktail that explodes on impact.",
+        "description": "A highly unstable cocktail of volatile salts that detonates with a deafening roar, scattering enemies in a cloud of shrapnel and smoke.",
         "type": "Active",
         "class_id": 6,
         "mp_cost": 15,
@@ -365,7 +365,7 @@ SKILLS = {
     "equivalent_exchange": {
         "key_id": "equivalent_exchange",
         "name": "Equivalent Exchange",
-        "description": "Deep knowledge of reactions boosts magical potency.",
+        "description": "The fundamental law of alchemy: to obtain, something of equal value must be lost. Your mastery allows you to draw more power from every reaction.",
         "type": "Passive",
         "class_id": 6,
         "passive_bonus": {"MAG_percent": 0.1},
@@ -377,7 +377,7 @@ SKILLS = {
     "mutagenic_serum": {
         "key_id": "mutagenic_serum",
         "name": "Mutagenic Serum",
-        "description": "Drink a dangerous concoction that mutates the body for combat.",
+        "description": "A forbidden elixir that warps the drinker's physiology, bulging muscles and hardening skin at the cost of sanity and health.",
         "type": "Active",
         "class_id": 6,
         "mp_cost": 50,
