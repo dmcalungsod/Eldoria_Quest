@@ -98,6 +98,11 @@ class TestSecurityShop(unittest.IsolatedAsyncioTestCase):
         # Mock db.get_player explicitly to return a dict, not a Mock
         db.get_player = MagicMock(return_value={"aurum": 900})
 
+        # MOCK THE NEW DAILY PURCHASE LIMIT METHOD
+        # The callback now calls asyncio.gather with db.get_daily_shop_purchases
+        db.get_daily_shop_purchases = MagicMock(return_value={})
+        db.get_inventory_items_counts = MagicMock(return_value={})
+
         with patch(
             "cogs.shop_cog.get_player_or_error",
             new=AsyncMock(return_value={"aurum": 1000}),
