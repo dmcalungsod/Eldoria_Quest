@@ -56,8 +56,42 @@ jobs:
       - run:
           name: Ruff Strict Check
           command: |
-            ruff check .
-            ruff format --check .
+            ruff check . 2>&1 | tee /tmp/ruff-check.txt
+            ruff format --check . 2>&1 | tee -a /tmp/ruff-check.txt
+      - install-gh
+      - run:
+          name: Post Lint Failures to PR
+          when: on_fail
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+            # Find the PR for this branch
+            PR_NUM=$(gh pr list --repo "dmcalungsod/Eldoria_Quest" --head "$CIRCLE_BRANCH" --json number --jq '.[0].number' 2>/dev/null || true)
+            if [ -z "$PR_NUM" ] || [ "$PR_NUM" = "null" ]; then
+              echo "No PR found for branch $CIRCLE_BRANCH, skipping comment."
+              exit 0
+            fi
+            # Build the comment
+            ERRORS=$(cat /tmp/ruff-check.txt 2>/dev/null | head -100 || echo "See CircleCI logs for details.")
+            COMMENT=$(cat <<EOF
+            ## ❌ Ruff Lint Check Failed
+
+            **Branch:** \`$CIRCLE_BRANCH\`
+            **Commit:** \`$CIRCLE_SHA1\`
+            **[View full logs on CircleCI]($CIRCLE_BUILD_URL)**
+
+            <details>
+            <summary>Lint errors (click to expand)</summary>
+
+            \`\`\`
+            $ERRORS
+            \`\`\`
+
+            </details>
+
+            > 🤖 Fix these lint issues and push again.
+            EOF
+            )
+            gh pr comment "$PR_NUM" --repo "dmcalungsod/Eldoria_Quest" --body "$COMMENT"
 
   test:
     docker:
@@ -70,14 +104,53 @@ jobs:
           command: pip install pytest pytest-cov
       - run:
           name: Run Tests with Coverage
-          command: python -m pytest --tb=short -q --cov=. --cov-report=xml:coverage.xml
+          command: python -m pytest --tb=short -q --cov=. --cov-report=xml:coverage.xml 2>&1 | tee /tmp/test-results.txt
       - run:
           name: Upload Coverage to Codacy
+          when: always
           command: |
-            export CODACY_ORGANIZATION_PROVIDER=gh
-            export CODACY_USERNAME=dmcalungsod
-            export CODACY_PROJECT_NAME=Eldoria_Quest
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+            if [ -f coverage.xml ]; then
+              export CODACY_ORGANIZATION_PROVIDER=gh
+              export CODACY_USERNAME=dmcalungsod
+              export CODACY_PROJECT_NAME=Eldoria_Quest
+              bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+            else
+              echo "No coverage.xml found, skipping upload."
+            fi
+      - install-gh
+      - run:
+          name: Post Test Failures to PR
+          when: on_fail
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+            # Find the PR for this branch
+            PR_NUM=$(gh pr list --repo "dmcalungsod/Eldoria_Quest" --head "$CIRCLE_BRANCH" --json number --jq '.[0].number' 2>/dev/null || true)
+            if [ -z "$PR_NUM" ] || [ "$PR_NUM" = "null" ]; then
+              echo "No PR found for branch $CIRCLE_BRANCH, skipping comment."
+              exit 0
+            fi
+            # Extract only the failures
+            FAILURES=$(cat /tmp/test-results.txt 2>/dev/null | grep -A 5 'FAILED\|ERROR\|AssertionError' | head -100 || echo "See CircleCI logs for details.")
+            COMMENT=$(cat <<EOF
+            ## ❌ Tests Failed
+
+            **Branch:** \`$CIRCLE_BRANCH\`
+            **Commit:** \`$CIRCLE_SHA1\`
+            **[View full logs on CircleCI]($CIRCLE_BUILD_URL)**
+
+            <details>
+            <summary>Failed tests (click to expand)</summary>
+
+            \`\`\`
+            $FAILURES
+            \`\`\`
+
+            </details>
+
+            > 🤖 Fix the failing tests and push again.
+            EOF
+            )
+            gh pr comment "$PR_NUM" --repo "dmcalungsod/Eldoria_Quest" --body "$COMMENT"
 
   auto-merge:
     docker:
