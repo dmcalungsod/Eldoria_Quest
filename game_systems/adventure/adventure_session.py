@@ -414,7 +414,8 @@ class AdventureSession:
 
             # Time Modifiers
             if time_phase == TimePhase.NIGHT:
-                regen_threshold -= 10  # Night is dangerous (+10% Combat Chance)
+                night_mod = context.get("active_boosts", {}).get("night_danger_mod", 0.0)
+                regen_threshold -= (10 + int(night_mod * 100))  # Night is dangerous (+10% + Event Mod Combat Chance)
             elif time_phase == TimePhase.DAY:
                 regen_threshold += 5  # Day is safer (-5% Combat Chance)
 
@@ -432,6 +433,8 @@ class AdventureSession:
                     # --- NIGHT AMBUSH MECHANIC ---
                     # 20% Chance for monsters to strike first at night
                     ambush_chance = 0.20
+                    # Event Modifier
+                    ambush_chance += context.get("active_boosts", {}).get("spectral_ambush_chance", 0.0)
 
                     # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
                     if self.supplies.get("pitch_torch"):
@@ -455,6 +458,9 @@ class AdventureSession:
                             self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
                         phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
+
+                        if context.get("event_type") == "spectral_tide":
+                            phrase += "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
 
                     # Start new combat
                     self.active_monster = monster
