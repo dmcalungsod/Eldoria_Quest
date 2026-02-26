@@ -116,11 +116,15 @@ class TestToxicBlade(unittest.TestCase):
         result3 = engine3.run_combat_turn()
         monster["HP"] = result3["monster_hp"]
 
-        self.assertEqual(
-            monster["HP"],
-            hp_after_tick - 11,
-            "Turn 3: Monster should take 11 poison damage",
-        )
+        expected_hp_t3 = hp_after_tick - 11
+        if expected_hp_t3 <= 0:
+            self.assertEqual(monster["HP"], 0, "Turn 3: Monster died (HP 0)")
+        else:
+            self.assertEqual(
+                monster["HP"],
+                expected_hp_t3,
+                "Turn 3: Monster should take 11 poison damage",
+            )
         self.assertEqual(monster["debuffs"][0]["duration"], 1, "Turn 3: Duration should be 1")
 
         # --- TURN 4: Poison Tick & Expire ---
