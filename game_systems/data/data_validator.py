@@ -60,7 +60,7 @@ class DataValidator:
             else:
                 # Validate monster entries: [monster_id, weight]
                 for idx, entry in enumerate(loc_data["monsters"]):
-                    if not isinstance(entry, (list, tuple)) or len(entry) != 2:
+                    if not isinstance(entry, list | tuple) or len(entry) != 2:
                         errors.append(f"Location '{loc_id}': 'monsters' entry at index {idx} must be [id, weight].")
                     elif not isinstance(entry[0], str) or not isinstance(entry[1], int):
                         errors.append(
@@ -76,7 +76,7 @@ class DataValidator:
                     errors.append(f"Location '{loc_id}': 'night_monsters' must be a list.")
                 else:
                     for idx, entry in enumerate(loc_data["night_monsters"]):
-                        if not isinstance(entry, (list, tuple)) or len(entry) != 2:
+                        if not isinstance(entry, list | tuple) or len(entry) != 2:
                             errors.append(
                                 f"Location '{loc_id}': 'night_monsters' entry at index {idx} must be [id, weight]."
                             )
@@ -90,7 +90,7 @@ class DataValidator:
                     errors.append(f"Location '{loc_id}': 'gatherables' must be a list.")
                 else:
                     for idx, entry in enumerate(loc_data["gatherables"]):
-                        if not isinstance(entry, (list, tuple)) or len(entry) != 2:
+                        if not isinstance(entry, list | tuple) or len(entry) != 2:
                             errors.append(
                                 f"Location '{loc_id}': 'gatherables' entry at index {idx} must be [id, weight]."
                             )
