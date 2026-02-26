@@ -290,11 +290,15 @@ def main():
     all_passed = all_passed and faction_passed
 
     # 9. Game Systems Tests (Mock-based, always run)
-    # 7. Game Systems Tests (Mock-based, always run)
     print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
     print("-" * 70)
-    game_passed = test_game_systems.run_all_tests()
+    # test_game_systems is a standard unittest module, use loader
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_game_systems)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    game_passed = result.wasSuccessful()
     all_passed = all_passed and game_passed
 
     # 8. Integration Tests (Require MongoDB)
