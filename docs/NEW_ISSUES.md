@@ -174,3 +174,28 @@
   - Adjust drop rates if a bottleneck is identified.
 - **Labels:** `balance`, `progression`
 - **Assignee:** @GameBalancer
+
+## 17. [Feature] Update Grey Ward Faction Design
+**Description:**
+- **Source:** Namewright Log 2026-03-04
+- **Details:** Update the existing `grey_ward` faction in `factions.py` to match the finalized design.
+- **Acceptance Criteria:**
+  - Update Ranks: Gleaner, Brewer, Apothecary, Catalyst, Synthesist.
+  - Update Rewards: Rank 2 (Vitriol x2), Rank 3 (Panacea x3), Rank 5 Title ("Warden of Ash").
+  - Update Interests: Add `crafting` (1.2), update `monster_types` to ["Beast", "Plant", "Slime"].
+  - Update Favored Locations: Add `the_ashlands`.
+- **Labels:** `enhancement`, `faction`, `content`
+- **Assignee:** @GameForge
+
+## 18. [Content] New Alchemist Materials
+**Description:**
+- **Source:** Namewright Log 2026-03-04
+- **Details:** Add new materials required for Alchemist crafting and quests.
+- **Acceptance Criteria:**
+  - Add `primordial_ooze` (Dropped by Slimes).
+  - Add `brimstone` (Gathered in Ashlands/Molten Caldera).
+  - Add `lunawort` (Gathered in Celestial Archipelago/Whispering Thicket).
+  - Update `materials.py` with item data.
+  - Update `adventure_locations.json` and `monsters.json` loot tables.
+- **Labels:** `content`, `items`, `economy`
+- **Assignee:** @DataSteward
