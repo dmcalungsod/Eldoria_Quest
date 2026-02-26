@@ -128,6 +128,9 @@ class EventHandler:
             # Get Time Phase for atmosphere
             current_phase = WorldTime.get_current_phase()
 
+            # Get Current Season
+            current_season = WorldTime.get_current_season()
+
             # Build Log Messages
             base_logs = AdventureEvents.regeneration(
                 location_id,
@@ -135,6 +138,7 @@ class EventHandler:
                 hp_percent,
                 time_phase=current_phase,
                 weather=weather,
+                season=current_season,
                 event_type=event_type,
             )
             # Add newline to the first element for spacing

@@ -8,7 +8,7 @@ Optimized for performance and future biome expansion.
 import random
 
 import game_systems.data.emojis as E
-from game_systems.core.world_time import TimePhase, Weather
+from game_systems.core.world_time import TimePhase, Weather, Season
 
 
 class AdventureEvents:
@@ -44,6 +44,43 @@ class AdventureEvents:
         "A chill settles deep in your bones.",
         "Something skitters nearby, unseen in the dark.",
         "The world is reduced to the small circle of your vision.",
+    ]
+
+    # --- SEASONAL ATMOSPHERE ---
+    ATMOSPHERE_SPRING = [
+        "Fresh shoots push through the thawing earth.",
+        "The air is filled with the scent of wet soil and new life.",
+        "A gentle rain washes away the remnants of winter.",
+        "Buds unfurl on the branches, vibrant green against the bark.",
+        "Streams swell with meltwater, rushing noisily nearby.",
+        "The world feels restless, waking from a long sleep.",
+    ]
+
+    ATMOSPHERE_SUMMER = [
+        "The heat is heavy and still, pressing down on the world.",
+        "Insects buzz lazily in the humid air.",
+        "Sunlight bakes the ground, cracking the dry earth.",
+        "The canopy is full and lush, casting deep, cool shadows.",
+        "Dust kicks up with every step in the dry heat.",
+        "The air shimmers with mirages in the distance.",
+    ]
+
+    ATMOSPHERE_AUTUMN = [
+        "Dry leaves crunch satisfyingly beneath your boots.",
+        "The wind carries the scent of woodsmoke and decay.",
+        "Trees stand like burning torches in shades of red and gold.",
+        "A chill bite is in the air, warning of the coming cold.",
+        "The forest floor is a carpet of rust-colored foliage.",
+        "Harvest time is near; the world feels old and wise.",
+    ]
+
+    ATMOSPHERE_WINTER = [
+        "Frost rimes the edges of your cloak.",
+        "The air is sharp and metallic, stinging your lungs.",
+        "Silence lies heavy over the frozen landscape.",
+        "Your breath clouds in the freezing air.",
+        "The ground is hard as iron beneath your feet.",
+        "Pale sunlight offers no warmth against the biting cold.",
     ]
 
     # --- WEATHER-BASED ATMOSPHERE ---
@@ -505,6 +542,7 @@ class AdventureEvents:
         hp_percent: float = 1.0,
         time_phase: TimePhase = TimePhase.DAY,
         weather: Weather = Weather.CLEAR,
+        season: Season | None = None,
         event_type: str | None = None,
     ) -> list:
         # Define the base message list
@@ -591,6 +629,19 @@ class AdventureEvents:
 
             if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
+
+            # Seasonal Override (25% chance)
+            elif season:
+                seasonal_chance = 0.25
+                if random.random() < seasonal_chance:
+                    if season == Season.SPRING:
+                        atmosphere_pool = AdventureEvents.ATMOSPHERE_SPRING
+                    elif season == Season.SUMMER:
+                        atmosphere_pool = AdventureEvents.ATMOSPHERE_SUMMER
+                    elif season == Season.AUTUMN:
+                        atmosphere_pool = AdventureEvents.ATMOSPHERE_AUTUMN
+                    elif season == Season.WINTER:
+                        atmosphere_pool = AdventureEvents.ATMOSPHERE_WINTER
 
             # Select and prepend
             atmospheric_line = random.choice(atmosphere_pool)
