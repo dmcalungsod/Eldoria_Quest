@@ -21,27 +21,21 @@ def mock_bot():
     return MagicMock()
 
 
-@patch("game_systems.adventure.adventure_resolution.WorldEventSystem")
-@patch("game_systems.adventure.adventure_resolution.WorldTime")
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
 @patch("game_systems.adventure.adventure_resolution.InventoryManager")
 @patch("game_systems.adventure.adventure_resolution.AdventureManager")
-def test_resolution_success(
-    mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_time, mock_event_sys, mock_bot, mock_db
-):
+def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
     # Setup
     engine = AdventureResolutionEngine(mock_bot, mock_db)
 
     mock_session = mock_session_cls.return_value
     mock_session.steps_completed = 0
-    mock_session.location_id = "loc_1"  # Needs location_id for weather
     # Simulate step returns success (not dead)
     mock_session.simulate_step.return_value = {"dead": False}
 
     session_doc = {
         "discord_id": 123,
-        "location_id": "loc_1",
         "duration_minutes": 30,  # 2 steps
         "steps_completed": 0,
     }
@@ -57,12 +51,7 @@ def test_resolution_success(
     assert mock_session.simulate_step.call_count == 2
     # Should be called with bundle and persist=False
     mock_session.simulate_step.assert_called_with(
-        context_bundle=mock_db.get_combat_context_bundle.return_value,
-        background=True,
-        persist=False,
-        weather=mock_time.get_current_weather.return_value,
-        time_phase=mock_time.get_current_phase.return_value,
-        event_override=mock_event_sys.return_value.get_current_event.return_value,
+        context_bundle=mock_db.get_combat_context_bundle.return_value, background=True, persist=False
     )
     # Should save state 1 time (only at end)
     assert mock_session.save_state.call_count == 1
@@ -70,21 +59,16 @@ def test_resolution_success(
     mock_db.update_adventure_status.assert_called_with(123, "completed")
 
 
-@patch("game_systems.adventure.adventure_resolution.WorldEventSystem")
-@patch("game_systems.adventure.adventure_resolution.WorldTime")
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
 @patch("game_systems.adventure.adventure_resolution.InventoryManager")
 @patch("game_systems.adventure.adventure_resolution.AdventureManager")
-def test_resolution_death(
-    mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_time, mock_event_sys, mock_bot, mock_db
-):
+def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
     # Setup
     engine = AdventureResolutionEngine(mock_bot, mock_db)
 
     mock_session = mock_session_cls.return_value
     mock_session.steps_completed = 0
-    mock_session.location_id = "loc_1"
     mock_session.logs = []
     mock_session.loot = {}
     mock_session.version = 1
@@ -97,7 +81,6 @@ def test_resolution_death(
 
     session_doc = {
         "discord_id": 123,
-        "location_id": "loc_1",
         "duration_minutes": 45,  # 3 steps
         "steps_completed": 0,
     }
@@ -115,27 +98,21 @@ def test_resolution_death(
     mock_db.update_adventure_status.assert_called_with(123, "failed")
 
 
-@patch("game_systems.adventure.adventure_resolution.WorldEventSystem")
-@patch("game_systems.adventure.adventure_resolution.WorldTime")
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
 @patch("game_systems.adventure.adventure_resolution.InventoryManager")
 @patch("game_systems.adventure.adventure_resolution.AdventureManager")
-def test_resume_session(
-    mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_time, mock_event_sys, mock_bot, mock_db
-):
+def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
     # Setup
     engine = AdventureResolutionEngine(mock_bot, mock_db)
 
     mock_session = mock_session_cls.return_value
     # Resuming from step 2 of 4
     mock_session.steps_completed = 2
-    mock_session.location_id = "loc_1"
     mock_session.simulate_step.return_value = {"dead": False}
 
     session_doc = {
         "discord_id": 123,
-        "location_id": "loc_1",
         "duration_minutes": 60,  # 4 steps total
         "steps_completed": 2,
     }
@@ -149,15 +126,11 @@ def test_resume_session(
     mock_db.update_adventure_status.assert_called_with(123, "completed")
 
 
-@patch("game_systems.adventure.adventure_resolution.WorldEventSystem")
-@patch("game_systems.adventure.adventure_resolution.WorldTime")
 @patch("game_systems.adventure.adventure_resolution.AdventureSession")
 @patch("game_systems.adventure.adventure_resolution.QuestSystem")
 @patch("game_systems.adventure.adventure_resolution.InventoryManager")
 @patch("game_systems.adventure.adventure_resolution.AdventureManager")
-def test_resolution_state_persistence(
-    mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_time, mock_event_sys, mock_bot, mock_db
-):
+def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
     """
     Verifies that player vitals are updated in the context bundle between simulation steps.
     This prevents the 'infinite healing' bug where vitals would reset to initial state.
@@ -165,7 +138,6 @@ def test_resolution_state_persistence(
     engine = AdventureResolutionEngine(mock_bot, mock_db)
     mock_session = mock_session_cls.return_value
     mock_session.steps_completed = 0
-    mock_session.location_id = "loc_1"
 
     # Setup context bundle
     mock_db.get_combat_context_bundle.return_value = {
@@ -174,7 +146,7 @@ def test_resolution_state_persistence(
     }
 
     # Side effect: Reduce HP by 10 each step
-    def simulate_side_effect(context_bundle, background, persist, weather, time_phase, event_override):
+    def simulate_side_effect(context_bundle, background, persist):
         current_hp = context_bundle["player"]["current_hp"]
         new_hp = current_hp - 10
         return {
@@ -187,7 +159,6 @@ def test_resolution_state_persistence(
 
     session_doc = {
         "discord_id": 123,
-        "location_id": "loc_1",
         "duration_minutes": 30,  # 2 steps
         "steps_completed": 0,
     }

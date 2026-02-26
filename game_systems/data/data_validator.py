@@ -64,7 +64,7 @@ class DataValidator:
     @staticmethod
     def _validate_range(data: Any, schema: dict[str, Any], path: str) -> list[str]:
         errors = []
-        if isinstance(data, (int, float)):
+        if isinstance(data, int | float):
             if "min" in schema and data < schema["min"]:
                 errors.append(f"{path}: Value {data} is less than minimum {schema['min']}")
             if "max" in schema and data > schema["max"]:

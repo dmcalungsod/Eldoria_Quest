@@ -66,12 +66,12 @@ class TestPopulateDatabase(unittest.TestCase):
         sys.modules["game_systems.data.equipments"] = mock_data.equipments
 
         # Import
-        import database.populate_database  # noqa: F401
+        import database.populate_database
 
         importlib = __import__("importlib")
-        if "database.populate_database" in sys.modules:
-            importlib.reload(sys.modules["database.populate_database"])
-        self.populate = sys.modules["database.populate_database"]
+        # Ensure we reload the module object directly
+        importlib.reload(database.populate_database)
+        self.populate = database.populate_database
 
     def tearDown(self):
         self.modules_patcher.stop()
