@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 import unittest
@@ -13,6 +12,7 @@ sys.modules["pymongo.results"] = MagicMock()
 # Adjust path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # --- Mocking Discord UI ---
 class MockItem:
     def __init__(self, *args, **kwargs):
@@ -21,16 +21,19 @@ class MockItem:
         self.disabled = kwargs.get("disabled", False)
         self.options = kwargs.get("options", [])
         self.callback = None
-        self.values = [] # For Select
+        self.values = []  # For Select
 
     def add_option(self, label, value, **kwargs):
         self.options.append(MagicMock(label=label, value=str(value)))
 
+
 class MockButton(MockItem):
     pass
 
+
 class MockSelect(MockItem):
     pass
+
 
 class MockView:
     def __init__(self, timeout=180):
@@ -42,6 +45,7 @@ class MockView:
 
     def clear_items(self):
         self.children = []
+
 
 # Mock discord module
 mock_discord = MagicMock()
@@ -74,7 +78,7 @@ class TestAdventureStatusView(unittest.IsolatedAsyncioTestCase):
         """Test initialization."""
         view = AdventureStatusView(self.mock_db, self.mock_manager, self.mock_user, self.session_data)
 
-        self.assertEqual(len(view.children), 3) # Refresh, Retreat, Back
+        self.assertEqual(len(view.children), 3)  # Refresh, Retreat, Back
         labels = [c.label for c in view.children]
         self.assertIn("Refresh Status", labels)
         self.assertIn("Retreat Early", labels)
@@ -122,7 +126,9 @@ class TestAdventureStatusView(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(view.children[1].disabled)
         self.assertFalse(view.children[2].disabled)
 
-        self.mock_interaction.followup.send.assert_called_with("Adventure session not found or already ended.", ephemeral=True)
+        self.mock_interaction.followup.send.assert_called_with(
+            "Adventure session not found or already ended.", ephemeral=True
+        )
 
     @patch("game_systems.adventure.ui.status_view.AdventureEmbeds")
     async def test_retreat_callback_success(self, MockEmbeds):

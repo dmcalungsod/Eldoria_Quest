@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 import unittest
@@ -13,6 +12,7 @@ sys.modules["pymongo.results"] = MagicMock()
 # Adjust path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # --- Mocking Discord UI ---
 class MockItem:
     def __init__(self, *args, **kwargs):
@@ -22,16 +22,19 @@ class MockItem:
         self.disabled = kwargs.get("disabled", False)
         self.options = kwargs.get("options", [])
         self.callback = None
-        self.values = [] # For Select
+        self.values = []  # For Select
 
     def add_option(self, label, value, **kwargs):
         self.options.append(MagicMock(label=label, value=str(value)))
 
+
 class MockButton(MockItem):
     pass
 
+
 class MockSelect(MockItem):
     pass
+
 
 class MockView:
     def __init__(self, timeout=180):
@@ -43,6 +46,7 @@ class MockView:
 
     def clear_items(self):
         self.children = []
+
 
 # Mock discord module
 mock_discord = MagicMock()
@@ -142,7 +146,7 @@ class TestExperimentView(unittest.IsolatedAsyncioTestCase):
         mock_system.experiment.return_value = (True, "Success!", {"name": "Potion", "effect": {"hp": 10}})
 
         view = ExperimentView(self.mock_db, self.mock_user)
-        view.selected_materials = [1, 2] # Pre-select
+        view.selected_materials = [1, 2]  # Pre-select
 
         await view.mix_callback(self.mock_interaction)
 
@@ -151,7 +155,7 @@ class TestExperimentView(unittest.IsolatedAsyncioTestCase):
 
         # Verify embed contains success info
         args, kwargs = self.mock_interaction.edit_original_response.call_args
-        embed = kwargs['embed']
+        embed = kwargs["embed"]
         # Can verify embed fields if mock discord was more sophisticated, but generic mock is fine
         self.assertIn("Potion", str(embed.add_field.call_args_list))
 

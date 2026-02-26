@@ -1,8 +1,8 @@
-import unittest
-from unittest.mock import MagicMock, patch
 import json
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Ensure root is in path
 sys.path.append(os.getcwd())
@@ -13,8 +13,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 # Import after mocking
 from game_systems.guild_system.reward_system import RewardSystem
-from game_systems.data.consumables import CONSUMABLES
-from game_systems.data.materials import MATERIALS
+
 
 class TestRewardSystemMaterials(unittest.TestCase):
     def setUp(self):
@@ -42,11 +41,13 @@ class TestRewardSystemMaterials(unittest.TestCase):
         quest_data = {
             "id": quest_id,
             "title": "Test Quest",
-            "rewards": json.dumps({
-                "exp": 100,
-                "aurum": 50,
-                "item": "Magic Stone (Small)"  # This is a Material
-            })
+            "rewards": json.dumps(
+                {
+                    "exp": 100,
+                    "aurum": 50,
+                    "item": "Magic Stone (Small)",  # This is a Material
+                }
+            ),
         }
 
         # Setup DB Mocks
@@ -54,11 +55,7 @@ class TestRewardSystemMaterials(unittest.TestCase):
         self.mock_db._col.return_value.find_one.return_value = quest_data
 
         # get_player returns basic player info
-        self.mock_db.get_player.return_value = {
-            "level": 1,
-            "experience": 0,
-            "exp_to_next": 100
-        }
+        self.mock_db.get_player.return_value = {"level": 1, "experience": 0, "exp_to_next": 100}
         self.mock_db.get_player_stats_json.return_value = None
 
         # Execute
@@ -71,11 +68,11 @@ class TestRewardSystemMaterials(unittest.TestCase):
         call_args = self.mock_db.add_inventory_item.call_args[0]
 
         self.assertEqual(call_args[0], discord_id)
-        self.assertEqual(call_args[1], "magic_stone_small") # Key from materials.py
+        self.assertEqual(call_args[1], "magic_stone_small")  # Key from materials.py
         self.assertEqual(call_args[2], "Magic Stone (Small)")
-        self.assertEqual(call_args[3], "material") # Type should be 'material'
-        self.assertEqual(call_args[4], "Common") # Rarity
-        self.assertEqual(call_args[5], 1) # Amount
+        self.assertEqual(call_args[3], "material")  # Type should be 'material'
+        self.assertEqual(call_args[4], "Common")  # Rarity
+        self.assertEqual(call_args[5], 1)  # Amount
 
         # Check message contains item acquired
         self.assertIn("Magic Stone (Small)", result_msg)
@@ -86,11 +83,7 @@ class TestRewardSystemMaterials(unittest.TestCase):
         quest_data = {
             "id": quest_id,
             "title": "Frozen Echo Test",
-            "rewards": json.dumps({
-                "exp": 100,
-                "aurum": 50,
-                "item": "Ice Core"
-            })
+            "rewards": json.dumps({"exp": 100, "aurum": 50, "item": "Ice Core"}),
         }
 
         self.mock_db._col.return_value.find_one.return_value = quest_data
@@ -105,9 +98,9 @@ class TestRewardSystemMaterials(unittest.TestCase):
         self.mock_db.add_inventory_item.assert_called()
         call_args = self.mock_db.add_inventory_item.call_args[0]
 
-        self.assertEqual(call_args[1], "ice_core") # Key from materials.py
+        self.assertEqual(call_args[1], "ice_core")  # Key from materials.py
         self.assertEqual(call_args[2], "Ice Core")
-        self.assertEqual(call_args[3], "material") # Type should be 'material'
+        self.assertEqual(call_args[3], "material")  # Type should be 'material'
         self.assertIn("Ice Core", result_msg)
 
     def test_grant_consumable_reward(self):
@@ -116,11 +109,13 @@ class TestRewardSystemMaterials(unittest.TestCase):
         quest_data = {
             "id": quest_id,
             "title": "Test Quest Consumable",
-            "rewards": json.dumps({
-                "exp": 100,
-                "aurum": 50,
-                "item": "Dewfall Tonic"  # This is a Consumable
-            })
+            "rewards": json.dumps(
+                {
+                    "exp": 100,
+                    "aurum": 50,
+                    "item": "Dewfall Tonic",  # This is a Consumable
+                }
+            ),
         }
 
         self.mock_db._col.return_value.find_one.return_value = quest_data
@@ -135,8 +130,9 @@ class TestRewardSystemMaterials(unittest.TestCase):
         self.mock_db.add_inventory_item.assert_called()
         call_args = self.mock_db.add_inventory_item.call_args[0]
 
-        self.assertEqual(call_args[1], "hp_potion_1") # Key from consumables.json
-        self.assertEqual(call_args[3], "consumable") # Type should be 'consumable'
+        self.assertEqual(call_args[1], "hp_potion_1")  # Key from consumables.json
+        self.assertEqual(call_args[3], "consumable")  # Type should be 'consumable'
+
 
 if __name__ == "__main__":
     unittest.main()

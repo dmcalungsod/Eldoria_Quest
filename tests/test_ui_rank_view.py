@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 import unittest
@@ -13,6 +12,7 @@ sys.modules["pymongo.results"] = MagicMock()
 # Adjust path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # --- Mocking Discord UI ---
 class MockItem:
     def __init__(self, *args, **kwargs):
@@ -26,11 +26,14 @@ class MockItem:
     def add_option(self, label, value, **kwargs):
         self.options.append(MagicMock(label=label, value=str(value)))
 
+
 class MockButton(MockItem):
     pass
 
+
 class MockSelect(MockItem):
     pass
+
 
 class MockView:
     def __init__(self, timeout=180):
@@ -46,6 +49,7 @@ class MockView:
     def set_back_button(self, callback, label):
         pass
 
+
 # Helper to import module with mocked dependencies
 def import_module_with_mocks():
     # Define mocks
@@ -57,8 +61,10 @@ def import_module_with_mocks():
     mock_discord.ui.Select = MockSelect
 
     mock_components = MagicMock()
+
     class MockGuildViewMixin:
         pass
+
     mock_components.GuildViewMixin = MockGuildViewMixin
 
     # Create a dict of modules to patch
@@ -74,9 +80,10 @@ def import_module_with_mocks():
         # We need to reload the module if it was already imported to apply patches
         if "game_systems.guild_system.ui.rank_view" in sys.modules:
             import importlib
+
             importlib.reload(sys.modules["game_systems.guild_system.ui.rank_view"])
         else:
-            import game_systems.guild_system.ui.rank_view
+            pass
 
         return sys.modules["game_systems.guild_system.ui.rank_view"]
 
@@ -84,11 +91,10 @@ def import_module_with_mocks():
 class TestRankView(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         # Patch sys.modules for the duration of the test method
-        self.module_patcher = patch.dict(sys.modules, {
-            "discord": MagicMock(),
-            "discord.ui": MagicMock(),
-            "game_systems.guild_system.ui.components": MagicMock()
-        })
+        self.module_patcher = patch.dict(
+            sys.modules,
+            {"discord": MagicMock(), "discord.ui": MagicMock(), "game_systems.guild_system.ui.components": MagicMock()},
+        )
         self.module_patcher.start()
 
         # Re-apply our specific mocks
@@ -102,21 +108,27 @@ class TestRankView(unittest.IsolatedAsyncioTestCase):
         sys.modules["discord.ui"] = mock_discord.ui
 
         mock_components = MagicMock()
+
         class MockGuildViewMixin:
             pass
+
         mock_components.GuildViewMixin = MockGuildViewMixin
         # We also need to mock SystemCache and ViewFactory on mock_components
         self.mock_rank_system = MagicMock()
         mock_components.SystemCache.get_rank_system.return_value = self.mock_rank_system
+
         def create_button(**kwargs):
             return MockButton(**kwargs)
+
         mock_components.ViewFactory.create_button.side_effect = create_button
 
         sys.modules["game_systems.guild_system.ui.components"] = mock_components
 
         # Now import the module under test
-        import game_systems.guild_system.ui.rank_view
         import importlib
+
+        import game_systems.guild_system.ui.rank_view
+
         importlib.reload(game_systems.guild_system.ui.rank_view)
         self.rank_view_module = game_systems.guild_system.ui.rank_view
 
@@ -143,7 +155,7 @@ class TestRankView(unittest.IsolatedAsyncioTestCase):
 
         # Check buttons
         self.assertEqual(len(view.children), 2)
-        self.assertFalse(view.children[0].disabled) # promote_btn
+        self.assertFalse(view.children[0].disabled)  # promote_btn
         self.assertEqual(view.children[0].custom_id, "req_promo")
 
     async def test_promote_callback_eligible(self):
@@ -159,7 +171,7 @@ class TestRankView(unittest.IsolatedAsyncioTestCase):
 
         self.mock_interaction.edit_original_response.assert_called()
         args, kwargs = self.mock_interaction.edit_original_response.call_args
-        self.assertIsInstance(kwargs['view'], self.rank_view_module.RankTrialConfirmationView)
+        self.assertIsInstance(kwargs["view"], self.rank_view_module.RankTrialConfirmationView)
 
     async def test_promote_callback_not_eligible(self):
         """Test promotion callback when not eligible."""
@@ -190,7 +202,7 @@ class TestRankView(unittest.IsolatedAsyncioTestCase):
 
         # Mock PlayerStats
         with patch("game_systems.player.player_stats.PlayerStats") as MockStats:
-             with patch("game_systems.adventure.ui.adventure_embeds.AdventureEmbeds") as MockEmbeds:
+            with patch("game_systems.adventure.ui.adventure_embeds.AdventureEmbeds") as MockEmbeds:
                 # Configure MockStats instance
                 mock_stats_instance = MockStats.from_dict.return_value
                 mock_stats_instance.max_hp = 100
@@ -224,8 +236,8 @@ class TestRankView(unittest.IsolatedAsyncioTestCase):
 
         self.mock_interaction.edit_original_response.assert_called()
         args, kwargs = self.mock_interaction.edit_original_response.call_args
-        self.assertIn('embed', kwargs)
-        self.assertIsInstance(kwargs['view'], self.rank_view_module.RankProgressView)
+        self.assertIn("embed", kwargs)
+        self.assertIsInstance(kwargs["view"], self.rank_view_module.RankProgressView)
 
 
 if __name__ == "__main__":

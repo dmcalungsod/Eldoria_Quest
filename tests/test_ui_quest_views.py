@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 import unittest
@@ -13,6 +12,7 @@ sys.modules["pymongo.results"] = MagicMock()
 # Adjust path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # --- Mocking Discord UI ---
 class MockItem:
     def __init__(self, *args, **kwargs):
@@ -21,16 +21,19 @@ class MockItem:
         self.disabled = kwargs.get("disabled", False)
         self.options = kwargs.get("options", [])
         self.callback = None
-        self.values = [] # For Select
+        self.values = []  # For Select
 
     def add_option(self, label, value, **kwargs):
         self.options.append(MagicMock(label=label, value=str(value)))
 
+
 class MockButton(MockItem):
     pass
 
+
 class MockSelect(MockItem):
     pass
+
 
 class MockView:
     def __init__(self, timeout=180):
@@ -42,6 +45,7 @@ class MockView:
 
     def clear_items(self):
         self.children = []
+
 
 # Mock discord module
 mock_discord = MagicMock()
@@ -100,7 +104,7 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         """Test QuestLogView initialization with completable quests."""
         # Setup mock system
         mock_system = MockQuestSystem.return_value
-        mock_system.check_completion.return_value = True # All quests completable
+        mock_system.check_completion.return_value = True  # All quests completable
 
         active_quests = [{"id": 1, "title": "Q1", "progress": {}, "objectives": {}}]
 
@@ -136,7 +140,7 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         """Test completing a quest."""
         mock_system = MockQuestSystem.return_value
         mock_system.complete_quest.return_value = (True, "Reward!")
-        mock_system.get_player_quests.return_value = [] # No more quests
+        mock_system.get_player_quests.return_value = []  # No more quests
 
         active_quests = [{"id": 1, "title": "Q1", "progress": {}, "objectives": {}}]
         view = QuestLogView(self.mock_db, active_quests, self.mock_user)
@@ -156,7 +160,7 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         # Verify embed updated
         self.mock_interaction.edit_original_response.assert_called()
         args, kwargs = self.mock_interaction.edit_original_response.call_args
-        self.assertEqual(kwargs['embed'], mock_embed)
+        self.assertEqual(kwargs["embed"], mock_embed)
 
     @patch("cogs.quest_hub_cog.QuestSystem")
     def test_quest_board_view_init(self, MockQuestSystem):
@@ -176,7 +180,11 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         """Test viewing quest details."""
         mock_system = MockQuestSystem.return_value
         mock_system.get_quest_details.return_value = {
-            "title": "Q1", "description": "Desc", "objectives": {"kill": {"slime": 5}}, "rewards": {"gold": 10}, "tier": "F"
+            "title": "Q1",
+            "description": "Desc",
+            "objectives": {"kill": {"slime": 5}},
+            "rewards": {"gold": 10},
+            "tier": "F",
         }
 
         quests = [{"id": 1, "tier": "F", "title": "Q1", "summary": "Summary"}]
@@ -190,8 +198,8 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         args, kwargs = self.mock_interaction.edit_original_response.call_args
 
         # Check if new view is QuestDetailView
-        self.assertIsInstance(kwargs['view'], QuestDetailView)
-        self.assertEqual(kwargs['view'].quest_id, 1)
+        self.assertIsInstance(kwargs["view"], QuestDetailView)
+        self.assertEqual(kwargs["view"].quest_id, 1)
 
     @patch("cogs.quest_hub_cog.QuestSystem")
     async def test_accept_quest_callback(self, MockQuestSystem):
@@ -209,7 +217,7 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         # Should transition back to board
         self.mock_interaction.edit_original_response.assert_called()
         args, kwargs = self.mock_interaction.edit_original_response.call_args
-        self.assertIsInstance(kwargs['view'], QuestBoardView)
+        self.assertIsInstance(kwargs["view"], QuestBoardView)
 
 
 if __name__ == "__main__":

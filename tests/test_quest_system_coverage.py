@@ -67,8 +67,10 @@ class TestQuestSystemCoverage(unittest.TestCase):
 
         # Case 1: Prereq not met
         def mock_find_1(query, projection=None):
-            if "tier" in query: return quests
-            if "discord_id" in query: return [] # No completed quests
+            if "tier" in query:
+                return quests
+            if "discord_id" in query:
+                return []  # No completed quests
             return []
 
         self.mock_db._col.return_value.find.side_effect = mock_find_1
@@ -78,8 +80,10 @@ class TestQuestSystemCoverage(unittest.TestCase):
 
         # Case 2: Prereq met
         def mock_find_2(query, projection=None):
-            if "tier" in query: return quests
-            if "discord_id" in query: return [{"quest_id": 1, "status": "completed"}]
+            if "tier" in query:
+                return quests
+            if "discord_id" in query:
+                return [{"quest_id": 1, "status": "completed"}]
             return []
 
         self.mock_db._col.return_value.find.side_effect = mock_find_2
@@ -127,9 +131,11 @@ class TestQuestSystemCoverage(unittest.TestCase):
 
         def mock_find_one(query, projection=None):
             # Check for existing
-            if "discord_id" in query: return None
+            if "discord_id" in query:
+                return None
             # Check for quest definition
-            if "id" in query: return quest
+            if "id" in query:
+                return quest
             return None
 
         self.mock_db._col.return_value.find_one.side_effect = mock_find_one
@@ -143,8 +149,10 @@ class TestQuestSystemCoverage(unittest.TestCase):
         quest = {"id": 1, "tier": "F", "objectives": "{bad", "exclusive_group": None}
 
         def mock_find_one(query, projection=None):
-            if "discord_id" in query: return None
-            if "id" in query: return quest
+            if "discord_id" in query:
+                return None
+            if "id" in query:
+                return quest
             return None
 
         self.mock_db._col.return_value.find_one.side_effect = mock_find_one
@@ -165,8 +173,8 @@ class TestQuestSystemCoverage(unittest.TestCase):
         # 1. find_one player quest
         # 2. find_one quest definition
         self.mock_db._col.return_value.find_one.side_effect = [
-            {"progress": '{"kill": {"slime": 5}}', "status": "in_progress"}, # pq
-            {"objectives": '{"kill": {"slime": 5}}', "rewards": '{"gold": 100}'}, # quest
+            {"progress": '{"kill": {"slime": 5}}', "status": "in_progress"},  # pq
+            {"objectives": '{"kill": {"slime": 5}}', "rewards": '{"gold": 100}'},  # quest
         ]
 
         # Mock update result

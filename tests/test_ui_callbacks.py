@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 import unittest
@@ -28,19 +27,25 @@ mock_discord.Embed = MagicMock()
 
 # Let's import it inside tests or after setup, but we need patch.dict active.
 
+
 class TestUICallbacks(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.module_patcher = patch.dict(sys.modules, {
-            "discord": mock_discord,
-            "discord.ui": MagicMock(),
-            "game_systems.character.ui.profile_view": MagicMock(),
-            "game_systems.guild_system.ui.lobby_view": MagicMock()
-        })
+        self.module_patcher = patch.dict(
+            sys.modules,
+            {
+                "discord": mock_discord,
+                "discord.ui": MagicMock(),
+                "game_systems.character.ui.profile_view": MagicMock(),
+                "game_systems.guild_system.ui.lobby_view": MagicMock(),
+            },
+        )
         self.module_patcher.start()
 
         # Now import/reload the module
-        import cogs.utils.ui_helpers
         import importlib
+
+        import cogs.utils.ui_helpers
+
         importlib.reload(cogs.utils.ui_helpers)
         self.ui_helpers = cogs.utils.ui_helpers
 
@@ -89,9 +94,29 @@ class TestUICallbacks(unittest.IsolatedAsyncioTestCase):
 
         # Setup profile bundle
         bundle = {
-            "player": {"name": "Hero", "class_id": 1, "level": 5, "current_hp": 100, "current_mp": 50, "experience": 100, "exp_to_next": 1000},
-            "stats": {"strength": 10, "endurance": 10, "dexterity": 10, "agility": 10, "magic": 10, "luck": 10, "max_hp": 100, "max_mp": 50, "max_inventory_slots": 20, "INVENTORY_STR_MOD": 0.5, "INVENTORY_DEX_MOD": 0.25},
-            "guild": {"rank": "F"}
+            "player": {
+                "name": "Hero",
+                "class_id": 1,
+                "level": 5,
+                "current_hp": 100,
+                "current_mp": 50,
+                "experience": 100,
+                "exp_to_next": 1000,
+            },
+            "stats": {
+                "strength": 10,
+                "endurance": 10,
+                "dexterity": 10,
+                "agility": 10,
+                "magic": 10,
+                "luck": 10,
+                "max_hp": 100,
+                "max_mp": 50,
+                "max_inventory_slots": 20,
+                "INVENTORY_STR_MOD": 0.5,
+                "INVENTORY_DEX_MOD": 0.25,
+            },
+            "guild": {"rank": "F"},
         }
         mock_db_instance.get_profile_bundle.return_value = bundle
         mock_db_instance.get_class.return_value = {"name": "Warrior"}
@@ -102,7 +127,7 @@ class TestUICallbacks(unittest.IsolatedAsyncioTestCase):
         # Verify interaction edit
         self.mock_interaction.edit_original_response.assert_called()
         args, kwargs = self.mock_interaction.edit_original_response.call_args
-        self.assertIn('embed', kwargs)
+        self.assertIn("embed", kwargs)
         # Verify view creation
         mock_profile_view_mod.CharacterTabView.assert_called()
 
