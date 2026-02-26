@@ -509,7 +509,7 @@ class CombatPhrases:
         ],
         "toxic_blade": [
             "You coat your weapon in deadly venom and deliver a **{skill_name}**!",
-            "A green glint on your steel betrays the poison of **{skill_name}**.",
+            "A green glint on your steel betrays the poison of **{skill_name}**!",
             "The {m_name} hisses in pain as **{skill_name}** infects its blood!",
         ],
         # --- CLERIC ---
@@ -538,6 +538,22 @@ class CombatPhrases:
             "You nock multiple arrows at once and unleash a **{skill_name}**!",
             "A rain of arrows darkens the sky as you use **{skill_name}**!",
             "You fire in rapid succession, turning the air into a deadly volley!",
+        ],
+        # --- ALCHEMIST ---
+        "vitriol_bomb": [
+            "Glass shatters! The **{skill_name}** releases a hissing cloud that eats through armor.",
+            "You hurl a volatile flask—**{skill_name}** drenches the {m_name} in liquid fire.",
+            "A sharp chemical stench fills the air as **{skill_name}** erodes the enemy's defenses.",
+        ],
+        "fulminating_compound": [
+            "You mix two reagents and throw—**{skill_name}** erupts in a blinding flash!",
+            "A unstable reaction triggers a shockwave! **{skill_name}** blasts everyone nearby!",
+            "The air crackles with chemical energy before **{skill_name}** detonates with deafening force.",
+        ],
+        "mutagenic_serum": [
+            "You down the vile concoction. **{skill_name}** twists your muscles with primal strength.",
+            "Veins bulge and skin hardens as the **{skill_name}** rewrites your biology.",
+            "A guttural roar escapes your throat—**{skill_name}** has unleashed the monster within.",
         ],
     }
 
@@ -654,6 +670,24 @@ class CombatPhrases:
                     f"Your bow sings—the {m_name} recoils from the hit. {d_str}",
                     f"You loose an arrow, catching the {m_name} in the flank. {d_str}",
                     f"You snap-fire a shot, hitting the {m_name} in stride. {d_str}",
+                ]
+
+        # --- ALCHEMIST (ID 6) ---
+        elif player_class_id == 6:
+            if is_crit:
+                pool = [
+                    f"A volatile mixture explodes on impact, shredding the {m_name}! {d_str}",
+                    f"You hurl a caustic flask with pinpoint accuracy—acid melts through bone! {d_str}",
+                    f"A precise throw! The vial shatters in the {m_name}'s eyes, blinding and burning it! {d_str}",
+                    f"The reaction is perfect! A chemical blast knocks the {m_name} reeling! {d_str}",
+                ]
+            else:
+                pool = [
+                    f"You toss a small explosive that snaps against the {m_name}'s hide. {d_str}",
+                    f"A thrown dagger coated in toxin nicks the {m_name}. {d_str}",
+                    f"You fling a corrosive concoction, singing the {m_name}'s flesh. {d_str}",
+                    f"Glass shatters, and a cloud of stinging gas envelops the {m_name}. {d_str}",
+                    f"A calculated strike with a reinforced beaker deals {d_str}.",
                 ]
 
         # --- DEFAULT ---
