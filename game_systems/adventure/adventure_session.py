@@ -13,6 +13,7 @@ from typing import Any
 from database.database_manager import DatabaseManager
 from game_systems.core.world_time import TimePhase, Weather, WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.consumables import CONSUMABLES
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
 
@@ -486,6 +487,7 @@ class AdventureSession:
                 location_name=location_name,
                 weather=weather,
                 event_type=context.get("event_type"),
+                supplies=self.supplies,
             )
             self.logs.extend(result["log"])
 
@@ -613,10 +615,18 @@ class AdventureSession:
             # Safety: Drop to manual if HP is too low
             max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
             if result["hp_current"] / max(max_hp, 1) < 0.30:
-                if not background:
-                    sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
-                # If background, we break silently. Next simulate_step will trigger _attempt_flee
-                break
+                # AUTO-POTION LOGIC
+                potion_used = self._try_auto_potion(context, max_hp)
+                if potion_used:
+                    # Log usage and continue combat
+                    sequence.append([potion_used])
+                    # Update vitals for next iteration
+                    result["hp_current"] = context["vitals"]["current_hp"]
+                else:
+                    if not background:
+                        sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                    # If background, we break silently. Next simulate_step will trigger _attempt_flee
+                    break
 
             if result.get("winner") == "monster":
                 is_dead = True
@@ -770,6 +780,46 @@ class AdventureSession:
                     self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
         return self._build_result([turn_logs], is_dead, context)
+
+    def _try_auto_potion(self, context: dict, max_hp: int) -> str | None:
+        """
+        Attempts to use a healing potion from supplies.
+        Returns log string if used, None otherwise.
+        """
+        # Find best potion (lowest heal that prevents overheal? or just first available?)
+        # Let's iterate supplies and look for type="hp"
+        target_potion = None
+
+        for item_key, count in self.supplies.items():
+            if count <= 0:
+                continue
+
+            # Check Consumable Data
+            c_data = CONSUMABLES.get(item_key)
+            if c_data and c_data["type"] == "hp":
+                target_potion = item_key
+                break
+
+        if not target_potion:
+            return None
+
+        # Use Potion
+        c_data = CONSUMABLES[target_potion]
+        heal_amount = c_data["effect"].get("heal", 0)
+
+        # Apply Heal
+        current_hp = context["vitals"]["current_hp"]
+        new_hp = min(max_hp, current_hp + heal_amount)
+        actual_heal = new_hp - current_hp
+
+        context["vitals"]["current_hp"] = new_hp
+
+        # Decrement Supply
+        self.supplies[target_potion] -= 1
+        if self.supplies[target_potion] <= 0:
+            del self.supplies[target_potion]
+
+        return f"💊 **Auto-Potion:** Used {c_data['name']} to recover {actual_heal} HP."
 
     # ======================================================================
     # PERSISTENCE
