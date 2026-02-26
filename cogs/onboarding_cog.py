@@ -26,9 +26,7 @@ from .utils.ui_helpers import back_to_profile_callback
 logger = logging.getLogger("eldoria.onboarding")
 
 
-async def transition_to_guild_lobby(
-    interaction: discord.Interaction, db: DatabaseManager, user: discord.User
-):
+async def transition_to_guild_lobby(interaction: discord.Interaction, db: DatabaseManager, user: discord.User):
     """Helper to transition to the Guild Lobby, avoiding circular imports."""
     from game_systems.guild_system.ui.lobby_view import GuildLobbyView
 
@@ -99,14 +97,8 @@ class StartMenuView(View):
     async def class_select_callback(self, interaction: discord.Interaction):
         class_id = int(interaction.data["custom_id"].split("_")[1])
 
-        class_info = next(
-            (v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id),
-            None,
-        )
-        class_name = next(
-            (k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id),
-            "Unknown",
-        )
+        class_info = next((v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), None)
+        class_name = next((k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), "Unknown")
 
         if not class_info:
             await interaction.response.send_message("Class data error.", ephemeral=True)
@@ -121,17 +113,11 @@ class StartMenuView(View):
             "MAG": E.MAG,
             "LCK": E.LCK,
         }
-        stats_str = "\n".join(
-            [
-                f"{stat_emojis.get(k, '•')} **{k}**: `{v}`"
-                for k, v in class_info["stats"].items()
-            ]
-        )
+        stats_str = "\n".join([f"{stat_emojis.get(k, '•')} **{k}**: `{v}`" for k, v in class_info["stats"].items()])
 
         embed = discord.Embed(
             title=f"Class: {class_name}",
-            description=f"{class_info['description']}\n\n"
-            f"**Base Attributes**\n{stats_str}",
+            description=f"{class_info['description']}\n\n**Base Attributes**\n{stats_str}",
             color=0x00B0F4,
         )
         embed.set_footer(text="Choose wisely. This decision shapes your fate.")
@@ -157,9 +143,7 @@ class ClassDetailView(View):
 
         exists = await asyncio.to_thread(self.db.player_exists, self.user.id)
         if exists:
-            await interaction.followup.send(
-                "You already have a character!", ephemeral=True
-            )
+            await interaction.followup.send("You already have a character!", ephemeral=True)
             return
 
         success, msg = await asyncio.to_thread(
@@ -173,12 +157,9 @@ class ClassDetailView(View):
             # --- RESTORED ATMOSPHERIC TEXT ---
             welcome_title = f"Welcome, {self.user.display_name}, to Astraeon City."
             welcome_desc = (
-                "Your name is known, but your deeds are not. "
-                "The path ahead is fraught with peril...\n\n"
-                "To seek purpose, coin, or redemption, you must register "
-                "with the **Adventurer's Guild**."
-                "\n\n*The city gates loom above you, iron-bound and weathered "
-                "by centuries of defense against the dark.*"
+                "Your name is known, but your deeds are not. The path ahead is fraught with peril...\n\n"
+                "To seek purpose, coin, or redemption, you must register with the **Adventurer's Guild**."
+                "\n\n*The city gates loom above you, iron-bound and weathered by centuries of defense against the dark.*"
             )
 
             embed = discord.Embed(
@@ -195,11 +176,7 @@ class ClassDetailView(View):
 
     @discord.ui.button(label="Reconsider", style=discord.ButtonStyle.secondary)
     async def back_btn(self, interaction: discord.Interaction, button: Button):
-        embed = discord.Embed(
-            title=WELCOME_TITLE,
-            description=WELCOME_MESSAGE,
-            color=discord.Color.gold(),
-        )
+        embed = discord.Embed(title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold())
         view = StartMenuView(self.db, self.user)
         await interaction.response.edit_message(embed=embed, view=view)
 
@@ -220,15 +197,11 @@ class CharacterMenuView(View):
         embed = discord.Embed(
             title="The Adventurer's Guild: Reception",
             description=(
-                "The Guild Clerk looks up from a stack of parchment, "
-                "adjusting her spectacles.\n\n"
-                '*"Name? Class? Ah, yes. Fresh blood. Welcome to the Guild, '
-                'Initiate."*\n\n'
-                "She stamps a document and slides a heavy iron badge across "
-                "the counter.\n\n"
+                "The Guild Clerk looks up from a stack of parchment, adjusting her spectacles.\n\n"
+                '*"Name? Class? Ah, yes. Fresh blood. Welcome to the Guild, Initiate."*\n\n'
+                "She stamps a document and slides a heavy iron badge across the counter.\n\n"
                 '*"We handle the paperwork; you handle the monsters. Simple, yes? '
-                "But before I let you loose in the dungeon, "
-                "let's see if you know which end of the weapon to hold.\"*"
+                "But before I let you loose in the dungeon, let's see if you know which end of the weapon to hold.\"*"
             ),
             color=discord.Color.dark_teal(),
         )
@@ -247,9 +220,7 @@ class GuildWelcomeView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user.id
 
-    @discord.ui.button(
-        label="⚔️ Prove Yourself (Tutorial)", style=discord.ButtonStyle.primary
-    )
+    @discord.ui.button(label="⚔️ Prove Yourself (Tutorial)", style=discord.ButtonStyle.primary)
     async def start_training(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
 
@@ -257,112 +228,15 @@ class GuildWelcomeView(View):
         embed = discord.Embed(
             title="⚔️ Combat Training: The Straw Knight",
             description=(
-                "You step into the training ring. The sawdust floor crunches "
-                "beneath your boots.\n\n"
-                "A **Straw Dummy** stands before you. It mocks you with "
-                "its silence and drawn-on angry eyebrows.\n\n"
+                "You step into the training ring. The sawdust floor crunches beneath your boots.\n\n"
+                "A **Straw Dummy** stands before you. It mocks you with its silence and drawn-on angry eyebrows.\n\n"
                 "**Action:** Strike the dummy to begin."
             ),
             color=discord.Color.red(),
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="⏩ I know what I'm doing (Skip)",
-        style=discord.ButtonStyle.secondary,
-    )
-    async def skip_to_lobby(self, interaction: discord.Interaction, button: Button):
-        await interaction.response.defer()
-        await transition_to_guild_lobby(interaction, self.db, self.user)
-
-
-class StartFirstExpeditionView(View):
-    def __init__(self, db, user):
-        super().__init__(timeout=300)
-        self.db = db
-        self.user = user
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        return interaction.user.id == self.user.id
-
-    @discord.ui.button(
-        label="🗺️ Start First Expedition", style=discord.ButtonStyle.success
-    )
-    async def start_expedition(self, interaction: discord.Interaction, button: Button):
-        # Check for Adventure Cog
-        adventure_cog = interaction.client.get_cog("AdventureCommands")
-        if not adventure_cog:
-            await interaction.response.send_message(
-                "Adventure system unavailable. Proceeding to lobby.",
-                ephemeral=True,
-            )
-            await transition_to_guild_lobby(interaction, self.db, self.user)
-            return
-
-        await interaction.response.defer()
-
-        # Fetch Data for Setup View
-        try:
-            (
-                guild_member,
-                player_data,
-                supplies,
-                max_slots,
-                current_slots,
-            ) = await asyncio.gather(
-                asyncio.to_thread(self.db.get_guild_member_data, self.user.id),
-                asyncio.to_thread(self.db.get_player, self.user.id),
-                asyncio.to_thread(
-                    self.db.get_inventory_items,
-                    self.user.id,
-                    item_type="supply",
-                ),
-                asyncio.to_thread(self.db.calculate_inventory_limit, self.user.id),
-                asyncio.to_thread(self.db.get_inventory_slot_count, self.user.id),
-            )
-            rank = guild_member["rank"] if guild_member else "F"
-            level = player_data["level"] if player_data else 1
-
-            # Import here to avoid circular dependencies if any
-            from game_systems.adventure.ui.setup_view import AdventureSetupView
-
-            embed = discord.Embed(
-                title=f"{E.MAP} First Expedition: The Outskirts",
-                description=(
-                    "**Step 1:** Select a **Location** (e.g., "
-                    "*Mistwood Outskirts*).\n"
-                    "**Step 2:** Choose a **Duration** (start small, "
-                    "maybe 30 minutes).\n"
-                    "**Step 3:** Click **Begin Expedition**.\n\n"
-                    "*Your character will explore automatically. "
-                    "Come back when the timer ends!*"
-                ),
-                color=discord.Color.dark_green(),
-            )
-
-            view = AdventureSetupView(
-                self.db,
-                adventure_cog.manager,
-                self.user,
-                rank,
-                level,
-                supplies=supplies,
-                capacity=(current_slots, max_slots),
-            )
-
-            # Override back button to return to Lobby instead of Profile
-            # for this flow?
-            # Actually, standard behavior is fine, but let's just show the view.
-            await interaction.edit_original_response(embed=embed, view=view)
-
-        except Exception as e:
-            logger.error(f"Failed to load first expedition setup: {e}", exc_info=True)
-            await interaction.followup.send(
-                "Something went wrong. Heading to lobby...", ephemeral=True
-            )
-            await transition_to_guild_lobby(interaction, self.db, self.user)
-
-    @discord.ui.button(label="🏠 Go to Guild Hall", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="⏩ I know what I'm doing (Skip)", style=discord.ButtonStyle.secondary)
     async def skip_to_lobby(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await transition_to_guild_lobby(interaction, self.db, self.user)
@@ -423,8 +297,7 @@ class CombatTutorialView(View):
         embed.description = (
             "**You strike the dummy!** Straw flies everywhere.\n"
             f"{E.PLAYER_ATTACK} **-5 HP**\n\n"
-            "The dummy wobbles menacingly. It looks like it's winding up "
-            "for a counter-wobble!\n\n"
+            "The dummy wobbles menacingly. It looks like it's winding up for a counter-wobble!\n\n"
             "**Action:** Prepare your defense!"
         )
         await interaction.response.edit_message(embed=embed, view=self)
@@ -437,8 +310,7 @@ class CombatTutorialView(View):
         embed.description = (
             "**You raise your guard.**\n"
             f"{E.SHIELD} **Block Success!**\n\n"
-            "The dummy tips over and bonks harmlessly against your defense. "
-            "**0 Damage.**\n"
+            "The dummy tips over and bonks harmlessly against your defense. **0 Damage.**\n"
             "Now, while it's off balance—finish it!"
         )
         await interaction.response.edit_message(embed=embed, view=self)
@@ -520,41 +392,18 @@ class CombatTutorialView(View):
             if item:
                 # Auto-Equip
                 equip_mgr = EquipmentManager(self.db)
-                ok, msg = await asyncio.to_thread(
-                    equip_mgr.equip_item, self.user.id, item["id"]
-                )
+                ok, msg = await asyncio.to_thread(equip_mgr.equip_item, self.user.id, item["id"])
                 if ok:
                     weapon_msg = f"\n⚔️ **Bonus:** Received and equipped **{name}**!"
                 else:
-                    weapon_msg = (
-                        f"\n⚔️ **Bonus:** Received **{name}**! (Check Inventory)"
-                    )
+                    weapon_msg = f"\n⚔️ **Bonus:** Received **{name}**! (Check Inventory)"
 
-        msg = f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}"
-        await interaction.followup.send(msg, ephemeral=True)
-
-        # Instead of going directly to lobby, offer the first expedition
-        view = StartFirstExpeditionView(self.db, self.user)
-        embed = discord.Embed(
-            title="📜 A New Assignment",
-            description=(
-                "*The Guild Clerk stamps your registration form with a heavy "
-                "thud.*\n\n"
-                "**“All official. Now, don't think you can just lounge "
-                "around.”**\n\n"
-                "She points to a map pinned to the wall.\n\n"
-                "**“We need eyes on the outskirts. Take a patrol contract. "
-                "It takes time, so you can head out and return later "
-                "to collect your pay.”**"
-            ),
-            color=discord.Color.dark_green(),
-        )
-        embed.set_footer(
-            text="Expeditions run in the background. "
-            "You can close Discord while they complete."
+        await interaction.followup.send(
+            f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}",
+            ephemeral=True,
         )
 
-        await interaction.edit_original_response(embed=embed, view=view)
+        await transition_to_guild_lobby(interaction, self.db, self.user)
 
 
 class OnboardingCog(commands.Cog):

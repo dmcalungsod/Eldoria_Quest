@@ -31,6 +31,11 @@ class MockButton:
     ):
         self.callback = None
         self.label = label
+        self.custom_id = custom_id
+        self.style = style
+        self.row = row
+        self.emoji = emoji
+        self.disabled = disabled
 
     def _is_v2(self):
         return False
@@ -51,6 +56,11 @@ class TestInfirmaryStateIssue(unittest.TestCase):
         mock_discord.Embed = MagicMock()
         mock_discord.Color = MagicMock()
 
+        mock_discord.ButtonStyle.primary = "primary"
+        mock_discord.ButtonStyle.secondary = "secondary"
+        mock_discord.ButtonStyle.success = "success"
+        mock_discord.Color.green.return_value = "green"
+        mock_discord.Color.red.return_value = "red"
         sys.modules["discord"] = mock_discord
         sys.modules["discord.ui"] = mock_discord.ui
         sys.modules["discord.ext"] = MagicMock()

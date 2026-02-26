@@ -172,14 +172,6 @@ class CombatEngine:
                     # Apply percentage modifiers
                     for stat in ["ATK", "DEF", "AGI", "DEX"]:
                         key = f"{stat}_percent"
-
-                        # Special Mapping: END_percent -> DEF for monsters
-                        if stat == "DEF" and "END_percent" in debuff:
-                            mod = float(debuff["END_percent"])
-                            base_val = eff_monster.get(stat, 0)
-                            new_val = max(0, int(base_val * (1.0 + mod)))
-                            eff_monster[stat] = new_val
-
                         if key in debuff:
                             mod = float(debuff[key])
                             base_val = eff_monster.get(stat, 0)
@@ -290,9 +282,9 @@ class CombatEngine:
         """
         if self.weather == Weather.STORM:
             # 15% Chance for random lightning strike
-            if random.random() < 0.15:
+            if random.random() < 0.15:  # nosec B311
                 # 50/50 to hit Player or Monster
-                target_is_player = random.choice([True, False])
+                target_is_player = random.choice([True, False])  # nosec B311
                 dmg = (
                     max(10, int(self.stats_dict.get("HP", 100) * 0.05))
                     if target_is_player
@@ -313,6 +305,27 @@ class CombatEngine:
             dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.02))
             self.player_hp = max(0, self.player_hp - dmg)
             log.append(f"🌋 **ASH:** The choking ash burns your lungs! (`{dmg}` dmg)")
+
+        elif self.weather == Weather.BLIZZARD:
+            # Blizzard: 20% Chance for Frostbite (3% Max HP)
+            if random.random() < 0.20:  # nosec B311
+                dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.03))
+                self.player_hp = max(0, self.player_hp - dmg)
+                log.append(f"❄️ **BLIZZARD:** The biting cold freezes your marrow! (`{dmg}` dmg)")
+
+        elif self.weather == Weather.SANDSTORM:
+            # Sandstorm: 20% Chance for Buffeting Sands (3% Max HP)
+            if random.random() < 0.20:  # nosec B311
+                dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.03))
+                self.player_hp = max(0, self.player_hp - dmg)
+                log.append(f"🌪️ **SANDSTORM:** The abrasive sand flays your skin! (`{dmg}` dmg)")
+
+        elif self.weather == Weather.MIASMA:
+            # Miasma: 25% Chance for Toxic Fumes (2% Max HP)
+            if random.random() < 0.25:  # nosec B311
+                dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.02))
+                self.player_hp = max(0, self.player_hp - dmg)
+                log.append(f"☠️ **MIASMA:** You inhale the toxic fumes! (`{dmg}` dmg)")
 
     def _detect_element(self, skill: dict) -> str:
         """Determines the elemental type of a skill."""
@@ -370,6 +383,31 @@ class CombatEngine:
         elif self.weather == Weather.ASH:
             if element == "fire":
                 return int(dmg * 1.1)
+
+        elif self.weather == Weather.BLIZZARD:
+            if element == "ice":
+                return int(dmg * 1.2)
+            if element == "fire":
+                return int(dmg * 0.8)
+
+        elif self.weather == Weather.SANDSTORM:
+            if element == "earth":
+                return int(dmg * 1.1)
+            if element == "wind":
+                return int(dmg * 1.2)
+
+        elif self.weather == Weather.GALE:
+            if element == "wind":
+                return int(dmg * 1.3)
+            # Gale makes aiming hard -> Nerf Ranged/DEX?
+            # We can check skill type if available, but here we only have element.
+            # Assuming "physical" might cover ranged, but we can't distinguish.
+
+        elif self.weather == Weather.MIASMA:
+            if element in ["poison", "dark"]:
+                return int(dmg * 1.2)
+            if element in ["holy", "light"]:
+                return int(dmg * 0.8)
 
         elif self.weather == Weather.STORM:
             # High winds affect physical ranged (DEX) if implemented,
@@ -436,15 +474,7 @@ class CombatEngine:
         Executes monster AI and action.
         Returns True if player is defeated.
         """
-        # Check for active Stun debuff (from skills)
-        is_stunned_debuff = False
-        if "debuffs" in self.monster:
-            for d in self.monster["debuffs"]:
-                if d.get("type") == "stun":
-                    is_stunned_debuff = True
-                    break
-
-        if monster_stunned or is_stunned_debuff:
+        if monster_stunned:
             log.append(f"💫 The {self.monster.get('name', 'enemy')} is reeling and misses its turn!")
             return False
 
@@ -614,7 +644,7 @@ class CombatEngine:
             # If action is 'auto', we'll rely on the random skill decision later, so we check specific actions here.
             if self.action == "auto":
                 # In auto mode, we give a small chance to "accidentally" counter
-                if is_magic and random.randint(1, 100) <= 20:
+                if is_magic and random.randint(1, 100) <= 20:  # nosec B311
                     is_offensive = True
                 else:
                     is_offensive = False  # Assume auto doesn't strategically counter
@@ -680,7 +710,7 @@ class CombatEngine:
         # even if the ability has its own crit chance roll.
         is_lucky_crit = False
         if spec.get("crit_bonus"):
-            if random.randint(1, 100) <= spec["crit_bonus"]:
+            if random.randint(1, 100) <= spec["crit_bonus"]:  # nosec B311
                 is_lucky_crit = True
 
         if is_lucky_crit or force_crit:
@@ -722,9 +752,6 @@ class CombatEngine:
         if skill.get("key_id") == "unstoppable_force":
             self.new_titles.append("Unstoppable")
 
-        damage_dealt = 0
-        recoil_based_on_damage = False
-
         if skill.get("heal_power", 0) > 0:
             # --- Healing Skill ---
             heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
@@ -738,8 +765,6 @@ class CombatEngine:
 
         else:
             # --- Offensive Skill ---
-            recoil_based_on_damage = True
-
             # Use effective stats for defense calculation
             effective_monster = self._get_effective_monster_stats()
 
@@ -761,40 +786,24 @@ class CombatEngine:
             if event_type == "crit":
                 turn_report["player_crit"] = 1
 
-            damage_dealt = dmg
-
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
 
+            # Recoil Mechanics (Tactician)
+            recoil_pct = skill.get("self_damage_percent")
+            if recoil_pct:
+                recoil_dmg = max(1, int(dmg * recoil_pct))
+                self.player_hp = max(0, self.player_hp - recoil_dmg)
+                log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
+
+            # Apply Debuffs (if any)
+            if skill.get("debuff"):
+                debuff_msg = self._apply_monster_debuff(skill)
+                if debuff_msg:
+                    log.append(debuff_msg)
+
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
-
-        # --- UNIVERSAL SKILL EFFECTS ---
-
-        # 1. Status Effects (Stun, etc.)
-        if skill.get("status_effect"):
-            self._apply_status_effects(skill, log)
-
-        # 2. Recoil Mechanics
-        recoil_pct = skill.get("self_damage_percent")
-        if recoil_pct:
-            if recoil_based_on_damage:
-                # Offensive Recoil (Based on Damage Dealt)
-                recoil_dmg = max(1, int(damage_dealt * recoil_pct))
-            else:
-                # Utility Recoil (Based on Max HP - e.g. Mutagenic Serum)
-                max_hp = self.stats_dict.get("HP", 100)
-                recoil_dmg = max(1, int(max_hp * recoil_pct))
-
-            self.player_hp = max(0, self.player_hp - recoil_dmg)
-            log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
-
-        # 3. Apply Debuffs (if any)
-        # Note: Vitriol Bomb (Offensive) has debuff.
-        if skill.get("debuff"):
-            debuff_msg = self._apply_monster_debuff(skill)
-            if debuff_msg:
-                log.append(debuff_msg)
 
     def _process_monster_debuffs(self):
         """
@@ -830,30 +839,6 @@ class CombatEngine:
 
         self.monster["debuffs"] = active_debuffs
         return msgs
-
-    def _apply_status_effects(self, skill, log):
-        """
-        Applies status effects like Stun to the monster.
-        """
-        status_data = skill.get("status_effect", {})
-        if not status_data:
-            return
-
-        if "debuffs" not in self.monster:
-            self.monster["debuffs"] = []
-
-        if "stun_chance" in status_data:
-            chance = float(status_data["stun_chance"])
-            if random.random() < chance:  # nosec B311
-                # Add Stun Debuff (Duration 1 = Current Turn)
-                self.monster["debuffs"].append(
-                    {
-                        "type": "stun",
-                        "duration": 1,
-                        "name": "Stun",
-                    }
-                )
-                log.append(f"💫 **{self.monster.get('name', 'Enemy')}** is stunned by the impact!")
 
     def _apply_monster_debuff(self, skill):
         """
@@ -902,13 +887,7 @@ class CombatEngine:
 
         # Check for Stat Modifiers (ATK_percent, DEF_percent, etc.)
         stat_mods = {}
-        # Added support for END_percent, STR_percent, etc.
-        valid_stats = [
-            "ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent",
-            "END_percent", "STR_percent", "MAG_percent", "LCK_percent"
-        ]
-
-        for key in valid_stats:
+        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent"]:
             if key in debuff_data:
                 stat_mods[key] = debuff_data[key]
 
@@ -923,6 +902,7 @@ class CombatEngine:
 
             if existing:
                 existing["duration"] = duration
+                # Update magnitude if new one is stronger? For now, we assume same skill = same magnitude.
                 return f"💢 **{self.monster.get('name', 'Enemy')}**'s {name} is refreshed!"
             else:
                 new_debuff = {
@@ -1032,7 +1012,7 @@ class CombatEngine:
         if not self.player_skills:
             return {"skill": None, "reason": "No skills available."}
 
-        roll = random.randint(1, 100)
+        roll = random.randint(1, 100)  # nosec B311  # nosec B311
         if roll > self.PLAYER_SKILL_CHANCE:
             return {"skill": None, "reason": "RNG check failed."}
 
@@ -1050,14 +1030,14 @@ class CombatEngine:
 
         # Priority 2: Buffs (50% chance if available)
         utility_skills = [s for s in usable_skills if s.get("buff_data")]
-        if utility_skills and random.randint(1, 100) > 50:
-            chosen_skill = random.choice(utility_skills)
+        if utility_skills and random.randint(1, 100) > 50:  # nosec B311
+            chosen_skill = random.choice(utility_skills)  # nosec B311
             return {"skill": chosen_skill, "reason": "Buff chosen."}
 
         # Priority 3: Offensive Skills
         offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0 and not s.get("buff_data")]
         if offensive_skills:
-            chosen_skill = random.choice(offensive_skills)
+            chosen_skill = random.choice(offensive_skills)  # nosec B311  # nosec B311
             return {"skill": chosen_skill, "reason": "Offense chosen."}
 
         return {"skill": None, "reason": "No offensive skills usable."}
