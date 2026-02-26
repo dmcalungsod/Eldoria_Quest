@@ -61,9 +61,9 @@ class TestPopulateDatabase(unittest.TestCase):
         sys.modules["game_systems.data.class_equipments"] = mock_data.class_equipments
         sys.modules["game_systems.data.equipments"] = mock_data.equipments
 
-        # Use import_module to avoid attribute chain issues with patch.dict
-        mod = importlib.import_module("database.populate_database")
-        self.populate = importlib.reload(mod)
+        # Clear cached module and import fresh with our mocks in place
+        sys.modules.pop("database.populate_database", None)
+        self.populate = importlib.import_module("database.populate_database")
 
     def tearDown(self):
         self.modules_patcher.stop()
