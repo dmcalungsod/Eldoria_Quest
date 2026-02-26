@@ -78,6 +78,11 @@ class PlayerStats:
     Manages all stats for a player character.
     """
 
+    # Inventory Capacity Constants
+    INVENTORY_BASE = 10
+    INVENTORY_STR_MOD = 0.5
+    INVENTORY_DEX_MOD = 0.25
+
     def __init__(self, str_base=1, end_base=1, dex_base=1, agi_base=1, mag_base=1, lck_base=1):
         self._stats: dict[str, StatBlock] = {
             "STR": StatBlock(base=str_base),
@@ -88,6 +93,10 @@ class PlayerStats:
             "LCK": StatBlock(base=lck_base),
             "DEF": StatBlock(base=0),  # Bonus/Item stat only
         }
+        self._cached_max_slots = None
+
+    def _invalidate_cache(self):
+        self._cached_max_slots = None
 
     # --- Total stat properties ---
     @property
@@ -137,32 +146,39 @@ class PlayerStats:
         Calculates total inventory slots based on STR and DEX.
         Formula: Base(10) + floor(STR * 0.5) + floor(DEX * 0.25).
         """
-        base_slots = 10
-        str_bonus = math.floor(self.strength * 0.5)
-        dex_bonus = math.floor(self.dexterity * 0.25)
-        return max(base_slots, base_slots + str_bonus + dex_bonus)
+        if self._cached_max_slots is None:
+            base_slots = self.INVENTORY_BASE
+            str_bonus = math.floor(self.strength * self.INVENTORY_STR_MOD)
+            dex_bonus = math.floor(self.dexterity * self.INVENTORY_DEX_MOD)
+            self._cached_max_slots = max(base_slots, base_slots + str_bonus + dex_bonus)
+        return self._cached_max_slots
 
     # --- Stat modification ---
     def set_base_stat(self, stat_name: str, value: int):
         key = stat_name.upper()
         if key in self._stats:
             self._stats[key].base = max(0, value)
+            self._invalidate_cache()
 
     def add_base_stat(self, stat_name: str, amount: int):
         key = stat_name.upper()
         if key in self._stats:
             self._stats[key].base += amount
+            self._invalidate_cache()
 
     def add_bonus_stat(self, stat_name: str, amount: int):
         key = stat_name.upper()
         if key in self._stats:
             self._stats[key].bonus += amount
+            self._invalidate_cache()
 
     def recalculate_bonuses(self, equipped_items: list[Any]):
         """Resets bonuses and re-applies them from item list."""
         # Reset all bonuses
         for key in self._stats:
             self._stats[key].bonus = 0
+
+        self._invalidate_cache()
 
         # Apply item bonuses
         for item in equipped_items:
