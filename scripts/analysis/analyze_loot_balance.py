@@ -50,10 +50,10 @@ def analyze():
     monsters_path = data_dir / "monsters.json"
     locations_path = data_dir / "adventure_locations.json"
 
-    with open(monsters_path) as f:
+    with open(monsters_path, encoding='utf-8') as f:
         monsters = json.load(f)
 
-    with open(locations_path) as f:
+    with open(locations_path, encoding='utf-8') as f:
         locations = json.load(f)
 
     # Analyze Monsters
@@ -157,7 +157,7 @@ def analyze():
     # Save Report
     output_path = Path(".Jules/analysis/2026-03-01_loot_economy_analysis.md")
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write("\n".join(report))
 
     print(f"Report generated at {output_path}")
