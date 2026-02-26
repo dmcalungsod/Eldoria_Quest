@@ -125,7 +125,7 @@ class TestUIHelpersExtended(unittest.IsolatedAsyncioTestCase):
     async def test_get_player_or_error_fail(self):
         interaction = AsyncMock()
         interaction.user.id = 123
-        interaction.response.is_done.return_value = False
+        interaction.response.is_done = MagicMock(return_value=True)
 
         db = MagicMock()
         db.get_player.return_value = None
@@ -147,7 +147,7 @@ class TestUIHelpersExtended(unittest.IsolatedAsyncioTestCase):
     async def test_get_profile_bundle_or_error_fail(self):
         interaction = AsyncMock()
         interaction.user.id = 123
-        interaction.response.is_done.return_value = False
+        interaction.response.is_done = MagicMock(return_value=True)
 
         db = MagicMock()
         db.get_profile_bundle.return_value = None
