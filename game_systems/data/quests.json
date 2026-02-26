@@ -1345,5 +1345,109 @@
       "aurum": 500,
       "item": "Heart of the Machine"
     }
+  },
+  {
+    "id": 70,
+    "title": "The Frozen Echo: Signal",
+    "tier": "A",
+    "quest_giver": "High Arcanist Vael",
+    "location": "The Frostfall Expanse",
+    "summary": "Investigate a strange signal in Frostfall Expanse.",
+    "description": "High Arcanist Vael's instruments are going haywire. A pulse, rhythmic and precise, is emanating from the deep glacier. It's not the Frozen King. It's older. He needs someone to clear the area and find the source.",
+    "objectives": {
+      "defeat": {
+        "Ice Golem": 5
+      },
+      "investigate": "Signal Source"
+    },
+    "flavor_text": {
+      "defeat:Ice Golem": "The golem crumbles, its core humming with the same frequency as the signal.",
+      "investigate:Signal Source": "You brush away the snow. Beneath lies a metallic rod, pulsating with faint blue light. It's warm."
+    },
+    "rewards": {
+      "exp": 4500,
+      "aurum": 1500
+    }
+  },
+  {
+    "id": 71,
+    "title": "The Frozen Echo: The Expedition",
+    "tier": "A",
+    "quest_giver": "High Arcanist Vael",
+    "location": "The Frostfall Expanse",
+    "summary": "Find the lost Pathfinder expedition.",
+    "description": "The signal source was a beacon... planted by a Pathfinder team lost decades ago. If they found something worth marking, we need to know what happened to them. Tracks lead deeper into the storm.",
+    "prerequisites": [
+      70
+    ],
+    "objectives": {
+      "locate": "Frozen Camp",
+      "retrieve": "Captain's Log"
+    },
+    "flavor_text": {
+      "locate:Frozen Camp": "Tattered tents flap in the wind. The camp is preserved perfectly in the ice.",
+      "retrieve:Captain's Log": "The leather is frozen stiff. The last entry reads: 'We found it. The Fracture. It's beautiful. It's wrong.'"
+    },
+    "rewards": {
+      "exp": 4800,
+      "aurum": 1600,
+      "item": "Winter Wolf Pelt"
+    }
+  },
+  {
+    "id": 72,
+    "title": "The Frozen Echo: Seal the Fracture",
+    "tier": "A",
+    "quest_giver": "High Arcanist Vael",
+    "location": "The Frostfall Expanse",
+    "summary": "Seal the dangerous discovery. (Option A)",
+    "description": "The log speaks of a 'Void Fracture' frozen in the ice. Vael urges caution. 'We must seal it. The Guild cannot risk waking it. The local spirits are already drawn to it.' Use the Sealing Ward on the fracture.",
+    "prerequisites": [
+      71
+    ],
+    "exclusive_group": "frozen_echo_choice",
+    "objectives": {
+      "defeat": {
+        "Chill Wisp": 5
+      },
+      "use": "Sealing Ward"
+    },
+    "flavor_text": {
+      "defeat:Chill Wisp": "The wisp shrieks as it dissipates, drawn to the Fracture's energy.",
+      "use:Sealing Ward": "The ward flares. The Fracture dims, then seals shut. The humming stops. The ice is silent."
+    },
+    "rewards": {
+      "exp": 6000,
+      "aurum": 2000,
+      "item": "Frost Crystal"
+    }
+  },
+  {
+    "id": 73,
+    "title": "The Frozen Echo: Tap the Source",
+    "tier": "A",
+    "quest_giver": "Whisperer Kaelen",
+    "location": "The Frostfall Expanse",
+    "summary": "Study the fracture for power. (Option B)",
+    "description": "A rogue mage, Kaelen, intercepts you. 'Vael is a coward. That fracture is a source of infinite energy. Help me stabilize it, and we can harness it. The wolves protect it instinctively; clear them out and channel the energy.'",
+    "prerequisites": [
+      71
+    ],
+    "exclusive_group": "frozen_echo_choice",
+    "objectives": {
+      "defeat": {
+        "Frost Wolf": 5
+      },
+      "channel": "Void Energy"
+    },
+    "flavor_text": {
+      "defeat:Frost Wolf": "The wolf's eyes burned with violet light before it fell.",
+      "channel:Void Energy": "You channel the energy into the containment flask. It feels heavy, buzzing with raw power."
+    },
+    "rewards": {
+      "exp": 6000,
+      "aurum": 2500,
+      "item": "Ice Core"
+    }
   }
 ]

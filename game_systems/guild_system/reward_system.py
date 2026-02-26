@@ -11,6 +11,7 @@ import logging
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
 from game_systems.data.consumables import CONSUMABLES
+from game_systems.data.materials import MATERIALS
 from game_systems.items.inventory_manager import InventoryManager
 from game_systems.player.achievement_system import AchievementSystem
 from game_systems.player.level_up import LevelUpSystem
@@ -28,6 +29,13 @@ class RewardSystem:
     def _get_consumable_data_by_name(self, item_name: str) -> tuple[str | None, dict | None]:
         """Helper to find a consumable's key_id and data by its display name."""
         for key, data in CONSUMABLES.items():
+            if data["name"] == item_name:
+                return key, data
+        return None, None
+
+    def _get_material_data_by_name(self, item_name: str) -> tuple[str | None, dict | None]:
+        """Helper to find a material's key_id and data by its display name."""
+        for key, data in MATERIALS.items():
             if data["name"] == item_name:
                 return key, data
         return None, None
@@ -90,13 +98,21 @@ class RewardSystem:
             # 5. Item Rewards
             item_msg = ""
             if item_reward_name:
+                # Check Consumables first
                 item_key, item_data = self._get_consumable_data_by_name(item_reward_name)
+                item_type = "consumable"
+
+                # Check Materials if not found
+                if not item_key:
+                    item_key, item_data = self._get_material_data_by_name(item_reward_name)
+                    item_type = "material"
+
                 if item_key and item_data:
                     self.db.add_inventory_item(
                         discord_id,
                         item_key,
                         item_data["name"],
-                        "consumable",
+                        item_type,
                         item_data["rarity"],
                         1,
                     )
