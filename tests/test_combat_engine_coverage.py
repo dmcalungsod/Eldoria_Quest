@@ -1,7 +1,9 @@
 import unittest
-from unittest.mock import MagicMock, patch, ANY
+from unittest.mock import MagicMock, patch
+
 from game_systems.combat.combat_engine import CombatEngine
-from game_systems.core.world_time import Weather, TimePhase
+from game_systems.core.world_time import Weather
+
 
 class TestCombatEngineCoverage(unittest.TestCase):
     def setUp(self):

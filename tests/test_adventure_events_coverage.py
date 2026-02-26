@@ -1,7 +1,9 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from game_systems.adventure.adventure_events import AdventureEvents
-from game_systems.core.world_time import TimePhase, Weather
+from game_systems.core.world_time import TimePhase
+
 
 class TestAdventureEventsCoverage(unittest.TestCase):
 

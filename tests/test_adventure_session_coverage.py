@@ -1,9 +1,9 @@
 import unittest
-from unittest.mock import MagicMock, patch, ANY
-import json
+from unittest.mock import MagicMock, patch
+
 from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.core.world_time import Weather, TimePhase
-from game_systems.player.player_stats import PlayerStats
+from game_systems.core.world_time import Weather
+
 
 class TestAdventureSessionCoverage(unittest.TestCase):
     def setUp(self):

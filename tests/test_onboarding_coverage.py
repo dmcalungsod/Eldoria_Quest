@@ -1,7 +1,15 @@
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-import discord
-from cogs.onboarding_cog import OnboardingCog, transition_to_guild_lobby, StartMenuView, ClassDetailView, CharacterMenuView, GuildWelcomeView, CombatTutorialView
+from unittest.mock import AsyncMock, MagicMock, patch
+
+from cogs.onboarding_cog import (
+    CharacterMenuView,
+    ClassDetailView,
+    CombatTutorialView,
+    OnboardingCog,
+    StartMenuView,
+    transition_to_guild_lobby,
+)
+
 
 class TestOnboardingCoverage(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):

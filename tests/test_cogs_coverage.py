@@ -1,9 +1,9 @@
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock, PropertyMock
-import asyncio
-import discord
-from cogs.chronicle_cog import ChronicleCog, TitleSelect, ChroniclesView
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
+
+from cogs.chronicle_cog import ChronicleCog, TitleSelect
 from cogs.faction_cog import FactionCog
+
 
 class TestCogsCoverage(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
