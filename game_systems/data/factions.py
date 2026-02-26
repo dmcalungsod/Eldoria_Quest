@@ -162,7 +162,7 @@ FACTIONS = {
         ],
     },
     "grey_ward": {
-        "name": "The Grey Ward",
+        "name": "Grey Ward",
         "emoji": "⚕️",
         "description": "A pragmatic order of alchemists and doctors who believe the only way to survive the Veil is to adapt to it. They operate the city's quarantine zones.",
         "ranks": {
@@ -190,13 +190,15 @@ FACTIONS = {
         },
         "interests": {
             "gathering": 1.5,
-            "monster_types": ["Plant", "Undead"],
+            "crafting": 1.5,
+            "monster_types": ["Plant", "Slime"],
         },
         "favored_locations": [
             "whispering_thicket",
             "deepgrove_roots",
             "shrouded_fen",
             "forgotten_ossuary",
+            "the_ashlands",
         ],
     },
 }

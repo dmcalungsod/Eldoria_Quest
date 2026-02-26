@@ -193,7 +193,6 @@ class AdventureEmbeds:
         loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone", "emoji": E.MAP})
 
         # Calculate Times
-        start_time = datetime.datetime.fromisoformat(session["start_time"])
         end_time = datetime.datetime.fromisoformat(session["end_time"])
         now = WorldTime.now()
 
