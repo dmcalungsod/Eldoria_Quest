@@ -1,3 +1,4 @@
+import importlib
 import os
 import sys
 import unittest
@@ -20,12 +21,7 @@ class TestPopulateDatabase(unittest.TestCase):
         sys.modules["pymongo"] = mock_pymongo
         sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-        # Mock data modules to avoid dependency on actual data files and ensure controlled testing
-        # We need to mock game_systems.data.*
-        # But populate_database.py imports them at top level (inside try block).
-        # We can just let it import real data OR mock them.
-        # Mocking is safer to test logic.
-
+        # Mock data modules to avoid dependency on actual data files
         mock_data = MagicMock()
         mock_data.consumables.CONSUMABLES = {"potion": {"name": "Potion"}}
         mock_data.materials.MATERIALS = {
@@ -65,13 +61,9 @@ class TestPopulateDatabase(unittest.TestCase):
         sys.modules["game_systems.data.class_equipments"] = mock_data.class_equipments
         sys.modules["game_systems.data.equipments"] = mock_data.equipments
 
-        # Import
-        import database.populate_database
-
-        importlib = __import__("importlib")
-        # Ensure we reload the module object directly
-        importlib.reload(database.populate_database)
-        self.populate = database.populate_database
+        # Clear cached module and import fresh with our mocks in place
+        sys.modules.pop("database.populate_database", None)
+        self.populate = importlib.import_module("database.populate_database")
 
     def tearDown(self):
         self.modules_patcher.stop()
@@ -94,21 +86,17 @@ class TestPopulateDatabase(unittest.TestCase):
         self.populate.main()
 
         # Verify db access
-        # It accesses many collections
-        # Check some inserts
         mock_db["monsters"].delete_many.assert_called()
         mock_db["monsters"].insert_many.assert_called()
 
         mock_db["consumables"].insert_many.assert_called()
 
         # Check upserts
-        # upsert_many calls bulk_write on collection
         mock_db["classes"].bulk_write.assert_called()
         mock_db["quests"].bulk_write.assert_called()
         mock_db["materials"].bulk_write.assert_called()
 
     def test_insert_functions(self):
-        # We can test individual functions too
         mock_db = MagicMock()
 
         self.populate.insert_classes(mock_db)
