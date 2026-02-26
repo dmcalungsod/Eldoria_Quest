@@ -28,18 +28,18 @@ class TestGreyWard(unittest.TestCase):
 
         faction = FACTIONS[self.faction_id]
         self.assertEqual(faction["name"], "The Grey Ward")
-        self.assertEqual(faction["emoji"], "⚗️")
-        self.assertIn("Alchemists who use science", faction["description"])
+        self.assertEqual(faction["emoji"], "⚕️")
+        self.assertIn("pragmatic order of alchemists", faction["description"])
 
         # Verify Ranks
         ranks = faction["ranks"]
         self.assertEqual(ranks[1]["title"], "Gleaner")
-        self.assertEqual(ranks[2]["title"], "Distiller")
-        self.assertEqual(ranks[3]["title"], "Synthesist")
-        self.assertEqual(ranks[4]["title"], "Apothecary")
-        self.assertEqual(ranks[5]["title"], "Master Apothecary")
+        self.assertEqual(ranks[2]["title"], "Brewer")
+        self.assertEqual(ranks[3]["title"], "Apothecary")
+        self.assertEqual(ranks[4]["title"], "Catalyst")
+        self.assertEqual(ranks[5]["title"], "Synthesist")
 
-        # Verify Rewards
+        # Verify Rewards (Reverted to old mechanics as per review)
         self.assertEqual(ranks[2]["reward"]["key"], "bitter_panacea")
         self.assertEqual(ranks[2]["reward"]["amount"], 3)
         self.assertEqual(ranks[3]["reward"]["key"], "phial_of_vitriol")
@@ -48,12 +48,12 @@ class TestGreyWard(unittest.TestCase):
         self.assertEqual(ranks[4]["reward"]["value"], 0.1)
         self.assertEqual(ranks[5]["reward"]["value"], "Master Apothecary")
 
-        # Verify Interests
+        # Verify Interests (Reverted)
         self.assertEqual(faction["interests"]["gathering"], 1.5)
         self.assertIn("Plant", faction["interests"]["monster_types"])
         self.assertIn("Undead", faction["interests"]["monster_types"])
 
-        # Verify Favored Locations
+        # Verify Favored Locations (Reverted)
         favored = faction["favored_locations"]
         self.assertIn("whispering_thicket", favored)
         self.assertIn("deepgrove_roots", favored)
