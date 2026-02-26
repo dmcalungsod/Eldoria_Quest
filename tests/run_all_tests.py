@@ -44,6 +44,8 @@ import test_security  # General security test
 import test_stack_limits  # New Stack Limits tests
 import test_tournament_cog
 import test_tournament_system  # New Tournament System tests
+import test_quest_update_efficiency  # Optimization test
+import test_adventure_rewards  # Adventure Rewards regression test
 
 
 def check_mongodb_connection():
@@ -69,6 +71,19 @@ def run_quest_security_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_quest_security)
+    suite.addTests(loader.loadTestsFromModule(test_quest_update_efficiency))
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
+def run_adventure_tests():
+    """Runs adventure system tests (mock-based, no DB needed)."""
+    print("\n" + "-" * 70)
+    print("RUNNING ADVENTURE SYSTEM TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_adventure_rewards)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -247,6 +262,10 @@ def main():
     quest_passed = run_quest_security_tests()
     all_passed = all_passed and quest_passed
 
+    # 1.2. Adventure System Tests
+    adventure_passed = run_adventure_tests()
+    all_passed = all_passed and adventure_passed
+
     # 1.5. General Security Tests
     general_sec_passed = run_general_security_tests()
     all_passed = all_passed and general_sec_passed
@@ -320,6 +339,7 @@ def main():
     print("FINAL TEST SUMMARY")
     print("=" * 70)
     print(f"Quest Security Tests: {'✓ PASSED' if quest_passed else '✗ FAILED'}")
+    print(f"Adventure System Tests: {'✓ PASSED' if adventure_passed else '✗ FAILED'}")
     print(f"General Security Tests: {'✓ PASSED' if general_sec_passed else '✗ FAILED'}")
     print(f"Scavenge Mechanic Tests: {'✓ PASSED' if scavenge_passed else '✗ FAILED'}")
     print(f"Crafting Expansion Tests: {'✓ PASSED' if crafting_passed else '✗ FAILED'}")

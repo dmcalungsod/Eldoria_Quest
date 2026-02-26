@@ -8,7 +8,7 @@ Hardened to ensure atomic reward distribution.
 import json
 import logging
 import random
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
@@ -283,6 +283,9 @@ class AdventureRewards:
         updated = []
         quests = quest_system.get_player_quests(self.discord_id)
 
+        # Aggregate drops for efficiency (one DB update per item type)
+        drop_counts = Counter(actual_drops)
+
         for q in quests:
             progress_made = False
             objs = q.get("objectives", {})
@@ -301,10 +304,9 @@ class AdventureRewards:
 
             # Collect check
             if "collect" in objs:
-                # Iterate through actual drops instead of potential drops
-                for dk in actual_drops:
+                for dk, count in drop_counts.items():
                     if dk in objs["collect"]:
-                        quest_system.update_progress(self.discord_id, q["id"], "collect", dk)
+                        quest_system.update_progress(self.discord_id, q["id"], "collect", dk, amount=count)
                         progress_made = True
 
                         # Check for flavor text (avoid spamming if multiple drop)
@@ -315,9 +317,9 @@ class AdventureRewards:
 
             # Examine check (for exploration events)
             if "examine" in objs:
-                for dk in actual_drops:
+                for dk, count in drop_counts.items():
                     if dk in objs["examine"]:
-                        quest_system.update_progress(self.discord_id, q["id"], "examine", dk)
+                        quest_system.update_progress(self.discord_id, q["id"], "examine", dk, amount=count)
                         progress_made = True
 
                         key = f"examine:{dk}"
