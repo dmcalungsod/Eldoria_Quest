@@ -285,7 +285,7 @@ class TestAdventureRewards(unittest.TestCase):
                 # Should update for defeat
                 quest_system.update_progress.assert_any_call(self.discord_id, "q1", "defeat", "Goblin")
                 # Should update for collect
-                quest_system.update_progress.assert_any_call(self.discord_id, "q1", "collect", "Goblin Ear")
+                quest_system.update_progress.assert_any_call(self.discord_id, "q1", "collect", "Goblin Ear", amount=1)
 
                 # Verify Logs contain loot
                 self.assertTrue(any("Goblin Ear" in log for log in logs))
