@@ -10,8 +10,9 @@ sys.modules["discord"] = MagicMock()
 
 from game_systems.adventure.adventure_rewards import AdventureRewards  # noqa: E402
 from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.core.world_time import TimePhase  # noqa: E402
 from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
-from game_systems.core.world_time import TimePhase # noqa: E402
+
 
 class TestSpectralTideEvent(unittest.TestCase):
     def setUp(self):
@@ -78,7 +79,7 @@ class TestSpectralTideEvent(unittest.TestCase):
             "end_time": "2099-01-01T00:00:00",
             "active": 1,
         }
-        self.mock_db.get_active_boosts.return_value = [] # Standard boosts empty
+        self.mock_db.get_active_boosts.return_value = []  # Standard boosts empty
 
         # Mock Time to NIGHT
         mock_time.get_current_phase.return_value = TimePhase.NIGHT
@@ -92,7 +93,7 @@ class TestSpectralTideEvent(unittest.TestCase):
         # 25 > 20 -> True (Combat)
         # Without event (Threshold 30): 25 > 30 -> False (No Combat)
 
-        mock_randint.return_value = 25 # Should trigger combat with event
+        mock_randint.return_value = 25  # Should trigger combat with event
 
         # Mock Combat Init to return something
         mock_combat_instance = mock_combat.return_value
@@ -119,7 +120,7 @@ class TestSpectralTideEvent(unittest.TestCase):
             "active": 1,
         }
         # Mock Stat XP json load
-        self.mock_db.get_stat_exp_row.return_value = None # Skip stat xp
+        self.mock_db.get_stat_exp_row.return_value = None  # Skip stat xp
         # Mock Achievement Check
         rewards.achievement_system = MagicMock()
         rewards.achievement_system.check_kill_achievements.return_value = None

@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -9,14 +9,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.player.player_stats import PlayerStats
 
+
 class TestAlchemistCombatSkills(unittest.TestCase):
     def setUp(self):
         # Mock Player
         self.player = MagicMock()
         self.player.stats = PlayerStats(str_base=10, mag_base=10, dex_base=10)
-        self.player.stats.get_total_stats_dict = MagicMock(return_value={
-            "STR": 10, "MAG": 10, "DEX": 10, "HP": 100, "MP": 100
-        })
+        self.player.stats.get_total_stats_dict = MagicMock(
+            return_value={"STR": 10, "MAG": 10, "DEX": 10, "HP": 100, "MP": 100}
+        )
         self.player.hp_current = 100
         self.player.level = 5
 
@@ -30,7 +31,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
             "DEF": 10,
             "AGI": 5,
             "DEX": 5,
-            "debuffs": []
+            "debuffs": [],
         }
 
     def test_vitriol_bomb_def_reduction(self):
@@ -53,7 +54,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
             player_skills=[skill],
             player_mp=50,
             player_class_id=6,
-            action="skill:vitriol_bomb"
+            action="skill:vitriol_bomb",
         )
 
         # Run Turn
@@ -89,7 +90,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
             player_skills=[skill],
             player_mp=50,
             player_class_id=6,
-            action="skill:mutagenic_serum"
+            action="skill:mutagenic_serum",
         )
 
         # Initial HP
@@ -114,7 +115,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
             "name": "Fulminating Compound",
             "type": "Active",
             "mp_cost": 5,
-            "status_effect": {"stun_chance": 1.0}, # 100% chance for test
+            "status_effect": {"stun_chance": 1.0},  # 100% chance for test
             "scaling_stat": "MAG",
         }
 
@@ -124,7 +125,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
             player_skills=[skill],
             player_mp=50,
             player_class_id=6,
-            action="skill:fulminating_compound"
+            action="skill:fulminating_compound",
         )
 
         # Mock random to ensure stun proc if using random.random()
@@ -135,6 +136,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
         # "phrases" should contain "reeling and misses its turn" if stunned
         phrases = " ".join(result["phrases"])
         self.assertIn("misses its turn", phrases)
+
 
 if __name__ == "__main__":
     unittest.main()

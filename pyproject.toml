@@ -36,3 +36,7 @@ markers = [
 ]
 python_classes = "Test*"
 python_functions = "test_*"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv", "scripts"]
+skips = ["B311"] # Standard random is fine for game logic

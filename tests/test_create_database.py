@@ -1,8 +1,7 @@
-
-import unittest
-from unittest.mock import MagicMock, patch
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,6 +12,7 @@ sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = MagicMock()
 
 from database.create_database import create_tables
+
 
 class TestCreateDatabase(unittest.TestCase):
     def test_create_tables_world_events_index(self):
@@ -52,6 +52,7 @@ class TestCreateDatabase(unittest.TestCase):
             self.fail("Missing index on 'active' for world_events collection")
         if not end_time_index_found:
             self.fail("Missing index on 'end_time' for world_events collection")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import existing test suites
 import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
+import test_adventure_rewards  # Adventure Rewards regression test
 import test_adventure_session_concurrency  # New session concurrency test
 import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
@@ -31,7 +32,6 @@ import test_developer_cog
 import test_dos_prevention  # New DoS prevention tests
 import test_event_cog
 import test_exploration_view_ux  # New UX test
-import test_shop_ux_enhancement  # New Shop UX test
 import test_faction_system  # New Faction System tests
 import test_game_systems
 import test_item_manager
@@ -39,13 +39,13 @@ import test_monster_actions
 import test_onboarding_ux  # New Onboarding UX test
 import test_populate_database
 import test_quest_security  # New security test
+import test_quest_update_efficiency  # Optimization test
 import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_security  # General security test
+import test_shop_ux_enhancement  # New Shop UX test
 import test_stack_limits  # New Stack Limits tests
 import test_tournament_cog
 import test_tournament_system  # New Tournament System tests
-import test_quest_update_efficiency  # Optimization test
-import test_adventure_rewards  # Adventure Rewards regression test
 
 
 def check_mongodb_connection():

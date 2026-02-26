@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.data.recipes import RECIPES
 
+
 class TestCraftingSupplies(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules to mock pymongo globally
@@ -66,7 +67,7 @@ class TestCraftingSupplies(unittest.TestCase):
 
         self.assertTrue(success)
         self.assertIn("Hardtack", msg)
-        self.assertIn("x2", msg) # Verifies output amount
+        self.assertIn("x2", msg)  # Verifies output amount
         self.assertIsNotNone(item_data)
 
         # Verify deductions
@@ -112,6 +113,7 @@ class TestCraftingSupplies(unittest.TestCase):
         args, _ = self.mock_db.add_inventory_item.call_args
         self.assertEqual(args[1], "pitch_torch")
         self.assertEqual(args[5], 3)  # Amount 3
+
 
 if __name__ == "__main__":
     unittest.main()

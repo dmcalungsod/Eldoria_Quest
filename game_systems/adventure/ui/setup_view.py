@@ -130,9 +130,7 @@ class AdventureSetupView(View):
                     desc = f"Takes {bundle} units."
                     label = f"{data['name']} (x{count})"
 
-                self.supply_select.add_option(
-                    label=label, value=value, description=desc, emoji="🎒"
-                )
+                self.supply_select.add_option(label=label, value=value, description=desc, emoji="🎒")
         else:
             self.supply_select.add_option(label="No Supplies", value="none")
             self.supply_select.disabled = True

@@ -108,7 +108,7 @@ class TestAdventureSuppliesExtended(unittest.TestCase):
             "supplies": {"explorer_kit": 1},
         }
         mock_quest = MagicMock()
-        mock_quest.get_player_quests.return_value = [] # No active quests
+        mock_quest.get_player_quests.return_value = []  # No active quests
 
         session = AdventureSession(self.db, mock_quest, None, 12345, row_data=row_data)
 
@@ -123,7 +123,7 @@ class TestAdventureSuppliesExtended(unittest.TestCase):
             with patch("random.randint", side_effect=[10, 75, 10]):
                 # Mock choice
                 with patch("random.choices", return_value=["medicinal_herb"]):
-                    with patch("random.random", return_value=0.5): # No extra variance
+                    with patch("random.random", return_value=0.5):  # No extra variance
                         with patch.object(session, "_fetch_session_context", return_value=self.context_mock):
                             result = session.simulate_step(context_bundle=None)
 
@@ -164,6 +164,7 @@ class TestAdventureSuppliesExtended(unittest.TestCase):
                             loot = session.loot
                             # Base yield 1
                             self.assertEqual(loot.get("medicinal_herb"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
