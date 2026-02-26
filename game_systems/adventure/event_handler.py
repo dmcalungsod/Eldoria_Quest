@@ -40,6 +40,7 @@ class EventHandler:
         location_name: str | None = None,
         weather: Weather = Weather.CLEAR,
         event_type: str | None = None,
+        supplies: dict[str, int] | None = None,
     ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
@@ -58,7 +59,7 @@ class EventHandler:
                             result["log"][0] = f"\n{result['log'][0]}"
                         return result
 
-                return self._perform_quest_event(context, location_name, location_id)
+                return self._perform_quest_event(context, location_name, location_id, supplies)
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
@@ -159,6 +160,7 @@ class EventHandler:
         context: dict[str, Any],
         location_name: str | None,
         location_id: str | None,
+        supplies: dict[str, int] | None = None,
     ) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
@@ -219,14 +221,18 @@ class EventHandler:
                                     }
 
             # If no matching quest event was found, try wild gathering
-            return self._perform_wild_gathering(context, location_id)
+            return self._perform_wild_gathering(context, location_id, supplies=supplies)
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
             return {"log": ["*The path ahead is unclear.*"], "dead": False}
 
     def _perform_wild_gathering(
-        self, context: dict[str, Any], location_id: str | None, bonus_chance: int = 0
+        self,
+        context: dict[str, Any],
+        location_id: str | None,
+        bonus_chance: int = 0,
+        supplies: dict[str, int] | None = None,
     ) -> dict[str, Any]:
         """
         Attempts to find wild materials if no quest event triggered.
@@ -267,6 +273,12 @@ class EventHandler:
                 if random.random() < 0.20:
                     quantity += 1
 
+                # SUPPLY EFFECT: Explorer's Kit
+                kit_bonus = 0
+                if supplies and supplies.get("explorer_kit"):
+                    quantity += 1
+                    kit_bonus = 1
+
                 # Apply Gathering Boost (e.g., Harvest Festival)
                 boosts = context.get("active_boosts", {})
                 gathering_mult = boosts.get("gathering_boost", 1.0)
@@ -281,6 +293,9 @@ class EventHandler:
 
                 if gathering_mult > 1.0:
                     display_name += f" {E.BUFF} (Bonus)"
+
+                if kit_bonus > 0:
+                    display_name += " (Kit Bonus)"
 
                 event_text = f"\n{AdventureEvents.wild_gather_event(display_name)}"
                 return {

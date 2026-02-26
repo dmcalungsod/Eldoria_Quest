@@ -16,6 +16,7 @@ from cogs.utils.ui_helpers import back_to_profile_callback, get_player_or_error
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.consumables import CONSUMABLES
 
 from .adventure_embeds import AdventureEmbeds
 from .status_view import AdventureStatusView
@@ -47,7 +48,7 @@ class AdventureSetupView(View):
 
         self.selected_location = None
         self.selected_duration = None
-        self.selected_supply = None
+        self.selected_supplies = []
 
         # 1. Location Select
         self.location_select = Select(
@@ -99,7 +100,7 @@ class AdventureSetupView(View):
         self.supply_select = Select(
             placeholder="Select Supplies (Optional)...",
             min_values=0,
-            max_values=1,
+            max_values=3,
             row=2,
         )
 
@@ -113,8 +114,24 @@ class AdventureSetupView(View):
 
         if supply_options:
             for key, data in supply_options.items():
+                count = data["count"]
+                c_def = CONSUMABLES.get(key)
+                c_type = c_def["type"] if c_def else "supply"
+
+                # Logic: Passive supplies take 1. Consumables take bundles.
+                if c_type == "supply":
+                    value = f"{key}:1"
+                    desc = f"Takes 1 {data['name']}."
+                    label = f"{data['name']} (x{count})"
+                else:
+                    # Consumable: Offer bundle of 5 or max
+                    bundle = min(5, count)
+                    value = f"{key}:{bundle}"
+                    desc = f"Takes {bundle} units."
+                    label = f"{data['name']} (x{count})"
+
                 self.supply_select.add_option(
-                    label=f"{data['name']} (x{data['count']})", value=key, description="Take 1 unit.", emoji="🎒"
+                    label=label, value=value, description=desc, emoji="🎒"
                 )
         else:
             self.supply_select.add_option(label="No Supplies", value="none")
@@ -198,10 +215,10 @@ class AdventureSetupView(View):
         await interaction.response.edit_message(view=self)
 
     async def supply_callback(self, interaction: discord.Interaction):
-        if self.supply_select.values:
-            self.selected_supply = self.supply_select.values[0]
+        if self.supply_select.values and "none" not in self.supply_select.values:
+            self.selected_supplies = self.supply_select.values
         else:
-            self.selected_supply = None
+            self.selected_supplies = []
         await interaction.response.edit_message(view=self)
 
     async def start_callback(self, interaction: discord.Interaction):
@@ -212,8 +229,15 @@ class AdventureSetupView(View):
         await interaction.response.defer()
 
         supplies_dict = {}
-        if self.selected_supply and self.selected_supply != "none":
-            supplies_dict[self.selected_supply] = 1
+        for val in self.selected_supplies:
+            if val == "none":
+                continue
+            if ":" in val:
+                k, v = val.split(":")
+                supplies_dict[k] = int(v)
+            else:
+                # Legacy fallback
+                supplies_dict[val] = 1
 
         try:
             # 1. Start the adventure in DB (Threaded)

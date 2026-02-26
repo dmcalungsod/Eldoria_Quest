@@ -19,6 +19,7 @@ from database.database_manager import DatabaseManager
 from game_systems.adventure.ui.adventure_embeds import AdventureEmbeds
 from game_systems.adventure.ui.setup_view import AdventureSetupView
 from game_systems.adventure.ui.status_view import AdventureStatusView
+from game_systems.data.consumables import CONSUMABLES
 
 logger = logging.getLogger("eldoria.ui.adventure_menu")
 
@@ -141,15 +142,25 @@ class AdventureView(View):
 
         try:
             # Parallel fetch of guild rank, player level, and inventory data
-            guild_member, player_data, supplies, max_slots, current_slots = await asyncio.gather(
+            guild_member, player_data, inventory_items, max_slots, current_slots = await asyncio.gather(
                 asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
                 asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_inventory_items, self.interaction_user.id, item_type="supply"),
+                asyncio.to_thread(self.db.get_inventory_items, self.interaction_user.id, equipped=0),
                 asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id),
                 asyncio.to_thread(self.db.get_inventory_slot_count, self.interaction_user.id),
             )
             rank = guild_member["rank"] if guild_member else "F"
             level = player_data["level"] if player_data else 1
+
+            # Filter valid supplies (supply, hp, mp, buff, etc.)
+            valid_types = {"supply", "hp", "mp", "buff", "antidote", "food", "throwable"}
+            supplies = []
+            for item in inventory_items:
+                c_data = CONSUMABLES.get(item["item_key"])
+                # Fallback to item_type from DB if not in CONSUMABLES (legacy safety)
+                i_type = c_data["type"] if c_data else item.get("item_type")
+                if i_type in valid_types:
+                    supplies.append(item)
 
             # Capacity Check Flavor
             capacity_str = f"🎒 **Pack:** {current_slots}/{max_slots}"
