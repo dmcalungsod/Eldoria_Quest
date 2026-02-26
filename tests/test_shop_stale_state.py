@@ -76,6 +76,10 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         # This will only be called if we rely on get_player (which we plan to remove).
         mock_db.get_player.return_value = {"aurum": 5}
 
+        # Mock inventory count fetching to avoid Asyncio MagicMock errors
+        mock_db.get_inventory_items_counts = MagicMock(return_value={})
+        mock_db.get_daily_shop_purchases = MagicMock(return_value={})
+
         # Mock get_player_or_error helper used in callback
         # Since we imported ShopView directly, we need to patch it where it's used in the module
         # Use patch.object to avoid import errors with string paths in some environments
@@ -91,8 +95,10 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         new_view = kwargs.get("view")
 
         # The Bug: new_view.current_aurum is currently 100 (stale), but should be 5 (fresh)
-        print(f"Old View Aurum: {view.current_aurum}")
-        print(f"New View Aurum: {new_view.current_aurum}")
+        if hasattr(view, 'current_aurum'):
+            print(f"Old View Aurum: {view.current_aurum}")
+        if hasattr(new_view, 'current_aurum'):
+            print(f"New View Aurum: {new_view.current_aurum}")
 
         # Assert that the new view reflects the fresh state (5), not the stale state (100)
         self.assertEqual(
