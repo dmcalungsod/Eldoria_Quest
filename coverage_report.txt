@@ -1,0 +1,821 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.0.2, pluggy-1.6.0 -- /home/jules/.pyenv/versions/3.12.12/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.0.0
+collecting ... collected 546 items
+
+tests/test_accessory_slots.py::TestAccessorySlots::test_equip_duplicate_accessory_fails PASSED [  0%]
+tests/test_accessory_slots.py::TestAccessorySlots::test_equip_first_accessory PASSED [  0%]
+tests/test_accessory_slots.py::TestAccessorySlots::test_equip_loadout_multi_accessory PASSED [  0%]
+tests/test_accessory_slots.py::TestAccessorySlots::test_equip_second_accessory PASSED [  0%]
+tests/test_accessory_slots.py::TestAccessorySlots::test_equip_third_accessory_fails PASSED [  0%]
+tests/test_accessory_slots.py::TestAccessorySlots::test_save_loadout_multi_accessory PASSED [  1%]
+tests/test_achievement_logic.py::TestAchievementLogic::test_check_kill_achievements_already_have PASSED [  1%]
+tests/test_achievement_logic.py::TestAchievementLogic::test_check_kill_achievements_normal_success PASSED [  1%]
+tests/test_achievement_logic.py::TestAchievementLogic::test_check_quest_achievements_success PASSED [  1%]
+tests/test_adventure_day_night.py::TestAdventureDayNight::test_day_no_ambush PASSED [  1%]
+tests/test_adventure_day_night.py::TestAdventureDayNight::test_night_ambush_trigger PASSED [  2%]
+tests/test_adventure_day_night.py::TestAdventureDayNight::test_night_no_ambush PASSED [  2%]
+tests/test_adventure_day_night.py::TestAdventureDayNight::test_regen_threshold_day PASSED [  2%]
+tests/test_adventure_day_night.py::TestAdventureDayNight::test_regen_threshold_night PASSED [  2%]
+tests/test_adventure_death_penalty.py::TestAdventureDeathPenalty::test_death_penalty_calculation PASSED [  2%]
+tests/test_adventure_embeds.py::TestAdventureEmbeds::test_combat_footer PASSED [  2%]
+tests/test_adventure_embeds.py::TestAdventureEmbeds::test_exploration_footer PASSED [  3%]
+tests/test_adventure_fatigue.py::TestAdventureFatigue::test_calculate_fatigue_multiplier PASSED [  3%]
+tests/test_adventure_fatigue.py::TestAdventureFatigue::test_combat_engine_applies_multiplier PASSED [  3%]
+tests/test_adventure_race.py::TestExplorationViewRace::test_race_condition_double_click PASSED [  3%]
+tests/test_adventure_resolution.py::test_resolution_success PASSED       [  3%]
+tests/test_adventure_resolution.py::test_resolution_death PASSED         [  4%]
+tests/test_adventure_resolution.py::test_resume_session PASSED           [  4%]
+tests/test_adventure_resolution.py::test_resolution_state_persistence PASSED [  4%]
+tests/test_adventure_retreat_exploit.py::test_retreat_exploit_reproduction PASSED [  4%]
+tests/test_adventure_rewards.py::TestAdventureRewards::test_process_victory_loot_and_quests PASSED [  4%]
+tests/test_adventure_rewards.py::TestAdventureRewards::test_process_victory_skill_xp PASSED [  4%]
+tests/test_adventure_rewards.py::TestAdventureRewards::test_process_victory_stat_xp PASSED [  5%]
+tests/test_adventure_safety.py::TestAdventureDataLoss::test_failure_stops_process PASSED [  5%]
+tests/test_adventure_safety.py::TestAdventureDataLoss::test_invalid_start_adventure PASSED [  5%]
+tests/test_adventure_safety.py::TestAdventureDataLoss::test_safe_reward_order PASSED [  5%]
+tests/test_adventure_schema_update.py::TestAdventureSchemaUpdate::test_database_manager_methods_exist PASSED [  5%]
+tests/test_adventure_schema_update.py::TestAdventureSchemaUpdate::test_start_adventure_passes_new_args PASSED [  6%]
+tests/test_adventure_session_concurrency.py::TestAdventureSessionConcurrency::test_concurrent_attacks PASSED [  6%]
+tests/test_adventure_session_concurrency.py::TestAdventureSessionConcurrency::test_legacy_session_update PASSED [  6%]
+tests/test_adventure_status_embed.py::TestAdventureStatusEmbed::test_status_embed_completed PASSED [  6%]
+tests/test_adventure_status_embed.py::TestAdventureStatusEmbed::test_status_embed_in_progress PASSED [  6%]
+tests/test_adventure_supplies.py::TestAdventureSupplies::test_hardtack_fatigue PASSED [  6%]
+tests/test_adventure_supplies.py::TestAdventureSupplies::test_load_supplies PASSED [  7%]
+tests/test_adventure_supplies.py::TestAdventureSupplies::test_night_ambush_without_torch PASSED [  7%]
+tests/test_adventure_supplies.py::TestAdventureSupplies::test_no_supplies_fatigue PASSED [  7%]
+tests/test_adventure_supplies.py::TestAdventureSupplies::test_pitch_torch_ambush_reduction PASSED [  7%]
+tests/test_adventure_supplies_extended.py::TestAdventureSuppliesExtended::test_auto_potion_depletion PASSED [  7%]
+tests/test_adventure_supplies_extended.py::TestAdventureSuppliesExtended::test_auto_potion_usage PASSED [  8%]
+tests/test_adventure_supplies_extended.py::TestAdventureSuppliesExtended::test_explorer_kit_bonus PASSED [  8%]
+tests/test_adventure_supplies_extended.py::TestAdventureSuppliesExtended::test_explorer_kit_no_effect_without_supply PASSED [  8%]
+tests/test_adventure_ux.py::TestAdventureUX::test_adventure_view_begin PASSED [  8%]
+tests/test_adventure_ux.py::TestAdventureUX::test_adventure_view_resume PASSED [  8%]
+tests/test_alchemist_combat.py::TestAlchemistCombatSkills::test_fulminating_compound_stun PASSED [  8%]
+tests/test_alchemist_combat.py::TestAlchemistCombatSkills::test_mutagenic_serum_self_damage PASSED [  9%]
+tests/test_alchemist_combat.py::TestAlchemistCombatSkills::test_vitriol_bomb_def_reduction PASSED [  9%]
+tests/test_alchemist_mechanics.py::TestAlchemistMechanics::test_class_data_exists PASSED [  9%]
+tests/test_alchemist_mechanics.py::TestAlchemistMechanics::test_equivalent_exchange_stat_bonus PASSED [  9%]
+tests/test_alchemist_mechanics.py::TestAlchemistMechanics::test_triage_healing_bonus PASSED [  9%]
+tests/test_armor_slots.py::TestArmorSlots::test_body_slot_conflict PASSED [ 10%]
+tests/test_armor_slots.py::TestArmorSlots::test_get_slot_display_name PASSED [ 10%]
+tests/test_armor_slots.py::TestArmorSlots::test_head_slot_conflict PASSED [ 10%]
+tests/test_aurum_drops.py::TestAurumDrops::test_aurum_calculator_boss PASSED [ 10%]
+tests/test_aurum_drops.py::TestAurumDrops::test_aurum_calculator_elite PASSED [ 10%]
+tests/test_aurum_drops.py::TestAurumDrops::test_aurum_calculator_normal PASSED [ 10%]
+tests/test_aurum_drops.py::TestAurumDrops::test_combat_engine_integration PASSED [ 11%]
+tests/test_aurum_drops.py::TestAurumDrops::test_luck_bonus PASSED        [ 11%]
+tests/test_balance.py::test_monsters_balance PASSED                      [ 11%]
+tests/test_balance.py::test_locations_balance PASSED                     [ 11%]
+tests/test_buff_bulk_optimization.py::TestBuffBulkOptimization::test_add_active_buffs_bulk_ops_count PASSED [ 11%]
+tests/test_buff_system.py::TestBuffSystem::test_buff_lifecycle PASSED    [ 12%]
+tests/test_buff_system.py::TestBuffSystem::test_combat_handler_applies_buff PASSED [ 12%]
+tests/test_buff_system.py::TestBuffSystem::test_combat_skills_generate_buffs PASSED [ 12%]
+tests/test_buff_system.py::TestBuffSystem::test_consumable_buff_application PASSED [ 12%]
+tests/test_clockwork_crafting.py::TestClockworkCrafting::test_clockwork_recipes_exist PASSED [ 12%]
+tests/test_clockwork_crafting.py::TestClockworkCrafting::test_craft_clockwork_bow PASSED [ 13%]
+tests/test_clockwork_halls.py::TestClockworkHalls::test_adventure_events PASSED [ 13%]
+tests/test_clockwork_halls.py::TestClockworkHalls::test_emojis_exist PASSED [ 13%]
+tests/test_clockwork_halls.py::TestClockworkHalls::test_location_exists PASSED [ 13%]
+tests/test_clockwork_halls.py::TestClockworkHalls::test_materials_exist PASSED [ 13%]
+tests/test_clockwork_halls.py::TestClockworkHalls::test_monsters_exist PASSED [ 13%]
+tests/test_clockwork_halls.py::TestClockworkHalls::test_skills_exist PASSED [ 14%]
+tests/test_combat_actions.py::TestCombatActions::test_defend_action PASSED [ 14%]
+tests/test_combat_actions.py::TestCombatActions::test_flee_failed_action PASSED [ 14%]
+tests/test_combat_actions.py::TestCombatActions::test_special_ability_action PASSED [ 14%]
+tests/test_combat_buff_scaling.py::TestCombatBuffScaling::test_all_stats_buff_uses_base_stats PASSED [ 14%]
+tests/test_combat_buff_scaling.py::TestCombatBuffScaling::test_buff_duration_parsing PASSED [ 15%]
+tests/test_combat_buff_scaling.py::TestCombatBuffScaling::test_percentage_buff_uses_base_stats PASSED [ 15%]
+tests/test_combat_counter.py::TestCombatCounter::test_fail_counter_wrong_action PASSED [ 15%]
+tests/test_combat_counter.py::TestCombatCounter::test_interrupt_magical_charge PASSED [ 15%]
+tests/test_combat_counter.py::TestCombatCounter::test_parry_physical_charge PASSED [ 15%]
+tests/test_combat_crash.py::TestCombatCrash::test_resolve_turn_db_failure PASSED [ 15%]
+tests/test_combat_defense_curve.py::TestCombatDefenseCurve::test_crit_multiplier PASSED [ 16%]
+tests/test_combat_defense_curve.py::TestCombatDefenseCurve::test_monster_attack_player_defense_scaling PASSED [ 16%]
+tests/test_combat_defense_curve.py::TestCombatDefenseCurve::test_monster_chip_damage_floor PASSED [ 16%]
+tests/test_combat_defense_curve.py::TestCombatDefenseCurve::test_player_attack_defense_reduction PASSED [ 16%]
+tests/test_combat_skill_selection.py::TestCombatSkillSelection::test_explicit_heal_usage PASSED [ 16%]
+tests/test_combat_skill_selection.py::TestCombatSkillSelection::test_explicit_skill_usage PASSED [ 17%]
+tests/test_combat_skill_selection.py::TestCombatSkillSelection::test_insufficient_mp_fallback PASSED [ 17%]
+tests/test_combat_skill_selection.py::TestCombatSkillSelection::test_unknown_skill_fallback PASSED [ 17%]
+tests/test_combat_special_exploit.py::TestCombatSpecialExploit::test_aimed_shot_force_crit_bug PASSED [ 17%]
+tests/test_combat_stat_debuffs.py::TestCombatDebuffs::test_taunt_application PASSED [ 17%]
+tests/test_consumable_logic.py::TestDualConsumableBug::test_use_dual_item_full_hp_full_mp PASSED [ 17%]
+tests/test_consumable_logic.py::TestDualConsumableBug::test_use_dual_item_full_hp_missing_mp PASSED [ 18%]
+tests/test_consumable_race.py::TestConsumableRace::test_use_item_consumes_atomically PASSED [ 18%]
+tests/test_consumable_race.py::TestConsumableRace::test_use_item_refunds_on_error PASSED [ 18%]
+tests/test_content_expansion.py::TestContentExpansion::test_c_tier_quests_loaded PASSED [ 18%]
+tests/test_content_expansion.py::TestContentExpansion::test_quest_location_references PASSED [ 18%]
+tests/test_content_expansion.py::TestContentExpansion::test_quest_monster_references PASSED [ 19%]
+tests/test_content_expansion.py::TestContentExpansion::test_shrouded_fen_location PASSED [ 19%]
+tests/test_crafting.py::TestDatabaseEnhancements::test_get_inventory_item_count PASSED [ 19%]
+tests/test_crafting.py::TestDatabaseEnhancements::test_remove_inventory_item_fail_insufficient PASSED [ 19%]
+tests/test_crafting.py::TestDatabaseEnhancements::test_remove_inventory_item_success PASSED [ 19%]
+tests/test_crafting.py::TestCraftingSystem::test_can_craft_success PASSED [ 19%]
+tests/test_crafting.py::TestCraftingSystem::test_craft_item_success PASSED [ 20%]
+tests/test_crafting.py::TestCraftingSystem::test_get_recipes PASSED      [ 20%]
+tests/test_crafting_dismantle.py::TestCraftingDismantle::test_dismantle_item_equipped PASSED [ 20%]
+tests/test_crafting_dismantle.py::TestCraftingDismantle::test_dismantle_item_not_equipment PASSED [ 20%]
+tests/test_crafting_dismantle.py::TestCraftingDismantle::test_dismantle_item_not_found PASSED [ 20%]
+tests/test_crafting_dismantle.py::TestCraftingDismantle::test_dismantle_item_success PASSED [ 21%]
+tests/test_crafting_dismantle.py::TestCraftingDismantle::test_get_dismantle_rewards_fallback PASSED [ 21%]
+tests/test_crafting_dismantle.py::TestCraftingDismantle::test_get_dismantle_rewards_recipe PASSED [ 21%]
+tests/test_crafting_equipment.py::TestCraftingEquipment::test_craft_equipment_missing_material PASSED [ 21%]
+tests/test_crafting_equipment.py::TestCraftingEquipment::test_craft_equipment_success PASSED [ 21%]
+tests/test_crafting_equipment.py::TestCraftingEquipment::test_recipe_data_integrity PASSED [ 21%]
+tests/test_crafting_expanded.py::TestCraftingExpanded::test_crafting_campfire_stew_success PASSED [ 22%]
+tests/test_crafting_expanded.py::TestCraftingExpanded::test_crafting_insufficient_materials PASSED [ 22%]
+tests/test_crafting_expanded.py::TestCraftingExpanded::test_molten_recipes_exist PASSED [ 22%]
+tests/test_crafting_expanded.py::TestCraftingExpanded::test_new_recipes_exist PASSED [ 22%]
+tests/test_crafting_experiment.py::TestCraftingExperiment::test_experiment_duplicate_ids PASSED [ 22%]
+tests/test_crafting_experiment.py::TestCraftingExperiment::test_experiment_failure_slag PASSED [ 23%]
+tests/test_crafting_experiment.py::TestCraftingExperiment::test_experiment_invalid_type PASSED [ 23%]
+tests/test_crafting_experiment.py::TestCraftingExperiment::test_experiment_success PASSED [ 23%]
+tests/test_crafting_proficiency.py::TestCraftingProficiency::test_xp_curve PASSED [ 23%]
+tests/test_crafting_proficiency.py::TestCraftingProficiency::test_add_crafting_xp_basic PASSED [ 23%]
+tests/test_crafting_proficiency.py::TestCraftingProficiency::test_add_crafting_xp_levelup PASSED [ 23%]
+tests/test_crafting_proficiency.py::TestCraftingProficiency::test_add_crafting_xp_multi_levelup PASSED [ 24%]
+tests/test_crafting_proficiency.py::TestCraftingProficiency::test_roll_quality_bonus PASSED [ 24%]
+tests/test_crafting_quality.py::TestCraftingQuality::test_craft_item_quality_upgrade PASSED [ 24%]
+tests/test_crafting_quality.py::TestCraftingQuality::test_dismantle_upgraded_item PASSED [ 24%]
+tests/test_crafting_quality.py::TestCraftingQuality::test_equipment_manager_quality_scaling PASSED [ 24%]
+tests/test_crafting_quality.py::TestCraftingQuality::test_roll_quality_cascade PASSED [ 25%]
+tests/test_crafting_quality.py::TestCraftingQuality::test_roll_quality_no_upgrade PASSED [ 25%]
+tests/test_crafting_quality.py::TestCraftingQuality::test_roll_quality_upgrade PASSED [ 25%]
+tests/test_crafting_supplies.py::TestCraftingSupplies::test_crafting_hardtack PASSED [ 25%]
+tests/test_crafting_supplies.py::TestCraftingSupplies::test_crafting_pitch_torch PASSED [ 25%]
+tests/test_crafting_supplies.py::TestCraftingSupplies::test_new_supplies_recipes_exist PASSED [ 26%]
+tests/test_crafting_ui.py::TestCraftingUI::test_category_equipment PASSED [ 26%]
+tests/test_crafting_ui.py::TestCraftingUI::test_default_category_consumable PASSED [ 26%]
+tests/test_create_database.py::TestCreateDatabase::test_create_tables_world_events_index PASSED [ 26%]
+tests/test_damage_scaling.py::TestDamageScaling::test_dynamic_scaling_factor PASSED [ 26%]
+tests/test_damage_scaling.py::TestDamageScaling::test_dynamic_scaling_stat PASSED [ 26%]
+tests/test_damage_scaling.py::TestDamageScaling::test_player_heal_max_hp_logic PASSED [ 27%]
+tests/test_data_validation.py::TestDataValidator::test_basic_validation PASSED [ 27%]
+tests/test_data_validation.py::TestDataValidator::test_nested_dict PASSED [ 27%]
+tests/test_data_validation.py::TestDataValidator::test_list_validation PASSED [ 27%]
+tests/test_data_validation.py::TestDataValidator::test_tuple_validation PASSED [ 27%]
+tests/test_data_validation.py::TestDataValidator::test_adventure_locations_integration PASSED [ 28%]
+tests/test_data_validation.py::TestDataValidator::test_monsters_integration PASSED [ 28%]
+tests/test_data_validation.py::TestDataValidator::test_consumables_integration PASSED [ 28%]
+tests/test_data_validation.py::TestDataValidator::test_equipments_integration PASSED [ 28%]
+tests/test_database.py::TestDatabaseManager::test_add_inventory_item PASSED [ 28%]
+tests/test_database.py::TestDatabaseManager::test_add_inventory_item_stacking PASSED [ 28%]
+tests/test_database.py::TestDatabaseManager::test_create_player PASSED   [ 29%]
+tests/test_database.py::TestDatabaseManager::test_deduct_aurum PASSED    [ 29%]
+tests/test_database.py::TestDatabaseManager::test_get_player PASSED      [ 29%]
+tests/test_database.py::TestDatabaseManager::test_get_profile_bundle PASSED [ 29%]
+tests/test_database.py::TestDatabaseManager::test_update_player_mixed PASSED [ 29%]
+tests/test_database.py::TestDatabaseManager::test_update_player_stats PASSED [ 30%]
+tests/test_database_aggregation.py::TestDatabaseAggregation::test_get_combat_context_bundle_query_count PASSED [ 30%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_apply_passive_regen PASSED [ 30%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_consume_item_atomic PASSED [ 30%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_create_tournament PASSED [ 30%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_end_adventure_session PASSED [ 30%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_get_active_tournament_caching PASSED [ 31%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_get_equipment_sets PASSED [ 31%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_get_player_skills PASSED [ 31%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_insert_adventure_session PASSED [ 31%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_learn_skill_insufficient_vestige PASSED [ 31%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_learn_skill_success PASSED [ 32%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_remove_inventory_item PASSED [ 32%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_save_equipment_set PASSED [ 32%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_set_player_faction PASSED [ 32%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_update_adventure_session_optimistic PASSED [ 32%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_update_faction_reputation PASSED [ 32%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_update_player_vitals_delta PASSED [ 33%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_update_tournament_score PASSED [ 33%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_upgrade_skill_success PASSED [ 33%]
+tests/test_database_extended.py::TestDatabaseManagerExtended::test_world_event_lifecycle PASSED [ 33%]
+tests/test_database_optimization.py::TestDatabaseOptimization::test_get_combat_context_bundle_optimization PASSED [ 33%]
+tests/test_database_optimization.py::TestDatabaseOptimization::test_get_combat_skills_optimization PASSED [ 34%]
+tests/test_database_optimization.py::TestDatabaseOptimization::test_get_player_skills_optimization PASSED [ 34%]
+tests/test_day_night.py::TestDayNightCycle::test_day_encounter PASSED    [ 34%]
+tests/test_day_night.py::TestDayNightCycle::test_night_encounter PASSED  [ 34%]
+tests/test_day_night.py::TestDayNightCycle::test_night_encounter_fallback PASSED [ 34%]
+tests/test_db_buffs.py::TestDBBuffs::test_add_active_buff_replaces_existing PASSED [ 34%]
+tests/test_db_purchase.py::TestShopTransactionFailure::test_purchase_item_refunds_on_inventory_failure PASSED [ 35%]
+tests/test_db_titles.py::TestDatabaseTitles::test_add_title PASSED       [ 35%]
+tests/test_db_titles.py::TestDatabaseTitles::test_get_active_title PASSED [ 35%]
+tests/test_db_titles.py::TestDatabaseTitles::test_get_titles PASSED      [ 35%]
+tests/test_db_titles.py::TestDatabaseTitles::test_get_titles_none PASSED [ 35%]
+tests/test_db_titles.py::TestDatabaseTitles::test_set_active_title_fail_ownership PASSED [ 36%]
+tests/test_db_titles.py::TestDatabaseTitles::test_set_active_title_none PASSED [ 36%]
+tests/test_db_titles.py::TestDatabaseTitles::test_set_active_title_success PASSED [ 36%]
+tests/test_depthswarden_content.py::TestDepthsWardenContent::test_monster_skills PASSED [ 36%]
+tests/test_depthswarden_content.py::TestDepthsWardenContent::test_new_materials_exist PASSED [ 36%]
+tests/test_depthswarden_content.py::TestDepthsWardenContent::test_new_monsters_exist PASSED [ 36%]
+tests/test_depthswarden_content.py::TestDepthsWardenContent::test_void_sanctum_exists PASSED [ 37%]
+tests/test_developer_cog.py::TestDeveloperCog::test_dev_panel_no_character PASSED [ 37%]
+tests/test_developer_cog.py::TestDeveloperCog::test_dev_panel_not_owner PASSED [ 37%]
+tests/test_developer_cog.py::TestDeveloperCog::test_dev_panel_success PASSED [ 37%]
+tests/test_developer_cog.py::TestDeveloperCog::test_view_buttons PASSED  [ 37%]
+tests/test_developer_cog.py::TestDeveloperCog::test_view_interaction_check_fail PASSED [ 38%]
+tests/test_developer_cog.py::TestDeveloperCog::test_view_interaction_check_success PASSED [ 38%]
+tests/test_dos_prevention.py::TestDoSPrevention::test_huge_payload_stance_rejected PASSED [ 38%]
+tests/test_elemental_surge_event.py::TestElementalSurgeEvent::test_elemental_surge_drops_mote PASSED [ 38%]
+tests/test_elemental_surge_event.py::TestElementalSurgeEvent::test_no_event_no_mote PASSED [ 38%]
+tests/test_equipment_race.py::TestEquipmentRaceMock::test_race_condition PASSED [ 39%]
+tests/test_equipment_restrictions.py::TestEquipmentRestrictions::test_check_requirements_level PASSED [ 39%]
+tests/test_equipment_restrictions.py::TestEquipmentRestrictions::test_check_requirements_rank PASSED [ 39%]
+tests/test_equipment_restrictions.py::TestEquipmentRestrictions::test_equip_item_restriction PASSED [ 39%]
+tests/test_equipment_restrictions.py::TestEquipmentRestrictions::test_inventory_view_ui_logic PASSED [ 39%]
+tests/test_equipment_robustness.py::test_recalculate_robustness PASSED   [ 39%]
+tests/test_equipment_robustness.py::test_recalculate_missing_item PASSED [ 40%]
+tests/test_equipment_sets.py::TestEquipmentSets::test_delete_loadout PASSED [ 40%]
+tests/test_equipment_sets.py::TestEquipmentSets::test_equip_loadout_missing_item PASSED [ 40%]
+tests/test_equipment_sets.py::TestEquipmentSets::test_equip_loadout_success PASSED [ 40%]
+tests/test_equipment_sets.py::TestEquipmentSets::test_save_loadout_empty_fail PASSED [ 40%]
+tests/test_equipment_sets.py::TestEquipmentSets::test_save_loadout_success PASSED [ 41%]
+tests/test_equipment_slots.py::TestEquipmentSlots::test_orb_unequips_staff PASSED [ 41%]
+tests/test_equipment_slots.py::TestEquipmentSlots::test_staff_unequips_wand_and_orb PASSED [ 41%]
+tests/test_equipment_slots.py::TestEquipmentSlots::test_wand_and_orb_coexist PASSED [ 41%]
+tests/test_equipment_slots.py::TestEquipmentSlots::test_wand_unequips_staff PASSED [ 41%]
+tests/test_equipment_stack_split.py::TestStackEquipBug::test_equip_stack_bug PASSED [ 41%]
+tests/test_event_cog.py::TestEventCog::test_admin_end PASSED             [ 42%]
+tests/test_event_cog.py::TestEventCog::test_admin_start_invalid PASSED   [ 42%]
+tests/test_event_cog.py::TestEventCog::test_admin_start_success PASSED   [ 42%]
+tests/test_event_cog.py::TestEventCog::test_announce PASSED              [ 42%]
+tests/test_event_cog.py::TestEventCog::test_check_event_cycle_harvest_festival PASSED [ 42%]
+tests/test_event_cog.py::TestEventCog::test_check_event_cycle_mystic_merchant PASSED [ 43%]
+tests/test_event_cog.py::TestEventCog::test_event_status_active PASSED   [ 43%]
+tests/test_event_cog.py::TestEventCog::test_event_status_no_active PASSED [ 43%]
+tests/test_event_scheduling_logic.py::TestEventScheduling::test_mystic_merchant_does_not_start_on_fail PASSED [ 43%]
+tests/test_event_scheduling_logic.py::TestEventScheduling::test_mystic_merchant_starts_on_roll PASSED [ 43%]
+tests/test_event_scheduling_logic.py::TestEventScheduling::test_no_event_start_if_active PASSED [ 43%]
+tests/test_exploration_achievements.py::TestExplorationAchievements::test_achievement_system_logic PASSED [ 44%]
+tests/test_exploration_achievements.py::TestExplorationAchievements::test_end_adventure_awards_achievement PASSED [ 44%]
+tests/test_exploration_events.py::TestExplorationEvents::test_ancient_shrine_event PASSED [ 44%]
+tests/test_exploration_events.py::TestExplorationEvents::test_hidden_stash_event PASSED [ 44%]
+tests/test_exploration_events.py::TestExplorationEvents::test_safe_room_event PASSED [ 44%]
+tests/test_exploration_events.py::TestExplorationEvents::test_trap_event_damage PASSED [ 45%]
+tests/test_exploration_events.py::TestExplorationEvents::test_trap_event_dead PASSED [ 45%]
+tests/test_exploration_events.py::TestExplorationEvents::test_unknown_event PASSED [ 45%]
+tests/test_exploration_feedback.py::TestExplorationFeedback::test_feedback_combat PASSED [ 45%]
+tests/test_exploration_feedback.py::TestExplorationFeedback::test_feedback_exploration PASSED [ 45%]
+tests/test_exploration_view_ux.py::TestExplorationViewUX::test_battle_state PASSED [ 45%]
+tests/test_exploration_view_ux.py::TestExplorationViewUX::test_battle_state_with_skills PASSED [ 46%]
+tests/test_exploration_view_ux.py::TestExplorationViewUX::test_forward_button_danger PASSED [ 46%]
+tests/test_exploration_view_ux.py::TestExplorationViewUX::test_forward_button_safe PASSED [ 46%]
+tests/test_faction_system.py::TestFactionSystem::test_add_reputation_rank_up PASSED [ 46%]
+tests/test_faction_system.py::TestFactionSystem::test_add_reputation_simple PASSED [ 46%]
+tests/test_faction_system.py::TestFactionSystem::test_grant_reputation_for_adventure PASSED [ 47%]
+tests/test_faction_system.py::TestFactionSystem::test_grant_reputation_for_kill PASSED [ 47%]
+tests/test_faction_system.py::TestFactionSystem::test_join_faction_already_member PASSED [ 47%]
+tests/test_faction_system.py::TestFactionSystem::test_join_faction_invalid_id PASSED [ 47%]
+tests/test_faction_system.py::TestFactionSystem::test_join_faction_success PASSED [ 47%]
+tests/test_faction_system.py::TestFactionSystem::test_leave_faction PASSED [ 47%]
+tests/test_frostfall_event.py::TestFrostfallEvent::test_adventure_rewards_loot_bonus PASSED [ 48%]
+tests/test_frostfall_event.py::TestFrostfallEvent::test_adventure_rewards_no_bonus_elsewhere PASSED [ 48%]
+tests/test_frostfall_event.py::TestFrostfallEvent::test_adventure_session_no_threat_reduction_elsewhere PASSED [ 48%]
+tests/test_frostfall_event.py::TestFrostfallEvent::test_adventure_session_threat_reduction PASSED [ 48%]
+tests/test_frostfall_event.py::TestFrostfallEvent::test_start_frostfall_event PASSED [ 48%]
+tests/test_game_systems.py::TestGameSystems::test_adventure_mp_persistence PASSED [ 49%]
+tests/test_game_systems.py::TestGameSystems::test_combat_system PASSED   [ 49%]
+tests/test_game_systems.py::TestGameSystems::test_damage_formulas PASSED [ 49%]
+tests/test_game_systems.py::TestGameSystems::test_inventory_system PASSED [ 49%]
+tests/test_game_systems.py::TestGameSystems::test_level_up_system PASSED [ 49%]
+tests/test_game_systems.py::TestGameSystems::test_player_stats PASSED    [ 50%]
+tests/test_game_systems.py::TestGameSystems::test_tiered_bonus_calculation PASSED [ 50%]
+tests/test_grey_ward.py::TestGreyWard::test_grey_ward_exists PASSED      [ 50%]
+tests/test_grey_ward.py::TestGreyWard::test_grey_ward_reputation_gain PASSED [ 50%]
+tests/test_grey_ward.py::TestGreyWard::test_grey_ward_reputation_gain_non_favored PASSED [ 50%]
+tests/test_grey_ward.py::TestGreyWard::test_join_grey_ward PASSED        [ 50%]
+tests/test_guild_advisor.py::TestGuildAdvisor::test_generic_fallback PASSED [ 51%]
+tests/test_guild_advisor.py::TestGuildAdvisor::test_low_hp_advice PASSED [ 51%]
+tests/test_guild_advisor.py::TestGuildAdvisor::test_no_active_quests PASSED [ 51%]
+tests/test_guild_advisor.py::TestGuildAdvisor::test_no_quests_completed PASSED [ 51%]
+tests/test_guild_advisor.py::TestGuildAdvisor::test_rich_but_unarmed PASSED [ 51%]
+tests/test_harvest_event.py::TestHarvestEvent::test_harvest_atmosphere PASSED [ 52%]
+tests/test_harvest_event.py::TestHarvestEvent::test_harvest_event_config PASSED [ 52%]
+tests/test_harvest_event.py::TestHarvestEvent::test_wild_gathering_boost PASSED [ 52%]
+tests/test_harvest_event.py::TestHarvestEvent::test_wild_gathering_no_boost PASSED [ 52%]
+tests/test_hp_overflow.py::TestHPOverflow::test_hp_clamp_on_unequip PASSED [ 52%]
+tests/test_hp_overflow.py::TestHPOverflow::test_hp_clamp_with_buffs PASSED [ 52%]
+tests/test_infirmary_exploit.py::TestInfirmaryFix::test_hp_restore_cost PASSED [ 53%]
+tests/test_infirmary_exploit.py::TestInfirmaryFix::test_mp_restore_cost PASSED [ 53%]
+tests/test_infirmary_fallback.py::TestInfirmaryFallbackExploit::test_fallback_vulnerability PASSED [ 53%]
+tests/test_infirmary_logic.py::TestInfirmaryLogic::test_calculate_heal_cost_hp_only PASSED [ 53%]
+tests/test_infirmary_logic.py::TestInfirmaryLogic::test_calculate_heal_cost_minimum_nonzero PASSED [ 53%]
+tests/test_infirmary_logic.py::TestInfirmaryLogic::test_calculate_heal_cost_mixed PASSED [ 54%]
+tests/test_infirmary_logic.py::TestInfirmaryLogic::test_calculate_heal_cost_mp_only PASSED [ 54%]
+tests/test_infirmary_logic.py::TestInfirmaryLogic::test_calculate_heal_cost_negative_missing PASSED [ 54%]
+tests/test_infirmary_logic.py::TestInfirmaryLogic::test_calculate_heal_cost_zero_missing PASSED [ 54%]
+tests/test_infirmary_race.py::TestInfirmaryRace::test_execute_heal_handles_race_condition PASSED [ 54%]
+tests/test_infirmary_race.py::TestInfirmaryRace::test_execute_heal_uses_atomic_inc PASSED [ 54%]
+tests/test_infirmary_security.py::TestInfirmaryStateIssue::test_stale_stats_healing PASSED [ 55%]
+tests/test_inventory_capacity.py::TestInventoryCapacity::test_capacity_scaling PASSED [ 55%]
+tests/test_inventory_capacity.py::TestInventoryCapacity::test_db_integration PASSED [ 55%]
+tests/test_inventory_filtering.py::TestInventoryFiltering::test_filter_all PASSED [ 55%]
+tests/test_inventory_filtering.py::TestInventoryFiltering::test_filter_consumables PASSED [ 55%]
+tests/test_inventory_filtering.py::TestInventoryFiltering::test_filter_weapons PASSED [ 56%]
+tests/test_inventory_filtering.py::TestInventoryFiltering::test_greyed_out_logic_persists PASSED [ 56%]
+tests/test_inventory_scaling.py::TestInventoryScaling::test_database_manager_uses_scaling PASSED [ 56%]
+tests/test_inventory_scaling.py::TestInventoryScaling::test_fallback_to_base PASSED [ 56%]
+tests/test_inventory_scaling.py::TestInventoryScaling::test_scaling_formula PASSED [ 56%]
+tests/test_item_manager.py::TestItemManager::test_format_consumable_effect_json PASSED [ 56%]
+tests/test_item_manager.py::TestItemManager::test_format_consumable_effect_plain PASSED [ 57%]
+tests/test_item_manager.py::TestItemManager::test_generate_monster_loot_fail_roll PASSED [ 57%]
+tests/test_item_manager.py::TestItemManager::test_generate_monster_loot_success PASSED [ 57%]
+tests/test_item_manager.py::TestItemManager::test_get_equipment_by_id PASSED [ 57%]
+tests/test_item_manager.py::TestItemManager::test_get_equipment_stats_invalid_id PASSED [ 57%]
+tests/test_item_manager.py::TestItemManager::test_get_equipment_stats_invalid_table PASSED [ 58%]
+tests/test_item_manager.py::TestItemManager::test_get_equipment_stats_valid PASSED [ 58%]
+tests/test_item_manager.py::TestItemManager::test_search_items PASSED    [ 58%]
+tests/test_level_curve.py::TestLevelCurve::test_xp_curve_values PASSED   [ 58%]
+tests/test_lobby_view.py::TestGuildLobbyView::test_advisor_button_logic PASSED [ 58%]
+tests/test_loot_boost_pipeline.py::TestLootBoostPipeline::test_adventure_rewards_uses_loot_boost PASSED [ 58%]
+tests/test_loot_boost_pipeline.py::TestLootBoostPipeline::test_adventure_session_fetches_loot_boost PASSED [ 59%]
+tests/test_loot_calculator.py::TestLootCalculator::test_calculate_drop_chance_boost PASSED [ 59%]
+tests/test_loot_calculator.py::TestLootCalculator::test_calculate_drop_chance_common PASSED [ 59%]
+tests/test_loot_calculator.py::TestLootCalculator::test_calculate_drop_chance_epic PASSED [ 59%]
+tests/test_loot_calculator.py::TestLootCalculator::test_calculate_drop_chance_max_luck PASSED [ 59%]
+tests/test_loot_calculator.py::TestLootCalculator::test_cap_at_100 PASSED [ 60%]
+tests/test_loot_calculator.py::TestLootCalculator::test_roll_drops_failure PASSED [ 60%]
+tests/test_loot_calculator.py::TestLootCalculator::test_roll_drops_success PASSED [ 60%]
+tests/test_material_refinement.py::TestMaterialRefinement::test_craft_iron_dirk_with_ingots PASSED [ 60%]
+tests/test_material_refinement.py::TestMaterialRefinement::test_insufficient_materials_for_refinement PASSED [ 60%]
+tests/test_material_refinement.py::TestMaterialRefinement::test_refine_iron_ingot PASSED [ 60%]
+tests/test_molten_caldera.py::TestMoltenCaldera::test_adventure_events PASSED [ 61%]
+tests/test_molten_caldera.py::TestMoltenCaldera::test_emojis_exist PASSED [ 61%]
+tests/test_molten_caldera.py::TestMoltenCaldera::test_location_exists PASSED [ 61%]
+tests/test_molten_caldera.py::TestMoltenCaldera::test_materials_exist PASSED [ 61%]
+tests/test_molten_caldera.py::TestMoltenCaldera::test_monsters_exist PASSED [ 61%]
+tests/test_monster_achievements.py::TestMonsterAchievements::test_check_group_achievements_goblin_bane PASSED [ 62%]
+tests/test_monster_achievements.py::TestMonsterAchievements::test_check_group_achievements_multiple_groups PASSED [ 62%]
+tests/test_monster_achievements.py::TestMonsterAchievements::test_check_group_achievements_no_milestone PASSED [ 62%]
+tests/test_monster_actions.py::TestMonsterActions::test_apply_buff PASSED [ 62%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_buff_logic PASSED [ 62%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_charged_skill PASSED [ 63%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_fallback_attack PASSED [ 63%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_heal_insufficient_mp PASSED [ 63%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_heal_priority PASSED [ 63%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_offensive_skill PASSED [ 63%]
+tests/test_monster_actions.py::TestMonsterActions::test_choose_action_telegraph_high_power PASSED [ 63%]
+tests/test_monster_actions.py::TestMonsterActions::test_handle_buffs_decrement PASSED [ 64%]
+tests/test_monster_actions.py::TestMonsterActions::test_handle_buffs_expiration PASSED [ 64%]
+tests/test_monster_data.py::TestMonsterData::test_drops_conversion PASSED [ 64%]
+tests/test_monster_data.py::TestMonsterData::test_monster_structure PASSED [ 64%]
+tests/test_monster_data.py::TestMonsterData::test_monsters_loaded PASSED [ 64%]
+tests/test_monster_data.py::TestMonsterData::test_skills_rehydration PASSED [ 65%]
+tests/test_monster_data_integrity.py::TestMonsterDataIntegrity::test_spectral_tide_does_not_mutate_global_monsters PASSED [ 65%]
+tests/test_mystic_merchant.py::TestMysticMerchantEvent::test_button_appears_when_event_active PASSED [ 65%]
+tests/test_mystic_merchant.py::TestMysticMerchantEvent::test_button_missing_when_no_event PASSED [ 65%]
+tests/test_mystic_merchant.py::TestMysticMerchantEvent::test_mystic_merchant_callback_opens_shop PASSED [ 65%]
+tests/test_narrative_embeds.py::TestNarrativeEmbeds::test_build_summary_embed_level_up PASSED [ 65%]
+tests/test_narrative_embeds.py::TestNarrativeEmbeds::test_build_summary_embed_location_flavor PASSED [ 66%]
+tests/test_narrative_embeds.py::TestNarrativeEmbeds::test_build_summary_embed_unknown_location PASSED [ 66%]
+tests/test_onboarding_ux.py::TestOnboardingUX::test_combat_tutorial_flow PASSED [ 66%]
+tests/test_onboarding_ux.py::TestOnboardingUX::test_guild_welcome_view_init PASSED [ 66%]
+tests/test_onboarding_ux.py::TestOnboardingUX::test_start_menu_view_init PASSED [ 66%]
+tests/test_optimistic_locking.py::TestOptimisticLocking::test_upgrade_insufficient_funds PASSED [ 67%]
+tests/test_optimistic_locking.py::TestOptimisticLocking::test_upgrade_race_condition PASSED [ 67%]
+tests/test_optimistic_locking.py::TestOptimisticLocking::test_upgrade_success PASSED [ 67%]
+tests/test_populate_database.py::TestPopulateDatabase::test_insert_functions PASSED [ 67%]
+tests/test_populate_database.py::TestPopulateDatabase::test_main PASSED  [ 67%]
+tests/test_populate_database.py::TestPopulateDatabase::test_upsert_many PASSED [ 67%]
+tests/test_progression_scaling.py::test_calculate_practice_threshold PASSED [ 68%]
+tests/test_progression_scaling.py::test_practice_growth_single_level PASSED [ 68%]
+tests/test_progression_scaling.py::test_practice_growth_multi_level PASSED [ 68%]
+tests/test_quest_branching.py::TestQuestBranching::test_accept_quest_exclusivity PASSED [ 68%]
+tests/test_quest_branching.py::TestQuestBranching::test_branching_logic_availability PASSED [ 68%]
+tests/test_quest_json_integrity.py::TestQuestJsonIntegrity::test_frozen_echo_chain PASSED [ 69%]
+tests/test_quest_json_integrity.py::TestQuestJsonIntegrity::test_prerequisites_exist PASSED [ 69%]
+tests/test_quest_json_integrity.py::TestQuestJsonIntegrity::test_reward_items_exist PASSED [ 69%]
+tests/test_quest_json_integrity.py::TestQuestJsonIntegrity::test_unique_ids PASSED [ 69%]
+tests/test_quest_race_condition.py::TestQuestRaceCondition::test_complete_quest_race_condition PASSED [ 69%]
+tests/test_quest_security.py::TestQuestSecurity::test_accept_quest_bypass_prevention PASSED [ 69%]
+tests/test_quest_security.py::TestQuestSecurity::test_complete_quest_malformed_rewards PASSED [ 70%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_accept_quest_json_error PASSED [ 70%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_accept_quest_security_check PASSED [ 70%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_complete_quest_invalid_rewards PASSED [ 70%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_complete_quest_race_condition PASSED [ 70%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_complete_quest_success PASSED [ 71%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_get_available_quests_prerequisites PASSED [ 71%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_get_available_quests_rank_filtering PASSED [ 71%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_get_player_quests_json_error PASSED [ 71%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_get_quest_details_json_error PASSED [ 71%]
+tests/test_quest_system_coverage.py::TestQuestSystemCoverage::test_update_progress_invalid_db_json PASSED [ 71%]
+tests/test_quest_update_efficiency.py::TestQuestOptimization::test_update_quests_aggregates_drops PASSED [ 72%]
+tests/test_quest_ux.py::TestQuestTurnInUX::test_turn_in_with_incomplete_quests PASSED [ 72%]
+tests/test_race_condition.py::TestRaceCondition::test_learn_skill_concurrent_duplicate_refunds_vestige PASSED [ 72%]
+tests/test_race_condition.py::TestRaceCondition::test_upgrade_skill_concurrent_failure_refunds_vestige PASSED [ 72%]
+tests/test_rank_balance.py::TestRankBalance::test_quest_counts_are_achievable PASSED [ 72%]
+tests/test_rank_system.py::TestRankSystem::test_rank_b_requirements PASSED [ 73%]
+tests/test_rank_system.py::TestRankSystem::test_rank_d_requirements PASSED [ 73%]
+tests/test_rank_system.py::TestRankSystem::test_rank_e_requirements PASSED [ 73%]
+tests/test_rank_system.py::TestRankSystem::test_rank_f_requirements PASSED [ 73%]
+tests/test_realism_inventory.py::TestRealismInventory::test_add_items_bulk_limit PASSED [ 73%]
+tests/test_realism_inventory.py::TestRealismInventory::test_inventory_limit_logic PASSED [ 73%]
+tests/test_realism_inventory.py::TestRealismInventory::test_purchase_item_full PASSED [ 74%]
+tests/test_regen_formula.py::TestRegenFormula::test_regeneration_scaling PASSED [ 74%]
+tests/test_reward_system_materials.py::TestRewardSystemMaterials::test_grant_consumable_reward PASSED [ 74%]
+tests/test_reward_system_materials.py::TestRewardSystemMaterials::test_grant_frostfall_reward PASSED [ 74%]
+tests/test_reward_system_materials.py::TestRewardSystemMaterials::test_grant_material_reward PASSED [ 74%]
+tests/test_scavenge_mechanic.py::TestDeadTurns::test_direct_wild_gather_scavenge PASSED [ 75%]
+tests/test_scavenge_mechanic.py::TestDeadTurns::test_full_rest_prevention PASSED [ 75%]
+tests/test_scavenge_mechanic.py::TestDeadTurns::test_scavenge_fallback_on_failed_gather PASSED [ 75%]
+tests/test_security.py::TestSecurity::test_link_sanitization PASSED      [ 75%]
+tests/test_security.py::TestSecurity::test_markdown_sanitization PASSED  [ 75%]
+tests/test_security.py::TestSecurity::test_zalgo_and_length PASSED       [ 76%]
+tests/test_security_developer.py::TestSecurityDeveloper::test_dev_panel_access_denied_for_non_owner PASSED [ 76%]
+tests/test_security_developer.py::TestSecurityDeveloper::test_dev_panel_access_granted_for_owner PASSED [ 76%]
+tests/test_security_exchange.py::TestGuildExchangeSecurity::test_exchange_all_materials_race_condition_fix PASSED [ 76%]
+tests/test_security_shop.py::TestSecurityShop::test_shop_callback_validation_failure_empty PASSED [ 76%]
+tests/test_security_shop.py::TestSecurityShop::test_shop_callback_validation_failure_malformed PASSED [ 76%]
+tests/test_security_shop.py::TestSecurityShop::test_shop_callback_validation_success PASSED [ 77%]
+tests/test_shop_integration.py::TestShopViewIntegration::test_shop_view_calls_purchase_item_success PASSED [ 77%]
+tests/test_shop_integration.py::TestShopViewIntegration::test_shop_view_handles_insufficient_funds PASSED [ 77%]
+tests/test_shop_integration.py::TestShopViewIntegration::test_shop_view_with_custom_inventory PASSED [ 77%]
+tests/test_shop_stale_state.py::TestShopStaleState::test_stale_state_on_purchase_failure PASSED [ 77%]
+tests/test_shop_ux_enhancement.py::TestShopUXEnhancement::test_get_inventory_items_counts PASSED [ 78%]
+tests/test_shop_ux_enhancement.py::TestShopUXEnhancement::test_shop_view_shows_owned_counts PASSED [ 78%]
+tests/test_skill_achievements.py::TestSkillAchievements::test_mixed_achievements PASSED [ 78%]
+tests/test_skill_achievements.py::TestSkillAchievements::test_no_new_achievement PASSED [ 78%]
+tests/test_skill_achievements.py::TestSkillAchievements::test_skill_count_achievement_scholar PASSED [ 78%]
+tests/test_skill_achievements.py::TestSkillAchievements::test_skill_count_achievement_student PASSED [ 78%]
+tests/test_skill_achievements.py::TestSkillAchievements::test_skill_level_achievement_virtuoso PASSED [ 79%]
+tests/test_skill_debuff.py::TestToxicBlade::test_toxic_blade_full_lifecycle PASSED [ 79%]
+tests/test_skill_exploit.py::TestSkillExploit::test_exploit_learn_free_skill PASSED [ 79%]
+tests/test_skill_exploit.py::TestSkillExploit::test_exploit_upgrade_free_skill PASSED [ 79%]
+tests/test_skill_upgrade_cost.py::TestSkillUpgradeCost::test_upgrade_cost_calculation PASSED [ 79%]
+tests/test_spectral_tide_event.py::TestSpectralTideEvent::test_adventure_rewards_drops_ectoplasm PASSED [ 80%]
+tests/test_spectral_tide_event.py::TestSpectralTideEvent::test_adventure_session_night_danger PASSED [ 80%]
+tests/test_spectral_tide_event.py::TestSpectralTideEvent::test_start_spectral_tide_event PASSED [ 80%]
+tests/test_stack_limits.py::TestStackLimits::test_bulk_add_distribution PASSED [ 80%]
+tests/test_stack_limits.py::TestStackLimits::test_consumable_overflow_creates_new_stack PASSED [ 80%]
+tests/test_stack_limits.py::TestStackLimits::test_equipment_no_stack PASSED [ 80%]
+tests/test_stack_limits.py::TestStackLimits::test_fill_existing_stack_then_overflow PASSED [ 81%]
+tests/test_stack_limits.py::TestStackLimits::test_inventory_full_on_overflow PASSED [ 81%]
+tests/test_stat_duplication.py::TestStatDuplication::test_recalculate_stats_duplication PASSED [ 81%]
+tests/test_stat_xp_refinement.py::TestStatXPRefinement::test_dynamic_damage_tagging PASSED [ 81%]
+tests/test_stat_xp_refinement.py::TestStatXPRefinement::test_endurance_xp_formula PASSED [ 81%]
+tests/test_stat_xp_refinement.py::TestStatXPRefinement::test_hits_taken_ignored_on_dodge PASSED [ 82%]
+tests/test_stat_xp_refinement.py::TestStatXPRefinement::test_hits_taken_tracking PASSED [ 82%]
+tests/test_stat_xp_refinement.py::TestStatXPRefinement::test_luck_xp_formula PASSED [ 82%]
+tests/test_sunken_grotto.py::TestSunkenGrotto::test_adventure_events PASSED [ 82%]
+tests/test_sunken_grotto.py::TestSunkenGrotto::test_emojis_exist PASSED  [ 82%]
+tests/test_sunken_grotto.py::TestSunkenGrotto::test_location_exists PASSED [ 82%]
+tests/test_sunken_grotto.py::TestSunkenGrotto::test_materials_exist PASSED [ 83%]
+tests/test_sunken_grotto.py::TestSunkenGrotto::test_monsters_exist PASSED [ 83%]
+tests/test_sunken_grotto.py::TestSunkenGrotto::test_skills_exist PASSED  [ 83%]
+tests/test_sunken_grotto_quests.py::TestSunkenGrottoQuests::test_new_quests_exist PASSED [ 83%]
+tests/test_sunken_grotto_quests.py::TestSunkenGrottoQuests::test_quest_details PASSED [ 83%]
+tests/test_sync_logic.py::test_sync_logic PASSED                         [ 84%]
+tests/test_telegraph_mechanic.py::TestTelegraphMechanic::test_monster_ai_telegraph_chance PASSED [ 84%]
+tests/test_telegraph_mechanic.py::TestTelegraphMechanic::test_telegraph_execution_flow PASSED [ 84%]
+tests/test_tournament_caching.py::TestTournamentCaching::test_cache_expiration PASSED [ 84%]
+tests/test_tournament_caching.py::TestTournamentCaching::test_invalidation_create PASSED [ 84%]
+tests/test_tournament_caching.py::TestTournamentCaching::test_invalidation_end PASSED [ 84%]
+tests/test_tournament_caching.py::TestTournamentCaching::test_return_copy PASSED [ 85%]
+tests/test_tournament_caching.py::TestTournamentCaching::test_tournament_caching PASSED [ 85%]
+tests/test_tournament_cog.py::TestTournamentCog::test_admin_end PASSED   [ 85%]
+tests/test_tournament_cog.py::TestTournamentCog::test_admin_start PASSED [ 85%]
+tests/test_tournament_cog.py::TestTournamentCog::test_admin_start_invalid PASSED [ 85%]
+tests/test_tournament_cog.py::TestTournamentCog::test_check_tournament_cycle_ends_expired PASSED [ 86%]
+tests/test_tournament_cog.py::TestTournamentCog::test_check_tournament_cycle_starts_new PASSED [ 86%]
+tests/test_tournament_cog.py::TestTournamentCog::test_init_starts_loop PASSED [ 86%]
+tests/test_tournament_cog.py::TestTournamentCog::test_leaderboard_active PASSED [ 86%]
+tests/test_tournament_cog.py::TestTournamentCog::test_leaderboard_no_active PASSED [ 86%]
+tests/test_tournament_cog.py::TestTournamentCog::test_tournament_status_active PASSED [ 86%]
+tests/test_tournament_cog.py::TestTournamentCog::test_tournament_status_no_active PASSED [ 87%]
+tests/test_tournament_system.py::TestTournamentSystem::test_end_current_tournament_distributes_rewards PASSED [ 87%]
+tests/test_tournament_system.py::TestTournamentSystem::test_record_action_ignores_mismatch PASSED [ 87%]
+tests/test_tournament_system.py::TestTournamentSystem::test_record_action_updates_score PASSED [ 87%]
+tests/test_tournament_system.py::TestTournamentSystem::test_start_weekly_tournament_creates_new PASSED [ 87%]
+tests/test_tournament_system.py::TestTournamentSystem::test_start_weekly_tournament_returns_existing PASSED [ 88%]
+tests/test_ui_adventure_views.py::TestAdventureStatusView::test_init PASSED [ 88%]
+tests/test_ui_adventure_views.py::TestAdventureStatusView::test_interaction_check PASSED [ 88%]
+tests/test_ui_adventure_views.py::TestAdventureStatusView::test_refresh_callback_session_ended PASSED [ 88%]
+tests/test_ui_adventure_views.py::TestAdventureStatusView::test_refresh_callback_success PASSED [ 88%]
+tests/test_ui_adventure_views.py::TestAdventureStatusView::test_retreat_callback_success PASSED [ 89%]
+tests/test_ui_callbacks.py::TestUICallbacks::test_back_to_guild_hall_callback_success PASSED [ 89%]
+tests/test_ui_callbacks.py::TestUICallbacks::test_back_to_profile_callback_success PASSED [ 89%]
+tests/test_ui_callbacks.py::TestUICallbacks::test_get_player_or_error_found PASSED [ 89%]
+tests/test_ui_callbacks.py::TestUICallbacks::test_get_player_or_error_not_found PASSED [ 89%]
+tests/test_ui_experiment_view.py::TestExperimentView::test_init_few_materials PASSED [ 89%]
+tests/test_ui_experiment_view.py::TestExperimentView::test_init_no_materials PASSED [ 90%]
+tests/test_ui_experiment_view.py::TestExperimentView::test_init_valid_materials PASSED [ 90%]
+tests/test_ui_experiment_view.py::TestExperimentView::test_material_select_callback PASSED [ 90%]
+tests/test_ui_experiment_view.py::TestExperimentView::test_mix_callback_failure PASSED [ 90%]
+tests/test_ui_experiment_view.py::TestExperimentView::test_mix_callback_success PASSED [ 90%]
+tests/test_ui_helpers.py::TestUIHelpers::test_inventory_embed_categorization PASSED [ 91%]
+tests/test_ui_helpers.py::TestUIHelpers::test_inventory_embed_unequipped PASSED [ 91%]
+tests/test_ui_helpers.py::TestUIHelpers::test_progress_bar_logic PASSED  [ 91%]
+tests/test_ui_quest_views.py::TestQuestViews::test_accept_quest_callback PASSED [ 91%]
+tests/test_ui_quest_views.py::TestQuestViews::test_complete_quest_callback PASSED [ 91%]
+tests/test_ui_quest_views.py::TestQuestViews::test_ledger_view_init PASSED [ 91%]
+tests/test_ui_quest_views.py::TestQuestViews::test_ledger_view_interaction_check PASSED [ 92%]
+tests/test_ui_quest_views.py::TestQuestViews::test_quest_board_view_init PASSED [ 92%]
+tests/test_ui_quest_views.py::TestQuestViews::test_quest_log_view_init PASSED [ 92%]
+tests/test_ui_quest_views.py::TestQuestViews::test_quest_log_view_init_empty PASSED [ 92%]
+tests/test_ui_quest_views.py::TestQuestViews::test_view_quest_details_callback PASSED [ 92%]
+tests/test_ui_rank_view.py::TestRankView::test_cancel_callback_success PASSED [ 93%]
+tests/test_ui_rank_view.py::TestRankView::test_confirm_callback_no_cog PASSED [ 93%]
+tests/test_ui_rank_view.py::TestRankView::test_confirm_callback_success PASSED [ 93%]
+tests/test_ui_rank_view.py::TestRankView::test_promote_callback_eligible PASSED [ 93%]
+tests/test_ui_rank_view.py::TestRankView::test_promote_callback_not_eligible PASSED [ 93%]
+tests/test_ui_rank_view.py::TestRankView::test_rank_progress_view_init PASSED [ 93%]
+tests/test_ui_validation.py::TestUIValidation::test_custom_message PASSED [ 94%]
+tests/test_ui_validation.py::TestUIValidation::test_player_found PASSED  [ 94%]
+tests/test_ui_validation.py::TestUIValidation::test_player_not_found_deferred PASSED [ 94%]
+tests/test_ui_validation.py::TestUIValidation::test_player_not_found_not_deferred PASSED [ 94%]
+tests/test_vitals_concurrency.py::TestHealRaceCondition::test_heal_overwritten_by_adventure PASSED [ 94%]
+tests/test_vp_cost_curve.py::TestVPCostCurve::test_cost_curve_exponential PASSED [ 95%]
+tests/test_vp_cost_curve.py::TestVPCostCurve::test_luck_cost_curve PASSED [ 95%]
+tests/test_weather_combat.py::TestWeatherCombat::test_ash_storm_event PASSED [ 95%]
+tests/test_weather_combat.py::TestWeatherCombat::test_detect_element PASSED [ 95%]
+tests/test_weather_combat.py::TestWeatherCombat::test_fog_modifiers PASSED [ 95%]
+tests/test_weather_combat.py::TestWeatherCombat::test_rain_modifiers PASSED [ 95%]
+tests/test_weather_combat.py::TestWeatherCombat::test_storm_lightning_event PASSED [ 96%]
+tests/test_weather_dynamic_features.py::TestDynamicWeather::test_adventure_session_environmental_hazard PASSED [ 96%]
+tests/test_weather_dynamic_features.py::TestDynamicWeather::test_combat_weather_modifiers_blizzard PASSED [ 96%]
+tests/test_weather_dynamic_features.py::TestDynamicWeather::test_combat_weather_modifiers_sandstorm PASSED [ 96%]
+tests/test_weather_dynamic_features.py::TestDynamicWeather::test_combat_weather_start_of_turn_sandstorm PASSED [ 96%]
+tests/test_weather_system.py::TestWeatherSystem::test_weather_enum_exists PASSED [ 97%]
+tests/test_weather_system.py::TestWeatherSystem::test_get_current_weather_deterministic PASSED [ 97%]
+tests/test_weather_system.py::TestWeatherSystem::test_get_current_weather_varies_by_location PASSED [ 97%]
+tests/test_weather_system.py::TestWeatherSystem::test_get_current_weather_varies_by_hour PASSED [ 97%]
+tests/test_weather_system.py::TestWeatherSystem::test_molten_caldera_weather_restrictions PASSED [ 97%]
+tests/test_weather_system.py::TestWeatherSystem::test_weather_flavor PASSED [ 97%]
+tests/test_wild_gathering.py::TestWildGathering::test_adventure_session_integration PASSED [ 98%]
+tests/test_wild_gathering.py::TestWildGathering::test_wild_gathering_no_gatherables PASSED [ 98%]
+tests/test_wild_gathering.py::TestWildGathering::test_wild_gathering_trigger_with_location PASSED [ 98%]
+tests/test_world_events.py::TestWorldEventSystem::test_get_current_event_active PASSED [ 98%]
+tests/test_world_events.py::TestWorldEventSystem::test_get_current_event_expired PASSED [ 98%]
+tests/test_world_events.py::TestWorldEventSystem::test_get_modifiers PASSED [ 99%]
+tests/test_world_events.py::TestWorldEventSystem::test_start_event PASSED [ 99%]
+tests/test_world_events_caching.py::TestWorldEventCaching::test_cache_expiration PASSED [ 99%]
+tests/test_world_events_caching.py::TestWorldEventCaching::test_invalidation_on_set PASSED [ 99%]
+tests/test_world_events_caching.py::TestWorldEventCaching::test_return_copy PASSED [ 99%]
+tests/test_world_events_caching.py::TestWorldEventCaching::test_world_event_caching PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.12-final-0 _______________
+
+Name                                             Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------
+cogs/__init__.py                                     0      0   100%
+cogs/adventure_cog.py                               13     13     0%   9-31
+cogs/adventure_loop.py                              36     36     0%   1-52
+cogs/character_cog.py                               11     11     0%   7-24
+cogs/chronicle_cog.py                               62     62     0%   7-124
+cogs/developer_cog.py                              134     50    63%   48-56, 70-76, 106-107, 110-113, 116-119, 135-137, 142-144, 148-150, 155-167, 171-173, 205-207, 214
+cogs/event_cog.py                                   96      9    91%   35, 79-80, 84, 91, 96-97, 175, 190
+cogs/faction_cog.py                                 60     60     0%   7-118
+cogs/general_cog.py                                 20     20     0%   8-45
+cogs/guild_hub_cog.py                               15     15     0%   7-30
+cogs/infirmary_cog.py                               93     43    54%   48-49, 73-74, 77, 93-95, 98-113, 117-175, 180-181, 185
+cogs/onboarding_cog.py                             200     86    57%   31-63, 95, 98-126, 131-135, 138, 142-175, 179-181, 186-188, 191, 195-211, 221, 225-237, 241-242, 254, 347-348, 366-399, 411-412, 416-428, 432
+cogs/quest_hub_cog.py                              206     57    72%   75-76, 145-148, 163-165, 185-202, 209-210, 287-288, 296-299, 302-305, 312-314, 319-320, 336, 369-393, 441-444, 461, 472, 511-512, 516
+cogs/shop_cog.py                                   100     15    85%   61, 67-69, 75, 104, 115, 119, 129-131, 136, 188-189, 193
+cogs/skill_trainer_cog.py                          148     32    78%   73-74, 77-80, 143, 159-160, 173, 177-179, 186, 191, 198-200, 214-215, 220-222, 232-233, 238-240, 268, 275-276, 280
+cogs/status_update_cog.py                          151     49    68%   130, 139, 186-188, 191-200, 203-229, 233-273, 278-279, 283
+cogs/tournament_cog.py                             104     14    87%   34, 69-70, 75-83, 87, 147, 211
+cogs/utils/__init__.py                               0      0   100%
+cogs/utils/ui_helpers.py                           164     25    85%   42, 48-50, 70-72, 75-76, 140, 179-183, 201, 281, 285-288, 302, 306-307, 333-334
+database/__init__.py                                 0      0   100%
+database/create_database.py                         59      8    86%   15, 29-34, 144
+database/database_manager.py                       840    277    67%   61, 93-96, 104, 129, 137, 270, 281-282, 357, 368-369, 394, 397-399, 403, 414-418, 422, 444, 448-452, 457-463, 471, 476, 482-484, 493, 552, 563-570, 633, 637-641, 653, 671, 684-705, 713-729, 736-749, 753-755, 793, 823-824, 833-834, 844-847, 882, 895, 902, 928, 973-975, 985-990, 994, 1043, 1124, 1190-1193, 1199, 1298, 1336, 1344, 1364, 1379-1385, 1389, 1393, 1397, 1401, 1405, 1409, 1413, 1420-1421, 1442-1455, 1463-1466, 1470-1473, 1481, 1490, 1494-1498, 1502-1523, 1527, 1537-1538, 1542, 1553-1557, 1561, 1568-1577, 1581, 1592-1596, 1600, 1607, 1622-1631, 1647-1651, 1689-1695, 1702-1714, 1726, 1745-1765, 1773-1774, 1800-1801, 1808-1812, 1816, 1823, 1839, 1848, 1852-1856, 1860, 1864, 1868, 1872-1874, 1879-1880, 1888-1892, 1911-1924, 1934-1938, 1954, 1964-1968, 1972, 1979-1994, 2019-2020, 2034, 2083, 2089, 2095, 2132-2142, 2154, 2177-2184, 2190, 2201, 2235-2243, 2258-2269, 2285-2335, 2387, 2405-2412, 2477-2498, 2502-2506, 2525-2527
+database/populate_database.py                      143     14    90%   17, 24, 41-43, 52, 56-58, 188, 294, 310-311, 315
+game_systems/__init__.py                             0      0   100%
+game_systems/adventure/adventure_events.py         146     33    77%   515, 519, 523, 527, 529, 531, 539, 541, 543, 555, 557, 559, 561, 563, 567, 569, 571, 575, 581, 583, 585, 590, 593, 603-609, 617, 635, 639
+game_systems/adventure/adventure_manager.py        212     46    78%   57-67, 95-97, 100-104, 112, 198-202, 213, 245, 248, 255, 269-270, 304, 324-325, 394-440
+game_systems/adventure/adventure_resolution.py      92     15    84%   55-56, 67-69, 117-129
+game_systems/adventure/adventure_rewards.py        249     44    82%   80-82, 108, 120-121, 127, 132, 139-143, 165, 217-218, 234-247, 255, 303, 315-316, 320-328, 375, 387-389, 397-402, 424, 427-428, 449, 464-465
+game_systems/adventure/adventure_session.py        397    132    67%   65-66, 70-71, 77-78, 138, 148-157, 174, 197-199, 206, 210, 213, 222, 224-225, 233, 246-248, 251-253, 256-258, 261-264, 277-278, 293, 301, 324-332, 335, 338, 348, 361-373, 393-394, 410, 412, 505, 521-547, 575, 578, 619-629, 632-634, 668, 702-782, 795, 804
+game_systems/adventure/combat_handler.py           146     40    73%   50-55, 58, 66-67, 90-115, 134-135, 150-152, 188-195, 213, 226, 254-257, 291
+game_systems/adventure/event_handler.py            143     35    76%   55-60, 63-66, 151-153, 183-215, 226-228, 274
+game_systems/adventure/exploration_events.py        77     12    84%   44-46, 92-97, 127-128, 140
+game_systems/adventure/ui/__init__.py                0      0   100%
+game_systems/adventure/ui/adventure_embeds.py      161     27    83%   61, 63, 65, 67, 69, 73, 123, 152-153, 164-165, 210, 238-239, 285, 290, 292, 294, 297, 302-303, 306-307, 325-326, 334, 338
+game_systems/adventure/ui/exploration_view.py      203     70    66%   238-241, 250, 253, 256, 259, 267-268, 272-273, 295-297, 333-335, 344-348, 363-386, 389-425, 431-460
+game_systems/adventure/ui/status_view.py            58      5    91%   83-85, 94-95
+game_systems/character/ui/adventure_menu.py         87     59    32%   71-74, 86-195, 201
+game_systems/character/ui/inventory_view.py        172     54    69%   56-57, 105-107, 109, 120-123, 152, 163-164, 218-221, 227-244, 247-254, 257-263, 266-272, 275-291, 294-308
+game_systems/combat/__init__.py                      0      0   100%
+game_systems/combat/combat_engine.py               568    117    79%   156-157, 159-160, 238-239, 253-256, 276, 302-303, 315-318, 329-332, 353, 355, 357, 359, 361, 363, 382-385, 388-389, 404-405, 411-414, 419, 470, 502, 525-531, 546, 549, 553-554, 563-567, 587, 595, 598, 651-654, 682-685, 710, 718, 727-730, 740-741, 757, 781-783, 791, 816, 848, 875, 879, 899-901, 929-931, 942, 959, 968, 972, 984, 1020-1024, 1042, 1050-1068, 1085-1092, 1114-1116
+game_systems/combat/combat_phrases.py              141     27    81%   590, 607-615, 625-633, 651-667, 702-703, 720-721, 744, 768-774, 802-803, 845-846, 850-857
+game_systems/combat/damage_formula.py              123     12    90%   122-123, 149, 173-174, 187, 203-212
+game_systems/core/world_time.py                     82     15    82%   122, 124, 126, 133, 141, 143, 145, 156, 179, 181, 183, 187, 189, 191, 193
+game_systems/crafting/crafting_system.py           219     29    87%   52, 93, 99, 117-118, 164, 175, 180, 219, 238, 263-265, 321-322, 327, 332, 340, 365-367, 384, 403, 415-416, 419, 464-466
+game_systems/crafting/ui/crafting_view.py          170     95    44%   49-51, 54-57, 99, 105-147, 163-172, 191, 209, 217, 220, 223, 226-241, 244-253, 256-271, 274-294, 297-331
+game_systems/crafting/ui/experiment_view.py         75     11    85%   38-41, 102-104, 120-121, 139-144
+game_systems/data/__init__.py                        0      0   100%
+game_systems/data/adventure_locations.py            36      9    75%   30-35, 43-45
+game_systems/data/class_data.py                      1      0   100%
+game_systems/data/class_equipments.py               35     35     0%   10-212
+game_systems/data/consumables.py                    28      9    68%   27-32, 39-41
+game_systems/data/crafting_recipes.py                1      0   100%
+game_systems/data/data_validator.py                 77      9    88%   35, 61, 69, 71, 79, 90, 130-135
+game_systems/data/emojis.py                         67      1    99%   103
+game_systems/data/equipments.py                     28      9    68%   31-36, 43-45
+game_systems/data/factions.py                        1      0   100%
+game_systems/data/materials.py                       1      0   100%
+game_systems/data/messages.py                        3      0   100%
+game_systems/data/monsters.py                       40     10    75%   29-34, 42-44, 57
+game_systems/data/narrative_data.py                  2      0   100%
+game_systems/data/quest_data.py                     26      6    77%   41-46
+game_systems/data/quest_items.py                     1      1     0%   15
+game_systems/data/recipes.py                         2      0   100%
+game_systems/data/schemas.py                         6      0   100%
+game_systems/data/shop_data.py                       2      0   100%
+game_systems/data/skills_data.py                     1      0   100%
+game_systems/data/stat_descriptions.py               1      1     0%   9
+game_systems/events/__init__.py                      0      0   100%
+game_systems/events/world_event_system.py           52      6    88%   125-127, 141-142, 160
+game_systems/guild_system/__init__.py                0      0   100%
+game_systems/guild_system/advisor.py                61     27    56%   102-189
+game_systems/guild_system/faction_system.py        135     20    85%   27, 89-91, 99, 104-106, 115, 168-174, 192-193, 205, 256, 259
+game_systems/guild_system/guild_exchange.py         42     17    60%   22-43, 78-80
+game_systems/guild_system/quest_system.py          186     44    76%   28, 38, 89, 97-99, 105, 114, 121-123, 149, 164, 172-174, 182, 188, 217-218, 237, 251-253, 269, 276-286, 299, 303, 323, 346-347, 352-354, 361-364
+game_systems/guild_system/rank_system.py            30      9    70%   100, 106, 116, 120-125
+game_systems/guild_system/reward_system.py          73     12    84%   41, 52, 56-58, 68, 73, 121-122, 149-151
+game_systems/guild_system/tournament_system.py      75     18    76%   43, 71, 82, 103-106, 120, 129, 139-151
+game_systems/guild_system/ui/components.py          56     15    73%   47-49, 54-55, 74-80, 86-88, 135, 146, 161
+game_systems/guild_system/ui/lobby_view.py          35     12    66%   78-82, 85-89, 92-97
+game_systems/guild_system/ui/quests_menu.py        113     57    50%   91-112, 118-148, 174, 199-244, 250-252, 270-272
+game_systems/guild_system/ui/rank_view.py          113     22    81%   81-85, 106-111, 170-173, 193, 219-221, 253-254, 274-285
+game_systems/guild_system/ui/services_menu.py      101     57    44%   107-129, 132-156, 159-180, 183-191, 194-203, 211, 238-240
+game_systems/items/__init__.py                       0      0   100%
+game_systems/items/consumable_manager.py           106     12    89%   34, 36, 42, 51, 71-72, 141-146, 151
+game_systems/items/equipment_manager.py            294     50    83%   87-99, 105, 110, 132-134, 146-147, 265, 267, 269, 274, 309, 358, 360, 362, 375-376, 382, 393-395, 403-407, 413, 426-427, 473, 477, 493, 506-522, 543, 569, 577
+game_systems/items/inventory_manager.py             41     16    61%   22, 40-41, 61-63, 81-88, 94-96
+game_systems/items/item_manager.py                  96     24    75%   46, 48-50, 59-61, 67, 70, 73, 79-88, 108, 139-140, 159, 167, 170-172, 176
+game_systems/monsters/__init__.py                    0      0   100%
+game_systems/monsters/monster_actions.py            75      5    93%   52, 67, 85-87, 102
+game_systems/monsters/monster_skills.py              1      0   100%
+game_systems/player/__init__.py                      0      0   100%
+game_systems/player/achievement_system.py          162     25    85%   129, 138, 159, 175, 191-197, 218, 225, 244, 250-252, 285-287, 301, 330-332, 350, 356-358
+game_systems/player/level_up.py                     31      7    77%   39, 62, 71-77
+game_systems/player/player_creator.py               34      6    82%   44, 47, 57, 91-93
+game_systems/player/player_stats.py                112     10    91%   178-193
+game_systems/rewards/__init__.py                     0      0   100%
+game_systems/rewards/aurum_calculator.py            11      0   100%
+game_systems/rewards/exp_calculator.py              16      3    81%   37-40
+game_systems/rewards/loot_calculator.py             21      0   100%
+main.py                                             94     38    60%   49-50, 55-62, 68, 73-80, 105-107, 116-117, 124-125, 135-136, 140-141, 147-156
+tests/conftest.py                                  125     35    72%   29, 32, 35, 53-59, 62, 90, 97-100, 121, 139, 149, 182, 184, 186, 204-217
+tests/test_accessory_slots.py                       89      2    98%   222, 247
+tests/test_achievement_logic.py                     38      1    97%   69
+tests/test_adventure_day_night.py                   87      6    93%   12-16, 165
+tests/test_adventure_death_penalty.py               53      3    94%   12-13, 143
+tests/test_adventure_embeds.py                      45      1    98%   88
+tests/test_adventure_fatigue.py                     50      0   100%
+tests/test_adventure_race.py                        66      1    98%   129
+tests/test_adventure_resolution.py                  82      0   100%
+tests/test_adventure_retreat_exploit.py             46      0   100%
+tests/test_adventure_rewards.py                    108      2    98%   194, 295
+tests/test_adventure_safety.py                      66      4    94%   78-81, 153
+tests/test_adventure_schema_update.py               38      1    97%   94
+tests/test_adventure_session_concurrency.py        104      8    92%   72, 76, 87-88, 106, 112-113, 270
+tests/test_adventure_status_embed.py                50      1    98%   102
+tests/test_adventure_supplies.py                    85     13    85%   15-22, 26-30, 202
+tests/test_adventure_supplies_extended.py           79     13    84%   12-18, 22-26, 170
+tests/test_adventure_ux.py                          77      6    92%   31, 96-97, 115-116, 120
+tests/test_alchemist_combat.py                      44      1    98%   142
+tests/test_alchemist_mechanics.py                   53      1    98%   107
+tests/test_armor_slots.py                           57      1    98%   134
+tests/test_aurum_drops.py                           47      1    98%   100
+tests/test_balance.py                               50     10    80%   86-95
+tests/test_buff_bulk_optimization.py                40      1    98%   69
+tests/test_buff_system.py                           84      1    99%   203
+tests/test_clockwork_crafting.py                    56      6    89%   13-16, 19, 106
+tests/test_clockwork_halls.py                       51      1    98%   76
+tests/test_combat_actions.py                        66      1    98%   181
+tests/test_combat_buff_scaling.py                   40      1    98%   105
+tests/test_combat_counter.py                        43      1    98%   116
+tests/test_combat_crash.py                          32      6    81%   49-54, 58
+tests/test_combat_defense_curve.py                  44      1    98%   133
+tests/test_combat_skill_selection.py                67      1    99%   178
+tests/test_combat_special_exploit.py                32      1    97%   116
+tests/test_combat_stat_debuffs.py                   31      3    90%   99-100, 104
+tests/test_consumable_logic.py                      52      2    96%   85, 132
+tests/test_consumable_race.py                       43      1    98%   124
+tests/test_content_expansion.py                     38      1    97%   70
+tests/test_crafting.py                              62      1    98%   110
+tests/test_crafting_dismantle.py                    54      1    98%   106
+tests/test_crafting_equipment.py                    53      3    94%   23, 73, 114
+tests/test_crafting_expanded.py                     66      1    98%   128
+tests/test_crafting_experiment.py                   45      1    98%   112
+tests/test_crafting_proficiency.py                  44      0   100%
+tests/test_crafting_quality.py                      70      1    99%   170
+tests/test_crafting_supplies.py                     62      1    98%   119
+tests/test_crafting_ui.py                          102      2    98%   32, 186
+tests/test_create_database.py                       34      3    91%   52, 54, 58
+tests/test_damage_scaling.py                        40      1    98%   109
+tests/test_data_validation.py                       40      0   100%
+tests/test_database.py                              85      6    93%   204-208, 212
+tests/test_database_aggregation.py                  75      1    99%   188
+tests/test_database_extended.py                    160      1    99%   341
+tests/test_database_optimization.py                 58      2    97%   23, 148
+tests/test_day_night.py                             52      7    87%   7-9, 69, 83, 103, 109
+tests/test_db_buffs.py                              23      1    96%   52
+tests/test_db_purchase.py                           66      5    92%   103-106, 122, 132
+tests/test_db_titles.py                             71      1    99%   113
+tests/test_depthswarden_content.py                  36      1    97%   59
+tests/test_developer_cog.py                        110      1    99%   179
+tests/test_dos_prevention.py                        97      1    99%   168
+tests/test_elemental_surge_event.py                 65      1    98%   125
+tests/test_equipment_race.py                       106     25    76%   49-60, 65, 78-83, 88-89, 92, 95, 98, 115, 127, 130, 191
+tests/test_equipment_restrictions.py                94      0   100%
+tests/test_equipment_robustness.py                  40      1    98%   39
+tests/test_equipment_sets.py                        62      1    98%   128
+tests/test_equipment_slots.py                       63      1    98%   148
+tests/test_equipment_stack_split.py                 38      1    97%   98
+tests/test_event_cog.py                            144      4    97%   212-213, 216, 226
+tests/test_event_scheduling_logic.py                78      2    97%   68, 127
+tests/test_exploration_achievements.py              48      1    98%   115
+tests/test_exploration_events.py                    54      1    98%   107
+tests/test_exploration_feedback.py                 108      0   100%
+tests/test_exploration_view_ux.py                  123      2    98%   39, 242
+tests/test_faction_system.py                        60      1    98%   127
+tests/test_frostfall_event.py                       88      1    99%   218
+tests/test_game_systems.py                         146      1    99%   322
+tests/test_grey_ward.py                             69      5    93%   27, 69, 78, 110, 130
+tests/test_guild_advisor.py                         67      2    97%   23, 100
+tests/test_harvest_event.py                         59      1    98%   110
+tests/test_hp_overflow.py                          103     11    89%   57, 91, 105, 116, 122-125, 128, 131, 225
+tests/test_infirmary_exploit.py                     51      2    96%   23, 92
+tests/test_infirmary_fallback.py                    61      3    95%   20, 37, 119
+tests/test_infirmary_logic.py                       29      1    97%   51
+tests/test_infirmary_race.py                        38      1    97%   92
+tests/test_infirmary_security.py                    68      3    96%   19, 36, 141
+tests/test_inventory_capacity.py                    31      1    97%   72
+tests/test_inventory_filtering.py                   95      8    92%   24-25, 28, 41-44, 218
+tests/test_inventory_scaling.py                     34      1    97%   61
+tests/test_item_manager.py                          97      2    98%   109, 164
+tests/test_level_curve.py                           23      1    96%   59
+tests/test_lobby_view.py                            55      2    96%   29, 87
+tests/test_loot_boost_pipeline.py                   43      1    98%   138
+tests/test_loot_calculator.py                       59      1    98%   104
+tests/test_material_refinement.py                   56      3    95%   32, 66, 104
+tests/test_molten_caldera.py                        34      1    97%   52
+tests/test_monster_achievements.py                  33      1    97%   67
+tests/test_monster_actions.py                       80      1    99%   130
+tests/test_monster_data.py                          42      4    90%   23, 43, 61, 72
+tests/test_monster_data_integrity.py                41      2    95%   82, 97
+tests/test_mystic_merchant.py                       91      3    97%   127-128, 165
+tests/test_narrative_embeds.py                      65      1    98%   110
+tests/test_onboarding_ux.py                         82      2    98%   24, 129
+tests/test_optimistic_locking.py                    68      2    97%   28, 149
+tests/test_populate_database.py                     65      1    98%   110
+tests/test_progression_scaling.py                   47      1    98%   81
+tests/test_quest_branching.py                       94     12    87%   56-60, 82, 106, 127, 131, 144-146, 157, 191
+tests/test_quest_json_integrity.py                  56      2    96%   32, 81
+tests/test_quest_race_condition.py                  39      3    92%   49, 83, 96
+tests/test_quest_security.py                        53      4    92%   39, 60, 81, 112
+tests/test_quest_system_coverage.py                123      5    96%   49, 74, 139, 156, 224
+tests/test_quest_update_efficiency.py               39      1    97%   77
+tests/test_quest_ux.py                              51      1    98%   98
+tests/test_race_condition.py                        62      1    98%   105
+tests/test_rank_balance.py                          25      1    96%   44
+tests/test_rank_system.py                           41      1    98%   150
+tests/test_realism_inventory.py                     64      2    97%   34, 135
+tests/test_regen_formula.py                         36      1    97%   74
+tests/test_reward_system_materials.py               65      1    98%   138
+tests/test_scavenge_mechanic.py                     52      1    98%   136
+tests/test_security.py                              82     19    77%   23-25, 30-33, 40-47, 129-133, 137
+tests/test_security_developer.py                    78     10    87%   26, 36, 39, 54-57, 60, 104, 175
+tests/test_security_exchange.py                     41      1    98%   92
+tests/test_security_shop.py                         90     10    89%   17, 20-21, 24, 27, 31, 34, 52-53, 174
+tests/test_shop_integration.py                      71      1    99%   118
+tests/test_shop_stale_state.py                      47      0   100%
+tests/test_shop_ux_enhancement.py                   70      1    99%   127
+tests/test_skill_achievements.py                    61      1    98%   110
+tests/test_skill_debuff.py                          50      3    94%   121, 153, 170
+tests/test_skill_exploit.py                        112      4    96%   35, 67, 71, 224
+tests/test_skill_upgrade_cost.py                    65      2    97%   33, 136
+tests/test_spectral_tide_event.py                   77      0   100%
+tests/test_stack_limits.py                         103      4    96%   29, 46, 58, 199
+tests/test_stat_duplication.py                      27      1    96%   70
+tests/test_stat_xp_refinement.py                    65      0   100%
+tests/test_sunken_grotto.py                         48      1    98%   76
+tests/test_sunken_grotto_quests.py                  38      2    95%   74, 106
+tests/test_sync_logic.py                            77      4    95%   96, 101, 123, 132
+tests/test_telegraph_mechanic.py                    54      1    98%   173
+tests/test_tournament_caching.py                    86      3    97%   27, 64, 184
+tests/test_tournament_cog.py                       156      1    99%   247
+tests/test_tournament_system.py                     50      1    98%   112
+tests/test_ui_adventure_views.py                    98      2    98%   27, 156
+tests/test_ui_callbacks.py                          71      1    99%   150
+tests/test_ui_experiment_view.py                   109      2    98%   48, 184
+tests/test_ui_helpers.py                            61      4    93%   18-20, 165
+tests/test_ui_quest_views.py                       134      2    99%   47, 224
+tests/test_ui_rank_view.py                         150     20    87%   27, 47, 56-88, 244
+tests/test_ui_validation.py                         55      1    98%   101
+tests/test_vitals_concurrency.py                    64      4    94%   54-55, 66, 205
+tests/test_vp_cost_curve.py                         60      1    98%   183
+tests/test_weather_combat.py                        62      1    98%   107
+tests/test_weather_dynamic_features.py              56      1    98%   136
+tests/test_weather_system.py                        44      0   100%
+tests/test_wild_gathering.py                        51      1    98%   142
+tests/test_world_events.py                          45      1    98%   78
+tests/test_world_events_caching.py                  75      1    99%   154
+------------------------------------------------------------------------------
+TOTAL                                            18950   2816    85%
+============================= 546 passed in 12.99s =============================

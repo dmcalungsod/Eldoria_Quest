@@ -139,6 +139,9 @@ class ClassDetailView(View):
 
     @discord.ui.button(label="Accept Destiny", style=discord.ButtonStyle.success)
     async def create_btn(self, interaction: discord.Interaction, button: Button):
+        await self._create_btn_callback(interaction, button)
+
+    async def _create_btn_callback(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
 
         exists = await asyncio.to_thread(self.db.player_exists, self.user.id)
