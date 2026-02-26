@@ -20,7 +20,7 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 
 | Agent | Schedule (GMT+8) | Primary Role |
 |-------|------------------|--------------|
-| **GameForge** | 12:00 AM | Content creation (monsters, items, quests) |
+| **Foreman** | 12:00 AM | Project management & milestone tracking |
 | **GameBalancer** | 12:30 AM | Economy & progression balance |
 | **SystemSmith** | 01:00 AM | Architecture & systems refinement |
 | **BugHunter** | 01:30 AM | Quality assurance & bug fixes |
@@ -33,7 +33,7 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 | **Lorekeeper** | 05:00 AM | World canon & consistency |
 | **Mentor** | 05:30 AM | Player onboarding & tutorials |
 | **Namewright** | 06:00 AM | Naming & lore‑friendly titles |
-| **Foreman** | 09:00 AM | Project management & milestone tracking |
+| **GameForge** | 09:00 AM | Content creation (monsters, items, quests) |
 | **Bolt** | 09:30 AM | Performance optimization |
 | **DepthsWarden** | 10:00 AM | Dungeon floors & factions |
 | **ProgressionBalancer** | 11:00 AM | Rank advancement & progression |
