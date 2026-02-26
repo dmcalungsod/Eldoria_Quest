@@ -277,6 +277,201 @@ class AdventureSession:
                 max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
                 self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
+    def _handle_active_combat(
+        self,
+        context: dict[str, Any],
+        action: str | None,
+        background: bool,
+        persist: bool,
+        weather: Weather,
+        time_phase: TimePhase,
+        threat_reduction: float,
+    ) -> dict[str, Any]:
+        """Handles the turn if a monster is already present."""
+        if action and action.startswith("set_stance:"):
+            stance = action.split(":", 1)[1]
+            self.active_monster["player_stance"] = stance
+            msg = f"You shift into an **{stance.capitalize()}** stance!"
+            self.logs.append(msg)
+            if persist:
+                self.save_state()
+            return self._build_result([[msg]], False, context)
+
+        if action == "flee":
+            return self._attempt_flee(context, persist=persist)
+
+        if action == "defend":
+            return self._process_combat_turn(
+                context,
+                action="defend",
+                persist=persist,
+                weather=weather,
+                time_phase=time_phase,
+                threat_reduction=threat_reduction,
+            )
+
+        if action == "special_ability":
+            return self._process_combat_turn(
+                context,
+                action="special_ability",
+                persist=persist,
+                weather=weather,
+                time_phase=time_phase,
+                threat_reduction=threat_reduction,
+            )
+
+        should_auto = self._check_auto_condition(context)
+
+        if background:
+            # Background: Flee if HP critical, else Auto-Combat
+            if context and context.get("vitals"):
+                current_hp = context["vitals"]["current_hp"]
+                # Ensure max_hp is at least 1
+                if "stats_dict" in context:
+                    max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
+                else:
+                    max_hp = max(context["player_stats"].max_hp, 1)
+
+                if (current_hp / max_hp) < 0.30:
+                    return self._attempt_flee(context, persist=persist)
+
+            return self._resolve_auto_combat(
+                context,
+                background=True,
+                persist=persist,
+                weather=weather,
+                time_phase=time_phase,
+                threat_reduction=threat_reduction,
+            )
+
+        # If explicit attack or implicit auto, and eligible -> Auto
+        if (action == "attack" or not action) and should_auto:
+            return self._resolve_auto_combat(
+                context,
+                persist=persist,
+                weather=weather,
+                time_phase=time_phase,
+                threat_reduction=threat_reduction,
+            )
+
+        # Otherwise manual single turn
+        final_action = action if action else "attack"
+        return self._process_combat_turn(
+            context,
+            action=final_action,
+            persist=persist,
+            weather=weather,
+            time_phase=time_phase,
+            threat_reduction=threat_reduction,
+        )
+
+    def _handle_new_encounter(
+        self,
+        context: dict[str, Any],
+        location: dict,
+        regen_threshold: int,
+        persist: bool,
+        weather: Weather,
+        time_phase: TimePhase,
+    ) -> dict[str, Any] | None:
+        """
+        Attempts to trigger a new combat encounter.
+        Returns result dict if encounter starts (or fails to start but logs something).
+        Returns None if no encounter check passed (random roll failed), allowing fall-through.
+        """
+        if random.randint(1, 100) <= regen_threshold:  # nosec B311
+            return None
+
+        # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
+        player_level = context["player_row"].get("level", 1)
+        monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
+
+        if monster:
+            # Prepend Weather Flavor to the encounter
+            weather_flavor = WorldTime.get_weather_flavor(weather)
+            phrase = f"{weather_flavor}\n{phrase}"
+
+            # --- NIGHT AMBUSH MECHANIC ---
+            ambush_chance = 0.20
+            # Event Modifier
+            ambush_chance += context.get("active_boosts", {}).get("spectral_ambush_chance", 0.0)
+
+            # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
+            if self.supplies.get("pitch_torch"):
+                ambush_chance *= 0.5
+
+            if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
+                monster_atk = monster.get("ATK", 10)
+                damage = int(monster_atk * 0.8)  # 80% ATK damage
+                damage = max(1, damage)  # Minimum 1 damage
+
+                # Apply damage immediately
+                current_hp = context["vitals"]["current_hp"]
+                new_hp = max(0, current_hp - damage)
+                context["vitals"]["current_hp"] = new_hp
+
+                # Use Delta Update
+                max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
+                max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+
+                if persist:
+                    self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
+
+                phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
+
+                if context.get("event_type") == "spectral_tide":
+                    phrase += "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
+
+            # Start new combat
+            self.active_monster = monster
+            self.logs.append(phrase)
+            if persist:
+                self.save_state()
+            return self._build_result([[phrase]], False, context)
+
+        # Location has no monster this tick (rare but possible depending on combat handler)
+        msg = phrase or "The path is clear for now."
+        self.logs.append(msg)
+        if persist:
+            self.save_state()
+        return self._build_result([[msg]], False, context)
+
+    def _handle_exploration_event(
+        self,
+        context: dict[str, Any],
+        location: dict,
+        weather: Weather,
+        persist: bool,
+    ) -> dict[str, Any]:
+        """Resolves a non-combat exploration event."""
+        location_name = location.get("name")
+        # Pass the pre-fetched context to event handler
+        result = self.events.resolve_non_combat(
+            context=context,
+            location_id=self.location_id,
+            regen_chance=70,
+            location_name=location_name,
+            weather=weather,
+            event_type=context.get("event_type"),
+            supplies=self.supplies,
+        )
+        self.logs.extend(result["log"])
+
+        # Process gathered loot
+        if "loot" in result and result["loot"]:
+            for item_key, amount in result["loot"].items():
+                self.loot[item_key] = self.loot.get(item_key, 0) + amount
+
+        if persist:
+            self.save_state()
+
+        # Event handler might have updated vitals (e.g. regeneration)
+        # Ensure context reflects this for return
+        if "vitals" in result:
+            context["vitals"] = result["vitals"]
+
+        return self._build_result([result["log"]], False, context)
+
     def simulate_step(
         self,
         context_bundle: dict | None = None,
@@ -310,99 +505,18 @@ class AdventureSession:
             time_phase = WorldTime.get_current_phase()
 
             # --- 0.5. Environmental Hazards ---
-            # Only apply if not already in combat (or maybe apply anyway? Exploring implies exposure)
-            # Logic: If active monster, you are distracted by combat, so maybe hazards are handled in combat engine.
-            # But "simulate_step" represents a 15 min block.
-            # If active_monster is present, we are IN combat. CombatEngine handles in-combat weather.
-            # So this check should only happen if NOT self.active_monster.
+            # Only apply if not already in combat
             if not self.active_monster:
                 self._apply_environmental_effects(context, weather, persist)
 
             # --- 1. Continue Combat ---
             if self.active_monster:
-                if action and action.startswith("set_stance:"):
-                    stance = action.split(":", 1)[1]
-                    self.active_monster["player_stance"] = stance
-                    msg = f"You shift into an **{stance.capitalize()}** stance!"
-                    self.logs.append(msg)
-                    if persist:
-                        self.save_state()
-                    # Return immediate result to update UI without processing turn
-                    # We wrap the msg in a list to match sequence format [[msg]]
-                    return self._build_result([[msg]], False, context)
-
-                if action == "flee":
-                    return self._attempt_flee(context, persist=persist)
-
-                if action == "defend":
-                    return self._process_combat_turn(
-                        context,
-                        action="defend",
-                        persist=persist,
-                        weather=weather,
-                        time_phase=time_phase,
-                        threat_reduction=threat_reduction,
-                    )
-
-                if action == "special_ability":
-                    return self._process_combat_turn(
-                        context,
-                        action="special_ability",
-                        persist=persist,
-                        weather=weather,
-                        time_phase=time_phase,
-                        threat_reduction=threat_reduction,
-                    )
-
-                should_auto = self._check_auto_condition(context)
-
-                if background:
-                    # Background: Flee if HP critical, else Auto-Combat
-                    if context and context.get("vitals"):
-                        current_hp = context["vitals"]["current_hp"]
-                        # Ensure max_hp is at least 1
-                        if "stats_dict" in context:
-                            max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
-                        else:
-                            max_hp = max(context["player_stats"].max_hp, 1)
-
-                        if (current_hp / max_hp) < 0.30:
-                            # Auto-Flee logic
-                            return self._attempt_flee(context, persist=persist)
-
-                    return self._resolve_auto_combat(
-                        context,
-                        background=True,
-                        persist=persist,
-                        weather=weather,
-                        time_phase=time_phase,
-                        threat_reduction=threat_reduction,
-                    )
-
-                # If explicit attack or implicit auto, and eligible -> Auto
-                if (action == "attack" or not action) and should_auto:
-                    return self._resolve_auto_combat(
-                        context,
-                        persist=persist,
-                        weather=weather,
-                        time_phase=time_phase,
-                        threat_reduction=threat_reduction,
-                    )
-
-                # Otherwise manual single turn
-                final_action = action if action else "attack"
-                return self._process_combat_turn(
-                    context,
-                    action=final_action,
-                    persist=persist,
-                    weather=weather,
-                    time_phase=time_phase,
-                    threat_reduction=threat_reduction,
+                return self._handle_active_combat(
+                    context, action, background, persist, weather, time_phase, threat_reduction
                 )
 
             # Dynamic Combat Threshold based on Weather and Time
             # Base REGEN_CHANCE is 40 (meaning 60% combat).
-            # We want Storms/Night to be more dangerous (Higher combat chance -> Lower Regen Chance).
             regen_threshold = self.REGEN_CHANCE
 
             # Weather Modifiers
@@ -416,95 +530,19 @@ class AdventureSession:
             # Time Modifiers
             if time_phase == TimePhase.NIGHT:
                 night_mod = context.get("active_boosts", {}).get("night_danger_mod", 0.0)
-                regen_threshold -= 10 + int(night_mod * 100)  # Night is dangerous (+10% + Event Mod Combat Chance)
+                regen_threshold -= 10 + int(night_mod * 100)  # Night is dangerous
             elif time_phase == TimePhase.DAY:
-                regen_threshold += 5  # Day is safer (-5% Combat Chance)
+                regen_threshold += 5  # Day is safer
 
             # --- 2. Trigger New Encounter ---
-            if random.randint(1, 100) > regen_threshold:  # nosec B311
-                # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
-                player_level = context["player_row"].get("level", 1)
-                monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
-
-                if monster:
-                    # Prepend Weather Flavor to the encounter
-                    weather_flavor = WorldTime.get_weather_flavor(weather)
-                    phrase = f"{weather_flavor}\n{phrase}"
-
-                    # --- NIGHT AMBUSH MECHANIC ---
-                    # 20% Chance for monsters to strike first at night
-                    ambush_chance = 0.20
-                    # Event Modifier
-                    ambush_chance += context.get("active_boosts", {}).get("spectral_ambush_chance", 0.0)
-
-                    # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
-                    if self.supplies.get("pitch_torch"):
-                        ambush_chance *= 0.5
-
-                    if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
-                        monster_atk = monster.get("ATK", 10)
-                        damage = int(monster_atk * 0.8)  # 80% ATK damage
-                        damage = max(1, damage)  # Minimum 1 damage
-
-                        # Apply damage immediately
-                        current_hp = context["vitals"]["current_hp"]
-                        new_hp = max(0, current_hp - damage)
-                        context["vitals"]["current_hp"] = new_hp
-
-                        # Use Delta Update
-                        max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
-                        max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
-
-                        if persist:
-                            self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
-
-                        phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
-
-                        if context.get("event_type") == "spectral_tide":
-                            phrase += "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
-
-                    # Start new combat
-                    self.active_monster = monster
-                    self.logs.append(phrase)
-                    if persist:
-                        self.save_state()
-                    return self._build_result([[phrase]], False, context)
-
-                # Location has no monster this tick
-                msg = phrase or "The path is clear for now."
-                self.logs.append(msg)
-                if persist:
-                    self.save_state()
-                return self._build_result([[msg]], False, context)
+            combat_result = self._handle_new_encounter(
+                context, location, regen_threshold, persist, weather, time_phase
+            )
+            if combat_result:
+                return combat_result
 
             # --- 3. Non-Combat Event ---
-            location_name = location.get("name")
-            # Pass the pre-fetched context to event handler
-            result = self.events.resolve_non_combat(
-                context=context,
-                location_id=self.location_id,
-                regen_chance=70,
-                location_name=location_name,
-                weather=weather,
-                event_type=context.get("event_type"),
-                supplies=self.supplies,
-            )
-            self.logs.extend(result["log"])
-
-            # Process gathered loot
-            if "loot" in result and result["loot"]:
-                for item_key, amount in result["loot"].items():
-                    self.loot[item_key] = self.loot.get(item_key, 0) + amount
-
-            if persist:
-                self.save_state()
-
-            # Event handler might have updated vitals (e.g. regeneration)
-            # Ensure context reflects this for return
-            if "vitals" in result:
-                context["vitals"] = result["vitals"]
-
-            return self._build_result([result["log"]], False, context)
+            return self._handle_exploration_event(context, location, weather, persist)
 
         except Exception as e:
             logger.error(f"Simulation error for {self.discord_id}: {e}", exc_info=True)
