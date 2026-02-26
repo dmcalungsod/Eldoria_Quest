@@ -1,57 +1,74 @@
 import os
 import sys
 import unittest
+import importlib
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock pymongo
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-
-# Mock Discord
-mock_discord = MagicMock()
-sys.modules["discord"] = mock_discord
-sys.modules["discord.ext"] = MagicMock()
-
-# Mock discord.ui
-mock_ui = MagicMock()
-
-# Mock Select to capture options
-class MockSelect:
-    def __init__(self, placeholder=None, min_values=1, max_values=1, row=0):
-        self.options = []
-        self.placeholder = placeholder
-        self.disabled = False
-        self.callback = None
-
-    def add_option(self, label, value, description=None, emoji=None):
-        self.options.append({"label": label, "value": value, "description": description})
-
-# Mock View to capture items
-class MockView:
-    def __init__(self, timeout=None):
-        self.items = []
-
-    def add_item(self, item):
-        self.items.append(item)
-
-mock_ui.Select = MockSelect
-mock_ui.View = MockView
-sys.modules["discord.ui"] = mock_ui
-mock_discord.ui = mock_ui
-
-# Reload modules to apply mocks
-if "cogs.shop_cog" in sys.modules:
-    del sys.modules["cogs.shop_cog"]
-
-from cogs.shop_cog import ShopView
-from database.database_manager import DatabaseManager
-
-
 class TestShopUXEnhancement(unittest.TestCase):
+    def setUp(self):
+        # Mock dependencies
+        self.mock_discord = MagicMock()
+        self.mock_ui = MagicMock()
+
+        # Mock Select
+        class MockSelect:
+            def __init__(self, placeholder=None, min_values=1, max_values=1, row=0):
+                self.options = []
+                self.placeholder = placeholder
+                self.disabled = False
+                self.callback = None
+
+            def add_option(self, label, value, description=None, emoji=None):
+                self.options.append({"label": label, "value": value, "description": description})
+
+        # Mock View
+        class MockView:
+            def __init__(self, timeout=None):
+                self.items = []
+
+            def add_item(self, item):
+                self.items.append(item)
+
+        self.mock_ui.Select = MockSelect
+        self.mock_ui.View = MockView
+        self.mock_discord.ui = self.mock_ui
+
+        # Prepare patches
+        self.modules_patcher = patch.dict(sys.modules, {
+            "discord": self.mock_discord,
+            "discord.ui": self.mock_ui,
+            "discord.ext": MagicMock(),
+            "pymongo": MagicMock(),
+            "pymongo.errors": MagicMock()
+        })
+        self.modules_patcher.start()
+
+        # Import under test (must happen after patching)
+        if "cogs.shop_cog" in sys.modules:
+            del sys.modules["cogs.shop_cog"]
+        import cogs.shop_cog
+        self.shop_module = cogs.shop_cog
+        self.ShopView = self.shop_module.ShopView
+
+        # Import DatabaseManager (it uses pymongo which is now mocked)
+        if "database.database_manager" in sys.modules:
+            del sys.modules["database.database_manager"]
+        import database.database_manager
+        self.db_module = database.database_manager
+        self.DatabaseManager = self.db_module.DatabaseManager
+
+    def tearDown(self):
+        self.modules_patcher.stop()
+        # Clean up imported modules to avoid polluting other tests
+        if "cogs.shop_cog" in sys.modules:
+            del sys.modules["cogs.shop_cog"]
+        if "database.database_manager" in sys.modules:
+            del sys.modules["database.database_manager"]
+
     def test_get_inventory_items_counts(self):
-        db = DatabaseManager()
+        db = self.DatabaseManager()
         # Mock aggregate
         mock_col = MagicMock()
         # Mock db[collection_name]
@@ -81,16 +98,17 @@ class TestShopUXEnhancement(unittest.TestCase):
         inventory = {"hp_potion": 50, "sword": 100}
         owned_counts = {"hp_potion": 3, "sword": 0}
 
-        # Mock CONSUMABLES lookup
-        with patch("cogs.shop_cog.CONSUMABLES", {
+        # Mock CONSUMABLES lookup within the patched module
+        with patch.dict(self.shop_module.CONSUMABLES, {
             "hp_potion": {"name": "Health Potion", "description": "Heals HP"},
             "sword": {"name": "Iron Sword", "description": "Sharp"}
-        }):
-            view = ShopView(mock_db, mock_user, 1000, inventory=inventory, owned_counts=owned_counts)
+        }, clear=True):
+            view = self.ShopView(mock_db, mock_user, 1000, inventory=inventory, owned_counts=owned_counts)
 
             # Retrieve the MockSelect from items
             select = view.items[0]
-            self.assertIsInstance(select, MockSelect)
+            # Verify type against the class defined in setUp
+            self.assertIsInstance(select, self.mock_ui.Select)
 
             # Check options
             options = {opt["value"].split(":")[0]: opt["label"] for opt in select.options}
