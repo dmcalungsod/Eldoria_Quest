@@ -456,4 +456,35 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1300,
     },
+    # --- The Thunder-Crag Coast Materials (Rank A) ---
+    "fulgurite_shard": {
+        "name": "Fulgurite Shard",
+        "description": "A jagged shard of glass formed by lightning striking sand.",
+        "rarity": "Common",
+        "value": 30,
+    },
+    "rusted_scrap": {
+        "name": "Rusted Scrap",
+        "description": "A piece of ancient, rusted metal. A skilled smith might refine it.",
+        "rarity": "Common",
+        "value": 10,
+    },
+    "storm_essence": {
+        "name": "Storm Essence",
+        "description": "A vial of crackling energy, collected from a storm elemental.",
+        "rarity": "Uncommon",
+        "value": 50,
+    },
+    "siren_scale": {
+        "name": "Siren Scale",
+        "description": "A shimmering scale that reflects the colors of a stormy sea.",
+        "rarity": "Rare",
+        "value": 150,
+    },
+    "admiral_insignia": {
+        "name": "Admiral's Insignia",
+        "description": "The tarnished badge of a long-dead admiral.",
+        "rarity": "Epic",
+        "value": 1200,
+    },
 }
