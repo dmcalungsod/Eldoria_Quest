@@ -31,6 +31,7 @@ import test_developer_cog
 import test_dos_prevention  # New DoS prevention tests
 import test_event_cog
 import test_exploration_view_ux  # New UX test
+import test_shop_ux_enhancement  # New Shop UX test
 import test_faction_system  # New Faction System tests
 import test_game_systems
 import test_item_manager
@@ -136,6 +137,7 @@ def run_ux_tests():
     suite = loader.loadTestsFromModule(test_exploration_view_ux)
     suite.addTests(loader.loadTestsFromModule(test_adventure_embeds))
     suite.addTests(loader.loadTestsFromModule(test_onboarding_ux))
+    suite.addTests(loader.loadTestsFromModule(test_shop_ux_enhancement))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()

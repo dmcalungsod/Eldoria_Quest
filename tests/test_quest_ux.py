@@ -15,12 +15,8 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # Mock pymongo BEFORE importing DatabaseManager
-# Mock pymongo BEFORE importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
-
-# Ensure cogs.quest_hub_cog is loaded so patch can find it on Python 3.10
-import cogs.quest_hub_cog  # noqa
 
 
 # Setup View and Button mocks
@@ -37,25 +33,8 @@ discord_ui_mock.Button = MagicMock
 discord_mock.Color.gold.return_value = "gold"
 discord_mock.Color.orange.return_value = "orange"
 
-
-class MockEmbed:
-    def __init__(self, title=None, description=None, color=None, **kwargs):
-        self.title = title or ""
-        self.description = description or ""
-        self.color = color
-        self.fields = []
-
-    def set_footer(self, text=None):
-        pass
-
-    def add_field(self, name, value, inline=False):
-        self.fields.append({"name": name, "value": value})
-
-
-discord_mock.Embed.side_effect = MockEmbed
-
-
 # Now import the module under test
+import cogs.quest_hub_cog  # noqa: E402
 from game_systems.guild_system.ui.quests_menu import QuestsMenuView  # noqa: E402
 
 
@@ -64,12 +43,6 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         self.db_mock = MagicMock()
         self.user_mock = MagicMock()
         self.user_mock.id = 12345
-
-        import game_systems.guild_system.ui.quests_menu as quests_menu
-
-        quests_menu.discord.Color.orange.return_value = "orange"
-        quests_menu.discord.Color.green.return_value = "green"
-        quests_menu.discord.Color.red.return_value = "red"
         self.interaction_mock = AsyncMock()
         self.interaction_mock.user = self.user_mock
 
@@ -113,13 +86,13 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(embed.color, "orange")
 
         # 3. Should have added fields for the quests
-        # Since embed is MockEmbed, we check fields list
-        self.assertEqual(len(embed.fields), 1)
+        # Since embed is a mock, we check call args on add_field
+        self.assertEqual(embed.add_field.call_count, 1)
 
-        field = embed.fields[0]
-        self.assertIn("Slime Hunt", field["name"])
-        self.assertIn("In Progress", field["name"])
-        self.assertIn("3/5", field["value"])
+        call_args = embed.add_field.call_args[1]  # kwargs
+        self.assertIn("Slime Hunt", call_args["name"])
+        self.assertIn("In Progress", call_args["name"])
+        self.assertIn("3/5", call_args["value"])
 
 
 if __name__ == "__main__":

@@ -1289,6 +1289,32 @@ class DatabaseManager:
         result = list(self._col("inventory").aggregate(pipeline))
         return result[0]["total"] if result else 0
 
+    def get_inventory_items_counts(self, discord_id: int, item_keys: list[str]) -> dict[str, int]:
+        """
+        Fetches the total count for multiple items in a single query.
+        Returns a dictionary {item_key: total_count}.
+        """
+        if not item_keys:
+            return {}
+
+        pipeline = [
+            {
+                "$match": {
+                    "discord_id": discord_id,
+                    "item_key": {"$in": item_keys},
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$item_key",
+                    "total": {"$sum": "$count"},
+                }
+            },
+        ]
+
+        results = list(self._col("inventory").aggregate(pipeline))
+        return {doc["_id"]: doc["total"] for doc in results}
+
     def consume_item_atomic(self, inv_id: int, amount: int = 1) -> bool:
         """
         Atomically decrements item count if sufficient quantity exists.

@@ -32,6 +32,7 @@ class ShopView(View):
         interaction_user: discord.User,
         current_aurum: int,
         inventory: dict = None,
+        owned_counts: dict[str, int] = None,
     ):
         super().__init__(timeout=180)
         self.db = db_manager
@@ -39,6 +40,7 @@ class ShopView(View):
         self.current_aurum = current_aurum
         self.inventory = inventory or SHOP_INVENTORY
         self.inv_manager = InventoryManager(self.db)
+        self.owned_counts = owned_counts or {}
 
         self.add_item(self.build_item_select())
 
@@ -79,7 +81,8 @@ class ShopView(View):
             emoji = E.AURUM if can_afford else E.LOCKED
 
             # Ensure label does not exceed 100 characters
-            suffix = f" — {price} G"
+            owned = self.owned_counts.get(item_key, 0)
+            suffix = f" — {price} G (Owned: {owned})"
             if not can_afford:
                 suffix += " [Too Expensive]"
 
@@ -150,6 +153,13 @@ class ShopView(View):
         fresh_player = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
         current_aurum = fresh_player["aurum"] if fresh_player else 0
 
+        # Fetch fresh inventory counts to update the UI
+        new_counts = await asyncio.to_thread(
+            self.db.get_inventory_items_counts,
+            self.interaction_user.id,
+            list(self.inventory.keys()),
+        )
+
         embed = discord.Embed(
             title="🛒 Guild Supply Depot",
             description=(
@@ -163,7 +173,13 @@ class ShopView(View):
         msg = f"{E.CHECK} Secured **1x {result['name']}**." if success else f"{E.ERROR} {result}"
         embed.add_field(name="Transaction Receipt", value=msg)
 
-        new_view = ShopView(self.db, self.interaction_user, current_aurum, self.inventory)
+        new_view = ShopView(
+            self.db,
+            self.interaction_user,
+            current_aurum,
+            self.inventory,
+            owned_counts=new_counts,
+        )
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
         await interaction.edit_original_response(embed=embed, view=new_view)
