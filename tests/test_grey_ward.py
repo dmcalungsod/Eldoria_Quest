@@ -22,12 +22,12 @@ class TestGreyWard(unittest.TestCase):
         self.faction_id = "grey_ward"
 
     def test_grey_ward_exists(self):
-        """Verify 'The Grey Ward' exists in FACTIONS and has correct properties."""
+        """Verify 'Grey Ward' exists in FACTIONS and has correct properties."""
         if self.faction_id not in FACTIONS:
             self.fail(f"The Grey Ward faction ({self.faction_id}) is missing from FACTIONS.")
 
         faction = FACTIONS[self.faction_id]
-        self.assertEqual(faction["name"], "The Grey Ward")
+        self.assertEqual(faction["name"], "Grey Ward")
         self.assertEqual(faction["emoji"], "⚕️")
         self.assertIn("pragmatic order of alchemists", faction["description"])
 
@@ -48,35 +48,31 @@ class TestGreyWard(unittest.TestCase):
         self.assertEqual(ranks[4]["reward"]["value"], 0.1)
         self.assertEqual(ranks[5]["reward"]["value"], "Master Apothecary")
 
-        # Verify Interests (Reverted)
+        # Verify Interests
         self.assertEqual(faction["interests"]["gathering"], 1.5)
+        self.assertEqual(faction["interests"]["crafting"], 1.5)
         self.assertIn("Plant", faction["interests"]["monster_types"])
-        self.assertIn("Undead", faction["interests"]["monster_types"])
+        self.assertIn("Slime", faction["interests"]["monster_types"])
+        self.assertNotIn("Undead", faction["interests"]["monster_types"])
 
-        # Verify Favored Locations (Reverted)
+        # Verify Favored Locations
         favored = faction["favored_locations"]
         self.assertIn("whispering_thicket", favored)
         self.assertIn("deepgrove_roots", favored)
         self.assertIn("shrouded_fen", favored)
         self.assertIn("forgotten_ossuary", favored)
+        self.assertIn("the_ashlands", favored)
 
     def test_join_grey_ward(self):
-        """Test joining The Grey Ward."""
+        """Test joining Grey Ward."""
         self.mock_db.get_player_faction_data.return_value = None
-
-        # Ensure it exists before testing join (otherwise it fails here if not implemented)
-        if self.faction_id not in FACTIONS:
-            self.skipTest("The Grey Ward faction not yet implemented.")
 
         success, msg = self.system.join_faction(self.discord_id, self.faction_id)
         self.assertTrue(success)
-        self.assertIn("The Grey Ward", msg)
+        self.assertIn("Grey Ward", msg)
 
     def test_grey_ward_reputation_gain(self):
         """Test reputation gain logic for The Grey Ward (favored locations)."""
-        if self.faction_id not in FACTIONS:
-            self.skipTest("The Grey Ward faction not yet implemented.")
-
         # Manually inject the faction into the system's knowledge if needed,
         # but the system reads directly from FACTIONS which we imported.
 
@@ -106,9 +102,6 @@ class TestGreyWard(unittest.TestCase):
 
     def test_grey_ward_reputation_gain_non_favored(self):
         """Test reputation gain in non-favored location."""
-        if self.faction_id not in FACTIONS:
-            self.skipTest("The Grey Ward faction not yet implemented.")
-
         self.mock_db.get_player_faction_data.return_value = {
             "faction_id": self.faction_id,
             "reputation": 0,
