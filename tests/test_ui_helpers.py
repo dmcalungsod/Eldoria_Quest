@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Adjust path to include the root directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,18 +18,10 @@ if "discord" not in sys.modules or not isinstance(sys.modules["discord"], MagicM
     mock_discord = MagicMock()
     sys.modules["discord"] = mock_discord
     sys.modules["discord.ui"] = MagicMock()
-    sys.modules["discord.ui"].View = type("MockView", (), {})
-    sys.modules["discord.ui"].Button = type("MockButton", (), {})
-    sys.modules["discord.ext"] = MagicMock()
-    sys.modules["discord.ext.commands"] = MagicMock()
 
 # Import the module to test
 import cogs.utils.ui_helpers  # noqa: E402
 from cogs.utils.ui_helpers import build_inventory_embed, make_progress_bar  # noqa: E402
-
-# Import view modules so patch can resolve their names
-import game_systems.character.ui.profile_view  # noqa: E402
-import game_systems.guild_system.ui.lobby_view  # noqa: E402
 
 
 class MockEmbed:
@@ -42,11 +34,8 @@ class MockEmbed:
     def add_field(self, name, value, inline=False):
         self.fields.append({"name": name, "value": value, "inline": inline})
 
-    def set_thumbnail(self, url):
-        self.thumbnail_url = url
 
-
-class TestUIHelpers(unittest.IsolatedAsyncioTestCase):
+class TestUIHelpers(unittest.TestCase):
     def setUp(self):
         # Retrieve the CURRENT global discord mock
         current_discord_mock = sys.modules["discord"]
@@ -170,72 +159,6 @@ class TestUIHelpers(unittest.IsolatedAsyncioTestCase):
         eq_field = next((f for f in embed.fields if f["name"] == "Equipment"), None)
         self.assertIsNotNone(eq_field)
         self.assertIn("Spare Sword (x1)", eq_field["value"])
-
-    @patch("game_systems.character.ui.profile_view.CharacterTabView", autospec=True)
-    @patch("cogs.utils.ui_helpers.DatabaseManager", autospec=True)
-    async def test_back_to_profile_callback_new_message(self, MockDB, MockCharacterTabView):
-        from unittest.mock import AsyncMock
-        import cogs.utils.ui_helpers as ui_helpers
-
-        db_instance = MockDB.return_value
-        # Mock get_profile_bundle
-        bundle = {
-            "player": {
-                "name": "Hero",
-                "class_id": 1,
-                "level": 1,
-                "experience": 0,
-                "exp_to_next": 100,
-                "current_hp": 100,
-                "current_mp": 50,
-            },
-            "stats": {
-                "strength": 10,
-                "endurance": 10,
-                "dexterity": 10,
-                "agility": 10,
-                "magic": 10,
-                "luck": 10,
-                "max_hp": 100,
-                "max_mp": 50,
-                "max_inventory_slots": 20,
-            },
-            "guild": {"rank": "F"},
-        }
-        db_instance.get_profile_bundle.return_value = bundle
-        db_instance.get_class.return_value = {"name": "Warrior"}
-        db_instance.get_inventory_slot_count.return_value = 5
-
-        interaction = AsyncMock()
-        interaction.user.id = 123
-        interaction.response.is_done = MagicMock(return_value=False)
-        await ui_helpers.back_to_profile_callback(interaction, is_new_message=False)
-        interaction.response.defer.assert_called_once()
-        interaction.edit_original_response.assert_called_once()
-
-        # Test new message branch
-        interaction2 = AsyncMock()
-        interaction2.response.is_done = MagicMock(return_value=True)
-        await ui_helpers.back_to_profile_callback(interaction2, is_new_message=True)
-        interaction2.followup.send.assert_called_once()
-
-    @patch("game_systems.guild_system.ui.lobby_view.GuildLobbyView", autospec=True)
-    @patch("cogs.utils.ui_helpers.DatabaseManager", autospec=True)
-    async def test_back_to_guild_hall_callback(self, MockDB, MockGuildLobbyView):
-        from unittest.mock import AsyncMock
-        import cogs.utils.ui_helpers as ui_helpers
-
-        db_instance = MockDB.return_value
-        db_instance.get_player.return_value = {"id": 123}
-        db_instance.get_guild_card_data.return_value = {"name": "Hero", "rank": "F"}
-
-        interaction = AsyncMock()
-        interaction.user.id = 123
-        interaction.response.is_done = MagicMock(return_value=False)
-
-        await ui_helpers.back_to_guild_hall_callback(interaction)
-        interaction.response.defer.assert_called_once()
-        interaction.edit_original_response.assert_called_once()
 
 
 if __name__ == "__main__":

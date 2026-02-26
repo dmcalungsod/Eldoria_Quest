@@ -1,23 +1,34 @@
 import os
 import sys
 import unittest
+import importlib
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock sys.modules for pymongo before importing DatabaseManager
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-sys.modules["pymongo.MongoClient"] = MagicMock()
-sys.modules["pymongo.UpdateOne"] = MagicMock()
-sys.modules["pymongo.InsertOne"] = MagicMock()
-
-from database.database_manager import DatabaseManager  # noqa: E402
-
-
 class TestStackLimits(unittest.TestCase):
     def setUp(self):
-        self.db = DatabaseManager()
+        # Mock sys.modules for pymongo
+        self.mock_pymongo = MagicMock()
+        self.mock_pymongo_errors = MagicMock()
+
+        self.modules_patcher = patch.dict(sys.modules, {
+            "pymongo": self.mock_pymongo,
+            "pymongo.errors": self.mock_pymongo_errors,
+            "pymongo.MongoClient": MagicMock(),
+            "pymongo.UpdateOne": MagicMock(),
+            "pymongo.InsertOne": MagicMock(),
+        })
+        self.modules_patcher.start()
+
+        # Import DatabaseManager after patching
+        if "database.database_manager" in sys.modules:
+            del sys.modules["database.database_manager"]
+        import database.database_manager
+        self.db_module = database.database_manager
+        self.DatabaseManager = self.db_module.DatabaseManager
+
+        self.db = self.DatabaseManager()
         self.db.db = MagicMock()
         self.db._col = MagicMock()
         self.inventory_col = MagicMock()
@@ -36,6 +47,11 @@ class TestStackLimits(unittest.TestCase):
         # Reset mocks
         self.inventory_col.reset_mock()
         self.counters_col.reset_mock()
+
+    def tearDown(self):
+        self.modules_patcher.stop()
+        if "database.database_manager" in sys.modules:
+            del sys.modules["database.database_manager"]
 
     def test_consumable_overflow_creates_new_stack(self):
         # Scenario: Add 12 potions (MAX=5).
@@ -119,9 +135,7 @@ class TestStackLimits(unittest.TestCase):
         self.assertEqual(inserted_docs[0]["count"], 1)
         self.assertEqual(inserted_docs[1]["count"], 1)
 
-    @patch("database.database_manager.UpdateOne")
-    @patch("database.database_manager.InsertOne")
-    def test_bulk_add_distribution(self, MockInsertOne, MockUpdateOne):
+    def test_bulk_add_distribution(self):
         # Scenario: Bulk add 12 potions. Existing stack of 2 (MAX=5).
         # Total 14. Existing(2) -> Full(5). Remainder 9.
         # New stacks: 5, 4.
@@ -153,25 +167,27 @@ class TestStackLimits(unittest.TestCase):
         self.inventory_col.count_documents.return_value = 1  # 1 slot used
         self.counters_col.find_one_and_update.return_value = {"seq": 200}
 
-        with patch.object(self.db, "calculate_inventory_limit", return_value=20):
+        # Patch UpdateOne/InsertOne within the patched module context
+        # We need to access them via self.db_module because we patched imports
+        with patch.object(self.db_module, "UpdateOne") as MockUpdateOne, \
+             patch.object(self.db_module, "InsertOne") as MockInsertOne, \
+             patch.object(self.db, "calculate_inventory_limit", return_value=20):
+
             failed = self.db.add_inventory_items_bulk(self.discord_id, items)
 
-        self.assertEqual(len(failed), 0)
+            self.assertEqual(len(failed), 0)
 
-        self.inventory_col.bulk_write.assert_called_once()
-        ops = self.inventory_col.bulk_write.call_args[0][0]
-        self.assertEqual(len(ops), 3)  # 1 Update + 2 Inserts
+            self.inventory_col.bulk_write.assert_called_once()
+            ops = self.inventory_col.bulk_write.call_args[0][0]
+            self.assertEqual(len(ops), 3)  # 1 Update + 2 Inserts
 
-        # Check UpdateOne call
-        MockUpdateOne.assert_called_with({"id": 50}, {"$inc": {"count": 3}})
+            # Check UpdateOne call
+            MockUpdateOne.assert_called_with({"id": 50}, {"$inc": {"count": 3}})
 
-        # Check InsertOne calls
-        # We expect 2 inserts: 5 and 4
-        # Since calls are mocked, we check if ANY call matches 5 and ANY matches 4
-
-        counts = [call[0][0]["count"] for call in MockInsertOne.call_args_list]
-        self.assertIn(5, counts)
-        self.assertIn(4, counts)
+            # Check InsertOne calls
+            counts = [call[0][0]["count"] for call in MockInsertOne.call_args_list]
+            self.assertIn(5, counts)
+            self.assertIn(4, counts)
 
 
 if __name__ == "__main__":
