@@ -41,3 +41,12 @@
 - **Mechanics:** Introduced wind-themed skills (`gust`, `aerial_dive`, `thunder_call`) focusing on magic/physical hybrid damage.
 - **Economy:** Added `cloud_wisp`, `griffon_feather`, `charged_core`, and `tempest_heart` to support future crafting.
 - **Challenge:** Designed "Tempest Guardian" (Level 39 Boss) with `aerial_dive` and `thunder_call` to test mixed mitigation.
+
+## 2026-03-05 — The Grey Ward
+
+**Learning:** Players interested in alchemy and survival had no dedicated faction to align with, despite lore references.
+**Action:** Implemented "The Grey Ward" faction.
+- **Identity:** Alchemists and pragmatists who study The Rot and use corruption to survive.
+- **Progression:** Ranks from Gleaner to Master Apothecary.
+- **Rewards:** Utility consumables (`bitter_panacea`, `phial_of_vitriol`) and gathering buffs.
+- **Integration:** Favored locations include `whispering_thicket` and `deepgrove_roots`, encouraging exploration of corrupted zones.
