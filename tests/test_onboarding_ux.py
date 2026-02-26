@@ -59,15 +59,13 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         sys.modules["pymongo.errors"] = mock_pymongo.errors
 
         # Import modules under test
-        if "cogs.onboarding_cog" in sys.modules:
-            del sys.modules["cogs.onboarding_cog"]
-
         import cogs.onboarding_cog
+
+        importlib.reload(cogs.onboarding_cog)
 
         self.GuildWelcomeView = cogs.onboarding_cog.GuildWelcomeView
         self.CombatTutorialView = cogs.onboarding_cog.CombatTutorialView
         self.StartMenuView = cogs.onboarding_cog.StartMenuView
-        self.StartFirstExpeditionView = cogs.onboarding_cog.StartFirstExpeditionView
 
     def tearDown(self):
         self.modules_patcher.stop()
@@ -85,11 +83,7 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         mock_discord = sys.modules["discord"]
         for btn in view.children:
             self.assertIsNotNone(btn.emoji, f"Button {btn.label} is missing an emoji")
-            self.assertEqual(
-                btn.style,
-                mock_discord.ButtonStyle.primary,
-                f"Button {btn.label} has wrong style",
-            )
+            self.assertEqual(btn.style, mock_discord.ButtonStyle.primary, f"Button {btn.label} has wrong style")
 
     async def test_guild_welcome_view_init(self):
         """Test that GuildWelcomeView initializes with correct buttons."""
@@ -126,22 +120,9 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(view.step, 3)
 
         # Simulate Complete (Step 3 -> End)
-        with patch(
-            "cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock
-        ) as mock_transition:
+        with patch("cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock) as mock_transition:
             await view.complete_callback(interaction)
-            # Should NOT call transition_to_guild_lobby, but offer expedition
-            mock_transition.assert_not_called()
-
-            # Verify it showed the new view
-            interaction.edit_original_response.assert_called()
-            call_args = interaction.edit_original_response.call_args
-            self.assertIsNotNone(call_args)
-
-            # Check if view is StartFirstExpeditionView
-            _, kwargs = call_args
-            new_view = kwargs.get("view")
-            self.assertIsInstance(new_view, self.StartFirstExpeditionView)
+            mock_transition.assert_called_with(interaction, db, user)
 
 
 if __name__ == "__main__":
