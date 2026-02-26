@@ -44,7 +44,7 @@ commands:
 jobs:
   ruff-fix:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.14
     steps:
       - checkout
       - install-ruff
@@ -61,7 +61,7 @@ jobs:
 
   test:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.14
     steps:
       - checkout
       - install-deps
@@ -81,7 +81,7 @@ jobs:
 
   auto-merge:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.14
     steps:
       - checkout
       - install-gh
