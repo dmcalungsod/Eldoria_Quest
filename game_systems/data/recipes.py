@@ -177,6 +177,43 @@ RECIPES = {
         "cost": 350,
         "description": "A scholar's secret: sharp as a quill.",
     },
+    # --- New Travel Supplies & Alchemist Items ---
+    "craft_hardtack": {
+        "id": "craft_hardtack",
+        "name": "Hardtack",
+        "output_key": "hardtack",
+        "output_amount": 2,
+        "materials": {"food_ration": 1, "medicinal_herb": 1},
+        "cost": 10,
+        "description": "Bake rations with herbs into long-lasting biscuits.",
+    },
+    "craft_pitch_torch": {
+        "id": "craft_pitch_torch",
+        "name": "Pitch Torch",
+        "output_key": "pitch_torch",
+        "output_amount": 3,
+        "materials": {"treant_branch": 1, "slime_gel": 2},
+        "cost": 15,
+        "description": "Soak a branch in slime gel to create a lasting torch.",
+    },
+    "craft_phial_of_vitriol": {
+        "id": "craft_phial_of_vitriol",
+        "name": "Phial of Vitriol",
+        "output_key": "phial_of_vitriol",
+        "output_amount": 1,
+        "materials": {"slime_gel": 2, "ash_blossom": 1},
+        "cost": 50,
+        "description": "Mix acidic gel with volcanic ash.",
+    },
+    "craft_bitter_panacea": {
+        "id": "craft_bitter_panacea",
+        "name": "Bitter Panacea",
+        "output_key": "bitter_panacea",
+        "output_amount": 1,
+        "materials": {"medicinal_herb": 3, "slime_gel": 1},
+        "cost": 30,
+        "description": "A potent, foul mixture to purge toxins.",
+    },
     # --- Refinement Recipes ---
     "refine_iron_ingot": {
         "id": "refine_iron_ingot",
