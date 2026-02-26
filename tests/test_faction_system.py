@@ -3,7 +3,11 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 
-sys.modules["pymongo"] = MagicMock()
+mock_pymongo = MagicMock()
+mock_pymongo.errors = MagicMock()
+mock_pymongo.errors.DuplicateKeyError = Exception
+sys.modules["pymongo"] = mock_pymongo
+sys.modules["pymongo.errors"] = mock_pymongo.errors
 
 from game_systems.guild_system.faction_system import FactionSystem  # noqa: E402
 
