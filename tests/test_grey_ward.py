@@ -10,8 +10,8 @@ mock_pymongo.errors.DuplicateKeyError = Exception
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-from game_systems.guild_system.faction_system import FactionSystem  # noqa: E402
 from game_systems.data.factions import FACTIONS  # noqa: E402
+from game_systems.guild_system.faction_system import FactionSystem  # noqa: E402
 
 
 class TestGreyWard(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestGreyWard(unittest.TestCase):
     def test_grey_ward_exists(self):
         """Verify 'The Grey Ward' exists in FACTIONS and has correct properties."""
         if self.faction_id not in FACTIONS:
-             self.fail(f"The Grey Ward faction ({self.faction_id}) is missing from FACTIONS.")
+            self.fail(f"The Grey Ward faction ({self.faction_id}) is missing from FACTIONS.")
 
         faction = FACTIONS[self.faction_id]
         self.assertEqual(faction["name"], "The Grey Ward")
@@ -124,6 +124,7 @@ class TestGreyWard(unittest.TestCase):
 
         self.mock_db.update_faction_reputation.assert_called_with(self.discord_id, 6)
         self.assertFalse(any("Favored Location Bonus" in log for log in logs))
+
 
 if __name__ == "__main__":
     unittest.main()

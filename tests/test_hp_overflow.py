@@ -173,9 +173,9 @@ class TestHPOverflow(unittest.TestCase):
     def test_hp_clamp_with_buffs(self):
         db = MockDatabaseManager()
         # Mock active buffs: +15 END => +150 HP
-        db.get_active_buffs = MagicMock(return_value=[
-            {"discord_id": 123, "stat": "END", "amount": 15, "name": "Giant Growth", "duration": 3600}
-        ])
+        db.get_active_buffs = MagicMock(
+            return_value=[{"discord_id": 123, "stat": "END", "amount": 15, "name": "Giant Growth", "duration": 3600}]
+        )
 
         manager = EquipmentManager(db)
 
@@ -215,7 +215,9 @@ class TestHPOverflow(unittest.TestCase):
         print(f"Current HP after unequip with buffs: {current_hp}")
 
         # It should be > 150 because of the buff
-        self.assertGreater(current_hp, 150, f"HP Clamped too aggressively! Current: {current_hp}, Expected > 150 (due to buff)")
+        self.assertGreater(
+            current_hp, 150, f"HP Clamped too aggressively! Current: {current_hp}, Expected > 150 (due to buff)"
+        )
         self.assertLessEqual(current_hp, 305, f"HP Overflow! Current: {current_hp}, Max allowed: ~300")
 
 

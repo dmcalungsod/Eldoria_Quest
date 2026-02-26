@@ -1,11 +1,11 @@
 import os
 import sys
 import unittest
-import importlib
 from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestWorldEventCaching(unittest.TestCase):
     def setUp(self):
@@ -13,16 +13,20 @@ class TestWorldEventCaching(unittest.TestCase):
         self.mock_pymongo = MagicMock()
         self.mock_pymongo_errors = MagicMock()
 
-        self.modules_patcher = patch.dict(sys.modules, {
-            "pymongo": self.mock_pymongo,
-            "pymongo.errors": self.mock_pymongo_errors,
-        })
+        self.modules_patcher = patch.dict(
+            sys.modules,
+            {
+                "pymongo": self.mock_pymongo,
+                "pymongo.errors": self.mock_pymongo_errors,
+            },
+        )
         self.modules_patcher.start()
 
         # Import DatabaseManager after patching
         if "database.database_manager" in sys.modules:
             del sys.modules["database.database_manager"]
         import database.database_manager
+
         self.db_module = database.database_manager
         self.DatabaseManager = self.db_module.DatabaseManager
 

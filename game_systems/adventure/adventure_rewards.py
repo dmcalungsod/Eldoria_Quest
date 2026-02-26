@@ -8,7 +8,7 @@ Hardened to ensure atomic reward distribution.
 import json
 import logging
 import random
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager

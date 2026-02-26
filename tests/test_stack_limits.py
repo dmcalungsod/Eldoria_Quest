@@ -1,10 +1,10 @@
 import os
 import sys
 import unittest
-import importlib
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestStackLimits(unittest.TestCase):
     def setUp(self):
@@ -12,19 +12,23 @@ class TestStackLimits(unittest.TestCase):
         self.mock_pymongo = MagicMock()
         self.mock_pymongo_errors = MagicMock()
 
-        self.modules_patcher = patch.dict(sys.modules, {
-            "pymongo": self.mock_pymongo,
-            "pymongo.errors": self.mock_pymongo_errors,
-            "pymongo.MongoClient": MagicMock(),
-            "pymongo.UpdateOne": MagicMock(),
-            "pymongo.InsertOne": MagicMock(),
-        })
+        self.modules_patcher = patch.dict(
+            sys.modules,
+            {
+                "pymongo": self.mock_pymongo,
+                "pymongo.errors": self.mock_pymongo_errors,
+                "pymongo.MongoClient": MagicMock(),
+                "pymongo.UpdateOne": MagicMock(),
+                "pymongo.InsertOne": MagicMock(),
+            },
+        )
         self.modules_patcher.start()
 
         # Import DatabaseManager after patching
         if "database.database_manager" in sys.modules:
             del sys.modules["database.database_manager"]
         import database.database_manager
+
         self.db_module = database.database_manager
         self.DatabaseManager = self.db_module.DatabaseManager
 
@@ -169,10 +173,11 @@ class TestStackLimits(unittest.TestCase):
 
         # Patch UpdateOne/InsertOne within the patched module context
         # We need to access them via self.db_module because we patched imports
-        with patch.object(self.db_module, "UpdateOne") as MockUpdateOne, \
-             patch.object(self.db_module, "InsertOne") as MockInsertOne, \
-             patch.object(self.db, "calculate_inventory_limit", return_value=20):
-
+        with (
+            patch.object(self.db_module, "UpdateOne") as MockUpdateOne,
+            patch.object(self.db_module, "InsertOne") as MockInsertOne,
+            patch.object(self.db, "calculate_inventory_limit", return_value=20),
+        ):
             failed = self.db.add_inventory_items_bulk(self.discord_id, items)
 
             self.assertEqual(len(failed), 0)

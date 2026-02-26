@@ -1,10 +1,10 @@
 import os
 import sys
 import unittest
-import importlib
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestShopUXEnhancement(unittest.TestCase):
     def setUp(self):
@@ -36,19 +36,23 @@ class TestShopUXEnhancement(unittest.TestCase):
         self.mock_discord.ui = self.mock_ui
 
         # Prepare patches
-        self.modules_patcher = patch.dict(sys.modules, {
-            "discord": self.mock_discord,
-            "discord.ui": self.mock_ui,
-            "discord.ext": MagicMock(),
-            "pymongo": MagicMock(),
-            "pymongo.errors": MagicMock()
-        })
+        self.modules_patcher = patch.dict(
+            sys.modules,
+            {
+                "discord": self.mock_discord,
+                "discord.ui": self.mock_ui,
+                "discord.ext": MagicMock(),
+                "pymongo": MagicMock(),
+                "pymongo.errors": MagicMock(),
+            },
+        )
         self.modules_patcher.start()
 
         # Import under test (must happen after patching)
         if "cogs.shop_cog" in sys.modules:
             del sys.modules["cogs.shop_cog"]
         import cogs.shop_cog
+
         self.shop_module = cogs.shop_cog
         self.ShopView = self.shop_module.ShopView
 
@@ -56,6 +60,7 @@ class TestShopUXEnhancement(unittest.TestCase):
         if "database.database_manager" in sys.modules:
             del sys.modules["database.database_manager"]
         import database.database_manager
+
         self.db_module = database.database_manager
         self.DatabaseManager = self.db_module.DatabaseManager
 
@@ -76,10 +81,7 @@ class TestShopUXEnhancement(unittest.TestCase):
         db.db.__getitem__.return_value = mock_col
 
         # Mock aggregate result
-        mock_col.aggregate.return_value = [
-            {"_id": "hp_potion", "total": 5},
-            {"_id": "mp_potion", "total": 2}
-        ]
+        mock_col.aggregate.return_value = [{"_id": "hp_potion", "total": 5}, {"_id": "mp_potion", "total": 2}]
 
         counts = db.get_inventory_items_counts(12345, ["hp_potion", "mp_potion"])
 
@@ -99,10 +101,14 @@ class TestShopUXEnhancement(unittest.TestCase):
         owned_counts = {"hp_potion": 3, "sword": 0}
 
         # Mock CONSUMABLES lookup within the patched module
-        with patch.dict(self.shop_module.CONSUMABLES, {
-            "hp_potion": {"name": "Health Potion", "description": "Heals HP"},
-            "sword": {"name": "Iron Sword", "description": "Sharp"}
-        }, clear=True):
+        with patch.dict(
+            self.shop_module.CONSUMABLES,
+            {
+                "hp_potion": {"name": "Health Potion", "description": "Heals HP"},
+                "sword": {"name": "Iron Sword", "description": "Sharp"},
+            },
+            clear=True,
+        ):
             view = self.ShopView(mock_db, mock_user, 1000, inventory=inventory, owned_counts=owned_counts)
 
             # Retrieve the MockSelect from items
@@ -115,6 +121,7 @@ class TestShopUXEnhancement(unittest.TestCase):
 
             self.assertIn("Health Potion — 50 G (Owned: 3)", options["hp_potion"])
             self.assertIn("Iron Sword — 100 G (Owned: 0)", options["sword"])
+
 
 if __name__ == "__main__":
     unittest.main()

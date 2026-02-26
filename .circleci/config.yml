@@ -8,12 +8,12 @@ parameters:
 
 # ── Reusable Commands ──────────────────────────────────
 commands:
-  install-ruff:
-    description: Install Ruff linter
+  install-tools:
+    description: Install static analysis tools (Ruff, Bandit, pip-audit)
     steps:
       - run:
-          name: Install Ruff
-          command: pip install ruff
+          name: Install Tools
+          command: pip install ruff bandit pip-audit
 
   install-deps:
     description: Install project dependencies with caching
@@ -42,12 +42,12 @@ commands:
 
 # ── Jobs ───────────────────────────────────────────────
 jobs:
-  ruff-fix:
+  static-analysis:
     docker:
-      - image: cimg/python:3.14
+      - image: cimg/python:3.12
     steps:
       - checkout
-      - install-ruff
+      - install-tools
       - run:
           name: Ruff Auto-Fix & Format
           command: |
@@ -58,10 +58,16 @@ jobs:
           command: |
             ruff check .
             ruff format --check .
+      - run:
+          name: Bandit Security Scan
+          command: bandit -r . -c pyproject.toml -ll
+      - run:
+          name: Dependency Vulnerability Scan
+          command: pip-audit -r requirements.txt
 
   test:
     docker:
-      - image: cimg/python:3.14
+      - image: cimg/python:3.12
     steps:
       - checkout
       - install-deps
@@ -81,7 +87,7 @@ jobs:
 
   auto-merge:
     docker:
-      - image: cimg/python:3.14
+      - image: cimg/python:3.12
     steps:
       - checkout
       - install-gh
@@ -184,19 +190,19 @@ workflows:
     when:
       not: << pipeline.parameters.run-schedule >>
     jobs:
-      - ruff-fix
+      - static-analysis
       - test:
           requires:
-            - ruff-fix
+            - static-analysis
       - auto-merge:
           requires:
-            - ruff-fix
+            - static-analysis
       - mirror:
           filters:
             branches:
               only: main
           requires:
-            - ruff-fix
+            - static-analysis
             - test
 
   # Scheduled: manage PRs

@@ -416,7 +416,7 @@ class AdventureSession:
             # Time Modifiers
             if time_phase == TimePhase.NIGHT:
                 night_mod = context.get("active_boosts", {}).get("night_danger_mod", 0.0)
-                regen_threshold -= (10 + int(night_mod * 100))  # Night is dangerous (+10% + Event Mod Combat Chance)
+                regen_threshold -= 10 + int(night_mod * 100)  # Night is dangerous (+10% + Event Mod Combat Chance)
             elif time_phase == TimePhase.DAY:
                 regen_threshold += 5  # Day is safer (-5% Combat Chance)
 
