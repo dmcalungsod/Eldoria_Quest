@@ -26,10 +26,6 @@ class Weather(Enum):
     FOG = "Fog"
     SNOW = "Snow"
     ASH = "Ash Storm"
-    BLIZZARD = "Blizzard"
-    SANDSTORM = "Sandstorm"
-    GALE = "Gale"
-    MIASMA = "Toxic Miasma"
 
 
 LOCATION_WEATHER_WEIGHTS = {
@@ -46,55 +42,9 @@ LOCATION_WEATHER_WEIGHTS = {
         (Weather.ASH, 40),
         (Weather.STORM, 10),
     ],  # Storm = Firestorm
-    "the_ashlands": [
-        (Weather.ASH, 60),
-        (Weather.CLEAR, 30),
-        (Weather.STORM, 10),
-    ],
     "shrouded_fen": [(Weather.FOG, 50), (Weather.RAIN, 30), (Weather.CLEAR, 20)],
-    "deepgrove_roots": [(Weather.MIASMA, 40), (Weather.FOG, 30), (Weather.CLEAR, 30)],  # Underground/roots
-    "forgotten_ossuary": [(Weather.MIASMA, 50), (Weather.FOG, 30), (Weather.CLEAR, 20)],
+    "deepgrove_roots": [(Weather.CLEAR, 70), (Weather.FOG, 30)],  # Underground/roots
     "crystal_caverns": [(Weather.CLEAR, 80), (Weather.FOG, 20)],  # Glimmering mist
-    "frostfall_expanse": [
-        (Weather.SNOW, 40),
-        (Weather.BLIZZARD, 30),
-        (Weather.CLEAR, 20),
-        (Weather.FOG, 10),
-    ],
-    "shimmering_wastes": [
-        (Weather.CLEAR, 50),
-        (Weather.SANDSTORM, 40),
-        (Weather.GALE, 10),
-    ],
-    "gale_scarred_heights": [
-        (Weather.GALE, 50),
-        (Weather.STORM, 30),
-        (Weather.CLEAR, 20),
-    ],
-    "void_sanctum": [
-        (Weather.MIASMA, 60),
-        (Weather.FOG, 20),
-        (Weather.STORM, 20),
-    ],
-    "sunken_grotto": [
-        (Weather.FOG, 40),
-        (Weather.RAIN, 30),
-        (Weather.CLEAR, 30),
-    ],
-    "clockwork_halls": [
-        (Weather.CLEAR, 70),
-        (Weather.FOG, 30),  # Steam
-    ],
-    "celestial_archipelago": [
-        (Weather.CLEAR, 50),
-        (Weather.GALE, 30),
-        (Weather.STORM, 20),
-    ],
-    "whispering_thicket": [
-        (Weather.CLEAR, 40),
-        (Weather.RAIN, 30),
-        (Weather.FOG, 30),
-    ],
 }
 
 
@@ -183,13 +133,5 @@ class WorldTime:
             return "❄️ **Snow** - Cold flakes drift down from a grey sky."
         elif weather == Weather.ASH:
             return "🌋 **Ash Storm** - Hot ash falls like grey snow, choking the air."
-        elif weather == Weather.BLIZZARD:
-            return "🌨️ **Blizzard** - A whiteout of snow and ice whips around you!"
-        elif weather == Weather.SANDSTORM:
-            return "🌪️ **Sandstorm** - Gritting sand scours your skin and clouds your eyes."
-        elif weather == Weather.GALE:
-            return "💨 **Gale** - Powerful winds threaten to knock you off your feet."
-        elif weather == Weather.MIASMA:
-            return "☠️ **Miasma** - Toxic fumes rise from the ground, burning your lungs."
         else:
             return "☀️ **Clear** - The sky is open and visibility is good."
