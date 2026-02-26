@@ -223,6 +223,59 @@ class AdventureSession:
         except Exception:
             return False
 
+    def _apply_environmental_effects(self, context: dict, weather: Weather, persist: bool = True):
+        """
+        Applies non-combat environmental hazards based on weather.
+        Modifies context["vitals"] directly.
+        """
+        if not context or not context.get("vitals"):
+            return
+
+        damage = 0
+        message = None
+        max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
+
+        # Hazard Logic
+        if weather == Weather.BLIZZARD:
+            if random.random() < 0.30:
+                damage = max(1, int(max_hp * 0.04))  # 4% Max HP
+                message = f"❄️ **Freezing Winds:** The blizzard bites deep, dealing **{damage}** cold damage!"
+
+        elif weather == Weather.SANDSTORM:
+            if random.random() < 0.30:
+                damage = max(1, int(max_hp * 0.04))
+                message = f"🌪️ **Scouring Sand:** The storm flays your skin, dealing **{damage}** damage!"
+
+        elif weather == Weather.ASH:
+            if random.random() < 0.30:
+                damage = max(1, int(max_hp * 0.03))
+                message = f"🌋 **Choking Ash:** You cough violently, taking **{damage}** damage!"
+
+        elif weather == Weather.MIASMA:
+            if random.random() < 0.40:
+                damage = max(1, int(max_hp * 0.03))
+                message = f"☠️ **Toxic Fumes:** The air burns your lungs! You take **{damage}** poison damage."
+
+        elif weather == Weather.GALE:
+            if random.random() < 0.20:
+                # Gale causes minor exhaustion damage
+                damage = max(1, int(max_hp * 0.02))
+                message = f"💨 **Gale Force:** The wind knocks you down! You take **{damage}** damage."
+
+        # Apply Effects
+        if damage > 0:
+            current_hp = context["vitals"]["current_hp"]
+            new_hp = max(0, current_hp - damage)
+            context["vitals"]["current_hp"] = new_hp
+
+            if message:
+                self.logs.append(message)
+
+            if persist:
+                # Delta update
+                max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+                self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
+
     def simulate_step(
         self,
         context_bundle: dict | None = None,
@@ -254,6 +307,15 @@ class AdventureSession:
             # --- Weather & Time System Check ---
             weather = WorldTime.get_current_weather(self.location_id)
             time_phase = WorldTime.get_current_phase()
+
+            # --- 0.5. Environmental Hazards ---
+            # Only apply if not already in combat (or maybe apply anyway? Exploring implies exposure)
+            # Logic: If active monster, you are distracted by combat, so maybe hazards are handled in combat engine.
+            # But "simulate_step" represents a 15 min block.
+            # If active_monster is present, we are IN combat. CombatEngine handles in-combat weather.
+            # So this check should only happen if NOT self.active_monster.
+            if not self.active_monster:
+                self._apply_environmental_effects(context, weather, persist)
 
             # --- 1. Continue Combat ---
             if self.active_monster:
