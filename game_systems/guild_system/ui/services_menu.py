@@ -130,6 +130,7 @@ class GuildServicesView(View, GuildViewMixin):
 
     async def shop_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.shop_cog import ShopView
+        from game_systems.data.shop_data import SHOP_INVENTORY
 
         await interaction.response.defer()
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
@@ -138,12 +139,19 @@ class GuildServicesView(View, GuildViewMixin):
 
         aurum = p_data["aurum"]
 
+        # Pre-fetch inventory counts for better UX
+        counts = await asyncio.to_thread(
+            self.db.get_inventory_items_counts,
+            self.interaction_user.id,
+            list(SHOP_INVENTORY.keys()),
+        )
+
         embed = discord.Embed(
             title="Guild Supply",
             description=f"Funds: {aurum} Aurum",
             color=discord.Color.green(),
         )
-        view = ShopView(self.db, self.interaction_user, aurum)
+        view = ShopView(self.db, self.interaction_user, aurum, owned_counts=counts)
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -204,12 +212,25 @@ class GuildServicesView(View, GuildViewMixin):
 
         aurum = p_data["aurum"]
 
+        # Pre-fetch inventory counts for better UX
+        counts = await asyncio.to_thread(
+            self.db.get_inventory_items_counts,
+            self.interaction_user.id,
+            list(MYSTIC_MERCHANT_INVENTORY.keys()),
+        )
+
         embed = discord.Embed(
             title="🔮 Mystic Merchant",
             description=f"A cloaked figure displays wares that shimmer with strange energy.\n\nFunds: {aurum} Aurum",
             color=discord.Color.purple(),
         )
-        view = ShopView(self.db, self.interaction_user, aurum, inventory=MYSTIC_MERCHANT_INVENTORY)
+        view = ShopView(
+            self.db,
+            self.interaction_user,
+            aurum,
+            inventory=MYSTIC_MERCHANT_INVENTORY,
+            owned_counts=counts,
+        )
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
