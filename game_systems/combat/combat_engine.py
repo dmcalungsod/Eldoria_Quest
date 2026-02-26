@@ -152,6 +152,13 @@ class CombatEngine:
         self.new_buffs = []
         self.new_titles = []
 
+        # Player Status State (Initialized from player object or default False)
+        # Note: Ideally this should persist in DB, but for now it's per-session or per-turn in this engine instance.
+        # If CombatEngine is re-instantiated every turn, we need to pass this state in.
+        # Current architecture suggests CombatEngine is transient.
+        # We will check if player object has a 'stunned' attribute or similar.
+        self.player_stunned = getattr(player, "is_stunned", False)
+
         if self.player_stance == "aggressive":
             self.dmg_dealt_mult = 1.2
             self.dmg_taken_mult = 1.2
@@ -219,9 +226,18 @@ class CombatEngine:
             monster_stunned, bonus_crit, player_defending = self._check_interrupt_mechanic(log)
 
             # --- 1. PLAYER'S TURN ---
-            monster_defeated, player_defending = self._process_player_turn(
-                log, turn_report, bonus_crit, player_defending
-            )
+            if self.player_stunned:
+                log.append("💫 **Stunned!** You cannot move!")
+                monster_defeated = False
+                # Reset stun for next turn (or decrement if we had duration)
+                self.player_stunned = False
+                # We need to signal this back to caller if state persists,
+                # but currently engine returns result dict.
+                # We'll add 'player_stunned' to result dict.
+            else:
+                monster_defeated, player_defending = self._process_player_turn(
+                    log, turn_report, bonus_crit, player_defending
+                )
 
             # Check if player skill stunned the monster
             if self.monster.pop("is_stunned", False):
@@ -248,6 +264,7 @@ class CombatEngine:
                 "active_boosts": self.active_boosts_dict,
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
+                "player_stunned": self.player_stunned,
             }
 
         except Exception as e:
@@ -520,6 +537,13 @@ class CombatEngine:
             mp_cost = skill.get("mp_cost", 0)
             self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
 
+            # --- Status Effects Check for Monster Skills ---
+            # Added here because it should apply regardless of hit/miss/dodge logic if it's a guaranteed effect,
+            # BUT usually effects are on hit.
+            # The previous implementation placed it inside 'if not player_defending'.
+            # However, the monster logic has branches for 'heal' and 'offensive'.
+            # We need to ensure it's checked in the offensive branch.
+
             if skill.get("heal_power", 0) > 0:
                 # --- Monster Healing ---
                 heal, new_hp, event_type = DamageFormula.monster_heal(
@@ -558,6 +582,22 @@ class CombatEngine:
 
                     if not player_defending:
                         log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
+
+                # Check for Status Effects (Applied even if defending, though logic can vary)
+                # Usually status effects happen on hit. If we dodge, we don't get hit.
+                # If we defend, we reduce damage but still get hit?
+                # Let's assume status applies if damage > 0.
+
+                # Check for Status Effects from Monster Skill
+                status_effect = skill.get("status_effect")
+                if status_effect:
+                    stun_chance = status_effect.get("stun_chance", 0)
+                    if stun_chance > 0 and random.random() < stun_chance:  # nosec B311
+                        if self._is_player_immune("stun"):
+                            log.append(f"🛡️ **Immune!** You shrug off the stun effect!")
+                        else:
+                            log.append(f"💫 **Stunned!** You are reeling from the blow!")
+                            self.player_stunned = True
 
         elif action["type"] == "buff":
             buff = action["buff"]
@@ -829,6 +869,17 @@ class CombatEngine:
             if stun_chance > 0 and random.random() < stun_chance:  # nosec B311
                 self.monster["is_stunned"] = True
                 log.append(f"💫 **Stunned!** The {self.monster.get('name', 'Enemy')} is reeling!")
+
+    def _is_player_immune(self, status_type: str) -> bool:
+        """Checks if the player has immunity to a specific status."""
+        for buff in self.active_buffs:
+            if buff.get("stat") == f"immunity_{status_type}":
+                return True
+        # Check new buffs applied this turn
+        for buff in self.new_buffs:
+            if buff.get("stat") == f"immunity_{status_type}":
+                return True
+        return False
 
     def _process_monster_debuffs(self):
         """
