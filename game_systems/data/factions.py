@@ -161,4 +161,42 @@ FACTIONS = {
             "the_ashlands",
         ],
     },
+    "grey_ward": {
+        "name": "The Grey Ward",
+        "emoji": "⚗️",
+        "description": "Alchemists who use science and corruption to survive the depths.",
+        "ranks": {
+            1: {"title": "Gleaner", "reputation_needed": 0, "reward": None},
+            2: {
+                "title": "Distiller",
+                "reputation_needed": 500,
+                "reward": {"type": "item", "key": "bitter_panacea", "amount": 3},
+            },
+            3: {
+                "title": "Synthesist",
+                "reputation_needed": 1500,
+                "reward": {"type": "item", "key": "phial_of_vitriol", "amount": 3},
+            },
+            4: {
+                "title": "Apothecary",
+                "reputation_needed": 3000,
+                "reward": {"type": "buff", "key": "gathering_boost", "value": 0.1},
+            },
+            5: {
+                "title": "Master Apothecary",
+                "reputation_needed": 5000,
+                "reward": {"type": "title", "value": "Master Apothecary"},
+            },
+        },
+        "interests": {
+            "gathering": 1.5,
+            "monster_types": ["Plant", "Undead"],
+        },
+        "favored_locations": [
+            "whispering_thicket",
+            "deepgrove_roots",
+            "shrouded_fen",
+            "forgotten_ossuary",
+        ],
+    },
 }
