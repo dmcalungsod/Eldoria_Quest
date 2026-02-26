@@ -36,6 +36,14 @@ import test_security  # General security test
 import test_stack_limits  # New Stack Limits tests
 import test_tournament_system  # New Tournament System tests
 
+# New Coverage Tests
+import test_developer_cog
+import test_event_cog
+import test_item_manager
+import test_monster_actions
+import test_populate_database
+import test_tournament_cog
+
 
 def check_mongodb_connection():
     """Checks if MongoDB is reachable at localhost:27017."""
@@ -165,6 +173,34 @@ def run_tournament_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_tournament_system)
+    suite.addTests(loader.loadTestsFromModule(test_tournament_cog))  # Added Cog tests
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
+def run_cog_tests():
+    """Runs the Cog tests (Developer, Event)."""
+    print("\n" + "-" * 70)
+    print("RUNNING COG TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_developer_cog)
+    suite.addTests(loader.loadTestsFromModule(test_event_cog))
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
+def run_manager_tests():
+    """Runs the Manager/Action tests (Item, Monster, Populate)."""
+    print("\n" + "-" * 70)
+    print("RUNNING MANAGER/ACTION TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_item_manager)
+    suite.addTests(loader.loadTestsFromModule(test_monster_actions))
+    suite.addTests(loader.loadTestsFromModule(test_populate_database))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -241,6 +277,14 @@ def main():
     stack_passed = run_stack_limit_tests()
     all_passed = all_passed and stack_passed
 
+    # 7.6. Cog Tests
+    cogs_passed = run_cog_tests()
+    all_passed = all_passed and cogs_passed
+
+    # 7.7. Manager Tests
+    managers_passed = run_manager_tests()
+    all_passed = all_passed and managers_passed
+
     # 8. Faction Tests (Mock-based, always run)
     faction_passed = run_faction_tests()
     all_passed = all_passed and faction_passed
@@ -278,6 +322,8 @@ def main():
     print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
     print(f"Tournament System Tests: {'✓ PASSED' if tournament_passed else '✗ FAILED'}")
     print(f"Stack Limit Tests: {'✓ PASSED' if stack_passed else '✗ FAILED'}")
+    print(f"Cog Tests: {'✓ PASSED' if cogs_passed else '✗ FAILED'}")
+    print(f"Manager Tests: {'✓ PASSED' if managers_passed else '✗ FAILED'}")
     print(f"Faction System Tests: {'✓ PASSED' if faction_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
