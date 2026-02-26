@@ -87,7 +87,7 @@ CONSUMABLE_SCHEMA = {
         "required": True,
         # keys/values can vary, usually str: int
         "keys_schema": {"type": str},
-        "values_schema": {"type": (int, float, str)},
+        "values_schema": {"type": (int, float, str, bool)},
     },
     "rarity": {"type": str, "required": True},
     "description": {"type": str, "required": True},
@@ -108,4 +108,16 @@ EQUIPMENT_SCHEMA = {
     # Optional
     "class_restrictions": {"type": list, "element_schema": {"type": str}},
     "rank_restriction": {"type": str},
+}
+
+# --- Materials Schema ---
+MATERIAL_SCHEMA = {
+    "name": {"type": str, "required": True},
+    "description": {"type": str, "required": True},
+    "rarity": {
+        "type": str,
+        "required": True,
+        "options": ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"],
+    },
+    "value": {"type": int, "required": True, "min": 0},
 }
