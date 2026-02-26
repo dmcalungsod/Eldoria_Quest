@@ -13,6 +13,7 @@ from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
 from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.data.materials import MATERIALS
 from game_systems.data.recipes import HIDDEN_RECIPES, RECIPES
+from game_systems.player.achievement_system import AchievementSystem
 
 logger = logging.getLogger("eldoria.crafting")
 
@@ -76,6 +77,13 @@ class CraftingSystem:
             crafting_level=current_level,
             crafting_xp=current_xp,
         )
+
+        # Check Achievements
+        if leveled_up:
+            achievements = AchievementSystem(self.db)
+            ach_msg = achievements.check_crafting_achievements(discord_id)
+            if ach_msg:
+                msg_extras += f"\n{ach_msg}"
 
         return f" (+{base_xp} Craft XP){msg_extras}"
 
