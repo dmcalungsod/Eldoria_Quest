@@ -115,6 +115,9 @@ class MockDatabaseManager:
     def get_guild_rank(self, discord_id):
         return "F"
 
+    def get_active_buffs(self, discord_id):
+        return []
+
     def get_equipped_in_slot(self, discord_id, slot):
         for item in self.inventory.values():
             if item["discord_id"] == discord_id and item.get("slot") == slot and item.get("equipped") == 1:
@@ -166,6 +169,54 @@ class TestHPOverflow(unittest.TestCase):
 
         # BUG: Current HP is likely still 250 because unequip_item doesn't clamp
         self.assertLessEqual(current_hp, 150, f"HP Overflow! Current: {current_hp}, Max allowed: 150")
+
+    def test_hp_clamp_with_buffs(self):
+        db = MockDatabaseManager()
+        # Mock active buffs: +15 END => +150 HP
+        db.get_active_buffs = MagicMock(return_value=[
+            {"discord_id": 123, "stat": "END", "amount": 15, "name": "Giant Growth", "duration": 3600}
+        ])
+
+        manager = EquipmentManager(db)
+
+        # Setup: Player has item equipped (+10 END) AND Buff (+15 END)
+        # Base 10 + Item 10 + Buff 15 = 35 END
+
+        # 1. Equip Item manually first to setup state
+        # The manager.recalculate_player_stats call inside equip/unequip resets bonuses
+        # so we rely on db.inventory having equipped=1 for the item.
+
+        # Simulate stats BEFORE unequip:
+        # We need to ensure manager sees the item as equipped.
+        # Recalculate will see item (10 END) and apply it.
+        # But buffs are applied ONLY for clamping check, NOT persisted to stats_json.
+
+        stats = manager.recalculate_player_stats(123)
+        # Persistent Stats (saved to DB): Base 10 + Item 10 = 20 END
+        # Max HP (Persistent) = 50 + 20*10 = 250.
+
+        self.assertEqual(stats.endurance, 20)
+        self.assertEqual(stats.max_hp, 250)
+
+        # With Buff (+15 END -> +150 HP), Total Max HP is ~400.
+        # We set current HP to 400.
+        db.players[123]["current_hp"] = 400
+
+        # Unequip item (+10 END)
+        # New Persistent Stats: Base 10 = 10 END -> 150 HP
+        # Buff remains: +15 END -> +150 HP
+        # New Total Max HP: 150 + 150 = 300
+
+        success, msg = manager.unequip_item(123, 1)
+        self.assertTrue(success, f"Unequip failed: {msg}")
+
+        # Verify Current HP is clamped to Total Max HP (300), NOT Persistent Max HP (150)
+        current_hp = db.players[123]["current_hp"]
+        print(f"Current HP after unequip with buffs: {current_hp}")
+
+        # It should be > 150 because of the buff
+        self.assertGreater(current_hp, 150, f"HP Clamped too aggressively! Current: {current_hp}, Expected > 150 (due to buff)")
+        self.assertLessEqual(current_hp, 305, f"HP Overflow! Current: {current_hp}, Max allowed: ~300")
 
 
 if __name__ == "__main__":

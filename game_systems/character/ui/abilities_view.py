@@ -15,6 +15,7 @@ import game_systems.data.emojis as E
 from cogs.utils.ui_helpers import back_to_profile_callback, build_inventory_embed
 from database.database_manager import DatabaseManager
 from game_systems.items.inventory_manager import InventoryManager
+from game_systems.player.player_stats import PlayerStats
 
 from .inventory_view import InventoryView
 
@@ -79,9 +80,12 @@ class AbilitiesView(View):
 
         try:
             items = await asyncio.to_thread(self.inventory_manager.get_inventory, self.interaction_user.id)
-            max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
+            stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+            stats = PlayerStats.from_dict(stats_json)
+            max_slots = stats.max_inventory_slots
+
             # build_inventory_embed is CPU bound (formatting), safe to run in thread
-            embed = await asyncio.to_thread(build_inventory_embed, items, max_slots)
+            embed = await asyncio.to_thread(build_inventory_embed, items, max_slots, stats)
 
             view = InventoryView(
                 self.db,

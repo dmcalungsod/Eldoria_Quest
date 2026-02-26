@@ -19,6 +19,7 @@ from game_systems.data.equipments import EQUIPMENT_DATA
 from game_systems.items.consumable_manager import ConsumableManager
 from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.items.inventory_manager import InventoryManager
+from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.ui.inventory")
 
@@ -291,8 +292,10 @@ class InventoryView(View):
 
     async def _refresh(self, interaction: discord.Interaction):
         items = await asyncio.to_thread(self.inv_manager.get_inventory, self.interaction_user.id)
-        max_slots = await asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id)
-        embed = build_inventory_embed(items, max_slots)
+        stats_json = await asyncio.to_thread(self.db.get_player_stats_json, self.interaction_user.id)
+        stats = PlayerStats.from_dict(stats_json)
+        max_slots = stats.max_inventory_slots
+        embed = build_inventory_embed(items, max_slots, stats)
 
         # Pass current filter to new view to maintain state
         new_view = InventoryView(

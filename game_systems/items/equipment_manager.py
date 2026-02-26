@@ -223,8 +223,23 @@ class EquipmentManager:
                 current_hp = vitals.get("current_hp", 0)
                 current_mp = vitals.get("current_mp", 0)
 
-                new_hp = min(current_hp, stats.max_hp)
-                new_mp = min(current_mp, stats.max_mp)
+                # Calculate Effective Max HP/MP (Stats + Buffs) for Clamping
+                effective_stats = PlayerStats.from_dict(stats.to_dict())
+                active_buffs = self.db.get_active_buffs(discord_id)
+
+                for buff in active_buffs:
+                    stat_name = buff.get("stat", "").upper()
+                    amount = int(buff.get("amount", 0))
+
+                    # Apply to Primary Stats (STR, END, etc.)
+                    # PlayerStats calculates derived HP/MP from these
+                    # Note: We do not handle direct "HP" or "MP" buffs here unless PlayerStats supports it.
+                    # Currently PlayerStats only supports primary stats + DEF in add_bonus_stat.
+                    if stat_name in ["STR", "END", "DEX", "AGI", "MAG", "LCK", "DEF"]:
+                        effective_stats.add_bonus_stat(stat_name, amount)
+
+                new_hp = min(current_hp, effective_stats.max_hp)
+                new_mp = min(current_mp, effective_stats.max_mp)
 
                 if new_hp != current_hp or new_mp != current_mp:
                     self.db.set_player_vitals(discord_id, new_hp, new_mp)
