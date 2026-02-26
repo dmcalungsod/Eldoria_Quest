@@ -9,9 +9,6 @@ import json
 import logging
 from pathlib import Path
 
-from game_systems.data.data_validator import DataValidator
-from game_systems.data.schemas import CONSUMABLE_SCHEMA
-
 logger = logging.getLogger("eldoria.data")
 
 
@@ -31,26 +28,23 @@ def load_consumables():
         logger.error(f"CRITICAL: consumables.json is invalid JSON: {e}")
         return {}
 
-    # Validate Schema
-    top_schema = {
-        "type": dict,
-        "values_schema": {
-            "type": dict,
-            "schema": CONSUMABLE_SCHEMA
-        }
-    }
+    validated_consumables = {}
+    required_keys = {"id", "name", "type", "effect", "rarity", "description"}
 
-    errors = DataValidator.validate(data, top_schema, "consumables")
-    if errors:
-        for err in errors:
-            logger.error(f"Validation Error: {err}")
-        logger.warning("Loaded consumable data contains schema errors.")
+    for key, item in data.items():
+        # Check required keys
+        missing_keys = required_keys - item.keys()
+        if missing_keys:
+            logger.warning(f"Consumable '{key}' missing required keys: {missing_keys}. Skipping.")
+            continue
 
-    # Pass through data if valid (or partially valid, validator only logs)
-    # The validator iterates and finds errors but doesn't filter.
-    # We could implement filtering of invalid items if desired, but for now we keep behavior consistent.
+        # Additional Type Checks
+        if not isinstance(item["effect"], dict):
+            logger.warning(f"Consumable '{key}': 'effect' must be a dictionary. Skipping.")
+            continue
 
-    validated_consumables = data
+        validated_consumables[key] = item
+
     logger.info(f"Loaded {len(validated_consumables)} consumables from {data_path.name}")
     return validated_consumables
 

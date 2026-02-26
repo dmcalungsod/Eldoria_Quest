@@ -84,7 +84,11 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         mock_discord = sys.modules["discord"]
         for btn in view.children:
             self.assertIsNotNone(btn.emoji, f"Button {btn.label} is missing an emoji")
-            self.assertEqual(btn.style, mock_discord.ButtonStyle.primary, f"Button {btn.label} has wrong style")
+            self.assertEqual(
+                btn.style,
+                mock_discord.ButtonStyle.primary,
+                f"Button {btn.label} has wrong style",
+            )
 
     async def test_guild_welcome_view_init(self):
         """Test that GuildWelcomeView initializes with correct buttons."""
@@ -121,7 +125,9 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(view.step, 3)
 
         # Simulate Complete (Step 3 -> End)
-        with patch("cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock) as mock_transition:
+        with patch(
+            "cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock
+        ) as mock_transition:
             await view.complete_callback(interaction)
             # Should NOT call transition_to_guild_lobby, but offer expedition
             mock_transition.assert_not_called()
@@ -133,7 +139,7 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
 
             # Check if view is StartFirstExpeditionView
             _, kwargs = call_args
-            new_view = kwargs.get('view')
+            new_view = kwargs.get("view")
             self.assertIsInstance(new_view, self.StartFirstExpeditionView)
 
 
