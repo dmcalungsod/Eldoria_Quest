@@ -164,7 +164,6 @@ class LoadoutView(View):
         await interaction.response.defer()
 
         # Feedback: Show loading state
-        original_label = self.equip_btn.label
         self.equip_btn.label = "Equipping... ⏳"
         self.equip_btn.disabled = True
         await interaction.edit_original_response(view=self)
