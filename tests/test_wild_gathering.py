@@ -134,6 +134,7 @@ class TestWildGathering(unittest.TestCase):
                     location_name="Forest",
                     weather=ANY,
                     event_type=ANY,
+                    supplies=ANY,
                 )
 
 

@@ -206,5 +206,13 @@
         "effect": {"cure_poison": true},
         "rarity": "Common",
         "description": "A foul-tasting mixture that neutralizes toxins."
+    },
+    "explorer_kit": {
+        "id": "explorer_kit",
+        "name": "Explorer's Kit",
+        "type": "supply",
+        "effect": {"gathering_bonus": 1},
+        "rarity": "Common",
+        "description": "Basic tools for harvesting flora and minerals."
     }
 }
