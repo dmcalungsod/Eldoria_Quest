@@ -531,7 +531,7 @@
         "drops": [
             [
                 "magic_stone_medium",
-                100
+                50
             ],
             [
                 "magic_stone_large",
@@ -539,11 +539,11 @@
             ],
             [
                 "boss_talon",
-                100
+                80
             ],
             [
                 "celestial_dust",
-                15
+                10
             ]
         ],
         "skills": [
@@ -634,7 +634,7 @@
         "drops": [
             [
                 "magic_stone_medium",
-                80
+                90
             ],
             [
                 "magic_stone_large",
@@ -795,7 +795,7 @@
         "drops": [
             [
                 "magic_stone_medium",
-                80
+                90
             ],
             [
                 "magic_stone_large",
@@ -1847,7 +1847,7 @@
             ],
             [
                 "magic_stone_large",
-                40
+                50
             ]
         ],
         "skills": [
@@ -2112,6 +2112,10 @@
             [
                 "spring_coil",
                 40
+            ],
+            [
+                "magic_stone_medium",
+                10
             ]
         ],
         "skills": [
