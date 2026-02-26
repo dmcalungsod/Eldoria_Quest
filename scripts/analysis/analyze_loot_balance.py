@@ -1,20 +1,20 @@
 import json
 import logging
+import sys
 from pathlib import Path
-from collections import defaultdict
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 # Adjust path to find the module
-import sys
 sys.path.append(str(Path(__file__).parents[2]))
 
 try:
-    from game_systems.data.materials import MATERIALS
+    from game_systems.data.materials import MATERIALS  # noqa: E402
 except ImportError:
     logging.error("Failed to import MATERIALS. Ensure you are running from the repo root.")
     sys.exit(1)
+
 
 # Helper functions
 def calculate_combat_power(hp, atk, defense):
@@ -22,6 +22,7 @@ def calculate_combat_power(hp, atk, defense):
     # Defense reduces incoming damage. Let's assume player damage is constant for relative comparison.
     # Actually, let's use a simpler heuristic: HP * Atk * (1 + Def/100)
     return hp * atk * (1 + defense / 100)
+
 
 def calculate_expected_loot_value(drops, materials):
     total_value = 0
@@ -42,16 +43,17 @@ def calculate_expected_loot_value(drops, materials):
         total_value += (chance / 100) * value
     return total_value
 
+
 def analyze():
     # Load Data
     data_dir = Path("game_systems/data")
     monsters_path = data_dir / "monsters.json"
     locations_path = data_dir / "adventure_locations.json"
 
-    with open(monsters_path, 'r') as f:
+    with open(monsters_path) as f:
         monsters = json.load(f)
 
-    with open(locations_path, 'r') as f:
+    with open(locations_path) as f:
         locations = json.load(f)
 
     # Analyze Monsters
@@ -72,10 +74,12 @@ def analyze():
     # Analyze Locations
     location_stats = {}
     for lid, loc in locations.items():
-        if lid == "guild_arena": continue # Skip arena
+        if lid == "guild_arena":
+            continue  # Skip arena
 
         monsters_list = loc.get('monsters', [])
-        if not monsters_list: continue
+        if not monsters_list:
+            continue
 
         total_cp = 0
         total_elv = 0
@@ -157,7 +161,8 @@ def analyze():
         f.write("\n".join(report))
 
     print(f"Report generated at {output_path}")
-    print("\n".join(report)) # Print to stdout for agent review
+    print("\n".join(report))  # Print to stdout for agent review
+
 
 if __name__ == "__main__":
     analyze()
