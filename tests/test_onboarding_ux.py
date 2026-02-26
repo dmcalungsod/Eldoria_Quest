@@ -59,9 +59,10 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         sys.modules["pymongo.errors"] = mock_pymongo.errors
 
         # Import modules under test
-        import cogs.onboarding_cog
+        if "cogs.onboarding_cog" in sys.modules:
+            del sys.modules["cogs.onboarding_cog"]
 
-        importlib.reload(cogs.onboarding_cog)
+        import cogs.onboarding_cog
 
         self.GuildWelcomeView = cogs.onboarding_cog.GuildWelcomeView
         self.CombatTutorialView = cogs.onboarding_cog.CombatTutorialView
