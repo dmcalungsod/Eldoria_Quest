@@ -54,17 +54,58 @@ class AdventureManager:
         # Verify and Deduct Supplies
         if supplies:
             # 1. Verification Phase
+            # Fetch inventory once to check counts AND capture item metadata for potential rollback
+            inventory_items = self.inventory_manager.get_inventory(discord_id)
+            item_totals = {}
+            item_meta = {}
+
+            for item in inventory_items:
+                k = item["item_key"]
+                item_totals[k] = item_totals.get(k, 0) + item["count"]
+                # Store metadata (name, type, rarity) for the first occurrence of this item key
+                if k not in item_meta:
+                    item_meta[k] = {
+                        "name": item["item_name"],
+                        "type": item["item_type"],
+                        "rarity": item["rarity"],
+                    }
+
             for item_key, count in supplies.items():
-                total = self.db.get_inventory_item_count(discord_id, item_key)
+                total = item_totals.get(item_key, 0)
                 if total < count:
                     logger.warning(f"User {discord_id} lacks supply {item_key} (Has {total}, Needs {count})")
                     return False
 
-            # 2. Deduction Phase
+            # 2. Deduction Phase with Rollback
+            deducted_items = []
+            rollback_needed = False
+
             for item_key, count in supplies.items():
-                if not self.db.remove_inventory_item(discord_id, item_key, count):
+                if self.db.remove_inventory_item(discord_id, item_key, count):
+                    deducted_items.append((item_key, count))
+                else:
                     logger.error(f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)")
-                    return False
+                    rollback_needed = True
+                    break
+
+            if rollback_needed:
+                logger.warning(f"Rolling back supply deduction for {discord_id}...")
+                for key, amount in deducted_items:
+                    meta = item_meta.get(key)
+                    if meta:
+                        self.inventory_manager.add_item(
+                            discord_id,
+                            key,
+                            meta["name"],
+                            meta["type"],
+                            meta["rarity"],
+                            amount,
+                        )
+                    else:
+                        logger.error(
+                            f"Critical: Failed to rollback {key} x{amount} for {discord_id} (Metadata missing)"
+                        )
+                return False
 
         start_time = WorldTime.now()
         end_time = (
