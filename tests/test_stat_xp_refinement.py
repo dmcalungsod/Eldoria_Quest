@@ -21,6 +21,8 @@ class TestStatXPRefinement(unittest.TestCase):
         self.mock_player = MagicMock()
         self.mock_player.stats.max_hp = 100
         self.mock_player.hp_current = 100
+        # Mock default Stun state to False so engine logic works
+        self.mock_player.is_stunned = False
 
         self.mock_monster = {
             "name": "Test Goblin",

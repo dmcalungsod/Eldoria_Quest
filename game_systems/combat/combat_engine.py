@@ -698,6 +698,8 @@ class CombatEngine:
                 bonus_crit = True
                 self.monster.pop("charged_skill", None)
                 log.append(CombatPhrases.counter_success(self.monster, charged_skill, "interrupt"))
+                # Ensure bonus_crit is propagated to result later if immediate action requires it,
+                # BUT this method returns bonus_crit to caller.
 
             # PARRY LOGIC: Physical Charge + Defend Action
             is_physical = not is_magic
@@ -799,21 +801,33 @@ class CombatEngine:
         # Track damage dealt for recoil purposes
         damage_dealt = 0
 
+        # Flag to check if we processed a category (to handle else/fallback)
+        skill_processed = False
+
         if skill.get("heal_power", 0) > 0:
             # --- Healing Skill ---
             heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
             self.player_hp = new_hp
             log.append(CombatPhrases.player_heal(self.player, skill, heal))
+            skill_processed = True
 
         elif skill.get("buff_data"):
             # --- Buff/Utility Skill ---
             self._apply_skill_buffs(skill)
             log.append(CombatPhrases.player_buff(self.player, skill))
+            skill_processed = True
 
-        else:
-            # --- Offensive Skill ---
+        # --- Offensive Skill Check ---
+        # Note: Some skills might have BOTH debuff and damage, or just debuff.
+        # If it wasn't a heal or buff_data only skill, treat as offensive.
+        # Logic fix: Check if it's explicitly offensive or default fallback.
+        if not skill_processed:
             # Use effective stats for defense calculation
             effective_monster = self._get_effective_monster_stats()
+
+            # Some skills (like purely debuff/status) might have power=0 or not use power_multiplier?
+            # Existing logic assumes power_multiplier exists or defaults to 1.0.
+            # If power_multiplier is 0 or low, it still does damage.
 
             dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, effective_monster, skill, skill_level)
 
@@ -838,16 +852,21 @@ class CombatEngine:
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
 
-            # Apply Debuffs (if any)
-            if skill.get("debuff"):
-                debuff_msg = self._apply_monster_debuff(skill)
-                if debuff_msg:
-                    log.append(debuff_msg)
-
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
 
-        # --- Shared Mechanics (Recoil, Status Effects) ---
+        # --- Shared Mechanics (Debuffs, Recoil, Status Effects) ---
+        # These should apply regardless of skill type (e.g. buff with recoil, attack with debuff)
+
+        # Apply Debuffs (if any)
+        # Note: Moved OUTSIDE the 'offensive' block to allow debuffs from other sources if needed,
+        # but primarily to ensure code flow is clean.
+        if skill.get("debuff"):
+            debuff_msg = self._apply_monster_debuff(skill)
+            if debuff_msg:
+                log.append(debuff_msg)
+
+        # Recoil Mechanics
 
         # Recoil Mechanics
         recoil_pct = skill.get("self_damage_percent")
