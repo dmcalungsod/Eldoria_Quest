@@ -17,3 +17,8 @@
 **Action:**
 1. Increased Rank F `normal_kills` (40 -> 50) and Rank E (120 -> 150) to encourage exploration/auto-adventure.
 2. Reduced Boss Kill requirements significantly (C: 5->2, B: 10->4, A: 20->8, S: 35->15, SS: 50->25) to align with actual spawn probabilities and prevent progression stalling.
+
+## 2026-03-04 — Rank D Kill Requirement Trivialized by Quests
+
+**Learning:** Rank D required +10 quests and +50 kills compared to Rank E. Since 10 quests typically involve ~50 kills, the kill requirement was entirely redundant, removing the need for exploration.
+**Action:** Increased Rank D `normal_kills` to 250 (+100 delta) to enforce ~50 kills from non-quest sources.

@@ -1,9 +1,8 @@
-# StoryWeaver Journal
+## 2024-05-23 — [Combat Narration Expansion]
+**Learning:** `CombatPhrases` relies on substring matching (`if "Goblin" in name`) which is robust but requires maintenance as new monster names are added. Grouping keywords (e.g., `["Wisp", "Shade", "Revenant"]`) allows for broader coverage without writing specific lines for every single mob.
+**Action:** Future narrative updates should check `game_systems/data/monsters.py` for new naming patterns and add them to the relevant keyword groups in `CombatPhrases`.
 
-## 2026-03-05 — Alchemist Narrative Integration
+## 2026-02-21 — Atmospheric Mission Reports
 
-**Learning:** Narrative text is scattered across `class_data.py`, `skills_data.py`, and `combat_phrases.py`.
-**Learning:** `CombatPhrases.player_attack` uses hardcoded class IDs (e.g., `player_class_id == 6` for Alchemist) to switch between narrative styles.
-**Learning:** `SKILL_PHRASES` in `combat_phrases.py` allows for specific skill narration, overriding generic text.
-**Action:** Always check `combat_phrases.py` when adding a new class to ensure it doesn't fall back to generic text.
-**Action:** Use vivid, sensory language ("hiss", "fumes", "slurry") for Alchemist descriptions to distinguish them from Mages.
+**Learning:** Mission reports were static and dry. By using a dictionary mapping location IDs to atmospheric text, I significantly increased immersion without changing mechanics.
+**Action:** In future narrative enhancements, look for opportunities to replace static strings with context-aware, randomized lists to keep the experience fresh.

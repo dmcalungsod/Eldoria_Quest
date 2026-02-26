@@ -15,3 +15,19 @@
 -   Add a custom `ruff` plugin or pre-commit hook to strictly enforce "ONE UI" (forbid `send_message` unless `ephemeral=True`).
 -   Automate the audit to run on PRs modifying `cogs/` to ensure no new `print()` statements or un-awaited coroutines slip in.
 -   Install `dpytest` to enable testing of Cogs.
+
+## 2026-02-26: Comprehensive Audit (Current Run)
+
+**Tools Used:**
+- `flake8`, `bandit`, `vulture`, `radon`, `safety`, `grep`.
+
+**Critical Learnings:**
+1.  **Side-Effects on Import**: `game_systems/data/class_equipments.py` executes logic (prints) at module level. This was caught by manual inspection/grep for `print` but missed by static analysis tools which often ignore `print`.
+    *   **Action**: Recommend moving to `if __name__ == "__main__":` block.
+2.  **ONE UI Enforcement**: Grep confirmed widespread use of `interaction.response.send_message` in Cogs (`faction`, `tournament`, `event`, `onboarding`). This requires a targeted refactor campaign.
+3.  **Unused Imports**: `flake8` identified `cogs.shop_cog` imported in tests but unused, and several unused variables in tests. These are low-hanging fruit for cleanup.
+4.  **Security Baseline**: The project is secure against common vulnerabilities (secrets, SQLi, dependencies). The primary "security" noise is RNG usage (`B311`), which is a feature, not a bug, in this RPG context.
+
+**Process Improvements:**
+-   Add a `bandit.yaml` config to exclude `B311` for the `game_systems/` directory to reduce noise in future reports.
+-   Implement a custom pre-commit check for `print()` statements in non-script files.
