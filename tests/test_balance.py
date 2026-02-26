@@ -37,16 +37,16 @@ def test_monsters_balance():
     spider = MONSTERS.get("monster_126")
     assert spider, "Cogwork Spider not found"
     drops = dict(spider["drops"])
-    assert drops.get("magic_stone_medium") == 10, (
-        f"Cogwork Spider magic_stone_medium expected 10, got {drops.get('magic_stone_medium')}"
+    assert drops.get("magic_stone_medium") == 25, (
+        f"Cogwork Spider magic_stone_medium expected 25, got {drops.get('magic_stone_medium')}"
     )
 
     # Void Stalker (monster_116)
     stalker = MONSTERS.get("monster_116")
     assert stalker, "Void Stalker not found"
     drops = dict(stalker["drops"])
-    assert drops.get("magic_stone_large") == 50, (
-        f"Void Stalker magic_stone_large expected 50, got {drops.get('magic_stone_large')}"
+    assert drops.get("magic_stone_large") == 60, (
+        f"Void Stalker magic_stone_large expected 60, got {drops.get('magic_stone_large')}"
     )
 
 
@@ -66,19 +66,19 @@ def test_locations_balance():
     halls = LOCATIONS.get("clockwork_halls")
     assert halls, "Clockwork Halls not found"
     gather = dict(halls["gatherables"])
-    assert gather.get("magic_stone_medium") == 25, (
-        f"Clockwork Halls magic_stone_medium expected 25, got {gather.get('magic_stone_medium')}"
+    assert gather.get("magic_stone_medium") == 35, (
+        f"Clockwork Halls magic_stone_medium expected 35, got {gather.get('magic_stone_medium')}"
     )
-    assert gather.get("magic_stone_large") == 5, (
-        f"Clockwork Halls magic_stone_large expected 5, got {gather.get('magic_stone_large')}"
+    assert gather.get("magic_stone_large") == 10, (
+        f"Clockwork Halls magic_stone_large expected 10, got {gather.get('magic_stone_large')}"
     )
 
     # Void Sanctum
     void = LOCATIONS.get("void_sanctum")
     assert void, "Void Sanctum not found"
     gather = dict(void["gatherables"])
-    assert gather.get("magic_stone_flawless") == 20, (
-        f"Void Sanctum magic_stone_flawless expected 20, got {gather.get('magic_stone_flawless')}"
+    assert gather.get("magic_stone_flawless") == 30, (
+        f"Void Sanctum magic_stone_flawless expected 30, got {gather.get('magic_stone_flawless')}"
     )
 
 
