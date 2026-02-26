@@ -487,4 +487,23 @@ MATERIALS = {
         "rarity": "Epic",
         "value": 1200,
     },
+    # --- Clockwork Heart Quest Rewards ---
+    "encrypted_log_cylinder": {
+        "name": "Encrypted Log Cylinder",
+        "description": "A brass cylinder etched with code. It feels warm.",
+        "rarity": "Uncommon",
+        "value": 100,
+    },
+    "artificers_alloy": {
+        "name": "Artificer's Alloy",
+        "description": "A bar of metal that seems to reshape itself slightly when touched.",
+        "rarity": "Rare",
+        "value": 300,
+    },
+    "heart_of_the_machine": {
+        "name": "Heart of the Machine",
+        "description": "A pulsing core saved from a unique golem. It hums with gratitude.",
+        "rarity": "Epic",
+        "value": 1000,
+    },
 }
