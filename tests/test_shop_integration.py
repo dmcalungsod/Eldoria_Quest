@@ -51,7 +51,7 @@ class TestShopViewIntegration(unittest.TestCase):
         view = ShopView(mock_db, mock_user, current_aurum)
 
         item_key = "hp_potion_1"
-        price = SHOP_INVENTORY[item_key]  # 40
+        price = SHOP_INVENTORY[item_key]["price"]  # 40
 
         # Mock purchase_item return: (success, item_data, new_balance)
         mock_db.purchase_item.return_value = (True, {"name": "Test Potion"}, 960)
@@ -60,10 +60,12 @@ class TestShopViewIntegration(unittest.TestCase):
 
         # Verify call
         mock_db.purchase_item.assert_called_once()
-        args, _ = mock_db.purchase_item.call_args
+        args, kwargs = mock_db.purchase_item.call_args
         self.assertEqual(args[0], 12345)
         self.assertEqual(args[1], item_key)
         self.assertEqual(args[3], price)
+        # Verify date_str is passed
+        self.assertIn("date_str", kwargs)
 
         self.assertTrue(success)
         self.assertEqual(new_aurum, 960)
@@ -77,7 +79,7 @@ class TestShopViewIntegration(unittest.TestCase):
         view = ShopView(mock_db, mock_user, current_aurum)
 
         item_key = "hp_potion_1"
-        price = SHOP_INVENTORY[item_key]  # 40
+        price = SHOP_INVENTORY[item_key]["price"]  # 40
 
         # Mock purchase_item return: (failure, msg, 0)
         mock_db.purchase_item.return_value = (False, "Insufficient Aurum.", 0)
@@ -96,12 +98,13 @@ class TestShopViewIntegration(unittest.TestCase):
         current_aurum = 1000
 
         # Custom inventory with modified price for an existing item
-        custom_inv = {"hp_potion_1": 999}
+        # New structure: Dict
+        custom_inv = {"hp_potion_1": {"price": 999, "daily_limit": 10}}
 
         view = ShopView(mock_db, mock_user, current_aurum, inventory=custom_inv)
 
         item_key = "hp_potion_1"
-        price = custom_inv[item_key]  # 999
+        price = custom_inv[item_key]["price"]  # 999
 
         # Mock purchase_item return
         mock_db.purchase_item.return_value = (True, {"name": "Dewfall Tonic"}, 1)
@@ -112,6 +115,28 @@ class TestShopViewIntegration(unittest.TestCase):
         mock_db.purchase_item.assert_called_once()
         args, _ = mock_db.purchase_item.call_args
         self.assertEqual(args[3], price)
+
+    def test_shop_view_with_legacy_inventory_format(self):
+        # Test backward compatibility if we ever use simple int mapping again
+        mock_db = MagicMock()
+        mock_user = MagicMock()
+        mock_user.id = 12345
+        current_aurum = 1000
+
+        custom_inv = {"hp_potion_1": 500} # Old format: int
+
+        view = ShopView(mock_db, mock_user, current_aurum, inventory=custom_inv)
+
+        item_key = "hp_potion_1"
+
+        mock_db.purchase_item.return_value = (True, {"name": "Dewfall Tonic"}, 500)
+
+        success, result, new_aurum = view._execute_purchase(item_key)
+
+        mock_db.purchase_item.assert_called_once()
+        args, kwargs = mock_db.purchase_item.call_args
+        self.assertEqual(args[3], 500)
+        self.assertIsNone(kwargs.get("daily_limit"))
 
 
 if __name__ == "__main__":

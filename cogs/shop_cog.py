@@ -2,7 +2,7 @@
 cogs/shop_cog.py
 
 Adventurer's Guild Supply Depot.
-Hardened with atomic transactions and non-blocking UI.
+Hardened with atomic transactions, non-blocking UI, and daily limits.
 Atmosphere restored.
 """
 
@@ -16,6 +16,7 @@ from discord.ui import Button, Select, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
+from game_systems.core.world_time import WorldTime
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.shop_data import SHOP_INVENTORY
 from game_systems.items.inventory_manager import InventoryManager
@@ -33,6 +34,7 @@ class ShopView(View):
         current_aurum: int,
         inventory: dict = None,
         owned_counts: dict[str, int] = None,
+        daily_purchases: dict[str, int] = None,
     ):
         super().__init__(timeout=180)
         self.db = db_manager
@@ -41,6 +43,7 @@ class ShopView(View):
         self.inventory = inventory or SHOP_INVENTORY
         self.inv_manager = InventoryManager(self.db)
         self.owned_counts = owned_counts or {}
+        self.daily_purchases = daily_purchases or {}
 
         self.add_item(self.build_item_select())
 
@@ -69,21 +72,45 @@ class ShopView(View):
             return item_select
 
         can_afford_any = False
-        for item_key, price in self.inventory.items():
+        valid_items = False
+
+        for item_key, item_info in self.inventory.items():
+            # Handle both new dict format and legacy int format (for safety/custom shops)
+            if isinstance(item_info, dict):
+                price = item_info["price"]
+                limit = item_info.get("daily_limit")
+            else:
+                price = item_info
+                limit = None
+
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 continue
 
+            limit_str = ""
+            limit_reached = False
+            if limit is not None:
+                used = self.daily_purchases.get(item_key, 0)
+                remaining = max(0, limit - used)
+                limit_str = f" [Limit: {used}/{limit}]"
+                if remaining <= 0:
+                    limit_reached = True
+
             can_afford = self.current_aurum >= price
-            if can_afford:
+            if can_afford and not limit_reached:
                 can_afford_any = True
 
             emoji = E.AURUM if can_afford else E.LOCKED
+            if limit_reached:
+                emoji = E.LOCKED
 
-            # Ensure label does not exceed 100 characters
+            # Label Construction
             owned = self.owned_counts.get(item_key, 0)
-            suffix = f" — {price} G (Owned: {owned})"
-            if not can_afford:
+            suffix = f" — {price} G (Owned: {owned}){limit_str}"
+
+            if limit_reached:
+                suffix += " (MAX)"
+            elif not can_afford:
                 suffix += " [Too Expensive]"
 
             name = item_data["name"]
@@ -97,9 +124,13 @@ class ShopView(View):
                 description=item_data["description"][:50],
                 emoji=emoji,
             )
+            valid_items = True
 
-        if not can_afford_any:
-            item_select.placeholder = "Insufficient Funds"
+        if not valid_items:
+            item_select.add_option(label="Out of Stock", value="disabled", emoji=E.ERROR)
+            item_select.disabled = True
+        elif not can_afford_any:
+            item_select.placeholder = "Insufficient Funds / Limits Reached"
             if self.current_aurum == 0:
                 item_select.disabled = True
 
@@ -110,16 +141,33 @@ class ShopView(View):
         """Atomic purchase transaction."""
         try:
             # SECURITY: Fetch price from server inventory, do not trust client
-            price = self.inventory.get(item_key)
-            if price is None:
+            item_info = self.inventory.get(item_key)
+            if item_info is None:
                 return (False, "Item not available.", 0)
+
+            if isinstance(item_info, dict):
+                price = item_info["price"]
+                daily_limit = item_info.get("daily_limit")
+            else:
+                price = item_info
+                daily_limit = None
 
             item_data = CONSUMABLES.get(item_key)
             if not item_data:
                 return (False, "Item data missing.", 0)
 
+            # Date String for Daily Limit
+            date_str = WorldTime.now().strftime("%Y-%m-%d")
+
             # Delegate to DatabaseManager for atomic execution with refund support
-            success, result, new_balance = self.db.purchase_item(self.interaction_user.id, item_key, item_data, price)
+            success, result, new_balance = self.db.purchase_item(
+                self.interaction_user.id,
+                item_key,
+                item_data,
+                price,
+                daily_limit=daily_limit,
+                date_str=date_str,
+            )
 
             if success:
                 logger.info(f"User {self.interaction_user.id} bought {item_key} for {price}")
@@ -151,11 +199,19 @@ class ShopView(View):
         # Use the fresh balance returned by the atomic transaction
         current_aurum = new_aurum
 
-        # Fetch fresh inventory counts to update the UI
-        new_counts = await asyncio.to_thread(
-            self.db.get_inventory_items_counts,
-            self.interaction_user.id,
-            list(self.inventory.keys()),
+        # Fetch fresh data for UI update
+        date_str = WorldTime.now().strftime("%Y-%m-%d")
+        new_counts, daily_purchases = await asyncio.gather(
+            asyncio.to_thread(
+                self.db.get_inventory_items_counts,
+                self.interaction_user.id,
+                list(self.inventory.keys()),
+            ),
+            asyncio.to_thread(
+                self.db.get_daily_shop_purchases,
+                self.interaction_user.id,
+                date_str,
+            ),
         )
 
         embed = discord.Embed(
@@ -177,6 +233,7 @@ class ShopView(View):
             current_aurum,
             self.inventory,
             owned_counts=new_counts,
+            daily_purchases=daily_purchases,
         )
         new_view.set_back_button(self.back_button.callback, self.back_button.label)
 
