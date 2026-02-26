@@ -10,8 +10,9 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.player.achievement_system import AchievementSystem  # noqa: E402
 from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
+from game_systems.player.achievement_system import AchievementSystem  # noqa: E402
+
 
 class TestCraftingAchievements(unittest.TestCase):
     def setUp(self):

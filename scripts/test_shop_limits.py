@@ -3,15 +3,16 @@ Test script for verifying daily shop limit logic.
 Mocks MongoDB interactions to simulate purchases and date changes.
 """
 
+import os
 import sys
 import unittest
 from unittest.mock import MagicMock
-import os
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.database_manager import DatabaseManager
+
 
 class TestShopLimits(unittest.TestCase):
     def setUp(self):
