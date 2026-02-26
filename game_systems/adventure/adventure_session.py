@@ -123,7 +123,9 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_session_context(self, bundle: dict | None = None) -> dict[str, Any] | None:
+    def _fetch_session_context(
+        self, bundle: dict | None = None, event_override: dict | None = None
+    ) -> dict[str, Any] | None:
         """
         Fetches all necessary data for the adventure step (combat or non-combat) in a single batch.
         Returns None if critical data (vitals) is missing.
@@ -173,9 +175,12 @@ class AdventureSession:
                 boosts_dict[key] = boosts_dict.get(key, 1.0) + val
 
             # --- WORLD EVENT BOOSTS ---
-            event_system = WorldEventSystem(self.db)
-            # OPTIMIZATION: Fetch event once to get both modifiers and type
-            event = event_system.get_current_event()
+            # OPTIMIZATION: Use event_override if provided to avoid redundant DB calls/calculations
+            if event_override is not None:
+                event = event_override
+            else:
+                event_system = WorldEventSystem(self.db)
+                event = event_system.get_current_event()
 
             if event:
                 boosts_dict.update(event.get("modifiers", {}))
@@ -229,6 +234,9 @@ class AdventureSession:
         action: str = None,
         background: bool = False,
         persist: bool = True,
+        weather=None,
+        time_phase=None,
+        event_override: dict | None = None,
     ) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
@@ -242,7 +250,7 @@ class AdventureSession:
             # --- 0. Pre-fetch Context (Optimized) ---
             # We fetch context ONCE at the start for both combat and non-combat.
             # This ensures Active Buffs are always available and reduces N+1 queries.
-            context = self._fetch_session_context(context_bundle)
+            context = self._fetch_session_context(context_bundle, event_override=event_override)
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
 
@@ -252,8 +260,11 @@ class AdventureSession:
                 threat_reduction = float(context["active_boosts"].get("frostfall_threat_reduction", 1.0))
 
             # --- Weather & Time System Check ---
-            weather = WorldTime.get_current_weather(self.location_id)
-            time_phase = WorldTime.get_current_phase()
+            # OPTIMIZATION: Use passed weather/time if available to avoid redundant calculations
+            if weather is None:
+                weather = WorldTime.get_current_weather(self.location_id)
+            if time_phase is None:
+                time_phase = WorldTime.get_current_phase()
 
             # --- 1. Continue Combat ---
             if self.active_monster:
