@@ -72,7 +72,7 @@ jobs:
             fi
             # Build the comment
             ERRORS=$(cat /tmp/ruff-check.txt 2>/dev/null | head -100 || echo "See CircleCI logs for details.")
-            COMMENT=$(cat <<EOF
+            COMMENT=$(cat \<<EOF
             ## ❌ Ruff Lint Check Failed
 
             **Branch:** \`$CIRCLE_BRANCH\`
@@ -131,7 +131,7 @@ jobs:
             fi
             # Extract only the failures
             FAILURES=$(cat /tmp/test-results.txt 2>/dev/null | grep -A 5 'FAILED\|ERROR\|AssertionError' | head -100 || echo "See CircleCI logs for details.")
-            COMMENT=$(cat <<EOF
+            COMMENT=$(cat \<<EOF
             ## ❌ Tests Failed
 
             **Branch:** \`$CIRCLE_BRANCH\`
