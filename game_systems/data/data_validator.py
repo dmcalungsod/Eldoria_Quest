@@ -33,14 +33,6 @@ class DataValidator:
             "description",
         }
 
-        # Keys that are optional but if present must be of correct type
-        optional_keys = {
-            "night_monsters",
-            "conditional_monsters",
-            "gatherables",
-            "special_events",
-        }
-
         for loc_id, loc_data in data.items():
             # 1. Check required keys
             missing_keys = required_keys - loc_data.keys()

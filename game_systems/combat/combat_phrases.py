@@ -572,7 +572,9 @@ class CombatPhrases:
         return f"**{random.choice(phrase_list).format(name=name)}**"
 
     @staticmethod
-    def player_attack(player, monster: dict, damage: int, is_crit: bool, player_class_id: int) -> str:
+    def player_attack(
+        player, monster: dict, damage: int, is_crit: bool, player_class_id: int
+    ) -> str:
         m_name = str(monster.get("name", "the enemy"))
 
         # Helper to format damage
@@ -846,9 +848,7 @@ class CombatPhrases:
         skill_name = str(skill.get("name", "attack"))
 
         if counter_type == "interrupt":
-            return (
-                f"⚡ **INTERRUPTED!** You strike the {m_name} while it channels **{skill_name}**! (CRITICAL HIT + STUN)"
-            )
+            return f"⚡ **INTERRUPTED!** You strike the {m_name} while it channels **{skill_name}**! (CRITICAL HIT + STUN)"
         else:
             return f"🛡️ **PARRIED!** You deflect the {m_name}'s **{skill_name}** perfectly! (REFLECT DAMAGE + STUN)"
 
