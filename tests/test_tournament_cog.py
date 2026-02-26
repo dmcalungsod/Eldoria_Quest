@@ -23,14 +23,18 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         def command_decorator(*args, **kwargs):
             def decorator(func):
                 return func
+
             return decorator
+
         mock_discord.app_commands.command = MagicMock(side_effect=command_decorator)
 
         # Mock checks.has_permissions decorator
         def checks_decorator(*args, **kwargs):
             def decorator(func):
                 return func
+
             return decorator
+
         mock_discord.app_commands.checks = MagicMock()
         mock_discord.app_commands.checks.has_permissions = MagicMock(side_effect=checks_decorator)
 
@@ -38,20 +42,25 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         def describe_decorator(*args, **kwargs):
             def decorator(func):
                 return func
+
             return decorator
+
         mock_discord.app_commands.describe = MagicMock(side_effect=describe_decorator)
 
         # Mock discord.Embed to capture init args
         class MockEmbed:
             def __init__(self, **kwargs):
-                self.title = kwargs.get('title')
-                self.description = kwargs.get('description')
-                self.color = kwargs.get('color')
+                self.title = kwargs.get("title")
+                self.description = kwargs.get("description")
+                self.color = kwargs.get("color")
                 self.fields = []
+
             def add_field(self, name, value, inline=True):
                 self.fields.append(MagicMock(name=name, value=value, inline=inline))
+
             def set_footer(self, text):
                 self.footer = text
+
         mock_discord.Embed = MockEmbed
 
         # Create a dummy Cog class to avoid MagicMock inheritance issues
@@ -71,9 +80,11 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
                 def before_loop_decorator(f):
                     return f
+
                 mock_task.before_loop = before_loop_decorator
                 mock_task.callback = func
                 return mock_task
+
             return decorator
 
         mock_loop = MagicMock(side_effect=loop_decorator)
@@ -92,6 +103,7 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         # Import modules locally to avoid E402 and ensure mocks are used
         import cogs.tournament_cog
+
         importlib.reload(cogs.tournament_cog)
 
         self.TournamentCog = cogs.tournament_cog.TournamentCog
@@ -125,7 +137,7 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         interaction.response.send_message.assert_called_once()
         args, kwargs = interaction.response.send_message.call_args
-        embed = kwargs.get('embed')
+        embed = kwargs.get("embed")
         self.assertIn("No Active Tournament", embed.title)
 
     async def test_tournament_status_active(self):
@@ -133,18 +145,14 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         interaction.user.id = 123
 
         future = (datetime.datetime.now() + datetime.timedelta(days=2)).isoformat()
-        self.cog.db.get_active_tournament.return_value = {
-            "id": 1,
-            "type": "monster_kills",
-            "end_time": future
-        }
+        self.cog.db.get_active_tournament.return_value = {"id": 1, "type": "monster_kills", "end_time": future}
         self.cog.db.get_player_tournament_score.return_value = 50
 
         await self.cog.tournament_status(interaction)
 
         interaction.response.send_message.assert_called_once()
         args, kwargs = interaction.response.send_message.call_args
-        embed = kwargs.get('embed')
+        embed = kwargs.get("embed")
         self.assertIn("Active Tournament", embed.title)
         # Check fields. Our MockEmbed stores fields as objects with .value
         self.assertIn("50 pts", embed.fields[1].value)
@@ -162,17 +170,14 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
     async def test_leaderboard_active(self):
         interaction = AsyncMock()
         active = {"id": 1, "type": "monster_kills"}
-        leaders = [
-            {"rank": 1, "name": "Player1", "score": 100},
-            {"rank": 2, "name": "Player2", "score": 90}
-        ]
+        leaders = [{"rank": 1, "name": "Player1", "score": 100}, {"rank": 2, "name": "Player2", "score": 90}]
         self.cog.system.get_leaderboard.return_value = (active, leaders)
 
         await self.cog.tournament_leaderboard(interaction)
 
         interaction.response.send_message.assert_called_once()
         args, kwargs = interaction.response.send_message.call_args
-        embed = kwargs.get('embed')
+        embed = kwargs.get("embed")
         self.assertIn("Leaderboard", embed.title)
         self.assertIn("Player1", embed.description)
 
@@ -212,11 +217,7 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
     async def test_check_tournament_cycle_ends_expired(self):
         # Setup
         past = (datetime.datetime.now() - datetime.timedelta(hours=1)).isoformat()
-        self.cog.db.get_active_tournament.return_value = {
-            "id": 1,
-            "type": "monster_kills",
-            "end_time": past
-        }
+        self.cog.db.get_active_tournament.return_value = {"id": 1, "type": "monster_kills", "end_time": past}
         self.cog.system.end_current_tournament.return_value = "Tournament Ended."
 
         # Execute the original function (callback)
@@ -232,7 +233,7 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         # Mock WorldTime.now to return a Monday
         with patch("game_systems.core.world_time.WorldTime.now") as mock_now:
-            mock_date = datetime.datetime(2023, 10, 23, 12, 0, 0) # Oct 23 2023 is a Monday
+            mock_date = datetime.datetime(2023, 10, 23, 12, 0, 0)  # Oct 23 2023 is a Monday
             mock_now.return_value = mock_date
 
             self.cog.system.start_weekly_tournament.return_value = 2

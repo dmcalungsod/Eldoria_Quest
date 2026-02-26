@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 import unittest
@@ -6,6 +5,7 @@ from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestItemManager(unittest.TestCase):
     def setUp(self):
@@ -27,9 +27,11 @@ class TestItemManager(unittest.TestCase):
         sys.modules["database.database_manager"].DatabaseManager = self.mock_db_cls
 
         # Import ItemManager
-        import game_systems.items.item_manager
         # Reload to ensure mocks are used
         import importlib
+
+        import game_systems.items.item_manager
+
         importlib.reload(game_systems.items.item_manager)
 
         self.ItemManager = game_systems.items.item_manager.ItemManager
@@ -96,10 +98,14 @@ class TestItemManager(unittest.TestCase):
         quest_mock = MagicMock()
 
         def col_side_effect(name):
-            if name == "equipment": return equip_mock
-            if name == "class_equipment": return class_mock
-            if name == "consumables": return consu_mock
-            if name == "quest_items": return quest_mock
+            if name == "equipment":
+                return equip_mock
+            if name == "class_equipment":
+                return class_mock
+            if name == "consumables":
+                return consu_mock
+            if name == "quest_items":
+                return quest_mock
             return MagicMock()
 
         self.mock_db._col.side_effect = col_side_effect
@@ -128,7 +134,7 @@ class TestItemManager(unittest.TestCase):
         # So only 20% chance to GET loot?
         # Yes.
 
-        with patch("random.randint", return_value=10): # <= 20
+        with patch("random.randint", return_value=10):  # <= 20
             # Mock aggregate
             col_mock.aggregate.return_value = [{"id": 99, "name": "Rare Drop", "rarity": "Rare", "slot": "hand"}]
 
@@ -139,7 +145,7 @@ class TestItemManager(unittest.TestCase):
             self.assertEqual(loot[0]["source"], "equipment")
 
     def test_generate_monster_loot_fail_roll(self):
-        with patch("random.randint", return_value=50): # > 20
+        with patch("random.randint", return_value=50):  # > 20
             loot = self.manager.generate_monster_loot({"level": 5})
             self.assertEqual(len(loot), 0)
 
@@ -152,6 +158,7 @@ class TestItemManager(unittest.TestCase):
         effect = "Restores HP"
         result = self.manager.format_consumable_effect(effect)
         self.assertEqual(result, "Restores HP")
+
 
 if __name__ == "__main__":
     unittest.main()

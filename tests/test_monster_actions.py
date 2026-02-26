@@ -1,21 +1,17 @@
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.monsters.monster_actions import MonsterAI
 
+
 class TestMonsterActions(unittest.TestCase):
     def setUp(self):
-        self.monster = {
-            "name": "Test Monster",
-            "max_hp": 100,
-            "tier": "Normal",
-            "skills": []
-        }
+        self.monster = {"name": "Test Monster", "max_hp": 100, "tier": "Normal", "skills": []}
 
     def test_choose_action_charged_skill(self):
         self.monster["charged_skill"] = {"name": "Big Boom"}
@@ -64,7 +60,7 @@ class TestMonsterActions(unittest.TestCase):
         nuke_skill = {"name": "Nuke", "power": 2.0, "mp_cost": 5}
         self.monster["skills"] = [nuke_skill]
 
-        with patch("random.randint", return_value=10): # Trigger skill usage
+        with patch("random.randint", return_value=10):  # Trigger skill usage
             with patch("random.choice", return_value=nuke_skill):
                 action = MonsterAI.choose_action(self.monster, 100, 10)
                 self.assertEqual(action["type"], "telegraph")
@@ -85,7 +81,7 @@ class TestMonsterActions(unittest.TestCase):
         # So step 2 is skipped if only buff skills exist.
 
         # Step 3: Buff Logic. 25% chance.
-        with patch("random.randint", return_value=10): # <= 25
+        with patch("random.randint", return_value=10):  # <= 25
             with patch("random.choice", return_value=buff_skill):
                 action = MonsterAI.choose_action(self.monster, 100, 10)
                 self.assertEqual(action["type"], "buff")
@@ -98,47 +94,37 @@ class TestMonsterActions(unittest.TestCase):
         self.assertEqual(action["type"], "attack")
 
     def test_apply_buff(self):
-        buff_skill = {
-            "name": "Rage",
-            "buff_data": {
-                "stat": "ATK",
-                "multiplier": 1.5,
-                "duration": 3
-            }
-        }
+        buff_skill = {"name": "Rage", "buff_data": {"stat": "ATK", "multiplier": 1.5, "duration": 3}}
         self.monster["ATK"] = 10
 
         MonsterAI.apply_buff(self.monster, buff_skill)
 
-        self.assertEqual(self.monster["ATK"], 15) # 10 * 1.5
+        self.assertEqual(self.monster["ATK"], 15)  # 10 * 1.5
         self.assertEqual(len(self.monster["buffs"]), 1)
         self.assertEqual(self.monster["buffs"][0]["increase"], 5)
 
     def test_handle_buffs_expiration(self):
         self.monster["ATK"] = 15
-        self.monster["buffs"] = [
-            {"stat": "ATK", "increase": 5, "duration": 1, "name": "Rage"}
-        ]
+        self.monster["buffs"] = [{"stat": "ATK", "increase": 5, "duration": 1, "name": "Rage"}]
 
         msgs = MonsterAI.handle_buffs(self.monster)
 
-        self.assertEqual(self.monster["ATK"], 10) # Reverted
+        self.assertEqual(self.monster["ATK"], 10)  # Reverted
         self.assertEqual(len(self.monster["buffs"]), 0)
         self.assertEqual(len(msgs), 1)
         self.assertIn("wore off", msgs[0])
 
     def test_handle_buffs_decrement(self):
         self.monster["ATK"] = 15
-        self.monster["buffs"] = [
-            {"stat": "ATK", "increase": 5, "duration": 2, "name": "Rage"}
-        ]
+        self.monster["buffs"] = [{"stat": "ATK", "increase": 5, "duration": 2, "name": "Rage"}]
 
         msgs = MonsterAI.handle_buffs(self.monster)
 
-        self.assertEqual(self.monster["ATK"], 15) # Still active
+        self.assertEqual(self.monster["ATK"], 15)  # Still active
         self.assertEqual(len(self.monster["buffs"]), 1)
         self.assertEqual(self.monster["buffs"][0]["duration"], 1)
         self.assertEqual(len(msgs), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

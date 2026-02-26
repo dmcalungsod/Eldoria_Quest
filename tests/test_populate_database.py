@@ -1,10 +1,11 @@
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestPopulateDatabase(unittest.TestCase):
     def setUp(self):
@@ -27,11 +28,27 @@ class TestPopulateDatabase(unittest.TestCase):
 
         mock_data = MagicMock()
         mock_data.consumables.CONSUMABLES = {"potion": {"name": "Potion"}}
-        mock_data.materials.MATERIALS = {"iron": {"name": "Iron", "description": "Metal", "rarity": "Common", "value": 10}}
+        mock_data.materials.MATERIALS = {
+            "iron": {"name": "Iron", "description": "Metal", "rarity": "Common", "value": 10}
+        }
         mock_data.monsters.MONSTERS = {"slime": {"name": "Slime"}}
-        mock_data.quest_data.ALL_QUESTS = [{"id": 1, "title": "Quest 1", "tier": 1, "quest_giver": "NPC", "location": "Loc", "summary": "Sum", "description": "Desc", "objectives": [], "rewards": {}}]
+        mock_data.quest_data.ALL_QUESTS = [
+            {
+                "id": 1,
+                "title": "Quest 1",
+                "tier": 1,
+                "quest_giver": "NPC",
+                "location": "Loc",
+                "summary": "Sum",
+                "description": "Desc",
+                "objectives": [],
+                "rewards": {},
+            }
+        ]
         mock_data.quest_items.QUEST_ITEMS = {"key": {"name": "Key"}}
-        mock_data.skills_data.SKILLS = {"fireball": {"key_id": "fireball", "name": "Fireball", "description": "Burn", "type": "Active"}}
+        mock_data.skills_data.SKILLS = {
+            "fireball": {"key_id": "fireball", "name": "Fireball", "description": "Burn", "type": "Active"}
+        }
 
         mock_data.class_data.CLASSES = {"Warrior": {"id": 1, "description": "Strong"}}
         mock_data.class_equipments.CLASS_EQUIPMENTS = {"sword": {"class": "Warrior", "name": "Sword"}}
@@ -49,8 +66,7 @@ class TestPopulateDatabase(unittest.TestCase):
         sys.modules["game_systems.data.equipments"] = mock_data.equipments
 
         # Import
-        import database.populate_database
-        importlib = __import__('importlib')
+        importlib = __import__("importlib")
         # Reload explicitly using sys.modules if attribute access fails
         importlib.reload(sys.modules["database.populate_database"])
         self.populate = sys.modules["database.populate_database"]
@@ -98,6 +114,7 @@ class TestPopulateDatabase(unittest.TestCase):
 
         self.populate.insert_monsters(mock_db)
         mock_db["monsters"].insert_many.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

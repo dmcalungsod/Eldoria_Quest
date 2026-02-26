@@ -1,10 +1,11 @@
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -18,33 +19,41 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
         # Mock app_commands.command decorator
         def command_decorator(*args, **kwargs):
             def decorator(func):
-                func.error = MagicMock() # For @dev_panel.error
+                func.error = MagicMock()  # For @dev_panel.error
                 return func
+
             return decorator
+
         mock_discord.app_commands.command = MagicMock(side_effect=command_decorator)
 
         # Mock discord.ui
         mock_discord.ui = MagicMock()
+
         # Mock button decorator
         def button_decorator(*args, **kwargs):
             def decorator(func):
                 return func
+
             return decorator
+
         mock_discord.ui.button = MagicMock(side_effect=button_decorator)
 
         # Mock View
         class MockView:
             def __init__(self, timeout=None):
                 pass
+
         mock_discord.ui.View = MockView
 
         # Mock Embed
         class MockEmbed:
             def __init__(self, **kwargs):
-                self.title = kwargs.get('title')
+                self.title = kwargs.get("title")
                 self.fields = []
+
             def add_field(self, **kwargs):
                 self.fields.append(kwargs)
+
         mock_discord.Embed = MockEmbed
 
         # Mock ButtonStyle
@@ -54,8 +63,10 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
         sys.modules["discord.app_commands"] = mock_discord.app_commands
 
         mock_ext = MagicMock()
+
         class DummyCog:
             pass
+
         mock_ext.commands.Cog = DummyCog
         sys.modules["discord.ext"] = mock_ext
         sys.modules["discord.ui"] = mock_discord.ui
@@ -67,7 +78,8 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
 
         # Import
         import cogs.developer_cog
-        importlib = __import__('importlib')
+
+        importlib = __import__("importlib")
         importlib.reload(cogs.developer_cog)
 
         self.DeveloperCog = cogs.developer_cog.DeveloperCog
@@ -119,7 +131,7 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
 
         interaction.followup.send.assert_called_once()
         kwargs = interaction.followup.send.call_args.kwargs
-        self.assertIsInstance(kwargs['view'], self.DevPanelView)
+        self.assertIsInstance(kwargs["view"], self.DevPanelView)
 
     async def test_view_interaction_check_success(self):
         user = MagicMock()
@@ -161,6 +173,7 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
 
         view.db.admin_grant.assert_called_once()
         interaction.edit_original_response.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

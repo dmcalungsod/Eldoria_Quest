@@ -1,11 +1,12 @@
 import datetime
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 class TestEventCog(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -20,6 +21,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         def pass_decorator(*args, **kwargs):
             def decorator(func):
                 return func
+
             return decorator
 
         mock_discord.app_commands.command = MagicMock(side_effect=pass_decorator)
@@ -29,20 +31,24 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         # Mock Embed
         class MockEmbed:
             def __init__(self, **kwargs):
-                self.title = kwargs.get('title')
-                self.description = kwargs.get('description')
+                self.title = kwargs.get("title")
+                self.description = kwargs.get("description")
                 self.fields = []
+
             def add_field(self, name, value, inline=True):
                 m = MagicMock()
                 m.name = name
                 m.value = value
                 self.fields.append(m)
+
         mock_discord.Embed = MockEmbed
 
         # Mock ext
         mock_ext = MagicMock()
+
         class DummyCog:
             pass
+
         mock_ext.commands.Cog = DummyCog
 
         # Mock tasks loop
@@ -52,11 +58,15 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
                 mock_task.start = MagicMock()
                 mock_task.cancel = MagicMock()
                 mock_task.callback = func
+
                 def before_loop_decorator(f):
                     return f
+
                 mock_task.before_loop = before_loop_decorator
                 return mock_task
+
             return decorator
+
         mock_ext.tasks.loop = MagicMock(side_effect=loop_decorator)
 
         sys.modules["discord"] = mock_discord
@@ -72,7 +82,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         # Import
         import cogs.event_cog
-        importlib = __import__('importlib')
+
+        importlib = __import__("importlib")
         importlib.reload(cogs.event_cog)
 
         self.EventCog = cogs.event_cog.EventCog
@@ -95,7 +106,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.cog.system.EVENT_CONFIGS = {
             "harvest_festival": {"name": "Harvest Festival", "description": "Desc"},
             "mystic_merchant": {"name": "Mystic Merchant", "description": "Desc"},
-            "blood_moon": {"name": "Blood Moon", "description": "Desc"}
+            "blood_moon": {"name": "Blood Moon", "description": "Desc"},
         }
 
     def tearDown(self):
@@ -109,27 +120,22 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         interaction.response.send_message.assert_called_once()
         kwargs = interaction.response.send_message.call_args.kwargs
-        self.assertIn("No Active Event", kwargs['embed'].title)
+        self.assertIn("No Active Event", kwargs["embed"].title)
 
     async def test_event_status_active(self):
         interaction = AsyncMock()
         future = (datetime.datetime.now() + datetime.timedelta(days=1)).isoformat()
 
-        active = {
-            "name": "Blood Moon",
-            "description": "Scary",
-            "end_time": future,
-            "modifiers": {"exp": 2.0}
-        }
+        active = {"name": "Blood Moon", "description": "Scary", "end_time": future, "modifiers": {"exp": 2.0}}
         self.cog.system.get_current_event.return_value = active
 
         await self.cog.event_status(interaction)
 
         interaction.response.send_message.assert_called_once()
         kwargs = interaction.response.send_message.call_args.kwargs
-        self.assertIn("Blood Moon", kwargs['embed'].title)
+        self.assertIn("Blood Moon", kwargs["embed"].title)
         # Check modifiers
-        fields = kwargs['embed'].fields
+        fields = kwargs["embed"].fields
         self.assertTrue(any("Global Effects" in f.name for f in fields))
 
     async def test_admin_start_success(self):
@@ -177,7 +183,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         mock_date = datetime.datetime(2023, 5, 1, 12, 0, 0)
         with patch("game_systems.core.world_time.WorldTime.now", return_value=mock_date):
-            with patch("random.random", return_value=0.01): # < 0.02
+            with patch("random.random", return_value=0.01):  # < 0.02
                 self.cog.system.start_event.return_value = True
 
                 await self.cog.check_event_cycle.callback(self.cog)
@@ -214,6 +220,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
             await self.cog._announce("Hello World")
 
         channel.send.assert_called_with("Hello World")
+
 
 if __name__ == "__main__":
     unittest.main()
