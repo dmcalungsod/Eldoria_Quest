@@ -1,7 +1,9 @@
 import unittest
-from unittest.mock import MagicMock, patch
 from datetime import datetime
-from game_systems.core.world_time import WorldTime, TimePhase, Weather, Season, LOCATION_WEATHER_WEIGHTS
+from unittest.mock import MagicMock, patch
+
+from game_systems.core.world_time import LOCATION_WEATHER_WEIGHTS, Season, TimePhase, Weather, WorldTime
+
 
 class TestWorldSeasons(unittest.TestCase):
     """

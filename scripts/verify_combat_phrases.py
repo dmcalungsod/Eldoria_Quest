@@ -7,6 +7,7 @@ Checks basic attack narration and skill specific phrases.
 
 from game_systems.combat.combat_phrases import CombatPhrases
 
+
 def main():
     print("=== Verifying Alchemist Combat Phrases ===\n")
 
