@@ -148,10 +148,8 @@ class ShopView(View):
 
         success, result, new_aurum = await asyncio.to_thread(self._execute_purchase, item_key)
 
-        # SECURITY FIX: Always fetch fresh stats to prevent stale state.
-        # This prevents the UI from showing incorrect balance if it changed externally.
-        fresh_player = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-        current_aurum = fresh_player["aurum"] if fresh_player else 0
+        # Use the fresh balance returned by the atomic transaction
+        current_aurum = new_aurum
 
         # Fetch fresh inventory counts to update the UI
         new_counts = await asyncio.to_thread(
