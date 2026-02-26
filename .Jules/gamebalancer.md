@@ -15,3 +15,11 @@
 **Learning:** Auto-adventures lacking dynamic difficulty scaling allowed players to farm indefinitely with sufficient healing, bypassing the intended "risk vs reward" curve of long expeditions. Static monster stats meant the 10th hour was no more dangerous than the 1st.
 
 **Action:** Implemented a fatigue system in `AdventureSession`. Expeditions longer than 4 hours now incur a +5% monster damage multiplier per subsequent hour. This creates a soft cap on session length, forcing players to weigh the risk of extended farming against the escalating danger, reinforcing the survival theme. The scaling is transient (calculated per step) to avoid permanently buffing monster records in the database.
+
+## 2026-03-08 — Buffing End-Game Adventure Zones
+
+**Learning:** Players were not engaging with "Clockwork Halls" and "The Void Sanctum" due to low reward-to-risk ratio. The "Void Heart" was unobtainable outside of the boss, making the zone feel incomplete.
+**Action:**
+1.  **Clockwork Halls (Rank B):** Added `steam_core` (10%) and `clockwork_heart` (1%) to gatherables. Increased `magic_stone_medium` gatherable chance to 35% and `magic_stone_large` to 10%. Buffed Cogwork Spider and Automaton Knight drops.
+2.  **The Void Sanctum (Rank S):** Added `void_heart` (2%) and `null_stone` (10%) to gatherables. Increased `magic_stone_flawless` gatherable chance to 30%. Buffed Void Stalker and Entropy Drake drops.
+**Result:** These changes should make end-game farming more viable and less reliant on boss spawns for key crafting materials.
