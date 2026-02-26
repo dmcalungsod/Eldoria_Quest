@@ -134,7 +134,6 @@ def create_tables(db=None):
     db["tournament_scores"].create_index([("tournament_id", ASCENDING), ("score", -1)])
 
     # --- world_events ---
-    # Performance: Critical index for O(1) active event lookup in combat/rewards loops
     db["world_events"].create_index("active")
     db["world_events"].create_index("end_time")
 

@@ -638,14 +638,6 @@ class AdventureSession:
                 self.active_monster = None
                 break
 
-            # Safety: Drop to manual if HP is too low
-            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
-            if result["hp_current"] / max(max_hp, 1) < 0.30:
-                if not background:
-                    sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
-                # If background, we break silently. Next simulate_step will trigger _attempt_flee
-                break
-
         # Save final vitals via Delta
         delta_hp = context["vitals"]["current_hp"] - initial_hp
         delta_mp = context["vitals"]["current_mp"] - initial_mp
