@@ -356,6 +356,11 @@ class AdventureSession:
 
         # Otherwise manual single turn
         final_action = action if action else "attack"
+
+        # Check if player is stunned (skip turn logic handled in process_combat_turn via combat_engine)
+        # However, we need to ensure the action reflects this if necessary, or rely on engine.
+        # Engine handles stun check internally.
+
         return self._process_combat_turn(
             context,
             action=final_action,
@@ -742,6 +747,26 @@ class AdventureSession:
         # Extract Stance
         stance = self.active_monster.get("player_stance", "balanced")
 
+        # Extract Stun State (Persistence)
+        # We inject the stunned state into the monster dict (temporary storage) or pass it directly.
+        # CombatEngine initializes `player_stunned` from `player.is_stunned`.
+        # `context['player']` is a dict (row data), not object. `context['player_stats']` is object.
+        # We need to set `is_stunned` on `context['player_stats']` or similar wrapper used by Engine.
+        # `CombatEngine` expects `player` arg to be "LevelUpSystem wrapper (with stats + current HP)".
+        # In `combat_handler.py`, it passes `player` object.
+        # In `adventure_session.py`, `combat.resolve_turn` is called.
+
+        # Check `active_monster` for persisted stun state
+        is_stunned = self.active_monster.get("player_stunned", False)
+
+        # We need to pass this to `resolve_turn`.
+        # `resolve_turn` instantiates `CombatEngine`.
+        # We need to ensure `CombatEngine` gets this state.
+        # `CombatHandler.resolve_turn` uses `context['player_stats']` as player object (usually).
+        # Let's attach the attribute to the player object in context.
+        if context and "player_stats" in context:
+            context["player_stats"].is_stunned = is_stunned
+
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
 
@@ -768,6 +793,10 @@ class AdventureSession:
         if context:
             context["vitals"]["current_hp"] = result.get("hp_current", initial_hp)
             context["vitals"]["current_mp"] = result.get("mp_current", initial_mp)
+
+        # Update Persistence for Stun State
+        if "player_stunned" in result:
+            self.active_monster["player_stunned"] = result["player_stunned"]
 
         turn_logs = result["phrases"]
         if prepend_logs:
