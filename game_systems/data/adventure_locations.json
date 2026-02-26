@@ -550,11 +550,19 @@
             ],
             [
                 "magic_stone_medium",
-                25
+                35
+            ],
+            [
+                "steam_core",
+                10
             ],
             [
                 "magic_stone_large",
-                5
+                10
+            ],
+            [
+                "clockwork_heart",
+                1
             ]
         ],
         "special_events": [
@@ -918,7 +926,15 @@
             ],
             [
                 "magic_stone_flawless",
-                20
+                30
+            ],
+            [
+                "null_stone",
+                10
+            ],
+            [
+                "void_heart",
+                2
             ]
         ],
         "special_events": [
