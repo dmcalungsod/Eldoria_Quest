@@ -10,7 +10,7 @@ A pragmatic survivor who views the Sundering not as a curse, but a chemical reac
 > "The gods didn't save us when the sky cracked. Steel rusted, and prayers went unanswered. But the rot... the rot was honest. It taught me that everything breaks down if you apply the right catalyst. I am not a hero; I am just the one who knows the formula for your undoing."
 > — *Kaelen, First Alchemist of the Grey Ward*
 
-Alchemists are often former scholars, apothecaries, or survivalists who realized that the warped mana of the world could be distilled into physical forms. They are closely associated with the **Grey Ward** (see `.Jules/lore_canon.md`), a faction of pragmatic survivalists who operate the city's quarantine zones. They are respected for their ability to cure the incurable, but feared for their ability to liquefy armor.
+Alchemists are often former scholars, apothecaries, or survivalists who realized that the warped mana of the world could be distilled into physical forms. They are respected for their ability to cure the incurable, but feared for their ability to liquefy armor.
 
 ## 📊 Base Stats (for GameBalancer)
 *   **HP:** Medium (1.1x Rogue base) - *Hardy from exposure to fumes.*

@@ -44,11 +44,17 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 *   **Key Interest:** Elemental/Demon monsters, magic stones, ancient texts.
 *   **Motto:** *Knowledge is Power.*
 
-### **Grey Ward** (Order of Resilience)
-*   **Philosophy:** "From rot, resilience. To survive the Veil, we must consume it."
-*   **Focus:** Alchemy, biological research, quarantine enforcement, turning monsters into medicine (and weapons).
-*   **Key Interest:** Mutated fauna, poisonous flora, reagent gathering.
-*   **Motto:** *Adapt or Perish.*
+### **The Stone Harvesters** (Miners of the Deep)
+*   **Philosophy:** "The earth provides, but only to those with the strength to take it."
+*   **Focus:** Mining, refining ores, maintaining the city's infrastructure. They are currently heavily invested in the **Frostfall Expanse** for its rare crystals.
+*   **Key Interest:** Construct/Elemental monsters, ores, crystals.
+*   **Motto:** *Strike True.*
+
+### **The Grey Ward** (Alchemists & Apothecaries)
+*   **Philosophy:** "The gods are silent. Science is the only prayer that is answered."
+*   **Focus:** Utilizing the corrupted flora and fauna of the world to create medicines, poisons, and explosives. They are pragmatic survivalists who view magic through a scientific lens.
+*   **Key Interest:** Potions, chemical weapons, understanding "The Rot."
+*   **Motto:** *Through Decay, Discovery.*
 
 ---
 
@@ -64,8 +70,8 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 8.  **The Clockwork Halls (Rank B):** A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.
 9.  **The Forgotten Ossuary (Rank B):** A silent labyrinth of bone and shadow. The air is cold and smells of ancient dust.
 10. **The Celestial Archipelago (Rank B):** Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.
-11. **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
-12. **The Frostfall Expanse (Rank A):** A frozen wasteland where the wind cuts like a knife and only the strong survive.
+11. **The Molten Caldera (Rank A):** A churning lake of fire and obsidian. The heat alone is enough to kill the unprepared.
+12. **The Frostfall Expanse (Rank A):** A frozen wasteland where the wind cuts like a knife. Home to Winter Wolves and ancient ice-bound secrets. The cold here is unnatural, a remnant of a past calamity.
 13. **Gale-Scarred Heights (Rank A):** High peaks where the wind howls like a living thing. Only the sure-footed survive.
 14. **The Shimmering Wastes (Rank A):** A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.
 15. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
@@ -85,7 +91,28 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 
 ---
 
-## 📜 **V. Tone Guidelines**
+## 🧪 **V. Classes & Disciplines**
+
+### **The Alchemist**
+*   **Archetype:** Technical Utility / Debuffer.
+*   **Lore:** Unlike Mages who channel the Veil directly (risking corruption), Alchemists distill its essence into physical forms. They use volatile mixtures—acids, explosives, and mutagens—to control the battlefield.
+*   **Philosophy:** They see the Sundering not as a curse, but as a chemical reaction to be understood. "Everything breaks down if you apply the right catalyst."
+*   **Key Abilities:** Vitriol Bomb, Triage, Mutagenic Serum.
+*   **Role in Society:** Often former scholars or survivalists, they are respected for their ability to cure the incurable but feared for their willingness to weaponize the very corruption they study.
+
+---
+
+## 📰 **VI. Current Events**
+
+### **The Frostfall Expedition**
+*   **Status:** Active.
+*   **Description:** The Guild has authorized a major push into the **Frostfall Expanse** to recover resources frozen in the ice. Adventurers are offered hazard pay (increased loot) but warned of the extreme cold.
+*   **Objective:** Secure a foothold in the frozen north and recover ancient technologies buried beneath the glaciers.
+*   **Tone:** Desperate expansion. The city needs resources, and the cold is a deadly price to pay.
+
+---
+
+## 📜 **VII. Tone Guidelines**
 
 *   **Grim but Hopeful:** The world is dark and dangerous, but people survive through grit and cooperation.
 *   **Literary:** Descriptions should be evocative. Avoid "video gamey" slang (e.g., "mob," "aggro," "spawn") in narrative text. Use "creature," "hostile," "emerge."
