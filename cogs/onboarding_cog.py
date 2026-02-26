@@ -100,10 +100,12 @@ class StartMenuView(View):
         class_id = int(interaction.data["custom_id"].split("_")[1])
 
         class_info = next(
-            (v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), None
+            (v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id),
+            None,
         )
         class_name = next(
-            (k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), "Unknown"
+            (k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id),
+            "Unknown",
         )
 
         if not class_info:
@@ -257,8 +259,8 @@ class GuildWelcomeView(View):
             description=(
                 "You step into the training ring. The sawdust floor crunches "
                 "beneath your boots.\n\n"
-                "A **Straw Dummy** stands before you. It mocks you with its silence "
-                "and drawn-on angry eyebrows.\n\n"
+                "A **Straw Dummy** stands before you. It mocks you with "
+                "its silence and drawn-on angry eyebrows.\n\n"
                 "**Action:** Strike the dummy to begin."
             ),
             color=discord.Color.red(),
@@ -266,7 +268,8 @@ class GuildWelcomeView(View):
         await interaction.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(
-        label="⏩ I know what I'm doing (Skip)", style=discord.ButtonStyle.secondary
+        label="⏩ I know what I'm doing (Skip)",
+        style=discord.ButtonStyle.secondary,
     )
     async def skip_to_lobby(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
@@ -290,7 +293,8 @@ class StartFirstExpeditionView(View):
         adventure_cog = interaction.client.get_cog("AdventureCommands")
         if not adventure_cog:
             await interaction.response.send_message(
-                "Adventure system unavailable. Proceeding to lobby.", ephemeral=True
+                "Adventure system unavailable. Proceeding to lobby.",
+                ephemeral=True,
             )
             await transition_to_guild_lobby(interaction, self.db, self.user)
             return
@@ -299,16 +303,22 @@ class StartFirstExpeditionView(View):
 
         # Fetch Data for Setup View
         try:
-            guild_member, player_data, supplies, max_slots, current_slots = (
-                await asyncio.gather(
-                    asyncio.to_thread(self.db.get_guild_member_data, self.user.id),
-                    asyncio.to_thread(self.db.get_player, self.user.id),
-                    asyncio.to_thread(
-                        self.db.get_inventory_items, self.user.id, item_type="supply"
-                    ),
-                    asyncio.to_thread(self.db.calculate_inventory_limit, self.user.id),
-                    asyncio.to_thread(self.db.get_inventory_slot_count, self.user.id),
-                )
+            (
+                guild_member,
+                player_data,
+                supplies,
+                max_slots,
+                current_slots,
+            ) = await asyncio.gather(
+                asyncio.to_thread(self.db.get_guild_member_data, self.user.id),
+                asyncio.to_thread(self.db.get_player, self.user.id),
+                asyncio.to_thread(
+                    self.db.get_inventory_items,
+                    self.user.id,
+                    item_type="supply",
+                ),
+                asyncio.to_thread(self.db.calculate_inventory_limit, self.user.id),
+                asyncio.to_thread(self.db.get_inventory_slot_count, self.user.id),
             )
             rank = guild_member["rank"] if guild_member else "F"
             level = player_data["level"] if player_data else 1
@@ -319,8 +329,10 @@ class StartFirstExpeditionView(View):
             embed = discord.Embed(
                 title=f"{E.MAP} First Expedition: The Outskirts",
                 description=(
-                    "**Step 1:** Select a **Location** (e.g., *Mistwood Outskirts*).\n"
-                    "**Step 2:** Choose a **Duration** (start small, maybe 30 minutes).\n"
+                    "**Step 1:** Select a **Location** (e.g., "
+                    "*Mistwood Outskirts*).\n"
+                    "**Step 2:** Choose a **Duration** (start small, "
+                    "maybe 30 minutes).\n"
                     "**Step 3:** Click **Begin Expedition**.\n\n"
                     "*Your character will explore automatically. "
                     "Come back when the timer ends!*"
@@ -338,7 +350,8 @@ class StartFirstExpeditionView(View):
                 capacity=(current_slots, max_slots),
             )
 
-            # Override back button to return to Lobby instead of Profile for this flow?
+            # Override back button to return to Lobby instead of Profile
+            # for this flow?
             # Actually, standard behavior is fine, but let's just show the view.
             await interaction.edit_original_response(embed=embed, view=view)
 
@@ -410,7 +423,8 @@ class CombatTutorialView(View):
         embed.description = (
             "**You strike the dummy!** Straw flies everywhere.\n"
             f"{E.PLAYER_ATTACK} **-5 HP**\n\n"
-            "The dummy wobbles menacingly. It looks like it's winding up for a counter-wobble!\n\n"
+            "The dummy wobbles menacingly. It looks like it's winding up "
+            "for a counter-wobble!\n\n"
             "**Action:** Prepare your defense!"
         )
         await interaction.response.edit_message(embed=embed, view=self)
@@ -423,7 +437,8 @@ class CombatTutorialView(View):
         embed.description = (
             "**You raise your guard.**\n"
             f"{E.SHIELD} **Block Success!**\n\n"
-            "The dummy tips over and bonks harmlessly against your defense. **0 Damage.**\n"
+            "The dummy tips over and bonks harmlessly against your defense. "
+            "**0 Damage.**\n"
             "Now, while it's off balance—finish it!"
         )
         await interaction.response.edit_message(embed=embed, view=self)
@@ -523,11 +538,14 @@ class CombatTutorialView(View):
         embed = discord.Embed(
             title="📜 A New Assignment",
             description=(
-                "*The Guild Clerk stamps your registration form with a heavy thud.*\n\n"
-                "**“All official. Now, don't think you can just lounge around.”**\n\n"
+                "*The Guild Clerk stamps your registration form with a heavy "
+                "thud.*\n\n"
+                "**“All official. Now, don't think you can just lounge "
+                "around.”**\n\n"
                 "She points to a map pinned to the wall.\n\n"
-                "**“We need eyes on the outskirts. Take a patrol contract. It takes time, "
-                "so you can head out and return later to collect your pay.”**"
+                "**“We need eyes on the outskirts. Take a patrol contract. "
+                "It takes time, so you can head out and return later "
+                "to collect your pay.”**"
             ),
             color=discord.Color.dark_green(),
         )
