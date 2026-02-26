@@ -10,10 +10,15 @@
         "patch"
       ],
       "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch"
+      "groupSlug": "all-minor-patch",
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": [
+        "pin",
+        "digest"
+      ],
+      "automerge": true
     }
-  ],
-  "schedule": [
-    "before 4am on monday"
   ]
 }
