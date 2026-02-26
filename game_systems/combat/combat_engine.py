@@ -223,6 +223,10 @@ class CombatEngine:
                 log, turn_report, bonus_crit, player_defending
             )
 
+            # Check if player skill stunned the monster
+            if self.monster.pop("is_stunned", False):
+                monster_stunned = True
+
             if monster_defeated:
                 logger.info("Combat End: Monster defeated.")
                 return self._player_victory(log, turn_report)
@@ -752,6 +756,9 @@ class CombatEngine:
         if skill.get("key_id") == "unstoppable_force":
             self.new_titles.append("Unstoppable")
 
+        # Track damage dealt for recoil purposes
+        damage_dealt = 0
+
         if skill.get("heal_power", 0) > 0:
             # --- Healing Skill ---
             heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
@@ -783,18 +790,13 @@ class CombatEngine:
             if self.dmg_dealt_mult != 1.0:
                 dmg = int(dmg * self.dmg_dealt_mult)
 
+            damage_dealt = dmg  # Capture for recoil
+
             if event_type == "crit":
                 turn_report["player_crit"] = 1
 
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
-
-            # Recoil Mechanics (Tactician)
-            recoil_pct = skill.get("self_damage_percent")
-            if recoil_pct:
-                recoil_dmg = max(1, int(dmg * recoil_pct))
-                self.player_hp = max(0, self.player_hp - recoil_dmg)
-                log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
 
             # Apply Debuffs (if any)
             if skill.get("debuff"):
@@ -804,6 +806,29 @@ class CombatEngine:
 
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
+
+        # --- Shared Mechanics (Recoil, Status Effects) ---
+
+        # Recoil Mechanics
+        recoil_pct = skill.get("self_damage_percent")
+        if recoil_pct:
+            if damage_dealt > 0:
+                recoil_dmg = max(1, int(damage_dealt * recoil_pct))
+            else:
+                # For non-damaging skills (buffs/heals), scale off Max HP
+                max_hp = self.stats_dict.get("HP", 100)
+                recoil_dmg = max(1, int(max_hp * recoil_pct))
+
+            self.player_hp = max(0, self.player_hp - recoil_dmg)
+            log.append(f"💔 **Recoil!** You take {recoil_dmg} damage from the exertion!")
+
+        # Status Effects (e.g. Stun)
+        status_effect = skill.get("status_effect")
+        if status_effect:
+            stun_chance = status_effect.get("stun_chance", 0)
+            if stun_chance > 0 and random.random() < stun_chance:  # nosec B311
+                self.monster["is_stunned"] = True
+                log.append(f"💫 **Stunned!** The {self.monster.get('name', 'Enemy')} is reeling!")
 
     def _process_monster_debuffs(self):
         """

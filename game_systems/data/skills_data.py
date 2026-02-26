@@ -329,7 +329,7 @@ SKILLS = {
         "class_id": 6,
         "mp_cost": 8,
         "power_multiplier": 1.2,
-        "debuff": {"END_percent": -0.1, "duration": 3},
+        "debuff": {"DEF_percent": -0.1, "duration": 3},
         "learn_cost": 0,  # Starting Skill
         "upgrade_cost": 200,
         "scaling_stat": "DEX",  # Accuracy of throw
