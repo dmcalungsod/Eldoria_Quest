@@ -15,8 +15,12 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # Mock pymongo BEFORE importing DatabaseManager
+# Mock pymongo BEFORE importing DatabaseManager
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
+
+# Ensure cogs.quest_hub_cog is loaded so patch can find it on Python 3.10
+import cogs.quest_hub_cog  # noqa
 
 
 # Setup View and Button mocks
