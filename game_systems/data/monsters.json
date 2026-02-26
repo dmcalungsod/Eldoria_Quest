@@ -279,7 +279,8 @@
             ],
             [
                 "ancient_tablet",
-                50]
+                50
+            ]
         ],
         "skills": [
             "void_slash",
@@ -1847,7 +1848,7 @@
             ],
             [
                 "magic_stone_large",
-                50
+                60
             ]
         ],
         "skills": [
@@ -1922,7 +1923,7 @@
             ],
             [
                 "magic_stone_flawless",
-                30
+                40
             ]
         ],
         "skills": [
@@ -2115,7 +2116,7 @@
             ],
             [
                 "magic_stone_medium",
-                10
+                25
             ]
         ],
         "skills": [
@@ -2191,6 +2192,10 @@
             [
                 "brass_gear",
                 50
+            ],
+            [
+                "magic_stone_large",
+                20
             ]
         ],
         "skills": [
