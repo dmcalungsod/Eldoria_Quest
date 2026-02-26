@@ -610,14 +610,6 @@ class AdventureSession:
             if result["phrases"]:
                 sequence.append(result["phrases"])
 
-            # Safety: Drop to manual if HP is too low
-            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
-            if result["hp_current"] / max(max_hp, 1) < 0.30:
-                if not background:
-                    sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
-                # If background, we break silently. Next simulate_step will trigger _attempt_flee
-                break
-
             if result.get("winner") == "monster":
                 is_dead = True
                 self.active_monster = None
@@ -626,6 +618,14 @@ class AdventureSession:
             if result.get("winner") == "player":
                 player_won = True
                 self.active_monster = None
+                break
+
+            # Safety: Drop to manual if HP is too low
+            max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
+            if result["hp_current"] / max(max_hp, 1) < 0.30:
+                if not background:
+                    sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                # If background, we break silently. Next simulate_step will trigger _attempt_flee
                 break
 
         # Save final vitals via Delta
