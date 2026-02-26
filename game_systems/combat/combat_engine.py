@@ -152,6 +152,13 @@ class CombatEngine:
         self.new_buffs = []
         self.new_titles = []
 
+        # Player Status State (Initialized from player object or default False)
+        # Note: Ideally this should persist in DB, but for now it's per-session or per-turn in this engine instance.
+        # If CombatEngine is re-instantiated every turn, we need to pass this state in.
+        # Current architecture suggests CombatEngine is transient.
+        # We will check if player object has a 'stunned' attribute or similar.
+        self.player_stunned = getattr(player, "is_stunned", False)
+
         if self.player_stance == "aggressive":
             self.dmg_dealt_mult = 1.2
             self.dmg_taken_mult = 1.2
@@ -219,9 +226,18 @@ class CombatEngine:
             monster_stunned, bonus_crit, player_defending = self._check_interrupt_mechanic(log)
 
             # --- 1. PLAYER'S TURN ---
-            monster_defeated, player_defending = self._process_player_turn(
-                log, turn_report, bonus_crit, player_defending
-            )
+            if self.player_stunned:
+                log.append("💫 **Stunned!** You cannot move!")
+                monster_defeated = False
+                # Reset stun for next turn (or decrement if we had duration)
+                self.player_stunned = False
+                # We need to signal this back to caller if state persists,
+                # but currently engine returns result dict.
+                # We'll add 'player_stunned' to result dict.
+            else:
+                monster_defeated, player_defending = self._process_player_turn(
+                    log, turn_report, bonus_crit, player_defending
+                )
 
             # Check if player skill stunned the monster
             if self.monster.pop("is_stunned", False):
@@ -248,6 +264,7 @@ class CombatEngine:
                 "active_boosts": self.active_boosts_dict,
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
+                "player_stunned": self.player_stunned,
             }
 
         except Exception as e:
@@ -520,6 +537,13 @@ class CombatEngine:
             mp_cost = skill.get("mp_cost", 0)
             self.monster["MP"] = max(0, self.monster.get("MP", 0) - mp_cost)
 
+            # --- Status Effects Check for Monster Skills ---
+            # Added here because it should apply regardless of hit/miss/dodge logic if it's a guaranteed effect,
+            # BUT usually effects are on hit.
+            # The previous implementation placed it inside 'if not player_defending'.
+            # However, the monster logic has branches for 'heal' and 'offensive'.
+            # We need to ensure it's checked in the offensive branch.
+
             if skill.get("heal_power", 0) > 0:
                 # --- Monster Healing ---
                 heal, new_hp, event_type = DamageFormula.monster_heal(
@@ -558,6 +582,22 @@ class CombatEngine:
 
                     if not player_defending:
                         log.append(CombatPhrases.monster_skill(self.monster, self.player, skill, dmg, crit))
+
+                # Check for Status Effects (Applied even if defending, though logic can vary)
+                # Usually status effects happen on hit. If we dodge, we don't get hit.
+                # If we defend, we reduce damage but still get hit?
+                # Let's assume status applies if damage > 0.
+
+                # Check for Status Effects from Monster Skill
+                status_effect = skill.get("status_effect")
+                if status_effect:
+                    stun_chance = status_effect.get("stun_chance", 0)
+                    if stun_chance > 0 and random.random() < stun_chance:  # nosec B311
+                        if self._is_player_immune("stun"):
+                            log.append(f"🛡️ **Immune!** You shrug off the stun effect!")
+                        else:
+                            log.append(f"💫 **Stunned!** You are reeling from the blow!")
+                            self.player_stunned = True
 
         elif action["type"] == "buff":
             buff = action["buff"]
@@ -658,6 +698,8 @@ class CombatEngine:
                 bonus_crit = True
                 self.monster.pop("charged_skill", None)
                 log.append(CombatPhrases.counter_success(self.monster, charged_skill, "interrupt"))
+                # Ensure bonus_crit is propagated to result later if immediate action requires it,
+                # BUT this method returns bonus_crit to caller.
 
             # PARRY LOGIC: Physical Charge + Defend Action
             is_physical = not is_magic
@@ -759,21 +801,33 @@ class CombatEngine:
         # Track damage dealt for recoil purposes
         damage_dealt = 0
 
+        # Flag to check if we processed a category (to handle else/fallback)
+        skill_processed = False
+
         if skill.get("heal_power", 0) > 0:
             # --- Healing Skill ---
             heal, new_hp, event_type = DamageFormula.player_heal(self.stats_dict, self.player_hp, skill, skill_level)
             self.player_hp = new_hp
             log.append(CombatPhrases.player_heal(self.player, skill, heal))
+            skill_processed = True
 
         elif skill.get("buff_data"):
             # --- Buff/Utility Skill ---
             self._apply_skill_buffs(skill)
             log.append(CombatPhrases.player_buff(self.player, skill))
+            skill_processed = True
 
-        else:
-            # --- Offensive Skill ---
+        # --- Offensive Skill Check ---
+        # Note: Some skills might have BOTH debuff and damage, or just debuff.
+        # If it wasn't a heal or buff_data only skill, treat as offensive.
+        # Logic fix: Check if it's explicitly offensive or default fallback.
+        if not skill_processed:
             # Use effective stats for defense calculation
             effective_monster = self._get_effective_monster_stats()
+
+            # Some skills (like purely debuff/status) might have power=0 or not use power_multiplier?
+            # Existing logic assumes power_multiplier exists or defaults to 1.0.
+            # If power_multiplier is 0 or low, it still does damage.
 
             dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, effective_monster, skill, skill_level)
 
@@ -798,16 +852,21 @@ class CombatEngine:
             # Tag damage type for stat growth
             self._tag_damage_type(skill, turn_report)
 
-            # Apply Debuffs (if any)
-            if skill.get("debuff"):
-                debuff_msg = self._apply_monster_debuff(skill)
-                if debuff_msg:
-                    log.append(debuff_msg)
-
             self.monster_hp -= dmg
             log.append(CombatPhrases.player_skill(self.player, self.monster, skill, dmg, crit))
 
-        # --- Shared Mechanics (Recoil, Status Effects) ---
+        # --- Shared Mechanics (Debuffs, Recoil, Status Effects) ---
+        # These should apply regardless of skill type (e.g. buff with recoil, attack with debuff)
+
+        # Apply Debuffs (if any)
+        # Note: Moved OUTSIDE the 'offensive' block to allow debuffs from other sources if needed,
+        # but primarily to ensure code flow is clean.
+        if skill.get("debuff"):
+            debuff_msg = self._apply_monster_debuff(skill)
+            if debuff_msg:
+                log.append(debuff_msg)
+
+        # Recoil Mechanics
 
         # Recoil Mechanics
         recoil_pct = skill.get("self_damage_percent")
@@ -829,6 +888,17 @@ class CombatEngine:
             if stun_chance > 0 and random.random() < stun_chance:  # nosec B311
                 self.monster["is_stunned"] = True
                 log.append(f"💫 **Stunned!** The {self.monster.get('name', 'Enemy')} is reeling!")
+
+    def _is_player_immune(self, status_type: str) -> bool:
+        """Checks if the player has immunity to a specific status."""
+        for buff in self.active_buffs:
+            if buff.get("stat") == f"immunity_{status_type}":
+                return True
+        # Check new buffs applied this turn
+        for buff in self.new_buffs:
+            if buff.get("stat") == f"immunity_{status_type}":
+                return True
+        return False
 
     def _process_monster_debuffs(self):
         """
