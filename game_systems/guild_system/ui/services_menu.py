@@ -130,6 +130,7 @@ class GuildServicesView(View, GuildViewMixin):
 
     async def shop_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.shop_cog import ShopView
+        from game_systems.core.world_time import WorldTime
         from game_systems.data.shop_data import SHOP_INVENTORY
 
         await interaction.response.defer()
@@ -138,12 +139,20 @@ class GuildServicesView(View, GuildViewMixin):
             return
 
         aurum = p_data["aurum"]
+        date_str = WorldTime.now().strftime("%Y-%m-%d")
 
-        # Pre-fetch inventory counts for better UX
-        counts = await asyncio.to_thread(
-            self.db.get_inventory_items_counts,
-            self.interaction_user.id,
-            list(SHOP_INVENTORY.keys()),
+        # Parallel fetch: inventory counts + daily usage
+        counts, daily_purchases = await asyncio.gather(
+            asyncio.to_thread(
+                self.db.get_inventory_items_counts,
+                self.interaction_user.id,
+                list(SHOP_INVENTORY.keys()),
+            ),
+            asyncio.to_thread(
+                self.db.get_daily_shop_purchases,
+                self.interaction_user.id,
+                date_str,
+            ),
         )
 
         embed = discord.Embed(
@@ -151,7 +160,13 @@ class GuildServicesView(View, GuildViewMixin):
             description=f"Funds: {aurum} Aurum",
             color=discord.Color.green(),
         )
-        view = ShopView(self.db, self.interaction_user, aurum, owned_counts=counts)
+        view = ShopView(
+            self.db,
+            self.interaction_user,
+            aurum,
+            owned_counts=counts,
+            daily_purchases=daily_purchases,
+        )
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)
 
@@ -204,6 +219,7 @@ class GuildServicesView(View, GuildViewMixin):
 
     async def mystic_merchant_callback(self, interaction: discord.Interaction, button: Button = None):
         from cogs.shop_cog import ShopView
+        from game_systems.core.world_time import WorldTime
 
         await interaction.response.defer()
         p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
@@ -211,12 +227,20 @@ class GuildServicesView(View, GuildViewMixin):
             return
 
         aurum = p_data["aurum"]
+        date_str = WorldTime.now().strftime("%Y-%m-%d")
 
-        # Pre-fetch inventory counts for better UX
-        counts = await asyncio.to_thread(
-            self.db.get_inventory_items_counts,
-            self.interaction_user.id,
-            list(MYSTIC_MERCHANT_INVENTORY.keys()),
+        # Parallel fetch
+        counts, daily_purchases = await asyncio.gather(
+            asyncio.to_thread(
+                self.db.get_inventory_items_counts,
+                self.interaction_user.id,
+                list(MYSTIC_MERCHANT_INVENTORY.keys()),
+            ),
+            asyncio.to_thread(
+                self.db.get_daily_shop_purchases,
+                self.interaction_user.id,
+                date_str,
+            ),
         )
 
         embed = discord.Embed(
@@ -230,6 +254,7 @@ class GuildServicesView(View, GuildViewMixin):
             aurum,
             inventory=MYSTIC_MERCHANT_INVENTORY,
             owned_counts=counts,
+            daily_purchases=daily_purchases,
         )
         view.set_back_button(self.back_to_services, "Back to Services")
         await interaction.edit_original_response(embed=embed, view=view)

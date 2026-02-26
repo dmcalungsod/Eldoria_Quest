@@ -2010,8 +2010,60 @@ class DatabaseManager:
     # SHOP (New methods for external call sites)
     # ============================================================
 
-    def purchase_item(self, discord_id: int, item_key: str, item_data: dict, price: int) -> tuple[bool, Any, int]:
-        """Atomic purchase: deducts gold and adds item. Includes refund on failure."""
+    def get_daily_shop_purchases(self, discord_id: int, date_str: str) -> dict[str, int]:
+        """
+        Fetches the counts of items purchased by a player on a specific date.
+        Returns: {item_key: count}
+        """
+        cursor = self._col("daily_shop_purchases").find(
+            {"discord_id": discord_id, "date_str": date_str},
+            {"_id": 0, "item_key": 1, "count": 1},
+        )
+        return {doc["item_key"]: doc["count"] for doc in cursor}
+
+    def increment_daily_shop_purchase(
+        self, discord_id: int, item_key: str, amount: int, date_str: str
+    ):
+        """Increments the daily purchase count for an item."""
+        self._col("daily_shop_purchases").update_one(
+            {"discord_id": discord_id, "item_key": item_key, "date_str": date_str},
+            {"$inc": {"count": amount}},
+            upsert=True,
+        )
+
+    def purchase_item(
+        self,
+        discord_id: int,
+        item_key: str,
+        item_data: dict,
+        price: int,
+        daily_limit: int | None = None,
+        date_str: str | None = None,
+    ) -> tuple[bool, Any, int]:
+        """
+        Atomic purchase: deducts gold and adds item. Includes refund on failure.
+        Includes optional Daily Limit check.
+        """
+        # 0. Check Daily Limit (if applicable)
+        if daily_limit is not None and date_str is not None:
+            # We must check limit before deducting gold.
+            # While this isn't strictly atomic with the purchase, the limit is a "soft" constraint
+            # compared to Aurum which is "hard" currency.
+            # Race condition risk: User buys item on two devices simultaneously to bypass limit.
+            # Mitigation: We could use find_one_and_update with a query filter, but that complicates the logic significantly
+            # given we need to insert if not exists.
+            # For a Discord bot, this check-then-act pattern is acceptable.
+
+            current_usage_doc = self._col("daily_shop_purchases").find_one(
+                {"discord_id": discord_id, "item_key": item_key, "date_str": date_str},
+                {"count": 1},
+            )
+            current_usage = current_usage_doc["count"] if current_usage_doc else 0
+
+            if current_usage >= daily_limit:
+                current_aurum = self.get_player_field(discord_id, "aurum") or 0
+                return (False, f"Daily limit reached ({daily_limit}).", current_aurum)
+
         # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
         if new_aurum is None:
@@ -2031,6 +2083,10 @@ class DatabaseManager:
             )
 
             if success:
+                # 3. Record Limit Usage (Post-Success)
+                if daily_limit is not None and date_str is not None:
+                    self.increment_daily_shop_purchase(discord_id, item_key, 1, date_str)
+
                 return (True, item_data, new_aurum)
             else:
                 # Inventory Full -> Refund
