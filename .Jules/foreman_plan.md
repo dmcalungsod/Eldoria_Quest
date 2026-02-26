@@ -51,14 +51,14 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Status:** **Completed** (Verified `adventure_locations.py` contains 12+ locations including Frostfall Expanse).
 - [ ] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
     - **Agent:** @GameBalancer
-    - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **(High Priority)**
-    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops).
-    - **Subtask 2.2c:** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives).
-    - **Due:** 2026-03-06
-- [ ] **Task 2.3:** Implement Fatigue System (>4h risk increase).
+    - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
+    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops). **[x] Completed**
+    - **Subtask 2.2c:** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives). **[ ] In Progress** (Partial: Void Heart missing).
+    - **Due:** 2026-03-08 (Extended)
+- [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
-    - **Details:** Modify `AdventureResolutionEngine` to increase monster damage scaling for long durations.
-    - **Due:** 2026-03-05
+    - **Details:** Modify `AdventureSession` to increase monster damage scaling for long durations.
+    - **Status:** **Completed** (Verified `_calculate_fatigue_multiplier` in `adventure_session.py`).
 
 ### Phase 3: Integration & Polish
 **Focus:** Flavor, depth, and safety nets.
@@ -93,6 +93,14 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Subtask 5.2b:** `AdventureEvents.regeneration`
     - **Subtask 5.2c:** `AdventureSession.simulate_step`
     - **Due:** 2026-03-10
+- [ ] **Task 5.3:** Update Grey Ward Faction (Issue #17).
+    - **Agent:** @GameForge
+    - **Details:** Update `factions.py` to match Namewright's design.
+    - **Due:** 2026-03-08
+- [ ] **Task 5.4:** Add Alchemist Materials (Issue #18).
+    - **Agent:** @DataSteward
+    - **Details:** Add `primordial_ooze`, `brimstone`, `lunawort` to `materials.py`.
+    - **Due:** 2026-03-08
 
 ---
 
@@ -111,9 +119,20 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @GameForge
     - **Due:** 2026-03-09
 
+### Warrior Skill Tree Expansion (New)
+**Design:** `.Jules/architect_designs/skill_tree_warrior.md`
+**Status:** **Implementation Phase**
+- [ ] **Task W.1:** Implement Recoil/Lifesteal mechanics.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-10
+- [ ] **Task W.2:** Add 7 new Warrior skills.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-10
+
 ---
 
 ## 📝 Activity Log
+- **2026-03-06:** Verified Tasks 2.2a, 2.2b, and 2.3 as Complete. Added new tasks for Grey Ward Faction, Alchemist Materials, and Warrior Skill Tree.
 - **2026-02-25 (Update):** Integrated Analyst findings (Task 2.2 split), Namewright updates (Task 3.3/Alchemist), and Issue Crafter reports (Phase 5). Marked Tasks 2.1 and 3.2 as Complete.
 - **2026-02-26:** Confirmed Phase 1 (UI) and key Phase 2/3 tasks (Locations, Death Penalty, Flavor Text) are Complete. Updated plan to reflect rapid progress. Assigned remaining Fatigue and Supply tasks.
 - **2026-02-25:** Phase 0 (Backend) marked Complete. Phase 1 detailed tasks assigned to @Palette and @SystemSmith.
