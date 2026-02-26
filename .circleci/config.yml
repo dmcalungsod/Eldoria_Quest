@@ -13,9 +13,7 @@ commands:
     steps:
       - run:
           name: Install Ruff
-          command: |
-            pip install --upgrade pip
-            pip install ruff
+          command: pip install ruff
 
   install-deps:
     description: Install project dependencies with caching
@@ -26,9 +24,7 @@ commands:
             - deps-v1-
       - run:
           name: Install Dependencies
-          command: |
-            pip install --upgrade pip
-            pip install -r requirements.txt
+          command: pip install -r requirements.txt
       - save_cache:
           key: deps-v1-{{ checksum "requirements.txt" }}
           paths:
