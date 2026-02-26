@@ -2015,7 +2015,9 @@ class DatabaseManager:
         # 1. Atomic Deduction
         new_aurum = self.deduct_aurum(discord_id, price)
         if new_aurum is None:
-            return (False, "Insufficient Aurum.", 0)
+            # Fetch current balance to avoid stale UI state
+            current_aurum = self.get_player_field(discord_id, "aurum") or 0
+            return (False, "Insufficient Aurum.", current_aurum)
 
         # 2. Add item to inventory with Refund Logic
         try:

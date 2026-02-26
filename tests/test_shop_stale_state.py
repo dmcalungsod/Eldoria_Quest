@@ -69,11 +69,11 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
 
         # Mock DB purchase to fail (Insufficient Funds)
         # purchase_item returns (success, result, new_balance)
-        # In the bug scenario, deduct_aurum returns None, so purchase_item returns 0.
-        mock_db.purchase_item.return_value = (False, "Insufficient Aurum.", 0)
+        # We expect purchase_item to return the actual balance (5) on failure.
+        mock_db.purchase_item.return_value = (False, "Insufficient Aurum.", 5)
 
         # Mock get_player to return fresh data (5 Aurum)
-        # This will only be called if we fix the bug.
+        # This will only be called if we rely on get_player (which we plan to remove).
         mock_db.get_player.return_value = {"aurum": 5}
 
         # Mock get_player_or_error helper used in callback
