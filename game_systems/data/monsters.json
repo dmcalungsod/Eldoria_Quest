@@ -2628,6 +2628,146 @@
         ],
         "description": "The central defense mechanism of the Archipelago. It judges intruders with the weight of stars."
     },
+    "monster_146": {
+        "id": 146,
+        "name": "Storm-Shell Crab",
+        "level": 32,
+        "tier": "Normal",
+        "hp": 1200,
+        "atk": 100,
+        "def": 100,
+        "xp": 1000,
+        "drops": [
+            [
+                "fulgurite_shard",
+                50
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "thunder_call"
+        ],
+        "description": "A massive crab whose shell conducts the endless lightning of the coast."
+    },
+    "monster_147": {
+        "id": 147,
+        "name": "Drowned Marine",
+        "level": 33,
+        "tier": "Normal",
+        "hp": 1100,
+        "atk": 110,
+        "def": 50,
+        "xp": 1050,
+        "drops": [
+            [
+                "rusted_scrap",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "water_jet"
+        ],
+        "description": "An undead soldier of the Iron Armada, wielding a rusted blade with unnatural strength."
+    },
+    "monster_148": {
+        "id": 148,
+        "name": "Volt-Eel",
+        "level": 32,
+        "tier": "Normal",
+        "hp": 900,
+        "atk": 120,
+        "def": 30,
+        "xp": 950,
+        "drops": [
+            [
+                "storm_essence",
+                30
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "thunder_call"
+        ],
+        "description": "A serpent of the rock pools that generates lethal shocks to stun prey."
+    },
+    "monster_149": {
+        "id": 149,
+        "name": "Siren Matriarch",
+        "level": 34,
+        "tier": "Elite",
+        "hp": 3000,
+        "atk": 140,
+        "def": 60,
+        "xp": 3500,
+        "drops": [
+            [
+                "siren_scale",
+                50
+            ],
+            [
+                "storm_essence",
+                40
+            ],
+            [
+                "magic_stone_large",
+                20
+            ]
+        ],
+        "skills": [
+            "bubble_beam",
+            "gust",
+            "mend"
+        ],
+        "description": "A leader of the coastal sirens, her song summons storms and breaks wills."
+    },
+    "monster_150": {
+        "id": 150,
+        "name": "Admiral Racker",
+        "level": 35,
+        "tier": "Boss",
+        "hp": 10000,
+        "atk": 170,
+        "def": 100,
+        "xp": 15000,
+        "drops": [
+            [
+                "admiral_insignia",
+                100
+            ],
+            [
+                "storm_essence",
+                80
+            ],
+            [
+                "magic_stone_flawless",
+                50
+            ],
+            [
+                "steel_ingot",
+                50
+            ]
+        ],
+        "skills": [
+            "thunder_call",
+            "water_jet",
+            "heavy_blow",
+            "regenerate"
+        ],
+        "description": "The cursed admiral of the lost fleet, fused with the wreckage and fueled by regret."
+    },
     "monster_151": {
         "id": 151,
         "name": "Glass Serpent",

@@ -707,6 +707,81 @@
             "safe_room"
         ]
     },
+    "thunder_crag_coast": {
+        "name": "The Thunder-Crag Coast",
+        "emoji": "⛈️",
+        "min_rank": "A",
+        "level_req": 33,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_146",
+                30
+            ],
+            [
+                "monster_147",
+                30
+            ],
+            [
+                "monster_148",
+                25
+            ],
+            [
+                "monster_149",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_149",
+                40
+            ],
+            [
+                "monster_147",
+                30
+            ],
+            [
+                "monster_148",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_150",
+                "weight": 5,
+                "min_level": 36
+            }
+        ],
+        "description": "A treacherous shoreline of jagged cliffs and shipwrecks, battered by an endless storm.",
+        "gatherables": [
+            [
+                "fulgurite_shard",
+                40
+            ],
+            [
+                "rusted_scrap",
+                30
+            ],
+            [
+                "storm_essence",
+                20
+            ],
+            [
+                "magic_stone_large",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine",
+            "hidden_stash"
+        ]
+    },
     "frostfall_expanse": {
         "name": "The Frostfall Expanse",
         "emoji": "❄️",
