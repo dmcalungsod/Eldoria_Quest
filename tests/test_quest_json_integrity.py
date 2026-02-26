@@ -1,7 +1,7 @@
-import unittest
 import json
-import sys
 import os
+import sys
+import unittest
 from pathlib import Path
 
 # Add root to path
@@ -10,10 +10,11 @@ sys.path.append(os.getcwd())
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.materials import MATERIALS
 
+
 class TestQuestJsonIntegrity(unittest.TestCase):
     def setUp(self):
         self.quest_path = Path("game_systems/data/quests.json")
-        with open(self.quest_path, "r", encoding="utf-8") as f:
+        with open(self.quest_path, encoding="utf-8") as f:
             self.quests = json.load(f)
 
         self.quest_ids = {q["id"] for q in self.quests}
@@ -74,6 +75,7 @@ class TestQuestJsonIntegrity(unittest.TestCase):
                 found_ice_core = True
                 break
         self.assertTrue(found_ice_core, "Ice Core not found in MATERIALS")
+
 
 if __name__ == "__main__":
     unittest.main()
