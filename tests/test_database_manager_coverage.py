@@ -30,11 +30,16 @@ class TestDatabaseManagerCoverage(unittest.TestCase):
         self.mock_player_skills = MagicMock()
 
         def get_col(name):
-            if name == "players": return self.mock_players
-            if name == "stats": return self.mock_stats
-            if name == "inventory": return self.mock_inventory
-            if name == "global_boosts": return self.mock_global_boosts
-            if name == "player_skills": return self.mock_player_skills
+            if name == "players":
+                return self.mock_players
+            if name == "stats":
+                return self.mock_stats
+            if name == "inventory":
+                return self.mock_inventory
+            if name == "global_boosts":
+                return self.mock_global_boosts
+            if name == "player_skills":
+                return self.mock_player_skills
             return MagicMock()
 
         self.db._col = MagicMock(side_effect=get_col)
@@ -296,8 +301,10 @@ class TestDatabaseManagerCoverage(unittest.TestCase):
         mock_we.find_one.side_effect = Exception("DB Error")
 
         original_side_effect = self.db._col.side_effect
+
         def side_effect(name):
-            if name == "world_events": return mock_we
+            if name == "world_events":
+                return mock_we
             return original_side_effect(name)
 
         self.db._col.side_effect = side_effect
