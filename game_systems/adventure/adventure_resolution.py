@@ -12,6 +12,8 @@ from typing import Any
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.adventure.adventure_session import AdventureSession
+from game_systems.core.world_time import WorldTime
+from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
 
@@ -90,12 +92,26 @@ class AdventureResolutionEngine:
                 max_hp = bundle["stats"].get("HP", 100)
                 max_mp = bundle["stats"].get("MP", 100)
 
+        # OPTIMIZATION: Fetch environmental data ONCE for the entire batch of steps
+        # This prevents recalculating weather/time and re-fetching events for every single 15-min step
+        weather = WorldTime.get_current_weather(session.location_id)
+        time_phase = WorldTime.get_current_phase()
+        event_system = WorldEventSystem(self.db)
+        event_data = event_system.get_current_event()
+
         final_vitals = None
 
         # 3. Simulation Loop
         for _ in range(steps_remaining):
             # Pass bundle and persist=False to avoid DB writes per step
-            result = session.simulate_step(context_bundle=bundle, background=True, persist=False)
+            result = session.simulate_step(
+                context_bundle=bundle,
+                background=True,
+                persist=False,
+                weather=weather,
+                time_phase=time_phase,
+                event_override=event_data,
+            )
 
             # Increment step counter
             session.steps_completed += 1
