@@ -17,3 +17,23 @@
 **Next Steps:**
 -   Coordinate with @GameBalancer to implement the drop table fixes.
 -   Re-run simulation after patches to verify balance.
+
+### Static Loot Efficiency Analysis
+**Goal:** Verify risk/reward balance across all adventure locations using static data analysis (Gold/CP ratio).
+
+**Findings:**
+1.  **Deepgrove Roots (Rank D)** confirmed as broken (Efficiency: 1.89).
+    -   Cause: Low CP mobs dropping decent loot + high value rare spawns.
+2.  **Shrouded Fen (Rank C)** confirmed as under-tuned (Efficiency: 0.56).
+    -   3.4x less efficient than the previous zone.
+3.  **Void Sanctum (Rank S)** has surprisingly low efficiency (0.10) despite being end-game.
+    -   High CP scaling outpaces loot value scaling.
+
+**Actions:**
+-   Created `scripts/analysis/analyze_loot_balance.py`.
+-   Generated report `.Jules/analysis/2026-03-01_loot_economy_analysis.md`.
+
+**Recommendations for @GameBalancer:**
+-   **Nerf Deepgrove:** Reduce drop rates for `magic_stone_medium` in this zone or increase monster CP.
+-   **Buff Shrouded Fen:** Increase drop rates of `magic_stone_medium` and `ancient_wood`.
+-   **Review End-Game Scaling:** Void Sanctum monsters are bullet sponges with low reward density.
