@@ -501,7 +501,6 @@ class EquipmentManager:
 
             # We can't use simple dictionary lookup for duplicate slots like accessory
             # So we iterate current_equipped values.
-            already_equipped = False
             for eq_item in current_equipped.values():
                 if (
                     eq_item["slot"] == target_slot

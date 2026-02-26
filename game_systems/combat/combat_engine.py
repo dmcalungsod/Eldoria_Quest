@@ -594,9 +594,9 @@ class CombatEngine:
                     stun_chance = status_effect.get("stun_chance", 0)
                     if stun_chance > 0 and random.random() < stun_chance:  # nosec B311
                         if self._is_player_immune("stun"):
-                            log.append(f"🛡️ **Immune!** You shrug off the stun effect!")
+                            log.append("🛡️ **Immune!** You shrug off the stun effect!")
                         else:
-                            log.append(f"💫 **Stunned!** You are reeling from the blow!")
+                            log.append("💫 **Stunned!** You are reeling from the blow!")
                             self.player_stunned = True
 
         elif action["type"] == "buff":

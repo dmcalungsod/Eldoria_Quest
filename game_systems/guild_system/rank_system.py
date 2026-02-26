@@ -121,5 +121,5 @@ class RankSystem:
             self.db.update_guild_member_rank(discord_id, new_rank)
             title = self.RANKS.get(new_rank, {}).get("title", "Adventurer")
             return True, f"Promoted to Rank {new_rank} — {title}."
-        except Exception as e:
+        except Exception:
             return False, "Promotion update failed."
