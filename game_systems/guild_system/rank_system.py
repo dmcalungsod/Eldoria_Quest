@@ -29,7 +29,7 @@ class RankSystem:
             "next_rank": "C",
             "requirements": {
                 "quests_completed": 20,
-                "normal_kills": 200,
+                "normal_kills": 250,
                 "elite_kills": 20,
                 "boss_kills": 1,
             },
