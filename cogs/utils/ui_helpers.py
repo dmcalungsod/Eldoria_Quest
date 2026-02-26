@@ -9,6 +9,7 @@ Fix: Added Level and EXP display back to profile.
 
 import asyncio
 import logging
+import math
 
 import discord
 
@@ -49,7 +50,9 @@ def get_health_status_emoji(current: int, max_val: int) -> str:
     return "🔴"
 
 
-def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> discord.Embed:
+def build_inventory_embed(
+    items: list, max_slots: int = MAX_INVENTORY_SLOTS, stats: PlayerStats | None = None
+) -> discord.Embed:
     """Constructs the inventory display."""
     # Only count unequipped items (backpack slots)
     slot_count = len([i for i in items if not i.get("equipped")])
@@ -61,6 +64,12 @@ def build_inventory_embed(items: list, max_slots: int = MAX_INVENTORY_SLOTS) -> 
     # Capacity Bar
     progress = make_progress_bar(slot_count, max_slots, length=12)
     embed.description = f"**Capacity:** `{progress}` {slot_count}/{max_slots}"
+
+    if stats:
+        # Calculate contributions
+        str_bonus = math.floor(stats.strength * stats.INVENTORY_STR_MOD)
+        dex_bonus = math.floor(stats.dexterity * stats.INVENTORY_DEX_MOD)
+        embed.description += f"\n*Scaling: +{str_bonus} (STR), +{dex_bonus} (DEX)*"
 
     if not items:
         embed.description += "\n\n*Your pack is light, holding only dust and echoes.*"
