@@ -163,27 +163,27 @@ FACTIONS = {
     },
     "grey_ward": {
         "name": "The Grey Ward",
-        "emoji": "⚗️",
-        "description": "Alchemists who use science and corruption to survive the depths.",
+        "emoji": "⚕️",
+        "description": "A pragmatic order of alchemists and doctors who believe the only way to survive the Veil is to adapt to it. They operate the city's quarantine zones.",
         "ranks": {
             1: {"title": "Gleaner", "reputation_needed": 0, "reward": None},
             2: {
-                "title": "Distiller",
+                "title": "Brewer",
                 "reputation_needed": 500,
                 "reward": {"type": "item", "key": "bitter_panacea", "amount": 3},
             },
             3: {
-                "title": "Synthesist",
+                "title": "Apothecary",
                 "reputation_needed": 1500,
                 "reward": {"type": "item", "key": "phial_of_vitriol", "amount": 3},
             },
             4: {
-                "title": "Apothecary",
+                "title": "Catalyst",
                 "reputation_needed": 3000,
                 "reward": {"type": "buff", "key": "gathering_boost", "value": 0.1},
             },
             5: {
-                "title": "Master Apothecary",
+                "title": "Synthesist",
                 "reputation_needed": 5000,
                 "reward": {"type": "title", "value": "Master Apothecary"},
             },
