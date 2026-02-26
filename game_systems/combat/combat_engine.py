@@ -282,9 +282,9 @@ class CombatEngine:
         """
         if self.weather == Weather.STORM:
             # 15% Chance for random lightning strike
-            if random.random() < 0.15:
+            if random.random() < 0.15:  # nosec B311
                 # 50/50 to hit Player or Monster
-                target_is_player = random.choice([True, False])
+                target_is_player = random.choice([True, False])  # nosec B311
                 dmg = (
                     max(10, int(self.stats_dict.get("HP", 100) * 0.05))
                     if target_is_player
@@ -308,21 +308,21 @@ class CombatEngine:
 
         elif self.weather == Weather.BLIZZARD:
             # Blizzard: 20% Chance for Frostbite (3% Max HP)
-            if random.random() < 0.20:
+            if random.random() < 0.20:  # nosec B311
                 dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.03))
                 self.player_hp = max(0, self.player_hp - dmg)
                 log.append(f"❄️ **BLIZZARD:** The biting cold freezes your marrow! (`{dmg}` dmg)")
 
         elif self.weather == Weather.SANDSTORM:
             # Sandstorm: 20% Chance for Buffeting Sands (3% Max HP)
-            if random.random() < 0.20:
+            if random.random() < 0.20:  # nosec B311
                 dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.03))
                 self.player_hp = max(0, self.player_hp - dmg)
                 log.append(f"🌪️ **SANDSTORM:** The abrasive sand flays your skin! (`{dmg}` dmg)")
 
         elif self.weather == Weather.MIASMA:
             # Miasma: 25% Chance for Toxic Fumes (2% Max HP)
-            if random.random() < 0.25:
+            if random.random() < 0.25:  # nosec B311
                 dmg = max(1, int(self.stats_dict.get("HP", 100) * 0.02))
                 self.player_hp = max(0, self.player_hp - dmg)
                 log.append(f"☠️ **MIASMA:** You inhale the toxic fumes! (`{dmg}` dmg)")
@@ -644,7 +644,7 @@ class CombatEngine:
             # If action is 'auto', we'll rely on the random skill decision later, so we check specific actions here.
             if self.action == "auto":
                 # In auto mode, we give a small chance to "accidentally" counter
-                if is_magic and random.randint(1, 100) <= 20:
+                if is_magic and random.randint(1, 100) <= 20:  # nosec B311
                     is_offensive = True
                 else:
                     is_offensive = False  # Assume auto doesn't strategically counter
@@ -710,7 +710,7 @@ class CombatEngine:
         # even if the ability has its own crit chance roll.
         is_lucky_crit = False
         if spec.get("crit_bonus"):
-            if random.randint(1, 100) <= spec["crit_bonus"]:
+            if random.randint(1, 100) <= spec["crit_bonus"]:  # nosec B311
                 is_lucky_crit = True
 
         if is_lucky_crit or force_crit:
@@ -1012,7 +1012,7 @@ class CombatEngine:
         if not self.player_skills:
             return {"skill": None, "reason": "No skills available."}
 
-        roll = random.randint(1, 100)
+        roll = random.randint(1, 100)  # nosec B311  # nosec B311
         if roll > self.PLAYER_SKILL_CHANCE:
             return {"skill": None, "reason": "RNG check failed."}
 
@@ -1030,14 +1030,14 @@ class CombatEngine:
 
         # Priority 2: Buffs (50% chance if available)
         utility_skills = [s for s in usable_skills if s.get("buff_data")]
-        if utility_skills and random.randint(1, 100) > 50:
-            chosen_skill = random.choice(utility_skills)
+        if utility_skills and random.randint(1, 100) > 50:  # nosec B311
+            chosen_skill = random.choice(utility_skills)  # nosec B311
             return {"skill": chosen_skill, "reason": "Buff chosen."}
 
         # Priority 3: Offensive Skills
         offensive_skills = [s for s in usable_skills if s.get("heal_power", 0) == 0 and not s.get("buff_data")]
         if offensive_skills:
-            chosen_skill = random.choice(offensive_skills)
+            chosen_skill = random.choice(offensive_skills)  # nosec B311  # nosec B311
             return {"skill": chosen_skill, "reason": "Offense chosen."}
 
         return {"skill": None, "reason": "No offensive skills usable."}

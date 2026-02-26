@@ -237,27 +237,27 @@ class AdventureSession:
 
         # Hazard Logic
         if weather == Weather.BLIZZARD:
-            if random.random() < 0.30:
+            if random.random() < 0.30:  # nosec B311
                 damage = max(1, int(max_hp * 0.04))  # 4% Max HP
                 message = f"❄️ **Freezing Winds:** The blizzard bites deep, dealing **{damage}** cold damage!"
 
         elif weather == Weather.SANDSTORM:
-            if random.random() < 0.30:
+            if random.random() < 0.30:  # nosec B311
                 damage = max(1, int(max_hp * 0.04))
                 message = f"🌪️ **Scouring Sand:** The storm flays your skin, dealing **{damage}** damage!"
 
         elif weather == Weather.ASH:
-            if random.random() < 0.30:
+            if random.random() < 0.30:  # nosec B311
                 damage = max(1, int(max_hp * 0.03))
                 message = f"🌋 **Choking Ash:** You cough violently, taking **{damage}** damage!"
 
         elif weather == Weather.MIASMA:
-            if random.random() < 0.40:
+            if random.random() < 0.40:  # nosec B311
                 damage = max(1, int(max_hp * 0.03))
                 message = f"☠️ **Toxic Fumes:** The air burns your lungs! You take **{damage}** poison damage."
 
         elif weather == Weather.GALE:
-            if random.random() < 0.20:
+            if random.random() < 0.20:  # nosec B311
                 # Gale causes minor exhaustion damage
                 damage = max(1, int(max_hp * 0.02))
                 message = f"💨 **Gale Force:** The wind knocks you down! You take **{damage}** damage."
@@ -419,7 +419,7 @@ class AdventureSession:
                 regen_threshold += 5  # Day is safer (-5% Combat Chance)
 
             # --- 2. Trigger New Encounter ---
-            if random.randint(1, 100) > regen_threshold:
+            if random.randint(1, 100) > regen_threshold:  # nosec B311
                 # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
                 player_level = context["player_row"].get("level", 1)
                 monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
@@ -437,7 +437,7 @@ class AdventureSession:
                     if self.supplies.get("pitch_torch"):
                         ambush_chance *= 0.5
 
-                    if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:
+                    if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
                         monster_atk = monster.get("ATK", 10)
                         damage = int(monster_atk * 0.8)  # 80% ATK damage
                         damage = max(1, damage)  # Minimum 1 damage
@@ -523,7 +523,7 @@ class AdventureSession:
         bonus = (agi - monster_level) * 2
         chance = max(10, min(90, 50 + bonus))
 
-        roll = random.randint(1, 100)
+        roll = random.randint(1, 100)  # nosec B311  # nosec B311
 
         if roll <= chance:
             # Success

@@ -162,7 +162,7 @@ class WorldTime:
         seed = hour + loc_hash
 
         # Use a local random instance to avoid affecting global random state
-        rng = random.Random(seed)
+        rng = random.Random(seed)  # nosec B311
 
         weights = LOCATION_WEATHER_WEIGHTS.get(location_id, LOCATION_WEATHER_WEIGHTS["default"])
         choices, probabilities = zip(*weights)

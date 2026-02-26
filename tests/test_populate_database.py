@@ -67,6 +67,7 @@ class TestPopulateDatabase(unittest.TestCase):
 
         # Import
         import database.populate_database  # noqa: F401
+
         importlib = __import__("importlib")
         if "database.populate_database" in sys.modules:
             importlib.reload(sys.modules["database.populate_database"])
