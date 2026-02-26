@@ -24,6 +24,7 @@ class WorldEventSystem:
     ELEMENTAL_SURGE = "elemental_surge"
     MYSTIC_MERCHANT = "mystic_merchant"
     FROSTFALL_EXPEDITION = "frostfall_expedition"
+    SPECTRAL_TIDE = "spectral_tide"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -88,6 +89,16 @@ class WorldEventSystem:
                 "exp_boost": 1.1,
                 "frostfall_threat_reduction": 0.9,  # 10% reduction in damage taken in Frostfall
                 "frostfall_loot_bonus": 1.5,  # 50% more loot from Frostfall
+            },
+        },
+        SPECTRAL_TIDE: {
+            "name": "The Spectral Tide",
+            "description": "The veil thins. Spirits wander freely, and the night is full of terrors.",
+            "modifiers": {
+                "exp_boost": 1.2,
+                "loot_boost": 1.1,
+                "spectral_ambush_chance": 0.15,  # +15% ambush chance at night
+                "night_danger_mod": 0.10,  # +10% combat chance at night
             },
         },
     }

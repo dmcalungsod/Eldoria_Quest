@@ -173,26 +173,47 @@ class AdventureRewards:
             frostfall_bonus = combat_result.get("active_boosts", {}).get("frostfall_loot_bonus", 1.0)
             loot_boost *= float(frostfall_bonus)
 
-        # Check for World Event: Elemental Surge
+        # Check for World Event: Elemental Surge or Spectral Tide
         try:
             active_event = self.db.get_active_world_event()
-            if active_event and active_event.get("type") == "elemental_surge":
-                # 30% chance to drop 1-3 Elemental Motes
-                if random.random() < 0.3:
-                    mote_count = random.randint(1, 3)
-                    self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
+            if active_event:
+                # Elemental Surge
+                if active_event.get("type") == "elemental_surge":
+                    # 30% chance to drop 1-3 Elemental Motes
+                    if random.random() < 0.3:
+                        mote_count = random.randint(1, 3)
+                        self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
 
-                    mote_info = MATERIALS.get("elemental_mote", {})
-                    loot_bundle[
-                        (
-                            mote_info.get("name", "Elemental Mote"),
-                            mote_info.get("rarity", "Uncommon"),
-                        )
-                    ] += mote_count
+                        mote_info = MATERIALS.get("elemental_mote", {})
+                        loot_bundle[
+                            (
+                                mote_info.get("name", "Elemental Mote"),
+                                mote_info.get("rarity", "Uncommon"),
+                            )
+                        ] += mote_count
 
-                    # We add to actual_drops so quests/tournaments can track it
-                    for _ in range(mote_count):
-                        actual_drops.append("elemental_mote")
+                        # We add to actual_drops so quests/tournaments can track it
+                        for _ in range(mote_count):
+                            actual_drops.append("elemental_mote")
+
+                # Spectral Tide
+                elif active_event.get("type") == "spectral_tide":
+                    # 30% chance to drop 1-2 Ectoplasm
+                    if random.random() < 0.3:
+                        ecto_count = random.randint(1, 2)
+                        self._add_loot_to_session(session_loot, "ectoplasm", ecto_count)
+
+                        ecto_info = MATERIALS.get("ectoplasm", {})
+                        loot_bundle[
+                            (
+                                ecto_info.get("name", "Ectoplasm"),
+                                ecto_info.get("rarity", "Uncommon"),
+                            )
+                        ] += ecto_count
+
+                        for _ in range(ecto_count):
+                            actual_drops.append("ectoplasm")
+
         except Exception as e:
             logger.error(f"Event loot error: {e}")
 
