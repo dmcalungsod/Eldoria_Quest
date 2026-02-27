@@ -29,7 +29,7 @@ class RankSystem:
             "next_rank": "C",
             "requirements": {
                 "quests_completed": 20,
-                "normal_kills": 250,
+                "normal_kills": 300,
                 "elite_kills": 20,
                 "boss_kills": 1,
             },
@@ -60,7 +60,7 @@ class RankSystem:
             "requirements": {
                 "quests_completed": 50,
                 "normal_kills": 800,
-                "boss_kills": 8,
+                "boss_kills": 6,
                 "elite_kills": 80,
             },
         },
@@ -70,7 +70,7 @@ class RankSystem:
             "requirements": {
                 "quests_completed": 60,
                 "normal_kills": 1000,
-                "boss_kills": 15,
+                "boss_kills": 10,
                 "elite_kills": 120,
             },
         },
@@ -80,7 +80,7 @@ class RankSystem:
             "requirements": {
                 "quests_completed": 65,
                 "normal_kills": 1500,
-                "boss_kills": 25,
+                "boss_kills": 20,
                 "elite_kills": 200,
             },
         },
