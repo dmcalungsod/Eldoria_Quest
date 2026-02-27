@@ -175,4 +175,34 @@ QUEST_ITEMS = {
         "rarity": "Legendary",
         "notes": "A relic of the glade's founding—central to a long quest chain.",
     },
+    "q_petrified_heart": {
+        "id": "q_petrified_heart",
+        "name": "Petrified Heart",
+        "rarity": "Uncommon",
+        "notes": "A heavy, grey heart collected from a stone-cursed beast.",
+    },
+    "q_basilisk_bile": {
+        "id": "q_basilisk_bile",
+        "name": "Basilisk Bile",
+        "rarity": "Rare",
+        "notes": "A vial of smoking, acidic fluid from an Ash Basilisk.",
+    },
+    "q_unstable_antidote": {
+        "id": "q_unstable_antidote",
+        "name": "Unstable Antidote",
+        "rarity": "Epic",
+        "notes": "An experimental cure for the Stone-Skin Plague. It bubbles ominously.",
+    },
+    "q_alchemical_retort": {
+        "id": "q_alchemical_retort",
+        "name": "Alchemist's Retort",
+        "rarity": "Rare",
+        "notes": "A specialized glassware set awarded by the Grey Ward for assisting their research.",
+    },
+    "q_grey_ward_mask": {
+        "id": "q_grey_ward_mask",
+        "name": "Grey Ward Mask",
+        "rarity": "Uncommon",
+        "notes": "A bird-like mask stuffed with herbs to filter out toxins.",
+    }
 }
