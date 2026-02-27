@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@5
-
 # ── Reusable Commands ──────────────────────────────────
 commands:
   install-tools:
@@ -82,20 +79,6 @@ jobs:
             export CODACY_PROJECT_NAME=Eldoria_Quest
             bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
 
-  test-and-upload-codecov:
-    docker:
-      - image: cimg/python:3.12
-    steps:
-      - checkout
-      - install-deps
-      - run:
-          name: Install Test Dependencies
-          command: pip install pytest pytest-cov
-      - run:
-          name: Run Tests with Coverage
-          command: python -m pytest --tb=short -q --cov=. --cov-report=xml:coverage.xml
-      - codecov/upload
-
   auto-merge:
     docker:
       - image: cimg/python:3.12
@@ -174,15 +157,15 @@ workflows:
             branches:
               only: main
 
-  # Scheduled workflow for Codecov upload (4 times a week)
-  weekly-codecov:
+  # Scheduled workflow for Codacy upload (Nightly)
+  nightly-codacy:
     triggers:
       - schedule:
-          # Sun, Tue, Thu, Sat at 00:00 UTC (08:00 AM PHT)
-          cron: "0 0 * * 0,2,4,6"
+          # Daily at 00:00 UTC (08:00 AM PHT)
+          cron: "0 0 * * *"
           filters:
             branches:
               only:
                 - main
     jobs:
-      - test-and-upload-codecov
+      - test
