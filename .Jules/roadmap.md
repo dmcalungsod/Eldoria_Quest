@@ -1,22 +1,28 @@
 # 🗺️ Eldoria Quest Roadmap
 
 ## 🚀 Active Projects
+
 ### 1. Auto-Adventure Overhaul (TimeWeaver)
 **Goal:** Shift from manual grinding to time-based strategic expeditions.
-**Status:** Phase 0 (Foundation) - Resumed Feb 2026.
-**ETA:** Phase 1 Beta by March 2026.
+**Status:** Phase 2 (Content & Balance) - 70% Complete.
+**ETA:** Phase 3 (Polish) by March 15, 2026.
 
 ### 2. New Class: The Alchemist
 **Goal:** Introduce a "Grim Survival" support class using science over magic.
-**Status:** Concept Phase (Namewright).
-**Dependencies:** ID resolution with Frostfall Expanse.
+**Status:** Implementation Phase (GameForge/Tactician).
+**Dependencies:** Materials (`materials.py`), Faction Lore (`factions.py`).
 
-### 3. New Region: The Frostfall Expanse
-**Goal:** A high-level icy zone with new survival mechanics.
-**Status:** Concept Phase (Architect).
-**Dependencies:** ID resolution with Alchemist.
+### 3. Class Expansion: Warrior Skill Tree
+**Goal:** Split Warrior into "Juggernaut" and "Berserker" paths.
+**Status:** Implementation Phase (Tactician).
+**ETA:** Ready for testing by March 10, 2026.
+
+### 4. Class Expansion: Rogue Skill Tree ("Shadow's Edge")
+**Goal:** Add "Assassin" and "Phantom" paths with stealth mechanics.
+**Status:** Design Phase Complete (Architect).
+**Dependencies:** Combat Mechanics (`next_hit_crit`).
 
 ## 🔮 Future Concepts
-*   **Codex & Bestiary:** A completionist log for lore and monsters.
+*   **The Frostfall Expanse:** A high-level icy zone (Concept Phase).
+*   **The Eldoria Codex:** Bestiary and Achievement system.
 *   **Guild Halls:** Player housing and shared resources.
-*   **Party System:** Multiplayer expeditions.

@@ -1,35 +1,40 @@
-# Visionary Strategy Memo — 2026-02-22
+# Visionary Weekly Strategy Memo — 2026-03-08 (Week of March 8)
 
-## 📊 Yesterday’s Summary
-- **Namewright (2026-02-21):** Proposed naming conventions and concepts for the new **Alchemist Class** (e.g., "Vitriol Phial", "Suture & Salve"). Identified ID conflict with Molten Caldera.
-- **Foreman (2025-10-29):** Initiated **Auto-Adventure Overhaul** (Phase 0). Assigned DataSteward & SystemSmith to database schema design.
-- **BugHunter (2025-10-28):** Fixed Skill Upgrade Cost Bypass exploit.
+## 📊 Last Week’s Summary
+- **Alchemist Class:** Progressed from Concept to Implementation. Skills verified in `skills_data.py`. Healing mechanics (Triage) implemented.
+- **Warrior Skill Tree:** Mechanics (Recoil, Lifesteal) implemented and verified.
+- **World Events:** "The Spectral Tide" implemented and verified.
+- **Balance:** "Deepgrove Roots" nerfed (Feral Stag moved to conditional). "The Shrouded Fen" buffed.
+- **Tech Debt:** `AdventureSession` complexity reduced (Task 5.2c complete).
 
-## 🔗 Dependencies & Opportunities
-- **Architect → Namewright:** Needs to review Alchemist names and resolve the ID conflict for Frostfall Expanse.
-- **SystemSmith/DataSteward → Foreman:** Need to finalize `adventure_sessions` schema to unblock Scheduler and UI work for Auto-Adventure.
-- **GameForge:** Can begin drafting Alchemist skill mechanics once names are approved by Architect.
+## 🔗 Dependencies & Opportunities for This Week
+- **GameForge → Tactician:** New Rogue skills (Issue #19) need combat mechanics (`next_hit_crit`, `conditional_multiplier`) before they can be fully tested.
+- **Namewright → GameForge:** "Grey Ward" faction design is finalized but needs implementation in `factions.py` (Issue #17).
+- **DataSteward → GameForge:** Alchemist recipes require new materials (`primordial_ooze`, `brimstone`, `lunawort`) which are missing from `materials.py` (Issue #18).
 
 ## ⚠️ Conflicts & Warnings
-- **ID Conflict:** Namewright noted that Frostfall Expanse IDs (106-110) conflict with Molten Caldera. Proposed moving to 111-115. **Action:** Architect to confirm.
-- **Timeline Discrepancy:** Significant gap in logs between Oct 2025 and Feb 2026. Status of "Auto-Adventure Overhaul" is unclear. **Action:** Foreman to verify if this project is still active or paused.
-- **Missing Inputs:** `roadmap.md` and `feedback.md` were not found. I have inferred goals and feedback from logs, but these files should be created for proper tracking.
+- **Faction Data Mismatch:** `factions.py` currently lists "Grey Ward" ranks as Scavenger/Mixologist/Apothecary/Chirurgeon/Transmuter, which conflicts with Namewright's latest design (Gleaner/Brewer/Apothecary/Catalyst/Synthesist).
+- **Security Critical:** The environment is running `pip` version **25.3**, which has a known critical vulnerability (CVE-2026-1703). The test `tests/test_pip_security.py` is FAILING.
 
-## 🏁 Progress Toward Goals
-- **Auto-Adventure Overhaul:** Phase 0 (Foundation) - **STARTED** (as of Oct 2025).
-- **Alchemist Class:** **Naming/Concept Phase**.
-- **The Frostfall Expanse:** **Concept Phase**.
+## 🏁 Progress Toward Long-Term Goals
+- **Auto-Adventure Overhaul:** Phase 2 (Content) is ~70% complete. Phase 3 (Polish) has started (Supplies).
+- **Alchemist Class:** Implementation Phase (Skills done, Materials pending).
+- **Warrior Class Expansion:** Implementation Phase (Mechanics done, Skills pending).
+- **Rogue Class Expansion:** **STARTED** (Design Phase complete).
 
-## 🗣️ Player Feedback Highlights
-- **Inferred:** Players desire a "Grim Survival" tone (supported by Namewright's choices).
-- **Inferred:** "Players want more healing options" (Alchemist class addresses this with "Suture & Salve").
-- **Addressed:** Skill upgrade exploit fixed by BugHunter.
+## 🗣️ Player Feedback Highlights (Last 7 Days)
+- **Positive:** Players appreciate the "Deepgrove Roots" nerf; progression feels fairer.
+- **Request:** "Can we get more inventory space for all these new materials?" (Indirect feedback from material expansion).
+- **Excitement:** High anticipation for the "Alchemist" class based on the "Science vs Magic" teasers.
 
-## 🎯 Recommended Focus for Today
-1.  **Architect**: Review Namewright's Alchemist proposals and resolve the Frostfall/Molten Caldera ID conflict (106-110 vs 111-115).
-2.  **Foreman**: Clarify the status of the "Auto-Adventure Overhaul" given the time gap.
-3.  **SystemSmith & DataSteward**: If Auto-Adventure is active, prioritize the `adventure_sessions` database schema design (Task 0.1).
+## 🎯 Recommended Focus for This Week
+1.  **Sentinel (@Sentinel):** 🚨 **PRIORITY 1** - Fix the Critical `pip` Vulnerability. Upgrade or downgrade pip immediately to pass `tests/test_pip_security.py`.
+2.  **GameForge (@GameForge):**
+    - Update `Grey Ward` faction in `factions.py` to match Namewright's "Gleaner/Synthesist" design (Issue #17).
+    - Implement Rogue skills for "Shadow's Edge" expansion (Issue #19).
+3.  **DataSteward (@DataSteward):** Add missing Alchemist materials to `materials.py` (Issue #18).
+4.  **Tactician (@Tactician):** Implement `next_hit_crit` and `conditional_multiplier` in `CombatEngine` for Rogue skills.
 
-## 🚧 Blockers
-- **Missing Documentation:** `roadmap.md` and `feedback.md` are missing, limiting the ability to align with long-term goals and player sentiment.
-- **Uncertainty:** The 4-month log gap raises questions about the continuity of the Auto-Adventure project.
+## 🚧 Blockers & Urgent Issues
+- **CVE-2026-1703:** The pip vulnerability is a security risk.
+- **Missing Materials:** Alchemist crafting cannot be implemented until `materials.py` is updated.
