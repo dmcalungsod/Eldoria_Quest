@@ -951,6 +951,21 @@ class DatabaseManager:
             {"$set": {"active": 0}},
         )
 
+    def lock_adventure_for_claiming(self, discord_id: int) -> bool:
+        """
+        Atomically updates an active adventure's status to 'claiming'.
+        Returns True if successful, False if no active session or already locked/completed.
+        """
+        result = self._col("adventure_sessions").update_one(
+            {
+                "discord_id": discord_id,
+                "active": 1,
+                "status": {"$ne": "claiming"},  # Ensure not already locked
+            },
+            {"$set": {"status": "claiming"}},
+        )
+        return result.modified_count > 0
+
     # ============================================================
     # INVENTORY (New methods for external call sites)
     # ============================================================
