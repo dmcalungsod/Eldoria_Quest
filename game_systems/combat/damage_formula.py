@@ -143,6 +143,12 @@ class DamageFormula:
         Calculates monster damage.
         Reduced Chip Damage to 5%.
         """
+        # Accuracy Check (Blind/Debuff Support)
+        accuracy_percent = monster.get("accuracy_percent", 0.0)
+        base_accuracy = 1.0 + accuracy_percent
+        if random.random() > base_accuracy:
+            return 0, False, "miss"
+
         agi = DamageFormula._get_stat(player_stats, "AGI")
         dodge_chance = agi * 0.001
         if random.random() < dodge_chance:

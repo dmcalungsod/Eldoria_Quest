@@ -151,6 +151,7 @@ class CombatEngine:
         self.dmg_taken_mult = 1.0
         self.new_buffs = []
         self.new_titles = []
+        self.consumed_buff_ids = []
 
         # Player Status State (Initialized from player object or default False)
         # Note: Ideally this should persist in DB, but for now it's per-session or per-turn in this engine instance.
@@ -191,7 +192,34 @@ class CombatEngine:
                             new_val = max(0, int(base_val * (1.0 + mod)))
                             eff_monster[stat] = new_val
 
+                    # Special Rogue Debuff: Accuracy
+                    if "accuracy_percent" in debuff:
+                        acc_mod = float(debuff["accuracy_percent"])
+                        # Additive to base accuracy (0.0 means 100% base)
+                        eff_monster["accuracy_percent"] = (
+                            eff_monster.get("accuracy_percent", 0.0) + acc_mod
+                        )
+
         return eff_monster
+
+    def _check_and_consume_crit_buff(self) -> bool:
+        """
+        Checks if 'next_hit_crit' buff is active.
+        If so, consumes it (marks for deletion) and returns True.
+        """
+        found_buff = None
+        for buff in self.active_buffs:
+            if buff.get("stat") == "next_hit_crit":
+                found_buff = buff
+                break
+
+        if found_buff:
+            self.consumed_buff_ids.append(found_buff.get("buff_id"))
+            # We don't remove from self.active_buffs immediately to avoid mutation during iteration in other places,
+            # but for logic consistency, we should treat it as gone for this turn if checked again.
+            # However, logic usually checks once per attack.
+            return True
+        return False
 
     def run_combat_turn(self):
         """
@@ -215,7 +243,9 @@ class CombatEngine:
             "hits_taken": 0,
         }
 
-        logger.debug(f"Combat Turn Start: Player {self.player_hp} HP, Monster {self.monster_hp} HP")
+        logger.debug(
+            f"Combat Turn Start: Player {self.player_hp} HP, Monster {self.monster_hp} HP"
+        )
 
         try:
             player_defending = False
@@ -223,7 +253,9 @@ class CombatEngine:
             bonus_crit = False
 
             # --- 0. CHECK FOR COUNTERS ---
-            monster_stunned, bonus_crit, player_defending = self._check_interrupt_mechanic(log)
+            monster_stunned, bonus_crit, player_defending = self._check_interrupt_mechanic(
+                log
+            )
 
             # --- 1. PLAYER'S TURN ---
             if self.player_stunned:
@@ -248,7 +280,9 @@ class CombatEngine:
                 return self._player_victory(log, turn_report)
 
             # --- 2. MONSTER'S TURN ---
-            player_defeated = self._process_monster_turn(log, turn_report, player_defending, monster_stunned)
+            player_defeated = self._process_monster_turn(
+                log, turn_report, player_defending, monster_stunned
+            )
 
             if player_defeated:
                 logger.info("Combat End: Player defeated.")
@@ -265,6 +299,7 @@ class CombatEngine:
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
                 "player_stunned": self.player_stunned,
+                "consumed_buff_ids": self.consumed_buff_ids,
             }
 
         except Exception as e:
@@ -726,6 +761,10 @@ class CombatEngine:
             self._perform_basic_attack(log, turn_report, force_crit=force_crit)
             return
 
+        # Check for Guaranteed Crit Buff
+        if self._check_and_consume_crit_buff():
+            force_crit = True
+
         # Deduct MP
         self.player_mp -= cost
         log.append(f"{spec['emoji']} **{spec['name']}**: {spec['log']}")
@@ -825,16 +864,44 @@ class CombatEngine:
             # Use effective stats for defense calculation
             effective_monster = self._get_effective_monster_stats()
 
+            # Check for Guaranteed Crit Buff
+            if self._check_and_consume_crit_buff():
+                force_crit = True
+
             # Some skills (like purely debuff/status) might have power=0 or not use power_multiplier?
             # Existing logic assumes power_multiplier exists or defaults to 1.0.
             # If power_multiplier is 0 or low, it still does damage.
 
             dmg, crit, event_type = DamageFormula.player_skill(self.stats_dict, effective_monster, skill, skill_level)
 
-            if force_crit:
+            # Apply Conditional Multiplier (Rogue: Venomous Strike)
+            cond_mult_data = skill.get("conditional_multiplier")
+            if cond_mult_data:
+                condition = cond_mult_data.get("condition")
+                multiplier = float(cond_mult_data.get("multiplier", 1.0))
+
+                if condition == "target_poisoned":
+                    # Check monster debuffs for poison
+                    # Using effective_monster to check debuffs that might have been applied before turn or during processing
+                    # But self.monster holds current state including debuffs
+                    has_poison = False
+                    for d in self.monster.get("debuffs", []):
+                        if d.get("type") == "poison":
+                            has_poison = True
+                            break
+                    if has_poison:
+                        # Recalculate damage with multiplier
+                        # NOTE: dmg was already calculated above. We apply multiplier to it.
+                        dmg = int(dmg * multiplier)
+                        log.append("☠️ **Critical Poison Strike!**")
+
+            # Apply Force Crit Multiplier
+            if force_crit and event_type != "crit":
                 crit = True
                 event_type = "crit"
                 dmg = int(dmg * 1.5)
+            elif force_crit and event_type == "crit":
+                crit = True
 
             # Apply Weather Modifiers
             element = self._detect_element(skill)
@@ -1014,12 +1081,24 @@ class CombatEngine:
     def _perform_basic_attack(self, log, turn_report, force_crit=False):
         # --- Basic Attack ---
         effective_monster = self._get_effective_monster_stats()
+
+        # Check for Guaranteed Crit Buff
+        if self._check_and_consume_crit_buff():
+            force_crit = True
+
         dmg, crit, event_type = DamageFormula.player_attack(self.stats_dict, effective_monster)
 
-        if force_crit:
+        # Apply Force Crit Multiplier
+        # Only apply multiplier if it wasn't already a crit, or if we want to ensure it counts.
+        # If natural crit happened (event_type="crit"), don't double dip unless intended.
+        # Standard logic: If force_crit is true, ensure event is crit. If it wasn't already, boost damage.
+        if force_crit and event_type != "crit":
             crit = True
             event_type = "crit"
             dmg = int(dmg * 1.5)
+        elif force_crit and event_type == "crit":
+            # Already crit naturally, ensure flag remains true (no extra boost to avoid 2.25x)
+            crit = True
 
         # Apply Weather Modifiers (Basic attacks are physical)
         dmg = self._apply_weather_modifiers(dmg, "physical")
