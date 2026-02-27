@@ -1,12 +1,13 @@
-import unittest
-import sys
 import os
-from unittest.mock import MagicMock, patch
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Add the project root to the sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from game_systems.player.achievement_system import AchievementSystem, ROGUE_ASSASSIN_SKILLS, ROGUE_PHANTOM_SKILLS
+from game_systems.player.achievement_system import ROGUE_ASSASSIN_SKILLS, ROGUE_PHANTOM_SKILLS, AchievementSystem
+
 
 class TestRogueAchievements(unittest.TestCase):
     def setUp(self):
@@ -59,7 +60,7 @@ class TestRogueAchievements(unittest.TestCase):
         skills = [{"skill_key": s} for s in ROGUE_ASSASSIN_SKILLS]
         self.mock_db.get_all_player_skills.return_value = skills
 
-        msg = self.achievements.check_class_mastery_achievements(self.discord_id, 1) # Warrior
+        msg = self.achievements.check_class_mastery_achievements(self.discord_id, 1)  # Warrior
 
         self.assertIsNone(msg)
         self.mock_db.add_title.assert_not_called()
@@ -88,12 +89,13 @@ class TestRogueAchievements(unittest.TestCase):
 
     def test_check_combat_feats_wrong_class(self):
         """Test no award if class is not Rogue (even with 0 damage)."""
-        combat_data = {"damage_taken": 0, "class_id": 1} # Warrior
+        combat_data = {"damage_taken": 0, "class_id": 1}  # Warrior
 
         msg = self.achievements.check_combat_feats(self.discord_id, combat_data)
 
         self.assertIsNone(msg)
         self.mock_db.add_title.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

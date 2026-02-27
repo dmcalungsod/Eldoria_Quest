@@ -60,5 +60,6 @@ class TestShopLimits(unittest.TestCase):
         purchases = self.db.get_daily_shop_purchases(123, "2023-10-28")
         self.assertEqual(purchases.get("potion", 0), 0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

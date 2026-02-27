@@ -180,7 +180,7 @@ class CharacterTabView(View):
                 recent_titles = titles[-5:]
                 titles_str = ", ".join(recent_titles)
                 if len(titles) > 5:
-                    titles_str += f" ...and {len(titles)-5} more"
+                    titles_str += f" ...and {len(titles) - 5} more"
 
                 embed.add_field(name="🏅 Earned Titles", value=titles_str, inline=False)
 
@@ -214,7 +214,7 @@ class CharacterTabView(View):
         embed = discord.Embed(
             title="🎖️ Title Manager",
             description="Select a title from the dropdown below to display on your profile.",
-            color=discord.Color.gold()
+            color=discord.Color.gold(),
         )
 
         view = TitleSelectView(self.db, self.interaction_user, p_data)

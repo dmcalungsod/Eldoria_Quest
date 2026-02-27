@@ -5,9 +5,11 @@ UI for equipping titles.
 """
 
 import discord
-from discord.ui import Select, Button, View
-from database.database_manager import DatabaseManager
+from discord.ui import Button, Select, View
+
 import cogs.utils.ui_helpers as ui_helpers
+from database.database_manager import DatabaseManager
+
 
 class TitleSelectView(View):
     def __init__(self, db: DatabaseManager, interaction_user: discord.User, player_data: dict):
@@ -20,11 +22,7 @@ class TitleSelectView(View):
 
         self.add_item(self.build_title_select())
 
-        self.back_button = Button(
-            label="Back to Profile",
-            style=discord.ButtonStyle.secondary,
-            row=1
-        )
+        self.back_button = Button(label="Back to Profile", style=discord.ButtonStyle.secondary, row=1)
         self.back_button.callback = ui_helpers.back_to_profile_callback
         self.add_item(self.back_button)
 
@@ -35,12 +33,7 @@ class TitleSelectView(View):
         return True
 
     def build_title_select(self) -> Select:
-        select = Select(
-            placeholder="Select a Title to Equip...",
-            min_values=1,
-            max_values=1,
-            row=0
-        )
+        select = Select(placeholder="Select a Title to Equip...", min_values=1, max_values=1, row=0)
 
         if not self.titles:
             select.add_option(label="No titles earned yet.", value="none", default=True)
@@ -52,20 +45,15 @@ class TitleSelectView(View):
             label="No Title",
             value="unequip",
             description="Clear your active title",
-            default=(self.active_title is None)
+            default=(self.active_title is None),
         )
 
         # List titles (limit 24 + 1 none = 25 max options)
         # TODO: Implement pagination if players can earn > 24 titles
         sorted_titles = sorted(self.titles)
         for title in sorted_titles[:24]:
-            is_active = (title == self.active_title)
-            select.add_option(
-                label=title,
-                value=title,
-                default=is_active,
-                emoji="🎖️" if is_active else "🔸"
-            )
+            is_active = title == self.active_title
+            select.add_option(label=title, value=title, default=is_active, emoji="🎖️" if is_active else "🔸")
 
         select.callback = self.title_select_callback
         return select
@@ -90,7 +78,7 @@ class TitleSelectView(View):
         embed = discord.Embed(
             title="🎖️ Title Manager",
             description=f"{msg}\n\nSelect a title from the dropdown below to display on your profile.",
-            color=discord.Color.gold()
+            color=discord.Color.gold(),
         )
 
         view = TitleSelectView(self.db, self.interaction_user, new_p_data)

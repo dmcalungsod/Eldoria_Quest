@@ -9,12 +9,14 @@ This ensures compatibility with the new Title System.
 
 import os
 import sys
+
 from pymongo import MongoClient
 
 # Add project root to sys.path to allow imports if needed, though this script is standalone.
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from database.database_manager import DEFAULT_MONGO_URI, DEFAULT_DB_NAME
+from database.database_manager import DEFAULT_DB_NAME, DEFAULT_MONGO_URI
+
 
 def run_migration():
     mongo_uri = os.getenv("MONGO_URI", DEFAULT_MONGO_URI)
@@ -32,20 +34,15 @@ def run_migration():
     print("Migrating players collection...")
 
     # 1. Initialize 'titles' as empty list
-    result_titles = players_col.update_many(
-        {"titles": {"$exists": False}},
-        {"$set": {"titles": []}}
-    )
+    result_titles = players_col.update_many({"titles": {"$exists": False}}, {"$set": {"titles": []}})
     print(f"Initialized 'titles' for {result_titles.modified_count} players.")
 
     # 2. Initialize 'active_title' as null
-    result_active = players_col.update_many(
-        {"active_title": {"$exists": False}},
-        {"$set": {"active_title": None}}
-    )
+    result_active = players_col.update_many({"active_title": {"$exists": False}}, {"$set": {"active_title": None}})
     print(f"Initialized 'active_title' for {result_active.modified_count} players.")
 
     print("Migration complete.")
+
 
 if __name__ == "__main__":
     run_migration()

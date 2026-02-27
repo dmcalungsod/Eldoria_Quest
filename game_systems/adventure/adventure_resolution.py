@@ -91,11 +91,11 @@ class AdventureResolutionEngine:
             initial_mp = context["vitals"]["current_mp"]
 
         if context.get("player_stats"):
-             max_hp = context["player_stats"].max_hp
-             max_mp = context["player_stats"].max_mp
+            max_hp = context["player_stats"].max_hp
+            max_mp = context["player_stats"].max_mp
         elif context.get("stats_dict"):
-             max_hp = context["stats_dict"].get("HP", 100)
-             max_mp = context["stats_dict"].get("MP", 100)
+            max_hp = context["stats_dict"].get("HP", 100)
+            max_mp = context["stats_dict"].get("MP", 100)
 
         final_vitals = None
 

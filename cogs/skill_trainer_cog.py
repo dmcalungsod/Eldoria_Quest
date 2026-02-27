@@ -222,7 +222,9 @@ class SkillTrainerView(View):
                 await interaction.followup.send(ach_msg, ephemeral=True)
 
             # Check Class Mastery Achievements (Rogue titles)
-            mastery_msg = await asyncio.to_thread(self.achievements.check_class_mastery_achievements, interaction.user.id, self.player_class_id)
+            mastery_msg = await asyncio.to_thread(
+                self.achievements.check_class_mastery_achievements, interaction.user.id, self.player_class_id
+            )
             if mastery_msg:
                 await interaction.followup.send(mastery_msg, ephemeral=True)
 
