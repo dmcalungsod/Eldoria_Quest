@@ -328,12 +328,12 @@ SKILLS = {
         "type": "Active",
         "class_id": 6,
         "mp_cost": 8,
-        "power_multiplier": 1.35,
+        "power_multiplier": 1.2,
         "debuff": {"DEF_percent": -0.1, "duration": 3},
         "learn_cost": 0,  # Starting Skill
         "upgrade_cost": 200,
         "scaling_stat": "DEX",  # Accuracy of throw
-        "scaling_factor": 2.6,
+        "scaling_factor": 2.4,
     },
     "triage": {
         "key_id": "triage",
@@ -354,13 +354,13 @@ SKILLS = {
         "type": "Active",
         "class_id": 6,
         "mp_cost": 15,
-        "power_multiplier": 1.15,
+        "power_multiplier": 1.0,
         "is_aoe": True,
         "status_effect": {"stun_chance": 0.2},
         "learn_cost": 1500,
         "upgrade_cost": 300,
         "scaling_stat": "MAG",
-        "scaling_factor": 2.6,
+        "scaling_factor": 2.5,
     },
     "equivalent_exchange": {
         "key_id": "equivalent_exchange",
