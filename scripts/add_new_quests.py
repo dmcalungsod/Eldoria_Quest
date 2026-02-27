@@ -110,7 +110,7 @@ def main():
         sys.exit(1)
 
     try:
-        with open(json_path, "r", encoding="utf-8") as f:
+        with open(json_path, encoding="utf-8") as f:
             quests = json.load(f)
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
