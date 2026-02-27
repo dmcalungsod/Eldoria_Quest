@@ -34,6 +34,13 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     # Simulate step returns success (not dead)
     mock_session.simulate_step.return_value = {"dead": False}
 
+    # Mock _fetch_session_context to return a valid context dict
+    mock_session._fetch_session_context.return_value = {
+        "vitals": {"current_hp": 100, "current_mp": 100},
+        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "player": {"current_hp": 100, "current_mp": 100} # Include player dict for persistence check
+    }
+
     session_doc = {
         "discord_id": 123,
         "duration_minutes": 30,  # 2 steps
@@ -49,9 +56,13 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     mock_session_cls.assert_called_once()
     # Should simulate 2 steps (30 / 15)
     assert mock_session.simulate_step.call_count == 2
-    # Should be called with bundle and persist=False
+
+    # Should be called with the parsed context (return value of _fetch_session_context)
+    # The engine now calls _fetch_session_context ONCE and passes the result
+    expected_context = mock_session._fetch_session_context.return_value
+
     mock_session.simulate_step.assert_called_with(
-        context_bundle=mock_db.get_combat_context_bundle.return_value, background=True, persist=False
+        context_bundle=expected_context, background=True, persist=False
     )
     # Should save state 1 time (only at end)
     assert mock_session.save_state.call_count == 1
@@ -72,6 +83,13 @@ def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock
     mock_session.logs = []
     mock_session.loot = {}
     mock_session.version = 1
+
+    # Mock context
+    mock_session._fetch_session_context.return_value = {
+        "vitals": {"current_hp": 100, "current_mp": 100},
+        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "player": {"current_hp": 100, "current_mp": 100}
+    }
 
     # First step ok, second step dead
     mock_session.simulate_step.side_effect = [{"dead": False}, {"dead": True}]
@@ -111,6 +129,12 @@ def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_b
     mock_session.steps_completed = 2
     mock_session.simulate_step.return_value = {"dead": False}
 
+    mock_session._fetch_session_context.return_value = {
+        "vitals": {"current_hp": 100, "current_mp": 100},
+        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "player": {"current_hp": 100, "current_mp": 100}
+    }
+
     session_doc = {
         "discord_id": 123,
         "duration_minutes": 60,  # 4 steps total
@@ -140,14 +164,22 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
     mock_session.steps_completed = 0
 
     # Setup context bundle
-    mock_db.get_combat_context_bundle.return_value = {
+    # Note: engine now calls _fetch_session_context, so we mock THAT return value
+    # instead of get_combat_context_bundle directly (though engine calls get_combat... first,
+    # then passes it to _fetch..., so mocking _fetch is cleaner for testing the engine logic).
+
+    context_dict = {
         "player": {"current_hp": 100, "current_mp": 100},
         "stats": {"HP": 100, "MP": 100},
+        "vitals": {"current_hp": 100, "current_mp": 100}, # Engine uses this
+        "player_stats": MagicMock(max_hp=100, max_mp=100)
     }
+    mock_session._fetch_session_context.return_value = context_dict
 
     # Side effect: Reduce HP by 10 each step
     def simulate_side_effect(context_bundle, background, persist):
-        current_hp = context_bundle["player"]["current_hp"]
+        # Engine passes the context_dict as context_bundle
+        current_hp = context_bundle["vitals"]["current_hp"]
         new_hp = current_hp - 10
         return {
             "dead": False,
@@ -170,10 +202,11 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
     assert mock_session.simulate_step.call_count == 2
 
     # Check that the final call received the updated HP
-    # Step 1: 100 -> 90. Bundle updated to 90.
-    # Step 2: 90 -> 80. Bundle updated to 80.
+    # Step 1: 100 -> 90. Context updated to 90.
+    # Step 2: 90 -> 80. Context updated to 80.
     calls = mock_session.simulate_step.call_args_list
     final_bundle = calls[-1].kwargs["context_bundle"]
 
     # The bundle object is mutated in place, so we check its final state
-    assert final_bundle["player"]["current_hp"] == 80
+    # Engine updates context["vitals"]["current_hp"]
+    assert final_bundle["vitals"]["current_hp"] == 80
