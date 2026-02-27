@@ -9,7 +9,7 @@ Total items generated: 5 Classes * 6 Rarities * 10 Slots = 300 items.
 
 from math import ceil
 
-CLASSES = ["Warrior", "Mage", "Rogue", "Cleric", "Ranger"]
+CLASSES = ["Warrior", "Mage", "Rogue", "Cleric", "Ranger", "Alchemist"]
 
 # 1. DEFINE SLOTS (Updated for Rogue Armor)
 SLOTS = {
@@ -73,6 +73,18 @@ SLOTS = {
         "belt",
         "accessory",
     ],
+    "Alchemist": [
+        "mace",
+        "dagger",
+        "tome",
+        "hood",
+        "alchemist_coat",
+        "gloves",
+        "legs",
+        "boots",
+        "belt",
+        "accessory",
+    ],
 }
 
 # 2. DEFINE RARITY DATA (Level Req, Power Multiplier, Name)
@@ -108,6 +120,7 @@ STAT_BUDGETS = {
     },  # <--- ADDED: Rogue Armor budget (High Agility)
     "robe": {"END": 0.5, "MAG": 0.5},
     "vestments": {"END": 0.6, "MAG": 0.4},
+    "alchemist_coat": {"MAG": 0.5, "DEX": 0.3, "END": 0.2},
     # -- Helmets --
     "helm": {"END": 0.7, "STR": 0.3},
     "hood": {"MAG": 0.7, "AGI": 0.3},
