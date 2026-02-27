@@ -77,6 +77,16 @@ class AdventureSetupView(View):
                 emoji=emoji,
             )
 
+        # Safety check: If no locations are available (e.g. all locked or error), prevent crash
+        if not self.location_select.options:
+            self.location_select.add_option(
+                label="No Destinations Available",
+                value="none",
+                description="You do not meet requirements for any location.",
+                emoji=E.LOCKED
+            )
+            self.location_select.disabled = True
+
         self.location_select.callback = self.location_callback
         self.add_item(self.location_select)
 
@@ -113,7 +123,11 @@ class AdventureSetupView(View):
             supply_options[key]["count"] += item["count"]
 
         if supply_options:
-            for key, data in supply_options.items():
+            # Enforce 25-option limit for Discord Select menu
+            sorted_keys = list(supply_options.keys())[:25]
+
+            for key in sorted_keys:
+                data = supply_options[key]
                 count = data["count"]
                 c_def = CONSUMABLES.get(key)
                 c_type = c_def["type"] if c_def else "supply"
@@ -131,9 +145,18 @@ class AdventureSetupView(View):
                     label = f"{data['name']} (x{count})"
 
                 self.supply_select.add_option(label=label, value=value, description=desc, emoji="🎒")
+
+            # Dynamically adjust max_values based on available options
+            # max_values cannot exceed the number of options
+            num_options = len(self.supply_select.options)
+            if num_options > 0:
+                self.supply_select.max_values = min(3, num_options)
+            else:
+                self.supply_select.disabled = True
         else:
             self.supply_select.add_option(label="No Supplies", value="none")
             self.supply_select.disabled = True
+            self.supply_select.max_values = 1
 
         self.supply_select.callback = self.supply_callback
         self.add_item(self.supply_select)

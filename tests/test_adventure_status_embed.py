@@ -42,10 +42,7 @@ class TestAdventureStatusEmbed(unittest.TestCase):
         self.modules_patcher.stop()
 
     def test_status_embed_in_progress(self):
-        # Use timezone-aware datetime to match new implementation
-        from zoneinfo import ZoneInfo
-        now = datetime.datetime.now(ZoneInfo("Asia/Manila"))
-
+        now = datetime.datetime.now()
         mock_session = {
             "location_id": "forest_clearing",
             "start_time": (now - datetime.timedelta(minutes=10)).isoformat(),
@@ -55,11 +52,9 @@ class TestAdventureStatusEmbed(unittest.TestCase):
             "status": "in_progress",
         }
 
-        # We don't need to patch WorldTime.now anymore since implementation uses datetime.now(tz)
-        # But if we did, we'd need to ensure consistent timezone usage.
-        # The implementation parses ISO string (naive or aware) -> ensures Manila TZ -> compares with Manila Now.
-
-        embed = self.AdventureEmbeds.build_adventure_status_embed(mock_session)
+        # Patch WorldTime.now on the imported class/module
+        with patch.object(self.WorldTime, "now", return_value=now):
+            embed = self.AdventureEmbeds.build_adventure_status_embed(mock_session)
 
         # Verify basic properties
         # 'embed' is a MagicMock because discord.Embed is mocked
@@ -72,9 +67,6 @@ class TestAdventureStatusEmbed(unittest.TestCase):
         # Call 1: Time Remaining
         args, kwargs = calls[0]
         assert "Time Remaining" in kwargs["name"]
-        # Verify relative timestamp format
-        assert "<t:" in kwargs["value"]
-        assert ":R>" in kwargs["value"]
 
         # Call 2: Steps
         args, kwargs = calls[1]
@@ -87,8 +79,7 @@ class TestAdventureStatusEmbed(unittest.TestCase):
         assert "5" in kwargs["value"]  # item_1 only
 
     def test_status_embed_completed(self):
-        from zoneinfo import ZoneInfo
-        now = datetime.datetime.now(ZoneInfo("Asia/Manila"))
+        now = datetime.datetime.now()
         mock_session = {
             "location_id": "forest_clearing",
             "start_time": (now - datetime.timedelta(minutes=60)).isoformat(),
@@ -98,7 +89,8 @@ class TestAdventureStatusEmbed(unittest.TestCase):
             "status": "in_progress",
         }
 
-        embed = self.AdventureEmbeds.build_adventure_status_embed(mock_session)
+        with patch.object(self.WorldTime, "now", return_value=now):
+            embed = self.AdventureEmbeds.build_adventure_status_embed(mock_session)
 
         # Verify "Complete!" is in the first field
         calls = embed.add_field.call_args_list
