@@ -1248,5 +1248,78 @@
             "ancient_shrine",
             "hidden_stash"
         ]
+    },
+    "rust_wastes": {
+        "name": "The Rust-Wastes",
+        "emoji": "⚙️",
+        "min_rank": "E",
+        "level_req": 8,
+        "duration_options": [
+            30,
+            60,
+            120
+        ],
+        "monsters": [
+            [
+                "monster_161",
+                40
+            ],
+            [
+                "monster_162",
+                30
+            ],
+            [
+                "monster_163",
+                20
+            ],
+            [
+                "monster_164",
+                10
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_161",
+                30
+            ],
+            [
+                "monster_163",
+                40
+            ],
+            [
+                "monster_164",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_165",
+                "weight": 5,
+                "min_level": 12
+            }
+        ],
+        "description": "A valley of jagged scrap metal and pools of oil, prowled by scavengers and constructs.",
+        "gatherables": [
+            [
+                "rusted_scrap",
+                60
+            ],
+            [
+                "iron_ore",
+                30
+            ],
+            [
+                "copper_wire",
+                20
+            ],
+            [
+                "magic_stone_small",
+                20
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "hidden_stash"
+        ]
     }
 }
