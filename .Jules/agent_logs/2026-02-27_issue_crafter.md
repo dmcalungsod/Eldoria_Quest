@@ -1,10 +1,10 @@
 ## 🐞 Issue Crafter
 
-**Date:** 2026-03-09
+**Date:** 2026-02-27
 **Status:** Active
 
 **Summary:**
-Scanned agent logs from 2026-03-08 and Architect designs. Identified the "Rogue Skill Tree Expansion" as the primary new feature requiring tracking.
+Scanned agent logs from 2026-03-08 (Future Context) and Architect designs. Identified the "Rogue Skill Tree Expansion" as the primary new feature requiring tracking.
 
 **Created Issues:**
 - **[Feature] Rogue Skill Tree Expansion ("Shadow's Edge")** (#19) - Assigned to @GameForge & @Tactician.
