@@ -4,7 +4,9 @@
 - **Unique Ecology:** Creating a distinct monster set with themed drops (Aether Stone, Star Metal) helps ground the region.
 - **Narrative Integration:** Linking item descriptions and combat text to the "floating ruins" theme reinforces the atmosphere.
 - **Rank Gating:** Placing the region at Rank B (Level 28) fills a gap in the progression curve between Frostfall (25) and Molten Caldera (30).
+- **Thematic Consistency:** *The Rust-Wastes* uses existing "junk" items (rusted scrap, copper wire) to make low-level crafting materials relevant again, while introducing a distinct "industrial decay" aesthetic different from the magical corruption of other zones.
 
 ## Balancing Notes
 - The Celestial Arbiter (Boss) drops `celestial_core` (Epic) which should be a high-value chase item.
 - Monster stats (ATK/DEF) are calibrated around the Level 28-31 range.
+- *The Rust-Wastes* (Rank E, Lvl 8) bridges the difficulty jump between *Whispering Thicket* (Lvl 5) and *Deepgrove Roots* (Lvl 10), smoothing out the early game curve.

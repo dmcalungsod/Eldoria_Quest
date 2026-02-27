@@ -3033,5 +3033,146 @@
             "regenerate"
         ],
         "description": "An ancient mage who merged with the library to hoard knowledge for eternity."
+    },
+    "monster_161": {
+        "id": 161,
+        "name": "Scrap Rat",
+        "level": 8,
+        "tier": "Normal",
+        "hp": 300,
+        "atk": 25,
+        "def": 12,
+        "xp": 250,
+        "drops": [
+            [
+                "rusted_scrap",
+                60
+            ],
+            [
+                "magic_stone_small",
+                30
+            ]
+        ],
+        "skills": [
+            "vicious_bite"
+        ],
+        "description": "A bloated rat bristling with sharp metal shards embedded in its scabby hide."
+    },
+    "monster_162": {
+        "id": 162,
+        "name": "Kobold Scavenger",
+        "level": 9,
+        "tier": "Normal",
+        "hp": 350,
+        "atk": 28,
+        "def": 15,
+        "xp": 300,
+        "drops": [
+            [
+                "copper_wire",
+                50
+            ],
+            [
+                "magic_stone_small",
+                40
+            ],
+            [
+                "rusted_scrap",
+                40
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "heavy_blow"
+        ],
+        "description": "A crafty kobold armed with a makeshift spear and pockets full of stolen junk."
+    },
+    "monster_163": {
+        "id": 163,
+        "name": "Oil Slime",
+        "level": 9,
+        "tier": "Normal",
+        "hp": 380,
+        "atk": 22,
+        "def": 10,
+        "xp": 280,
+        "drops": [
+            [
+                "slime_gel",
+                50
+            ],
+            [
+                "magic_stone_small",
+                30
+            ]
+        ],
+        "skills": [
+            "mend",
+            "poison_spit"
+        ],
+        "description": "A glob of sentient, flammable sludge that leaves a toxic trail."
+    },
+    "monster_164": {
+        "id": 164,
+        "name": "Junk Golem",
+        "level": 10,
+        "tier": "Elite",
+        "hp": 800,
+        "atk": 45,
+        "def": 35,
+        "xp": 800,
+        "drops": [
+            [
+                "iron_ore",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                20
+            ],
+            [
+                "copper_wire",
+                30
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crushing_slam"
+        ],
+        "description": "A lumbering construct held together by rust and bad magic."
+    },
+    "monster_165": {
+        "id": 165,
+        "name": "The Galvanized Horror",
+        "level": 12,
+        "tier": "Boss",
+        "hp": 2500,
+        "atk": 80,
+        "def": 50,
+        "xp": 3500,
+        "drops": [
+            [
+                "brass_gear",
+                100
+            ],
+            [
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "steel_ingot",
+                50
+            ],
+            [
+                "charged_core",
+                20
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "regenerate",
+            "thunder_call"
+        ],
+        "description": "A twisted amalgamation of flesh and machinery, crackling with stolen electricity."
     }
 }
