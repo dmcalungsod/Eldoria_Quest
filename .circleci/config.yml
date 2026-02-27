@@ -163,12 +163,6 @@ workflows:
           filters:
             branches:
               ignore: main
-      - test-and-upload-codecov:
-          requires:
-            - static-analysis
-          filters:
-            branches:
-              ignore: main
       - auto-merge:
           requires:
             - static-analysis
