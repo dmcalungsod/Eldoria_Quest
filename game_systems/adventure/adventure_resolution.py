@@ -72,39 +72,47 @@ class AdventureResolutionEngine:
 
         # OPTIMIZATION: Fetch context ONCE and persist only at the end
         bundle = self.db.get_combat_context_bundle(discord_id)
+
+        # ⚡ OPTIMIZATION: Parse context ONCE to avoid O(N) re-parsing in loop
+        context = session._fetch_session_context(bundle)
+
+        if not context:
+            logger.error(f"Failed to load context for {discord_id}")
+            return False
+
         initial_hp = 0
         initial_mp = 0
         max_hp = 100  # Fallback
         max_mp = 100  # Fallback
 
-        if bundle and "player" in bundle:
-            initial_hp = bundle["player"].get("current_hp", 0)
-            initial_mp = bundle["player"].get("current_mp", 0)
+        # Use parsed context for initial values if available
+        if context.get("vitals"):
+            initial_hp = context["vitals"]["current_hp"]
+            initial_mp = context["vitals"]["current_mp"]
 
-            # Extract Max HP/MP from stats if available for delta calculation
-            # Note: AdventureSession extracts this internally, but we need it for final delta
-            # We can rely on the last result's context if available, or fetch now.
-            # Let's try to extract it from bundle["stats"]
-            if bundle.get("stats"):
-                # Use simple extraction, exact logic matches PlayerStats defaults
-                max_hp = bundle["stats"].get("HP", 100)
-                max_mp = bundle["stats"].get("MP", 100)
+        if context.get("player_stats"):
+             max_hp = context["player_stats"].max_hp
+             max_mp = context["player_stats"].max_mp
+        elif context.get("stats_dict"):
+             max_hp = context["stats_dict"].get("HP", 100)
+             max_mp = context["stats_dict"].get("MP", 100)
 
         final_vitals = None
 
         # 3. Simulation Loop
         for _ in range(steps_remaining):
-            # Pass bundle and persist=False to avoid DB writes per step
-            result = session.simulate_step(context_bundle=bundle, background=True, persist=False)
+            # Pass PRE-PARSED context object directly to simulate_step
+            # AdventureSession was updated to check if context_bundle has "player_stats" and reuse it.
+            result = session.simulate_step(context_bundle=context, background=True, persist=False)
 
             # Increment step counter
             session.steps_completed += 1
             final_vitals = result.get("vitals")
 
-            # FIX: Update bundle with new vitals so damage persists to next step
-            if final_vitals and bundle and "player" in bundle:
-                bundle["player"]["current_hp"] = final_vitals.get("current_hp", bundle["player"]["current_hp"])
-                bundle["player"]["current_mp"] = final_vitals.get("current_mp", bundle["player"]["current_mp"])
+            # FIX: Update context vitals so damage persists to next step in memory
+            if final_vitals:
+                context["vitals"]["current_hp"] = final_vitals.get("current_hp", context["vitals"]["current_hp"])
+                context["vitals"]["current_mp"] = final_vitals.get("current_mp", context["vitals"]["current_mp"])
 
             if result.get("dead", False):
                 logger.info(f"Player {discord_id} died during simulation step {session.steps_completed}.")
@@ -168,11 +176,6 @@ class AdventureResolutionEngine:
             # but didn't save the log update (it modified session.loot only usually).
             # Actually _handle_death_rewards calls db.end_adventure_session.
             # We should probably update the log with the loss report.
-
-            # Fetch closed session to append log?
-            # Or assume _handle_death_rewards does enough.
-            # _handle_death_rewards in AdventureManager returns a string but doesn't save it to session logs explicitly?
-            # It seems it expects the caller to display it.
 
             # Let's save it to the session logs.
             session.logs.append(loss_msg)
