@@ -496,5 +496,17 @@
         "description": "A pale herb that only blooms under moonlight.",
         "rarity": "Rare",
         "value": 45
+    },
+    "paper_scrap": {
+        "name": "Paper Scrap",
+        "description": "A tattered piece of parchment with illegible scribbles.",
+        "rarity": "Common",
+        "value": 15
+    },
+    "enchanted_ink": {
+        "name": "Enchanted Ink",
+        "description": "Ink that shimmers with a faint, magical glow.",
+        "rarity": "Uncommon",
+        "value": 35
     }
 }

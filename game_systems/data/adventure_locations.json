@@ -793,7 +793,7 @@
     "frostfall_expanse": {
         "name": "The Frostfall Expanse",
         "emoji": "❄️",
-        "min_rank": "A",
+        "min_rank": "B",
         "level_req": 25,
         "duration_options": [
             60,
@@ -1173,5 +1173,80 @@
         "duration_options": [],
         "monsters": [],
         "description": "The dedicated arena for Adventurer rank examinations."
+    },
+    "whispering_archives": {
+        "name": "The Whispering Archives",
+        "emoji": "📚",
+        "min_rank": "B",
+        "level_req": 26,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_156",
+                30
+            ],
+            [
+                "monster_157",
+                30
+            ],
+            [
+                "monster_158",
+                25
+            ],
+            [
+                "monster_159",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_158",
+                40
+            ],
+            [
+                "monster_157",
+                30
+            ],
+            [
+                "monster_156",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_160",
+                "weight": 5,
+                "min_level": 30
+            }
+        ],
+        "description": "Endless rows of floating books and whispering shadows. Knowledge here comes at a price.",
+        "gatherables": [
+            [
+                "ancient_tablet",
+                40
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ],
+            [
+                "paper_scrap",
+                20
+            ],
+            [
+                "enchanted_ink",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine",
+            "hidden_stash"
+        ]
     }
 }

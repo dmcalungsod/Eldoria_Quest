@@ -121,6 +121,7 @@ FACTIONS = {
             "celestial_archipelago",
             "shimmering_wastes",
             "sunken_grotto",
+            "whispering_archives",
         ],
     },
     "stone_harvesters": {
