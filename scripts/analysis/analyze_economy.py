@@ -66,8 +66,6 @@ def calculate_expected_value(location_key, location_data, player_luck=10):
     fallback_chance = 1.0 - gather_chance
     fallback_ev = fallback_chance * 0.5 * 3.0  # Avg 3 Aurum
 
-    total_regen_ev = gather_ev + fallback_ev
-
     # --- Combat EV ---
     monsters = location_data.get("monsters", [])
     # Add night monsters (weighted 50/50 for simplicity or assume uniform distribution over 24h)
@@ -114,8 +112,6 @@ def calculate_expected_value(location_key, location_data, player_luck=10):
                 avg_drop_value += final_chance * value
 
             combat_ev_materials += prob * avg_drop_value
-
-    total_combat_ev = combat_ev_aurum + combat_ev_materials
 
     # --- Total Hourly EV ---
     # 4 Steps per Hour
