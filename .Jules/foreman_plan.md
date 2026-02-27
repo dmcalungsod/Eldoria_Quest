@@ -53,12 +53,17 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @GameBalancer
     - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
     - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops). **[x] Completed**
-    - **Subtask 2.2c:** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives). **[ ] In Progress** (Partial: Void Heart missing).
-    - **Due:** 2026-03-08 (Extended)
+    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives). **[ ] In Progress**
+    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Underperforming rewards). **[ ] Assigned**
+    - **Due:** 2026-03-08
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
     - **Details:** Modify `AdventureSession` to increase monster damage scaling for long durations.
     - **Status:** **Completed** (Verified `_calculate_fatigue_multiplier` in `adventure_session.py`).
+- [ ] **Task 2.4:** Resolve Rank Logic Conflict (Frostfall vs Archipelago).
+    - **Agent:** @GameBalancer / @GameForge
+    - **Details:** Resolve Level 25/28 vs Rank A/B inconsistency.
+    - **Due:** 2026-03-08
 
 ### Phase 3: Integration & Polish
 **Focus:** Flavor, depth, and safety nets.
@@ -68,10 +73,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 3.2:** Write Flavor Text for Adventure Reports.
     - **Agent:** @StoryWeaver
     - **Status:** **Completed** (`narrative_data.py` populated with location/outcome flavor).
-- [ ] **Task 3.3:** Implement Travel Supplies.
+- [x] **Task 3.3:** Implement Travel Supplies.
     - **Agent:** @Equipper / @SystemSmith
-    - **Details:** Create items (Hardtack, Pitch Torch, etc.), add UI selector in `AdventureSetupView`, implement usage logic.
-    - **Due:** 2026-03-07
+    - **Status:** **Completed** (Verified `hardtack`/`pitch_torch` in `consumables.json`, logic in `adventure_session.py`).
 
 ### Phase 4: Testing & Launch
 **Focus:** Stress testing and final verification.
@@ -86,7 +90,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 **Focus:** Resolving critical issues identified by Issue Crafter.
 - [ ] **Task 5.1:** Fix Critical `pip` Vulnerability (CVE-2026-1703).
     - **Agent:** @Sentinel
-    - **Due:** **IMMEDIATE**
+    - **Due:** **IMMEDIATE (CRITICAL)**
 - [ ] **Task 5.2:** Refactor High-Complexity Methods.
     - **Agent:** @SystemSmith
     - **Subtask 5.2a:** `CombatEngine.run_combat_turn`
@@ -129,10 +133,23 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @GameForge
     - **Due:** 2026-03-10
 
+### Rogue Skill Tree Expansion (New)
+**Design:** `.Jules/architect_designs/skill_tree_rogue.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task R.1:** Implement Mechanics (`next_hit_crit`, `conditional_multiplier`).
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-10
+- [ ] **Task R.2:** Implement Rogue Skills (`Shadow Step`, `Venomous Strike`, etc.).
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-10
+- [ ] **Task R.3:** Create Rogue Achievements.
+    - **Agent:** @ChronicleKeeper
+    - **Due:** 2026-03-10
+
 ---
 
 ## 📝 Activity Log
-- **2026-03-06:** Verified Tasks 2.2a, 2.2b, and 2.3 as Complete. Added new tasks for Grey Ward Faction, Alchemist Materials, and Warrior Skill Tree.
+- **2026-02-27:** Verified Task 3.3 (Supplies) as Complete. Added Rogue Skill Tree project and Analyst Integration tasks (2.2c/d, 2.4). Flagged Task 5.1 as CRITICAL.
 - **2026-02-25 (Update):** Integrated Analyst findings (Task 2.2 split), Namewright updates (Task 3.3/Alchemist), and Issue Crafter reports (Phase 5). Marked Tasks 2.1 and 3.2 as Complete.
 - **2026-02-26:** Confirmed Phase 1 (UI) and key Phase 2/3 tasks (Locations, Death Penalty, Flavor Text) are Complete. Updated plan to reflect rapid progress. Assigned remaining Fatigue and Supply tasks.
 - **2026-02-25:** Phase 0 (Backend) marked Complete. Phase 1 detailed tasks assigned to @Palette and @SystemSmith.
