@@ -22,3 +22,16 @@
 
 **Learning:** Rank D required +10 quests and +50 kills compared to Rank E. Since 10 quests typically involve ~50 kills, the kill requirement was entirely redundant, removing the need for exploration.
 **Action:** Increased Rank D `normal_kills` to 250 (+100 delta) to enforce ~50 kills from non-quest sources.
+
+## 2026-03-09 — Rank D Kill Tuning & Endgame Boss Smoothing
+
+**Learning:**
+1. **Rank D Still Trivial:** Even with 250 kills, the 20 quest requirement often resulted in players naturally hitting ~280+ kills just by doing quests (assuming ~8 kills/quest + incidental encounters). The "exploration gap" was non-existent.
+2. **Endgame Wall:** Despite previous adjustments, the gap between Rank A (8 boss kills) and S (15 boss kills) remained a massive statistical hurdle (7 extra boss kills = ~140 encounters at 5% spawn). This felt more like a "luck gate" than a skill gate.
+
+**Action:**
+1. **Rank D:** Increased `normal_kills` to **300**. This enforces a distinct gap that requires dedicated exploration or auto-adventure sessions outside of quest objectives.
+2. **Endgame Smoothing:** Reduced boss kill requirements further to align with reasonable playtime expectations:
+   - Rank A: 8 -> **6**
+   - Rank S: 15 -> **10**
+   - Rank SS: 25 -> **20**
