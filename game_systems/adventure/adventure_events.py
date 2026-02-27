@@ -286,6 +286,21 @@ class AdventureEvents:
         "A spectral chill passes through you, leaving frost on your armor.",
     ]
 
+    ATMOSPHERE_ARCHIVES = [
+        "Thousands of books float in the air, defying gravity.",
+        "The sound of turning pages fills the silence like rustling leaves.",
+        "Ink drips from the ceiling, forming puddles of dark magic.",
+        "You feel the weight of forbidden knowledge pressing on your mind.",
+        "The shelves seem to stretch on forever, disappearing into the gloom.",
+        "A spectral librarian watches you from the end of the aisle.",
+        "Dust motes swirl in the light of floating arcane candles.",
+        "The air smells of old paper and ozone.",
+        "Whispers emanate from the books, tempting you to read them.",
+        "Shadows flicker as if they have a life of their own.",
+        "A chill draft blows through the stacks, carrying the scent of decay.",
+        "The silence here is heavy, broken only by your own heartbeat.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -381,6 +396,15 @@ class AdventureEvents:
         f"{E.SKULL} Ignoring the staring skulls, you bandage your wounds.",
         f"{E.SKULL} The cold air numbs your pain as you rest.",
         f"{E.SKULL} You find a moment of peace in the house of the dead.",
+    ]
+
+    REGEN_PHRASES_ARCHIVES = [
+        f"📚 You find a reading nook and rest your legs.",
+        f"📚 The quiet of the library soothes your nerves.",
+        f"📚 You lean against a stack of ancient tomes and catch your breath.",
+        f"📚 The smell of old paper is strangely comforting.",
+        f"📚 You bandage your wounds while ignoring the whispers.",
+        f"📚 A floating candle provides a warm light as you rest.",
     ]
 
     REGEN_LOW_HP = [
@@ -579,6 +603,8 @@ class AdventureEvents:
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ASHLANDS)]
         elif location_id == "forgotten_ossuary":
             base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_OSSUARY)]
+        elif location_id == "whispering_archives":
+            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARCHIVES)]
 
         # 5. Generic Fallback
         else:
@@ -607,6 +633,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_ASHLANDS
             elif location_id == "forgotten_ossuary":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_OSSUARY
+            elif location_id == "whispering_archives":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_ARCHIVES
 
             # Event Override (High Priority)
             if event_type == "blood_moon":

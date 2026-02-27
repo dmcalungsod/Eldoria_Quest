@@ -238,4 +238,29 @@ MONSTER_SKILLS = {
         "type": "magical",
         "desc_key": "magic",
     },
+    # Whispering Archives Skills
+    "paper_cut": {
+        "key_id": "paper_cut",
+        "name": "Paper Cut",
+        "power": 1.3,
+        "mp_cost": 4,
+        "type": "physical",
+        "desc_key": "special_hit",
+    },
+    "blind_splash": {
+        "key_id": "blind_splash",
+        "name": "Blind Splash",
+        "power": 1.4,
+        "mp_cost": 6,
+        "type": "magical",
+        "desc_key": "magic",
+    },
+    "silence_aura": {
+        "key_id": "silence_aura",
+        "name": "Silence Aura",
+        "power": 1.5,
+        "mp_cost": 8,
+        "type": "magical",
+        "desc_key": "magic",
+    },
 }

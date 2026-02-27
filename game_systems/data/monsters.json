@@ -2903,5 +2903,135 @@
             "arcane_pulse"
         ],
         "description": "A blindingly bright entity of pure light and heat, residing at the peak of the Prism Spire."
+    },
+    "monster_156": {
+        "id": 156,
+        "name": "Living Grimoire",
+        "level": 25,
+        "tier": "Normal",
+        "hp": 1200,
+        "atk": 80,
+        "def": 30,
+        "xp": 800,
+        "drops": [
+            [
+                "ancient_tablet",
+                60
+            ],
+            [
+                "magic_stone_medium",
+                40
+            ]
+        ],
+        "skills": [
+            "arcane_pulse",
+            "paper_cut"
+        ],
+        "description": "A tome of forbidden knowledge that has gained sentience. Its pages are sharp as razors."
+    },
+    "monster_157": {
+        "id": 157,
+        "name": "Ink Ooze",
+        "level": 26,
+        "tier": "Normal",
+        "hp": 1300,
+        "atk": 85,
+        "def": 35,
+        "xp": 850,
+        "drops": [
+            [
+                "shadow_essence",
+                50
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ]
+        ],
+        "skills": [
+            "void_slash",
+            "blind_splash"
+        ],
+        "description": "A shapeless mass of sentient ink, dripping with dark magic and forgotten words."
+    },
+    "monster_158": {
+        "id": 158,
+        "name": "Silence Stalker",
+        "level": 26,
+        "tier": "Normal",
+        "hp": 1250,
+        "atk": 90,
+        "def": 25,
+        "xp": 880,
+        "drops": [
+            [
+                "ectoplasm",
+                60
+            ],
+            [
+                "shadow_essence",
+                30
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "silence_aura"
+        ],
+        "description": "A restless spirit bound to the library, hunting anyone who dares to make a sound."
+    },
+    "monster_159": {
+        "id": 159,
+        "name": "Codex Golem",
+        "level": 27,
+        "tier": "Elite",
+        "hp": 2500,
+        "atk": 110,
+        "def": 60,
+        "xp": 2800,
+        "drops": [
+            [
+                "ancient_tablet",
+                50
+            ],
+            [
+                "magic_stone_large",
+                30
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "arcane_pulse"
+        ],
+        "description": "A massive guardian constructed from thousands of hardened books."
+    },
+    "monster_160": {
+        "id": 160,
+        "name": "The Grand Archivist",
+        "level": 28,
+        "tier": "Boss",
+        "hp": 7500,
+        "atk": 140,
+        "def": 70,
+        "xp": 11000,
+        "drops": [
+            [
+                "ancient_tablet",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                50
+            ],
+            [
+                "shadow_essence",
+                80
+            ]
+        ],
+        "skills": [
+            "arcane_pulse",
+            "void_slash",
+            "regenerate"
+        ],
+        "description": "An ancient mage who merged with the library to hoard knowledge for eternity."
     }
 }
