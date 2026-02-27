@@ -111,11 +111,19 @@ class TestAdventureDayNight(unittest.TestCase):
                         logs = "".join(result["sequence"][0])
                         self.assertIn("AMBUSH!", logs)
 
-                        # Verify Damage (20 * 0.8 = 16)
-                        expected_hp = 100 - 16
+                        # Verify Damage
+                        # Monster ATK: 20
+                        # Base Damage: 20 * 0.8 = 16
+                        # Player Stats (Default Mock): END=10, DEF=0
+                        # Defense Power: Tiered(10, 1.5) + 0 = 15
+                        # Mitigation: 15 * (0.3 + (0.2 * 0.15)) = 15 * 0.33 = 4.95
+                        # Ambush Penalty: 4.95 * 0.5 = 2.475
+                        # Final Damage: int(16 - 2.475) = int(13.525) = 13
+                        expected_damage = 13
+                        expected_hp = 100 - expected_damage
                         self.assertEqual(self.mock_context["vitals"]["current_hp"], expected_hp)
                         # Verify atomic delta update is used
-                        self.mock_db.update_player_vitals_delta.assert_called_with(123456789, -16, 0, 100, 50)
+                        self.mock_db.update_player_vitals_delta.assert_called_with(123456789, -expected_damage, 0, 100, 50)
 
     def test_night_no_ambush(self):
         """Nighttime encounter chance failure should not ambush."""

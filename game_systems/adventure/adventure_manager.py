@@ -244,11 +244,24 @@ class AdventureManager:
 
     def end_adventure(self, discord_id: int) -> dict | None:
         try:
+            # 1. Optimistic Locking
+            if not self.db.lock_adventure_for_claiming(discord_id):
+                # If locking failed, check if it's because there is no session
+                active = self.db.get_active_adventure(discord_id)
+                if not active:
+                    return None
+                # If active session exists but lock failed, it's already being claimed
+                logger.warning(f"Adventure duplicate claim prevention for {discord_id}")
+                return None
+
             stats_json = self.db.get_player_stats_json(discord_id)
             p_stats = PlayerStats.from_dict(stats_json)
             items_to_add = []
             summary = None
 
+            # 2. Get Locked Session
+            # We fetch again (or use cached if we fetched for check) but status might be 'claiming' now
+            # get_active_adventure filters by 'active: 1', status irrelevant for retrieval here
             row = self.db.get_active_adventure(discord_id)
             if not row:
                 return None
