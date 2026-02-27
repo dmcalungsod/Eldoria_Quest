@@ -1558,5 +1558,25 @@
       "aurum": 500,
       "item": "Alchemist's Retort"
     }
+  },
+  {
+    "id": 78,
+    "title": "The Great Work",
+    "tier": "E",
+    "quest_giver": "Kaelen, the First Alchemist",
+    "location": "Grey Ward District",
+    "summary": "Collect rare reagents to prove your mastery of alchemy.",
+    "description": "To truly understand the nature of the Veil, one must deconstruct it. Bring me Primordial Ooze, Brimstone, and Lunawort. Only then can you begin the Great Work.",
+    "objectives": {
+      "collect": {
+        "primordial_ooze": 3,
+        "brimstone": 3,
+        "lunawort": 3
+      }
+    },
+    "rewards": {
+      "exp": 500,
+      "aurum": 300
+    }
   }
 ]
