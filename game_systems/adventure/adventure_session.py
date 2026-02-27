@@ -544,9 +544,7 @@ class AdventureSession:
 
             # EVENT HOOK: Check for Frostfall Threat Reduction
             threat_reduction = 1.0
-            if self.location_id == "frostfall_expanse" and context.get(
-                "active_boosts"
-            ):
+            if self.location_id == "frostfall_expanse" and context.get("active_boosts"):
                 threat_reduction = float(
                     context["active_boosts"].get("frostfall_threat_reduction", 1.0)
                 )

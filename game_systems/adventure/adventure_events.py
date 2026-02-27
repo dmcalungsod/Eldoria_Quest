@@ -301,6 +301,21 @@ class AdventureEvents:
         "The silence here is heavy, broken only by your own heartbeat.",
     ]
 
+    ATMOSPHERE_FROSTFALL = [
+        "A biting wind screams across the ice, carrying the ghosts of the fallen.",
+        "Snowdrifts hide treacherous crevices, waiting to swallow the unwary.",
+        "The cold is a physical weight, pressing against your armor.",
+        "Ice crystals form on your eyelashes, blurring your vision.",
+        "The aurora borealis dances overhead, beautiful and indifferent.",
+        "Ancient ruins poke through the snow, silent monuments to a lost age.",
+        "The silence of the tundra is absolute, broken only by the wind.",
+        "You trudge through knee-deep snow, every step a battle.",
+        "A white wolf howls in the distance, a lonely and haunting sound.",
+        "The air is so cold it burns your lungs with every breath.",
+        "Frozen waterfalls hang like crystal curtains from the cliffs.",
+        "Shadows on the ice seem to move, tracking your progress.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -641,6 +656,8 @@ class AdventureEvents:
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
             elif event_type == "harvest_festival":
                 atmosphere_pool = AdventureEvents.ATMOSPHERE_HARVEST
+            elif event_type == "frostfall_expedition":
+                atmosphere_pool = AdventureEvents.ATMOSPHERE_FROSTFALL
 
             # Time Phase Override (30% chance)
             elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
