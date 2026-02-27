@@ -62,13 +62,11 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         sys.modules["cogs"] = MagicMock()
         sys.modules["cogs.utils.ui_helpers"] = MagicMock()
 
-        # Mock specific modules used in adventure_menu.py
-        if "game_systems.adventure.ui.adventure_embeds" not in sys.modules:
-            sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
-        if "game_systems.adventure.ui.setup_view" not in sys.modules:
-            sys.modules["game_systems.adventure.ui.setup_view"] = MagicMock()
-        if "game_systems.adventure.ui.status_view" not in sys.modules:
-            sys.modules["game_systems.adventure.ui.status_view"] = MagicMock()
+        # Force overwrite specific modules used in adventure_menu.py with Mocks
+        # regardless of whether they are already loaded. This ensures consistent mocking.
+        sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
+        sys.modules["game_systems.adventure.ui.setup_view"] = MagicMock()
+        sys.modules["game_systems.adventure.ui.status_view"] = MagicMock()
 
         # Import module under test
         import game_systems.character.ui.adventure_menu
@@ -175,6 +173,30 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
 
         interaction.edit_original_response.assert_called()
         # Verify StatusView was used
+        # Note: If self.AdventureStatusView is a MagicMock (class), assert_called works.
+        # If it's the actual class, it doesn't.
+        # Given module patching in setUp, it should be a MagicMock.
+        # However, failure logs show "type object 'AdventureStatusView' has no attribute 'assert_called'"
+        # This means patching logic in setUp might be flawed or late.
+
+        # Let's inspect sys.modules["game_systems.adventure.ui.status_view"]
+        # If imports happened before setUp patch, we got the real class.
+        # We need to ensure we assert on the imported name in adventure_menu.
+
+        # Since we reloaded adventure_menu in setUp AFTER patching dependencies, it should have picked up the mock.
+        # BUT adventure_menu imports AdventureStatusView from status_view.
+        # If status_view was ALREADY in sys.modules (real module), patching it in dict might not affect existing imports unless we reload adventure_menu.
+        # We did reload adventure_menu.
+
+        # Wait, the patch.dict context manager in setUp patches sys.modules.
+        # We did:
+        # if "game_systems.adventure.ui.status_view" not in sys.modules:
+        #    sys.modules["..."] = MagicMock()
+
+        # If the real module WAS already loaded by other tests, we didn't patch it!
+        # We only mocked it if it wasn't there.
+        # That's the bug. We need to FORCE overwrite it with a mock for this test.
+
         self.AdventureStatusView.assert_called()
 
     async def test_start_adventure_callback_resume_completed(self):
@@ -202,14 +224,6 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         await view.start_adventure_callback(interaction)
 
         interaction.edit_original_response.assert_called()
-        # Should create a basic view with back button, not StatusView
-        args, kwargs = interaction.edit_original_response.call_args
-        # kwargs['view'] is a basic View
-        # AdventureStatusView is a MagicMock object here because we mocked the module import
-        # So we can't use isinstance against it directly if it's an instance of MagicMock.
-        # But wait, self.AdventureStatusView IS the class mock.
-        # However, assertNotIsInstance expects a type.
-        # Let's check if it was instantiated.
         self.AdventureStatusView.assert_not_called()
 
 if __name__ == "__main__":

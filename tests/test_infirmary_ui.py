@@ -69,18 +69,21 @@ class TestInfirmaryUI(unittest.IsolatedAsyncioTestCase):
 
         # Import module under test
 
-        # Manually load the module from file to bypass package issues
-        loader = importlib.machinery.SourceFileLoader(
-            "cogs.infirmary_cog",
-            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cogs/infirmary_cog.py")
-        )
-        mod = importlib.util.module_from_spec(importlib.util.spec_from_loader("cogs.infirmary_cog", loader))
-        sys.modules["cogs.infirmary_cog"] = mod
-        loader.exec_module(mod)
+        # Now that cogs/__init__.py exists, we can import normally
+        # However, due to previous mocking of 'cogs' in sys.modules,
+        # we might need to be careful. If 'cogs' is a Mock in sys.modules,
+        # imports will fail or return mocks.
 
-        self.InfirmaryView = mod.InfirmaryView
-        self.DatabaseManager = mod.DatabaseManager
-        self.PlayerStats = mod.PlayerStats
+        # Ensure cogs is NOT a mock if we want real imports
+        if "cogs" in sys.modules and isinstance(sys.modules["cogs"], MagicMock):
+             del sys.modules["cogs"]
+
+        import cogs.infirmary_cog
+        importlib.reload(cogs.infirmary_cog)
+
+        self.InfirmaryView = cogs.infirmary_cog.InfirmaryView
+        self.DatabaseManager = cogs.infirmary_cog.DatabaseManager
+        self.PlayerStats = cogs.infirmary_cog.PlayerStats
 
         self.mock_db = MagicMock()
         self.mock_user = MagicMock()

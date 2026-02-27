@@ -44,14 +44,10 @@ class TestUICallbacks(unittest.IsolatedAsyncioTestCase):
         # Now import/reload the module
         import importlib
 
-        # Manually load the module from file to bypass package issues
-        loader = importlib.machinery.SourceFileLoader(
-            "cogs.utils.ui_helpers",
-            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cogs/utils/ui_helpers.py")
-        )
-        self.ui_helpers = importlib.util.module_from_spec(importlib.util.spec_from_loader("cogs.utils.ui_helpers", loader))
-        sys.modules["cogs.utils.ui_helpers"] = self.ui_helpers
-        loader.exec_module(self.ui_helpers)
+        # Now that cogs/__init__.py and cogs/utils/__init__.py exist, we can import normally
+        import cogs.utils.ui_helpers
+        importlib.reload(cogs.utils.ui_helpers)
+        self.ui_helpers = cogs.utils.ui_helpers
 
         self.mock_interaction = MagicMock()
         self.mock_interaction.user.id = 12345

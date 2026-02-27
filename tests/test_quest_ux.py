@@ -30,8 +30,30 @@ class MockView:
 
 discord_ui_mock.View = MockView
 discord_ui_mock.Button = MagicMock
+# Configure Color class mock correctly
+# discord.Color is a class, so accessing discord.Color.orange returns a bound method (mock)
+# calling that method should return "orange"
 discord_mock.Color.gold.return_value = "gold"
 discord_mock.Color.orange.return_value = "orange"
+
+# Ensure embed.color returns the value when accessed as a property on a MagicMock
+# if discord.Embed() returns a MagicMock, accessing .color on it returns a new MagicMock by default.
+# We need to tell the system that if someone assigns to .color, it works (which mocks do),
+# but if we assert equality, we might need to be careful.
+# However, usually equality check against a mock fails unless it's configured.
+
+# The failing test showed: AssertionError: <MagicMock name='mock.Color.orange()' ...> != 'orange'
+# This means embed.color IS the return value of discord.Color.orange().
+# But wait, discord.Color.orange.return_value = "orange" was set.
+# Why did it return a MagicMock name='mock.Color.orange()'?
+# This happens if the mock setup wasn't effective when the code ran, or if Color.orange is accessed as a property.
+# In discord.py, Color.orange is a classmethod.
+# Let's ensure the mock is robust.
+
+color_mock = MagicMock()
+color_mock.orange.return_value = "orange"
+color_mock.gold.return_value = "gold"
+discord_mock.Color = color_mock
 
 # Now import the module under test
 from game_systems.guild_system.ui.quests_menu import QuestsMenuView  # noqa: E402

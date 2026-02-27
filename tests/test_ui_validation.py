@@ -31,15 +31,10 @@ class TestUIValidation(unittest.IsolatedAsyncioTestCase):
 
         importlib.reload(database.database_manager)
 
-        # Manually load the module from file to bypass package issues
-        loader = importlib.machinery.SourceFileLoader(
-            "cogs.utils.ui_helpers",
-            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cogs/utils/ui_helpers.py")
-        )
-        mod = importlib.util.module_from_spec(importlib.util.spec_from_loader("cogs.utils.ui_helpers", loader))
-        sys.modules["cogs.utils.ui_helpers"] = mod
-        loader.exec_module(mod)
-        self.get_player_or_error = mod.get_player_or_error
+        # Now that cogs/__init__.py and cogs/utils/__init__.py exist, we can import normally
+        import cogs.utils.ui_helpers
+        importlib.reload(cogs.utils.ui_helpers)
+        self.get_player_or_error = cogs.utils.ui_helpers.get_player_or_error
         self.DatabaseManager = database.database_manager.DatabaseManager
 
         self.mock_db = MagicMock(spec=self.DatabaseManager)
