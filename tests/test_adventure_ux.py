@@ -62,6 +62,10 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         sys.modules["cogs"] = MagicMock()
         sys.modules["cogs.utils.ui_helpers"] = MagicMock()
 
+        # Import Mock to use for synchronous mocks
+        from unittest.mock import Mock
+        self.Mock = Mock
+
         # Force overwrite specific modules used in adventure_menu.py with Mocks
         # regardless of whether they are already loaded. This ensures consistent mocking.
         sys.modules["game_systems.adventure.ui.adventure_embeds"] = MagicMock()
@@ -112,16 +116,14 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         view = self.AdventureView(mock_db, mock_user, active_session=False)
 
         interaction = AsyncMock()
+        # Set response.is_done to a synchronous Mock to avoid RuntimeWarning
+        interaction.response.is_done = self.Mock(return_value=False)
         interaction.user.id = mock_user.id
 
         # Mock Cog and Manager
         mock_cog = MagicMock()
         mock_manager = MagicMock()
         mock_cog.manager = mock_manager
-        # interaction.client.get_cog is likely being awaited incorrectly in the test setup or source
-        # but in source: adventure_cog = interaction.client.get_cog("AdventureCommands") is NOT awaited.
-        # However, interaction is an AsyncMock, so methods are async by default.
-        # We need to make get_cog synchronous for the mock.
         interaction.client.get_cog = MagicMock(return_value=mock_cog)
 
         # Mock active session -> None (New adventure)
@@ -150,6 +152,8 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         view = self.AdventureView(mock_db, mock_user, active_session=True)
 
         interaction = AsyncMock()
+        # Set response.is_done to a synchronous Mock to avoid RuntimeWarning
+        interaction.response.is_done = self.Mock(return_value=False)
         interaction.user.id = mock_user.id
 
         # Mock Cog and Manager
@@ -206,6 +210,8 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         view = self.AdventureView(mock_db, mock_user, active_session=True)
 
         interaction = AsyncMock()
+        # Set response.is_done to a synchronous Mock to avoid RuntimeWarning
+        interaction.response.is_done = self.Mock(return_value=False)
         interaction.user.id = mock_user.id
 
         mock_cog = MagicMock()
