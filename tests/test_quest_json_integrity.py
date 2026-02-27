@@ -9,6 +9,7 @@ sys.path.append(os.getcwd())
 
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.materials import MATERIALS
+from game_systems.data.quest_items import QUEST_ITEMS
 
 
 class TestQuestJsonIntegrity(unittest.TestCase):
@@ -52,6 +53,13 @@ class TestQuestJsonIntegrity(unittest.TestCase):
                     # Check Materials
                     for m in MATERIALS.values():
                         if m["name"] == item_name:
+                            found = True
+                            break
+
+                if not found:
+                    # Check Quest Items
+                    for q in QUEST_ITEMS.values():
+                        if q["name"] == item_name:
                             found = True
                             break
 
