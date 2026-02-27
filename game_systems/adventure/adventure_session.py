@@ -16,7 +16,7 @@ from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.skills_data import SKILLS
 from game_systems.events.world_event_system import WorldEventSystem
-from game_systems.player.player_stats import PlayerStats
+from game_systems.player.player_stats import PlayerStats, calculate_tiered_bonus
 
 # Subsystems
 from .adventure_rewards import AdventureRewards
@@ -432,7 +432,23 @@ class AdventureSession:
 
             if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
                 monster_atk = monster.get("ATK", 10)
-                damage = int(monster_atk * 0.8)  # 80% ATK damage
+
+                # --- AMBUSH DEFENSE MITIGATION ---
+                # Retrieve stats (use context dict if available for speed, else object)
+                stats = context.get("stats_dict", {})
+                end_val = stats.get("END", 10)
+                def_val = stats.get("DEF", 0)
+
+                # Calculate Defense Power
+                defense_power = calculate_tiered_bonus(end_val, 1.5) + def_val
+
+                # Calculate Mitigation: Def * (0.3 + 0.2 * saturation)
+                mitigation = defense_power * (0.3 + (0.2 * min(1, defense_power / 100)))
+
+                # Ambush Penalty: Defense is 50% less effective
+                mitigation *= 0.5
+
+                damage = int((monster_atk * 0.8) - mitigation)
                 damage = max(1, damage)  # Minimum 1 damage
 
                 # Apply damage immediately
