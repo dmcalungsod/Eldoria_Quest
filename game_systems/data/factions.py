@@ -166,9 +166,9 @@ FACTIONS = {
         "emoji": "⚕️",
         "description": "A pragmatic order of alchemists and doctors who believe the only way to survive the Veil is to adapt to it. They operate the city's quarantine zones.",
         "ranks": {
-            1: {"title": "Gleaner", "reputation_needed": 0, "reward": None},
+            1: {"title": "Scavenger", "reputation_needed": 0, "reward": None},
             2: {
-                "title": "Brewer",
+                "title": "Mixologist",
                 "reputation_needed": 500,
                 "reward": {"type": "item", "key": "bitter_panacea", "amount": 3},
             },
@@ -178,12 +178,12 @@ FACTIONS = {
                 "reward": {"type": "item", "key": "phial_of_vitriol", "amount": 3},
             },
             4: {
-                "title": "Catalyst",
+                "title": "Chirurgeon",
                 "reputation_needed": 3000,
                 "reward": {"type": "buff", "key": "gathering_boost", "value": 0.1},
             },
             5: {
-                "title": "Synthesist",
+                "title": "Transmuter",
                 "reputation_needed": 5000,
                 "reward": {"type": "title", "value": "Master Apothecary"},
             },

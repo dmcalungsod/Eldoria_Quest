@@ -214,5 +214,13 @@
         "effect": {"gathering_bonus": 1},
         "rarity": "Common",
         "description": "Basic tools for harvesting flora and minerals."
+    },
+    "field_kit": {
+        "id": "field_kit",
+        "name": "Field Kit",
+        "type": "supply",
+        "effect": {"potion_duration_bonus": 0.05},
+        "rarity": "Common",
+        "description": "A belt pouch containing organized vials and bandages."
     }
 }
