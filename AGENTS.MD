@@ -62,6 +62,7 @@ Jules AI now has memory. Before starting work each day, all agents must read the
 |-------|----------|------|
 | **Repo Auditor** | Weekly on Sunday | Comprehensive codebase inspection |
 | **Visionary** | Weekly on Sunday | Strategic planning & coordination |
+| **The Nexus** | Weekly on Monday | System Integration & Dependency Analysis |
 | **Chronicler** | Monthly on 1st | Monthly update summaries & webhook posting |
 
 ## 📝 Journal Files
