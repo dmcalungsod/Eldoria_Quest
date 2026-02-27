@@ -772,16 +772,16 @@
                 40
             ],
             [
-                "rusted_scrap",
-                30
-            ],
-            [
                 "storm_essence",
-                20
+                30
             ],
             [
                 "magic_stone_large",
                 10
+            ],
+            [
+                "mithril_ore",
+                20
             ]
         ],
         "special_events": [
@@ -1156,7 +1156,7 @@
                 20
             ],
             [
-                "obsidian_shard",
+                "mithril_ore",
                 10
             ]
         ],
