@@ -1,0 +1,2158 @@
+./main.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./main.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./main.py:54 in public function `init_db`:
+        D401: First line should be in imperative mood (perhaps 'Initialize', not 'Initializes')
+./main.py:67 in public function `health_handler`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./main.py:72 in public function `start_health_server`:
+        D401: First line should be in imperative mood (perhaps 'Start', not 'Starts')
+./main.py:84 in public class `EldoriaBot`:
+        D101: Missing docstring in public class
+./main.py:85 in public method `__init__`:
+        D107: Missing docstring in __init__
+./main.py:98 in public method `setup_hook`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./main.py:139 in public method `on_ready`:
+        D401: First line should be in imperative mood (perhaps 'Call', not 'Called')
+./game_systems/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/data/monsters.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/monsters.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./game_systems/data/monsters.py:20 in private function `load_monsters`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/monsters.py:20 in private function `load_monsters`:
+        D400: First line should end with a period (not 's')
+./game_systems/data/monsters.py:20 in private function `load_monsters`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./game_systems/data/consumables.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/consumables.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./game_systems/data/consumables.py:19 in private function `load_consumables`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/data/consumables.py:19 in private function `load_consumables`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./game_systems/data/shop_data.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/narrative_data.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/data_validator.py:1 at module level:
+        D100: Missing docstring in public module
+./game_systems/data/data_validator.py:8 in public class `DataValidator`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/data/data_validator.py:14 in public method `validate`:
+        D401: First line should be in imperative mood (perhaps 'Validate', not 'Validates')
+./game_systems/data/data_validator.py:127 in public method `validate_location_schema`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/data/data_validator.py:127 in public method `validate_location_schema`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Deprecated')
+./game_systems/data/class_equipments.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/class_equipments.py:1 at module level:
+        D400: First line should end with a period (not ')')
+./game_systems/data/class_data.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/data/messages.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/quest_items.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/quest_items.py:1 at module level:
+        D400: First line should end with a period (not ')')
+./game_systems/data/skills_data.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/adventure_locations.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/adventure_locations.py:21 in private function `load_locations`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/adventure_locations.py:21 in private function `load_locations`:
+        D400: First line should end with a period (not 't')
+./game_systems/data/adventure_locations.py:21 in private function `load_locations`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./game_systems/data/quest_data.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/quest_data.py:31 in private function `load_quests`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/data/quest_data.py:31 in private function `load_quests`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./game_systems/data/equipments.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/equipments.py:1 at module level:
+        D400: First line should end with a period (not ')')
+./game_systems/data/equipments.py:22 in private function `load_and_validate_equipments`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/data/equipments.py:22 in private function `load_and_validate_equipments`:
+        D400: First line should end with a period (not ',')
+./game_systems/data/equipments.py:22 in private function `load_and_validate_equipments`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./game_systems/data/factions.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/crafting_recipes.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/materials.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/materials.py:20 in public function `load_materials`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/data/materials.py:20 in public function `load_materials`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./game_systems/data/emojis.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/emojis.py:101 in public function `get_rarity_ansi`:
+        D401: First line should be in imperative mood (perhaps 'Wrap', not 'Wraps')
+./game_systems/data/stat_descriptions.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/schemas.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/data/recipes.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/items/equipment_manager.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/items/equipment_manager.py:22 in public class `EquipmentManager`:
+        D101: Missing docstring in public class
+./game_systems/items/equipment_manager.py:78 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/items/equipment_manager.py:82 in public method `get_slot_display_name`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/items/equipment_manager.py:102 in private method `_get_player_allowed_slots`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./game_systems/items/equipment_manager.py:113 in public method `check_requirements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/items/equipment_manager.py:113 in public method `check_requirements`:
+        D401: First line should be in imperative mood (perhaps 'Validate', not 'Validates')
+./game_systems/items/equipment_manager.py:139 in public method `recalculate_player_stats`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/items/equipment_manager.py:257 in public method `equip_item`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/items/equipment_manager.py:410 in private method `_unequip_logic`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Internal')
+./game_systems/items/equipment_manager.py:432 in public method `save_loadout`:
+        D401: First line should be in imperative mood (perhaps 'Save', not 'Saves')
+./game_systems/items/equipment_manager.py:462 in public method `delete_loadout`:
+        D401: First line should be in imperative mood (perhaps 'Delete', not 'Deletes')
+./game_systems/items/equipment_manager.py:467 in public method `equip_loadout`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/items/equipment_manager.py:467 in public method `equip_loadout`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./game_systems/items/item_manager.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/items/item_manager.py:27 in public class `ItemManager`:
+        D101: Missing docstring in public class
+./game_systems/items/item_manager.py:28 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/items/item_manager.py:32 in public method `get_equipment_stats`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./game_systems/items/item_manager.py:56 in private method `_lookup`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Internal')
+./game_systems/items/item_manager.py:63 in public method `get_equipment_by_id`:
+        D102: Missing docstring in public method
+./game_systems/items/item_manager.py:66 in public method `get_equipment_by_name`:
+        D102: Missing docstring in public method
+./game_systems/items/item_manager.py:69 in public method `get_consumable`:
+        D102: Missing docstring in public method
+./game_systems/items/item_manager.py:72 in public method `get_quest_item`:
+        D102: Missing docstring in public method
+./game_systems/items/item_manager.py:78 in public method `get_class_equipment_for_class`:
+        D102: Missing docstring in public method
+./game_systems/items/item_manager.py:93 in public method `roll_rarity`:
+        D102: Missing docstring in public method
+./game_systems/items/item_manager.py:111 in public method `generate_monster_loot`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./game_systems/items/item_manager.py:148 in public method `search_items`:
+        D401: First line should be in imperative mood (perhaps 'Search', not 'Searches')
+./game_systems/items/item_manager.py:174 in public method `format_consumable_effect`:
+        D102: Missing docstring in public method
+./game_systems/items/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/items/consumable_manager.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/items/consumable_manager.py:19 in public class `ConsumableManager`:
+        D101: Missing docstring in public class
+./game_systems/items/consumable_manager.py:20 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/items/consumable_manager.py:25 in public method `use_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/items/consumable_manager.py:25 in public method `use_item`:
+        D401: First line should be in imperative mood (perhaps 'Use', not 'Uses')
+./game_systems/items/inventory_manager.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/items/inventory_manager.py:16 in public class `InventoryManager`:
+        D101: Missing docstring in public class
+./game_systems/items/inventory_manager.py:17 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/items/inventory_manager.py:21 in public method `get_inventory_slot_count`:
+        D401: First line should be in imperative mood (perhaps 'Count', not 'Counts')
+./game_systems/items/inventory_manager.py:35 in public method `add_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/items/inventory_manager.py:35 in public method `add_item`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./game_systems/items/inventory_manager.py:66 in public method `add_items_bulk`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/items/inventory_manager.py:66 in public method `add_items_bulk`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./game_systems/items/inventory_manager.py:77 in public method `remove_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/items/inventory_manager.py:77 in public method `remove_item`:
+        D401: First line should be in imperative mood (perhaps 'Remove', not 'Removes')
+./game_systems/items/inventory_manager.py:91 in public method `get_inventory`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./game_systems/combat/combat_phrases.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/combat/combat_phrases.py:14 in public class `CombatPhrases`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/combat/combat_phrases.py:562 in public method `opening`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./game_systems/combat/combat_phrases.py:575 in public method `player_attack`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:710 in public method `player_skill`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:730 in public method `player_heal`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:748 in public method `player_buff`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:766 in public method `monster_attack`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:789 in public method `monster_skill`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:801 in public method `monster_buff`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:811 in public method `telegraph_warning`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:845 in public method `counter_success`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:857 in public method `player_victory`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:878 in public method `player_defeated`:
+        D102: Missing docstring in public method
+./game_systems/combat/combat_phrases.py:883 in public method `monster_heal`:
+        D102: Missing docstring in public method
+./game_systems/combat/damage_formula.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/combat/damage_formula.py:13 in public class `DamageFormula`:
+        D101: Missing docstring in public class
+./game_systems/combat/damage_formula.py:34 in public method `player_attack`:
+        D102: Missing docstring in public method
+./game_systems/combat/damage_formula.py:68 in public method `player_skill`:
+        D102: Missing docstring in public method
+./game_systems/combat/damage_formula.py:108 in public method `player_heal`:
+        D102: Missing docstring in public method
+./game_systems/combat/damage_formula.py:142 in public method `monster_attack`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/damage_formula.py:142 in public method `monster_attack`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/combat/damage_formula.py:180 in public method `monster_skill`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/combat/damage_formula.py:180 in public method `monster_skill`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/combat/damage_formula.py:200 in public method `monster_heal`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/combat/damage_formula.py:200 in public method `monster_heal`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/combat/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/combat/combat_engine.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./game_systems/combat/combat_engine.py:25 in public class `CombatEngine`:
+        D101: Missing docstring in public class
+./game_systems/combat/combat_engine.py:95 in public method `__init__`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:95 in public method `__init__`:
+        D400: First line should end with a period (not ')')
+./game_systems/combat/combat_engine.py:95 in public method `__init__`:
+        D403: First word of the first line should be properly capitalized ('Player', not 'player')
+./game_systems/combat/combat_engine.py:170 in private method `_get_effective_monster_stats`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:170 in private method `_get_effective_monster_stats`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/combat/combat_engine.py:197 in public method `run_combat_turn`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:197 in public method `run_combat_turn`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./game_systems/combat/combat_engine.py:286 in private method `_handle_start_of_turn`:
+        D401: First line should be in imperative mood (perhaps 'Process', not 'Processes')
+./game_systems/combat/combat_engine.py:301 in private method `_handle_weather_events`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/combat/combat_engine.py:301 in private method `_handle_weather_events`:
+        D401: First line should be in imperative mood (perhaps 'Process', not 'Processes')
+./game_systems/combat/combat_engine.py:352 in private method `_detect_element`:
+        D401: First line should be in imperative mood (perhaps 'Determine', not 'Determines')
+./game_systems/combat/combat_engine.py:385 in private method `_apply_weather_modifiers`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/combat/combat_engine.py:385 in private method `_apply_weather_modifiers`:
+        D401: First line should be in imperative mood (perhaps 'Apply', not 'Applies')
+./game_systems/combat/combat_engine.py:441 in private method `_process_player_turn`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:441 in private method `_process_player_turn`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/combat/combat_engine.py:494 in private method `_process_monster_turn`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:494 in private method `_process_monster_turn`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/combat/combat_engine.py:657 in private method `_check_interrupt_mechanic`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:657 in private method `_check_interrupt_mechanic`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/combat/combat_engine.py:893 in private method `_is_player_immune`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/combat/combat_engine.py:904 in private method `_process_monster_debuffs`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/combat/combat_engine.py:904 in private method `_process_monster_debuffs`:
+        D401: First line should be in imperative mood (perhaps 'Handle', not 'Handles')
+./game_systems/combat/combat_engine.py:939 in private method `_apply_monster_debuff`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:939 in private method `_apply_monster_debuff`:
+        D401: First line should be in imperative mood (perhaps 'Apply', not 'Applies')
+./game_systems/combat/combat_engine.py:1048 in private method `_apply_skill_buffs`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:1048 in private method `_apply_skill_buffs`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/combat/combat_engine.py:1097 in private method `_tag_damage_type`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/combat/combat_engine.py:1103 in private method `_decide_player_skill`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/combat/combat_engine.py:1141 in private method `_player_victory`:
+        D401: First line should be in imperative mood (perhaps 'Handle', not 'Handles')
+./game_systems/combat/combat_engine.py:1183 in private method `_monster_victory`:
+        D401: First line should be in imperative mood (perhaps 'Handle', not 'Handles')
+./game_systems/character/ui/settings_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/character/ui/settings_view.py:20 in public class `SettingsView`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/character/ui/settings_view.py:25 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/settings_view.py:52 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/settings_view.py:58 in public method `reset_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/settings_view.py:78 in public class `ResetConfirmationView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/character/ui/settings_view.py:82 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/settings_view.py:106 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/settings_view.py:112 in public method `confirm_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/settings_view.py:137 in public method `cancel_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/inventory_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/character/ui/inventory_view.py:28 in public class `InventoryView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/character/ui/inventory_view.py:32 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/inventory_view.py:87 in public method `create_filter_buttons`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./game_systems/character/ui/inventory_view.py:96 in private method `_get_item_category`:
+        D401: First line should be in imperative mood (perhaps 'Determine', not 'Determines')
+./game_systems/character/ui/inventory_view.py:217 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/inventory_view.py:226 in public method `filter_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/inventory_view.py:246 in public method `equip_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/inventory_view.py:256 in public method `unequip_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/inventory_view.py:265 in public method `use_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/inventory_view.py:274 in public method `loadouts_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/abilities_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/character/ui/abilities_view.py:26 in public class `AbilitiesView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/character/ui/abilities_view.py:30 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/abilities_view.py:68 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/abilities_view.py:78 in public method `inventory_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/abilities_view.py:106 in public method `skills_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/abilities_view.py:137 in public class `SkillsView`:
+        D101: Missing docstring in public class
+./game_systems/character/ui/abilities_view.py:138 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/abilities_view.py:149 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/adventure_menu.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/character/ui/adventure_menu.py:30 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/adventure_menu.py:68 in public method `interaction_check`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/character/ui/adventure_menu.py:81 in public method `start_adventure_callback`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/character/ui/adventure_menu.py:81 in public method `start_adventure_callback`:
+        D400: First line should end with a period (not ':')
+./game_systems/character/ui/adventure_menu.py:81 in public method `start_adventure_callback`:
+        D401: First line should be in imperative mood (perhaps 'Handle', not 'Handles')
+./game_systems/character/ui/adventure_menu.py:200 in public method `guild_hall_callback`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/character/ui/profile_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/character/ui/profile_view.py:31 in public class `CharacterTabView`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/character/ui/profile_view.py:36 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/profile_view.py:100 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/profile_view.py:110 in public method `abilities_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/profile_view.py:122 in public method `adventure_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/profile_view.py:140 in public method `status_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/profile_view.py:171 in public method `guild_hall_callback`:
+        D401: First line should be in imperative mood (perhaps 'Open', not 'Opens')
+./game_systems/character/ui/profile_view.py:179 in public method `settings_callback`:
+        D401: First line should be in imperative mood (perhaps 'Open', not 'Opens')
+./game_systems/character/ui/loadout_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/character/ui/loadout_view.py:14 in public class `LoadoutNameModal`:
+        D101: Missing docstring in public class
+./game_systems/character/ui/loadout_view.py:22 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/loadout_view.py:28 in public method `on_submit`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:45 in public class `ConfirmDeleteView`:
+        D101: Missing docstring in public class
+./game_systems/character/ui/loadout_view.py:46 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/loadout_view.py:54 in public method `confirm`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:68 in public method `cancel`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:77 in public class `LoadoutView`:
+        D101: Missing docstring in public class
+./game_systems/character/ui/loadout_view.py:78 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/character/ui/loadout_view.py:143 in public method `select_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:156 in public method `equip_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:179 in public method `save_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:188 in public method `delete_callback`:
+        D102: Missing docstring in public method
+./game_systems/character/ui/loadout_view.py:222 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/events/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/events/world_event_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/events/world_event_system.py:18 in public class `WorldEventSystem`:
+        D101: Missing docstring in public class
+./game_systems/events/world_event_system.py:106 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/events/world_event_system.py:110 in public method `get_current_event`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/events/world_event_system.py:110 in public method `get_current_event`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/events/world_event_system.py:139 in public method `start_event`:
+        D401: First line should be in imperative mood (perhaps 'Start', not 'Starts')
+./game_systems/events/world_event_system.py:152 in public method `end_current_event`:
+        D401: First line should be in imperative mood (perhaps 'End', not 'Ends')
+./game_systems/events/world_event_system.py:157 in public method `get_modifiers`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/player/player_creator.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/player_creator.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./game_systems/player/player_creator.py:19 in public class `PlayerCreator`:
+        D101: Missing docstring in public class
+./game_systems/player/player_creator.py:20 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/player/player_creator.py:31 in public method `create_player`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/player_creator.py:31 in public method `create_player`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./game_systems/player/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/player/player_stats.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/player/player_stats.py:15 in public function `calculate_tiered_bonus`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/player_stats.py:15 in public function `calculate_tiered_bonus`:
+        D400: First line should end with a period (not 'g')
+./game_systems/player/player_stats.py:15 in public function `calculate_tiered_bonus`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/player/player_stats.py:51 in public function `calculate_practice_threshold`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/player_stats.py:51 in public function `calculate_practice_threshold`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/player/player_stats.py:72 in public method `total`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:77 in public class `PlayerStats`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/player/player_stats.py:86 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/player/player_stats.py:103 in public method `strength`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:107 in public method `endurance`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:111 in public method `dexterity`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:115 in public method `agility`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:119 in public method `magic`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:123 in public method `luck`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:127 in public method `defense`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:132 in public method `max_hp`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:138 in public method `max_mp`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:145 in public method `max_inventory_slots`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/player_stats.py:157 in public method `set_base_stat`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:163 in public method `add_base_stat`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:169 in public method `add_bonus_stat`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:176 in public method `recalculate_bonuses`:
+        D401: First line should be in imperative mood (perhaps 'Reset', not 'Resets')
+./game_systems/player/player_stats.py:196 in public method `to_dict`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:200 in public method `from_dict`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:213 in public method `get_base_stats_dict`:
+        D102: Missing docstring in public method
+./game_systems/player/player_stats.py:216 in public method `get_total_stats_dict`:
+        D102: Missing docstring in public method
+./game_systems/player/level_up.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./game_systems/player/level_up.py:14 in public class `LevelUpSystem`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/level_up.py:21 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/player/level_up.py:34 in public method `add_exp`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/level_up.py:34 in public method `add_exp`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./game_systems/player/level_up.py:61 in public method `to_dict`:
+        D102: Missing docstring in public method
+./game_systems/player/level_up.py:70 in public method `from_dict`:
+        D102: Missing docstring in public method
+./game_systems/player/achievement_system.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:1 at module level:
+        D400: First line should end with a period (not 'm')
+./game_systems/player/achievement_system.py:124 in public class `AchievementSystem`:
+        D101: Missing docstring in public class
+./game_systems/player/achievement_system.py:125 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/player/achievement_system.py:129 in public method `check_kill_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:129 in public method `check_kill_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/player/achievement_system.py:175 in public method `check_quest_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:175 in public method `check_quest_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/player/achievement_system.py:207 in public method `check_group_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:207 in public method `check_group_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/player/achievement_system.py:262 in public method `check_exploration_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:262 in public method `check_exploration_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/player/achievement_system.py:301 in public method `check_skill_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:301 in public method `check_skill_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/player/achievement_system.py:342 in public method `check_duration_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:342 in public method `check_duration_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/player/achievement_system.py:368 in public method `check_crafting_achievements`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/player/achievement_system.py:368 in public method `check_crafting_achievements`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/adventure/adventure_resolution.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/adventure_resolution.py:21 in public class `AdventureResolutionEngine`:
+        D101: Missing docstring in public class
+./game_systems/adventure/adventure_resolution.py:22 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/adventure_resolution.py:30 in public method `resolve_session`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_resolution.py:30 in public method `resolve_session`:
+        D401: First line should be in imperative mood (perhaps 'Process', not 'Processes')
+./game_systems/adventure/adventure_resolution.py:166 in private method `_mark_complete`:
+        D401: First line should be in imperative mood (perhaps 'Mark', not 'Marks')
+./game_systems/adventure/adventure_resolution.py:170 in private method `_handle_death`:
+        D401: First line should be in imperative mood (perhaps 'Resolve', not 'Resolves')
+./game_systems/adventure/event_handler.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/event_handler.py:28 in public class `EventHandler`:
+        D101: Missing docstring in public class
+./game_systems/adventure/event_handler.py:29 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/event_handler.py:75 in private method `_perform_regeneration`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/event_handler.py:75 in private method `_perform_regeneration`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/adventure/event_handler.py:169 in private method `_perform_quest_event`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/event_handler.py:169 in private method `_perform_quest_event`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/adventure/event_handler.py:241 in private method `_perform_wild_gathering`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/event_handler.py:241 in private method `_perform_wild_gathering`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./game_systems/adventure/adventure_manager.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/adventure_manager.py:29 in public class `AdventureManager`:
+        D101: Missing docstring in public class
+./game_systems/adventure/adventure_manager.py:30 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/adventure_manager.py:37 in public method `start_adventure`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_manager.py:140 in public method `get_active_session`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_manager.py:147 in public method `simulate_adventure_step`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_manager.py:176 in private method `_handle_death_rewards`:
+        D401: First line should be in imperative mood (perhaps 'Extract', not 'Extracts')
+./game_systems/adventure/adventure_manager.py:245 in public method `end_adventure`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_manager.py:381 in private method `_grant_rewards_internal`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/adventure/adventure_manager.py:434 in public method `start_promotion_trial`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/adventure_events.py:15 in public class `AdventureEvents`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_events.py:563 in public method `regeneration`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:681 in public method `quest_event`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:691 in public method `wild_gather_event`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:695 in public method `surge_event`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:699 in public method `scavenge_event`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:705 in public method `special_event_flavor`:
+        D102: Missing docstring in public method
+./game_systems/adventure/adventure_events.py:717 in public method `no_event_found`:
+        D102: Missing docstring in public method
+./game_systems/adventure/combat_handler.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/combat_handler.py:25 in public class `CombatHandler`:
+        D101: Missing docstring in public class
+./game_systems/adventure/combat_handler.py:26 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/combat_handler.py:33 in public method `initiate_combat`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/combat_handler.py:33 in public method `initiate_combat`:
+        D401: First line should be in imperative mood (perhaps 'Select', not 'Selects')
+./game_systems/adventure/combat_handler.py:167 in public method `resolve_turn`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/combat_handler.py:167 in public method `resolve_turn`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/adventure/combat_handler.py:309 in public method `create_empty_battle_report`:
+        D102: Missing docstring in public method
+./game_systems/adventure/exploration_events.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/exploration_events.py:23 in public class `ExplorationEvents`:
+        D101: Missing docstring in public class
+./game_systems/adventure/exploration_events.py:24 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/exploration_events.py:28 in public method `handle_event`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_session.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/adventure_session.py:30 in public class `AdventureSession`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:37 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/adventure_session.py:102 in private method `_build_result`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/adventure/adventure_session.py:114 in private method `_calculate_fatigue_multiplier`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:114 in private method `_calculate_fatigue_multiplier`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/adventure/adventure_session.py:139 in private method `_fetch_session_context`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:139 in private method `_fetch_session_context`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./game_systems/adventure/adventure_session.py:213 in private method `_check_auto_condition`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_session.py:213 in private method `_check_auto_condition`:
+        D401: First line should be in imperative mood (perhaps 'Determine', not 'Determines')
+./game_systems/adventure/adventure_session.py:243 in private method `_apply_environmental_effects`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:243 in private method `_apply_environmental_effects`:
+        D401: First line should be in imperative mood (perhaps 'Apply', not 'Applies')
+./game_systems/adventure/adventure_session.py:309 in private method `_handle_active_combat`:
+        D401: First line should be in imperative mood (perhaps 'Handle', not 'Handles')
+./game_systems/adventure/adventure_session.py:403 in private method `_handle_new_encounter`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:403 in private method `_handle_new_encounter`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./game_systems/adventure/adventure_session.py:482 in private method `_handle_exploration_event`:
+        D401: First line should be in imperative mood (perhaps 'Resolve', not 'Resolves')
+./game_systems/adventure/adventure_session.py:518 in public method `simulate_step`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:518 in public method `simulate_step`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/adventure/adventure_session.py:617 in private method `_attempt_flee`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_session.py:617 in private method `_attempt_flee`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/adventure/adventure_session.py:665 in private method `_resolve_auto_combat`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_session.py:818 in private method `_process_combat_turn`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_session.py:818 in private method `_process_combat_turn`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/adventure/adventure_session.py:938 in private method `_try_auto_potion`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_session.py:938 in private method `_try_auto_potion`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./game_systems/adventure/adventure_session.py:1016 in public method `save_state`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_session.py:1016 in public method `save_state`:
+        D401: First line should be in imperative mood (perhaps 'Write', not 'Writes')
+./game_systems/adventure/adventure_rewards.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/adventure_rewards.py:50 in public class `AdventureRewards`:
+        D101: Missing docstring in public class
+./game_systems/adventure/adventure_rewards.py:51 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/adventure_rewards.py:68 in public method `process_victory`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/adventure_rewards.py:156 in private method `_process_loot_and_quests`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/adventure/adventure_rewards.py:339 in private method `_calculate_growth`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/adventure/adventure_rewards.py:348 in private method `_process_stat_exp`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/adventure_rewards.py:348 in private method `_process_stat_exp`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./game_systems/adventure/adventure_rewards.py:434 in private method `_process_skill_exp`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./game_systems/adventure/ui/adventure_embeds.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/ui/adventure_embeds.py:27 in public class `AdventureEmbeds`:
+        D101: Missing docstring in public class
+./game_systems/adventure/ui/adventure_embeds.py:30 in private method `_format_log_line`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/ui/adventure_embeds.py:30 in private method `_format_log_line`:
+        D401: First line should be in imperative mood (perhaps 'Apply', not 'Applies')
+./game_systems/adventure/ui/adventure_embeds.py:88 in public method `build_exploration_embed`:
+        D202: No blank lines allowed after function docstring (found 1)
+./game_systems/adventure/ui/adventure_embeds.py:88 in public method `build_exploration_embed`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/adventure/ui/adventure_embeds.py:88 in public method `build_exploration_embed`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./game_systems/adventure/ui/adventure_embeds.py:189 in public method `build_adventure_status_embed`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/adventure/ui/adventure_embeds.py:189 in public method `build_adventure_status_embed`:
+        D401: First line should be in imperative mood (perhaps 'Build', not 'Builds')
+./game_systems/adventure/ui/adventure_embeds.py:252 in public method `build_summary_embed`:
+        D401: First line should be in imperative mood (perhaps 'Construct', not 'Constructs')
+./game_systems/adventure/ui/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/adventure/ui/exploration_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/ui/exploration_view.py:27 in public class `ExplorationView`:
+        D101: Missing docstring in public class
+./game_systems/adventure/ui/exploration_view.py:28 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/ui/exploration_view.py:237 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:246 in public method `explore_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:249 in public method `action_attack`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:252 in public method `action_defend`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:255 in public method `action_flee`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:258 in public method `action_special`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:261 in public method `action_stance`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:265 in public method `action_skill`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:362 in public method `inventory_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:388 in public method `return_from_inventory`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/exploration_view.py:430 in public method `leave_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/setup_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/ui/setup_view.py:29 in public class `AdventureSetupView`:
+        D101: Missing docstring in public class
+./game_systems/adventure/ui/setup_view.py:30 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/ui/setup_view.py:158 in private method `_is_unlocked`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/adventure/ui/setup_view.py:179 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/setup_view.py:185 in public method `back_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/setup_view.py:194 in public method `location_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/setup_view.py:210 in public method `duration_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/setup_view.py:215 in public method `supply_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/setup_view.py:222 in public method `start_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/status_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/adventure/ui/status_view.py:20 in public class `AdventureStatusView`:
+        D101: Missing docstring in public class
+./game_systems/adventure/ui/status_view.py:21 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/adventure/ui/status_view.py:57 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/status_view.py:63 in public method `refresh_callback`:
+        D102: Missing docstring in public method
+./game_systems/adventure/ui/status_view.py:87 in public method `retreat_callback`:
+        D102: Missing docstring in public method
+./game_systems/rewards/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/rewards/aurum_calculator.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/rewards/aurum_calculator.py:10 in public class `AurumCalculator`:
+        D101: Missing docstring in public class
+./game_systems/rewards/aurum_calculator.py:15 in public method `calculate_drop`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/rewards/loot_calculator.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/rewards/loot_calculator.py:14 in public class `LootCalculator`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/rewards/loot_calculator.py:20 in public method `calculate_drop_chance`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/rewards/loot_calculator.py:49 in public method `roll_drops`:
+        D401: First line should be in imperative mood (perhaps 'Process', not 'Processes')
+./game_systems/rewards/exp_calculator.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/rewards/exp_calculator.py:11 in public class `ExpCalculator`:
+        D101: Missing docstring in public class
+./game_systems/rewards/exp_calculator.py:16 in public method `calculate_exp`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/rewards/exp_calculator.py:16 in public method `calculate_exp`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/guild_system/quest_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/quest_system.py:19 in public class `QuestSystem`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/quest_system.py:20 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/quest_system.py:24 in public method `get_available_quests`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/quest_system.py:101 in public method `get_quest_details`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/quest_system.py:125 in public method `get_player_quests`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/quest_system.py:176 in public method `accept_quest`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/quest_system.py:255 in public method `update_progress`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/quest_system.py:288 in public method `complete_quest`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/quest_system.py:356 in public method `check_completion`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/reward_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/reward_system.py:23 in public class `RewardSystem`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/reward_system.py:24 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/reward_system.py:30 in private method `_get_consumable_data_by_name`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/guild_system/reward_system.py:37 in private method `_get_material_data_by_name`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/guild_system/reward_system.py:44 in public method `grant_rewards`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/advisor.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/advisor.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/advisor.py:14 in public class `GuildAdvisor`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/advisor.py:15 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/advisor.py:20 in public method `get_advice`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/advisor.py:20 in public method `get_advice`:
+        D400: First line should end with a period (not ')')
+./game_systems/guild_system/advisor.py:98 in public method `get_checklist_embed`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/advisor.py:98 in public method `get_checklist_embed`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./game_systems/guild_system/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/guild_system/guild_exchange.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/guild_exchange.py:16 in public class `GuildExchange`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/guild_exchange.py:17 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/guild_exchange.py:46 in public method `exchange_all_materials`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/faction_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/faction_system.py:17 in public class `FactionSystem`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/faction_system.py:18 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/faction_system.py:22 in public method `get_player_faction`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/faction_system.py:22 in public method `get_player_faction`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/guild_system/faction_system.py:62 in public method `join_faction`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/faction_system.py:62 in public method `join_faction`:
+        D401: First line should be in imperative mood (perhaps 'Join', not 'Joins')
+./game_systems/guild_system/faction_system.py:94 in public method `leave_faction`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/faction_system.py:109 in public method `add_reputation`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/faction_system.py:109 in public method `add_reputation`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./game_systems/guild_system/faction_system.py:149 in private method `_grant_faction_reward`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/guild_system/faction_system.py:177 in public method `grant_reputation_for_kill`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/faction_system.py:177 in public method `grant_reputation_for_kill`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/guild_system/faction_system.py:210 in public method `grant_reputation_for_adventure`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/rank_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/rank_system.py:10 in public class `RankSystem`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/rank_system.py:90 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/rank_system.py:93 in public method `get_rank_info`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/rank_system.py:97 in public method `check_promotion_eligibility`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/rank_system.py:115 in public method `get_next_rank`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/rank_system.py:119 in public method `finalize_promotion`:
+        D401: First line should be in imperative mood (perhaps 'Apply', not 'Applies')
+./game_systems/guild_system/tournament_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/tournament_system.py:19 in public class `TournamentSystem`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/tournament_system.py:29 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/tournament_system.py:33 in public method `start_weekly_tournament`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/tournament_system.py:33 in public method `start_weekly_tournament`:
+        D401: First line should be in imperative mood (perhaps 'Start', not 'Starts')
+./game_systems/guild_system/tournament_system.py:65 in public method `end_current_tournament`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/tournament_system.py:65 in public method `end_current_tournament`:
+        D401: First line should be in imperative mood (perhaps 'End', not 'Ends')
+./game_systems/guild_system/tournament_system.py:115 in public method `record_action`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/tournament_system.py:115 in public method `record_action`:
+        D401: First line should be in imperative mood (perhaps 'Record', not 'Records')
+./game_systems/guild_system/tournament_system.py:135 in public method `get_leaderboard`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/tournament_system.py:135 in public method `get_leaderboard`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/guild_system/ui/rank_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/ui/rank_view.py:24 in public class `RankProgressView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/ui/rank_view.py:28 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/ui/rank_view.py:60 in public method `promote_callback`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/ui/rank_view.py:115 in public class `RankTrialConfirmationView`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/rank_view.py:120 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/ui/rank_view.py:151 in public method `confirm_callback`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/rank_view.py:151 in public method `confirm_callback`:
+        D400: First line should end with a period (not 'e')
+./game_systems/guild_system/ui/rank_view.py:224 in public method `cancel_callback`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/lobby_view.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/lobby_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/ui/lobby_view.py:19 in public class `GuildLobbyView`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/ui/lobby_view.py:20 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/ui/quests_menu.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/quests_menu.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/ui/quests_menu.py:25 in public class `QuestsMenuView`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/quests_menu.py:30 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/ui/quests_menu.py:90 in public method `view_quests_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/quests_menu.py:117 in public method `view_quest_ledger_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/quests_menu.py:153 in public method `quest_turn_in_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/quests_menu.py:198 in public method `check_rank_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/quests_menu.py:249 in public method `back_to_this_menu`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/components.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/ui/components.py:30 in public class `SystemCache`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/guild_system/ui/components.py:39 in public method `get_rank_system`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/guild_system/ui/components.py:46 in public method `get_guild_exchange`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/guild_system/ui/components.py:53 in public method `clear`:
+        D401: First line should be in imperative mood (perhaps 'Clear', not 'Clears')
+./game_systems/guild_system/ui/components.py:71 in public method `interaction_check`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/ui/components.py:83 in public method `set_back_button`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/ui/components.py:83 in public method `set_back_button`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./game_systems/guild_system/ui/components.py:109 in public method `create_button`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/ui/components.py:109 in public method `create_button`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./game_systems/guild_system/ui/components.py:134 in public method `quest_menu`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/components.py:145 in public method `services_menu`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/components.py:160 in public method `guild_exchange`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/ui/services_menu.py:25 in public class `GuildServicesView`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/ui/services_menu.py:26 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/ui/services_menu.py:106 in public method `exchange_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:131 in public method `shop_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:173 in public method `infirmary_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:197 in public method `trainer_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:208 in public method `alchemist_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:220 in public method `mystic_merchant_callback`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/services_menu.py:262 in public method `back_to_services`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/exchange_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/guild_system/ui/exchange_view.py:23 in public class `GuildExchangeView`:
+        D101: Missing docstring in public class
+./game_systems/guild_system/ui/exchange_view.py:24 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/guild_system/ui/exchange_view.py:56 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/guild_system/ui/exchange_view.py:63 in public method `sell_callback`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/guild_system/ui/exchange_view.py:63 in public method `sell_callback`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/help_system/handbook_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/help_system/handbook_view.py:13 in public class `HandbookView`:
+        D101: Missing docstring in public class
+./game_systems/help_system/handbook_view.py:14 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/help_system/handbook_view.py:54 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/help_system/handbook_view.py:62 in public method `select_callback`:
+        D102: Missing docstring in public method
+./game_systems/monsters/monster_skills.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/monsters/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./game_systems/monsters/monster_actions.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/monsters/monster_actions.py:11 in public class `MonsterAI`:
+        D101: Missing docstring in public class
+./game_systems/monsters/monster_actions.py:14 in public method `choose_action`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/monsters/monster_actions.py:91 in public method `apply_buff`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/monsters/monster_actions.py:91 in public method `apply_buff`:
+        D401: First line should be in imperative mood (perhaps 'Apply', not 'Applies')
+./game_systems/monsters/monster_actions.py:130 in public method `handle_buffs`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/core/world_time.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/core/world_time.py:15 in public class `TimePhase`:
+        D101: Missing docstring in public class
+./game_systems/core/world_time.py:22 in public class `Season`:
+        D101: Missing docstring in public class
+./game_systems/core/world_time.py:29 in public class `Weather`:
+        D101: Missing docstring in public class
+./game_systems/core/world_time.py:140 in public class `WorldTime`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/core/world_time.py:146 in public method `now`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/core/world_time.py:146 in public method `now`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/core/world_time.py:156 in public method `get_current_phase`:
+        D401: First line should be in imperative mood (perhaps 'Determine', not 'Determines')
+./game_systems/core/world_time.py:170 in public method `get_current_season`:
+        D401: First line should be in imperative mood (perhaps 'Determine', not 'Determines')
+./game_systems/core/world_time.py:184 in public method `is_night`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./game_systems/core/world_time.py:189 in public method `get_phase_flavor`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/core/world_time.py:203 in public method `get_current_weather`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/core/world_time.py:238 in public method `get_weather_flavor`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/crafting/crafting_system.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/crafting/crafting_system.py:32 in public function `calculate_crafting_xp_req`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/crafting/crafting_system.py:36 in public class `CraftingSystem`:
+        D101: Missing docstring in public class
+./game_systems/crafting/crafting_system.py:37 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/crafting/crafting_system.py:41 in private method `_add_crafting_xp`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/crafting/crafting_system.py:91 in public method `get_recipes`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./game_systems/crafting/crafting_system.py:97 in public method `can_craft`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./game_systems/crafting/crafting_system.py:119 in private method `_roll_quality`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./game_systems/crafting/crafting_system.py:119 in private method `_roll_quality`:
+        D401: First line should be in imperative mood (perhaps 'Roll', not 'Rolls')
+./game_systems/crafting/crafting_system.py:147 in public method `craft_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/crafting/crafting_system.py:147 in public method `craft_item`:
+        D401: First line should be in imperative mood (perhaps 'Execute', not 'Executes')
+./game_systems/crafting/crafting_system.py:276 in public method `get_dismantle_rewards`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/crafting/crafting_system.py:276 in public method `get_dismantle_rewards`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./game_systems/crafting/crafting_system.py:304 in public method `dismantle_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/crafting/crafting_system.py:378 in public method `experiment`:
+        D205: 1 blank line required between summary line and description (found 0)
+./game_systems/crafting/crafting_system.py:378 in public method `experiment`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./game_systems/crafting/ui/crafting_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/crafting/ui/crafting_view.py:22 in public class `CraftingView`:
+        D101: Missing docstring in public class
+./game_systems/crafting/ui/crafting_view.py:23 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/crafting/ui/crafting_view.py:48 in public method `set_back_button`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:53 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:216 in public method `category_cons_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:219 in public method `category_equip_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:222 in public method `category_dismantle_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:225 in public method `category_experiment_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:255 in public method `recipe_select_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:273 in public method `dismantle_select_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/crafting_view.py:296 in public method `build_embed`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/experiment_view.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./game_systems/crafting/ui/experiment_view.py:20 in public class `ExperimentView`:
+        D101: Missing docstring in public class
+./game_systems/crafting/ui/experiment_view.py:21 in public method `__init__`:
+        D107: Missing docstring in __init__
+./game_systems/crafting/ui/experiment_view.py:37 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/experiment_view.py:106 in public method `material_select_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/experiment_view.py:116 in public method `mix_callback`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/experiment_view.py:138 in public method `build_embed`:
+        D102: Missing docstring in public method
+./game_systems/crafting/ui/experiment_view.py:146 in public method `build_result_embed`:
+        D102: Missing docstring in public method
+./database/populate_database.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./database/populate_database.py:47 in private function `_upsert_many`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./database/populate_database.py:63 in public function `insert_classes`:
+        D103: Missing docstring in public function
+./database/populate_database.py:71 in public function `insert_monsters`:
+        D103: Missing docstring in public function
+./database/populate_database.py:100 in public function `insert_quest_items`:
+        D103: Missing docstring in public function
+./database/populate_database.py:123 in public function `insert_consumables`:
+        D103: Missing docstring in public function
+./database/populate_database.py:146 in public function `insert_equipments`:
+        D103: Missing docstring in public function
+./database/populate_database.py:176 in public function `insert_class_equipments`:
+        D103: Missing docstring in public function
+./database/populate_database.py:214 in public function `insert_quests`:
+        D103: Missing docstring in public function
+./database/populate_database.py:237 in public function `insert_materials`:
+        D103: Missing docstring in public function
+./database/populate_database.py:256 in public function `insert_skills`:
+        D103: Missing docstring in public function
+./database/populate_database.py:289 in public function `main`:
+        D103: Missing docstring in public function
+./database/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./database/create_database.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./database/create_database.py:24 in public function `create_tables`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./database/database_manager.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./database/database_manager.py:39 in public class `DatabaseManager`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:47 in public method `__new__`:
+        D102: Missing docstring in public method
+./database/database_manager.py:52 in public method `__init__`:
+        D107: Missing docstring in __init__
+./database/database_manager.py:85 in private method `_ensure_skill_cache`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./database/database_manager.py:123 in public method `get_connection`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:123 in public method `get_connection`:
+        D400: First line should end with a period (not 'g')
+./database/database_manager.py:136 in public method `player_exists`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./database/database_manager.py:150 in public method `create_player`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./database/database_manager.py:187 in public method `get_player`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:192 in public method `get_combat_context_bundle`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:192 in public method `get_combat_context_bundle`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:328 in public method `get_profile_bundle`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:328 in public method `get_profile_bundle`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:391 in public method `get_player_stats_json`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:402 in public method `get_player_stats_row`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:406 in public method `update_player_stats`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:413 in public method `get_player_vitals`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:421 in public method `set_player_vitals`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:428 in public method `apply_passive_regen`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:428 in public method `apply_passive_regen`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./database/database_manager.py:526 in public method `update_player_vitals_delta`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:526 in public method `update_player_vitals_delta`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:551 in public method `update_player_level_data`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:562 in public method `get_class`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:573 in public method `get_player_skills`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:598 in public method `get_combat_skills`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:632 in public method `get_guild_member_data`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:636 in public method `get_guild_card_data`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:652 in public method `get_player_faction_data`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:656 in public method `set_player_faction`:
+        D401: First line should be in imperative mood (perhaps 'Set', not 'Sets')
+./database/database_manager.py:670 in public method `leave_faction`:
+        D401: First line should be in imperative mood (perhaps 'Remove', not 'Removes')
+./database/database_manager.py:674 in public method `update_faction_reputation`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:683 in public method `get_faction_leaderboard`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:712 in public method `get_active_boosts`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:732 in public method `set_global_boost`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:732 in public method `set_global_boost`:
+        D401: First line should be in imperative mood (perhaps 'Set', not 'Sets')
+./database/database_manager.py:752 in public method `clear_global_boosts`:
+        D401: First line should be in imperative mood (perhaps 'Remove', not 'Removes')
+./database/database_manager.py:770 in public method `add_active_buff`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./database/database_manager.py:787 in public method `add_active_buffs_bulk`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:787 in public method `add_active_buffs_bulk`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./database/database_manager.py:822 in public method `get_active_buffs`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:832 in public method `clear_expired_buffs`:
+        D401: First line should be in imperative mood (perhaps 'Remove', not 'Removes')
+./database/database_manager.py:843 in public method `delete_adventure_session`:
+        D401: First line should be in imperative mood (perhaps 'Delete', not 'Deletes')
+./database/database_manager.py:859 in public method `insert_adventure_session`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./database/database_manager.py:881 in public method `get_adventures_ending_before`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:894 in public method `update_adventure_status`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:901 in public method `get_active_adventure`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:917 in public method `update_adventure_session`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:917 in public method `update_adventure_session`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:948 in public method `end_adventure_session`:
+        D401: First line should be in imperative mood (perhaps 'Mark', not 'Marks')
+./database/database_manager.py:959 in public method `calculate_inventory_limit`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:959 in public method `calculate_inventory_limit`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./database/database_manager.py:978 in public method `get_inventory_slot_count`:
+        D401: First line should be in imperative mood (perhaps 'Count', not 'Counts')
+./database/database_manager.py:984 in public method `get_inventory_items`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:993 in public method `get_inventory_item_by_id`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1009 in public method `find_stackable_item`:
+        D401: First line should be in imperative mood (perhaps 'Find', not 'Finds')
+./database/database_manager.py:1034 in public method `add_inventory_item`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./database/database_manager.py:1118 in public method `add_inventory_items_bulk`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1284 in public method `get_inventory_item_count`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./database/database_manager.py:1293 in public method `get_inventory_items_counts`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1293 in public method `get_inventory_items_counts`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1319 in public method `consume_item_atomic`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1339 in public method `remove_inventory_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1339 in public method `remove_inventory_item`:
+        D401: First line should be in imperative mood (perhaps 'Remove', not 'Removes')
+./database/database_manager.py:1378 in private method `_next_inventory_id`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./database/database_manager.py:1388 in public method `update_inventory_count`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1400 in public method `delete_inventory_item`:
+        D401: First line should be in imperative mood (perhaps 'Delete', not 'Deletes')
+./database/database_manager.py:1404 in public method `delete_inventory_by_type`:
+        D401: First line should be in imperative mood (perhaps 'Delete', not 'Deletes')
+./database/database_manager.py:1408 in public method `set_item_equipped`:
+        D401: First line should be in imperative mood (perhaps 'Set', not 'Sets')
+./database/database_manager.py:1412 in public method `get_equipped_in_slot`:
+        D401: First line should be in imperative mood (perhaps 'Find', not 'Finds')
+./database/database_manager.py:1419 in public method `insert_equipped_split`:
+        D401: First line should be in imperative mood (perhaps 'Insert', not 'Inserts')
+./database/database_manager.py:1437 in public method `split_stack_to_equipped`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1462 in public method `get_equipment_id_by_name`:
+        D401: First line should be in imperative mood (perhaps 'Find', not 'Finds')
+./database/database_manager.py:1469 in public method `get_item_from_source_table`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1480 in public method `get_quests_by_tier`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1489 in public method `get_quest_details`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1493 in public method `get_player_quest_ids`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1501 in public method `get_player_quests_joined`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1526 in public method `player_has_quest`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./database/database_manager.py:1536 in public method `get_quest_objectives`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1541 in public method `insert_player_quest`:
+        D401: First line should be in imperative mood (perhaps 'Insert', not 'Inserts')
+./database/database_manager.py:1552 in public method `get_player_quest_progress`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1560 in public method `set_player_quest_progress`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1567 in public method `get_player_quest_with_objectives`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1580 in public method `complete_player_quest`:
+        D401: First line should be in imperative mood (perhaps 'Mark', not 'Marks')
+./database/database_manager.py:1591 in public method `get_guild_rank`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1599 in public method `update_guild_rank`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1606 in public method `insert_guild_member`:
+        D401: First line should be in imperative mood (perhaps 'Register', not 'Registers')
+./database/database_manager.py:1641 in public method `get_player_skill_levels`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./database/database_manager.py:1646 in public method `get_default_skills`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1654 in public method `insert_player_skill`:
+        D401: First line should be in imperative mood (perhaps 'Insert', not 'Inserts')
+./database/database_manager.py:1665 in public method `player_has_skill`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./database/database_manager.py:1675 in public method `get_player_skill_row`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1688 in public method `update_player_skill`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1701 in public method `get_skill_with_definition`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1725 in public method `get_stat_exp_row`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1741 in public method `update_stat_exp`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1741 in public method `update_stat_exp`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1772 in public method `update_player_fields`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Generic')
+./database/database_manager.py:1785 in public method `update_player_mixed`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1799 in public method `increment_player_fields`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Generic')
+./database/database_manager.py:1807 in public method `get_player_field`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1815 in public method `set_player_field`:
+        D401: First line should be in imperative mood (perhaps 'Set', not 'Sets')
+./database/database_manager.py:1829 in public method `get_equipped_items`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1838 in public method `get_all_player_skills`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1851 in public method `get_guild_member_field`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1887 in public method `get_specific_monster_kills`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:1930 in public method `deduct_vestige`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1941 in public method `deduct_aurum`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1960 in public method `update_player_stats_optimistic`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:1960 in public method `update_player_stats_optimistic`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1971 in public method `update_player_vitals`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:1978 in public method `add_reward_item_internal`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./database/database_manager.py:2014 in public method `get_daily_shop_purchases`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2014 in public method `get_daily_shop_purchases`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2043 in public method `purchase_item`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2119 in public method `calculate_heal_cost`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2119 in public method `calculate_heal_cost`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./database/database_manager.py:2309 in public method `delete_player_full`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2398 in public method `add_title`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2398 in public method `add_title`:
+        D401: First line should be in imperative mood (perhaps 'Add', not 'Adds')
+./database/database_manager.py:2409 in public method `get_titles`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2414 in public method `set_active_title`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2414 in public method `set_active_title`:
+        D401: First line should be in imperative mood (perhaps 'Set', not 'Sets')
+./database/database_manager.py:2431 in public method `get_active_title`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2440 in public method `update_exploration_stats`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./database/database_manager.py:2440 in public method `update_exploration_stats`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:2457 in public method `get_exploration_stats`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2457 in public method `get_exploration_stats`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2478 in private method `_next_tournament_id`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./database/database_manager.py:2488 in public method `create_tournament`:
+        D401: First line should be in imperative mood (perhaps 'Create', not 'Creates')
+./database/database_manager.py:2503 in public method `get_active_tournament`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2516 in public method `end_active_tournament`:
+        D401: First line should be in imperative mood (perhaps 'Mark', not 'Marks')
+./database/database_manager.py:2524 in public method `update_tournament_score`:
+        D401: First line should be in imperative mood (perhaps 'Update', not 'Updates')
+./database/database_manager.py:2532 in public method `get_tournament_leaderboard`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2557 in public method `get_player_tournament_score`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2569 in public method `get_active_world_event`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2586 in public method `set_active_world_event`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2586 in public method `set_active_world_event`:
+        D401: First line should be in imperative mood (perhaps 'Set', not 'Sets')
+./database/database_manager.py:2604 in public method `end_active_world_event`:
+        D401: First line should be in imperative mood (perhaps 'Mark', not 'Marks')
+./database/database_manager.py:2616 in public method `save_equipment_set`:
+        D205: 1 blank line required between summary line and description (found 0)
+./database/database_manager.py:2616 in public method `save_equipment_set`:
+        D401: First line should be in imperative mood (perhaps 'Save', not 'Saves')
+./database/database_manager.py:2634 in public method `get_equipment_sets`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2643 in public method `get_equipment_set`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./database/database_manager.py:2650 in public method `delete_equipment_set`:
+        D401: First line should be in imperative mood (perhaps 'Delete', not 'Deletes')
+./scripts/verify_combat_phrases.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./scripts/verify_combat_phrases.py:11 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/generate_monster_json.py:1 at module level:
+        D100: Missing docstring in public module
+./scripts/generate_monster_json.py:15 in public function `export_monsters`:
+        D103: Missing docstring in public function
+./scripts/run_agents.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./scripts/run_agents.py:22 in public function `get_current_date`:
+        D401: First line should be in imperative mood (perhaps 'Retrieve', not 'Retrieves')
+./scripts/run_agents.py:33 in public function `inject_date`:
+        D401: First line should be in imperative mood (perhaps 'Replace', not 'Replaces')
+./scripts/run_agents.py:38 in public function `run_agent`:
+        D205: 1 blank line required between summary line and description (found 0)
+./scripts/run_agents.py:38 in public function `run_agent`:
+        D401: First line should be in imperative mood (perhaps 'Simulate', not 'Simulates')
+./scripts/run_agents.py:65 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/validate_logs.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./scripts/validate_logs.py:18 in public function `get_current_date_manila`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./scripts/validate_logs.py:24 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/verify_all.py:1 at module level:
+        D100: Missing docstring in public module
+./scripts/parse_jules_issues.py:234 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/prune_merged_branches.py:1 at module level:
+        D100: Missing docstring in public module
+./scripts/prune_merged_branches.py:8 in public function `log_summary`:
+        D103: Missing docstring in public function
+./scripts/prune_merged_branches.py:15 in public function `run_command`:
+        D103: Missing docstring in public function
+./scripts/prune_merged_branches.py:27 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/verify_json_integrity.py:1 at module level:
+        D100: Missing docstring in public module
+./scripts/verify_json_integrity.py:11 in public function `verify_json_file`:
+        D103: Missing docstring in public function
+./scripts/verify_json_integrity.py:24 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/analysis/analyze_economy.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./scripts/analysis/analyze_economy.py:30 in public function `calculate_expected_value`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./scripts/analysis/analyze_economy.py:30 in public function `calculate_expected_value`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./scripts/analysis/analyze_economy.py:138 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/analysis/check_progression_gaps.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./scripts/analysis/check_progression_gaps.py:31 in public function `calculate_ev`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./scripts/analysis/check_progression_gaps.py:31 in public function `calculate_ev`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./scripts/analysis/check_progression_gaps.py:106 in public function `main`:
+        D103: Missing docstring in public function
+./scripts/chronicler/post_update.py:1 at module level:
+        D100: Missing docstring in public module
+./scripts/chronicler/post_update.py:14 in public function `load_file`:
+        D401: First line should be in imperative mood (perhaps 'Load', not 'Loads')
+./scripts/chronicler/post_update.py:23 in public function `parse_markdown_to_embed`:
+        D401: First line should be in imperative mood (perhaps 'Parse', not 'Parses')
+./scripts/chronicler/post_update.py:91 in public function `send_webhook`:
+        D401: First line should be in imperative mood (perhaps 'Send', not 'Sends')
+./scripts/chronicler/post_update.py:113 in public function `main`:
+        D103: Missing docstring in public function
+./tests/stress_adventure_realistic.py:1 at module level:
+        D100: Missing docstring in public module
+./tests/stress_adventure_realistic.py:24 in public class `RealisticMockDatabase`:
+        D101: Missing docstring in public class
+./tests/stress_adventure_realistic.py:25 in public method `__init__`:
+        D107: Missing docstring in __init__
+./tests/stress_adventure_realistic.py:62 in public method `get_combat_context_bundle`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:68 in public method `get_active_boosts`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:71 in public method `get_player_vitals`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:74 in public method `update_player_vitals_delta`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:77 in public method `update_adventure_session`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:80 in public method `update_adventure_status`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:83 in public method `set_player_vitals`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:86 in public method `add_active_buffs_bulk`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:89 in public method `add_title`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:92 in public method `get_player_quests`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:95 in public method `update_progress`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:98 in public method `get_active_tournament`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:101 in public method `get_active_world_event`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:104 in public method `get_player_field`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:109 in public method `get_player_stats_json`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:112 in public method `get_player`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:115 in public method `get_combat_skills`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:118 in public method `clear_expired_buffs`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:121 in public method `get_active_buffs`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:124 in public method `increment_guild_stat`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:127 in public method `increment_specific_monster_kill`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:130 in public method `get_stat_exp_row`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:151 in public method `update_stat_exp`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:154 in public method `get_skill_with_definition`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:157 in public method `update_player_skill`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:160 in public method `get_guild_member_field`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:165 in public method `add_inventory_item`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:168 in public method `update_player_mixed`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:171 in public method `end_adventure_session`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_realistic.py:182 in public function `run_realistic_stress_test`:
+        D103: Missing docstring in public function
+./tests/stress_adventure_scheduler.py:1 at module level:
+        D100: Missing docstring in public module
+./tests/stress_adventure_scheduler.py:15 in public class `MockDatabase`:
+        D101: Missing docstring in public class
+./tests/stress_adventure_scheduler.py:16 in public method `__init__`:
+        D107: Missing docstring in __init__
+./tests/stress_adventure_scheduler.py:22 in public method `get_combat_context_bundle`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:30 in public method `update_adventure_status`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:33 in public method `update_player_vitals_delta`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:36 in public method `update_adventure_session`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:39 in public method `end_adventure_session`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:47 in public class `FastAdventureSession`:
+        D101: Missing docstring in public class
+./tests/stress_adventure_scheduler.py:48 in public method `__init__`:
+        D107: Missing docstring in __init__
+./tests/stress_adventure_scheduler.py:55 in public method `simulate_step`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:60 in public method `save_state`:
+        D102: Missing docstring in public method
+./tests/stress_adventure_scheduler.py:64 in public function `run_stress_test`:
+        D103: Missing docstring in public function
+./tests/run_all_tests.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./tests/run_all_tests.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./tests/run_all_tests.py:52 in public function `check_mongodb_connection`:
+        D401: First line should be in imperative mood (perhaps 'Check', not 'Checks')
+./tests/run_all_tests.py:68 in public function `run_quest_security_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:81 in public function `run_adventure_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:93 in public function `run_faction_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:105 in public function `run_general_security_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:119 in public function `run_scavenge_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:131 in public function `run_crafting_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:147 in public function `run_ux_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:162 in public function `run_race_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:175 in public function `run_combat_action_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:187 in public function `run_tournament_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:200 in public function `run_cog_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:213 in public function `run_manager_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/run_all_tests.py:227 in public function `run_stack_limit_tests`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./tests/verify_regen.py:1 at module level:
+        D100: Missing docstring in public module
+./tests/verify_regen.py:13 in public class `TestPassiveRegen`:
+        D101: Missing docstring in public class
+./tests/verify_regen.py:14 in public method `setUp`:
+        D102: Missing docstring in public method
+./tests/verify_regen.py:27 in public method `test_apply_passive_regen`:
+        D102: Missing docstring in public method
+./tests/conftest.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./tests/conftest.py:1 at module level:
+        D400: First line should end with a period (not 't')
+./tests/conftest.py:114 in private function `_patch_duplicate_key_error`:
+        D202: No blank lines allowed after function docstring (found 1)
+./tests/conftest.py:143 in private function `_patch_discord_ui`:
+        D202: No blank lines allowed after function docstring (found 1)
+./tests/perf_create_player.py:1 at module level:
+        D100: Missing docstring in public module
+./tests/perf_create_player.py:17 in public function `benchmark_create_player_synthetic`:
+        D202: No blank lines allowed after function docstring (found 1)
+./tests/perf_create_player.py:17 in public function `benchmark_create_player_synthetic`:
+        D205: 1 blank line required between summary line and description (found 0)
+./tests/verify_regen_fractional.py:1 at module level:
+        D100: Missing docstring in public module
+./tests/verify_regen_fractional.py:13 in public class `TestPassiveRegenFractional`:
+        D101: Missing docstring in public class
+./tests/verify_regen_fractional.py:14 in public method `setUp`:
+        D102: Missing docstring in public method
+./tests/verify_regen_fractional.py:23 in public method `test_fractional_regen_does_not_reset_timer`:
+        D102: Missing docstring in public method
+./tests/reproduce_dead_ranks.py:1 at module level:
+        D100: Missing docstring in public module
+./tests/reproduce_dead_ranks.py:12 in public class `TestRankProgression`:
+        D101: Missing docstring in public class
+./tests/reproduce_dead_ranks.py:13 in public method `setUp`:
+        D102: Missing docstring in public method
+./tests/reproduce_dead_ranks.py:17 in public method `test_s_rank_promotion_requirements`:
+        D102: Missing docstring in public method
+./tests/reproduce_dead_ranks.py:43 in public method `test_ss_rank_promotion_requirements`:
+        D102: Missing docstring in public method
+./cogs/faction_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/faction_cog.py:21 in public class `FactionCog`:
+        D101: Missing docstring in public class
+./cogs/faction_cog.py:22 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/faction_cog.py:31 in public method `list_factions`:
+        D401: First line should be in imperative mood (perhaps 'List', not 'Lists')
+./cogs/faction_cog.py:57 in public method `join_faction`:
+        D401: First line should be in imperative mood (perhaps 'Join', not 'Joins')
+./cogs/faction_cog.py:63 in public method `faction_status`:
+        D401: First line should be in imperative mood (perhaps 'Display', not 'Displays')
+./cogs/faction_cog.py:117 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/infirmary_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/infirmary_cog.py:25 in public class `InfirmaryView`:
+        D101: Missing docstring in public class
+./cogs/infirmary_cog.py:26 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/infirmary_cog.py:72 in public method `set_back_button`:
+        D102: Missing docstring in public method
+./cogs/infirmary_cog.py:76 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/infirmary_cog.py:97 in public method `heal_callback`:
+        D102: Missing docstring in public method
+./cogs/infirmary_cog.py:116 in public method `build_infirmary_embed`:
+        D102: Missing docstring in public method
+./cogs/infirmary_cog.py:178 in public class `InfirmaryCog`:
+        D101: Missing docstring in public class
+./cogs/infirmary_cog.py:179 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/infirmary_cog.py:184 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/general_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/general_cog.py:17 in public class `GeneralCog`:
+        D101: Missing docstring in public class
+./cogs/general_cog.py:18 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/general_cog.py:23 in public method `ping`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./cogs/general_cog.py:23 in public method `ping`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./cogs/general_cog.py:44 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./cogs/quest_hub_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/quest_hub_cog.py:41 in public class `QuestLedgerView`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/quest_hub_cog.py:46 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/quest_hub_cog.py:67 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:74 in public method `set_back_button`:
+        D401: First line should be in imperative mood (perhaps 'Allow', not 'Allows')
+./cogs/quest_hub_cog.py:85 in public class `QuestLogView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./cogs/quest_hub_cog.py:89 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/quest_hub_cog.py:144 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:150 in public method `set_back_button`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:155 in public method `complete_quest_callback`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/quest_hub_cog.py:155 in public method `complete_quest_callback`:
+        D401: First line should be in imperative mood (perhaps 'Handle', not 'Handles')
+./cogs/quest_hub_cog.py:229 in public class `QuestBoardView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./cogs/quest_hub_cog.py:233 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/quest_hub_cog.py:295 in public method `set_back_button`:
+        D401: First line should be in imperative mood (perhaps 'Allow', not 'Allows')
+./cogs/quest_hub_cog.py:301 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:307 in public method `view_quest_details_callback`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:368 in public method `refresh_board`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./cogs/quest_hub_cog.py:402 in public class `QuestDetailView`:
+        D200: One-line docstring should fit on one line with quotes (found 3)
+./cogs/quest_hub_cog.py:406 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/quest_hub_cog.py:440 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:446 in public method `accept_quest_callback`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:465 in public method `back_to_quest_board_callback`:
+        D102: Missing docstring in public method
+./cogs/quest_hub_cog.py:509 in public class `QuestHubCog`:
+        D101: Missing docstring in public class
+./cogs/quest_hub_cog.py:510 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/quest_hub_cog.py:515 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/chronicle_cog.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/chronicle_cog.py:1 at module level:
+        D400: First line should end with a period (not 'm')
+./cogs/chronicle_cog.py:20 in public class `TitleSelect`:
+        D101: Missing docstring in public class
+./cogs/chronicle_cog.py:21 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/chronicle_cog.py:46 in public method `callback`:
+        D102: Missing docstring in public method
+./cogs/chronicle_cog.py:64 in public class `ChroniclesView`:
+        D101: Missing docstring in public class
+./cogs/chronicle_cog.py:65 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/chronicle_cog.py:73 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/chronicle_cog.py:77 in public class `ChronicleCog`:
+        D101: Missing docstring in public class
+./cogs/chronicle_cog.py:78 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/chronicle_cog.py:83 in public method `chronicles`:
+        D102: Missing docstring in public method
+./cogs/chronicle_cog.py:123 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/guild_hub_cog.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/guild_hub_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/guild_hub_cog.py:17 in public class `GuildHubCog`:
+        D101: Missing docstring in public class
+./cogs/guild_hub_cog.py:18 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/guild_hub_cog.py:29 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/tournament_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/tournament_cog.py:23 in public class `TournamentCog`:
+        D101: Missing docstring in public class
+./cogs/tournament_cog.py:24 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/tournament_cog.py:33 in public method `cog_unload`:
+        D102: Missing docstring in public method
+./cogs/tournament_cog.py:38 in public method `check_tournament_cycle`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/tournament_cog.py:38 in public method `check_tournament_cycle`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./cogs/tournament_cog.py:73 in private method `_announce`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./cogs/tournament_cog.py:86 in public method `before_check_tournament_cycle`:
+        D102: Missing docstring in public method
+./cogs/tournament_cog.py:98 in public method `tournament_status`:
+        D401: First line should be in imperative mood (perhaps 'Display', not 'Displays')
+./cogs/tournament_cog.py:134 in public method `tournament_leaderboard`:
+        D401: First line should be in imperative mood (perhaps 'Display', not 'Displays')
+./cogs/tournament_cog.py:210 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/adventure_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/adventure_cog.py:19 in public class `AdventureCommands`:
+        D101: Missing docstring in public class
+./cogs/adventure_cog.py:20 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/adventure_cog.py:30 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/adventure_loop.py:1 at module level:
+        D100: Missing docstring in public module
+./cogs/adventure_loop.py:12 in public class `AdventureLoop`:
+        D101: Missing docstring in public class
+./cogs/adventure_loop.py:13 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/adventure_loop.py:19 in public method `cog_unload`:
+        D102: Missing docstring in public method
+./cogs/adventure_loop.py:23 in public method `adventure_worker`:
+        D102: Missing docstring in public method
+./cogs/adventure_loop.py:47 in public method `before_worker`:
+        D102: Missing docstring in public method
+./cogs/adventure_loop.py:51 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/developer_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/developer_cog.py:26 in public class `DevPanelView`:
+        D101: Missing docstring in public class
+./cogs/developer_cog.py:27 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/developer_cog.py:40 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:59 in public method `build_dev_embed`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:128 in public method `exp_btn`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:134 in public method `aurum_btn`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:141 in public method `boost_exp_btn`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:147 in public method `boost_loot_btn`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:154 in public method `heal_btn`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:170 in public method `clear_boost_btn`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:176 in public class `DeveloperCog`:
+        D101: Missing docstring in public class
+./cogs/developer_cog.py:177 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/developer_cog.py:182 in public method `dev_panel`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:204 in public method `dev_error`:
+        D102: Missing docstring in public method
+./cogs/developer_cog.py:213 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/skill_trainer_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/skill_trainer_cog.py:29 in public function `get_upgrade_cost`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./cogs/skill_trainer_cog.py:36 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/skill_trainer_cog.py:69 in private method `_get_player_skills_sync`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./cogs/skill_trainer_cog.py:76 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:82 in public method `set_back_button`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:89 in public method `build_learn_select`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:125 in public method `build_upgrade_select`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:169 in private method `_execute_learn`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./cogs/skill_trainer_cog.py:182 in private method `_execute_upgrade`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./cogs/skill_trainer_cog.py:205 in public method `learn_skill_callback`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:224 in public method `upgrade_skill_callback`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:243 in private method `_refresh_ui`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Common')
+./cogs/skill_trainer_cog.py:254 in public method `build_skill_embed`:
+        D102: Missing docstring in public method
+./cogs/skill_trainer_cog.py:273 in public class `SkillTrainerCog`:
+        D101: Missing docstring in public class
+./cogs/skill_trainer_cog.py:274 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/skill_trainer_cog.py:279 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/shop_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/shop_cog.py:29 in public class `ShopView`:
+        D101: Missing docstring in public class
+./cogs/shop_cog.py:30 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/shop_cog.py:59 in public method `set_back_button`:
+        D102: Missing docstring in public method
+./cogs/shop_cog.py:63 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/shop_cog.py:66 in public method `build_item_select`:
+        D102: Missing docstring in public method
+./cogs/shop_cog.py:181 in public method `purchase_item_callback`:
+        D102: Missing docstring in public method
+./cogs/shop_cog.py:243 in public class `ShopCog`:
+        D101: Missing docstring in public class
+./cogs/shop_cog.py:244 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/shop_cog.py:249 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/status_update_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/status_update_cog.py:30 in public class `StatusUpdateView`:
+        D101: Missing docstring in public class
+./cogs/status_update_cog.py:31 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/status_update_cog.py:47 in private method `_get_class_starting_stats`:
+        D401: First line should be in imperative mood (perhaps 'Retrieve', not 'Retrieves')
+./cogs/status_update_cog.py:54 in private method `_calculate_single_point_cost`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/status_update_cog.py:54 in private method `_calculate_single_point_cost`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./cogs/status_update_cog.py:72 in private method `_calculate_bulk_cost`:
+        D401: First line should be in imperative mood (perhaps 'Calculate', not 'Calculates')
+./cogs/status_update_cog.py:129 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/status_update_cog.py:190 in public method `toggle_multiplier_callback`:
+        D102: Missing docstring in public method
+./cogs/status_update_cog.py:202 in public method `stat_callback`:
+        D102: Missing docstring in public method
+./cogs/status_update_cog.py:232 in public method `build_status_embed`:
+        D102: Missing docstring in public method
+./cogs/status_update_cog.py:276 in public class `StatusUpdateCog`:
+        D101: Missing docstring in public class
+./cogs/status_update_cog.py:277 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/status_update_cog.py:282 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/character_cog.py:1 at module level:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/character_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/character_cog.py:16 in public class `CharacterCog`:
+        D101: Missing docstring in public class
+./cogs/character_cog.py:17 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/character_cog.py:23 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/event_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/event_cog.py:24 in public class `EventCog`:
+        D101: Missing docstring in public class
+./cogs/event_cog.py:25 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/event_cog.py:34 in public method `cog_unload`:
+        D102: Missing docstring in public method
+./cogs/event_cog.py:39 in public method `check_event_cycle`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/event_cog.py:39 in public method `check_event_cycle`:
+        D401: First line should be in imperative mood (perhaps 'Run', not 'Runs')
+./cogs/event_cog.py:83 in public method `before_check_event_cycle`:
+        D102: Missing docstring in public method
+./cogs/event_cog.py:87 in private method `_announce`:
+        D401: First line should be in imperative mood (perhaps 'Attempt', not 'Attempts')
+./cogs/event_cog.py:105 in public method `event_status`:
+        D401: First line should be in imperative mood (perhaps 'Display', not 'Displays')
+./cogs/event_cog.py:189 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/onboarding_cog.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/onboarding_cog.py:30 in public function `transition_to_guild_lobby`:
+        D401: First line should be in imperative mood; try rephrasing (found 'Helper')
+./cogs/onboarding_cog.py:66 in public class `StartMenuView`:
+        D101: Missing docstring in public class
+./cogs/onboarding_cog.py:67 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/onboarding_cog.py:94 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:97 in public method `class_select_callback`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:129 in public class `ClassDetailView`:
+        D101: Missing docstring in public class
+./cogs/onboarding_cog.py:130 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/onboarding_cog.py:137 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:141 in public method `create_btn`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:178 in public method `back_btn`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:184 in public class `CharacterMenuView`:
+        D101: Missing docstring in public class
+./cogs/onboarding_cog.py:185 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/onboarding_cog.py:190 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:194 in public method `approach_clerk`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:214 in public class `GuildWelcomeView`:
+        D101: Missing docstring in public class
+./cogs/onboarding_cog.py:215 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/onboarding_cog.py:220 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:224 in public method `start_training`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:240 in public method `skip_to_lobby`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:245 in public class `CombatTutorialView`:
+        D101: Missing docstring in public class
+./cogs/onboarding_cog.py:246 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/onboarding_cog.py:253 in public method `interaction_check`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:292 in public method `attack_callback`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:305 in public method `defend_callback`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:318 in public method `finish_callback`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:333 in public method `complete_callback`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:409 in public class `OnboardingCog`:
+        D101: Missing docstring in public class
+./cogs/onboarding_cog.py:410 in public method `__init__`:
+        D107: Missing docstring in __init__
+./cogs/onboarding_cog.py:415 in public method `start`:
+        D102: Missing docstring in public method
+./cogs/onboarding_cog.py:431 in public function `setup`:
+        D103: Missing docstring in public function
+./cogs/utils/__init__.py:1 at module level:
+        D104: Missing docstring in public package
+./cogs/utils/ui_helpers.py:1 at module level:
+        D400: First line should end with a period (not 'y')
+./cogs/utils/ui_helpers.py:33 in public function `make_progress_bar`:
+        D401: First line should be in imperative mood (perhaps 'Generate', not 'Generates')
+./cogs/utils/ui_helpers.py:40 in public function `get_health_status_emoji`:
+        D401: First line should be in imperative mood (perhaps 'Return', not 'Returns')
+./cogs/utils/ui_helpers.py:56 in public function `build_inventory_embed`:
+        D401: First line should be in imperative mood (perhaps 'Construct', not 'Constructs')
+./cogs/utils/ui_helpers.py:151 in public function `get_player_or_error`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/utils/ui_helpers.py:151 in public function `get_player_or_error`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./cogs/utils/ui_helpers.py:170 in public function `get_profile_bundle_or_error`:
+        D205: 1 blank line required between summary line and description (found 0)
+./cogs/utils/ui_helpers.py:170 in public function `get_profile_bundle_or_error`:
+        D401: First line should be in imperative mood (perhaps 'Fetch', not 'Fetches')
+./cogs/utils/ui_helpers.py:291 in public function `back_to_guild_hall_callback`:
+        D103: Missing docstring in public function
