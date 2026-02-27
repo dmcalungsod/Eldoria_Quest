@@ -1,5 +1,4 @@
 import json
-import os
 
 filepath = "game_systems/data/quests.json"
 
@@ -25,7 +24,7 @@ new_quest = {
 }
 
 try:
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         data = json.load(f)
 
     # Check if quest exists by title to avoid duplicates

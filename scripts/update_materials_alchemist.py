@@ -1,5 +1,4 @@
 import json
-import os
 
 filepath = "game_systems/data/materials.json"
 
@@ -25,7 +24,7 @@ new_materials = {
 }
 
 try:
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         data = json.load(f)
 
     # Update only if missing to prevent overwrite of manual changes
