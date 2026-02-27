@@ -31,15 +31,15 @@ class TestGreyWard(unittest.TestCase):
         self.assertEqual(faction["emoji"], "⚕️")
         self.assertIn("pragmatic order of alchemists", faction["description"])
 
-        # Verify Ranks (Updated to match Alchemist Lore)
+        # Verify Ranks
         ranks = faction["ranks"]
-        self.assertEqual(ranks[1]["title"], "Scavenger")
-        self.assertEqual(ranks[2]["title"], "Mixologist")
+        self.assertEqual(ranks[1]["title"], "Gleaner")
+        self.assertEqual(ranks[2]["title"], "Brewer")
         self.assertEqual(ranks[3]["title"], "Apothecary")
-        self.assertEqual(ranks[4]["title"], "Chirurgeon")
-        self.assertEqual(ranks[5]["title"], "Transmuter")
+        self.assertEqual(ranks[4]["title"], "Catalyst")
+        self.assertEqual(ranks[5]["title"], "Synthesist")
 
-        # Verify Rewards
+        # Verify Rewards (Reverted to old mechanics as per review)
         self.assertEqual(ranks[2]["reward"]["key"], "bitter_panacea")
         self.assertEqual(ranks[2]["reward"]["amount"], 3)
         self.assertEqual(ranks[3]["reward"]["key"], "phial_of_vitriol")
