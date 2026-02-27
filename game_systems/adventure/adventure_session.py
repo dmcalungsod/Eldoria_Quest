@@ -527,7 +527,16 @@ class AdventureSession:
             # --- 0. Pre-fetch Context (Optimized) ---
             # We fetch context ONCE at the start for both combat and non-combat.
             # This ensures Active Buffs are always available and reduces N+1 queries.
-            context = self._fetch_session_context(context_bundle)
+
+            # ⚡ OPTIMIZATION: If context_bundle is ALREADY a valid context dict (with 'player_stats'), reuse it.
+            # This allows AdventureResolutionEngine to pre-parse the bundle ONCE and pass the ready-to-use context object,
+            # avoiding redundant processing in _fetch_session_context.
+
+            if context_bundle and "player_stats" in context_bundle and isinstance(context_bundle["player_stats"], PlayerStats):
+                 context = context_bundle
+            else:
+                 context = self._fetch_session_context(context_bundle)
+
             if not context:
                 return self._build_result(
                     [["Error: Failed to load player data."]], False, None
