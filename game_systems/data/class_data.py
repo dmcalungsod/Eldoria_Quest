@@ -44,7 +44,9 @@ CLASSES = {
         "stats": {"STR": 3, "END": 5, "DEX": 6, "AGI": 4, "MAG": 7, "LCK": 4},
         "allowed_slots": [
             "mace",
-            "dagger",  # Weapons
+            "dagger",
+            "tome",  # Weapons
+            "alchemist_coat",  # Class-specific
             "medium_armor",
             "medium_gloves",
             "medium_boots",

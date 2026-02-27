@@ -70,7 +70,7 @@ class EquipmentManager:
 
     # Armor Groups (Standardized Slots)
     HEAD_SLOTS = {"helm", "leather_cap", "hood", "miter", "leather_hood"}
-    BODY_SLOTS = {"heavy_armor", "medium_armor", "rogue_armor", "robe", "vestments"}
+    BODY_SLOTS = {"heavy_armor", "medium_armor", "rogue_armor", "robe", "vestments", "alchemist_coat"}
     HAND_SLOTS = {"heavy_gloves", "medium_gloves", "gloves"}
     LEG_SLOTS = {"heavy_legs", "medium_legs", "legs"}
     FOOT_SLOTS = {"heavy_boots", "medium_boots", "boots"}
