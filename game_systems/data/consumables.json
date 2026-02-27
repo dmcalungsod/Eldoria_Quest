@@ -222,5 +222,21 @@
         "effect": {"potion_duration_bonus": 0.05},
         "rarity": "Common",
         "description": "A belt pouch containing organized vials and bandages."
+    },
+    "cryo_flask": {
+        "id": "cryo_flask",
+        "name": "Cryo-Flask",
+        "type": "throwable",
+        "effect": {"aoe_atk": 60, "status": "freeze", "chance": 30},
+        "rarity": "Rare",
+        "description": "A glass sphere filled with liquid cold from the Frostfall Expanse."
+    },
+    "dragonblood_ale": {
+        "id": "dragonblood_ale",
+        "name": "Dragonblood Ale",
+        "type": "buff",
+        "effect": {"STR": 8, "duration_s": 180},
+        "rarity": "Epic",
+        "description": "Brewed with essence of magma. Burns going down, but grants immense strength."
     }
 }

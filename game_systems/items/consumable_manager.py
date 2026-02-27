@@ -118,6 +118,33 @@ class ConsumableManager:
             if is_buff_item or duration:
                 duration = duration or 300
 
+                # SUPPLY EFFECT: Field Kit increases potion duration by 5%
+                try:
+                    # Check active adventure supplies first (if in session)
+                    active_session = self.db.get_active_adventure(discord_id)
+                    field_kit_bonus = 0.0
+
+                    if active_session:
+                        supplies = active_session.get("supplies", {})
+                        if supplies.get("field_kit"):
+                            field_kit_bonus = 0.05
+                    else:
+                        # Fallback to Inventory check (if used in town/hub)
+                        # We need to scan inventory for 'field_kit'
+                        # This is slightly expensive but safe
+                        inv_items = self.inv_manager.get_inventory(discord_id)
+                        for inv_item in inv_items:
+                            if inv_item["item_key"] == "field_kit":
+                                field_kit_bonus = 0.05
+                                break
+
+                    if field_kit_bonus > 0:
+                        duration = int(duration * (1.0 + field_kit_bonus))
+                        message_lines.append(f"(Field Kit: Duration +{int(field_kit_bonus * 100)}%)")
+
+                except Exception as e:
+                    logger.error(f"Field Kit logic error: {e}")
+
                 ignored_keys = {
                     "heal",
                     "mana",
