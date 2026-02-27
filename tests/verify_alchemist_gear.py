@@ -39,7 +39,11 @@ def verify_alchemist_generation():
 
     # Verify specific slots
     slots_found = set(item["slot"] for item in alchemist_items)
-    required_slots = {"mace", "dagger", "tome", "hood", "alchemist_coat", "gloves", "legs", "boots", "belt", "accessory"}
+    required_slots = {
+        "mace", "dagger", "tome", "hood", "alchemist_coat",
+        "gloves", "legs", "boots", "belt", "accessory",
+        "medium_armor", "medium_gloves", "medium_legs", "medium_boots", "leather_cap", "robe"
+    }
 
     missing_slots = required_slots - slots_found
     if missing_slots:
