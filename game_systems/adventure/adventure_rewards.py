@@ -83,7 +83,12 @@ class AdventureRewards:
 
             # 2. Loot & Quests
             actual_drops = self._process_loot_and_quests(
-                combat_result, quest_system, inventory_manager, session_loot, logs, location_id
+                combat_result,
+                quest_system,
+                inventory_manager,
+                session_loot,
+                logs,
+                location_id,
             )
 
             # 3. Stat Growth

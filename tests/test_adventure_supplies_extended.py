@@ -1,9 +1,8 @@
-
-import unittest
 import json
-from unittest.mock import MagicMock, patch
 import os
 import sys
+import unittest
+from unittest.mock import MagicMock, patch
 
 # Mock pymongo to allow execution without dependencies installed
 sys.modules["pymongo"] = MagicMock()
@@ -15,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.adventure.adventure_rewards import AdventureRewards
+
 
 class TestAdventureEquipmentExtended(unittest.TestCase):
     def setUp(self):
@@ -31,15 +31,20 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
         # Prepare DB mocks
         self.mock_db.get_player_stats_json.return_value = {"strength": 10}
         self.mock_db.get_player.return_value = {
-            "level": 1, "experience": 0, "exp_to_next": 100,
-            "current_hp": 100, "current_mp": 100
+            "level": 1,
+            "experience": 0,
+            "exp_to_next": 100,
+            "current_hp": 100,
+            "current_mp": 100,
         }
         self.mock_db.lock_adventure_for_claiming.return_value = True
 
         # FIX: Ensure get_player_field returns integers for level comparison
         def get_field_side_effect(did, field):
-            if field == "level": return 1
+            if field == "level":
+                return 1
             return 0
+
         self.mock_db.get_player_field.side_effect = get_field_side_effect
 
     def test_identical_equipment_granting(self):
@@ -49,7 +54,14 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
         """
         discord_id = 12345
 
-        equip_data = {"id": 101, "name": "Fire Sword", "type": "equipment", "rarity": "Rare", "slot": "main_hand", "source": "monster_drop"}
+        equip_data = {
+            "id": 101,
+            "name": "Fire Sword",
+            "type": "equipment",
+            "rarity": "Rare",
+            "slot": "main_hand",
+            "source": "monster_drop",
+        }
         equip_json = json.dumps(equip_data, sort_keys=True)
         equip_key = f"__EQUIPMENT__:{equip_json}"
 
@@ -61,9 +73,9 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
             "duration_minutes": 60,
             "active": 1,
             "logs": "[]",
-            "loot_collected": json.dumps({equip_key: 3}), # 3 identical Fire Swords
+            "loot_collected": json.dumps({equip_key: 3}),  # 3 identical Fire Swords
             "active_monster_json": None,
-            "version": 1
+            "version": 1,
         }
 
         self.mock_db.get_active_adventure.return_value = mock_session_row
@@ -86,7 +98,7 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
             "exp": 100,
             "aurum": 50,
             "drops": [],
-            "monster_data": {"name": "Test Monster", "tier": "Normal"}
+            "monster_data": {"name": "Test Monster", "tier": "Normal"},
         }
 
         session_loot = {}
@@ -94,9 +106,16 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
         # Need to mock the generate_monster_loot to return two differently ordered dicts
         # representing the same item
         item_1 = {"id": 1, "name": "Sword", "rarity": "Common"}
-        item_2 = {"rarity": "Common", "name": "Sword", "id": 1} # Same data, different insertion order
+        item_2 = {
+            "rarity": "Common",
+            "name": "Sword",
+            "id": 1,
+        }  # Same data, different insertion order
 
-        with patch("game_systems.items.item_manager.item_manager.generate_monster_loot", return_value=[item_1, item_2]):
+        with patch(
+            "game_systems.items.item_manager.item_manager.generate_monster_loot",
+            return_value=[item_1, item_2],
+        ):
             self.rewards._process_loot_and_quests(combat_result, MagicMock(), MagicMock(), session_loot, [])
 
         # There should only be ONE equipment key in session_loot, with count 2
@@ -111,7 +130,14 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
         """
         discord_id = 12345
 
-        equip_data = {"id": 101, "name": "Fire Sword", "type": "equipment", "rarity": "Rare", "slot": "main_hand", "source": "monster_drop"}
+        equip_data = {
+            "id": 101,
+            "name": "Fire Sword",
+            "type": "equipment",
+            "rarity": "Rare",
+            "slot": "main_hand",
+            "source": "monster_drop",
+        }
         equip_json = json.dumps(equip_data, sort_keys=True)
         equip_key = f"__EQUIPMENT__:{equip_json}"
 
@@ -125,14 +151,16 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
             "logs": "[]",
             "loot_collected": json.dumps({equip_key: 1, "iron_ore": 2}),
             "active_monster_json": None,
-            "version": 1
+            "version": 1,
         }
 
         self.mock_db.get_active_adventure.return_value = mock_session_row
 
         # Mock Inventory Manager to FAIL EVERYTHING
         self.manager.inventory_manager.add_item.return_value = False
-        self.manager.inventory_manager.add_items_bulk.return_value = [{"item_name": "iron_ore", "reason": "Inventory Full"}]
+        self.manager.inventory_manager.add_items_bulk.return_value = [
+            {"item_name": "iron_ore", "reason": "Inventory Full"}
+        ]
 
         summary = self.manager.end_adventure(discord_id)
 
@@ -152,10 +180,16 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
         mock_session = MagicMock()
         mock_session.discord_id = discord_id
 
-        equip_data = {"id": 1, "name": "Sword", "rarity": "Common", "slot": "main_hand", "source": "monster_drop"}
+        equip_data = {
+            "id": 1,
+            "name": "Sword",
+            "rarity": "Common",
+            "slot": "main_hand",
+            "source": "monster_drop",
+        }
         equip_key = f"__EQUIPMENT__:{json.dumps(equip_data, sort_keys=True)}"
 
-        mock_session.loot = {equip_key: 10} # 10 items
+        mock_session.loot = {equip_key: 10}  # 10 items
 
         # Force a specific sequence of random rolls (5 True, 5 False)
         with patch("random.random", side_effect=[0.1, 0.9] * 5):
@@ -167,6 +201,7 @@ class TestAdventureEquipmentExtended(unittest.TestCase):
 
             # Verify the loss string in report
             self.assertIn("-5x Sword", loss_report)
+
 
 if __name__ == "__main__":
     unittest.main()

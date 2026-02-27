@@ -216,7 +216,7 @@ class AdventureManager:
                             kept += 1
 
                     if lost > 0:
-                         material_losses.append(f"• -{lost}x {name} (Equipment)")
+                        material_losses.append(f"• -{lost}x {name} (Equipment)")
 
                     if kept > 0:
                         session.loot[item_key] = kept
@@ -256,13 +256,15 @@ class AdventureManager:
                 if item["type"] == "equipment":
                     equipment_items.append(item)
                 else:
-                    bulk_items.append({
-                        "item_key": item["key"],
-                        "item_name": item["name"],
-                        "item_type": item["type"],
-                        "rarity": item["rarity"],
-                        "amount": item["amount"],
-                    })
+                    bulk_items.append(
+                        {
+                            "item_key": item["key"],
+                            "item_name": item["name"],
+                            "item_type": item["type"],
+                            "rarity": item["rarity"],
+                            "amount": item["amount"],
+                        }
+                    )
 
             failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items) or []
 
@@ -395,13 +397,15 @@ class AdventureManager:
                 if item["type"] == "equipment":
                     equipment_items.append(item)
                 else:
-                     bulk_items.append({
-                        "item_key": item["key"],
-                        "item_name": item["name"],
-                        "item_type": item["type"],
-                        "rarity": item["rarity"],
-                        "amount": item["amount"],
-                    })
+                    bulk_items.append(
+                        {
+                            "item_key": item["key"],
+                            "item_name": item["name"],
+                            "item_type": item["type"],
+                            "rarity": item["rarity"],
+                            "amount": item["amount"],
+                        }
+                    )
 
             failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items) or []
 
@@ -489,14 +493,16 @@ class AdventureManager:
                 try:
                     equip_json = item_key.replace("__EQUIPMENT__:", "", 1)
                     equip_data = json.loads(equip_json)
-                    items_awarded.append({
-                        "key": item_key, # Keep full key so we can access json later if needed
-                        "name": equip_data["name"],
-                        "type": "equipment",
-                        "rarity": equip_data["rarity"],
-                        "amount": count,
-                        "data": equip_data # Pass full data
-                    })
+                    items_awarded.append(
+                        {
+                            "key": item_key,  # Keep full key so we can access json later if needed
+                            "name": equip_data["name"],
+                            "type": "equipment",
+                            "rarity": equip_data["rarity"],
+                            "amount": count,
+                            "data": equip_data,  # Pass full data
+                        }
+                    )
                 except Exception as e:
                     logger.error(f"Error parsing equipment key {item_key}: {e}")
                 continue
