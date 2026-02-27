@@ -63,11 +63,17 @@ class ConsumableManager:
                 skill_levels = self.db.get_player_skill_levels(discord_id)
                 for s_key, s_level in skill_levels.items():
                     skill_def = SKILLS.get(s_key)
-                    if skill_def and skill_def.get("type") == "Passive" and "passive_bonus" in skill_def:
+                    if (
+                        skill_def
+                        and skill_def.get("type") == "Passive"
+                        and "passive_bonus" in skill_def
+                    ):
                         bonuses = skill_def["passive_bonus"]
                         if "healing_item_potency" in bonuses:
                             # 0.2 * level
-                            healing_multiplier += bonuses["healing_item_potency"] * s_level
+                            healing_multiplier += (
+                                bonuses["healing_item_potency"] * s_level
+                            )
             except Exception as e:
                 logger.error(f"Error checking passive skills for {discord_id}: {e}")
 
@@ -128,11 +134,14 @@ class ConsumableManager:
                 for key, val in effect.items():
                     if key not in ignored_keys:
                         # Defer DB write until after consumption
-                        buffs_to_apply.append({"key": key, "val": val, "duration": duration})
+                        buffs_to_apply.append(
+                            {"key": key, "val": val, "duration": duration}
+                        )
                         buff_names_for_msg.append(f"{key.upper()} +{val}")
 
                 if buff_names_for_msg:
-                    message_lines.append(f"Buffs applied: {', '.join(buff_names_for_msg)} ({duration}s).")
+                    msg = f"Buffs applied: {', '.join(buff_names_for_msg)} ({duration}s)."
+                    message_lines.append(msg)
                     item_used = True
 
             if not item_used:
@@ -174,7 +183,9 @@ class ConsumableManager:
 
             except Exception as e:
                 # Rollback: Refund item if effect application fails
-                logger.error(f"Item use error for {discord_id} (Refunding): {e}", exc_info=True)
+                logger.error(
+                    f"Item use error for {discord_id} (Refunding): {e}", exc_info=True
+                )
                 self.db.increment_inventory_count(inventory_db_id, 1)
                 # Re-raise to be caught by outer block for generic error message
                 raise e
