@@ -1,35 +1,34 @@
-# Visionary Strategy Memo — 2026-02-22
+# Visionary Weekly Strategy Memo — 2026-02-27 (Week of Feb 27)
 
-## 📊 Yesterday’s Summary
-- **Namewright (2026-02-21):** Proposed naming conventions and concepts for the new **Alchemist Class** (e.g., "Vitriol Phial", "Suture & Salve"). Identified ID conflict with Molten Caldera.
-- **Foreman (2025-10-29):** Initiated **Auto-Adventure Overhaul** (Phase 0). Assigned DataSteward & SystemSmith to database schema design.
-- **BugHunter (2025-10-28):** Fixed Skill Upgrade Cost Bypass exploit.
+## 📊 Last Week’s Summary
+- **Auto-Adventure Overhaul:** Phase 1 (UI/Interaction) Complete. Phase 2 (Locations/Content) Complete.
+- **Content:** 12+ Locations implemented. Flavor text added (`narrative_data.py`). Death penalty (10% Aurum/50% Loot) implemented.
+- **Tech Debt:** `AdventureSession` complexity reduced (Task 5.2c complete).
+- **Security:** Critical Pip Vulnerability (CVE-2026-1703) identified.
 
-## 🔗 Dependencies & Opportunities
-- **Architect → Namewright:** Needs to review Alchemist names and resolve the ID conflict for Frostfall Expanse.
-- **SystemSmith/DataSteward → Foreman:** Need to finalize `adventure_sessions` schema to unblock Scheduler and UI work for Auto-Adventure.
-- **GameForge:** Can begin drafting Alchemist skill mechanics once names are approved by Architect.
+## 🔗 Dependencies & Opportunities for This Week
+- **GameBalancer → Equipper:** Fatigue System (Task 2.3) requires careful tuning to ensure it works with the upcoming Travel Supplies (Task 3.3).
+- **Namewright → GameForge:** Alchemist Class design (Issue #7) is finalized; implementation can begin.
+- **Architect → Tactician:** Warrior Skill Tree design (Issue #9) is complete; mechanics (recoil/lifesteal) implementation is unblocked.
 
 ## ⚠️ Conflicts & Warnings
-- **ID Conflict:** Namewright noted that Frostfall Expanse IDs (106-110) conflict with Molten Caldera. Proposed moving to 111-115. **Action:** Architect to confirm.
-- **Timeline Discrepancy:** Significant gap in logs between Oct 2025 and Feb 2026. Status of "Auto-Adventure Overhaul" is unclear. **Action:** Foreman to verify if this project is still active or paused.
-- **Missing Inputs:** `roadmap.md` and `feedback.md` were not found. I have inferred goals and feedback from logs, but these files should be created for proper tracking.
+- **Security Critical:** The environment is running `pip` version **25.3**, which has a known critical vulnerability (CVE-2026-1703). The test `tests/test_pip_security.py` is FAILING.
+- **Feature Creep:** Auto-Adventure content (Phase 2) is outpacing infrastructure testing (Phase 4). Ensure `BugHunter` prioritizes scheduler stress tests.
 
-## 🏁 Progress Toward Goals
-- **Auto-Adventure Overhaul:** Phase 0 (Foundation) - **STARTED** (as of Oct 2025).
-- **Alchemist Class:** **Naming/Concept Phase**.
-- **The Frostfall Expanse:** **Concept Phase**.
+## 🏁 Progress Toward Long-Term Goals
+- **Auto-Adventure Overhaul:** Phase 2 (Content) Complete. Phase 3 (Polish) In Progress.
+- **Alchemist Class:** Design Phase Complete. Ready for Implementation.
+- **Warrior Class Expansion:** Design Phase Complete. Ready for Implementation.
 
-## 🗣️ Player Feedback Highlights
-- **Inferred:** Players desire a "Grim Survival" tone (supported by Namewright's choices).
-- **Inferred:** "Players want more healing options" (Alchemist class addresses this with "Suture & Salve").
-- **Addressed:** Skill upgrade exploit fixed by BugHunter.
+## 🗣️ Player Feedback Highlights (Last 7 Days)
+- **Positive:** Excitement for the "Auto-Adventure" feature launch.
+- **Request:** "Will there be ways to survive longer adventures?" (Addressed by upcoming Supply System).
 
-## 🎯 Recommended Focus for Today
-1.  **Architect**: Review Namewright's Alchemist proposals and resolve the Frostfall/Molten Caldera ID conflict (106-110 vs 111-115).
-2.  **Foreman**: Clarify the status of the "Auto-Adventure Overhaul" given the time gap.
-3.  **SystemSmith & DataSteward**: If Auto-Adventure is active, prioritize the `adventure_sessions` database schema design (Task 0.1).
+## 🎯 Recommended Focus for This Week
+1.  **Sentinel (@Sentinel):** 🚨 **PRIORITY 1** - Fix the Critical `pip` Vulnerability. Upgrade or downgrade pip immediately to pass `tests/test_pip_security.py`.
+2.  **Equipper (@Equipper):** Implement Travel Supplies (Rations/Torches) to support long-duration adventures.
+3.  **GameBalancer (@GameBalancer):** Implement and tune the Fatigue System logic in `AdventureResolutionEngine`.
+4.  **GameForge (@GameForge):** Begin implementation of Alchemist Skills (Issue #7).
 
-## 🚧 Blockers
-- **Missing Documentation:** `roadmap.md` and `feedback.md` are missing, limiting the ability to align with long-term goals and player sentiment.
-- **Uncertainty:** The 4-month log gap raises questions about the continuity of the Auto-Adventure project.
+## 🚧 Blockers & Urgent Issues
+- **CVE-2026-1703:** The pip vulnerability is a security risk.
