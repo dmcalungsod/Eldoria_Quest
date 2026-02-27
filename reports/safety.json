@@ -1,17 +1,3 @@
-
-
-+===========================================================================================================================================================================================+
-
-
-DEPRECATED: this command (`check`) has been DEPRECATED, and will be unsupported beyond 01 June 2024.
-
-
-We highly encourage switching to the new `scan` command which is easier to use, more powerful, and can be set up to mimic the deprecated command if required.
-
-
-+===========================================================================================================================================================================================+
-
-
 {
     "report_meta": {
         "scan_target": "environment",
@@ -31,8 +17,8 @@ We highly encourage switching to the new `scan` command which is easier to use, 
         "account": "",
         "local_database_path": null,
         "safety_version": "3.7.0",
-        "timestamp": "2026-02-27 03:13:19",
-        "packages_found": 97,
+        "timestamp": "2026-02-26 03:26:32",
+        "packages_found": 57,
         "vulnerabilities_found": 0,
         "vulnerabilities_ignored": 0,
         "remediations_recommended": 0,
@@ -51,10 +37,10 @@ We highly encourage switching to the new `scan` command which is easier to use, 
             "safety_command": "check"
         },
         "git": {
-            "branch": "jules-5940225466141898681-fe93c62b",
+            "branch": "jules-8435245665559205475-0a707b62",
             "tag": "",
-            "commit": "4bf4b6fd00b5c1305ece8a0ef7bcbe0679212a5f",
-            "dirty": "True",
+            "commit": "81c05017d8564e773791b754252174e1401556f8",
+            "dirty": "False",
             "origin": "https://github.com/dmcalungsod/Eldoria_Quest"
         },
         "project": null,
@@ -289,21 +275,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "yarl": {
-            "name": "yarl",
-            "version": "1.22.0",
-            "requirements": [
-                {
-                    "raw": "yarl==1.22.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "yarl",
-                    "specifier": "==1.22.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/yarl-1.22.0.dist-info"
-                }
-            ]
-        },
         "certifi": {
             "name": "certifi",
             "version": "2026.2.25",
@@ -349,51 +320,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "aiohappyeyeballs": {
-            "name": "aiohappyeyeballs",
-            "version": "2.6.1",
-            "requirements": [
-                {
-                    "raw": "aiohappyeyeballs==2.6.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "aiohappyeyeballs",
-                    "specifier": "==2.6.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/aiohappyeyeballs-2.6.1.dist-info"
-                }
-            ]
-        },
-        "discord.py": {
-            "name": "discord.py",
-            "version": "2.6.4",
-            "requirements": [
-                {
-                    "raw": "discord.py==2.6.4",
-                    "extras": [],
-                    "marker": null,
-                    "name": "discord.py",
-                    "specifier": "==2.6.4",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/discord_py-2.6.4.dist-info"
-                }
-            ]
-        },
-        "msgpack": {
-            "name": "msgpack",
-            "version": "1.1.2",
-            "requirements": [
-                {
-                    "raw": "msgpack==1.1.2",
-                    "extras": [],
-                    "marker": null,
-                    "name": "msgpack",
-                    "specifier": "==1.1.2",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/msgpack-1.1.2.dist-info"
-                }
-            ]
-        },
         "dparse": {
             "name": "dparse",
             "version": "0.6.4",
@@ -409,21 +335,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "CacheControl": {
-            "name": "CacheControl",
-            "version": "0.14.4",
-            "requirements": [
-                {
-                    "raw": "CacheControl==0.14.4",
-                    "extras": [],
-                    "marker": null,
-                    "name": "CacheControl",
-                    "specifier": "==0.14.4",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/cachecontrol-0.14.4.dist-info"
-                }
-            ]
-        },
         "radon": {
             "name": "radon",
             "version": "6.0.1",
@@ -436,21 +347,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==6.0.1",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/radon-6.0.1.dist-info"
-                }
-            ]
-        },
-        "tzdata": {
-            "name": "tzdata",
-            "version": "2025.3",
-            "requirements": [
-                {
-                    "raw": "tzdata==2025.3",
-                    "extras": [],
-                    "marker": null,
-                    "name": "tzdata",
-                    "specifier": "==2025.3",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/tzdata-2025.3.dist-info"
                 }
             ]
         },
@@ -499,21 +395,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "pytest-cov": {
-            "name": "pytest-cov",
-            "version": "7.0.0",
-            "requirements": [
-                {
-                    "raw": "pytest-cov==7.0.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pytest-cov",
-                    "specifier": "==7.0.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pytest_cov-7.0.0.dist-info"
-                }
-            ]
-        },
         "six": {
             "name": "six",
             "version": "1.17.0",
@@ -559,21 +440,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "packageurl-python": {
-            "name": "packageurl-python",
-            "version": "0.17.6",
-            "requirements": [
-                {
-                    "raw": "packageurl-python==0.17.6",
-                    "extras": [],
-                    "marker": null,
-                    "name": "packageurl-python",
-                    "specifier": "==0.17.6",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/packageurl_python-0.17.6.dist-info"
-                }
-            ]
-        },
         "joblib": {
             "name": "joblib",
             "version": "1.5.3",
@@ -586,36 +452,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==1.5.3",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/joblib-1.5.3.dist-info"
-                }
-            ]
-        },
-        "dnspython": {
-            "name": "dnspython",
-            "version": "2.8.0",
-            "requirements": [
-                {
-                    "raw": "dnspython==2.8.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "dnspython",
-                    "specifier": "==2.8.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/dnspython-2.8.0.dist-info"
-                }
-            ]
-        },
-        "dill": {
-            "name": "dill",
-            "version": "0.4.1",
-            "requirements": [
-                {
-                    "raw": "dill==0.4.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "dill",
-                    "specifier": "==0.4.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/dill-0.4.1.dist-info"
                 }
             ]
         },
@@ -646,36 +482,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==1.9.4",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/bandit-1.9.4.dist-info"
-                }
-            ]
-        },
-        "pymongo": {
-            "name": "pymongo",
-            "version": "4.16.0",
-            "requirements": [
-                {
-                    "raw": "pymongo==4.16.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pymongo",
-                    "specifier": "==4.16.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pymongo-4.16.0.dist-info"
-                }
-            ]
-        },
-        "defusedxml": {
-            "name": "defusedxml",
-            "version": "0.7.1",
-            "requirements": [
-                {
-                    "raw": "defusedxml==0.7.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "defusedxml",
-                    "specifier": "==0.7.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/defusedxml-0.7.1.dist-info"
                 }
             ]
         },
@@ -724,36 +530,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "cyclonedx-python-lib": {
-            "name": "cyclonedx-python-lib",
-            "version": "11.6.0",
-            "requirements": [
-                {
-                    "raw": "cyclonedx-python-lib==11.6.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "cyclonedx-python-lib",
-                    "specifier": "==11.6.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/cyclonedx_python_lib-11.6.0.dist-info"
-                }
-            ]
-        },
-        "tomli": {
-            "name": "tomli",
-            "version": "2.4.0",
-            "requirements": [
-                {
-                    "raw": "tomli==2.4.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "tomli",
-                    "specifier": "==2.4.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/tomli-2.4.0.dist-info"
-                }
-            ]
-        },
         "requests": {
             "name": "requests",
             "version": "2.32.5",
@@ -781,21 +557,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==0.4.2",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/typing_inspection-0.4.2.dist-info"
-                }
-            ]
-        },
-        "aiosignal": {
-            "name": "aiosignal",
-            "version": "1.4.0",
-            "requirements": [
-                {
-                    "raw": "aiosignal==1.4.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "aiosignal",
-                    "specifier": "==1.4.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/aiosignal-1.4.0.dist-info"
                 }
             ]
         },
@@ -829,51 +590,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "platformdirs": {
-            "name": "platformdirs",
-            "version": "4.9.2",
-            "requirements": [
-                {
-                    "raw": "platformdirs==4.9.2",
-                    "extras": [],
-                    "marker": null,
-                    "name": "platformdirs",
-                    "specifier": "==4.9.2",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/platformdirs-4.9.2.dist-info"
-                }
-            ]
-        },
-        "pyparsing": {
-            "name": "pyparsing",
-            "version": "3.3.2",
-            "requirements": [
-                {
-                    "raw": "pyparsing==3.3.2",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pyparsing",
-                    "specifier": "==3.3.2",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pyparsing-3.3.2.dist-info"
-                }
-            ]
-        },
-        "py-serializable": {
-            "name": "py-serializable",
-            "version": "2.1.0",
-            "requirements": [
-                {
-                    "raw": "py-serializable==2.1.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "py-serializable",
-                    "specifier": "==2.1.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/py_serializable-2.1.0.dist-info"
-                }
-            ]
-        },
         "typer": {
             "name": "typer",
             "version": "0.24.1",
@@ -886,51 +602,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==0.24.1",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/typer-0.24.1.dist-info"
-                }
-            ]
-        },
-        "pylint": {
-            "name": "pylint",
-            "version": "4.0.5",
-            "requirements": [
-                {
-                    "raw": "pylint==4.0.5",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pylint",
-                    "specifier": "==4.0.5",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pylint-4.0.5.dist-info"
-                }
-            ]
-        },
-        "isort": {
-            "name": "isort",
-            "version": "8.0.0",
-            "requirements": [
-                {
-                    "raw": "isort==8.0.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "isort",
-                    "specifier": "==8.0.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/isort-8.0.0.dist-info"
-                }
-            ]
-        },
-        "pluggy": {
-            "name": "pluggy",
-            "version": "1.6.0",
-            "requirements": [
-                {
-                    "raw": "pluggy==1.6.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pluggy",
-                    "specifier": "==1.6.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pluggy-1.6.0.dist-info"
                 }
             ]
         },
@@ -949,21 +620,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "pydocstyle": {
-            "name": "pydocstyle",
-            "version": "6.3.0",
-            "requirements": [
-                {
-                    "raw": "pydocstyle==6.3.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pydocstyle",
-                    "specifier": "==6.3.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pydocstyle-6.3.0.dist-info"
-                }
-            ]
-        },
         "mccabe": {
             "name": "mccabe",
             "version": "0.7.0",
@@ -976,81 +632,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==0.7.0",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/mccabe-0.7.0.dist-info"
-                }
-            ]
-        },
-        "tomli_w": {
-            "name": "tomli_w",
-            "version": "1.2.0",
-            "requirements": [
-                {
-                    "raw": "tomli_w==1.2.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "tomli_w",
-                    "specifier": "==1.2.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/tomli_w-1.2.0.dist-info"
-                }
-            ]
-        },
-        "python-dotenv": {
-            "name": "python-dotenv",
-            "version": "1.2.1",
-            "requirements": [
-                {
-                    "raw": "python-dotenv==1.2.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "python-dotenv",
-                    "specifier": "==1.2.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/python_dotenv-1.2.1.dist-info"
-                }
-            ]
-        },
-        "propcache": {
-            "name": "propcache",
-            "version": "0.4.1",
-            "requirements": [
-                {
-                    "raw": "propcache==0.4.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "propcache",
-                    "specifier": "==0.4.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/propcache-0.4.1.dist-info"
-                }
-            ]
-        },
-        "coverage": {
-            "name": "coverage",
-            "version": "7.13.4",
-            "requirements": [
-                {
-                    "raw": "coverage==7.13.4",
-                    "extras": [],
-                    "marker": null,
-                    "name": "coverage",
-                    "specifier": "==7.13.4",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/coverage-7.13.4.dist-info"
-                }
-            ]
-        },
-        "pip-api": {
-            "name": "pip-api",
-            "version": "0.0.34",
-            "requirements": [
-                {
-                    "raw": "pip-api==0.0.34",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pip-api",
-                    "specifier": "==0.0.34",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pip_api-0.0.34.dist-info"
                 }
             ]
         },
@@ -1099,51 +680,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "sortedcontainers": {
-            "name": "sortedcontainers",
-            "version": "2.4.0",
-            "requirements": [
-                {
-                    "raw": "sortedcontainers==2.4.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "sortedcontainers",
-                    "specifier": "==2.4.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/sortedcontainers-2.4.0.dist-info"
-                }
-            ]
-        },
-        "astroid": {
-            "name": "astroid",
-            "version": "4.0.4",
-            "requirements": [
-                {
-                    "raw": "astroid==4.0.4",
-                    "extras": [],
-                    "marker": null,
-                    "name": "astroid",
-                    "specifier": "==4.0.4",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/astroid-4.0.4.dist-info"
-                }
-            ]
-        },
-        "multidict": {
-            "name": "multidict",
-            "version": "6.7.1",
-            "requirements": [
-                {
-                    "raw": "multidict==6.7.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "multidict",
-                    "specifier": "==6.7.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/multidict-6.7.1.dist-info"
-                }
-            ]
-        },
         "Authlib": {
             "name": "Authlib",
             "version": "1.6.8",
@@ -1156,21 +692,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==1.6.8",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/authlib-1.6.8.dist-info"
-                }
-            ]
-        },
-        "iniconfig": {
-            "name": "iniconfig",
-            "version": "2.3.0",
-            "requirements": [
-                {
-                    "raw": "iniconfig==2.3.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "iniconfig",
-                    "specifier": "==2.3.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/iniconfig-2.3.0.dist-info"
                 }
             ]
         },
@@ -1234,21 +755,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "frozenlist": {
-            "name": "frozenlist",
-            "version": "1.8.0",
-            "requirements": [
-                {
-                    "raw": "frozenlist==1.8.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "frozenlist",
-                    "specifier": "==1.8.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/frozenlist-1.8.0.dist-info"
-                }
-            ]
-        },
         "Pygments": {
             "name": "Pygments",
             "version": "2.19.2",
@@ -1291,21 +797,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==2.14.0",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pycodestyle-2.14.0.dist-info"
-                }
-            ]
-        },
-        "attrs": {
-            "name": "attrs",
-            "version": "25.4.0",
-            "requirements": [
-                {
-                    "raw": "attrs==25.4.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "attrs",
-                    "specifier": "==25.4.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/attrs-25.4.0.dist-info"
                 }
             ]
         },
@@ -1369,21 +860,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "snowballstemmer": {
-            "name": "snowballstemmer",
-            "version": "3.0.1",
-            "requirements": [
-                {
-                    "raw": "snowballstemmer==3.0.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "snowballstemmer",
-                    "specifier": "==3.0.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/snowballstemmer-3.0.1.dist-info"
-                }
-            ]
-        },
         "rich": {
             "name": "rich",
             "version": "14.3.3",
@@ -1396,36 +872,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==14.3.3",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/rich-14.3.3.dist-info"
-                }
-            ]
-        },
-        "aiohttp": {
-            "name": "aiohttp",
-            "version": "3.13.3",
-            "requirements": [
-                {
-                    "raw": "aiohttp==3.13.3",
-                    "extras": [],
-                    "marker": null,
-                    "name": "aiohttp",
-                    "specifier": "==3.13.3",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/aiohttp-3.13.3.dist-info"
-                }
-            ]
-        },
-        "pip_audit": {
-            "name": "pip_audit",
-            "version": "2.10.0",
-            "requirements": [
-                {
-                    "raw": "pip_audit==2.10.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pip_audit",
-                    "specifier": "==2.10.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pip_audit-2.10.0.dist-info"
                 }
             ]
         },
@@ -1444,36 +890,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
-        "pip-requirements-parser": {
-            "name": "pip-requirements-parser",
-            "version": "32.0.1",
-            "requirements": [
-                {
-                    "raw": "pip-requirements-parser==32.0.1",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pip-requirements-parser",
-                    "specifier": "==32.0.1",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pip_requirements_parser-32.0.1.dist-info"
-                }
-            ]
-        },
-        "pytest": {
-            "name": "pytest",
-            "version": "9.0.2",
-            "requirements": [
-                {
-                    "raw": "pytest==9.0.2",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pytest",
-                    "specifier": "==9.0.2",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pytest-9.0.2.dist-info"
-                }
-            ]
-        },
         "pydantic": {
             "name": "pydantic",
             "version": "2.12.5",
@@ -1486,36 +902,6 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "specifier": "==2.12.5",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pydantic-2.12.5.dist-info"
-                }
-            ]
-        },
-        "license-expression": {
-            "name": "license-expression",
-            "version": "30.4.4",
-            "requirements": [
-                {
-                    "raw": "license-expression==30.4.4",
-                    "extras": [],
-                    "marker": null,
-                    "name": "license-expression",
-                    "specifier": "==30.4.4",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/license_expression-30.4.4.dist-info"
-                }
-            ]
-        },
-        "boolean.py": {
-            "name": "boolean.py",
-            "version": "5.0",
-            "requirements": [
-                {
-                    "raw": "boolean.py==5.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "boolean.py",
-                    "specifier": "==5.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/boolean_py-5.0.dist-info"
                 }
             ]
         }
@@ -1531,15 +917,3 @@ We highly encourage switching to the new `scan` command which is easier to use, 
         "remediations_skipped": {}
     }
 }
-
-
-+===========================================================================================================================================================================================+
-
-
-DEPRECATED: this command (`check`) has been DEPRECATED, and will be unsupported beyond 01 June 2024.
-
-
-We highly encourage switching to the new `scan` command which is easier to use, more powerful, and can be set up to mimic the deprecated command if required.
-
-
-+===========================================================================================================================================================================================+
