@@ -14,6 +14,7 @@ from database.database_manager import DatabaseManager
 from game_systems.core.world_time import TimePhase, Weather, WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.consumables import CONSUMABLES
+from game_systems.data.skills_data import SKILLS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
 
@@ -872,7 +873,36 @@ class AdventureSession:
 
         # Use Potion
         c_data = CONSUMABLES[target_potion]
-        heal_amount = c_data["effect"].get("heal", 0)
+        base_heal = c_data["effect"].get("heal", 0)
+
+        # --- PASSIVE SKILL CHECK (Triage) ---
+        healing_multiplier = 1.0
+        try:
+            # Check for 'healing_item_potency' in active boosts/skills
+            # Assuming 'context' has 'skills' (list of dicts)
+            skills = context.get("skills", [])
+            for s in skills:
+                # Skill dicts from DB context bundle usually have 'key_id' and 'skill_level'
+                # but might be raw skill data. We need to check if it's the right passive.
+                # Assuming 'skills' contains skill definitions or keys.
+                # Let's check 'skills_data.py' for 'triage'.
+                # Actually, context['skills'] in _fetch_session_context is a list of player's skills.
+                if s.get("key_id") == "triage":
+                    # Triage: increases healing item potency by 20% (0.2)
+                    # We might need to check skill level if scaling is implemented,
+                    # but default passive bonus is fixed or handled by data.
+                    # skills_data says: "passive_bonus": {"healing_item_potency": 0.2}
+                    # We should check 'passive_bonus'
+                    # But the context['skills'] might just be the skill ROW from DB.
+                    # We need to look up the full definition in SKILLS if it's not merged.
+                    full_skill = SKILLS.get(s.get("key_id"))
+                    if full_skill and "passive_bonus" in full_skill:
+                        potency = full_skill["passive_bonus"].get("healing_item_potency", 0)
+                        healing_multiplier += potency * s.get("skill_level", 1)
+        except Exception as e:
+            logger.error(f"Error checking passive skills for auto-potion: {e}")
+
+        heal_amount = int(base_heal * healing_multiplier)
 
         # Apply Heal
         current_hp = context["vitals"]["current_hp"]
@@ -886,7 +916,10 @@ class AdventureSession:
         if self.supplies[target_potion] <= 0:
             del self.supplies[target_potion]
 
-        return f"💊 **Auto-Potion:** Used {c_data['name']} to recover {actual_heal} HP."
+        msg = f"💊 **Auto-Potion:** Used {c_data['name']} to recover {actual_heal} HP."
+        if healing_multiplier > 1.0:
+            msg += f" (Boosted x{healing_multiplier:.1f})"
+        return msg
 
     # ======================================================================
     # PERSISTENCE
