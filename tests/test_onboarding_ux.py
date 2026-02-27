@@ -46,6 +46,7 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         mock_discord.ButtonStyle = MagicMock()
         mock_discord.ext = MagicMock()
         mock_discord.ext.commands = MagicMock()
+        mock_discord.ui.button = lambda **kwargs: lambda func: func  # Decorator mock
 
         sys.modules["discord"] = mock_discord
         sys.modules["discord.ui"] = mock_discord.ui
@@ -66,6 +67,9 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
         self.GuildWelcomeView = cogs.onboarding_cog.GuildWelcomeView
         self.CombatTutorialView = cogs.onboarding_cog.CombatTutorialView
         self.StartMenuView = cogs.onboarding_cog.StartMenuView
+        self.ClassDetailView = cogs.onboarding_cog.ClassDetailView
+        self.CharacterMenuView = cogs.onboarding_cog.CharacterMenuView
+        self.cogs_module = cogs.onboarding_cog
 
     def tearDown(self):
         self.modules_patcher.stop()
@@ -85,12 +89,95 @@ class TestOnboardingUX(unittest.IsolatedAsyncioTestCase):
             self.assertIsNotNone(btn.emoji, f"Button {btn.label} is missing an emoji")
             self.assertEqual(btn.style, mock_discord.ButtonStyle.primary, f"Button {btn.label} has wrong style")
 
+    async def test_start_menu_callback(self):
+        """Test the class selection callback."""
+        db = MagicMock()
+        user = MagicMock()
+        view = self.StartMenuView(db, user)
+
+        interaction = AsyncMock()
+        interaction.data = {"custom_id": "cls_1"}  # Warrior
+        interaction.user.id = user.id
+
+        # Mock interaction check
+        check = await view.interaction_check(interaction)
+        self.assertTrue(check)
+
+        # Mock interaction response
+        await view.class_select_callback(interaction)
+
+        interaction.response.edit_message.assert_called()
+        args, kwargs = interaction.response.edit_message.call_args
+        self.assertIsInstance(kwargs["view"], self.ClassDetailView)
+        self.assertEqual(kwargs["view"].class_id, 1)
+
+    async def test_class_detail_view(self):
+        """Test ClassDetailView creation and buttons."""
+        db = MagicMock()
+        user = MagicMock()
+        class_id = 1
+        view = self.ClassDetailView(db, class_id, user)
+
+        # Test accept callback
+        interaction = AsyncMock()
+        interaction.user.id = user.id
+
+        # Mock creator
+        view.creator.create_player = MagicMock(return_value=(True, "Success"))
+        db.player_exists = MagicMock(return_value=False)
+
+        await view.create_btn(interaction, MagicMock())
+
+        interaction.edit_original_response.assert_called()
+        args, kwargs = interaction.edit_original_response.call_args
+        self.assertIsInstance(kwargs["view"], self.CharacterMenuView)
+
+    async def test_class_detail_back(self):
+        """Test ClassDetailView back button."""
+        db = MagicMock()
+        user = MagicMock()
+        view = self.ClassDetailView(db, 1, user)
+
+        interaction = AsyncMock()
+        await view.back_btn(interaction, MagicMock())
+
+        interaction.response.edit_message.assert_called()
+        args, kwargs = interaction.response.edit_message.call_args
+        self.assertIsInstance(kwargs["view"], self.StartMenuView)
+
+    async def test_character_menu_view(self):
+        """Test CharacterMenuView approach_clerk."""
+        db = MagicMock()
+        user = MagicMock()
+        view = self.CharacterMenuView(db, user)
+
+        interaction = AsyncMock()
+        await view.approach_clerk(interaction, MagicMock())
+
+        interaction.edit_original_response.assert_called()
+        args, kwargs = interaction.edit_original_response.call_args
+        self.assertIsInstance(kwargs["view"], self.GuildWelcomeView)
+
     async def test_guild_welcome_view_init(self):
         """Test that GuildWelcomeView initializes with correct buttons."""
         db = MagicMock()
         user = MagicMock()
         view = self.GuildWelcomeView(db, user)
         self.assertIsInstance(view, self.GuildWelcomeView)
+
+        interaction = AsyncMock()
+
+        # Test start training
+        await view.start_training(interaction, MagicMock())
+        interaction.edit_original_response.assert_called()
+        args, kwargs = interaction.edit_original_response.call_args
+        self.assertIsInstance(kwargs["view"], self.CombatTutorialView)
+
+        # Test skip
+        interaction.reset_mock()
+        with patch("cogs.onboarding_cog.transition_to_guild_lobby", new_callable=AsyncMock) as mock_trans:
+            await view.skip_to_lobby(interaction, MagicMock())
+            mock_trans.assert_called()
 
     async def test_combat_tutorial_flow(self):
         """Test the state transitions of the combat tutorial."""
