@@ -15,7 +15,7 @@ def log_summary(message):
 def run_command(command_list):
     try:
         # Use shell=False and pass list for safety
-        result = subprocess.run(command_list, capture_output=True, text=True, check=True)  # nosec
+        result = subprocess.run(command_list, capture_output=True, text=True, check=True)  # nosec B603
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         # Avoid printing full command if it contains secrets (though here it's just branch names)
@@ -102,7 +102,7 @@ def main():
             continue
 
         # Check if branch still exists
-        branch_check = subprocess.run(  # nosec
+        branch_check = subprocess.run(  # nosec B603
             ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"],
             capture_output=True,
         )
@@ -121,7 +121,7 @@ def main():
             "DELETE",
             f"repos/{current_repo}/git/refs/heads/{head_ref}",
         ]
-        delete_result = subprocess.run(delete_cmd, capture_output=True, text=True)  # nosec
+        delete_result = subprocess.run(delete_cmd, capture_output=True, text=True)  # nosec B603
 
         if delete_result.returncode == 0:
             print(f"Successfully deleted branch '{head_ref}'.")

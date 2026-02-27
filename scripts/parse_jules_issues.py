@@ -150,7 +150,7 @@ def fetch_existing_issue_titles(repo: str) -> set:
     """Fetch all open issue titles from the repo into a set."""
     titles: set = set()
     try:
-        result = subprocess.run(  # nosec
+        result = subprocess.run(  # nosec B603
             ["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "1000", "--json", "title"],
             capture_output=True,
             text=True,
@@ -168,7 +168,7 @@ def ensure_labels(labels_csv: str, repo: str):
     for label in labels_csv.split(","):
         label = label.strip()
         color = LABEL_COLORS.get(label, "cccccc")
-        proc = subprocess.run(  # nosec
+        proc = subprocess.run(  # nosec B603
             ["gh", "label", "create", label, "--color", color, "--force", "--repo", repo],
             capture_output=True,
             text=True,
@@ -183,7 +183,7 @@ def create_issue(title: str, body: str, labels_csv: str, repo: str) -> bool:
     for label in labels_csv.split(","):
         label_args += ["--label", label.strip()]
     try:
-        subprocess.run(  # nosec
+        subprocess.run(  # nosec B603
             [
                 "gh",
                 "issue",
@@ -220,7 +220,7 @@ def get_changed_files(event_name: str):
 
     # push event: use git diff
     try:
-        proc = subprocess.run(  # nosec
+        proc = subprocess.run(  # nosec B603
             ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
             capture_output=True,
             text=True,

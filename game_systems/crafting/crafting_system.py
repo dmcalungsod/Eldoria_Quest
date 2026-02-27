@@ -469,6 +469,9 @@ class CraftingSystem:
                     None,
                 )
 
-        except Exception as e:
-            logger.error(f"Experiment error for {discord_id}: {e}", exc_info=True)
+        except (ValueError, TypeError, KeyError) as e:
+            logger.error(f"Experiment data error for {discord_id}: {e}", exc_info=True)
             return False, "An error occurred during experimentation.", None
+        except Exception as e:
+            logger.error(f"Unexpected experiment error for {discord_id}: {e}", exc_info=True)
+            return False, "An unexpected error occurred.", None

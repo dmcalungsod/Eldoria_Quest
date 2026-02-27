@@ -180,8 +180,8 @@ class AdventureRewards:
                 # Elemental Surge
                 if active_event.get("type") == "elemental_surge":
                     # 30% chance to drop 1-3 Elemental Motes
-                    if random.random() < 0.3:
-                        mote_count = random.randint(1, 3)
+                    if random.random() < 0.3:  # nosec B311
+                        mote_count = random.randint(1, 3)  # nosec B311
                         self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
 
                         mote_info = MATERIALS.get("elemental_mote", {})
@@ -199,8 +199,8 @@ class AdventureRewards:
                 # Spectral Tide
                 elif active_event.get("type") == "spectral_tide":
                     # 30% chance to drop 1-2 Ectoplasm
-                    if random.random() < 0.3:
-                        ecto_count = random.randint(1, 2)
+                    if random.random() < 0.3:  # nosec B311
+                        ecto_count = random.randint(1, 2)  # nosec B311
                         self._add_loot_to_session(session_loot, "ectoplasm", ecto_count)
 
                         ecto_info = MATERIALS.get("ectoplasm", {})
