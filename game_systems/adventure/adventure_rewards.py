@@ -234,7 +234,8 @@ class AdventureRewards:
             # Key format: __EQUIPMENT__:{json_data}
             # We use a unique key for each item instance to prevent stacking logic here
             # (Equipment generally doesn't stack in session loot unless we make it)
-            item_json = json.dumps(item)
+            # Use sort_keys=True to ensure stable dictionary serialization
+            item_json = json.dumps(item, sort_keys=True)
             equip_key = f"__EQUIPMENT__:{item_json}"
 
             # Use '1' as amount. If identical items drop, we might overwrite?

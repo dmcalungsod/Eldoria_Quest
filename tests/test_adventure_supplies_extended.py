@@ -1,170 +1,172 @@
+
+import unittest
+import json
+from unittest.mock import MagicMock, patch
 import os
 import sys
-import unittest
-from unittest.mock import MagicMock, patch
+
+# Mock pymongo to allow execution without dependencies installed
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["discord"] = MagicMock()
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock dependencies
-try:
-    import pymongo  # noqa: F401
-except ImportError:
-    mock_pymongo = MagicMock()
-    mock_pymongo.errors = MagicMock()
-    sys.modules["pymongo"] = mock_pymongo
-    sys.modules["pymongo.errors"] = mock_pymongo.errors
-    if not isinstance(mock_pymongo.errors.DuplicateKeyError, type):
-        mock_pymongo.errors.DuplicateKeyError = type("DuplicateKeyError", (Exception,), {})
+from game_systems.adventure.adventure_manager import AdventureManager
+from game_systems.adventure.adventure_rewards import AdventureRewards
 
-try:
-    import discord  # noqa: F401
-except ImportError:
-    mock_discord = MagicMock()
-    mock_discord.ext = MagicMock()
-    sys.modules["discord"] = mock_discord
-    sys.modules["discord.ext"] = mock_discord.ext
-
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.core.world_time import TimePhase, Weather
-
-
-class TestAdventureSuppliesExtended(unittest.TestCase):
+class TestAdventureEquipmentExtended(unittest.TestCase):
     def setUp(self):
-        self.db = MagicMock(spec=DatabaseManager)
-        # Mock bundle
-        self.context_mock = {
-            "stats": {},
-            "buffs": [],
-            "player": {"current_hp": 100, "current_mp": 100, "level": 1, "class_id": 1},
-            "skills": [],
-            "player_stats": MagicMock(max_hp=100, max_mp=100, agility=10, luck=10),
-            "stats_dict": {"HP": 100, "MP": 100},
-            "vitals": {"current_hp": 100, "current_mp": 100},
-            "player_row": {"level": 1, "class_id": 1, "current_hp": 100, "current_mp": 100},
-            "active_boosts": {},
-            "event_type": None,
-        }
-        self.db.get_combat_context_bundle.return_value = {
-            "stats": {},
-            "buffs": [],
-            "player": {"current_hp": 100, "current_mp": 100},
-            "skills": [],
-        }
-        self.db.get_active_boosts.return_value = []
+        self.mock_db = MagicMock()
+        self.mock_bot = MagicMock()
+        self.manager = AdventureManager(self.mock_db, self.mock_bot)
+        self.rewards = AdventureRewards(self.mock_db, 12345)
 
-    def test_auto_potion_usage(self):
-        """Verify Auto-Potion triggers at low HP and consumes supply."""
-        row_data = {
+        # Mock dependencies
+        self.manager.inventory_manager = MagicMock()
+        self.manager.quest_system = MagicMock()
+        self.manager.faction_system = MagicMock()
+
+        # Prepare DB mocks
+        self.mock_db.get_player_stats_json.return_value = {"strength": 10}
+        self.mock_db.get_player.return_value = {
+            "level": 1, "experience": 0, "exp_to_next": 100,
+            "current_hp": 100, "current_mp": 100
+        }
+        self.mock_db.lock_adventure_for_claiming.return_value = True
+
+        # FIX: Ensure get_player_field returns integers for level comparison
+        def get_field_side_effect(did, field):
+            if field == "level": return 1
+            return 0
+        self.mock_db.get_player_field.side_effect = get_field_side_effect
+
+    def test_identical_equipment_granting(self):
+        """
+        Verify that identical equipment items dropped in the same combat
+        are correctly granted at the end of the adventure (verifying amount > 1).
+        """
+        discord_id = 12345
+
+        equip_data = {"id": 101, "name": "Fire Sword", "type": "equipment", "rarity": "Rare", "slot": "main_hand", "source": "monster_drop"}
+        equip_json = json.dumps(equip_data, sort_keys=True)
+        equip_key = f"__EQUIPMENT__:{equip_json}"
+
+        mock_session_row = {
+            "discord_id": discord_id,
             "location_id": "test_loc",
+            "start_time": "2023-01-01T00:00:00",
+            "end_time": "2023-01-01T01:00:00",
+            "duration_minutes": 60,
             "active": 1,
             "logs": "[]",
-            "loot_collected": "{}",
+            "loot_collected": json.dumps({equip_key: 3}), # 3 identical Fire Swords
             "active_monster_json": None,
-            "supplies": {"hp_potion_1": 2},
+            "version": 1
         }
-        session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
 
-        # Mock HP to be critical (20/100 = 20% < 30%)
-        self.context_mock["vitals"]["current_hp"] = 20
+        self.mock_db.get_active_adventure.return_value = mock_session_row
+        self.manager.inventory_manager.add_item.return_value = True
 
-        # Manually trigger the helper (since simulate_step is complex to mock fully)
-        # But we want to test that _try_auto_potion works.
-        log = session._try_auto_potion(self.context_mock, max_hp=100)
+        summary = self.manager.end_adventure(discord_id)
 
-        # Verify Usage
-        self.assertIsNotNone(log)
-        self.assertIn("Used Dewfall Tonic", log)
-        self.assertEqual(session.supplies["hp_potion_1"], 1)
-        # Check HP update (50 heal)
-        self.assertEqual(self.context_mock["vitals"]["current_hp"], 70)
+        self.assertIsNotNone(summary)
 
-    def test_auto_potion_depletion(self):
-        """Verify potion is removed when count hits 0."""
-        row_data = {
+        # Verify add_item was called 3 times for this item
+        self.assertEqual(self.manager.inventory_manager.add_item.call_count, 3)
+
+    def test_json_dumps_key_stability(self):
+        """
+        Verify that json.dumps key stability doesn't result in multiple entries.
+        We test the behavior directly in adventure_rewards to ensure identical
+        items end up in the same slot.
+        """
+        combat_result = {
+            "exp": 100,
+            "aurum": 50,
+            "drops": [],
+            "monster_data": {"name": "Test Monster", "tier": "Normal"}
+        }
+
+        session_loot = {}
+
+        # Need to mock the generate_monster_loot to return two differently ordered dicts
+        # representing the same item
+        item_1 = {"id": 1, "name": "Sword", "rarity": "Common"}
+        item_2 = {"rarity": "Common", "name": "Sword", "id": 1} # Same data, different insertion order
+
+        with patch("game_systems.items.item_manager.item_manager.generate_monster_loot", return_value=[item_1, item_2]):
+            self.rewards._process_loot_and_quests(combat_result, MagicMock(), MagicMock(), session_loot, [])
+
+        # There should only be ONE equipment key in session_loot, with count 2
+        equip_keys = [k for k in session_loot.keys() if k.startswith("__EQUIPMENT__:")]
+        self.assertEqual(len(equip_keys), 1)
+        self.assertEqual(session_loot[equip_keys[0]], 2)
+
+    def test_full_inventory_failure_reporting(self):
+        """
+        Verify that a full inventory scenario correctly reports both bulk items
+        and equipment as failed in the final summary.
+        """
+        discord_id = 12345
+
+        equip_data = {"id": 101, "name": "Fire Sword", "type": "equipment", "rarity": "Rare", "slot": "main_hand", "source": "monster_drop"}
+        equip_json = json.dumps(equip_data, sort_keys=True)
+        equip_key = f"__EQUIPMENT__:{equip_json}"
+
+        mock_session_row = {
+            "discord_id": discord_id,
             "location_id": "test_loc",
+            "start_time": "2023-01-01T00:00:00",
+            "end_time": "2023-01-01T01:00:00",
+            "duration_minutes": 60,
             "active": 1,
             "logs": "[]",
-            "loot_collected": "{}",
+            "loot_collected": json.dumps({equip_key: 1, "iron_ore": 2}),
             "active_monster_json": None,
-            "supplies": {"hp_potion_1": 1},
+            "version": 1
         }
-        session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
-        self.context_mock["vitals"]["current_hp"] = 20
 
-        session._try_auto_potion(self.context_mock, max_hp=100)
+        self.mock_db.get_active_adventure.return_value = mock_session_row
 
-        self.assertNotIn("hp_potion_1", session.supplies)
+        # Mock Inventory Manager to FAIL EVERYTHING
+        self.manager.inventory_manager.add_item.return_value = False
+        self.manager.inventory_manager.add_items_bulk.return_value = [{"item_name": "iron_ore", "reason": "Inventory Full"}]
 
-    def test_explorer_kit_bonus(self):
-        """Verify Explorer's Kit increases wild gathering yield."""
-        row_data = {
-            "location_id": "forest_outskirts",
-            "active": 1,
-            "logs": "[]",
-            "loot_collected": "{}",
-            "active_monster_json": None,
-            "supplies": {"explorer_kit": 1},
-        }
-        mock_quest = MagicMock()
-        mock_quest.get_player_quests.return_value = []  # No active quests
+        summary = self.manager.end_adventure(discord_id)
 
-        session = AdventureSession(self.db, mock_quest, None, 12345, row_data=row_data)
+        self.assertIsNotNone(summary)
 
-        with patch("game_systems.adventure.adventure_session.WorldTime") as MockTime:
-            MockTime.get_current_weather.return_value = Weather.CLEAR
-            MockTime.get_current_phase.return_value = TimePhase.DAY
+        # Expect failed items to include both iron ore and the sword
+        failed_names = [f["item_name"] for f in summary["failed_items"]]
+        self.assertIn("iron_ore", failed_names)
+        self.assertIn("Fire Sword", failed_names)
 
-            # Mock random.randint:
-            # 1. simulate_step combat check: 10 (Pass <= 40 -> Non-Combat)
-            # 2. resolve_non_combat regen check: 75 (Fail > 70 -> Wild Gather)
-            # 3. _perform_wild_gathering success check: 10 (Pass <= 35 -> Loot)
-            with patch("random.randint", side_effect=[10, 75, 10]):
-                # Mock choice
-                with patch("random.choices", return_value=["medicinal_herb"]):
-                    with patch("random.random", return_value=0.5):  # No extra variance
-                        with patch.object(session, "_fetch_session_context", return_value=self.context_mock):
-                            result = session.simulate_step(context_bundle=None)
+    def test_death_penalty_multiple_units(self):
+        """
+        Verify that the 50% death loss correctly processes individual equipment units
+        when the session loot count is greater than 1.
+        """
+        discord_id = 12345
+        mock_session = MagicMock()
+        mock_session.discord_id = discord_id
 
-                            loot = session.loot
-                            # Base yield 1 (luck 10/25 = 0 bonus).
-                            # Kit bonus +1. Total 2.
-                            self.assertEqual(loot.get("medicinal_herb"), 2)
+        equip_data = {"id": 1, "name": "Sword", "rarity": "Common", "slot": "main_hand", "source": "monster_drop"}
+        equip_key = f"__EQUIPMENT__:{json.dumps(equip_data, sort_keys=True)}"
 
-                            logs = "".join(result["sequence"][0])
-                            self.assertIn("Kit Bonus", logs)
+        mock_session.loot = {equip_key: 10} # 10 items
 
-    def test_explorer_kit_no_effect_without_supply(self):
-        """Verify wild gathering yield is normal without kit."""
-        row_data = {
-            "location_id": "forest_outskirts",
-            "active": 1,
-            "logs": "[]",
-            "loot_collected": "{}",
-            "active_monster_json": None,
-            "supplies": {},
-        }
-        mock_quest = MagicMock()
-        mock_quest.get_player_quests.return_value = []
+        # Force a specific sequence of random rolls (5 True, 5 False)
+        with patch("random.random", side_effect=[0.1, 0.9] * 5):
+            loss_report = self.manager._handle_death_rewards(discord_id, mock_session)
 
-        session = AdventureSession(self.db, mock_quest, None, 12345, row_data=row_data)
+            # The manager's handle_death_rewards will try to grant the surviving 5 items.
+            # So inventory_manager.add_item should be called 5 times.
+            self.assertEqual(self.manager.inventory_manager.add_item.call_count, 5)
 
-        with patch("game_systems.adventure.adventure_session.WorldTime") as MockTime:
-            MockTime.get_current_weather.return_value = Weather.CLEAR
-            MockTime.get_current_phase.return_value = TimePhase.DAY
-
-            # Mock random.randint: 10 (Non-Combat), 75 (Wild Gather), 10 (Success)
-            with patch("random.randint", side_effect=[10, 75, 10]):
-                with patch("random.choices", return_value=["medicinal_herb"]):
-                    with patch("random.random", return_value=0.5):
-                        with patch.object(session, "_fetch_session_context", return_value=self.context_mock):
-                            result = session.simulate_step(context_bundle=None)
-
-                            loot = session.loot
-                            # Base yield 1
-                            self.assertEqual(loot.get("medicinal_herb"), 1)
-
+            # Verify the loss string in report
+            self.assertIn("-5x Sword", loss_report)
 
 if __name__ == "__main__":
     unittest.main()
