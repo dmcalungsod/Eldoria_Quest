@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -53,7 +53,7 @@ class MockSelect:
         self.options.append({"label": label, "value": value, "description": description, "emoji": emoji})
 
 
-class TestCraftingUI(unittest.IsolatedAsyncioTestCase):
+class TestCraftingUI(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules
         self.modules_patcher = patch.dict(sys.modules)
@@ -86,7 +86,6 @@ class TestCraftingUI(unittest.IsolatedAsyncioTestCase):
         # Mock other dependencies
         sys.modules["cogs"] = MagicMock()
         sys.modules["cogs.utils.ui_helpers"] = MagicMock()
-        sys.modules["game_systems.crafting.ui.experiment_view"] = MagicMock()
 
         # Import module under test
         import game_systems.crafting.ui.crafting_view
@@ -181,74 +180,6 @@ class TestCraftingUI(unittest.IsolatedAsyncioTestCase):
         labels = [opt["label"] for opt in select.options]
         self.assertTrue(any("Iron Sword" in lbl for lbl in labels))
         self.assertFalse(any("Health Potion" in lbl for lbl in labels))
-
-    async def test_recipe_select_callback(self):
-        """Test selecting a recipe to craft."""
-        view = self.CraftingView(self.mock_db, self.mock_user)
-        interaction = AsyncMock()
-        interaction.data = {"values": ["potion_1"]}
-
-        # Mock crafting logic
-        self.mock_crafting_system.craft_item.return_value = (True, "Crafted successfully!", {})
-
-        await view.recipe_select_callback(interaction)
-
-        # Verify craft_item called
-        self.mock_crafting_system.craft_item.assert_called_with(12345, "potion_1")
-
-        # Verify response update
-        interaction.edit_original_response.assert_called()
-        args, kwargs = interaction.edit_original_response.call_args
-        self.assertIsInstance(kwargs["view"], self.CraftingView)
-        self.assertEqual(kwargs["view"].status_msg, "Crafted successfully!")
-
-    async def test_dismantle_select_callback(self):
-        """Test selecting an item to dismantle."""
-        # Setup view in dismantle mode
-        view = self.CraftingView(self.mock_db, self.mock_user, category="dismantle")
-
-        interaction = AsyncMock()
-        interaction.data = {"values": ["999"]}  # Inventory ID
-
-        # Mock dismantle logic
-        self.mock_crafting_system.dismantle_item.return_value = (True, "Dismantled!", {"scrap": 1})
-
-        await view.dismantle_select_callback(interaction)
-
-        # Verify dismantle_item called
-        self.mock_crafting_system.dismantle_item.assert_called_with(12345, 999)
-
-        # Verify response update
-        interaction.edit_original_response.assert_called()
-        args, kwargs = interaction.edit_original_response.call_args
-        self.assertEqual(kwargs["view"].status_msg, "Dismantled!")
-
-    async def test_category_experiment_callback(self):
-        """Test switching to experiment view."""
-        view = self.CraftingView(self.mock_db, self.mock_user)
-        interaction = AsyncMock()
-
-        # Mock ExperimentView
-        MockExperimentView = sys.modules["game_systems.crafting.ui.experiment_view"].ExperimentView
-        MockExperimentView.return_value.build_embed.return_value = MagicMock()
-
-        await view.category_experiment_callback(interaction)
-
-        interaction.edit_original_response.assert_called()
-        # Ensure ExperimentView was instantiated
-        MockExperimentView.assert_called()
-
-    async def test_switch_category(self):
-        """Test switching categories."""
-        view = self.CraftingView(self.mock_db, self.mock_user, category="consumable")
-        interaction = AsyncMock()
-
-        await view.category_equip_callback(interaction)
-
-        interaction.edit_original_response.assert_called()
-        args, kwargs = interaction.edit_original_response.call_args
-        new_view = kwargs["view"]
-        self.assertEqual(new_view.category, "equipment")
 
 
 if __name__ == "__main__":

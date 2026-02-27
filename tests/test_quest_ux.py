@@ -30,36 +30,10 @@ class MockView:
 
 discord_ui_mock.View = MockView
 discord_ui_mock.Button = MagicMock
-# Configure Color class mock correctly
-# discord.Color is a class, so accessing discord.Color.orange returns a bound method (mock)
-# calling that method should return "orange"
 discord_mock.Color.gold.return_value = "gold"
 discord_mock.Color.orange.return_value = "orange"
 
-# Ensure embed.color returns the value when accessed as a property on a MagicMock
-# if discord.Embed() returns a MagicMock, accessing .color on it returns a new MagicMock by default.
-# We need to tell the system that if someone assigns to .color, it works (which mocks do),
-# but if we assert equality, we might need to be careful.
-# However, usually equality check against a mock fails unless it's configured.
-
-# The failing test showed: AssertionError: <MagicMock name='mock.Color.orange()' ...> != 'orange'
-# This means embed.color IS the return value of discord.Color.orange().
-# But wait, discord.Color.orange.return_value = "orange" was set.
-# Why did it return a MagicMock name='mock.Color.orange()'?
-# This happens if the mock setup wasn't effective when the code ran, or if Color.orange is accessed as a property.
-# In discord.py, Color.orange is a classmethod.
-# Let's ensure the mock is robust.
-
-color_mock = MagicMock()
-color_mock.orange.return_value = "orange"
-color_mock.gold.return_value = "gold"
-discord_mock.Color = color_mock
-
 # Now import the module under test
-# Reload to ensure it picks up the mocked discord
-import importlib
-import game_systems.guild_system.ui.quests_menu
-importlib.reload(game_systems.guild_system.ui.quests_menu)
 from game_systems.guild_system.ui.quests_menu import QuestsMenuView  # noqa: E402
 
 
@@ -93,12 +67,6 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         qs_instance.get_player_quests.return_value = quests
         qs_instance.check_completion.return_value = False  # None are complete
 
-        # Manually configure the global mock directly to ensure it propagates
-        # Since we control sys.modules["discord"], patching "discord.Color" might try to patch the real module if found,
-        # or fail if the mock structure is complex.
-        # Direct configuration is safer here.
-        discord_mock.Color.orange.return_value = "orange"
-
         # Run callback
         with patch("cogs.quest_hub_cog.QuestLogView") as MockQuestLogView:
             await view.quest_turn_in_callback(self.interaction_mock)
@@ -113,8 +81,8 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Return when the work is done", embed.description)
 
         # 2. Color should be orange (warning)
-        # We check that color is set (truthy) to avoid fragile mock identity assertions
-        self.assertTrue(embed.color)
+        # Note: We mocked Color.orange() to return "orange"
+        self.assertEqual(embed.color, "orange")
 
         # 3. Should have added fields for the quests
         # Since embed is a mock, we check call args on add_field

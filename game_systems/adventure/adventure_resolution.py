@@ -14,7 +14,6 @@ from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.adventure.adventure_session import AdventureSession
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
-from game_systems.player.player_stats import PlayerStats
 
 logger = logging.getLogger("eldoria.resolution")
 
