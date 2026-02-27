@@ -17,6 +17,13 @@ class TestGuildAdvisor(unittest.TestCase):
         sys.modules["pymongo.errors"] = mock_pymongo.errors
         sys.modules["pymongo.MongoClient"] = MagicMock()
 
+        # Mock Discord
+        mock_discord = MagicMock()
+        mock_discord.Embed = MagicMock
+        mock_discord.Color.blue.return_value = "blue"
+        mock_discord.Color.gold.return_value = "gold"
+        sys.modules["discord"] = mock_discord
+
         # Add repo root to path if not present
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         if repo_root not in sys.path:
@@ -95,6 +102,52 @@ class TestGuildAdvisor(unittest.TestCase):
         self.assertIsInstance(advice, str)
         self.assertTrue(len(advice) > 10)
 
+    def test_checklist_embed_incomplete(self):
+        """Test checklist embed generation for incomplete onboarding."""
+        # Setup incomplete state
+        self.mock_db.get_equipped_items.return_value = []
+        self.mock_db.get_guild_member_data.return_value = {"quests_completed": 0}
+        self.mock_db.get_player_quests_joined.return_value = []
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 0}
+
+        embed = self.advisor.get_checklist_embed()
+
+        # We mocked discord.Embed, so we inspect calls or properties if we could.
+        # But since it's a MagicMock class, the instance is a MagicMock.
+        # We can check add_field calls.
+
+        self.assertEqual(embed.add_field.call_count, 4)
+
+        # Check specific field values for Pending status
+        calls = embed.add_field.call_args_list
+
+        # Registration (Always Complete)
+        self.assertIn("Complete", calls[0].kwargs['value'])
+
+        # Gear Up (Pending)
+        self.assertIn("Pending", calls[1].kwargs['value'])
+
+        # First Contract (Pending)
+        self.assertIn("Pending", calls[2].kwargs['value'])
+
+        # First Expedition (Pending)
+        self.assertIn("Pending", calls[3].kwargs['value'])
+
+    def test_checklist_embed_complete(self):
+        """Test checklist embed generation for completed onboarding."""
+        # Setup complete state
+        self.mock_db.get_equipped_items.return_value = [{"slot": "sword"}]
+        self.mock_db.get_guild_member_data.return_value = {"quests_completed": 1}
+        self.mock_db.get_player_quests_joined.return_value = []
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 1}
+
+        embed = self.advisor.get_checklist_embed()
+
+        self.assertEqual(embed.add_field.call_count, 4)
+
+        calls = embed.add_field.call_args_list
+        for call in calls:
+            self.assertIn("Complete", call.kwargs['value'])
 
 if __name__ == "__main__":
     unittest.main()

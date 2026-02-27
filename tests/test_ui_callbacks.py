@@ -44,8 +44,8 @@ class TestUICallbacks(unittest.IsolatedAsyncioTestCase):
         # Now import/reload the module
         import importlib
 
+        # Now that cogs/__init__.py and cogs/utils/__init__.py exist, we can import normally
         import cogs.utils.ui_helpers
-
         importlib.reload(cogs.utils.ui_helpers)
         self.ui_helpers = cogs.utils.ui_helpers
 

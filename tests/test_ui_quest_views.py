@@ -1,3 +1,4 @@
+import importlib
 import os
 import sys
 import unittest
@@ -46,6 +47,8 @@ class MockView:
     def clear_items(self):
         self.children = []
 
+    async def interaction_check(self, interaction):
+        return True
 
 # Mock discord module
 mock_discord = MagicMock()
@@ -60,8 +63,39 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # Import after mocking
-from cogs.quest_hub_cog import QuestBoardView, QuestDetailView, QuestLedgerView, QuestLogView
+if "cogs" not in sys.modules:
+    sys.modules["cogs"] = MagicMock()
+if "cogs.utils" not in sys.modules:
+    sys.modules["cogs.utils"] = MagicMock()
+if "cogs.utils.ui_helpers" not in sys.modules:
+    sys.modules["cogs.utils.ui_helpers"] = MagicMock()
+if "cogs.quest_hub_cog" not in sys.modules:
+    sys.modules["cogs.quest_hub_cog"] = MagicMock()
 
+import game_systems.guild_system.ui.quests_menu
+importlib.reload(game_systems.guild_system.ui.quests_menu)
+from game_systems.guild_system.ui.quests_menu import QuestsMenuView
+
+# Important: We need to reload cogs.quest_hub_cog if it was already imported,
+# or import it properly now that mocks are in place.
+
+# Force unload cogs.quest_hub_cog if it exists to ensure a fresh import with our mocked discord
+if "cogs.quest_hub_cog" in sys.modules:
+    del sys.modules["cogs.quest_hub_cog"]
+
+# Ensure cogs is treated as a package
+if "cogs" not in sys.modules:
+    sys.modules["cogs"] = MagicMock()
+
+# Since imports in python are cached, and we messed with sys.modules,
+# we need to force reload cogs.quest_hub_cog from file
+import types
+loader = importlib.machinery.SourceFileLoader('cogs.quest_hub_cog', os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cogs/quest_hub_cog.py'))
+quest_hub_cog = types.ModuleType(loader.name)
+loader.exec_module(quest_hub_cog)
+sys.modules['cogs.quest_hub_cog'] = quest_hub_cog
+
+from cogs.quest_hub_cog import QuestBoardView, QuestDetailView, QuestLedgerView, QuestLogView
 
 class TestQuestViews(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -95,6 +129,7 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         other_user.id = 999
         self.mock_interaction.user = other_user
 
+        # View's interaction_check behavior: if mismatch, sends ephemeral message and returns False
         result = await view.interaction_check(self.mock_interaction)
         self.assertFalse(result)
         self.mock_interaction.response.send_message.assert_called_with("This is not your adventure.", ephemeral=True)
@@ -218,6 +253,42 @@ class TestQuestViews(unittest.IsolatedAsyncioTestCase):
         self.mock_interaction.edit_original_response.assert_called()
         args, kwargs = self.mock_interaction.edit_original_response.call_args
         self.assertIsInstance(kwargs["view"], QuestBoardView)
+
+    async def test_quests_menu_view_callbacks(self):
+        """Test QuestsMenuView navigation callbacks."""
+        view = QuestsMenuView(self.mock_db, self.mock_user)
+
+        # Since QuestsMenuView does 'from cogs.quest_hub_cog import QuestBoardView' inside the method,
+        # we need to patch it in 'cogs.quest_hub_cog'.
+
+        # Test view_quests_callback
+        with patch("game_systems.guild_system.ui.quests_menu.QuestSystem") as MockQS:
+            MockQS.return_value.get_available_quests.return_value = []
+
+            # Patch in the module where the class is defined
+            with patch("cogs.quest_hub_cog.QuestBoardView") as MockBoardView:
+                await view.view_quests_callback(self.mock_interaction)
+                self.mock_interaction.edit_original_response.assert_called()
+                args, kwargs = self.mock_interaction.edit_original_response.call_args
+                self.assertEqual(kwargs["view"], MockBoardView.return_value)
+
+        # Test view_quest_ledger_callback
+        with patch("game_systems.guild_system.ui.quests_menu.QuestSystem") as MockQS:
+            MockQS.return_value.get_player_quests.return_value = []
+            with patch("cogs.quest_hub_cog.QuestLedgerView") as MockLedgerView:
+                await view.view_quest_ledger_callback(self.mock_interaction)
+                self.mock_interaction.edit_original_response.assert_called()
+                args, kwargs = self.mock_interaction.edit_original_response.call_args
+                self.assertEqual(kwargs["view"], MockLedgerView.return_value)
+
+        # Test quest_turn_in_callback
+        with patch("game_systems.guild_system.ui.quests_menu.QuestSystem") as MockQS:
+            MockQS.return_value.get_player_quests.return_value = []
+            with patch("cogs.quest_hub_cog.QuestLogView") as MockLogView:
+                await view.quest_turn_in_callback(self.mock_interaction)
+                self.mock_interaction.edit_original_response.assert_called()
+                args, kwargs = self.mock_interaction.edit_original_response.call_args
+                self.assertEqual(kwargs["view"], MockLogView.return_value)
 
 
 if __name__ == "__main__":
