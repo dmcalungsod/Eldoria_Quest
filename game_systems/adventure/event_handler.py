@@ -59,7 +59,7 @@ class EventHandler:
                             result["log"][0] = f"\n{result['log'][0]}"
                         return result
 
-                return self._perform_quest_event(context, location_name, location_id, supplies)
+                return self._perform_quest_event(context, location_name, location_id, supplies, weather)
         except Exception as e:
             logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
@@ -165,6 +165,7 @@ class EventHandler:
         location_name: str | None,
         location_id: str | None,
         supplies: dict[str, int] | None = None,
+        weather: Weather = Weather.CLEAR,
     ) -> dict[str, Any]:
         """
         Checks active quests for exploration objectives.
@@ -225,7 +226,7 @@ class EventHandler:
                                     }
 
             # If no matching quest event was found, try wild gathering
-            return self._perform_wild_gathering(context, location_id, supplies=supplies)
+            return self._perform_wild_gathering(context, location_id, supplies=supplies, weather=weather)
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")
@@ -237,6 +238,7 @@ class EventHandler:
         location_id: str | None,
         bonus_chance: int = 0,
         supplies: dict[str, int] | None = None,
+        weather: Weather = Weather.CLEAR,
     ) -> dict[str, Any]:
         """
         Attempts to find wild materials if no quest event triggered.
@@ -258,6 +260,18 @@ class EventHandler:
 
         # 35% Base Chance + Bonus
         base_chance = 35 + bonus_chance
+
+        # Weather modifiers on gathering chance
+        weather_fail_flavor = None
+        if weather in [Weather.FOG, Weather.SNOW, Weather.BLIZZARD]:
+            base_chance -= 10
+            weather_fail_flavor = f"The {weather.value.lower()} obscures your vision, making it hard to find anything."
+        elif weather in [Weather.SANDSTORM, Weather.ASH]:
+            base_chance -= 15
+            weather_fail_flavor = f"The scouring {weather.value.lower()} forces you to seek shelter instead of foraging."
+        elif weather == Weather.CLEAR:
+            base_chance += 5
+
         if random.randint(1, 100) <= base_chance:
             # Weighted Selection
             choices, weights = zip(*gatherables)
@@ -291,6 +305,13 @@ class EventHandler:
                     # Ensure at least 1 if multiplier somehow reduces it (unlikely but safe)
                     quantity = max(1, quantity)
 
+                weather_bonus = False
+                if weather == Weather.RAIN:
+                    quantity += 1
+                    weather_bonus = True
+                elif weather in [Weather.ASH, Weather.MIASMA]:
+                    quantity = max(1, quantity - 1)
+
                 name = mat_data["name"]
                 # Format name with quantity if > 1
                 display_name = f"{name} (x{quantity})" if quantity > 1 else name
@@ -300,6 +321,9 @@ class EventHandler:
 
                 if kit_bonus > 0:
                     display_name += " (Kit Bonus)"
+
+                if weather_bonus:
+                    display_name += " 🌧️ (Rain Bonus)"
 
                 event_text = f"\n{AdventureEvents.wild_gather_event(display_name)}"
                 return {
