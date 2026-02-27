@@ -10,7 +10,6 @@ import json
 import logging
 import random
 import re
-from zoneinfo import ZoneInfo
 
 import discord
 
@@ -195,22 +194,27 @@ class AdventureEmbeds:
 
         # Calculate Times
         end_time = datetime.datetime.fromisoformat(session["end_time"])
+        now = WorldTime.now()
 
-        # Ensure timezone awareness (Manila) for correct timestamp calculation
-        if end_time.tzinfo is None:
-            end_time = end_time.replace(tzinfo=ZoneInfo("Asia/Manila"))
-
-        now = datetime.datetime.now(ZoneInfo("Asia/Manila"))
         remaining = end_time - now
 
+        # Format duration strings
+        def fmt_delta(d):
+            seconds = int(d.total_seconds())
+            if seconds < 0:
+                return "0m"
+            hours, remainder = divmod(seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+            if hours > 0:
+                return f"{hours}h {minutes}m"
+            return f"{minutes}m"
+
+        remaining_str = fmt_delta(remaining)
         if remaining.total_seconds() <= 0:
             remaining_str = "Complete!"
             status_text = "Ready to Return"
             color = discord.Color.gold()
         else:
-            # Use Discord relative timestamp <t:TIMESTAMP:R>
-            ts = int(end_time.timestamp())
-            remaining_str = f"<t:{ts}:R>"
             status_text = "In Progress"
             color = discord.Color.blue()
 
