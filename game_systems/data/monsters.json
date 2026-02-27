@@ -2669,8 +2669,8 @@
         "xp": 1050,
         "drops": [
             [
-                "rusted_scrap",
-                60
+                "iron_ingot",
+                50
             ],
             [
                 "magic_stone_medium",
