@@ -43,6 +43,9 @@ class MockDatabase:
     def _col(self, name):
         return MagicMock()
 
+    def get_active_boosts(self):
+        return []
+
 
 class FastAdventureSession:
     def __init__(self, db, quest, inv, discord_id, row_data=None):
@@ -59,6 +62,22 @@ class FastAdventureSession:
 
     def save_state(self):
         pass
+
+    def _fetch_session_context(self, bundle=None):
+        # Return a dummy context matching what AdventureResolutionEngine expects
+        player_stats = MagicMock()
+        player_stats.max_hp = 100
+        player_stats.max_mp = 100
+
+        return {
+            "vitals": {"current_hp": 100, "current_mp": 100},
+            "player_stats": player_stats,
+            "stats_dict": {"HP": 100, "MP": 100},
+            "player_row": {"current_hp": 100, "current_mp": 100},
+            "skills": [],
+            "active_boosts": {},
+            "event_type": None,
+        }
 
 
 def run_stress_test():
@@ -106,7 +125,7 @@ def run_stress_test():
         end_time = time.time()
         duration = end_time - start_time
 
-        throughput = NUM_SESSIONS / duration
+        throughput = NUM_SESSIONS / duration if duration > 0 else NUM_SESSIONS
         logger.info(f"Finished in {duration:.4f}s")
         logger.info(f"Throughput: {throughput:.2f} sessions/sec")
 
