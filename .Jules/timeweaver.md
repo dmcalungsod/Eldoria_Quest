@@ -1,28 +1,55 @@
 # Timeweaver Journal
 
-## Initial Analysis
-I have explored the codebase and found that an `AdventureResolutionEngine` already exists, which simulates steps for adventures that have passed their end time. The current system uses `AdventureSession` to simulate steps, which involves:
-- Fetching player stats and context.
-- Simulating combat or events (60/40 split).
-- Handling auto-combat (up to 8 turns).
-- Managing loot and vitals.
+## Initial Research
+- Reviewed `AdventureManager`: Current system seems to support a mix of immediate processing and session-based tracking.
+- Reviewed `CombatEngine`: Solid turn-based logic. The auto-adventure system needs to adapt this for "simulated" combat without necessarily running every single turn in full detail if performance is a concern, or just run it as is if the volume is manageable. given it's a discord bot, full simulation might be heavy if many players are adventuring. *Decision: We should probably simulate "encounters" rather than strictly "steps" to save processing, or use a simplified resolution for auto-adventures.*
+- Reviewed `AdventureSession`: Needs to be checked to see if it supports the "log" of events that will be generated over time.
 
-The current implementation seems to be a "catch-up" simulation at the end of the duration. This fits the "idle" requirement, but the prompt asks for a "comprehensive design" to "transform" the game. This suggests the current system might be a prototype or incomplete, or the user wants a more robust, feature-rich version.
-
-## Key Observations
-- **Existing Logic**: `AdventureSession.simulate_step` is the core. It handles combat and events. `AdventureResolutionEngine` loops this.
-- **Manual vs Auto**: The `AdventureCommands` cog suggests manual commands are removed, so we are already moving towards auto.
-- **Performance**: Simulating every step (combat turns etc.) for a 24h adventure (96 steps) for many players might be heavy if done all at once. I should consider if "statistical resolution" or "batched processing" is needed, but preserving "Class Identity" suggests we need the combat logic.
-- **Risk/Reward**: Currently, fatigue increases damage after 16 steps. This is a good start. I need to expand on this with explicit duration tiers (Short, Medium, Long).
-
-## Design Goals
-1.  **Formalize the Idle Loop**: Make it clear how players start and claim adventures.
-2.  **Duration Tiers**: Define specific durations (e.g., 30m, 4h, 12h) with distinct modifiers.
-3.  **Risk Management**: Supplies should be crucial. "Retreat" conditions.
-4.  **Notification**: Discord webhooks/messages when done.
-5.  **Data Structure**: Ensure the DB schema supports the new features (status, start/end time, duration, log, rewards).
+## Design Thoughts
+- **Time vs Steps**: The prompt suggests "Clear mapping of time to steps: e.g., 1 step = 1 minute". This is a good baseline.
+- **Interruption**: Players might want to check status.
+- **Supplies**: Crucial for the "survival" aspect. Food/Torches should be consumed over time.
+- **Risk**: Longer adventures = deeper floors = higher monster level.
 
 ## Next Steps
-- Draft the `timeweaver_design.md` covering all sections from the prompt.
-- Focus on "Integration" with existing systems (Floors, Supplies).
-- Detail the "Auto-Resolution" logic (keep it simulation-based for fidelity, but optimize).
+- Define the database schema changes needed.
+- Define the "Resolution Engine" logic.
+- Draft the UI flow.
+
+## Database & Data Analysis
+- **Monsters**: `monsters.json` contains detailed stats. We can reuse this.
+- **Items**: `recipes.py` shows consumables. We need to ensure supplies like "rations" or "torches" are properly tagged for auto-adventure usage.
+- **Adventure Session**: The `AdventureSession` class already supports `logs`, `loot`, and `steps_completed`. We need to expand this to handle "time elapsed" and "next processing time".
+
+## Design Refinements
+- **Core Loop**: User selects duration -> Bot calculates "end time" and "next step time" -> Database stores session -> Background task checks for "due" sessions -> Processes X steps based on time elapsed -> Updates DB -> Notifies user if complete.
+- **Supplies**: Players should "equip" supplies for the journey.
+- **Combat**: Auto-resolve using `CombatEngine` but perhaps in "fast mode" (just calc damage/results, skip detailed logs if not needed, or generate a summary log).
+
+## Open Questions
+- How to handle "death" in auto-adventure? Should they lose everything? Or just a portion? *Memory says: 10% Aurum, 50% Material, 100% XP loss.* We should stick to this or refine for auto-adventure specific (maybe less harsh since it's passive? Or harsher because it's riskier?). Let's stick to the memory standard for consistency but maybe add a "Rescue" mechanic later.
+- **Discord Interaction**: We can't update a message every minute. We should update the "status" embed only on user request or at key milestones (25%, 50%, 75%, 100%).
+
+## Drafting the Design Document Structure
+1. **Title & Vision**: "Chronos Engine" - Time as the primary resource.
+2. **Core Loop**:
+   - `/adventure` command -> Select Location -> Select Duration -> Select Supplies -> Start.
+   - Background Task: Checks DB every minute (or 5 mins).
+   - "Recall": Allow early cancel with penalty (no loot from unfinished steps).
+3. **Time Mechanics**:
+   - Short (30m), Medium (2h), Long (8h), Epic (24h).
+   - Multipliers for risk/reward based on duration? Or just linear scaling?
+   - *Idea*: "Pushing it" mechanic. Going longer than comfortable adds fatigue.
+4. **Resolution Engine**:
+   - `ResolutionEngine` class.
+   - Calculates "Events per hour".
+   - Simulates combat using `CombatEngine` (headless mode).
+   - Handles supply consumption (1 ration/hour, 1 torch/dungeon floor).
+5. **UI/UX**:
+   - Start: Dropdowns for location/time. Button for supplies.
+   - Status: `/status` or Button on original message to "Refresh".
+   - End: DM with summary image/embed.
+6. **Integration**:
+   - `InventoryManager` for deducting supplies.
+   - `PlayerStats` for determining success chance of events.
+   - `LevelUpSystem` for rewards.
