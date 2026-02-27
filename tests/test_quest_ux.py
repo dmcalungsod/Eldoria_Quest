@@ -93,9 +93,14 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         qs_instance.get_player_quests.return_value = quests
         qs_instance.check_completion.return_value = False  # None are complete
 
-        # Run callback with explicitly patched Color to ensure return value
-        with patch("cogs.quest_hub_cog.QuestLogView") as MockQuestLogView, \
-             patch("discord.Color.orange", return_value="orange"):
+        # Manually configure the global mock directly to ensure it propagates
+        # Since we control sys.modules["discord"], patching "discord.Color" might try to patch the real module if found,
+        # or fail if the mock structure is complex.
+        # Direct configuration is safer here.
+        discord_mock.Color.orange.return_value = "orange"
+
+        # Run callback
+        with patch("cogs.quest_hub_cog.QuestLogView") as MockQuestLogView:
             await view.quest_turn_in_callback(self.interaction_mock)
 
         # Verify
