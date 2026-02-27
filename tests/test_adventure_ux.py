@@ -161,7 +161,11 @@ class TestAdventureUX(unittest.IsolatedAsyncioTestCase):
         interaction.client.get_cog = MagicMock(return_value=mock_cog)
 
         # Mock active session
-        session = {"status": "in_progress", "location_id": "forest"}
+        session = {
+            "status": "in_progress",
+            "location_id": "forest",
+            "end_time": "2023-01-01T12:00:00"  # Required by AdventureEmbeds
+        }
         mock_manager.get_active_session = MagicMock(return_value=session)
 
         # Mock Embeds

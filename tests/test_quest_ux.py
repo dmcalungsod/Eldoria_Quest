@@ -81,7 +81,47 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Return when the work is done", embed.description)
 
         # 2. Color should be orange (warning)
-        # Note: We mocked Color.orange() to return "orange"
+        # Note: We mocked Color.orange() to return "orange", but embed.color might be accessed differently depending on how Embed is constructed.
+        # If embed is a MagicMock, embed.color returns a new MagicMock by default unless configured.
+        # In the source code (quests_menu.py), it does `embed.color = discord.Color.orange()`.
+        # Since we mocked `discord.Color.orange.return_value = "orange"`, `embed.color` should be "orange".
+        # However, if embed was created via `discord.Embed(...)` which is a Mock, the constructor usage might affect it.
+        # Let's verify what `embed.color` actually is.
+        # The failure log said: AssertionError: <MagicMock name='mock.Color.orange()' ...> != 'orange'
+        # This implies `embed.color` holds the Mock object itself, not the return value.
+        # This happens if the code calls `discord.Color.orange()` (which returns the mock we set up)
+        # BUT the assertion sees the mock function call result.
+
+        # Ah, looking at the error: <MagicMock name='mock.Color.orange()' ...>
+        # It seems discord.Color.orange is a MagicMock, and calling it returns a MagicMock unless we set return_value.
+        # We did: discord_mock.Color.orange.return_value = "orange"
+
+        # Re-checking the setup:
+        # discord_mock.Color.gold.return_value = "gold"
+        # discord_mock.Color.orange.return_value = "orange"
+
+        # If the code uses `discord.Color.orange` (property) instead of `discord.Color.orange()` (method), that would be different.
+        # Discord.py Color.orange is a classmethod, so it is called as `discord.Color.orange()`.
+
+        # Maybe the issue is how we set up the mock.
+        # discord_mock = MagicMock()
+        # sys.modules["discord"] = discord_mock
+        # discord_mock.Color.orange.return_value = "orange"
+
+        # If I look at the error again: <MagicMock name='mock.Color.orange()' id='140098889106400'>
+        # The name suggests it's the result of calling orange().
+
+        # Let's relax the assertion to check if it's the right thing, or ensure the mock returns a string.
+        # It's possible the `Color` class itself needs to be mocked differently.
+
+        # If the code does: `embed.color = discord.Color.orange()`
+        # And we set `discord.Color.orange.return_value = 'orange'`
+        # Then `embed.color` should be `'orange'`.
+
+        # Wait, if `discord.Color` is a MagicMock, `discord.Color.orange` is a child MagicMock.
+        # `discord.Color.orange()` returns `discord.Color.orange.return_value`.
+
+        # Let's force it in the test function to be sure.
         self.assertEqual(embed.color, "orange")
 
         # 3. Should have added fields for the quests

@@ -58,6 +58,8 @@ class TestInfirmaryUI(unittest.IsolatedAsyncioTestCase):
 
         sys.modules["discord"] = mock_discord
         sys.modules["discord.ui"] = mock_ui
+        sys.modules["discord.ext"] = MagicMock()
+        sys.modules["discord.ext.commands"] = MagicMock()
 
         # Mock other dependencies
         # Ensure 'cogs' is seen as a package so importlib can reload submodule
@@ -66,12 +68,19 @@ class TestInfirmaryUI(unittest.IsolatedAsyncioTestCase):
         sys.modules["cogs.utils.ui_helpers"] = MagicMock()
 
         # Import module under test
-        import cogs.infirmary_cog
-        importlib.reload(cogs.infirmary_cog)
 
-        self.InfirmaryView = cogs.infirmary_cog.InfirmaryView
-        self.DatabaseManager = cogs.infirmary_cog.DatabaseManager
-        self.PlayerStats = cogs.infirmary_cog.PlayerStats
+        # Manually load the module from file to bypass package issues
+        loader = importlib.machinery.SourceFileLoader(
+            "cogs.infirmary_cog",
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cogs/infirmary_cog.py")
+        )
+        mod = importlib.util.module_from_spec(importlib.util.spec_from_loader("cogs.infirmary_cog", loader))
+        sys.modules["cogs.infirmary_cog"] = mod
+        loader.exec_module(mod)
+
+        self.InfirmaryView = mod.InfirmaryView
+        self.DatabaseManager = mod.DatabaseManager
+        self.PlayerStats = mod.PlayerStats
 
         self.mock_db = MagicMock()
         self.mock_user = MagicMock()
@@ -159,12 +168,42 @@ class TestInfirmaryUI(unittest.IsolatedAsyncioTestCase):
         view = self.InfirmaryView(self.mock_db, self.mock_user, self.p_data, self.stats)
         interaction = AsyncMock()
 
-        # Mock failure
-        self.mock_db.get_player_stats_json.return_value = None # Cause execute_heal to fail inside _execute_heal
+        # Mock failure in execute_heal
+        self.mock_db.get_player_stats_json.side_effect = [
+            None,  # Fail during _execute_heal
+            self.stats.to_dict() if hasattr(self.stats, 'to_dict') else {}, # Succeed during rebuild
+        ]
 
-        await view.heal_callback(interaction)
+        # Since _execute_heal catches exception and returns (False, msg),
+        # we need to ensure the subsequent data fetch for rebuild works or is mocked.
+        # In heal_callback:
+        # success, msg = await asyncio.to_thread(self._execute_heal)
+        # tasks = [get_player, get_player_stats_json]
+
+        # We need to ensure get_player returns valid data so build_infirmary_embed doesn't crash
+        self.mock_db.get_player.return_value = self.p_data
+
+        # If get_player_stats_json returns None in the first call (inside _execute_heal),
+        # _execute_heal returns (False, "System error...").
+        # Then heal_callback calls get_player and get_player_stats_json AGAIN to refresh view.
+        # We need to make sure the SECOND call to get_player_stats_json returns something valid
+        # so PlayerStats.from_dict doesn't crash, OR mock PlayerStats.from_dict to handle it.
+
+        # Let's just mock the second call to return valid stats json
+        # But wait, setUp mocked PlayerStats class from the module.
+        # In the source: new_stats = PlayerStats.from_dict(stats_json)
+
+        # We need to ensure stats_json is not None in the second call.
+        self.mock_db.get_player_stats_json.side_effect = [None, {"max_hp": 100, "max_mp": 50}]
+
+        # We also need to patch PlayerStats.from_dict to return a stats object
+        with patch.object(self.PlayerStats, 'from_dict', return_value=self.stats):
+            await view.heal_callback(interaction)
 
         # Verify response
         interaction.edit_original_response.assert_called()
         args, kwargs = interaction.edit_original_response.call_args
         # Should show error state in embed
+
+if __name__ == "__main__":
+    unittest.main()
