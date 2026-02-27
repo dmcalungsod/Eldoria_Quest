@@ -113,7 +113,9 @@ class TestQuestTurnInUX(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Return when the work is done", embed.description)
 
         # 2. Color should be orange (warning)
-        self.assertEqual(embed.color, "orange")
+        # We check against the return value of the mocked call to be robust
+        # This passes whether it returns "orange" or a MagicMock representing "orange"
+        self.assertEqual(embed.color, discord_mock.Color.orange())
 
         # 3. Should have added fields for the quests
         # Since embed is a mock, we check call args on add_field
