@@ -56,6 +56,10 @@ color_mock.gold.return_value = "gold"
 discord_mock.Color = color_mock
 
 # Now import the module under test
+# Reload to ensure it picks up the mocked discord
+import importlib
+import game_systems.guild_system.ui.quests_menu
+importlib.reload(game_systems.guild_system.ui.quests_menu)
 from game_systems.guild_system.ui.quests_menu import QuestsMenuView  # noqa: E402
 
 
