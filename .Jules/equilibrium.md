@@ -42,3 +42,26 @@
 **Player Impact:**
 - Makes the "Feral Stag" feel like a true rare encounter rather than a farming node.
 - Smooths the difficulty curve for new players entering Deepgrove Roots (fewer boss wipes).
+
+## 2026-03-07 — Night Ambush Defense Calculation Fix
+
+**Learning:** Defense stats were completely ignored during Night Ambushes in `AdventureSession`, causing high-level tanks to take massive damage from low-level mobs.
+**The Imbalance:**
+1.  **Formula:** The damage logic was simply `Monster ATK * 0.8`.
+2.  **Impact:** A player with 9999 Defense took the same damage as a player with 0 Defense (e.g., 80 damage from a 100 ATK mob).
+
+**The Fix:**
+1.  **Logic:** Updated `_handle_new_encounter` in `adventure_session.py` to calculate player defense using `calculate_tiered_bonus`.
+2.  **Formula:** `(Monster ATK * 0.8) - (Defense Mitigation * 0.5)`.
+    - **Defense Mitigation:** Standard combat mitigation formula `Def * (0.3 + 0.2 * saturation)`.
+    - **Ambush Penalty:** Mitigation is reduced by 50% to reflect the surprise nature of the attack.
+    - **Floor:** Damage cannot go below 1.
+
+**Measured Impact:**
+- **Low Defense (END 10, DEF 0):** Takes ~77 damage (Previously 80).
+- **High Defense (END 100, DEF 100):** Takes ~17 damage (Previously 80).
+- **God Mode (END 9999, DEF 9999):** Takes 1 damage (Previously 80).
+
+**Player Impact:**
+- Restores value to the Defense stat during night cycles.
+- Maintains the "danger" of night travel (50% mitigation penalty) without being unfair to high-level players.
