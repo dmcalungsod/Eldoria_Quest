@@ -76,6 +76,19 @@ class EventCog(commands.Cog):
                         )
                         logger.info("Auto-started Mystic Merchant.")
 
+                # Guild Expedition Drive: Every Weekend (Saturday 00:00 to Sunday 23:59)
+                elif now.weekday() == 5 and now.hour == 0:  # Saturday midnight
+                    success = self.system.start_event(WorldEventSystem.GUILD_EXPEDITION_DRIVE, 48)
+                    if success:
+                        config = self.system.EVENT_CONFIGS[WorldEventSystem.GUILD_EXPEDITION_DRIVE]
+                        await self._announce(
+                            f"🗺️ **GUILD EXPEDITION DRIVE!** 🗺️\n\n"
+                            f"**{config['name']}**\n"
+                            f"{config['description']}\n\n"
+                            f"Set out on long adventures this weekend! 🏕️"
+                        )
+                        logger.info("Auto-started Guild Expedition Drive.")
+
         except Exception as e:
             logger.error(f"Error in event cycle: {e}", exc_info=True)
 
