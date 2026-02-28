@@ -20,6 +20,7 @@
 *   **The Silent Witness:** Solve a murder in the guild by talking to NPCs with secrets.
 *   **The Sundering's Child:** A monster that seems intelligent – do you kill it or try to communicate?
 *   **The Clockwork Heart:** A moral dilemma involving a sentient construct in the Clockwork Halls.
+*   **The Blind Choir's Requiem:** A dark, atmospheric cult storyline for The Wailing Chasm, focusing on corrupted harmony and a choice between silencing the void or claiming its secrets.
 
 ## 🚫 Avoids
 *   **Generic fetch/kill quests** without context.
