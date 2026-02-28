@@ -262,13 +262,10 @@ class EventHandler:
         base_chance = 35 + bonus_chance
 
         # Weather modifiers on gathering chance
-        weather_fail_flavor = None
         if weather in [Weather.FOG, Weather.SNOW, Weather.BLIZZARD]:
             base_chance -= 10
-            weather_fail_flavor = f"The {weather.value.lower()} obscures your vision, making it hard to find anything."
         elif weather in [Weather.SANDSTORM, Weather.ASH]:
             base_chance -= 15
-            weather_fail_flavor = f"The scouring {weather.value.lower()} forces you to seek shelter instead of foraging."
         elif weather == Weather.CLEAR:
             base_chance += 5
 

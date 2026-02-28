@@ -25,7 +25,8 @@ def main():
     files_to_check = [
         "game_systems/data/adventure_locations.json",
         "game_systems/data/monsters.json",
-        "game_systems/data/materials.json"
+        "game_systems/data/materials.json",
+        "game_systems/data/quest_items.json"
     ]
 
     all_valid = True

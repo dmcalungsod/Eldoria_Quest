@@ -135,9 +135,7 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_session_context(
-        self, bundle: dict | None = None
-    ) -> dict[str, Any] | None:
+    def _fetch_session_context(self, bundle: dict | None = None) -> dict[str, Any] | None:
         """
         Fetches all necessary data for the adventure step (combat or non-combat).
         Returns None if critical data (vitals) is missing.
@@ -291,7 +289,9 @@ class AdventureSession:
 
             if persist:
                 # Delta update
-                max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+                max_mp = context["stats_dict"].get(
+                    "MP", context["player_stats"].max_mp
+                )
                 self.db.update_player_vitals_delta(
                     self.discord_id, -damage, 0, max_hp, max_mp
                 )
@@ -348,8 +348,7 @@ class AdventureSession:
                 # Ensure max_hp is at least 1
                 if "stats_dict" in context:
                     max_hp = max(
-                        context["stats_dict"].get("HP", context["player_stats"].max_hp),
-                        1,
+                        context["stats_dict"].get("HP", context["player_stats"].max_hp), 1
                     )
                 else:
                     max_hp = max(context["player_stats"].max_hp, 1)
@@ -431,9 +430,7 @@ class AdventureSession:
             if self.supplies.get("pitch_torch"):
                 ambush_chance *= 0.5
 
-            if (
-                time_phase == TimePhase.NIGHT and random.random() < ambush_chance
-            ):  # nosec B311
+            if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
                 monster_atk = monster.get("ATK", 10)
 
                 # --- AMBUSH DEFENSE MITIGATION ---
@@ -460,8 +457,12 @@ class AdventureSession:
                 context["vitals"]["current_hp"] = new_hp
 
                 # Use Delta Update
-                max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
-                max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+                max_hp = context["stats_dict"].get(
+                    "HP", context["player_stats"].max_hp
+                )
+                max_mp = context["stats_dict"].get(
+                    "MP", context["player_stats"].max_mp
+                )
 
                 if persist:
                     self.db.update_player_vitals_delta(
@@ -471,7 +472,7 @@ class AdventureSession:
                 phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
                 if context.get("event_type") == "spectral_tide":
-                    phrase += "\n👻 **Spectral Chill:** An unnatural cold grips your heart as restless spirits guide the enemy's strike! You were caught completely off guard."
+                    phrase += "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
 
             # Start new combat
             self.active_monster = monster
@@ -547,14 +548,10 @@ class AdventureSession:
             # This allows AdventureResolutionEngine to pre-parse the bundle ONCE and pass the ready-to-use context object,
             # avoiding redundant processing in _fetch_session_context.
 
-            if (
-                context_bundle
-                and "player_stats" in context_bundle
-                and isinstance(context_bundle["player_stats"], PlayerStats)
-            ):
-                context = context_bundle
+            if context_bundle and "player_stats" in context_bundle and isinstance(context_bundle["player_stats"], PlayerStats):
+                 context = context_bundle
             else:
-                context = self._fetch_session_context(context_bundle)
+                 context = self._fetch_session_context(context_bundle)
 
             if not context:
                 return self._build_result(
@@ -661,9 +658,7 @@ class AdventureSession:
             return self._build_result([msg], False, context)
         else:
             # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
-            fail_msg = (
-                f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
-            )
+            fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
             return self._process_combat_turn(
                 context, action="flee_failed", prepend_logs=[fail_msg], persist=persist
             )
@@ -751,9 +746,7 @@ class AdventureSession:
                 else:
                     if not background:
                         sequence.append(
-                            [
-                                "\n⚠️ **Combat paused:** HP critical. Manual mode engaged."
-                            ]
+                            ["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."]
                         )
                     # If background, we break silently. Next simulate_step will trigger _attempt_flee
                     break
