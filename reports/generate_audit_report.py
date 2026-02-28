@@ -1,4 +1,3 @@
-import json
 
 with open("reports/flake8.txt", "r") as f:
     flake8_out = f.read()
@@ -12,7 +11,7 @@ with open("reports/vulture.txt", "r") as f:
 with open("reports/complexity.txt", "r") as f:
     complexity_out = f.read()
 
-report = f"""# 🔍 Eldoria Quest Codebase Audit — 2026-02-28
+report = """# 🔍 Eldoria Quest Codebase Audit — 2026-02-28
 
 **Auditor:** Repo Auditor
 **Scope:** Entire repository

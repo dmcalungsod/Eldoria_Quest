@@ -1047,7 +1047,7 @@
     "celestial_archipelago": {
         "name": "The Celestial Archipelago",
         "emoji": "☁️",
-        "min_rank": "A",
+        "min_rank": "B",
         "level_req": 28,
         "duration_options": [
             60,
