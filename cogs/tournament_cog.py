@@ -13,6 +13,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 import game_systems.data.emojis as E
+from cogs.utils.announcer import announce_to_guilds
 from database.database_manager import DatabaseManager
 from game_systems.core.world_time import WorldTime
 from game_systems.guild_system.tournament_system import TournamentSystem
@@ -50,7 +51,7 @@ class TournamentCog(commands.Cog):
                     # End it
                     result_msg = self.system.end_current_tournament()
                     logger.info(f"Tournament Ended Automatically: {result_msg}")
-                    await self._announce(f"🏆 **Tournament Concluded!**\n\n{result_msg}")
+                    await announce_to_guilds(self.bot, f"🏆 **Tournament Concluded!**\n\n{result_msg}")
             else:
                 # Start new one if it's Monday
                 if now.weekday() == 0:  # Monday
@@ -60,7 +61,7 @@ class TournamentCog(commands.Cog):
                     # Announce start
                     active = self.db.get_active_tournament()
                     if active:
-                        await self._announce(
+                        await announce_to_guilds(self.bot,
                             f"⚔️ **New Tournament Started!**\n\n"
                             f"Objective: **{active['type'].replace('_', ' ').title()}**\n"
                             f"Ends in: **7 days**"
@@ -68,19 +69,6 @@ class TournamentCog(commands.Cog):
 
         except Exception as e:
             logger.error(f"Error in tournament cycle: {e}", exc_info=True)
-
-    async def _announce(self, message: str):
-        """Attempts to announce to a guild channel (guild-hall or general)."""
-        for guild in self.bot.guilds:
-            channel = discord.utils.get(guild.text_channels, name="guild-hall")
-            if not channel:
-                channel = discord.utils.get(guild.text_channels, name="general")
-
-            if channel:
-                try:
-                    await channel.send(message)
-                except Exception as e:
-                    logger.error(f"Failed to announce in {guild.name}: {e}")
 
     @check_tournament_cycle.before_loop
     async def before_check_tournament_cycle(self):
