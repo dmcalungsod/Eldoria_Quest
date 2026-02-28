@@ -1,14 +1,14 @@
 
-with open("reports/flake8.txt", "r") as f:
+with open("reports/flake8.txt") as f:
     flake8_out = f.read()
 
-with open("reports/bandit.txt", "r") as f:
+with open("reports/bandit.txt") as f:
     bandit_out = f.read()
 
-with open("reports/vulture.txt", "r") as f:
+with open("reports/vulture.txt") as f:
     vulture_out = f.read()
 
-with open("reports/complexity.txt", "r") as f:
+with open("reports/complexity.txt") as f:
     complexity_out = f.read()
 
 report = """# 🔍 Eldoria Quest Codebase Audit — 2026-02-28
