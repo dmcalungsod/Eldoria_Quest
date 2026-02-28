@@ -733,6 +733,14 @@ class CombatEngine:
                 self.monster["is_stunned"] = True
                 log.append(f"💫 **Stunned!** The {self.monster.get('name', 'Enemy')} is reeling!")
 
+            bleed = status_effect.get("bleed", 0)
+            if bleed > 0:
+                duration = int(status_effect.get("duration", 3))
+                if "debuffs" not in self.monster:
+                    self.monster["debuffs"] = []
+                self.monster["debuffs"].append({"type": "bleed", "damage": bleed, "duration": duration, "name": "Bleed"})
+                log.append(f"🩸 **{self.monster.get('name', 'Enemy')}** is bleeding for {bleed} dmg/turn!")
+
     def _is_player_immune(self, status_type: str) -> bool:
         """Checks if the player has immunity to a specific status."""
         for buff in self.active_buffs:
@@ -763,11 +771,14 @@ class CombatEngine:
 
             name = debuff.get("name", "Debuff")
 
-            if debuff_type == "poison":
+            if debuff_type in ["poison", "bleed"]:
                 dmg = debuff.get("damage", 0)
                 # Apply Damage
                 self.monster_hp -= dmg
-                msgs.append(f"☠️ **{self.monster.get('name', 'Enemy')}** takes {dmg} {name.lower()} damage!")
+                if debuff_type == "poison":
+                    msgs.append(f"☠️ **{self.monster.get('name', 'Enemy')}** takes {dmg} {name.lower()} damage!")
+                else:
+                    msgs.append(f"🩸 **{self.monster.get('name', 'Enemy')}** bleeds for {dmg} damage!")
 
             # Decrement Duration
             debuff["duration"] -= 1
@@ -826,7 +837,7 @@ class CombatEngine:
 
         # Check for Stat Modifiers (ATK_percent, DEF_percent, etc.)
         stat_mods = {}
-        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent"]:
+        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent", "accuracy_percent"]:
             if key in debuff_data:
                 stat_mods[key] = debuff_data[key]
 
@@ -896,7 +907,7 @@ class CombatEngine:
         Calculates and records buffs from a skill.
         Converts % bonuses to flat values based on current stats.
         """
-        buff_data = skill.get("buff_data", {})
+        buff_data = skill.get("buff_data", skill.get("buff", {}))
         if not buff_data:
             return
 
@@ -924,6 +935,10 @@ class CombatEngine:
                     bonus = current_val * float(val)
                     if bonus > 0:
                         add_buff(stat_code, bonus)
+
+            elif key == "next_hit_crit":
+                if val:
+                    add_buff("next_hit_crit", 1)
 
             elif key.endswith("_percent"):
                 # e.g., "END_percent": 0.25 -> +25% END

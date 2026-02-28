@@ -40,6 +40,17 @@
         },
         "description": "A crude iron blade, sharp enough to cut a purse or a throat."
     },
+    "gen_dagger_002": {
+        "name": "Chirurgeon's Scalpel",
+        "slot": "dagger",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "DEX": 1,
+            "MAG": 1
+        },
+        "description": "A delicate, razor-sharp blade meant for flesh, not armor."
+    },
     "gen_bow_001": {
         "name": "Hunter's Bow",
         "slot": "bow",

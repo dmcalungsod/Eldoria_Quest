@@ -70,10 +70,10 @@ class ConsumableManager:
                     ):
                         bonuses = skill_def["passive_bonus"]
                         if "healing_item_potency" in bonuses:
-                            # 0.2 * level
-                            healing_multiplier += (
-                                bonuses["healing_item_potency"] * s_level
-                            )
+                            # Equilibrium Fix: Prevent runaway scaling. Base bonus + 2% per extra level.
+                            base_potency = bonuses["healing_item_potency"]
+                            scaling_potency = base_potency + (0.02 * (s_level - 1))
+                            healing_multiplier += scaling_potency
             except Exception as e:
                 logger.error(f"Error checking passive skills for {discord_id}: {e}")
 

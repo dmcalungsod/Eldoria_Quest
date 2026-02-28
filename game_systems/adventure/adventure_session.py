@@ -1000,10 +1000,14 @@ class AdventureSession:
                     # We need to look up the full definition in SKILLS if it's not merged.
                     full_skill = SKILLS.get(s.get("key_id"))
                     if full_skill and "passive_bonus" in full_skill:
-                        potency = full_skill["passive_bonus"].get(
+                        base_potency = full_skill["passive_bonus"].get(
                             "healing_item_potency", 0
                         )
-                        healing_multiplier += potency * s.get("skill_level", 1)
+                        # Equilibrium Fix: Prevent runaway scaling. Base bonus + 2% per extra level.
+                        s_level = s.get("skill_level", 1)
+                        if base_potency > 0:
+                            scaling_potency = base_potency + (0.02 * (s_level - 1))
+                            healing_multiplier += scaling_potency
         except Exception as e:
             logger.error(f"Error checking passive skills for auto-potion: {e}")
 

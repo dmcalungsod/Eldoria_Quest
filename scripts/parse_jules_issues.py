@@ -179,9 +179,7 @@ def ensure_labels(labels_csv: str, repo: str):
 
 def create_issue(title: str, body: str, labels_csv: str, repo: str) -> bool:
     """Create a GitHub Issue. Return True on success."""
-    label_args = []
-    for label in labels_csv.split(","):
-        label_args += ["--label", label.strip()]
+    labels = ",".join(label.strip() for label in labels_csv.split(","))
     try:
         subprocess.run(  # nosec B603
             [
@@ -196,8 +194,9 @@ def create_issue(title: str, body: str, labels_csv: str, repo: str) -> bool:
                 body,
                 "--assignee",
                 "google-labs-jules",
-            ]
-            + label_args,
+                "--label",
+                labels,
+            ],
             capture_output=True,
             text=True,
             check=True,

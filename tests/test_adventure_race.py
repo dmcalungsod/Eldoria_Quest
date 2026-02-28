@@ -69,7 +69,7 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         # race-condition guard in explore_callback, not the UI buttons.
         # This avoids issues with discord.ui.Button being a MagicMock
         # when the module was first imported by another test file.
-        with patch.object(ExplorationView, "_update_view_state"):
+        with patch.object(ExplorationView, "_update_view_state", new=lambda self: None):
             view = ExplorationView(
                 db=mock_db,
                 manager=mock_manager,

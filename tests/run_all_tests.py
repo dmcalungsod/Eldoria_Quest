@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
 import test_adventure_rewards  # Adventure Rewards regression test
+import test_adventure_scheduler_stress
 import test_adventure_session_concurrency  # New session concurrency test
 import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
@@ -166,6 +167,7 @@ def run_race_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_adventure_race)
     suite.addTests(loader.loadTestsFromModule(test_adventure_session_concurrency))
+    suite.addTests(loader.loadTestsFromModule(test_adventure_scheduler_stress))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
