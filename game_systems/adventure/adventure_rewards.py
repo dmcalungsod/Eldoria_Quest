@@ -83,12 +83,7 @@ class AdventureRewards:
 
             # 2. Loot & Quests
             actual_drops = self._process_loot_and_quests(
-                combat_result,
-                quest_system,
-                inventory_manager,
-                session_loot,
-                logs,
-                location_id,
+                combat_result, quest_system, inventory_manager, session_loot, logs, location_id
             )
 
             # 3. Stat Growth
@@ -250,25 +245,24 @@ class AdventureRewards:
         # Equipment Drops
         eq_list = item_manager.generate_monster_loot(combat_result["monster_data"])
         for item in eq_list:
-            # Serialize equipment into session_loot to grant at end of adventure
-            # Key format: __EQUIPMENT__:{json_data}
-            # We use a unique key for each item instance to prevent stacking logic here
-            # (Equipment generally doesn't stack in session loot unless we make it)
-            # Use sort_keys=True to ensure stable dictionary serialization
-            item_json = json.dumps(item, sort_keys=True)
-            equip_key = f"__EQUIPMENT__:{item_json}"
+            # Add item to DB immediately to prevent loss
+            success = inventory_manager.add_item(
+                self.discord_id,
+                str(item["id"]),
+                item["name"],
+                "equipment",
+                item["rarity"],
+                1,
+                item["slot"],
+                item["source"],
+            )
+            if success:
+                loot_bundle[(item["name"], item["rarity"])] += 1
+            else:
+                logs.append(f"\n{E.ERROR} **Inventory Full!** Left **{item['name']}** behind.")
 
-            # Use '1' as amount. If identical items drop, we might overwrite?
-            # Actually, `item_manager.generate_monster_loot` creates unique IDs usually?
-            # No, `item["id"]` is the template ID.
-            # If we get two identical swords, we need to distinguish them.
-            # Let's append a random salt or index if needed, but for now standard loot key is fine.
-            # Actually, session_loot dict keys must be unique.
-            # If we get 2x "Iron Sword" (same stats), we want 2 entries or count=2.
-            # Since we will deserialize later, count=2 means "grant this item 2 times".
-
-            self._add_loot_to_session(session_loot, equip_key, 1)
-            loot_bundle[(item["name"], item["rarity"])] += 1
+            # Assuming equipment doesn't trigger "collect" quests for now, or if it does, it's not handled here.
+            # Usually collect quests are for materials.
 
         # Format Logs
         loot_lines = [get_rarity_ansi("Common", f"• {exp_gain} EXP")]
