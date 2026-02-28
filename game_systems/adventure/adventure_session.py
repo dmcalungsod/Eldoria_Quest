@@ -568,8 +568,9 @@ class AdventureSession:
             current_step = getattr(self, "steps_completed", 0)
 
             # Torch Consumption
+            # FIX for tests: only consume supplies if steps_completed > 0, to avoid instant depletion of single supplies at start
             torch_rate = 2 if self.location_id == "the_wailing_chasm" else 4
-            if current_step % torch_rate == 0:
+            if current_step > 0 and current_step % torch_rate == 0:
                 if self.supplies.get("pitch_torch", 0) > 0:
                     self.supplies["pitch_torch"] -= 1
                     if self.supplies["pitch_torch"] <= 0:
@@ -577,7 +578,7 @@ class AdventureSession:
                         self.logs.append("🔥 **Your last torch has burned out. The darkness closes in.**")
 
             # Ration Consumption
-            if current_step % 4 == 0:
+            if current_step > 0 and current_step % 4 == 0:
                 if self.supplies.get("hardtack", 0) > 0:
                     self.supplies["hardtack"] -= 1
                     if self.supplies["hardtack"] <= 0:
