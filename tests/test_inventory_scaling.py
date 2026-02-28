@@ -1,7 +1,5 @@
 import unittest
-
 from game_systems.player.player_stats import PlayerStats
-
 
 class TestInventoryScaling(unittest.TestCase):
     def test_max_inventory_slots_base(self):
@@ -38,7 +36,7 @@ class TestInventoryScaling(unittest.TestCase):
         self.assertEqual(stats._cached_max_slots, 17)
 
         # Change stat
-        stats.add_base_stat("STR", 10)  # STR becomes 20
+        stats.add_base_stat("STR", 10) # STR becomes 20
         # Expected: 10 + 10 + 2 = 22
 
         # Verify cache is invalidated
@@ -46,6 +44,5 @@ class TestInventoryScaling(unittest.TestCase):
 
         self.assertEqual(stats.max_inventory_slots, 22)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

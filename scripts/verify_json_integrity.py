@@ -1,15 +1,16 @@
+
 import json
 import logging
+from pathlib import Path
 import sys
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("json_verifier")
 
-
 def verify_json_file(filepath):
     try:
-        with open(filepath, encoding="utf-8") as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
         logger.info(f"✅ JSON Valid: {filepath}")
         return True
@@ -19,7 +20,6 @@ def verify_json_file(filepath):
     except Exception as e:
         logger.error(f"❌ Error reading {filepath}: {e}")
         return False
-
 
 def main():
     files_to_check = [
@@ -40,7 +40,6 @@ def main():
     else:
         logger.error("JSON validation failed.")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()
