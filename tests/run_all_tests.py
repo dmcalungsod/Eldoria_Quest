@@ -29,6 +29,7 @@ import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 
 # New Coverage Tests
+import test_adventure_loop  # New Adventure Loop cog tests
 import test_developer_cog
 import test_dos_prevention  # New DoS prevention tests
 import test_event_cog
@@ -199,13 +200,14 @@ def run_tournament_tests():
 
 
 def run_cog_tests():
-    """Runs the Cog tests (Developer, Event)."""
+    """Runs the Cog tests (Developer, Event, AdventureLoop)."""
     print("\n" + "-" * 70)
     print("RUNNING COG TESTS (Unit)")
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_developer_cog)
     suite.addTests(loader.loadTestsFromModule(test_event_cog))
+    suite.addTests(loader.loadTestsFromModule(test_adventure_loop))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
