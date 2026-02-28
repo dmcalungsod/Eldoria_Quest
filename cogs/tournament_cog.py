@@ -11,7 +11,6 @@ import logging
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
-from discord.ui import Button, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
@@ -20,127 +19,6 @@ from game_systems.guild_system.tournament_system import TournamentSystem
 
 logger = logging.getLogger("eldoria.cogs.tournament")
 
-
-
-
-class TournamentView(View):
-    def __init__(self, db, system, current_view="status"):
-        super().__init__(timeout=None)
-        self.db = db
-        self.system = system
-        self.current_view = current_view
-        self._update_buttons()
-
-    def _update_buttons(self):
-        self.clear_items()
-
-        # Refresh button is always present
-        refresh_btn = Button(label="Refresh", style=discord.ButtonStyle.secondary, custom_id="tournament_refresh", emoji="🔄")
-        refresh_btn.callback = self.refresh_callback
-        self.add_item(refresh_btn)
-
-        if self.current_view == "status":
-            btn = Button(label="View Leaderboard", style=discord.ButtonStyle.primary, custom_id="tournament_leaderboard", emoji="🏆")
-            btn.callback = self.leaderboard_callback
-            self.add_item(btn)
-        else:
-            btn = Button(label="Back to Status", style=discord.ButtonStyle.primary, custom_id="tournament_status", emoji="📊")
-            btn.callback = self.status_callback
-            self.add_item(btn)
-
-    async def _render_status(self, interaction: discord.Interaction):
-        active = self.db.get_active_tournament()
-
-        if not active:
-            embed = discord.Embed(
-                title=f"{E.VICTORY} No Active Tournament",
-                description="The guild hall is quiet. The next tournament will begin on Monday.",
-                color=discord.Color.dark_grey(),
-            )
-            # Remove buttons if no tournament
-            self.clear_items()
-            if not interaction.response.is_done():
-                await interaction.response.send_message(embed=embed, ephemeral=True)
-            else:
-                await interaction.edit_original_response(embed=embed, view=None)
-            return
-
-        end_time = datetime.datetime.fromisoformat(active["end_time"])
-        time_remaining = end_time - WorldTime.now()
-        days = time_remaining.days
-        hours = time_remaining.seconds // 3600
-
-        embed = discord.Embed(
-            title=f"{E.VICTORY} Active Tournament: {active['type'].replace('_', ' ').title()}",
-            description="Compete against your guildmates for glory and Aurum!",
-            color=discord.Color.gold(),
-        )
-        embed.add_field(name="Ends In", value=f"{days}d {hours}h", inline=True)
-
-        score = self.db.get_player_tournament_score(interaction.user.id, active["id"])
-        embed.add_field(name="Your Score", value=f"{score} pts", inline=True)
-
-        self.current_view = "status"
-        self._update_buttons()
-
-        if not interaction.response.is_done():
-            await interaction.response.send_message(embed=embed, view=self)
-        else:
-            await interaction.edit_original_response(embed=embed, view=self)
-
-    async def _render_leaderboard(self, interaction: discord.Interaction):
-        active, leaders = self.system.get_leaderboard()
-
-        if not active:
-            msg = f"{E.WARNING} No tournament is currently active."
-            if not interaction.response.is_done():
-                await interaction.response.send_message(msg, ephemeral=True)
-            else:
-                await interaction.followup.send(msg, ephemeral=True)
-            return
-
-        embed = discord.Embed(
-            title=f"{E.VICTORY} Leaderboard: {active['type'].replace('_', ' ').title()}",
-            color=discord.Color.gold(),
-        )
-
-        if not leaders:
-            embed.description = "No participants yet. Be the first!"
-        else:
-            lines = []
-            for entry in leaders:
-                rank_emoji = (
-                    "🥇"
-                    if entry["rank"] == 1
-                    else ("🥈" if entry["rank"] == 2 else "🥉" if entry["rank"] == 3 else f"#{entry['rank']}")
-                )
-                name = entry.get("name", "Unknown")
-                score = entry["score"]
-                lines.append(f"{rank_emoji} **{name}**: {score} pts")
-            embed.description = "\n".join(lines)
-
-        self.current_view = "leaderboard"
-        self._update_buttons()
-
-        if not interaction.response.is_done():
-            await interaction.response.send_message(embed=embed, view=self)
-        else:
-            await interaction.edit_original_response(embed=embed, view=self)
-
-    async def status_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        await self._render_status(interaction)
-
-    async def leaderboard_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        await self._render_leaderboard(interaction)
-
-    async def refresh_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        if self.current_view == "status":
-            await self._render_status(interaction)
-        else:
-            await self._render_leaderboard(interaction)
 
 class TournamentCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -218,8 +96,35 @@ class TournamentCog(commands.Cog):
     )
     async def tournament_status(self, interaction: discord.Interaction):
         """Displays the current tournament status."""
-        view = TournamentView(self.db, self.system, "status")
-        await view._render_status(interaction)
+        active = self.db.get_active_tournament()
+
+        if not active:
+            embed = discord.Embed(
+                title=f"{E.VICTORY} No Active Tournament",
+                description="The guild hall is quiet. The next tournament will begin on Monday.",
+                color=discord.Color.dark_grey(),
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        end_time = datetime.datetime.fromisoformat(active["end_time"])
+        time_remaining = end_time - WorldTime.now()
+        days = time_remaining.days
+        hours = time_remaining.seconds // 3600
+
+        embed = discord.Embed(
+            title=f"{E.VICTORY} Active Tournament: {active['type'].replace('_', ' ').title()}",
+            description="Compete against your guildmates for glory and Aurum!",
+            color=discord.Color.gold(),
+        )
+        embed.add_field(name="Ends In", value=f"{days}d {hours}h", inline=True)
+
+        # Player's Score
+        score = self.db.get_player_tournament_score(interaction.user.id, active["id"])
+        embed.add_field(name="Your Score", value=f"{score} pts", inline=True)
+
+        embed.set_footer(text="Use /tournament_leaderboard to see top players.")
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
         name="tournament_leaderboard",
@@ -227,8 +132,33 @@ class TournamentCog(commands.Cog):
     )
     async def tournament_leaderboard(self, interaction: discord.Interaction):
         """Displays the leaderboard for the active tournament."""
-        view = TournamentView(self.db, self.system, "leaderboard")
-        await view._render_leaderboard(interaction)
+        active, leaders = self.system.get_leaderboard()
+
+        if not active:
+            await interaction.response.send_message(f"{E.WARNING} No tournament is currently active.", ephemeral=True)
+            return
+
+        embed = discord.Embed(
+            title=f"{E.VICTORY} Leaderboard: {active['type'].replace('_', ' ').title()}",
+            color=discord.Color.gold(),
+        )
+
+        if not leaders:
+            embed.description = "No participants yet. Be the first!"
+        else:
+            lines = []
+            for entry in leaders:
+                rank_emoji = (
+                    "🥇"
+                    if entry["rank"] == 1
+                    else ("🥈" if entry["rank"] == 2 else "🥉" if entry["rank"] == 3 else f"#{entry['rank']}")
+                )
+                name = entry.get("name", "Unknown")
+                score = entry["score"]
+                lines.append(f"{rank_emoji} **{name}**: {score} pts")
+            embed.description = "\n".join(lines)
+
+        await interaction.response.send_message(embed=embed)
 
     # ==================================================================
     # ADMIN COMMANDS
