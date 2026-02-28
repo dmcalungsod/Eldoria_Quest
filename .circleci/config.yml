@@ -67,10 +67,10 @@ jobs:
       - install-deps
       - run:
           name: Install Test Dependencies
-          command: pip install "pip==24.0" && pip install pytest pytest-cov
+          command: pip install "pip==24.0" && pip install pytest pytest-cov pytest-xdist
       - run:
           name: Run Tests with Coverage
-          command: python -m pytest --tb=short -q --cov=. --cov-report=xml:coverage.xml
+          command: python -m pytest -n auto --tb=short -q --cov=. --cov-report=xml:coverage.xml
       - run:
           name: Upload Coverage to Codacy
           command: |
