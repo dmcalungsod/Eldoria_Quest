@@ -63,14 +63,14 @@ class TestAlchemistMechanics(unittest.TestCase):
         self.assertIn("healed for 60 HP", msg)
         self.assertIn("Boosted x1.2", msg)
 
-        # Case 3: Triage Level 5 (+100%)
+        # Case 3: Triage Level 5 (Base 20% + 4*2% = 28% -> 1.28x)
         self.mock_db.get_player_skill_levels.return_value = {"triage": 5}
 
         success, msg = self.cm.use_item(self.discord_id, 1)
         self.assertTrue(success)
-        # Expected heal: 50 * 2.0 = 100
-        self.assertIn("healed for 100 HP", msg)
-        self.assertIn("Boosted x2.0", msg)
+        # Expected heal: 50 * 1.28 = 64
+        self.assertIn("healed for 64 HP", msg)
+        self.assertIn("Boosted x1.3", msg)
 
     def test_equivalent_exchange_stat_bonus(self):
         """Verify Equivalent Exchange skill increases MAG."""
