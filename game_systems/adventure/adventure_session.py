@@ -116,7 +116,7 @@ class AdventureSession:
         bonus = (excess_steps / 4.0) * 0.05
 
         # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
-        if self.supplies.get("hardtack"):
+        if self.supplies.get("hardtack", 0) > 0:
             bonus *= 0.8
 
         return 1.0 + bonus
@@ -312,6 +312,19 @@ class AdventureSession:
                 max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
                 self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
+        # Wailing Chasm - Sanity Drain (MP Drain)
+        if getattr(self, "location_id", None) == "the_wailing_chasm" and random.random() < 0.30:  # nosec B311
+            max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
+            max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
+            mp_drain = max(1, int(max_mp * 0.02))
+            current_mp = context["vitals"]["current_mp"]
+            if current_mp > 0:
+                new_mp = max(0, current_mp - mp_drain)
+                context["vitals"]["current_mp"] = new_mp
+                self.logs.append(f"🧠 **Sanity Drain:** The maddening echoes of the chasm sap **{current_mp - new_mp}** MP.")
+                if persist:
+                    self.db.update_player_vitals_delta(self.discord_id, 0, -(current_mp - new_mp), max_hp, max_mp)
+
     def _handle_active_combat(
         self,
         context: dict[str, Any],
@@ -432,11 +445,18 @@ class AdventureSession:
             # Event Modifier
             ambush_chance += context.get("active_boosts", {}).get("spectral_ambush_chance", 0.0)
 
+            is_dark = time_phase == TimePhase.NIGHT or self.location_id == "the_wailing_chasm"
+            has_torch = self.supplies.get("pitch_torch", 0) > 0
+
             # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
-            if self.supplies.get("pitch_torch"):
+            if has_torch:
                 ambush_chance *= 0.5
 
-            if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
+            # Wailing Chasm specific: No torch means severe ambush risk
+            if self.location_id == "the_wailing_chasm" and not has_torch:
+                ambush_chance += 0.40
+
+            if is_dark and random.random() < ambush_chance:  # nosec B311
                 damage = self._apply_ambush_damage(context, monster, persist)
                 phrase += (
                     f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
@@ -543,6 +563,26 @@ class AdventureSession:
                 weather = WorldTime.get_current_weather(self.location_id)
             if time_phase is None:
                 time_phase = WorldTime.get_current_phase()
+
+            # --- 0.25. Supply Consumption ---
+            current_step = getattr(self, "steps_completed", 0)
+
+            # Torch Consumption
+            torch_rate = 2 if self.location_id == "the_wailing_chasm" else 4
+            if current_step % torch_rate == 0:
+                if self.supplies.get("pitch_torch", 0) > 0:
+                    self.supplies["pitch_torch"] -= 1
+                    if self.supplies["pitch_torch"] <= 0:
+                        del self.supplies["pitch_torch"]
+                        self.logs.append("🔥 **Your last torch has burned out. The darkness closes in.**")
+
+            # Ration Consumption
+            if current_step % 4 == 0:
+                if self.supplies.get("hardtack", 0) > 0:
+                    self.supplies["hardtack"] -= 1
+                    if self.supplies["hardtack"] <= 0:
+                        del self.supplies["hardtack"]
+                        self.logs.append("🍞 **You have run out of rations. Fatigue will build faster.**")
 
             # --- 0.5. Environmental Hazards ---
             # Only apply if not already in combat
