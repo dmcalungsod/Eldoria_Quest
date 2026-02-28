@@ -3,7 +3,9 @@
         "id": "hp_potion_1",
         "name": "Dewfall Tonic",
         "type": "hp",
-        "effect": {"heal": 50},
+        "effect": {
+            "heal": 50
+        },
         "rarity": "Common",
         "description": "A modest vial of dew distilled from forest leaves. Restores a lick of vitality."
     },
@@ -11,7 +13,9 @@
         "id": "hp_potion_2",
         "name": "Glade Salve Vial",
         "type": "hp",
-        "effect": {"heal": 120},
+        "effect": {
+            "heal": 120
+        },
         "rarity": "Uncommon",
         "description": "Balmed with sap and honey; travelers swear by its steadying warmth."
     },
@@ -19,7 +23,9 @@
         "id": "hp_large",
         "name": "Elixir of Verdant Heart",
         "type": "hp",
-        "effect": {"heal": 300},
+        "effect": {
+            "heal": 300
+        },
         "rarity": "Rare",
         "description": "Bottled heartwood essence; a boon for the gravely wounded."
     },
@@ -27,7 +33,9 @@
         "id": "mp_potion_1",
         "name": "Scholar's Draught",
         "type": "mp",
-        "effect": {"mana": 40},
+        "effect": {
+            "mana": 40
+        },
         "rarity": "Common",
         "description": "A chalk-sweet draught; aids in gathering stray sigils of power."
     },
@@ -35,7 +43,9 @@
         "id": "mp_potion_2",
         "name": "Lunaris Tonic",
         "type": "mp",
-        "effect": {"mana": 110},
+        "effect": {
+            "mana": 110
+        },
         "rarity": "Uncommon",
         "description": "Drawn from moon-scented mushrooms; used by apprentice mages."
     },
@@ -43,7 +53,9 @@
         "id": "antidote_basic",
         "name": "Thicket Antidote",
         "type": "antidote",
-        "effect": {"cure_poison": true},
+        "effect": {
+            "cure_poison": true
+        },
         "rarity": "Common",
         "description": "A paste brewed from moss and nettle—pulls sting from the blood."
     },
@@ -51,7 +63,10 @@
         "id": "stamina_tonic",
         "name": "Runner's Cordial",
         "type": "buff",
-        "effect": {"stamina_boost": 30, "duration_s": 180},
+        "effect": {
+            "stamina_boost": 30,
+            "duration_s": 180
+        },
         "rarity": "Common",
         "description": "Sipped before a chase; steadies the legs and clears the head."
     },
@@ -59,7 +74,10 @@
         "id": "strength_brew",
         "name": "Captains' Ale (Embolden)",
         "type": "buff",
-        "effect": {"STR": 3, "duration_s": 120},
+        "effect": {
+            "STR": 3,
+            "duration_s": 120
+        },
         "rarity": "Uncommon",
         "description": "A warming draft that floods the arm with sudden might."
     },
@@ -67,7 +85,10 @@
         "id": "dex_elixir",
         "name": "Starlit Tincture",
         "type": "buff",
-        "effect": {"DEX": 3, "duration_s": 120},
+        "effect": {
+            "DEX": 3,
+            "duration_s": 120
+        },
         "rarity": "Uncommon",
         "description": "A shimmering sip that makes the hand deft for a time."
     },
@@ -75,7 +96,10 @@
         "id": "food_ration",
         "name": "Trailman's Ration",
         "type": "food",
-        "effect": {"hp": 10, "stamina": 25},
+        "effect": {
+            "hp": 10,
+            "stamina": 25
+        },
         "rarity": "Common",
         "description": "Dried meat and bread—plain, comforting, sustaining."
     },
@@ -83,7 +107,10 @@
         "id": "campfire_stew",
         "name": "Warden's Stew",
         "type": "food",
-        "effect": {"hp": 30, "stamina": 50},
+        "effect": {
+            "hp": 30,
+            "stamina": 50
+        },
         "rarity": "Uncommon",
         "description": "A thick, hearty stew that bolsters the weary heart."
     },
@@ -91,7 +118,11 @@
         "id": "throwing_bomb",
         "name": "Sporebomb",
         "type": "throwable",
-        "effect": {"aoe_atk": 40, "status": "blind", "chance": 20},
+        "effect": {
+            "aoe_atk": 40,
+            "status": "blind",
+            "chance": 20
+        },
         "rarity": "Common",
         "description": "When burst, it clouds sight with numbing spores."
     },
@@ -99,7 +130,10 @@
         "id": "regen_potion",
         "name": "Sap of Renewal",
         "type": "hp",
-        "effect": {"regen": 5, "duration_s": 30},
+        "effect": {
+            "regen": 5,
+            "duration_s": 30
+        },
         "rarity": "Rare",
         "description": "A dripping sap that mends slowly over time."
     },
@@ -107,7 +141,10 @@
         "id": "resist_elixir",
         "name": "Wardkeeper's Vial",
         "type": "buff",
-        "effect": {"DEF": 5, "duration_s": 120},
+        "effect": {
+            "DEF": 5,
+            "duration_s": 120
+        },
         "rarity": "Rare",
         "description": "Hums faintly; pushes away the keen edges of harm."
     },
@@ -115,7 +152,10 @@
         "id": "antidote_strong",
         "name": "Panacea Root Paste",
         "type": "antidote",
-        "effect": {"cure_poison": true, "cure_bleed": true},
+        "effect": {
+            "cure_poison": true,
+            "cure_bleed": true
+        },
         "rarity": "Rare",
         "description": "A thick paste that quiets the worst venoms."
     },
@@ -123,7 +163,9 @@
         "id": "elixir_of_focus",
         "name": "Scribe's Focus",
         "type": "mp",
-        "effect": {"mana": 200},
+        "effect": {
+            "mana": 200
+        },
         "rarity": "Epic",
         "description": "A scholar's secret: sharp as a quill."
     },
@@ -131,7 +173,11 @@
         "id": "heroic_potion",
         "name": "Champion's Draught",
         "type": "buff",
-        "effect": {"STR": 5, "DEF": 5, "duration_s": 45},
+        "effect": {
+            "STR": 5,
+            "DEF": 5,
+            "duration_s": 45
+        },
         "rarity": "Epic",
         "description": "A rare tonic gifted to those who stand against fate."
     },
@@ -139,7 +185,9 @@
         "id": "mythic_amber",
         "name": "Amber of the Old World",
         "type": "hp",
-        "effect": {"heal": 1500},
+        "effect": {
+            "heal": 1500
+        },
         "rarity": "Mythical",
         "description": "Found only in whispered legends; restores life like a dawn."
     },
@@ -147,7 +195,9 @@
         "id": "smoke_pellet",
         "name": "Whisper-Cloud Pellet",
         "type": "throwable",
-        "effect": {"escape": true},
+        "effect": {
+            "escape": true
+        },
         "rarity": "Common",
         "description": "A quick, choking cloud that covers flight and trickery."
     },
@@ -155,7 +205,10 @@
         "id": "elixir_luck",
         "name": "Luck-Blessed Cordial",
         "type": "buff",
-        "effect": {"LCK": 4, "duration_s": 180},
+        "effect": {
+            "LCK": 4,
+            "duration_s": 180
+        },
         "rarity": "Rare",
         "description": "A whispered toast to fortune; coins seem to fall kinder."
     },
@@ -163,7 +216,11 @@
         "id": "volatile_brew",
         "name": "Volatile Brew",
         "type": "buff",
-        "effect": {"STR": 10, "DEF": -5, "duration_s": 60},
+        "effect": {
+            "STR": 10,
+            "DEF": -5,
+            "duration_s": 60
+        },
         "rarity": "Rare",
         "description": "A bubbling, unstable mixture. Grants immense power at a cost to safety."
     },
@@ -171,7 +228,11 @@
         "id": "shadow_veil",
         "name": "Shadow Veil",
         "type": "buff",
-        "effect": {"AGI": 5, "LCK": 5, "duration_s": 90},
+        "effect": {
+            "AGI": 5,
+            "LCK": 5,
+            "duration_s": 90
+        },
         "rarity": "Rare",
         "description": "A liquid that seems to absorb light, making the drinker hard to track."
     },
@@ -179,7 +240,9 @@
         "id": "hardtack",
         "name": "Hardtack",
         "type": "supply",
-        "effect": {"fatigue_reduction": 0.2},
+        "effect": {
+            "fatigue_reduction": 0.2
+        },
         "rarity": "Common",
         "description": "Dense, dry biscuit that keeps the hunger at bay on long marches."
     },
@@ -187,7 +250,9 @@
         "id": "pitch_torch",
         "name": "Pitch Torch",
         "type": "supply",
-        "effect": {"ambush_reduction": 0.5},
+        "effect": {
+            "ambush_reduction": 0.5
+        },
         "rarity": "Common",
         "description": "A tar-soaked torch that burns bright, warding off creatures of the dark."
     },
@@ -195,7 +260,9 @@
         "id": "phial_of_vitriol",
         "name": "Phial of Vitriol",
         "type": "throwable",
-        "effect": {"aoe_atk": 20},
+        "effect": {
+            "aoe_atk": 20
+        },
         "rarity": "Common",
         "description": "A sealed glass vial containing concentrated acid. Explodes on impact."
     },
@@ -203,15 +270,19 @@
         "id": "bitter_panacea",
         "name": "Bitter Panacea",
         "type": "antidote",
-        "effect": {"cure_poison": true},
+        "effect": {
+            "cure_poison": true
+        },
         "rarity": "Common",
-        "description": "A foul-tasting mixture that neutralizes toxins."
+        "description": "A foul-tasting remedy that purges toxins from the body."
     },
     "explorer_kit": {
         "id": "explorer_kit",
         "name": "Explorer's Kit",
         "type": "supply",
-        "effect": {"gathering_bonus": 1},
+        "effect": {
+            "gathering_bonus": 1
+        },
         "rarity": "Common",
         "description": "Basic tools for harvesting flora and minerals."
     },
@@ -219,7 +290,9 @@
         "id": "field_kit",
         "name": "Field Kit",
         "type": "supply",
-        "effect": {"potion_duration_bonus": 0.05},
+        "effect": {
+            "potion_duration_bonus": 0.05
+        },
         "rarity": "Common",
         "description": "A belt pouch containing organized vials and bandages."
     },
@@ -227,7 +300,11 @@
         "id": "cryo_flask",
         "name": "Cryo-Flask",
         "type": "throwable",
-        "effect": {"aoe_atk": 60, "status": "freeze", "chance": 30},
+        "effect": {
+            "aoe_atk": 60,
+            "status": "freeze",
+            "chance": 30
+        },
         "rarity": "Rare",
         "description": "A glass sphere filled with liquid cold from the Frostfall Expanse."
     },
@@ -235,7 +312,10 @@
         "id": "dragonblood_ale",
         "name": "Dragonblood Ale",
         "type": "buff",
-        "effect": {"STR": 8, "duration_s": 180},
+        "effect": {
+            "STR": 8,
+            "duration_s": 180
+        },
         "rarity": "Epic",
         "description": "Brewed with essence of magma. Burns going down, but grants immense strength."
     }
