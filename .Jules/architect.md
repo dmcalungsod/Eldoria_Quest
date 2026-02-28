@@ -131,3 +131,10 @@ Major Content Expansion: The Survival & Logistics Update.
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/expansion_survival_logistics.md`
+
+
+## 2026-02-28
+- **Focus:** Mage Skill Tree Expansion
+- **Outcome:** Designed the Elementalist (DPS/AoE) and Arcanist (Utility/Control) paths.
+- **Key Insight:** Balancing MP cost and AoE is crucial for mages, introduced a passive (Mana Syphon) to help sustain high MP costs in long fights.
+- **Artifact:** `.Jules/architect_designs/skill_tree_mage.md`
