@@ -1,254 +1,231 @@
-# ⏳ Timeweaver: Auto-Adventure Overhaul Design
+# ⏳ Timeweaver: Eldoria Quest Auto-Adventure Overhaul Design
 
-**Project:** Eldoria Quest - Chronos Engine
-**Agent:** Timeweaver
-**Version:** 1.0.0
-**Status:** Draft
+## 🎯 Mission Objective
+Transform Eldoria Quest's core gameplay loop from manual, turn-based exploration to a time-based auto-adventure experience. This design shifts progression to real-time expeditions while preserving the game's dark fantasy survival tone, material-driven economy, class identities, and guild progression. Players will make strategic choices regarding expedition length, risk level, and resource investment, and then wait real-world time to discover their fate.
 
 ---
 
-## 1. 🎯 Executive Summary
-The **Chronos Engine** transforms Eldoria Quest's adventure system from a manual, turn-based grind into a strategic, time-based idle experience. Players will dispatch their characters on expeditions of varying lengths, investing real time and resources to reap rewards. This shift respects the player's time while deepening the strategic layer of preparation (supplies, gear) and risk management (duration, location depth).
+## 1. 🔄 Core Loop
 
-**Core Philosophy:** "Time is the ultimate resource. Spend it wisely."
+### 1.1 Starting an Adventure
+*   **Command:** `/adventure depart` or interacting with a "Guild Expedition Board" button in the guild hall.
+*   **UI (The Departure Board):** A rich embed containing:
+    *   **Destination Selection:** Dropdown of available regions (unlocked via Guild Rank/Level).
+    *   **Duration Selection:** Dropdown for expedition length (e.g., 30m, 2h, 8h, 24h).
+    *   **Supply Allocation:** Options to allocate food, potions, and light sources (torches).
+    *   **Risk/Reward Estimate:** Displays expected danger level, potential loot tiers, and required supplies.
+*   **Action:** Clicking the "🚀 Depart" button locks the character into the adventure state.
+*   **Limitations:** Only one active adventure per character at a time.
 
----
+### 1.2 During the Adventure
+*   **State Lock:** While adventuring, the character cannot engage in other active gameplay (duels, crafting, manual exploration).
+*   **Status Tracking:** The `/adventure status` command shows a live-updating embed with:
+    *   Current location and duration remaining.
+    *   Estimated current HP/MP (calculated based on time elapsed).
+    *   A brief "flavor" log of the most recent event (e.g., "Fending off a pack of Shadow Wolves...").
+*   **Background Processing:** The bot does *not* simulate every step in real-time to save resources. Instead, it calculates the outcome either periodically in large batches or entirely upon completion.
 
-## 2. 🔄 The Core Loop
-
-### 2.1 Starting an Adventure
-Players initiate an adventure via the `/adventure` command or a persistent "Depart" button in the Guild Hub.
-
-1.  **Select Location:** Dropdown menu filtered by the player's Guild Rank and Level.
-    *   *Constraint:* Must meet minimum requirements (e.g., Rank F for "Whispering Forest").
-2.  **Select Duration:** Players choose how long to commit their character.
-    *   **Scout (30m):** Low risk, shallow exploration (Floors 1-5). Good for materials.
-    *   **Patrol (2h):** Moderate risk, medium exploration (Floors 6-15). Balanced XP/Loot.
-    *   **Expedition (8h):** High risk, deep exploration (Floors 16-30). Best for rare drops.
-    *   **Raid (24h):** Extreme risk, abyss exploration (Floors 31+). Legendary potential.
-3.  **Equip Supplies:** Players select a "Supply Loadout" from their inventory.
-    *   **Rations:** Required for stamina. 1 Ration per hour of travel. Failure to supply results in "Exhaustion" (stat penalties).
-    *   **Torches:** Reduces ambush chance in dark zones/night. 1 Torch per 2 hours.
-    *   **Potions:** Auto-consumed when HP < 30%.
-4.  **Confirm & Depart:** The bot calculates the return time, deducts supplies, and locks the character state.
-
-### 2.2 Active State
-While adventuring, the character is **locked**.
-*   Cannot duel, trade, or craft.
-*   Profile status shows: "Adventuring in [Location] (Return: [Time])".
-*   Players can check status via `/status` to see a "live" log snippet (e.g., "Currently fighting a Goblin Scout...").
-
-### 2.3 Completion & Results
-When the timer expires:
-1.  **Notification:** The bot DMs the player or pings them in the adventure channel.
-2.  **Report Card:** A rich embed summary is generated.
-    *   **Outcome:** Success / Failure / Emergency Retreat.
-    *   **Loot:** List of gathered materials and drops.
-    *   **XP/Aurum:** Total gains.
-    *   **Combat Log:** A collapsible or summarized view of key battles (Elites/Bosses).
-    *   **Vitals:** Ending HP/MP.
+### 1.3 Completion & Results
+*   **Resolution:** When the timer expires, the `AdventureResolutionEngine` processes the entire expedition.
+*   **Notification:** The bot sends a direct message (or pings the user in a designated channel) announcing the return.
+*   **The Mission Report:** A detailed embed summarizing the expedition:
+    *   **Outcome:** Triumphant Return, Bruised but Alive, or Critical Failure (Death).
+    *   **Loot & Resources:** A consolidated list of all materials, items, Aurum, and XP gained.
+    *   **Highlights:** Key events, elite monsters defeated, or rare items found.
+    *   **Final Vitals:** The character's remaining HP and MP.
 
 ---
 
-## 3. ⏳ Time Mechanics & Risk
+## 2. ⏳ Time Mechanics
 
-### 3.1 Time Tracking
-*   **Server-Side Authority:** Time is tracked using UTC timestamps in the database (`start_time`, `end_time`).
-*   **Resolution:** The background scheduler checks for completed adventures every 60 seconds.
+### 2.1 Tracking Real Time
+*   **Database Authority:** Adventures are recorded in an `adventure_sessions` collection/table with a `start_time`, `target_end_time`, and `duration_minutes`.
+*   **Scheduler:** A background task (e.g., `discord.ext.tasks.loop` running every minute) queries for sessions where `target_end_time <= NOW()` and triggers their resolution.
 
-### 3.2 Duration Scaling
-Longer adventures aren't just "more time" — they are **deeper dives**.
+### 2.2 Duration Tiers & Scaling
+The length of the adventure dictates how deep into the region the player goes, affecting both risk and reward.
 
-| Duration | Floors | Monster Tier Odds | Event Density | Fatigue Modifier |
+| Duration | Conceptual Depth | Encounter Density | Loot Rarity Modifier | Danger Multiplier |
 | :--- | :--- | :--- | :--- | :--- |
-| **30m** | 1-5 | 90% Normal / 10% Elite | Low | 1.0x |
-| **2h** | 6-15 | 80% Normal / 20% Elite | Medium | 1.1x |
-| **8h** | 16-30 | 70% Normal / 25% Elite / 5% Boss | High | 1.25x |
-| **24h** | 31+ | 60% Normal / 30% Elite / 10% Boss | Extreme | 1.5x |
+| **30m (Scout)** | Outskirts / Floors 1-5 | Low | 1.0x Base | 1.0x Base |
+| **2h (Patrol)** | Shallow / Floors 6-15 | Medium | 1.2x Base | 1.1x Base |
+| **8h (Expedition)**| Deep / Floors 16-30 | High | 1.5x Base | 1.3x Base |
+| **24h (Campaign)**| Abyss / Floors 31+ | Extreme | 2.0x Base | 1.6x Base |
 
-*   **Fatigue Modifier:** Increases damage taken and reduces accuracy as time goes on, simulating exhaustion.
+*   **Fatigue:** Longer durations introduce a "Fatigue" debuff that steadily decreases combat effectiveness and increases damage taken over time, making 8h and 24h adventures significantly riskier without high stats or ample supplies.
 
-### 3.3 Cancellation (Recall)
-Players can use a "Recall" button to end an adventure early.
-*   **Penalty:** The character "flees" back to town.
-    *   **Loot:** 50% of gathered items are lost (dropped in panic).
-    *   **XP:** 50% of earned XP is retained.
-    *   **Supplies:** Consumed supplies are not refunded.
-
----
-
-## 4. 🤖 Auto-Resolution Engine
-
-The engine simulates the adventure in "ticks" (virtual steps), but processes them in batches for performance.
-
-### 4.1 Simulation Logic
-*   **Tick Rate:** 1 Tick = 1 Minute of real time.
-*   **Event Roll:** Every tick, roll for an event (Combat, Gathering, Trap, Empty).
-    *   *Base Chance:* 10% Combat, 20% Gathering, 5% Trap, 65% Walking.
-    *   *Modifiers:* "Danger Level" of the location increases Combat chance.
-
-### 4.2 Automated Combat
-Instead of full turn-by-turn simulation (which is CPU intensive), use a **Deterministic Combat Model**:
-1.  **Matchup:** Player Stats vs. Monster Stats (from `monsters.json`).
-2.  **Damage Output (DPS):** Calculate average player damage per round (Attack + Skill Avg).
-3.  **Damage Intake (DTPS):** Calculate average monster damage per round (Monster Atk - Player Def).
-4.  **Resolution:**
-    *   `Turns to Kill = MonsterHP / PlayerDPS`
-    *   `Total Damage Taken = Turns to Kill * MonsterDTPS`
-5.  **Variance:** Apply a ±10% RNG factor to simulate crits/dodges.
-6.  **Resource Usage:**
-    *   Deduct HP.
-    *   If HP < 30%, consume Potion (if equipped).
-    *   If HP <= 0, trigger **Death**.
-
-### 4.3 Death & Failure
-If HP hits 0:
-*   **State:** Adventure ends immediately. Status becomes "Defeated".
-*   **Penalty (Standard):**
-    *   **Aurum:** -10% of total held (not just gained).
-    *   **Materials:** -50% of *gathered* loot (bag is torn).
-    *   **XP:** -100% of XP gained *this session*.
-    *   **Flavor:** "You crawl back to the guild hall, battered and empty-handed."
+### 2.3 Early Cancellation (Recall)
+*   **Action:** Players can use a "🛑 Recall" button on the status embed to end the adventure prematurely.
+*   **Consequences:**
+    *   **Partial Rewards:** Only retain 50% of the loot and XP gathered up to the point of recall.
+    *   **Supply Loss:** All allocated supplies are considered consumed and are not refunded.
+    *   **Flavor:** "You sounded the retreat, dropping half your scavenged goods in the scramble to safety."
 
 ---
 
-## 5. 🔗 System Integration
+## 3. 🤖 Auto-Resolution Engine
 
-### 5.1 Dungeon Floors (DepthsWarden)
-*   Adventures map directly to **Floor Ranges**.
-*   *Design Note:* Use the existing `adventure_locations.json` but add a `floor_depth` property to scale difficulty dynamically.
+To maintain performance, the engine uses a deterministic, statistical model rather than simulating every individual turn of combat.
 
-### 5.2 Inventory (InventoryManager)
-*   **Supply Bag:** A new "virtual slot" for adventures.
-    *   *Inputs:* Rations, Torches, Potions.
-    *   *Consumption:* Deducted at start.
-*   **Loot Bag:** Temporary storage during adventure. Transferred to main inventory upon "Claim Rewards".
+### 3.1 Exploration Simulation
+*   **Tick Rate:** The adventure is divided into conceptual "ticks" (e.g., 1 tick = 5 minutes).
+*   **Event Generation:** For each tick, an event is rolled based on the location's event tables (Combat, Gathering, Discovery, Trap).
+    *   Event probabilities shift based on the location's Danger Level and the current conceptual depth (duration elapsed).
 
-### 5.3 Economy (GameBalancer)
-*   **Loot Tables:** Must be tuned so 8h AFK != 8h Manual Play.
-    *   *Auto Penalty:* Drop rates for rares should be slightly lower (e.g., 80% of manual rate) to preserve the value of active play.
-*   **Aurum:** Generated from monster kills standardly.
+### 3.2 Automated Combat
+*   **Power Abstraction:** Calculate an "Offensive Rating" (DPS based on stats, weapon, and equipped skills) and "Defensive Rating" (Damage Mitigation based on armor and stats) for both the player and the encountered monster.
+*   **Deterministic Clash:**
+    *   Determine "Turns to Kill" (Monster HP / Player DPS).
+    *   Calculate "Damage Taken" (Turns to Kill * Monster DPS * Defensive Mitigation).
+*   **Variance:** Apply a small RNG factor (±10%) to the final damage taken to represent crits or dodges.
+*   **Resource Consumption:** Deduct calculated damage from the player's simulated HP pool. If HP drops below a threshold (e.g., 30%) and the player allocated potions, a potion is consumed to restore HP.
 
-### 5.4 Rank & Progression (ProgressionBalancer)
-*   **Rank Gating:**
-    *   Rank F: Scout only.
-    *   Rank E: Scout, Patrol.
-    *   Rank D: All durations.
-*   **Rank Points:** Auto-adventures grant Rank Points (RP) but at a slower rate than manual Quests.
-
-### 5.5 Skills & Classes (Tactician)
-*   **Class Traits:**
-    *   *Warrior:* -10% Fatigue buildup.
-    *   *Rogue:* +10% Loot rarity.
-    *   *Mage:* +10% XP gain.
-    *   *Cleric:* Auto-heal 5% HP per hour.
-
-### 5.6 Factions (FactionSystem)
-*   **Time-Based Reputation:** Players gain 1 Reputation Point per hour spent adventuring.
-*   **Favored Locations:** Each Faction has "Favored Locations" (e.g., Pathfinders favor "Whispering Forest"). Adventuring there grants +50% Reputation gain.
-*   **Faction Orders:** Special "Faction Requests" may appear as events, offering bonus Rep for specific kills during auto-adventure.
-
-### 5.7 Achievements (ChronicleKeeper)
-*   **Endurance Feats:**
-    *   *Day Tripper:* Complete a 1-hour adventure.
-    *   *Marathoner:* Complete an 8-hour adventure.
-    *   *Iron Soul:* Complete a 24-hour adventure without using potions.
-*   **Exploration Feats:**
-    *   *Cartographer:* Accumulate 100 hours of exploration time.
-    *   *Survivor:* Survive 10 consecutive expeditions without death.
+### 3.3 Death & Failure
+If the player's simulated HP reaches 0 during the resolution:
+*   **State:** The adventure immediately halts at that tick.
+*   **Grimwarden's Toll (Death Penalty):**
+    *   The player is returned to town with 1 HP.
+    *   All loot gathered during the expedition is lost.
+    *   A portion of carried Aurum (e.g., 5%) is lost to scavengers.
+    *   All allocated supplies are lost.
+*   **Narrative:** The mission report is bleak, describing how the player barely escaped with their life and had to abandon their pack.
 
 ---
 
-## 6. 📱 UI/UX Design
+## 4. 🔗 Integration with Existing Systems
 
-### 6.1 The Departure Board (Embed)
-*   **Title:** 🗺️ Expedition Planning
-*   **Fields:**
-    *   **Location:** [Select Menu]
-    *   **Duration:** [Select Menu]
-    *   **Supplies:** [Button: Auto-Fill] (Fills with best available)
-    *   **Risk Estimate:** "⚠️ High Risk (Recommended Level: 15)"
-*   **Action:** [Button: 🚀 Depart]
+### 4.1 Dungeon Floors (DepthsWarden)
+*   Regions in `adventure_locations.json` need a defined `danger_level` and `floor_depth_ranges`.
+*   The system uses these ranges to pull appropriate monsters and events from existing tables based on the selected duration.
 
-### 6.2 Status Command (`/status`)
-*   **Embed:**
-    *   **Status:** ⚔️ Fighting (Goblin Scout)
-    *   **Time:** 01:15:00 / 02:00:00
-    *   **HP:** 75% | **MP:** 40%
-    *   **Loot:** 12x Iron Ore, 3x Goblin Ear
-*   **Action:** [Button: 🛑 Recall]
+### 4.2 Inventory & Supplies
+*   Players must physically possess supplies (Food, Potions, Torches) to allocate them to an expedition.
+*   Allocated supplies are temporarily removed from the main inventory and placed in an "Expedition Pack."
+*   Unused supplies (e.g., unconsumed potions) are returned upon successful completion.
 
-### 6.3 Mission Report (DM/Channel)
-*   **Title:** 📜 Expedition Report: Whispering Forest
-*   **Color:** Green (Success) / Red (Failure)
-*   **Visual:** ASCII art or small image of the location.
-*   **Summary:** "You explored 12 floors, defeated 45 enemies, and found 1 rare item."
-*   **Rewards:** [List]
+### 4.3 Economy & Loot (GameBalancer)
+*   Drop rates must be carefully tuned. While auto-adventuring provides passive income, the *rate per hour* should be lower than active, manual play to ensure active engagement is still rewarding.
+*   Auto-adventuring should be the primary source of bulk common/uncommon materials, while manual boss fights or specific quests are required for top-tier items.
+
+### 4.4 Guild Ranks (ProgressionBalancer)
+*   Higher durations and more dangerous regions are gated by Guild Rank.
+    *   Rank F: Limited to 30m / 2h in starting zones.
+    *   Rank C: Unlocks 8h expeditions in dangerous zones.
+    *   Rank A/S: Unlocks 24h campaigns in the Abyss.
+*   Auto-adventures grant Rank Points (RP) to contribute to guild promotion, scaling with duration and difficulty.
+
+### 4.5 Factions
+*   **Passive Reputation:** Players gain base faction reputation continuously while adventuring (e.g., 1 Rep per hour).
+*   **Favored Terrain:** If a player adventures in a region favored by their active faction, reputation gains are multiplied by 1.5x.
+
+### 4.6 Achievements
+*   **Time-Based Feats:**
+    *   *Day Tripper:* Complete a 30m adventure.
+    *   *Endurance Runner:* Complete an 8h adventure.
+    *   *Sleepless in Eldoria:* Complete a 24h campaign.
+*   **Survival Feats:**
+    *   *Close Call:* Survive an adventure returning with less than 5% HP.
+    *   *Iron Stomach:* Complete a 24h campaign without packing rations.
+
+### 4.7 Skills & Classes (Tactician)
+*   Class identities influence the auto-resolution stats:
+    *   **Warrior:** High Defensive Rating, reduces fatigue penalties.
+    *   **Rogue:** Increased evasion (less damage taken), higher chance to find rare gathering nodes.
+    *   **Mage:** High Offensive Rating (kills faster, taking less damage over time), but fragile if hit.
+    *   **Cleric:** Innate HP regeneration between ticks, reducing potion reliance.
 
 ---
 
-## 7. ⚖️ Balance Considerations
+## 5. 📱 UI/UX Specifications
 
-*   **Anti-Inflation:** To prevent AFK economy flooding, we limit **Concurrent Adventures** to 1 per player.
-*   **Time-Gating:** A cooldown of 1 hour between "Raid" (24h) adventures.
-*   **Active vs Passive:** Manual play should always yield *more* per minute, but Auto play yields *more* per day (since it runs while sleeping).
+Following the **One UI Policy**, interactions should primarily edit existing messages rather than creating new ones.
+
+### 5.1 The Expedition Board View (`setup_view.py`)
+*   **Dropdowns:**
+    1.  Select Location.
+    2.  Select Duration (30m, 2h, 8h, 24h).
+*   **Buttons:**
+    *   `[ + Potion ]` `[ - Potion ]` (Adjust potion allocation)
+    *   `[ + Torch ]` `[ - Torch ]` (Adjust torch allocation)
+    *   `[ 🚀 Depart ]` (Confirms and starts)
+*   **Embed Updates:** As the user changes selections, the embed updates to show required level, estimated danger, and supply cost.
+
+### 5.2 Status View (`status_view.py`)
+*   Accessed via `/adventure status`.
+*   Displays a progress bar (text-based, e.g., `[██████░░░░] 60%`) and estimated time remaining.
+*   Button: `[ 🛑 Recall ]`. Clicking this edits the message to a confirmation prompt: "Are you sure? You will lose 50% of your loot. `[ Confirm ]` `[ Cancel ]`".
+
+### 5.3 Mission Report Embed (`adventure_embeds.py`)
+*   A visually distinct embed sent upon completion.
+*   Uses color coding (Green = Success, Orange = Recalled, Red = Defeated).
+*   Sections: `Adventure Summary`, `Loot Acquired`, `Experience & Wealth`, `Vitals`.
 
 ---
 
-## 8. 🛠️ Technical Specifications
+## 6. ⚖️ Balance & Anti-Abuse Measures
 
-### 8.1 Database Schema
-**Table:** `adventure_sessions`
-```sql
-CREATE TABLE adventure_sessions (
-    session_id SERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    location_id VARCHAR(50) NOT NULL,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
-    duration_minutes INT NOT NULL,
-    status VARCHAR(20) DEFAULT 'active', -- active, completed, failed, recalled
-    hp_current INT NOT NULL,
-    mp_current INT NOT NULL,
-    supplies JSONB DEFAULT '{}', -- {"ration": 2, "torch": 1}
-    log JSONB DEFAULT '[]', -- Stores key events for report
-    loot_cache JSONB DEFAULT '{}'
-);
+*   **Concurrency Limit:** Strictly one active adventure per player. Attempting to start another returns an error.
+*   **Reward Scaling:** Loot tables for auto-adventures apply a `0.8x` multiplier compared to manual drops to preserve the premium on active play.
+*   **The "Overnight" Problem:** 8h and 24h adventures require significant supply investment. A player cannot just spam 24h adventures without first actively gathering or buying the necessary food and potions.
+*   **Stamina/Energy:** To prevent infinite looping, characters might require a "Rest Period" in town equal to 10% of their expedition duration before departing again.
+
+---
+
+## 7. 🛠️ Technical Requirements
+
+### 7.1 Database Schema
+**Collection/Table:** `adventure_sessions`
+```json
+{
+  "user_id": 123456789,
+  "location_id": "whispering_forest",
+  "status": "active", // active, completed, failed, recalled
+  "start_time": "2023-10-27T10:00:00Z",
+  "end_time": "2023-10-27T12:00:00Z",
+  "duration_minutes": 120,
+  "hp_current": 150,
+  "mp_current": 50,
+  "supplies": {
+    "potions": 3,
+    "torches": 1
+  },
+  "loot_cache": {},
+  "log": []
+}
 ```
 
-### 8.2 Scheduler (SystemSmith)
-*   **Loop:** `tasks.loop(minutes=1)`
-*   **Logic:**
-    1.  Query `adventure_sessions` where `end_time <= NOW()` AND `status = 'active'`.
-    2.  For each, run `ResolutionEngine.finalize()`.
-    3.  Update DB status to `completed`.
-    4.  Notify user.
+### 7.2 Scheduler & Bot Restarts
+*   A `discord.ext.tasks.loop` runs every 60 seconds to find sessions where `end_time <= NOW()` and `status == "active"`.
+*   **Crash Recovery:** Because the state is entirely DB-driven, if the bot restarts, it will simply resume checking the scheduler loop. Any sessions that completed while the bot was offline will be immediately processed and the user notified.
 
-### 8.3 Interaction Handling
-*   **Buttons:** Must handle "Interaction Failed" gracefully if the bot restarts.
-*   **Persistence:** State is purely DB-driven. Bot restart does not kill adventures.
+### 7.3 Discord Interaction Timeouts
+*   Resolving a 24h adventure in one batch might take > 3 seconds, leading to a Discord "Interaction Failed" error if triggered by a user action (like `/status`).
+*   **Solution:** All long-running calculations must use `await interaction.response.defer()` immediately.
+*   The background scheduler runs independently of interactions, so it will naturally avoid the 3-second limit, safely DMing the user when done.
 
 ---
 
-## 9. 🤝 Agent Coordination
+## 8. 🤝 Coordination Notes for Other Agents
 
-*   **@SystemSmith:** Implement the `adventure_sessions` table and the background `tasks.loop`. Ensure timezone handling is UTC.
-*   **@DataSteward:** Update `adventure_locations.json` to include `floor_depth` and `danger_level` fields.
-*   **@Tactician:** Implement `CombatEngine.simulate_encounter(player, monster)` — the deterministic version of combat.
-*   **@Palette:** Design the "Departure Board" and "Mission Report" embeds. Use standard emoji sets.
-*   **@GameBalancer:** Tune the `Fatigue Modifier` and `Loot Drop Rates` for auto-sessions.
-*   **@Grimwarden:** Implement the Death Penalty logic (-10% Aurum, -50% Loot) within the `ResolutionEngine`.
-*   **@StoryWeaver:** Write flavor text templates for "Adventure Log" events (e.g., "Found a hidden cache...", "Ambushed by shadows...").
-*   **@ChronicleKeeper:** Create the new Achievements (`Day Tripper`, `Marathoner`) in `achievement_system.py`.
-*   **@ProgressionBalancer:** Define the Rank Point (RP) yield per hour for each adventure tier.
-*   **@GameForge:** Create the new Supply items (`Ration`, `Pitch Torch`) in `recipes.py`.
-*   **@DepthsWarden:** Map current locations to specific "Floor Depths" (1-5, 6-15, etc.) for difficulty scaling.
-*   **@BugHunter:** Stress test the scheduler with 100+ concurrent simulated sessions.
-*   **@Visionary:** Review the final "Risk vs. Reward" balance to ensure manual play remains viable.
+*   **@SystemSmith:** Build the database schema (`adventure_sessions`) in section 7.1 and the background scheduler (`discord.ext.tasks.loop`) to process completions. Ensure robust crash recovery (if the bot restarts, it should pick up missed completions). Ensure `defer()` is used correctly.
+*   **@DataSteward:** Update `adventure_locations.json` with `danger_level` and tier data. Define the abstract loot tables for auto-resolution.
+*   **@Tactician:** Develop the statistical combat abstraction model. We cannot use the full turn-based combat engine for background processing; we need a fast, deterministic formula comparing player stats to monster stats.
+*   **@GameBalancer:** Tune the drop rates, XP yields, and the Fatigue debuff scaling for longer durations.
+*   **@Grimwarden:** Implement the death penalty logic within the resolution engine. Ensure the loss of loot and supplies feels punishing but fair.
+*   **@Palette:** Design the rich embeds for the Expedition Board, Status, and Mission Reports. Ensure compliance with the One UI policy.
+*   **@DepthsWarden:** Map out which existing monsters and events correspond to the conceptual "depths" of the different duration tiers.
+*   **@GameForge:** Create new destination descriptions and special event items related to auto-adventures.
+*   **@StoryWeaver:** Write immersive result narratives for the Mission Report.
+*   **@ChronicleKeeper:** Add achievements for time-based feats.
+*   **@ProgressionBalancer:** Integrate auto-adventure progress into rank advancement.
+*   **@BugHunter:** Test edge cases (timeouts, multiple concurrent).
+*   **@Visionary:** Overall priority and player feedback.
 
 ---
 
-## 10. 🔮 Future Expansions
-*   **Party System:** Allow players to form a squad (Tank/Healer/DPS) for better odds.
-*   **Mercenaries:** Hire NPCs to fill party slots.
-*   **Seasons:** "Winter" season increases supply consumption (Cold).
+## 9. 🔮 Future Expansions (Phase 2+)
+
+*   **Party Expeditions:** Allow players to form groups. The system averages their stats and resolves the adventure for the whole party, splitting loot.
+*   **Mercenary System:** Hire NPC companions to boost stats for difficult campaigns.
+*   **Dynamic Weather/Seasons:** Weather conditions at the time of departure (or changing during a 24h campaign) impact the difficulty and loot tables.
+*   **Special Events:** Occasional "Raid Targets" appear on the board requiring a 24h commitment from multiple guild members to defeat.
