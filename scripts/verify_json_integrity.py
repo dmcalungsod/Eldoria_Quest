@@ -26,10 +26,6 @@ def main():
         "game_systems/data/adventure_locations.json",
         "game_systems/data/monsters.json",
         "game_systems/data/materials.json",
-<<<<<<< chronicle-rogue-titles-1309278897205980754
-=======
-        "game_systems/data/quest_items.json"
->>>>>>> main
     ]
 
     all_valid = True
