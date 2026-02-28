@@ -20,6 +20,10 @@ class DamageFormula:
         "LCK": "luck",
     }
 
+    # ------------------------------------------------------------------
+    # Private shared helpers
+    # ------------------------------------------------------------------
+
     @staticmethod
     def _get_stat(stats_obj, stat_code):
         if isinstance(stats_obj, dict):
@@ -29,6 +33,23 @@ class DamageFormula:
         if property_name:
             return getattr(stats_obj, property_name, 0)
         return 0
+
+    @staticmethod
+    def _apply_crit(damage: int, crit_chance: float, crit_mult: float = 1.75) -> tuple[int, bool, str]:
+        """Rolls for a critical hit. Returns (damage, is_crit, event_type)."""
+        is_crit = random.random() < crit_chance  # nosec B311
+        if is_crit:
+            return int(damage * crit_mult), True, "crit"
+        return damage, False, "hit"
+
+    @staticmethod
+    def _check_dodge(agi: int) -> bool:
+        """Returns True if the attack is dodged based on player agility."""
+        return random.random() < (agi * 0.001)  # nosec B311
+
+    # ------------------------------------------------------------------
+    # Public calculation methods
+    # ------------------------------------------------------------------
 
     @staticmethod
     def player_attack(player_stats, monster):
@@ -41,27 +62,19 @@ class DamageFormula:
         str_bonus = calculate_tiered_bonus(str_val, 2.0)
         dex_bonus = calculate_tiered_bonus(dex_val, 1.0)
         mag_bonus = calculate_tiered_bonus(mag_val, 0.5)
-
         attack_power = str_bonus + dex_bonus + mag_bonus
 
         # Defense
         monster_def = monster.get("DEF", 0)
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))
-
         base_damage = max(1, attack_power - defense_reduction)
 
-        variance = random.uniform(0.9, 1.1)
+        variance = random.uniform(0.9, 1.1)  # nosec B311
         damage = int(base_damage * variance)
 
-        # Crit (Buffed slightly to 1.75x)
+        # Crit (1.75x)
         crit_chance = 0.03 + (luck_val * 0.002)
-        is_crit = random.random() < crit_chance
-
-        event_type = "hit"
-        if is_crit:
-            damage = int(damage * 1.75)
-            event_type = "crit"
-
+        damage, is_crit, event_type = DamageFormula._apply_crit(damage, crit_chance)
         return max(1, damage), is_crit, event_type
 
     @staticmethod
@@ -73,9 +86,8 @@ class DamageFormula:
         base_stat_value = DamageFormula._get_stat(player_stats, scaling_stat)
         attack_power = calculate_tiered_bonus(base_stat_value, scaling_factor)
 
-        # --- SECONDARY STAT SCALING ---
-        # Add 0.5x scaling from other core offensive stats (STR, DEX, MAG)
-        # This prevents skills from falling behind normal attacks (which sum all 3 stats)
+        # Secondary stat scaling: add 0.5x from other core offensive stats
+        # (prevents skills falling behind normal attacks that sum all 3 stats)
         for stat in ["STR", "DEX", "MAG"]:
             if stat != scaling_stat:
                 val = DamageFormula._get_stat(player_stats, stat)
@@ -87,28 +99,20 @@ class DamageFormula:
 
         monster_def = monster.get("DEF", 0)
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))
-
         base_damage = max(1, attack_power - defense_reduction)
 
-        variance = random.uniform(0.9, 1.1)
+        variance = random.uniform(0.9, 1.1)  # nosec B311
         damage = int(base_damage * variance)
 
         luck_val = DamageFormula._get_stat(player_stats, "LCK")
         crit_chance = 0.03 + (luck_val * 0.002)
-        is_crit = random.random() < crit_chance
-
-        event_type = "hit"
-        if is_crit:
-            damage = int(damage * 1.75)
-            event_type = "crit"
-
+        damage, is_crit, event_type = DamageFormula._apply_crit(damage, crit_chance)
         return max(1, damage), is_crit, event_type
 
     @staticmethod
     def player_heal(player_stats, current_hp: int, skill_data: dict, skill_level: int) -> tuple[int, int, str]:
         base_heal = float(skill_data.get("heal_power", 0))
 
-        # Use scaling stat if available (default MAG)
         scaling_stat = skill_data.get("scaling_stat", "MAG")
         scaling_factor = float(skill_data.get("scaling_factor", 1.5))
         stat_val = DamageFormula._get_stat(player_stats, scaling_stat)
@@ -124,13 +128,9 @@ class DamageFormula:
 
         stat_bonus = calculate_tiered_bonus(stat_val, scaling_factor)
         level_multiplier = 1.0 + (0.15 * (skill_level - 1))
-        final_base_heal = base_heal * level_multiplier
+        total_heal = min(base_heal * level_multiplier + stat_bonus, max_hp * 0.6)
 
-        total_heal = final_base_heal + stat_bonus
-        max_allowed = max_hp * 0.6
-        total_heal = min(total_heal, max_allowed)
-
-        variance = random.uniform(0.9, 1.1)
+        variance = random.uniform(0.9, 1.1)  # nosec B311
         heal_amount = int(total_heal * variance)
         new_hp = min(current_hp + heal_amount, max_hp)
         actual_healed = new_hp - current_hp
@@ -145,13 +145,11 @@ class DamageFormula:
         """
         # Accuracy Check (Blind/Debuff Support)
         accuracy_percent = monster.get("accuracy_percent", 0.0)
-        base_accuracy = 1.0 + accuracy_percent
-        if random.random() > base_accuracy:
+        if random.random() > (1.0 + accuracy_percent):  # nosec B311
             return 0, False, "miss"
 
         agi = DamageFormula._get_stat(player_stats, "AGI")
-        dodge_chance = agi * 0.001
-        if random.random() < dodge_chance:
+        if DamageFormula._check_dodge(agi):
             return 0, False, "dodge"
 
         attack_power = monster.get("ATK", 10)
@@ -160,59 +158,32 @@ class DamageFormula:
 
         defense = calculate_tiered_bonus(end, 1.5) + flat_def
         defense_reduction = defense * (0.3 + (0.2 * min(1, defense / 100)))
-
         base_damage = max(0, attack_power - defense_reduction)
 
-        # --- REBALANCED DEFENSE PENETRATION ---
-        # 5% minimum damage instead of 10%
-        min_damage = max(attack_power * 0.05, 1)
+        # 5% minimum chip damage
+        final_damage = max(base_damage, max(attack_power * 0.05, 1))
 
-        final_damage = max(base_damage, min_damage)
-
-        variance = random.uniform(0.9, 1.1)
+        variance = random.uniform(0.9, 1.1)  # nosec B311
         damage = int(final_damage * variance)
 
-        is_crit = random.random() < 0.05
-        event_type = "hit"
-
-        if is_crit:
-            damage = int(damage * 1.5)
-            event_type = "crit"
-
+        damage, is_crit, event_type = DamageFormula._apply_crit(damage, 0.05, crit_mult=1.5)
         return max(1, damage), is_crit, event_type
 
     @staticmethod
     def monster_skill(monster, player_stats, skill_data):
-        """
-        Calculates monster skill damage.
-        """
-        # Dodge check
+        """Calculates monster skill damage."""
         agi = DamageFormula._get_stat(player_stats, "AGI")
-        dodge_chance = agi * 0.001
-        if random.random() < dodge_chance:
+        if DamageFormula._check_dodge(agi):
             return 0, False, "dodge"
 
-        # Base calculation uses standard attack logic
+        # Base calculation uses standard attack logic, then apply skill multiplier
         damage, is_crit, event_type = DamageFormula.monster_attack(monster, player_stats)
-
-        # Apply Skill Multiplier
         multiplier = float(skill_data.get("power", 1.5))
-        damage = int(damage * multiplier)
-
-        return damage, is_crit, event_type
+        return int(damage * multiplier), is_crit, event_type
 
     @staticmethod
     def monster_heal(monster_max_hp: int, current_hp: int, skill_data: dict) -> tuple[int, int, str]:
-        """
-        Calculates monster healing.
-        """
-        heal_amount = float(skill_data.get("heal_power", 0))
-
-        # Variance
-        variance = random.uniform(0.9, 1.1)
-        heal_amount = int(heal_amount * variance)
-
+        """Calculates monster healing."""
+        heal_amount = int(float(skill_data.get("heal_power", 0)) * random.uniform(0.9, 1.1))  # nosec B311
         new_hp = min(current_hp + heal_amount, monster_max_hp)
-        actual_healed = int(new_hp - current_hp)
-
-        return actual_healed, int(new_hp), "heal"
+        return int(new_hp - current_hp), int(new_hp), "heal"

@@ -61,57 +61,43 @@ def _try_live_db():
         return None, None
 
 
-def get_players():
+def _fetch_collection(collection_name: str, fallback_path: str) -> list:
+    """
+    Tries to load documents from the live MongoDB collection.
+    Falls back to a local JSON snapshot if the DB is unavailable or empty.
+    """
+    client, db = _try_live_db()
+
+    if db is not None:
+        documents = list(db[collection_name].find({}, {"_id": 0}))
+        client.close()
+        if documents:
+            print(f"[db_helper] ✅ Live DB — {len(documents)} {collection_name} loaded.")
+            return documents
+        print(f"[db_helper] ⚠️  Live DB connected but {collection_name} collection is empty.")
+
+    # Fallback to stored snapshot
+    if os.path.exists(fallback_path):
+        with open(fallback_path, encoding="utf-8") as f:
+            documents = json.load(f)
+        print(f"[db_helper] 📂 Stored snapshot — {len(documents)} {collection_name} loaded from {fallback_path}")
+        return documents
+
+    print(f"[db_helper] ❌ No data available for {collection_name}. Run export_db.py to create a local snapshot.")
+    return []
+
+
+def get_players() -> list:
     """
     Returns a list of player documents.
     Prefers live DB; falls back to data/players.json.
     """
-    client, db = _try_live_db()
-
-    if db is not None:
-        players = list(db["players"].find({}, {"_id": 0}))
-        if players:
-            print(f"[db_helper] ✅ Live DB — {len(players)} players loaded.")
-            client.close()
-            return players
-        else:
-            print("[db_helper] ⚠️  Live DB connected but players collection is empty.")
-            client.close()
-
-    # Fallback to stored snapshot
-    if os.path.exists(_PLAYERS_FILE):
-        with open(_PLAYERS_FILE, encoding="utf-8") as f:
-            players = json.load(f)
-        print(f"[db_helper] 📂 Stored snapshot — {len(players)} players loaded from {_PLAYERS_FILE}")
-        return players
-
-    print("[db_helper] ❌ No data available. Run export_db.py to create a local snapshot.")
-    return []
+    return _fetch_collection("players", _PLAYERS_FILE)
 
 
-def get_guild_members():
+def get_guild_members() -> list:
     """
     Returns a list of guild_members documents.
     Prefers live DB; falls back to data/guild_members.json.
     """
-    client, db = _try_live_db()
-
-    if db is not None:
-        members = list(db["guild_members"].find({}, {"_id": 0}))
-        if members:
-            print(f"[db_helper] ✅ Live DB — {len(members)} guild members loaded.")
-            client.close()
-            return members
-        else:
-            print("[db_helper] ⚠️  Live DB connected but guild_members collection is empty.")
-            client.close()
-
-    # Fallback to stored snapshot
-    if os.path.exists(_GUILD_MEMBERS_FILE):
-        with open(_GUILD_MEMBERS_FILE, encoding="utf-8") as f:
-            members = json.load(f)
-        print(f"[db_helper] 📂 Stored snapshot — {len(members)} guild members loaded from {_GUILD_MEMBERS_FILE}")
-        return members
-
-    print("[db_helper] ❌ No data available. Run export_db.py to create a local snapshot.")
-    return []
+    return _fetch_collection("guild_members", _GUILD_MEMBERS_FILE)
