@@ -77,7 +77,7 @@ class TitleSelectView(View):
         new_p_data = self.db.get_player(self.interaction_user.id)
         embed = discord.Embed(
             title="🎖️ Title Manager",
-            description=f"{msg}\n\nSelect a title from the dropdown below to display on your profile.",
+            description=f"{msg}\n\nSelect a title from the dropdown below to display on your profile.",  # nosec B608
             color=discord.Color.gold(),
         )
 
