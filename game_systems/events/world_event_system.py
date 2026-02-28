@@ -25,6 +25,7 @@ class WorldEventSystem:
     MYSTIC_MERCHANT = "mystic_merchant"
     FROSTFALL_EXPEDITION = "frostfall_expedition"
     SPECTRAL_TIDE = "spectral_tide"
+    GUILD_EXPEDITION_DRIVE = "guild_expedition_drive"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -99,6 +100,15 @@ class WorldEventSystem:
                 "loot_boost": 1.1,
                 "spectral_ambush_chance": 0.15,  # +15% ambush chance at night
                 "night_danger_mod": 0.10,  # +10% combat chance at night
+            },
+        },
+        GUILD_EXPEDITION_DRIVE: {
+            "name": "Guild Expedition Drive",
+            "description": "The Guild is heavily funding long-term exploration! Auto-adventures yield bonus experience and loot, and fatigue accumulates 20% slower.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.25,
+                "fatigue_reduction": 0.8,
             },
         },
     }
