@@ -82,6 +82,7 @@ FACTIONS = {
             "void_sanctum",
             "gale_scarred_heights",
             "deepgrove_roots",
+            "thunder_crag_coast",
         ],
     },
     "arcane_assembly": {
@@ -160,6 +161,7 @@ FACTIONS = {
             "clockwork_halls",
             "frostfall_expanse",
             "the_ashlands",
+            "rust_wastes",
         ],
     },
     "grey_ward": {
