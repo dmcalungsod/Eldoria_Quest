@@ -51,11 +51,12 @@ class FastAdventureSession:
     def __init__(self, db, quest, inv, discord_id, row_data=None):
         self.steps_completed = row_data.get("steps_completed", 0) if row_data else 0
         self.discord_id = discord_id
+        self.location_id = "forest_outskirts"
         self.logs = []
         self.loot = {}
         self.version = 1
 
-    def simulate_step(self, context_bundle=None, background=False, persist=False):
+    def simulate_step(self, context_bundle=None, background=False, persist=False, weather=None, time_phase=None):
         # Simulate CPU work if needed
         # time.sleep(0.0001)
         return {"dead": False, "vitals": {"current_hp": 100, "current_mp": 100}}

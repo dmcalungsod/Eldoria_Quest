@@ -60,14 +60,15 @@ class TestEventScheduling(unittest.TestCase):
         mock_wes_module.WorldEventSystem.MYSTIC_MERCHANT = "mystic_merchant"
         mock_wes_module.WorldEventSystem.HARVEST_FESTIVAL = "harvest_festival"
 
-        mock_announcer_module = MagicMock()
-        mock_announcer_module.announce_to_guilds = AsyncMock()
-        sys.modules["cogs.utils.announcer"] = mock_announcer_module
-
+        # 3. Import cogs.event_cog inside the patched environment
+        # We must ensure it's not already cached from real imports (handled by patch.dict, sort of)
+        # But if it was already imported by another test, patch.dict might copy it.
+        # We want to force reload it to pick up OUR mocks.
         if "cogs.event_cog" in sys.modules:
             del sys.modules["cogs.event_cog"]
 
         import cogs.event_cog
+
         self.EventCog = cogs.event_cog.EventCog
 
         # 4. Initialize Cog
@@ -77,6 +78,7 @@ class TestEventScheduling(unittest.TestCase):
         # 5. Setup instance mocks
         self.cog.system = MagicMock()
         self.cog.db = MagicMock()
+        self.cog._announce = AsyncMock()
 
         self.cog.system.EVENT_CONFIGS = {
             "mystic_merchant": {"name": "The Mystic Merchant", "description": "Test Description"}
@@ -91,16 +93,14 @@ class TestEventScheduling(unittest.TestCase):
         mock_random.return_value = 0.01
         self.cog.system.start_event.return_value = True
 
-        import cogs.event_cog
-        with patch.object(cogs.event_cog, 'announce_to_guilds', new_callable=AsyncMock) as mock_announce:
-            # 2. Run
-            asyncio.run(self.cog.check_event_cycle())
+        # 2. Run
+        asyncio.run(self.cog.check_event_cycle())
 
-            # 3. Verify
-            self.cog.system.start_event.assert_called_with("mystic_merchant", 24)
-            mock_announce.assert_called()
-            args, _ = mock_announce.call_args
-            self.assertIn("Mystic", args[1])
+        # 3. Verify
+        self.cog.system.start_event.assert_called_with("mystic_merchant", 24)
+        self.cog._announce.assert_called()
+        args, _ = self.cog._announce.call_args
+        self.assertIn("Mystic", args[0])
 
     @patch("game_systems.core.world_time.WorldTime")
     @patch("random.random")

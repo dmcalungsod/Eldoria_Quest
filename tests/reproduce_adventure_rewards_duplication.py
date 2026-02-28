@@ -2,6 +2,8 @@ import os
 import sys
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 # Add root dir to sys.path
 sys.path.append(os.getcwd())
 
@@ -11,13 +13,16 @@ sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
 from game_systems.adventure.adventure_manager import AdventureManager
+from game_systems.player.player_stats import PlayerStats
 
 
 @patch("game_systems.adventure.adventure_manager.AdventureSession")
 @patch("game_systems.adventure.adventure_manager.QuestSystem")
 @patch("game_systems.adventure.adventure_manager.InventoryManager")
 @patch("game_systems.adventure.adventure_manager.FactionSystem")
-def test_end_adventure_duplicate_rewards_on_error(mock_faction, mock_inv, mock_quest, mock_session_cls):
+def test_end_adventure_duplicate_rewards_on_error(
+    mock_faction, mock_inv, mock_quest, mock_session_cls
+):
     """
     Reproduces the issue where rewards are granted multiple times if an error
     occurs during the end_adventure process (e.g., inside FactionSystem).
@@ -74,17 +79,12 @@ def test_end_adventure_duplicate_rewards_on_error(mock_faction, mock_inv, mock_q
         "current_mp": 100,
         "aurum": 0,
     }
-    mock_db.get_player_field.return_value = 1  # level
+    mock_db.get_player_field.return_value = 1 # level
 
     mock_db.get_player_stats_json.return_value = {
-        "strength": 10,
-        "agility": 10,
-        "intelligence": 10,
-        "endurance": 10,
-        "vitality": 10,
-        "wisdom": 10,
-        "max_hp": 100,
-        "max_mp": 100,
+        "strength": 10, "agility": 10, "intelligence": 10,
+        "endurance": 10, "vitality": 10, "wisdom": 10,
+        "max_hp": 100, "max_mp": 100
     }
 
     # Mock Inventory Manager success
@@ -97,7 +97,7 @@ def test_end_adventure_duplicate_rewards_on_error(mock_faction, mock_inv, mock_q
     result1 = manager.end_adventure(discord_id)
 
     # Verify failure
-    assert result1 is None  # Should return None on exception
+    assert result1 is None # Should return None on exception
 
     # Verify Rewards were granted (Partial execution)
     # update_player_mixed is called to give XP
