@@ -835,18 +835,6 @@ class DatabaseManager:
             {"discord_id": discord_id, "end_time": {"$lte": now}},
         )
 
-    def remove_active_buffs_by_ids(self, discord_id: int, buff_ids: list[str]):
-        """
-        Removes specific buffs by their unique buff_id.
-        Used for consuming charges (e.g. next_hit_crit).
-        """
-        if not buff_ids:
-            return
-
-        self._col("active_buffs").delete_many(
-            {"discord_id": discord_id, "buff_id": {"$in": buff_ids}}
-        )
-
     # ============================================================
     # ADVENTURE SESSIONS (New methods for external call sites)
     # ============================================================

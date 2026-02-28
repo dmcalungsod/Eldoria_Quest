@@ -8,6 +8,7 @@ Hardened: Safe state transitions and secure reward handling.
 import datetime
 import json
 import logging
+import random
 
 from database.database_manager import DatabaseManager
 from game_systems.core.world_time import WorldTime
@@ -192,6 +193,37 @@ class AdventureManager:
             keys_to_remove = []
 
             for item_key, count in session.loot.items():
+                # Handle Equipment (Serialization)
+                if item_key.startswith("__EQUIPMENT__:"):
+                    # 50% Chance to lose each equipment piece individually?
+                    # Or 50% of the count?
+                    # Equipment usually has count 1.
+                    # Let's roll for each unit.
+                    kept = 0
+                    lost = 0
+                    try:
+                        equip_json = item_key.replace("__EQUIPMENT__:", "", 1)
+                        equip_data = json.loads(equip_json)
+                        name = equip_data.get("name", "Unknown Item")
+                    except Exception:
+                        name = "Unknown Equipment"
+
+                    for _ in range(count):
+                        # 50% chance to lose
+                        if random.random() < 0.5:
+                            lost += 1
+                        else:
+                            kept += 1
+
+                    if lost > 0:
+                        material_losses.append(f"• -{lost}x {name} (Equipment)")
+
+                    if kept > 0:
+                        session.loot[item_key] = kept
+                    else:
+                        keys_to_remove.append(item_key)
+                    continue
+
                 kept_amount = int(count * 0.5)
                 lost_amount = count - kept_amount
 
@@ -216,17 +248,33 @@ class AdventureManager:
 
             items = self._grant_rewards_internal(session, 0, p_stats)
 
-            bulk_items = [
-                {
-                    "item_key": item["key"],
-                    "item_name": item["name"],
-                    "item_type": item["type"],
-                    "rarity": item["rarity"],
-                    "amount": item["amount"],
-                }
-                for item in items
-            ]
-            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+            # Separate bulk items (materials) and equipment (single items)
+            bulk_items = []
+            equipment_items = []
+
+            for item in items:
+                if item["type"] == "equipment":
+                    equipment_items.append(item)
+                else:
+                    bulk_items.append(
+                        {
+                            "item_key": item["key"],
+                            "item_name": item["name"],
+                            "item_type": item["type"],
+                            "rarity": item["rarity"],
+                            "amount": item["amount"],
+                        }
+                    )
+
+            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items) or []
+
+            # Grant Equipment via Helper
+            failed_equipment = self._grant_equipment_loot(discord_id, equipment_items)
+
+            # Combine failures
+            if failed_items is None:
+                failed_items = []
+            failed_items.extend(failed_equipment)
 
             if failed_items:
                 failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
@@ -342,17 +390,28 @@ class AdventureManager:
                 "penalty_logs": penalty_logs,
             }
 
-            bulk_items = [
-                {
-                    "item_key": item["key"],
-                    "item_name": item["name"],
-                    "item_type": item["type"],
-                    "rarity": item["rarity"],
-                    "amount": item["amount"],
-                }
-                for item in items_to_add
-            ]
-            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items)
+            bulk_items = []
+            equipment_items = []
+
+            for item in items_to_add:
+                if item["type"] == "equipment":
+                    equipment_items.append(item)
+                else:
+                    bulk_items.append(
+                        {
+                            "item_key": item["key"],
+                            "item_name": item["name"],
+                            "item_type": item["type"],
+                            "rarity": item["rarity"],
+                            "amount": item["amount"],
+                        }
+                    )
+
+            failed_items = self.inventory_manager.add_items_bulk(discord_id, bulk_items) or []
+
+            # Grant Equipment via Helper
+            failed_equipment = self._grant_equipment_loot(discord_id, equipment_items)
+            failed_items.extend(failed_equipment)
 
             if failed_items:
                 summary["failed_items"] = failed_items
@@ -429,6 +488,25 @@ class AdventureManager:
 
         items_awarded = []
         for item_key, count in session.loot.items():
+            # EQUIPMENT HANDLING
+            if item_key.startswith("__EQUIPMENT__:"):
+                try:
+                    equip_json = item_key.replace("__EQUIPMENT__:", "", 1)
+                    equip_data = json.loads(equip_json)
+                    items_awarded.append(
+                        {
+                            "key": item_key,  # Keep full key so we can access json later if needed
+                            "name": equip_data["name"],
+                            "type": "equipment",
+                            "rarity": equip_data["rarity"],
+                            "amount": count,
+                            "data": equip_data,  # Pass full data
+                        }
+                    )
+                except Exception as e:
+                    logger.error(f"Error parsing equipment key {item_key}: {e}")
+                continue
+
             mat = MATERIALS.get(item_key)
             name = mat["name"] if mat else item_key
             rarity = mat.get("rarity", "Common") if mat else "Common"
@@ -443,6 +521,33 @@ class AdventureManager:
             )
 
         return items_awarded
+
+    def _grant_equipment_loot(self, discord_id: int, equipment_items: list) -> list[dict]:
+        """
+        Helper to grant equipment items individually.
+        Returns a list of failed items (dict with item_name).
+        """
+        failed = []
+        for equip in equipment_items:
+            item_data = equip.get("data")
+            if not item_data:
+                logger.error(f"Missing data for equipment reward: {equip.get('name', 'Unknown')}")
+                continue
+
+            for _ in range(equip["amount"]):
+                success = self.inventory_manager.add_item(
+                    discord_id,
+                    str(item_data["id"]),
+                    item_data["name"],
+                    "equipment",
+                    item_data["rarity"],
+                    1,
+                    item_data["slot"],
+                    item_data["source"],
+                )
+                if not success:
+                    failed.append({"item_name": item_data["name"], "reason": "Inventory Full"})
+        return failed
 
     def start_promotion_trial(self, discord_id: int, next_rank: str):
         try:
