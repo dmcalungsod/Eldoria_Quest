@@ -5,7 +5,9 @@ Security Utility: Check installed pip version.
 Verifies that the installed pip version is not the vulnerable 25.3.
 """
 import sys
+
 import pip
+
 
 def check_pip_version():
     """Check installed pip version for known vulnerabilities."""
