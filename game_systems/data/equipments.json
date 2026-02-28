@@ -477,7 +477,9 @@
         "slot": "accessory",
         "rarity": "Uncommon",
         "level_req": 5,
-        "class_restrictions": ["Warrior"],
+        "class_restrictions": [
+            "Warrior"
+        ],
         "stats_bonus": {
             "STR": 5,
             "END": 5
@@ -489,11 +491,60 @@
         "slot": "accessory",
         "rarity": "Uncommon",
         "level_req": 5,
-        "class_restrictions": ["Mage"],
+        "class_restrictions": [
+            "Mage"
+        ],
         "stats_bonus": {
             "MAG": 8,
             "MP": 20
         },
         "description": "A delicate silver ring that hums when near ley lines."
+    },
+    "iron_pestle": {
+        "name": "Iron Pestle",
+        "slot": "mace",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "STR": 1,
+            "END": 2,
+            "MAG": 1
+        },
+        "description": "A heavy iron tool meant for grinding herbs, equally effective at grinding bones.",
+        "class_restrictions": [
+            "Alchemist",
+            "Cleric"
+        ]
+    },
+    "apothecarys_leathers": {
+        "name": "Apothecary's Leathers",
+        "slot": "medium_armor",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "END": 2,
+            "DEX": 1,
+            "MAG": 1
+        },
+        "description": "Sturdy leather armor stained with various unknown chemical concoctions.",
+        "class_restrictions": [
+            "Alchemist",
+            "Rogue",
+            "Ranger"
+        ]
+    },
+    "bandolier_of_vials": {
+        "name": "Bandolier of Vials",
+        "slot": "accessory",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "LCK": 2,
+            "DEX": 1
+        },
+        "description": "A leather strap lined with empty vials, clinking softly with every step.",
+        "class_restrictions": [
+            "Alchemist"
+        ]
     }
 }

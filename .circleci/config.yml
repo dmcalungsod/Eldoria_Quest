@@ -68,12 +68,10 @@ jobs:
       - install-deps
       - run:
           name: Install Test Dependencies
-          command: pip install "pip==24.0" && pip install pytest pytest-cov
+          command: pip install "pip==24.0" && pip install pytest pytest-cov pytest-xdist
       - run:
-          name: Split and Run Tests
-          command: |
-            TESTFILES=$(circleci tests glob "tests/test_*.py" | circleci tests split --split-by=timings)
-            python -m pytest $TESTFILES --tb=short -q --cov=. --cov-report=xml:coverage-${CIRCLE_NODE_INDEX}.xml
+          name: Run Tests with Coverage
+          command: python -m pytest -n auto --tb=short -q --cov=. --cov-report=xml:coverage.xml
       - run:
           name: Upload Partial Coverage to Codacy
           command: |
