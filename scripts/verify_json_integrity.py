@@ -10,7 +10,7 @@ logger = logging.getLogger("json_verifier")
 def verify_json_file(filepath):
     try:
         with open(filepath, encoding="utf-8") as f:
-            data = json.load(f)
+            json.load(f)
         logger.info(f"✅ JSON Valid: {filepath}")
         return True
     except json.JSONDecodeError as e:
@@ -26,6 +26,7 @@ def main():
         "game_systems/data/adventure_locations.json",
         "game_systems/data/monsters.json",
         "game_systems/data/materials.json",
+        "game_systems/data/quest_items.json",
     ]
 
     all_valid = True
