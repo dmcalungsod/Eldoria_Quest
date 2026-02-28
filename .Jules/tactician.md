@@ -9,3 +9,8 @@
 
 **Learning:** Monsters with high power skills (>= 1.5) felt unfair without telegraphs. Implemented a 50% chance for skills >= 1.5 power to telegraph their intent first.
 **Action:** `CombatEngine` now supports "telegraph" and "execute_charge" actions, persisting state in `active_monster` to enable multi-turn combat logic.
+
+## 2026-02-28 — Deterministic Auto-Combat Abstraction
+
+**Learning:** Designing an abstraction formula to replace turn-based simulation requires creating "expected values" for variable mechanics (like crits, accuracy, and skill triggers). By taking average base power and multiplying by expected multipliers (e.g., 1 + crit_chance*(crit_mult-1)), we can derive a stable "DPS" value. Flooring chip damage and putting a ceiling on turns-to-kill prevents infinite math loops in extreme defense cases.
+**Action:** Implemented `AutoCombatFormula.resolve_clash` taking into account stats, stances, and weather modifiers for background expedition resolution without invoking `CombatEngine` iteratively.
