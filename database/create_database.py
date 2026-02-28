@@ -36,106 +36,100 @@ def create_tables(db=None):
     # -------------------------
     # COLLECTIONS & INDEXES
     # -------------------------
+    # Format: "collection_name": [ (keys, unique, partialFilter) ]
+    INDEX_DEFINITIONS = {
+        "players": [(("discord_id", ASCENDING), True, None)],
+        "stats": [(("discord_id", ASCENDING), True, None)],
+        "monsters": [
+            (("id", ASCENDING), True, None),
+            (("biome", ASCENDING), False, None),
+            (("tier", ASCENDING), False, None),
+        ],
+        "quest_items": [(("id", ASCENDING), True, None)],
+        "consumables": [(("id", ASCENDING), True, None)],
+        "equipment": [(("id", ASCENDING), True, None)],
+        "class_equipment": [(("id", ASCENDING), True, None)],
+        "item_sets": [(("id", ASCENDING), True, None)],
+        "guild_members": [(("discord_id", ASCENDING), True, None)],
+        "quests": [
+            (("id", ASCENDING), True, None),
+            (("tier", ASCENDING), False, None),
+        ],
+        "player_quests": [
+            ([("discord_id", ASCENDING), ("quest_id", ASCENDING)], False, None),
+            (("discord_id", ASCENDING), False, None),
+        ],
+        "materials": [
+            (("id", ASCENDING), True, None),
+            (("key_id", ASCENDING), True, None),
+        ],
+        "inventory": [
+            (("id", ASCENDING), True, None),
+            (("discord_id", ASCENDING), False, None),
+            (
+                [
+                    ("discord_id", ASCENDING),
+                    ("item_key", ASCENDING),
+                    ("rarity", ASCENDING),
+                    ("equipped", ASCENDING),
+                ],
+                False,
+                None,
+            ),
+            (
+                [("discord_id", ASCENDING), ("slot", ASCENDING)],
+                True,
+                {"equipped": 1},
+            ),
+        ],
+        "adventure_sessions": [
+            (("discord_id", ASCENDING), True, None),
+            ([("discord_id", ASCENDING), ("active", ASCENDING)], False, None),
+        ],
+        "skills": [
+            (("id", ASCENDING), True, None),
+            (("key_id", ASCENDING), True, None),
+        ],
+        "player_skills": [
+            ([("discord_id", ASCENDING), ("skill_key", ASCENDING)], True, None),
+            (("discord_id", ASCENDING), False, None),
+        ],
+        "global_boosts": [
+            (("boost_key", ASCENDING), True, None),
+            (("end_time", ASCENDING), False, None),
+        ],
+        "active_buffs": [
+            (("discord_id", ASCENDING), False, None),
+            ([("discord_id", ASCENDING), ("end_time", ASCENDING)], False, None),
+        ],
+        "classes": [(("id", ASCENDING), True, None)],
+        "locations": [(("id", ASCENDING), True, None)],
+        "tournaments": [
+            (("id", ASCENDING), True, None),
+            (("active", ASCENDING), False, None),
+            (("end_time", ASCENDING), False, None),
+        ],
+        "tournament_scores": [
+            (
+                [("discord_id", ASCENDING), ("tournament_id", ASCENDING)],
+                True,
+                None,
+            ),
+            ([("tournament_id", ASCENDING), ("score", -1)], False, None),
+        ],
+        "world_events": [
+            (("active", ASCENDING), False, None),
+            (("end_time", ASCENDING), False, None),
+        ],
+    }
 
-    # --- players ---
-    db["players"].create_index("discord_id", unique=True)
-
-    # --- stats ---
-    db["stats"].create_index("discord_id", unique=True)
-
-    # --- monsters ---
-    db["monsters"].create_index("id", unique=True)
-    db["monsters"].create_index("biome")
-    db["monsters"].create_index("tier")
-
-    # --- quest_items ---
-    db["quest_items"].create_index("id", unique=True)
-
-    # --- consumables ---
-    db["consumables"].create_index("id", unique=True)
-
-    # --- equipment ---
-    db["equipment"].create_index("id", unique=True)
-
-    # --- class_equipment ---
-    db["class_equipment"].create_index("id", unique=True)
-
-    # --- item_sets ---
-    db["item_sets"].create_index("id", unique=True)
-
-    # --- guild_members ---
-    db["guild_members"].create_index("discord_id", unique=True)
-
-    # --- quests ---
-    db["quests"].create_index("id", unique=True)
-    db["quests"].create_index("tier")
-
-    # --- player_quests ---
-    db["player_quests"].create_index([("discord_id", ASCENDING), ("quest_id", ASCENDING)])
-    db["player_quests"].create_index("discord_id")
-
-    # --- materials ---
-    db["materials"].create_index("id", unique=True)
-    db["materials"].create_index("key_id", unique=True)
-
-    # --- inventory ---
-    db["inventory"].create_index("id", unique=True)
-    db["inventory"].create_index("discord_id")
-    db["inventory"].create_index(
-        [
-            ("discord_id", ASCENDING),
-            ("item_key", ASCENDING),
-            ("rarity", ASCENDING),
-            ("equipped", ASCENDING),
-        ]
-    )
-    db["inventory"].create_index(
-        [("discord_id", ASCENDING), ("slot", ASCENDING)],
-        unique=True,
-        partialFilterExpression={"equipped": 1},
-    )
-
-    # --- adventure_sessions ---
-    db["adventure_sessions"].create_index("discord_id", unique=True)
-    db["adventure_sessions"].create_index([("discord_id", ASCENDING), ("active", ASCENDING)])
-
-    # --- skills ---
-    db["skills"].create_index("id", unique=True)
-    db["skills"].create_index("key_id", unique=True)
-
-    # --- player_skills ---
-    db["player_skills"].create_index([("discord_id", ASCENDING), ("skill_key", ASCENDING)], unique=True)
-    db["player_skills"].create_index("discord_id")
-
-    # --- global_boosts ---
-    db["global_boosts"].create_index("boost_key", unique=True)
-    db["global_boosts"].create_index("end_time")
-
-    # --- active_buffs ---
-    db["active_buffs"].create_index("discord_id")
-    db["active_buffs"].create_index([("discord_id", ASCENDING), ("end_time", ASCENDING)])
-
-    # --- classes ---
-    db["classes"].create_index("id", unique=True)
-
-    # --- counters (for auto-increment IDs) ---
-    # Seeded automatically by _next_inventory_id in database_manager
-
-    # --- locations ---
-    db["locations"].create_index("id", unique=True)
-
-    # --- tournaments ---
-    db["tournaments"].create_index("id", unique=True)
-    db["tournaments"].create_index("active")
-    db["tournaments"].create_index("end_time")
-
-    # --- tournament_scores ---
-    db["tournament_scores"].create_index([("discord_id", ASCENDING), ("tournament_id", ASCENDING)], unique=True)
-    db["tournament_scores"].create_index([("tournament_id", ASCENDING), ("score", -1)])
-
-    # --- world_events ---
-    db["world_events"].create_index("active")
-    db["world_events"].create_index("end_time")
+    for col_name, indexes in INDEX_DEFINITIONS.items():
+        collection = db[col_name]
+        for keys, is_unique, partial in indexes:
+            args = {"unique": is_unique}
+            if partial:
+                args["partialFilterExpression"] = partial
+            collection.create_index(keys, **args)
 
     logger.info("MongoDB collections and indexes verified/created.")
 

@@ -19,20 +19,13 @@ class TestCreateDatabase(unittest.TestCase):
         """Verify that indexes are created for world_events."""
         mock_db = MagicMock()
 
-        # Configure mock_db to return different mocks for different collections
-        # This allows us to inspect calls specific to world_events
-        def get_collection(name):
-            return getattr(mock_db, f"collection_{name}")
-
-        mock_db.__getitem__.side_effect = get_collection
-
         # Call the function
         create_tables(mock_db)
 
-        # Check world_events collection specific calls
-        world_events_mock = mock_db.collection_world_events
+        # In the refactored loop, db[col_name] is accessed via __getitem__
+        # So the actual collection object is mock_db.__getitem__("world_events")
+        world_events_mock = mock_db.__getitem__("world_events")
 
-        # We expect create_index("active") and create_index("end_time")
         # Check all calls to create_index on this collection
         calls = world_events_mock.create_index.call_args_list
 
@@ -42,11 +35,19 @@ class TestCreateDatabase(unittest.TestCase):
         print("\nVerifying world_events indexes:")
         for call in calls:
             args, _ = call
-            print(f"  - create_index({args})")
-            if args and args[0] == "active":
-                active_index_found = True
-            if args and args[0] == "end_time":
-                end_time_index_found = True
+            # args[0] is typically a list of tuples like [( "active", ASCENDING )]
+            # or a tuple. Extract the key name.
+            if args:
+                index_keys = args[0]
+                if isinstance(index_keys, tuple) and index_keys[0] == "active":
+                    active_index_found = True
+                elif isinstance(index_keys, tuple) and index_keys[0] == "end_time":
+                    end_time_index_found = True
+                elif isinstance(index_keys, str):
+                    if index_keys == "active":
+                        active_index_found = True
+                    elif index_keys == "end_time":
+                        end_time_index_found = True
 
         if not active_index_found:
             self.fail("Missing index on 'active' for world_events collection")
