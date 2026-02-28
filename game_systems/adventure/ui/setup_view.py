@@ -63,7 +63,9 @@ class AdventureSetupView(View):
 
             if is_unlocked:
                 label = loc_data["name"]
-                desc = f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']})"
+                depth = loc_data.get('floor_depth', '?')
+                danger = loc_data.get('danger_level', '?')
+                desc = f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']}) | Depth {depth} | Danger {danger}"
                 emoji = loc_data.get("emoji", E.MAP)
             else:
                 label = f"{E.LOCKED} {loc_data['name']}"
