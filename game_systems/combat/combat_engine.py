@@ -738,7 +738,9 @@ class CombatEngine:
                 duration = int(status_effect.get("duration", 3))
                 if "debuffs" not in self.monster:
                     self.monster["debuffs"] = []
-                self.monster["debuffs"].append({"type": "bleed", "damage": bleed, "duration": duration, "name": "Bleed"})
+                self.monster["debuffs"].append(
+                    {"type": "bleed", "damage": bleed, "duration": duration, "name": "Bleed"}
+                )
                 log.append(f"🩸 **{self.monster.get('name', 'Enemy')}** is bleeding for {bleed} dmg/turn!")
 
     def _is_player_immune(self, status_type: str) -> bool:
@@ -852,7 +854,6 @@ class CombatEngine:
 
             if existing:
                 existing["duration"] = duration
-                # Update magnitude if new one is stronger? For now, we assume same skill = same magnitude.
                 return f"💢 **{self.monster.get('name', 'Enemy')}**'s {name} is refreshed!"
             else:
                 new_debuff = {
@@ -863,6 +864,19 @@ class CombatEngine:
                 new_debuff.update(stat_mods)
                 self.monster["debuffs"].append(new_debuff)
                 return f"💢 **{self.monster.get('name', 'Enemy')}** is weakened by {name}!"
+
+        # Check for Bleed
+        if debuff_data.get("type") == "bleed":
+            damage = int(debuff_data.get("damage", 5))
+            duration = int(debuff_data.get("duration", 3))
+            existing = next((d for d in self.monster["debuffs"] if d.get("type") == "bleed"), None)
+            if existing:
+                existing["duration"] = duration
+                existing["damage"] = max(existing["damage"], damage)
+                return f"🩸 **{self.monster.get('name', 'Enemy')}**'s bleed is refreshed!"
+            else:
+                self.monster["debuffs"].append({"type": "bleed", "damage": damage, "duration": duration})
+                return f"🩸 **{self.monster.get('name', 'Enemy')}** is bleeding for {damage} dmg/turn!"
 
         return None
 
