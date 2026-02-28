@@ -216,8 +216,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
             return None
 
         with patch("discord.utils.get", side_effect=utils_get):
-            # Test private method _announce
-            await self.cog._announce("Hello World")
+            from cogs.utils.announcer import announce_to_guilds
+            await announce_to_guilds(self.bot, "Hello World")
 
         channel.send.assert_called_with("Hello World")
 

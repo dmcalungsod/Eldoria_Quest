@@ -12,16 +12,19 @@ import sys
 
 # Mock pymongo to allow import of EquipmentManager
 from unittest.mock import MagicMock
-sys.modules['pymongo'] = MagicMock()
-sys.modules['pymongo.errors'] = MagicMock()
+
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from game_systems.data.class_data import CLASSES
 from game_systems.data.class_equipments import CLASS_EQUIPMENTS
+
 # Import EquipmentManager after mocking pymongo
 from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.data.class_data import CLASSES
+
 
 def verify_alchemist_generation():
     print("--- Verifying Alchemist Equipment Generation ---")
@@ -40,9 +43,22 @@ def verify_alchemist_generation():
     # Verify specific slots
     slots_found = set(item["slot"] for item in alchemist_items)
     required_slots = {
-        "mace", "dagger", "tome", "hood", "alchemist_coat",
-        "gloves", "legs", "boots", "belt", "accessory",
-        "medium_armor", "medium_gloves", "medium_legs", "medium_boots", "leather_cap", "robe"
+        "mace",
+        "dagger",
+        "tome",
+        "hood",
+        "alchemist_coat",
+        "gloves",
+        "legs",
+        "boots",
+        "belt",
+        "accessory",
+        "medium_armor",
+        "medium_gloves",
+        "medium_legs",
+        "medium_boots",
+        "leather_cap",
+        "robe",
     }
 
     missing_slots = required_slots - slots_found
@@ -76,6 +92,7 @@ def verify_alchemist_generation():
     print(f"PASS: Verified {valid_coats} Alchemist Coats have correct stat distribution keys.")
     return True
 
+
 def verify_equip_logic():
     print("\n--- Verifying Equip Logic ---")
 
@@ -87,12 +104,12 @@ def verify_equip_logic():
 
     allowed_slots = alchemist_class.get("allowed_slots", [])
     if "alchemist_coat" not in allowed_slots:
-         print("FAIL: 'alchemist_coat' not in Alchemist allowed_slots.")
-         return False
+        print("FAIL: 'alchemist_coat' not in Alchemist allowed_slots.")
+        return False
 
     if "tome" not in allowed_slots:
-         print("FAIL: 'tome' not in Alchemist allowed_slots.")
-         return False
+        print("FAIL: 'tome' not in Alchemist allowed_slots.")
+        return False
 
     print("PASS: Alchemist class has correct allowed_slots.")
 
@@ -104,6 +121,7 @@ def verify_equip_logic():
     print("PASS: 'alchemist_coat' correctly registered as BODY_SLOTS.")
 
     return True
+
 
 if __name__ == "__main__":
     gen_ok = verify_alchemist_generation()
