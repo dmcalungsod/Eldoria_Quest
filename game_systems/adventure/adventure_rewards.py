@@ -136,6 +136,21 @@ class AdventureRewards:
             if group_ach_msg:
                 logs.append(f"\n{group_ach_msg}")
 
+            # Check Combat Feats (e.g. Unseen Death)
+            # NOTE: This method is synchronous, but so is everything else in AdventureRewards currently.
+            # AdventureSession calls this method and handles saving.
+            # If performance becomes an issue, DatabaseManager updates should be batched.
+            # Currently, check_combat_feats performs a single DB update if successful.
+            total_damage_taken = sum(r.get("damage_taken", 0) for r in report_list)
+            # Retrieve class_id
+            player_data = self.db.get_player(self.discord_id)
+            if player_data:
+                class_id = player_data.get("class_id")
+                combat_data = {"damage_taken": total_damage_taken, "class_id": class_id}
+                combat_feat_msg = self.achievement_system.check_combat_feats(self.discord_id, combat_data)
+                if combat_feat_msg:
+                    logs.append(f"\n{combat_feat_msg}")
+
             # 7. Faction Reputation
             faction_logs = self.faction_system.grant_reputation_for_kill(
                 self.discord_id, combat_result.get("monster_data", {})
