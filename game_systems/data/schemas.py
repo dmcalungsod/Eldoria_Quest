@@ -33,6 +33,8 @@ LOCATION_SCHEMA = {
         "options": ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"],
     },
     "level_req": {"type": int, "required": True, "min": 1},
+    "floor_depth": {"type": int, "required": True, "min": 1},
+    "danger_level": {"type": int, "required": True, "min": 1},
     "duration_options": {
         "type": list,
         "required": True,
