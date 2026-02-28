@@ -414,12 +414,12 @@ class AdventureEvents:
     ]
 
     REGEN_PHRASES_ARCHIVES = [
-        "📚 You find a reading nook and rest your legs.",
-        "📚 The quiet of the library soothes your nerves.",
-        "📚 You lean against a stack of ancient tomes and catch your breath.",
-        "📚 The smell of old paper is strangely comforting.",
-        "📚 You bandage your wounds while ignoring the whispers.",
-        "📚 A floating candle provides a warm light as you rest.",
+        f"📚 You find a reading nook and rest your legs.",
+        f"📚 The quiet of the library soothes your nerves.",
+        f"📚 You lean against a stack of ancient tomes and catch your breath.",
+        f"📚 The smell of old paper is strangely comforting.",
+        f"📚 You bandage your wounds while ignoring the whispers.",
+        f"📚 A floating candle provides a warm light as you rest.",
     ]
 
     REGEN_LOW_HP = [

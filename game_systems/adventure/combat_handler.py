@@ -285,7 +285,12 @@ class CombatHandler:
                     )
                 self.db.add_active_buffs_bulk(self.discord_id, bulk_buffs)
 
-            # 8. Award Titles
+            # 8. Remove Consumed Buffs (Rogue Mechanics)
+            consumed_ids = result.get("consumed_buff_ids", [])
+            if consumed_ids:
+                self.db.remove_active_buffs_by_ids(self.discord_id, consumed_ids)
+
+            # 9. Award Titles
             new_titles = result.get("new_titles", [])
             for title in new_titles:
                 self.db.add_title(self.discord_id, title)
