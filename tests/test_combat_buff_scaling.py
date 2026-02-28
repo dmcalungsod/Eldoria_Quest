@@ -10,6 +10,7 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
 from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
+from game_systems.combat.combat_effects import CombatEffects  # noqa: E402
 
 
 class TestCombatBuffScaling(unittest.TestCase):
@@ -56,12 +57,11 @@ class TestCombatBuffScaling(unittest.TestCase):
         skill = {"name": "Rage", "buff_data": {"STR_percent": 0.5, "duration": 3}}
 
         # Apply the buff logic (directly calling the internal method for unit testing)
-        self.engine._apply_skill_buffs(skill)
+        buffs = CombatEffects.apply_skill_buffs(skill, self.base_stats)
 
         # Check the generated buffs
         # Expect: 50% of BASE (100) = 50
         # NOT: 50% of TOTAL (200) = 100
-        buffs = self.engine.new_buffs
         self.assertEqual(len(buffs), 1)
 
         str_buff = buffs[0]
@@ -77,9 +77,7 @@ class TestCombatBuffScaling(unittest.TestCase):
         # Skill that grants +10% to all stats
         skill = {"name": "Limit Break", "buff_data": {"all_stats_percent": 0.1, "duration": 3}}
 
-        self.engine._apply_skill_buffs(skill)
-
-        buffs = self.engine.new_buffs
+        buffs = CombatEffects.apply_skill_buffs(skill, self.base_stats)
         # Expect 6 buffs (STR, END, DEX, AGI, MAG, LCK)
         self.assertEqual(len(buffs), 6)
 
@@ -95,9 +93,9 @@ class TestCombatBuffScaling(unittest.TestCase):
         """Verify duration is parsed correctly from skill data."""
         skill = {"name": "Short Burst", "buff_data": {"STR_percent": 0.1, "duration": 5}}
 
-        self.engine._apply_skill_buffs(skill)
+        buffs = CombatEffects.apply_skill_buffs(skill, self.base_stats)
 
-        buff = self.engine.new_buffs[0]
+        buff = buffs[0]
         self.assertEqual(buff["duration"], 5)
 
 
