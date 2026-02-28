@@ -246,10 +246,10 @@ SKILLS = {
         "type": "Active",
         "class_id": 3,
         "mp_cost": 15,
-        "buff": {
+        "buff_data": {
+            "next_hit_crit": 1,
             "AGI_percent": 0.5,
-            "next_hit_crit": True,
-            "duration": 2
+            "duration": 2,
         },
         "learn_cost": 1500,
         "upgrade_cost": 300,
@@ -279,7 +279,7 @@ SKILLS = {
         "mp_cost": 18,
         "power_multiplier": 0.0,
         "is_aoe": True,
-        "debuff": {"accuracy_percent": -0.4, "duration": 3},
+        "debuff": {"type": "stat_mod", "accuracy_percent": -0.4, "duration": 3},
         "learn_cost": 3000,
         "upgrade_cost": 400,
         "scaling_stat": "AGI",
@@ -294,7 +294,7 @@ SKILLS = {
         "mp_cost": 50,
         "power_multiplier": 2.5,
         "is_aoe": True,
-        "status_effect": {"bleed": 10, "duration": 3},
+        "debuff": {"type": "bleed", "damage": 10, "duration": 3},
         "learn_cost": 10000,
         "upgrade_cost": 1000,
         "scaling_stat": "DEX",

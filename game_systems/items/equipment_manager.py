@@ -109,6 +109,41 @@ class EquipmentManager:
                 return data.get("allowed_slots", [])
         return []
 
+    def _resolve_conflict_slots(self, target_slot: str) -> set:
+        """
+        Returns the set of slots that must be cleared before equipping target_slot.
+        Returns an empty set when no conflicts are possible (e.g. accessories).
+        """
+        if target_slot in self.TWO_HANDED_SLOTS:
+            return self.MAIN_HAND_SLOTS | self.OFF_HAND_SLOTS | self.TWO_HANDED_SLOTS
+        if target_slot in self.MAIN_HAND_SLOTS:
+            return self.MAIN_HAND_SLOTS | self.TWO_HANDED_SLOTS
+        if target_slot in self.OFF_HAND_SLOTS:
+            return self.OFF_HAND_SLOTS | self.TWO_HANDED_SLOTS
+        if target_slot in self.HEAD_SLOTS:
+            return set(self.HEAD_SLOTS)
+        if target_slot in self.BODY_SLOTS:
+            return set(self.BODY_SLOTS)
+        if target_slot in self.HAND_SLOTS:
+            return set(self.HAND_SLOTS)
+        if target_slot in self.LEG_SLOTS:
+            return set(self.LEG_SLOTS)
+        if target_slot in self.FOOT_SLOTS:
+            return set(self.FOOT_SLOTS)
+        return {target_slot}
+
+    def _get_base_stat(self, stats: "PlayerStats", stat_name: str) -> int:
+        """Returns the current base value of a primary stat by name."""
+        mapping = {
+            "STR": stats.strength,
+            "END": stats.endurance,
+            "DEX": stats.dexterity,
+            "AGI": stats.agility,
+            "MAG": stats.magic,
+            "LCK": stats.luck,
+        }
+        return mapping.get(stat_name, 0)
+
     def check_requirements(self, item_data: dict, player_data: dict) -> tuple[bool, str | None]:
         """
         Validates if a player can equip an item based on Level, Rank, and Class.
@@ -198,18 +233,7 @@ class EquipmentManager:
                     for stat_key, percent in skill_data["passive_bonus"].items():
                         if stat_key.endswith("_percent"):
                             stat_name = stat_key.split("_")[0].upper()
-                            current_total = getattr(stats, stat_name.lower(), 0)
-                            if current_total == 0:
-                                mapping = {
-                                    "STR": stats.strength,
-                                    "END": stats.endurance,
-                                    "DEX": stats.dexterity,
-                                    "AGI": stats.agility,
-                                    "MAG": stats.magic,
-                                    "LCK": stats.luck,
-                                }
-                                current_total = mapping.get(stat_name, 0)
-
+                            current_total = self._get_base_stat(stats, stat_name)
                             bonus = math.ceil(current_total * (percent * level))
                             stats.add_bonus_stat(stat_name, bonus)
 
@@ -308,67 +332,26 @@ class EquipmentManager:
             if item["slot"] not in allowed:
                 return False, f"Your class cannot equip {item['slot']} items."
 
-            # Resolve Slot Conflicts (Two-Handed / Main Hand / Off Hand)
+            # Resolve Slot Conflicts
             conflicts_msg = ""
-            slots_to_check = set()
             target_slot = item["slot"]
-
             equipped_items = self.db.get_equipped_items(discord_id)
 
-            # --- MULTI-SLOT LOGIC FOR ACCESSORIES ---
+            # Accessories: check uniqueness and capacity, no slot clearing
             if target_slot == "accessory":
-                # Get current accessories
                 current_accessories = [i for i in equipped_items if i.get("slot") == "accessory"]
-
-                # Check 1: Unique Equipped (Can't equip duplicate item_key)
                 for acc in current_accessories:
                     if acc["item_key"] == item["item_key"]:
                         return False, "You cannot equip two of the same accessory."
-
-                # Check 2: Capacity
                 if len(current_accessories) >= self.MAX_ACCESSORY_SLOTS:
                     return (
                         False,
                         f"Accessory slots full ({self.MAX_ACCESSORY_SLOTS}/{self.MAX_ACCESSORY_SLOTS}). Unequip one first.",
                     )
-
-                # If we have space, we DO NOT add "accessory" to slots_to_check
-                # This prevents auto-unequipping existing accessories
-                pass
-
             else:
-                # Normal conflict logic
-                if target_slot in self.TWO_HANDED_SLOTS:
-                    slots_to_check.update(self.MAIN_HAND_SLOTS)
-                    slots_to_check.update(self.OFF_HAND_SLOTS)
-                    slots_to_check.update(self.TWO_HANDED_SLOTS)
-                elif target_slot in self.MAIN_HAND_SLOTS:
-                    slots_to_check.update(self.MAIN_HAND_SLOTS)
-                    slots_to_check.update(self.TWO_HANDED_SLOTS)
-                elif target_slot in self.OFF_HAND_SLOTS:
-                    slots_to_check.update(self.OFF_HAND_SLOTS)
-                    slots_to_check.update(self.TWO_HANDED_SLOTS)
-
-                # Check Armor Groups
-                elif target_slot in self.HEAD_SLOTS:
-                    slots_to_check.update(self.HEAD_SLOTS)
-                elif target_slot in self.BODY_SLOTS:
-                    slots_to_check.update(self.BODY_SLOTS)
-                elif target_slot in self.HAND_SLOTS:
-                    slots_to_check.update(self.HAND_SLOTS)
-                elif target_slot in self.LEG_SLOTS:
-                    slots_to_check.update(self.LEG_SLOTS)
-                elif target_slot in self.FOOT_SLOTS:
-                    slots_to_check.update(self.FOOT_SLOTS)
-                else:
-                    # Normal armor slot
-                    slots_to_check.add(target_slot)
-
-            # Find and unequip conflicting items
-            if slots_to_check:
+                slots_to_check = self._resolve_conflict_slots(target_slot)
                 for eq_item in equipped_items:
-                    eq_slot = eq_item.get("slot")
-                    if eq_slot in slots_to_check:
+                    if eq_item.get("slot") in slots_to_check:
                         try:
                             self._unequip_logic(discord_id, eq_item["id"])
                             conflicts_msg += f" (Unequipped {eq_item['item_name']})"
