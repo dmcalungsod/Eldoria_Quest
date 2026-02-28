@@ -31,3 +31,11 @@
 **Process Improvements:**
 -   Add a `bandit.yaml` config to exclude `B311` for the `game_systems/` directory to reduce noise in future reports.
 -   Implement a custom pre-commit check for `print()` statements in non-script files.
+# Repo Auditor Journal
+
+## 2026-02-28
+- **Tools used:** `flake8`, `bandit`, `vulture`, `radon`, `safety`, `pytest-cov`, and manual regex checks (`grep`).
+- **Effectiveness:** Automated tools were highly effective at identifying style, security, dead code, and complexity issues. `safety` was deprecated but `bandit` caught Python-specific security concerns. Manual grep was effective for ONE UI policy violations (`send_message`).
+- **Recurring Issues:** High cyclomatic complexity in UI components (e.g., `ShopView`, `QuestBoardView`). Consistent use of `send_message` in UI logic which violates the ONE UI pattern.
+- **Recommendations for future:** Add pre-commit hooks for `flake8` and `vulture`. Ensure `bandit` is run in CI. Create specific lint rules for the ONE UI policy if possible (e.g., a custom flake8 plugin).
+- **Limitations:** Cannot automatically determine if an `assert` in test code is a security flaw (expected) vs in production code (flaw), though `bandit` flagged test files. Ignored test files for `bandit` severity. `safety` command deprecated.
