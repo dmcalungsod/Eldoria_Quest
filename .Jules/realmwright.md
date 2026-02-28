@@ -10,3 +10,9 @@
 - The Celestial Arbiter (Boss) drops `celestial_core` (Epic) which should be a high-value chase item.
 - Monster stats (ATK/DEF) are calibrated around the Level 28-31 range.
 - *The Rust-Wastes* (Rank E, Lvl 8) bridges the difficulty jump between *Whispering Thicket* (Lvl 5) and *Deepgrove Roots* (Lvl 10), smoothing out the early game curve.
+
+## 2026-03-01: The Wailing Chasm
+- Designed a new Rank A (Level 35+) underground region: The Wailing Chasm.
+- **Design Pattern:** Introduced a new survival mechanic: Light Management and Sound-based ambushes. This adds depth to exploration beyond standard HP/MP management.
+- **Thematic Consistency:** Built on the lore of The Sundering, focusing on a lost civilization (Kaza-Kor) swallowed by the disaster.
+- **Coordination:** The new region will require cross-agent coordination to implement new mechanics (Light, Sound, Sanity).
