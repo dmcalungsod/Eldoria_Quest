@@ -34,6 +34,50 @@ commands:
             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
             sudo apt-get update && sudo apt-get install gh -y
 
+  check-md-only:
+    description: Halt the job if only markdown files were changed.
+    steps:
+      - run:
+          name: Check if only Markdown files changed
+          command: |
+            # Determine changed files based on the branch
+            if [ "$CIRCLE_BRANCH" == "main" ]; then
+              # On main branch (e.g., after a merge), check files changed against the previous commit
+              echo "Running on main branch. Checking files changed in the push..."
+              # Fallback to HEAD~1 if CIRCLE_SHA1 is not set or base revision is missing
+              BASE_REV=${CIRCLE_SHA1:-HEAD}~1
+              CHANGED_FILES=$(git diff --name-only "$BASE_REV" HEAD || git diff-tree --no-commit-id --name-only -r HEAD)
+            else
+              # On a PR branch, compare against origin/main
+              echo "Running on PR branch. Comparing against origin/main..."
+              git fetch origin main || true
+
+              if ! git show-ref --verify --quiet refs/remotes/origin/main; then
+                echo "No origin/main found. Proceeding with normal execution."
+                exit 0
+              fi
+
+              CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+            fi
+
+            echo "Changed files:"
+            echo "$CHANGED_FILES"
+
+            if [ -z "$CHANGED_FILES" ]; then
+              echo "No files changed or unable to determine changes. Proceeding."
+              exit 0
+            fi
+
+            # Check if there are any non-markdown files
+            NON_MD_FILES=$(echo "$CHANGED_FILES" | grep -v "\.md$" || true)
+
+            if [ -z "$NON_MD_FILES" ]; then
+              echo "Only markdown (.md) files changed. Halting job to save compute."
+              circleci-agent step halt
+            else
+              echo "Found non-markdown file changes. Proceeding with the job."
+            fi
+
 # ── Jobs ───────────────────────────────────────────────
 jobs:
   static-analysis:
@@ -41,6 +85,7 @@ jobs:
       - image: cimg/python:3.12
     steps:
       - checkout
+      - check-md-only
       - install-tools
       - run:
           name: Ruff Auto-Fix & Format
@@ -65,6 +110,7 @@ jobs:
     parallelism: 4
     steps:
       - checkout
+      - check-md-only
       - install-deps
       - run:
           name: Install Test Dependencies
@@ -87,6 +133,7 @@ jobs:
       - image: cimg/base:current
     steps:
       - checkout
+      - check-md-only
       - run:
           name: Finalize Codacy Coverage
           command: |
@@ -152,22 +199,13 @@ workflows:
     when:
       equal: [ "https://github.com/dmcalungsod/Eldoria_Quest", << pipeline.project.git_url >> ]
     jobs:
-      - static-analysis:
-          filters:
-            branches:
-              ignore: main
+      - static-analysis
       - test:
           requires:
             - static-analysis
-          filters:
-            branches:
-              ignore: main
       - finalize-coverage:
           requires:
             - test
-          filters:
-            branches:
-              ignore: main
       - auto-merge:
           requires:
             - static-analysis
@@ -180,15 +218,3 @@ workflows:
             branches:
               only: main
 
-  # Scheduled workflow for Codacy upload (Nightly)
-  nightly-codacy:
-    triggers:
-      - schedule:
-          # Daily at 00:00 UTC (08:00 AM PHT)
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - test

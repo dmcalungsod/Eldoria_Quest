@@ -1578,5 +1578,88 @@
       "exp": 500,
       "aurum": 300
     }
+  },
+  {
+    "id": 79,
+    "title": "The Blind Choir's Requiem: Resonance",
+    "tier": "A",
+    "quest_giver": "\"Whispering\" Thorne",
+    "location": "The Wailing Chasm",
+    "summary": "Investigate the harmonic humming in the chasm.",
+    "description": "Thorne, a paranoid survivor, warns of 'The Blind Choir', a cult of former Delvers who sing to the void below. Their requiem threatens to widen the chasm and swallow everything. Travel to The Echoing Hollow and destroy their Resonance Crystals to disrupt their harmony.",
+    "objectives": {
+      "destroy": {
+        "Resonance Crystal": 3
+      },
+      "retrieve": {
+        "Hymnal of the Void": 1
+      }
+    },
+    "flavor_text": {
+      "destroy:Resonance Crystal": "The crystal shatters with a discordant shriek, throwing the cultists' chanting off balance.",
+      "retrieve:Hymnal of the Void": "The pages of the hymnal are written in dried blood. Just looking at the notes makes your head throb."
+    },
+    "rewards": {
+      "exp": 4000,
+      "aurum": 1000
+    }
+  },
+  {
+    "id": 80,
+    "title": "The Blind Choir's Requiem: Silence",
+    "tier": "A",
+    "quest_giver": "\"Whispering\" Thorne",
+    "location": "The Wailing Chasm",
+    "summary": "Destroy the Hymnal and silence the Choirmaster. (Choice A)",
+    "description": "Thorne begs you to destroy the Hymnal of the Void, fearing its corrupting influence. With the book burned, he gives you a sonic-dampening bomb. Take it to the edge of the fissure and silence the Choirmaster permanently.",
+    "prerequisites": [
+      79
+    ],
+    "exclusive_group": "blind_choir_choice",
+    "objectives": {
+      "defeat": {
+        "Choirmaster": 1,
+        "Blind Choir Zealot": 2
+      },
+      "use": "Sonic-Dampening Bomb"
+    },
+    "flavor_text": {
+      "use:Sonic-Dampening Bomb": "The bomb detonates in a flash of absolute silence, staggering the Choirmaster and cutting his song short.",
+      "defeat:Choirmaster": "The Choirmaster falls silently into the abyss, his final note unfinished."
+    },
+    "rewards": {
+      "exp": 5500,
+      "aurum": 1800,
+      "item": "Echolocation Helm Recipe",
+      "title": "The Silencer"
+    }
+  },
+  {
+    "id": 81,
+    "title": "The Blind Choir's Requiem: Discord",
+    "tier": "A",
+    "quest_giver": "\"Whispering\" Thorne",
+    "location": "The Wailing Chasm",
+    "summary": "Keep the Hymnal and confront the Choirmaster. (Choice B)",
+    "description": "You refuse to destroy the Hymnal, believing its secrets might be useful. Thorne, terrified and suspicious, refuses to help you further. You must confront the Choirmaster at the edge of the fissure and resist his mind-altering void whispers on your own.",
+    "prerequisites": [
+      79
+    ],
+    "exclusive_group": "blind_choir_choice",
+    "objectives": {
+      "defeat": {
+        "Choirmaster": 1,
+        "Blind Choir Zealot": 4
+      }
+    },
+    "flavor_text": {
+      "defeat:Choirmaster": "The Choirmaster shrieks as he falls into the void. You clutch the Hymnal tightly; its whispers seem louder now."
+    },
+    "rewards": {
+      "exp": 6500,
+      "aurum": 2000,
+      "item": "Hymnal of the Void",
+      "title": "Discordant Hero"
+    }
   }
 ]
