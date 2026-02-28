@@ -2656,7 +2656,7 @@
             "heavy_blow",
             "thunder_call"
         ],
-        "description": "A massive crab whose shell conducts the endless lightning of the coast."
+        "description": "A massive crab whose shell conducts the endless lightning of the coast. These creatures have adapted to the turbulent storms birthed by the fractured Veil."
     },
     "monster_147": {
         "id": 147,
@@ -2681,7 +2681,7 @@
             "rapid_strike",
             "water_jet"
         ],
-        "description": "An undead soldier of the Iron Armada, wielding a rusted blade with unnatural strength."
+        "description": "An undead soldier of the Iron Armada, wielding a rusted blade with unnatural strength. Their souls are bound to the cursed waters, forced to endlessly patrol the shores."
     },
     "monster_148": {
         "id": 148,
@@ -2706,7 +2706,7 @@
             "vicious_bite",
             "thunder_call"
         ],
-        "description": "A serpent of the rock pools that generates lethal shocks to stun prey."
+        "description": "A serpent of the rock pools that generates lethal shocks to stun prey. They feed on the ambient electrical magic of the region, making their strikes deadly."
     },
     "monster_149": {
         "id": 149,
@@ -2736,7 +2736,7 @@
             "gust",
             "mend"
         ],
-        "description": "A leader of the coastal sirens, her song summons storms and breaks wills."
+        "description": "A leader of the coastal sirens, her song summons storms and breaks wills. Luring sailors to their doom, they feed on the despair of the drowned."
     },
     "monster_150": {
         "id": 150,
@@ -2771,7 +2771,7 @@
             "heavy_blow",
             "regenerate"
         ],
-        "description": "The cursed admiral of the lost fleet, fused with the wreckage and fueled by regret."
+        "description": "The cursed admiral of the lost fleet, fused with the wreckage and fueled by regret. Condemned to command an armada of the dead, his very presence summons violent tempests."
     },
     "monster_151": {
         "id": 151,
@@ -2927,7 +2927,7 @@
             "arcane_pulse",
             "paper_cut"
         ],
-        "description": "A tome of forbidden knowledge that has gained sentience. Its pages are sharp as razors."
+        "description": "A tome of forbidden knowledge that has gained sentience. Its pages are sharp as razors, and it feeds on the raw magic seeping from the Veil."
     },
     "monster_157": {
         "id": 157,
@@ -2952,7 +2952,7 @@
             "void_slash",
             "blind_splash"
         ],
-        "description": "A shapeless mass of sentient ink, dripping with dark magic and forgotten words."
+        "description": "A shapeless mass of sentient ink, dripping with dark magic and forgotten words. It is said these oozes are the physical manifestation of spells gone wrong."
     },
     "monster_158": {
         "id": 158,
@@ -2977,7 +2977,7 @@
             "rapid_strike",
             "silence_aura"
         ],
-        "description": "A restless spirit bound to the library, hunting anyone who dares to make a sound."
+        "description": "A restless spirit bound to the library, hunting anyone who dares to make a sound. They are the souls of scholars who perished during the Sundering, forever trapped."
     },
     "monster_159": {
         "id": 159,
@@ -3002,7 +3002,7 @@
             "heavy_blow",
             "arcane_pulse"
         ],
-        "description": "A massive guardian constructed from thousands of hardened books."
+        "description": "A massive guardian constructed from thousands of hardened books. It attacks intruders relentlessly to protect the dangerous knowledge stored within the Archives."
     },
     "monster_160": {
         "id": 160,
@@ -3032,7 +3032,7 @@
             "void_slash",
             "regenerate"
         ],
-        "description": "An ancient mage who merged with the library to hoard knowledge for eternity."
+        "description": "An ancient mage who merged with the library to hoard knowledge for eternity. Corrupted by the Veil, their mind is fractured, driven to destroy any who seek to plunder their secrets."
     },
     "monster_161": {
         "id": 161,
@@ -3056,7 +3056,7 @@
         "skills": [
             "vicious_bite"
         ],
-        "description": "A bloated rat bristling with sharp metal shards embedded in its scabby hide."
+        "description": "A bloated rat bristling with sharp metal shards embedded in its scabby hide. These vermin feed on the raw magic leaking from abandoned, rusted machinery, growing to monstrous size."
     },
     "monster_162": {
         "id": 162,
@@ -3085,7 +3085,7 @@
             "rapid_strike",
             "heavy_blow"
         ],
-        "description": "A crafty kobold armed with a makeshift spear and pockets full of stolen junk."
+        "description": "A crafty kobold armed with a makeshift spear and pockets full of stolen junk. Driven mad by Veil sickness, they scavenge the Rust-Wastes for anything shiny to offer their unseen masters."
     },
     "monster_163": {
         "id": 163,
@@ -3110,7 +3110,7 @@
             "mend",
             "poison_spit"
         ],
-        "description": "A glob of sentient, flammable sludge that leaves a toxic trail."
+        "description": "A glob of sentient, flammable sludge that leaves a toxic trail. Born from the corrupted runoff of ancient factories, these slimes can ignite if exposed to a spark."
     },
     "monster_164": {
         "id": 164,
@@ -3139,7 +3139,7 @@
             "heavy_blow",
             "crushing_slam"
         ],
-        "description": "A lumbering construct held together by rust and bad magic."
+        "description": "A lumbering construct held together by rust and bad magic. Originally built for heavy labor before the Sundering, the corrupted Veil energy now animates it to crush intruders with unrelenting force."
     },
     "monster_165": {
         "id": 165,
@@ -3173,6 +3173,6 @@
             "regenerate",
             "thunder_call"
         ],
-        "description": "A twisted amalgamation of flesh and machinery, crackling with stolen electricity."
+        "description": "A twisted amalgamation of flesh and machinery, crackling with stolen electricity. This horrifying elite was once an explorer who dug too deep, now fused with the very technology they sought to salvage."
     }
 }
