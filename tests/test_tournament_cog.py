@@ -90,6 +90,27 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         mock_loop = MagicMock(side_effect=loop_decorator)
         mock_discord.ext.tasks.loop = mock_loop
 
+
+        class MockView:
+            def __init__(self, *args, **kwargs):
+                self.items = []
+                self.timeout = kwargs.get('timeout', None)
+            def add_item(self, item):
+                self.items.append(item)
+            def clear_items(self):
+                self.items.clear()
+
+        mock_discord.ui = MagicMock()
+        mock_discord.ui.View = MockView
+        mock_discord.ui.Button = MagicMock()
+        mock_discord.ButtonStyle = MagicMock()
+        mock_discord.ButtonStyle.primary = 1
+        mock_discord.ButtonStyle.secondary = 2
+        mock_discord.ButtonStyle.success = 3
+        mock_discord.ButtonStyle.danger = 4
+
+        sys.modules["discord.ui"] = mock_discord.ui
+
         sys.modules["discord"] = mock_discord
         sys.modules["discord.app_commands"] = mock_discord.app_commands
         sys.modules["discord.ext"] = mock_discord.ext
@@ -130,7 +151,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.cog.check_tournament_cycle.start.assert_called_once()
 
     async def test_tournament_status_no_active(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         self.cog.db.get_active_tournament.return_value = None
 
         await self.cog.tournament_status(interaction)
@@ -141,7 +164,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("No Active Tournament", embed.title)
 
     async def test_tournament_status_active(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         interaction.user.id = 123
 
         future = (datetime.datetime.now() + datetime.timedelta(days=2)).isoformat()
@@ -158,7 +183,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("50 pts", embed.fields[1].value)
 
     async def test_leaderboard_no_active(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         self.cog.system.get_leaderboard.return_value = (None, [])
 
         await self.cog.tournament_leaderboard(interaction)
@@ -168,7 +195,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("No tournament is currently active", args[0])
 
     async def test_leaderboard_active(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         active = {"id": 1, "type": "monster_kills"}
         leaders = [{"rank": 1, "name": "Player1", "score": 100}, {"rank": 2, "name": "Player2", "score": 90}]
         self.cog.system.get_leaderboard.return_value = (active, leaders)
@@ -182,7 +211,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Player1", embed.description)
 
     async def test_admin_start(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         # Mock checks? No, we call the function directly.
 
         self.cog.system.TOURNAMENT_TYPES = ["monster_kills"]
@@ -196,7 +227,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Started Tournament #101", interaction.response.send_message.call_args[0][0])
 
     async def test_admin_start_invalid(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         self.cog.system.TOURNAMENT_TYPES = ["monster_kills"]
 
         await self.cog.admin_start(interaction, "invalid_type")
@@ -206,7 +239,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Invalid type", interaction.response.send_message.call_args[0][0])
 
     async def test_admin_end(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         self.cog.system.end_current_tournament.return_value = "Ended."
 
         await self.cog.admin_end(interaction)
