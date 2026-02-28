@@ -40,17 +40,26 @@ commands:
       - run:
           name: Check if only Markdown files changed
           command: |
-            # Fetch origin/main so we can compare against it
-            git fetch origin main || true
+            # Determine changed files based on the branch
+            if [ "$CIRCLE_BRANCH" == "main" ]; then
+              # On main branch (e.g., after a merge), check files changed against the previous commit
+              echo "Running on main branch. Checking files changed in the push..."
+              # Fallback to HEAD~1 if CIRCLE_SHA1 is not set or base revision is missing
+              BASE_REV=${CIRCLE_SHA1:-HEAD}~1
+              CHANGED_FILES=$(git diff --name-only "$BASE_REV" HEAD || git diff-tree --no-commit-id --name-only -r HEAD)
+            else
+              # On a PR branch, compare against origin/main
+              echo "Running on PR branch. Comparing against origin/main..."
+              git fetch origin main || true
 
-            # If there's no main branch available locally, we skip the check to be safe
-            if ! git show-ref --verify --quiet refs/remotes/origin/main; then
-              echo "No origin/main found. Proceeding with normal execution."
-              exit 0
+              if ! git show-ref --verify --quiet refs/remotes/origin/main; then
+                echo "No origin/main found. Proceeding with normal execution."
+                exit 0
+              fi
+
+              CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
             fi
 
-            # Find changed files between the base branch (main) and current branch/commit
-            CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
             echo "Changed files:"
             echo "$CHANGED_FILES"
 
