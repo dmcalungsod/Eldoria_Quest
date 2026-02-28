@@ -176,6 +176,8 @@ class AdventureResolutionEngine:
                 return True
 
         # 4. Finalize Success
+        self._mark_complete(discord_id)
+
         # Save state ONCE at the end
         session.save_state()
 
@@ -195,7 +197,6 @@ class AdventureResolutionEngine:
             if delta_hp != 0 or delta_mp != 0:
                 self.db.update_player_vitals_delta(discord_id, delta_hp, delta_mp, max_hp, max_mp)
 
-        self._mark_complete(discord_id)
         return True
 
     def _mark_complete(self, discord_id: int):
@@ -204,6 +205,9 @@ class AdventureResolutionEngine:
 
     def _handle_death(self, discord_id: int, session: AdventureSession):
         """Resolves death: penalties, inventory update, and marks session failed."""
+        # Update status first before _handle_death_rewards sets active=0 or removes the session
+        self.db.update_adventure_status(discord_id, "failed")
+
         loss_msg = self.adventure_manager._handle_death_rewards(discord_id, session)
 
         # Append loss message to logs if available
@@ -217,14 +221,12 @@ class AdventureResolutionEngine:
             session.logs.append(loss_msg)
             # Use raw update because session is now inactive
             trimmed_logs = session.logs[-30:]
-            self.db.update_adventure_session(
-                discord_id,
-                logs=json.dumps(trimmed_logs),
-                loot_collected=json.dumps(session.loot),
-                active=0,  # Ensure inactive
-                active_monster_json=None,
-                previous_version=session.version,  # Hope version matches
-                steps_completed=session.steps_completed,
+            # Use direct DB update targeting inactive sessions
+            self.db._col("adventure_sessions").update_one(
+                {"discord_id": discord_id, "active": 0},
+                {"$set": {
+                    "logs": json.dumps(trimmed_logs),
+                    "loot_collected": json.dumps(session.loot),
+                    "steps_completed": session.steps_completed
+                }}
             )
-
-        self.db.update_adventure_status(discord_id, "failed")
