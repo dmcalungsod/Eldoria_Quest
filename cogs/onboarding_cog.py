@@ -26,9 +26,7 @@ from .utils.ui_helpers import back_to_profile_callback
 logger = logging.getLogger("eldoria.onboarding")
 
 
-async def transition_to_guild_lobby(
-    interaction: discord.Interaction, db: DatabaseManager, user: discord.User
-):
+async def transition_to_guild_lobby(interaction: discord.Interaction, db: DatabaseManager, user: discord.User):
     """Helper to transition to the Guild Lobby, avoiding circular imports."""
     from game_systems.guild_system.ui.lobby_view import GuildLobbyView
 
@@ -47,11 +45,6 @@ async def transition_to_guild_lobby(
         color=discord.Color.dark_gold(),
     )
 
-    embed.add_field(
-        name="🗺️ Expeditions",
-        value="Time-based exploration is the core of your journey. Use your profile to select a destination, prepare your supplies, and depart.",
-        inline=False,
-    )
     embed.add_field(
         name="📜 Quest Board",
         value="Review available contracts and report successes.",
@@ -104,12 +97,8 @@ class StartMenuView(View):
     async def class_select_callback(self, interaction: discord.Interaction):
         class_id = int(interaction.data["custom_id"].split("_")[1])
 
-        class_info = next(
-            (v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), None
-        )
-        class_name = next(
-            (k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), "Unknown"
-        )
+        class_info = next((v for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), None)
+        class_name = next((k for k, v in CLASS_DEFINITIONS.items() if v["id"] == class_id), "Unknown")
 
         if not class_info:
             await interaction.response.send_message("Class data error.", ephemeral=True)
@@ -124,12 +113,7 @@ class StartMenuView(View):
             "MAG": E.MAG,
             "LCK": E.LCK,
         }
-        stats_str = "\n".join(
-            [
-                f"{stat_emojis.get(k, '•')} **{k}**: `{v}`"
-                for k, v in class_info["stats"].items()
-            ]
-        )
+        stats_str = "\n".join([f"{stat_emojis.get(k, '•')} **{k}**: `{v}`" for k, v in class_info["stats"].items()])
 
         embed = discord.Embed(
             title=f"Class: {class_name}",
@@ -159,9 +143,7 @@ class ClassDetailView(View):
 
         exists = await asyncio.to_thread(self.db.player_exists, self.user.id)
         if exists:
-            await interaction.followup.send(
-                "You already have a character!", ephemeral=True
-            )
+            await interaction.followup.send("You already have a character!", ephemeral=True)
             return
 
         success, msg = await asyncio.to_thread(
@@ -194,9 +176,7 @@ class ClassDetailView(View):
 
     @discord.ui.button(label="Reconsider", style=discord.ButtonStyle.secondary)
     async def back_btn(self, interaction: discord.Interaction, button: Button):
-        embed = discord.Embed(
-            title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold()
-        )
+        embed = discord.Embed(title=WELCOME_TITLE, description=WELCOME_MESSAGE, color=discord.Color.gold())
         view = StartMenuView(self.db, self.user)
         await interaction.response.edit_message(embed=embed, view=view)
 
@@ -240,9 +220,7 @@ class GuildWelcomeView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user.id
 
-    @discord.ui.button(
-        label="⚔️ Prove Yourself (Tutorial)", style=discord.ButtonStyle.primary
-    )
+    @discord.ui.button(label="⚔️ Prove Yourself (Tutorial)", style=discord.ButtonStyle.primary)
     async def start_training(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
 
@@ -258,9 +236,7 @@ class GuildWelcomeView(View):
         )
         await interaction.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(
-        label="⏩ I know what I'm doing (Skip)", style=discord.ButtonStyle.secondary
-    )
+    @discord.ui.button(label="⏩ I know what I'm doing (Skip)", style=discord.ButtonStyle.secondary)
     async def skip_to_lobby(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer()
         await transition_to_guild_lobby(interaction, self.db, self.user)
@@ -416,15 +392,11 @@ class CombatTutorialView(View):
             if item:
                 # Auto-Equip
                 equip_mgr = EquipmentManager(self.db)
-                ok, msg = await asyncio.to_thread(
-                    equip_mgr.equip_item, self.user.id, item["id"]
-                )
+                ok, msg = await asyncio.to_thread(equip_mgr.equip_item, self.user.id, item["id"])
                 if ok:
                     weapon_msg = f"\n⚔️ **Bonus:** Received and equipped **{name}**!"
                 else:
-                    weapon_msg = (
-                        f"\n⚔️ **Bonus:** Received **{name}**! (Check Inventory)"
-                    )
+                    weapon_msg = f"\n⚔️ **Bonus:** Received **{name}**! (Check Inventory)"
 
         await interaction.followup.send(
             f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}",

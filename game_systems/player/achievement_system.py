@@ -120,6 +120,13 @@ CRAFTING_MILESTONES = {
     50: ("Grandmaster of the Forge", "Reached Crafting Level 50."),
 }
 
+# --- Rogue Expansion Skill Sets ---
+# Using existing Rogue skills from skills_data.py
+# Assassin: DPS focused (Double Strike, Toxic Blade)
+ROGUE_ASSASSIN_SKILLS = {"double_strike", "toxic_blade"}
+# Phantom: Stealth focused (Stealth) - Limited existing skills, but fits the theme
+ROGUE_PHANTOM_SKILLS = {"stealth"}
+
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -393,4 +400,74 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking crafting achievements for {discord_id}: {e}")
+            return None
+
+    def check_class_mastery_achievements(self, discord_id: int, class_id: int) -> str | None:
+        """
+        Checks for class-specific mastery titles (e.g. Rogue paths).
+        Returns a success message if a new title is awarded, else None.
+        """
+        try:
+            # Only check Rogue (Class ID 3) for now
+            if class_id != 3:
+                return None
+
+            skills = self.db.get_all_player_skills(discord_id)
+            if not skills:
+                return None
+
+            known_skill_keys = {s["skill_key"] for s in skills}
+            newly_awarded = []
+
+            # Check Assassin Path
+            if ROGUE_ASSASSIN_SKILLS.issubset(known_skill_keys):
+                if self.db.add_title(discord_id, "Assassin"):
+                    newly_awarded.append("Assassin")
+                    logger.info(f"Awarded title 'Assassin' to {discord_id}")
+
+            # Check Phantom Path
+            if ROGUE_PHANTOM_SKILLS.issubset(known_skill_keys):
+                if self.db.add_title(discord_id, "Phantom"):
+                    newly_awarded.append("Phantom")
+                    logger.info(f"Awarded title 'Phantom' to {discord_id}")
+
+            if newly_awarded:
+                if len(newly_awarded) == 1:
+                    return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
+                else:
+                    return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Error checking class mastery achievements for {discord_id}: {e}")
+            return None
+
+    def check_combat_feats(self, discord_id: int, combat_data: dict) -> str | None:
+        """
+        Checks for combat-specific feats (e.g. No Damage).
+        combat_data: {"damage_taken": int, "class_id": int}
+        """
+        try:
+            damage_taken = combat_data.get("damage_taken", -1)
+            class_id = combat_data.get("class_id")
+
+            newly_awarded = []
+
+            # "Unseen Death" - Rogue wins without taking damage
+            if class_id == 3 and damage_taken == 0:
+                if self.db.add_title(discord_id, "Unseen Death"):
+                    newly_awarded.append("Unseen Death")
+                    logger.info(f"Awarded title 'Unseen Death' to {discord_id}")
+
+            if newly_awarded:
+                if len(newly_awarded) == 1:
+                    return f"🏆 **Achievement Unlocked:** {newly_awarded[0]}"
+                else:
+                    return f"🏆 **Achievements Unlocked:** {', '.join(newly_awarded)}"
+
+            return None
+
+        except Exception as e:
+            logger.error(f"Error checking combat feats for {discord_id}: {e}")
             return None

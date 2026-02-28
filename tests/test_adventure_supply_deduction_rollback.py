@@ -22,10 +22,10 @@ class TestAdventureSupplyDeduction(unittest.TestCase):
         # Mock inventory items for metadata
         self.mock_db.get_inventory_items.return_value = [
             {"item_key": "ration", "item_name": "Ration", "item_type": "consumable", "rarity": "Common", "count": 10},
-            {"item_key": "torch", "item_name": "Torch", "item_type": "consumable", "rarity": "Common", "count": 10}
+            {"item_key": "torch", "item_name": "Torch", "item_type": "consumable", "rarity": "Common", "count": 10},
         ]
 
-        self.mock_db.remove_inventory_item.side_effect = [True, False] # First succeeds, second fails
+        self.mock_db.remove_inventory_item.side_effect = [True, False]  # First succeeds, second fails
 
         # Mock active session check
         self.mock_db.get_active_adventure.return_value = None
@@ -35,12 +35,12 @@ class TestAdventureSupplyDeduction(unittest.TestCase):
 
     def test_partial_deduction_failure(self):
         discord_id = 12345
-        location_id = "forest_outskirts" # valid location
+        location_id = "forest_outskirts"  # valid location
         duration = 30
         supplies = {"ration": 1, "torch": 1}
 
         # Patch LOCATIONS to ensure validation passes
-        with patch('game_systems.adventure.adventure_manager.LOCATIONS', {"forest_outskirts": {}}):
+        with patch("game_systems.adventure.adventure_manager.LOCATIONS", {"forest_outskirts": {}}):
             # Execute
             result = self.manager.start_adventure(discord_id, location_id, duration, supplies)
 
@@ -57,5 +57,6 @@ class TestAdventureSupplyDeduction(unittest.TestCase):
 
             print("Test passed: Rollback triggered successfully.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

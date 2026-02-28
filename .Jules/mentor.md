@@ -1,4 +1,4 @@
-## 2026-02-27 — [Mentor: Auto-Adventure Onboarding]
+## 2024-05-23 — Initial Onboarding Analysis
 
-**Learning:** New players lacked guidance regarding the recently implemented Auto-Adventure System (Expeditions), which is a core feature. They need an introduction immediately after completing or skipping the combat tutorial.
-**Action:** In `cogs/onboarding_cog.py`, updated `transition_to_guild_lobby` to add an "🗺️ Expeditions" field to the Guild Lobby embed. This message seamlessly introduces the time-based exploration mechanic and directs them to their profile, adhering to the One UI Policy by editing the existing message.
+**Learning:** New players were dropped directly into their profile/guild lobby after character creation without clear direction on how to engage with core loops (combat, quests).
+**Action:** Implemented an interactive "Combat Training" tutorial immediately following character creation to teach basic mechanics (Attack/Defend) and provide a narrative bridge to the Guild Hall.
