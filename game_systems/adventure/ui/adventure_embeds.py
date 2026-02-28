@@ -336,5 +336,9 @@ class AdventureEmbeds:
         if penalty_logs := s.get("penalty_logs"):
             embed.add_field(name="⚠️ Penalties", value="\n".join(penalty_logs), inline=False)
 
+        # 8. Refunded Supplies
+        if refund_logs := s.get("refund_logs"):
+            embed.add_field(name="🎒 Unused Supplies", value="\n".join(refund_logs), inline=False)
+
         embed.set_footer(text="Your journey is recorded in the archives.")
         return embed
