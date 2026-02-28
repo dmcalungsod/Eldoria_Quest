@@ -19,19 +19,12 @@ NEW_QUESTS = [
         "location": "Deepgrove Roots",
         "summary": "Collect samples from petrified wildlife.",
         "description": "Refugees from the outer districts are turning to stone. Alchemist Vane of the Grey Ward needs tissue samples from infected beasts in the Deepgrove to study the pathogen before it breaches the quarantine.",
-        "objectives": {
-            "collect": {"Petrified Heart": 3},
-            "examine": {"Calcified Corpse": 1}
-        },
+        "objectives": {"collect": {"Petrified Heart": 3}, "examine": {"Calcified Corpse": 1}},
         "flavor_text": {
             "collect:Petrified Heart": "The heart is heavy and cold, turned completely to grey stone.",
-            "examine:Calcified Corpse": "The victim's face is frozen in a silent scream. Moss is already growing in the cracks."
+            "examine:Calcified Corpse": "The victim's face is frozen in a silent scream. Moss is already growing in the cracks.",
         },
-        "rewards": {
-            "exp": 600,
-            "aurum": 150,
-            "item": "Grey Ward Mask"
-        }
+        "rewards": {"exp": 600, "aurum": 150, "item": "Grey Ward Mask"},
     },
     {
         "id": 75,
@@ -42,19 +35,12 @@ NEW_QUESTS = [
         "summary": "Hunt a Basilisk for its bile.",
         "description": "The Stone-Skin Plague is magical in nature. Vane believes the acidic bile of an Ash Basilisk can dissolve the petrification curse. These beasts prowl the borders of the Ashlands.",
         "prerequisites": [74],
-        "objectives": {
-            "defeat": {"Ember Salamander": 1},
-            "collect": {"Basilisk Bile": 1}
-        },
+        "objectives": {"defeat": {"Ember Salamander": 1}, "collect": {"Basilisk Bile": 1}},
         "flavor_text": {
             "defeat:Ember Salamander": "The beast hisses one last time before dissolving into ash.",
-            "collect:Basilisk Bile": "The bile smokes in the vial, smelling of acid and old earth."
+            "collect:Basilisk Bile": "The bile smokes in the vial, smelling of acid and old earth.",
         },
-        "rewards": {
-            "exp": 800,
-            "aurum": 200,
-            "item": "Unstable Antidote"
-        }
+        "rewards": {"exp": 800, "aurum": 200, "item": "Unstable Antidote"},
     },
     {
         "id": 76,
@@ -66,17 +52,11 @@ NEW_QUESTS = [
         "description": "A merchant intercepts you. 'Why waste such a miracle on the dregs? House Valerius will pay a fortune for that antidote. They can replicate it... eventually. Secure your future, adventurer.'",
         "prerequisites": [75],
         "exclusive_group": "stone_skin_choice",
-        "objectives": {
-            "deliver": {"Unstable Antidote": 1}
-        },
+        "objectives": {"deliver": {"Unstable Antidote": 1}},
         "flavor_text": {
             "deliver:Unstable Antidote": "The courier accepts the vial with a sneer. 'Wise choice. The coin is yours.'"
         },
-        "rewards": {
-            "exp": 400,
-            "aurum": 1500,
-            "title": "Mercenary"
-        }
+        "rewards": {"exp": 400, "aurum": 1500, "title": "Mercenary"},
     },
     {
         "id": 77,
@@ -88,19 +68,14 @@ NEW_QUESTS = [
         "description": "Alchemist Vane is waiting. 'It's not enough for everyone yet, but with this sample, we can save the quarantine zone. We can stop the spread. The city owes you a debt.'",
         "prerequisites": [75],
         "exclusive_group": "stone_skin_choice",
-        "objectives": {
-            "deliver": {"Unstable Antidote": 1}
-        },
+        "objectives": {"deliver": {"Unstable Antidote": 1}},
         "flavor_text": {
             "deliver:Unstable Antidote": "Vane's hands shake as he takes the vial. 'You did good. Real good.'"
         },
-        "rewards": {
-            "exp": 1000,
-            "aurum": 500,
-            "item": "Alchemist's Retort"
-        }
-    }
+        "rewards": {"exp": 1000, "aurum": 500, "item": "Alchemist's Retort"},
+    },
 ]
+
 
 def main():
     json_path = os.path.join("game_systems", "data", "quests.json")
@@ -139,6 +114,7 @@ def main():
         print(f"Successfully saved {len(quests)} quests to {json_path}.")
     else:
         print("No new quests were added.")
+
 
 if __name__ == "__main__":
     main()
