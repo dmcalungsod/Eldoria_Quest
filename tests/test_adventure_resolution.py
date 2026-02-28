@@ -61,8 +61,10 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     # The engine now calls _fetch_session_context ONCE and passes the result
     expected_context = mock_session._fetch_session_context.return_value
 
+    # It now also passes weather and time_phase, but we can verify using ANY
+    from unittest.mock import ANY
     mock_session.simulate_step.assert_called_with(
-        context_bundle=expected_context, background=True, persist=False
+        context_bundle=expected_context, background=True, persist=False, weather=ANY, time_phase=ANY
     )
     # Should save state 1 time (only at end)
     assert mock_session.save_state.call_count == 1
@@ -177,7 +179,7 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
     mock_session._fetch_session_context.return_value = context_dict
 
     # Side effect: Reduce HP by 10 each step
-    def simulate_side_effect(context_bundle, background, persist):
+    def simulate_side_effect(context_bundle, background, persist, weather=None, time_phase=None):
         # Engine passes the context_dict as context_bundle
         current_hp = context_bundle["vitals"]["current_hp"]
         new_hp = current_hp - 10
