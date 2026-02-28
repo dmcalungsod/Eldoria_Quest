@@ -194,25 +194,25 @@
   "resonance_crystal": {
     "id": "resonance_crystal",
     "name": "Resonance Crystal Shard",
-    "description": "A fragment of a shattered crystal that still hums with discordant energy.",
     "rarity": "Rare",
-    "quest_id": 79,
-    "droppable": true
+    "notes": "A fragment of a shattered crystal that still hums with discordant energy."
   },
   "hymnal_of_the_void": {
     "id": "hymnal_of_the_void",
     "name": "Hymnal of the Void",
-    "description": "A forbidden text written in dried blood. Whispers seem to emanate from its pages.",
     "rarity": "Epic",
-    "quest_id": 79,
-    "droppable": false
+    "notes": "A forbidden text written in dried blood. Whispers seem to emanate from its pages."
   },
   "sonic_dampening_bomb": {
     "id": "sonic_dampening_bomb",
     "name": "Sonic-Dampening Bomb",
-    "description": "An alchemical explosive designed to unleash an expanding field of absolute silence.",
-    "rarity": "Quest",
-    "quest_id": 80,
-    "droppable": false
+    "rarity": "Epic",
+    "notes": "An alchemical explosive designed to unleash an expanding field of absolute silence."
+  },
+  "echolocation_helm_recipe": {
+    "id": "echolocation_helm_recipe",
+    "name": "Echolocation Helm Recipe",
+    "rarity": "Epic",
+    "notes": "A scroll detailing how to craft the Echolocation Helm using Abyssal Ore."
   }
 }
