@@ -1,11 +1,9 @@
 import unittest
 from unittest.mock import MagicMock
-
 from game_systems.combat.combat_engine import CombatEngine
-from game_systems.data.skills_data import SKILLS
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
-
+from game_systems.data.skills_data import SKILLS
 
 class TestRogueExpansion(unittest.TestCase):
     def setUp(self):

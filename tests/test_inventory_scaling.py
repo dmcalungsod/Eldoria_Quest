@@ -1,7 +1,5 @@
 import unittest
-
 from game_systems.player.player_stats import PlayerStats
-
 
 class TestInventoryScaling(unittest.TestCase):
     def test_max_inventory_slots_base(self):

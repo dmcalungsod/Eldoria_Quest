@@ -1,7 +1,7 @@
-import logging
 import os
 import sys
 import time
+import logging
 import unittest
 from unittest.mock import MagicMock, patch
 
