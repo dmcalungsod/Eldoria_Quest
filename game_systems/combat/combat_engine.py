@@ -955,6 +955,11 @@ class CombatEngine:
                 for status in val:
                     add_buff(f"immunity_{status}", 1)
 
+            else:
+                # Generic flag-style buff (e.g. next_hit_crit, mana_shield)
+                # Pass through with raw value so downstream systems can consume it
+                add_buff(key, val)
+
     def _tag_damage_type(self, skill, report):
         """Helper to categorize skill damage for stat growth."""
         stat = skill.get("scaling_stat", "STR").upper()
