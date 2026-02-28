@@ -195,19 +195,19 @@
     "id": "resonance_crystal",
     "name": "Resonance Crystal Shard",
     "rarity": "Rare",
-    "notes": "A fragment of a shattered crystal that still hums with discordant energy."
+    "notes": "A jagged, dark shard that vibrates violently in your palm. If you hold it to your ear, you can hear a faint, corrupted choir singing from somewhere deep within the stone."
   },
   "hymnal_of_the_void": {
     "id": "hymnal_of_the_void",
     "name": "Hymnal of the Void",
     "rarity": "Epic",
-    "notes": "A forbidden text written in dried blood. Whispers seem to emanate from its pages."
+    "notes": "Bound in cold, flayed skin, this unholy scripture contains musical notation written in rusted blood. The pages are heavy with a maddening, whispered resonance."
   },
   "sonic_dampening_bomb": {
     "id": "sonic_dampening_bomb",
     "name": "Sonic-Dampening Bomb",
     "rarity": "Epic",
-    "notes": "An alchemical explosive designed to unleash an expanding field of absolute silence."
+    "notes": "A delicate glass sphere filled with compressed vacuum and rare alchemical salts. When shattered, it rapidly consumes all ambient sound, creating a suffocating bubble of total silence."
   },
   "echolocation_helm_recipe": {
     "id": "echolocation_helm_recipe",
