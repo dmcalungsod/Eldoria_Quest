@@ -567,13 +567,6 @@ class AdventureSession:
                     context["active_boosts"].get("frostfall_threat_reduction", 1.0)
                 )
 
-            # EVENT HOOK: Guild Expedition Drive Fatigue Reduction
-            if context.get("active_boosts"):
-                fatigue_reduction = float(
-                    context["active_boosts"].get("fatigue_reduction", 1.0)
-                )
-                threat_reduction *= fatigue_reduction
-
             # --- Weather & Time System Check ---
             if weather is None:
                 weather = WorldTime.get_current_weather(self.location_id)
