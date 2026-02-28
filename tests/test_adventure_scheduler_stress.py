@@ -62,6 +62,7 @@ class FastAdventureSession:
         self.version = 1
 
     def simulate_step(self, context_bundle=None, background=False, persist=False, weather=None, time_phase=None):
+        assert context_bundle is not None, "context_bundle must be passed to simulate_step"
         return {"dead": False, "vitals": {"current_hp": 100, "current_mp": 100}}
 
     def save_state(self):
