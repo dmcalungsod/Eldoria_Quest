@@ -125,7 +125,9 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_session_context(self, bundle: dict | None = None) -> dict[str, Any] | None:
+    def _fetch_session_context(
+        self, bundle: dict | None = None
+    ) -> dict[str, Any] | None:
         """
         Fetches all necessary data for the adventure step (combat or non-combat).
         Returns None if critical data (vitals) is missing.
@@ -406,7 +408,9 @@ class AdventureSession:
             if self.supplies.get("pitch_torch"):
                 ambush_chance *= 0.5
 
-            if time_phase == TimePhase.NIGHT and random.random() < ambush_chance:  # nosec B311
+            if (
+                time_phase == TimePhase.NIGHT and random.random() < ambush_chance
+            ):  # nosec B311
                 monster_atk = monster.get("ATK", 10)
 
                 # --- AMBUSH DEFENSE MITIGATION ---
@@ -444,7 +448,7 @@ class AdventureSession:
                 )
 
                 if context.get("event_type") == "spectral_tide":
-                    phrase += "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
+                    phrase += "\n👻 **Spectral Chill:** An unnatural cold grips your heart as restless spirits guide the enemy's strike! You were caught completely off guard."
 
             # Start new combat
             self.active_monster = monster
