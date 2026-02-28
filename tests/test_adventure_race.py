@@ -26,6 +26,15 @@ if "pymongo" not in sys.modules or not hasattr(sys.modules["pymongo"], "__versio
 
 if "discord" not in sys.modules or not hasattr(sys.modules["discord"], "__version__"):
     _mock_discord = MagicMock()
+
+    class DummyView:
+        def __init__(self, *args, **kwargs):
+            self.children = []
+        def add_item(self, item):
+            self.children.append(item)
+
+    _mock_discord.ui.View = DummyView
+
     sys.modules.setdefault("discord", _mock_discord)
     sys.modules.setdefault("discord.ui", _mock_discord.ui)
     sys.modules.setdefault("discord.ext", MagicMock())
