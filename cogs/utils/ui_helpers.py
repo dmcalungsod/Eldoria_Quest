@@ -332,18 +332,3 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
 
     except Exception as e:
         logger.error(f"Guild Hall load error: {e}")
-
-async def navigate_to_settings(interaction: discord.Interaction, db, user):
-    """Navigation: Opens the Settings Menu."""
-    from game_systems.character.ui.settings_view import SettingsView
-
-    if not interaction.response.is_done():
-        await interaction.response.defer()
-
-    embed = discord.Embed(
-        title="⚙️ Settings",
-        description="Manage your account and preferences.",
-        color=discord.Color.light_grey(),
-    )
-    view = SettingsView(db, user)
-    await interaction.edit_original_response(embed=embed, view=view)

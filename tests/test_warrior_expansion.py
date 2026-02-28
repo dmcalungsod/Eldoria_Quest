@@ -8,6 +8,7 @@ from game_systems.player.player_stats import PlayerStats
 
 
 class TestWarriorExpansion:
+
     @pytest.fixture
     def setup_combat(self):
         """Sets up a basic combat scenario with a Warrior player."""
@@ -19,14 +20,7 @@ class TestWarriorExpansion:
         player.stats = MagicMock(spec=PlayerStats)
         player.stats.max_hp = 500
         player.stats.get_total_stats_dict.return_value = {
-            "HP": 500,
-            "MP": 100,
-            "STR": 50,
-            "END": 50,
-            "DEX": 20,
-            "AGI": 20,
-            "MAG": 10,
-            "LCK": 10,
+            "HP": 500, "MP": 100, "STR": 50, "END": 50, "DEX": 20, "AGI": 20, "MAG": 10, "LCK": 10
         }
         player.add_exp = MagicMock()
         # Default stun state
@@ -41,11 +35,14 @@ class TestWarriorExpansion:
             "DEF": 20,
             "level": 10,
             "tier": "Normal",
-            "drops": [],
+            "drops": []
         }
 
         # Warrior Skills - Focusing only on implemented/verified mechanics (Stun/Immunity)
-        warrior_skills = [SKILLS["shield_bash"], SKILLS["unstoppable_force"]]
+        warrior_skills = [
+            SKILLS["shield_bash"],
+            SKILLS["unstoppable_force"]
+        ]
 
         return player, monster, warrior_skills
 
@@ -54,14 +51,14 @@ class TestWarriorExpansion:
         player, monster, skills = setup_combat
 
         # Force stun chance to 100% via patching random
-        with patch("random.random", return_value=0.0):  # 0.0 < 0.3
+        with patch("random.random", return_value=0.0): # 0.0 < 0.3
             engine = CombatEngine(
                 player=player,
                 monster=monster,
                 player_skills=skills,
                 player_mp=100,
                 player_class_id=1,
-                action="skill:shield_bash",
+                action="skill:shield_bash"
             )
             result = engine.run_combat_turn()
 
@@ -83,7 +80,7 @@ class TestWarriorExpansion:
             player_skills=skills,
             player_mp=100,
             player_class_id=1,
-            action="skill:unstoppable_force",
+            action="skill:unstoppable_force"
         )
 
         result = engine.run_combat_turn()
@@ -113,7 +110,7 @@ class TestWarriorExpansion:
             player_mp=100,
             player_class_id=1,
             active_buffs=active_buffs,
-            action="defend",  # Player defends
+            action="defend" # Player defends
         )
 
         # Mock Monster Action to be a skill that stuns
@@ -121,7 +118,7 @@ class TestWarriorExpansion:
             "name": "Stunning Blow",
             "type": "physical",
             "power": 1.0,
-            "status_effect": {"stun_chance": 1.0},  # 100% chance
+            "status_effect": {"stun_chance": 1.0} # 100% chance
         }
 
         # Force monster to use stun skill
@@ -150,7 +147,12 @@ class TestWarriorExpansion:
         player.is_stunned = True
 
         engine = CombatEngine(
-            player=player, monster=monster, player_skills=skills, player_mp=100, player_class_id=1, action="attack"
+            player=player,
+            monster=monster,
+            player_skills=skills,
+            player_mp=100,
+            player_class_id=1,
+            action="attack"
         )
 
         # Execute turn

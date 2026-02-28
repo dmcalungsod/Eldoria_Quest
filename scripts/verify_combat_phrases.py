@@ -27,7 +27,7 @@ def main():
     skills_to_test = [
         {"key_id": "vitriol_bomb", "name": "Vitriol Bomb"},
         {"key_id": "fulminating_compound", "name": "Fulminating Compound"},
-        {"key_id": "mutagenic_serum", "name": "Mutagenic Serum"},
+        {"key_id": "mutagenic_serum", "name": "Mutagenic Serum"}
     ]
 
     for skill in skills_to_test:
@@ -36,7 +36,6 @@ def main():
             is_crit = i == 2
             phrase = CombatPhrases.player_skill(mock_player, mock_monster, skill, 50, is_crit)
             print(f"- {phrase}")
-
 
 if __name__ == "__main__":
     main()

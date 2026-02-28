@@ -1,7 +1,5 @@
-from unittest.mock import MagicMock, patch
-
 import pytest
-
+from unittest.mock import MagicMock, patch
 from game_systems.combat.combat_engine import CombatEngine
 
 
@@ -55,7 +53,9 @@ def test_recoil_damage(mock_player, mock_monster):
     }
 
     # Patch DamageFormula to return fixed damage
-    with patch("game_systems.combat.combat_engine.DamageFormula.player_skill") as mock_calc:
+    with patch(
+        "game_systems.combat.combat_engine.DamageFormula.player_skill"
+    ) as mock_calc:
         mock_calc.return_value = (50, False, "hit")  # 50 damage
 
         engine = CombatEngine(
@@ -94,7 +94,9 @@ def test_bloodlust_heal(mock_player, mock_monster):
     mock_monster["HP"] = 1
     mock_player.hp_current = 50  # Damaged player
 
-    with patch("game_systems.combat.combat_engine.DamageFormula.player_attack") as mock_calc:
+    with patch(
+        "game_systems.combat.combat_engine.DamageFormula.player_attack"
+    ) as mock_calc:
         mock_calc.return_value = (10, False, "hit")
 
         engine = CombatEngine(
@@ -134,6 +136,7 @@ def test_status_immunity(mock_player, mock_monster):
             "game_systems.combat.combat_engine.DamageFormula.player_attack",
             return_value=(0, False, "miss"),
         ):
+
             engine = CombatEngine(
                 player=mock_player,
                 monster=mock_monster,

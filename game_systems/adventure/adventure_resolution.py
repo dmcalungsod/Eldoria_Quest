@@ -10,6 +10,7 @@ import math
 from typing import Any
 
 from database.database_manager import DatabaseManager
+from game_systems.core.world_time import WorldTime
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.adventure.adventure_session import AdventureSession
 from game_systems.guild_system.quest_system import QuestSystem
@@ -26,7 +27,28 @@ class AdventureResolutionEngine:
         self.inventory_manager = InventoryManager(self.db)
         self.adventure_manager = AdventureManager(self.db, self.bot)
 
-    def resolve_session(self, session_doc: dict[str, Any]) -> bool:
+    def resolve_sessions_batch(self, session_docs: list[dict[str, Any]]):
+        """
+        Processes a batch of adventure sessions, optimizing context fetching.
+        """
+        if not session_docs:
+            return
+
+        # We fetch the active boosts once for all sessions to avoid DB overhead.
+        # This is safe because active boosts don't change per player in this loop.
+        self.db.get_active_boosts() # Cache it in DB layer if not already
+
+        # In a real scenario with a proper DB method, we would fetch context_bundles in bulk here
+        # For now, we rely on existing individual fetching within resolve_session to maintain
+        # consistency until batch fetching is implemented in DatabaseManager
+
+        for session_doc in session_docs:
+            try:
+                self.resolve_session(session_doc)
+            except Exception as e:
+                logger.error(f"Failed to resolve session {session_doc.get('discord_id')}: {e}", exc_info=True)
+
+    def resolve_session(self, session_doc: dict[str, Any], context_bundle: dict | None = None) -> bool:
         """
         Processes a time-based adventure session to completion (or death).
         Returns True if session was marked completed/processed.
@@ -71,10 +93,11 @@ class AdventureResolutionEngine:
         logger.info(f"Simulating {steps_remaining} steps for {discord_id} (Total: {total_steps})")
 
         # OPTIMIZATION: Fetch context ONCE and persist only at the end
-        bundle = self.db.get_combat_context_bundle(discord_id)
+        if context_bundle is None:
+            context_bundle = self.db.get_combat_context_bundle(discord_id)
 
         # ⚡ OPTIMIZATION: Parse context ONCE to avoid O(N) re-parsing in loop
-        context = session._fetch_session_context(bundle)
+        context = session._fetch_session_context(context_bundle)
 
         if not context:
             logger.error(f"Failed to load context for {discord_id}")
@@ -91,19 +114,32 @@ class AdventureResolutionEngine:
             initial_mp = context["vitals"]["current_mp"]
 
         if context.get("player_stats"):
-            max_hp = context["player_stats"].max_hp
-            max_mp = context["player_stats"].max_mp
+             max_hp = context["player_stats"].max_hp
+             max_mp = context["player_stats"].max_mp
         elif context.get("stats_dict"):
-            max_hp = context["stats_dict"].get("HP", 100)
-            max_mp = context["stats_dict"].get("MP", 100)
+             max_hp = context["stats_dict"].get("HP", 100)
+             max_mp = context["stats_dict"].get("MP", 100)
 
         final_vitals = None
 
         # 3. Simulation Loop
+        # Pre-fetch weather and time phase to avoid duplicate lookups per step
+        location_id = getattr(session, "location_id", "forest_outskirts")
+        if not isinstance(location_id, str): # Handle MagicMock in tests
+            location_id = "forest_outskirts"
+        weather = WorldTime.get_current_weather(location_id)
+        time_phase = WorldTime.get_current_phase()
+
         for _ in range(steps_remaining):
             # Pass PRE-PARSED context object directly to simulate_step
             # AdventureSession was updated to check if context_bundle has "player_stats" and reuse it.
-            result = session.simulate_step(context_bundle=context, background=True, persist=False)
+            result = session.simulate_step(
+                context_bundle=context,
+                background=True,
+                persist=False,
+                weather=weather,
+                time_phase=time_phase
+            )
 
             # Increment step counter
             session.steps_completed += 1

@@ -326,8 +326,8 @@ class CraftingSystem:
                 original_data = self.db.get_item_from_source_table("equipment", db_id)
                 if original_data:
                     original_name = original_data["name"]
-            except Exception as e:
-                logger.debug(f"Failed to resolve original name: {e}")  # Fallback to stored name
+            except Exception:
+                pass  # Fallback to stored name
 
         # 4. Calculate Rewards
         rewards = self.get_dismantle_rewards(original_name, item["rarity"])
