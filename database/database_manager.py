@@ -118,6 +118,31 @@ class DatabaseManager:
         """Shorthand to get a collection."""
         return self.db[name]
 
+    def _parse_stats_json(self, row: dict, discord_id: int) -> dict[str, Any]:
+        """Safely parses the stats_json field from a stats row."""
+        if not row or not row.get("stats_json"):
+            return {}
+        try:
+            return json.loads(row["stats_json"])
+        except json.JSONDecodeError:
+            logger.error(f"Corrupted stats_json for user {discord_id}")
+            return {}
+
+    def _build_skill_dict(self, skill_def: dict, ps: dict) -> dict[str, Any]:
+        """Builds a combat-ready skill dict from a skill definition and player_skill record."""
+        return {
+            "key_id": skill_def["key_id"],
+            "name": skill_def["name"],
+            "type": skill_def["type"],
+            "skill_level": ps["skill_level"],
+            "mp_cost": skill_def.get("mp_cost", 0),
+            "power_multiplier": skill_def.get("power_multiplier", 1.0),
+            "heal_power": skill_def.get("heal_power", 0),
+            "buff_data": skill_def.get("buff_data"),
+            "scaling_stat": skill_def.get("scaling_stat", "MAG"),
+            "scaling_factor": skill_def.get("scaling_factor", 1.0),
+        }
+
     @contextmanager
     def get_connection(self):
         """
@@ -272,40 +297,19 @@ class DatabaseManager:
         data = result[0]
 
         # 1. Process Stats
-        stats_data = {}
-        if data.get("stats_docs"):
-            stats_row = data["stats_docs"][0]
-            if stats_row.get("stats_json"):
-                try:
-                    stats_data = json.loads(stats_row["stats_json"])
-                except json.JSONDecodeError:
-                    logger.error(f"Corrupted stats_json for user {discord_id}")
+        stats_data = self._parse_stats_json(data["stats_docs"][0] if data.get("stats_docs") else {}, discord_id)
 
-        # 2. Process Buffs
-        # Buffs are already list of dicts from lookup
+        # 2. Process Buffs (already list of dicts from lookup)
         buffs = data.get("buffs", [])
 
         # 3. Process Skills
         player_skill_docs = data.get("player_skills", [])
         self._ensure_skill_cache()
-        skills = []
-        for ps in player_skill_docs:
-            skill_def = self._skill_cache.get(ps["skill_key"])
-            if skill_def and skill_def["type"] == "Active":
-                skills.append(
-                    {
-                        "key_id": skill_def["key_id"],
-                        "name": skill_def["name"],
-                        "type": skill_def["type"],
-                        "skill_level": ps["skill_level"],
-                        "mp_cost": skill_def.get("mp_cost", 0),
-                        "power_multiplier": skill_def.get("power_multiplier", 1.0),
-                        "heal_power": skill_def.get("heal_power", 0),
-                        "buff_data": skill_def.get("buff_data"),
-                        "scaling_stat": skill_def.get("scaling_stat", "MAG"),
-                        "scaling_factor": skill_def.get("scaling_factor", 1.0),
-                    }
-                )
+        skills = [
+            self._build_skill_dict(skill_def, ps)
+            for ps in player_skill_docs
+            if (skill_def := self._skill_cache.get(ps["skill_key"])) and skill_def["type"] == "Active"
+        ]
 
         # 4. Extract Session
         active_session = data.get("active_session", [])
@@ -359,22 +363,12 @@ class DatabaseManager:
         data = result[0]
 
         # 1. Process Stats
-        stats_data = {}
-        if data.get("stats_docs"):
-            stats_row = data["stats_docs"][0]
-            if stats_row.get("stats_json"):
-                try:
-                    stats_data = json.loads(stats_row["stats_json"])
-                except json.JSONDecodeError:
-                    logger.error(f"Corrupted stats_json for user {discord_id}")
+        stats_data = self._parse_stats_json(data["stats_docs"][0] if data.get("stats_docs") else {}, discord_id)
 
         # 2. Process Guild
-        guild_data = None
-        if data.get("guild_docs"):
-            guild_data = data["guild_docs"][0]
+        guild_data = data["guild_docs"][0] if data.get("guild_docs") else None
 
         # 3. Clean Player Data
-        # Remove the joined arrays to return a clean player dict
         player_data = {k: v for k, v in data.items() if k not in ["stats_docs", "guild_docs"]}
 
         return {
@@ -390,13 +384,7 @@ class DatabaseManager:
     def get_player_stats_json(self, discord_id: int) -> dict[str, Any]:
         """Fetches and parses the JSON stats block."""
         row = self._col("stats").find_one({"discord_id": discord_id}, {"_id": 0, "stats_json": 1})
-        if not row or not row.get("stats_json"):
-            return {}
-        try:
-            return json.loads(row["stats_json"])
-        except json.JSONDecodeError:
-            logger.error(f"Corrupted stats_json for user {discord_id}")
-            return {}
+        return self._parse_stats_json(row, discord_id)
 
     def get_player_stats_row(self, discord_id: int) -> dict | None:
         """Fetches the raw stats row (including practice EXP columns)."""
@@ -604,25 +592,11 @@ class DatabaseManager:
         )
 
         self._ensure_skill_cache()
-        skills = []
-        for ps in player_skill_docs:
-            skill_def = self._skill_cache.get(ps["skill_key"])
-            if skill_def and skill_def["type"] == "Active":
-                skills.append(
-                    {
-                        "key_id": skill_def["key_id"],
-                        "name": skill_def["name"],
-                        "type": skill_def["type"],
-                        "skill_level": ps["skill_level"],
-                        "mp_cost": skill_def.get("mp_cost", 0),
-                        "power_multiplier": skill_def.get("power_multiplier", 1.0),
-                        "heal_power": skill_def.get("heal_power", 0),
-                        "buff_data": skill_def.get("buff_data"),
-                        "scaling_stat": skill_def.get("scaling_stat", "MAG"),
-                        "scaling_factor": skill_def.get("scaling_factor", 1.0),
-                    }
-                )
-        return skills
+        return [
+            self._build_skill_dict(skill_def, ps)
+            for ps in player_skill_docs
+            if (skill_def := self._skill_cache.get(ps["skill_key"])) and skill_def["type"] == "Active"
+        ]
 
     # ============================================================
     # GUILD SYSTEM
@@ -843,9 +817,7 @@ class DatabaseManager:
         if not buff_ids:
             return
 
-        self._col("active_buffs").delete_many(
-            {"discord_id": discord_id, "buff_id": {"$in": buff_ids}}
-        )
+        self._col("active_buffs").delete_many({"discord_id": discord_id, "buff_id": {"$in": buff_ids}})
 
     # ============================================================
     # ADVENTURE SESSIONS (New methods for external call sites)
@@ -2048,9 +2020,7 @@ class DatabaseManager:
         )
         return {doc["item_key"]: doc["count"] for doc in cursor}
 
-    def increment_daily_shop_purchase(
-        self, discord_id: int, item_key: str, amount: int, date_str: str
-    ):
+    def increment_daily_shop_purchase(self, discord_id: int, item_key: str, amount: int, date_str: str):
         """Increments the daily purchase count for an item."""
         self._col("daily_shop_purchases").update_one(
             {"discord_id": discord_id, "item_key": item_key, "date_str": date_str},
