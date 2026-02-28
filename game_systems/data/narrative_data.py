@@ -96,6 +96,12 @@ MISSION_FLAVOR_TEXT = {
         "Sand that sparkles like diamonds falls from your gear. You have walked the mirror lands and returned.",
         "The disorientation passes as you see the city gates. The Wastes are beautiful, but deadly.",
     ],
+    "wailing_chasm": [
+        "The crushing silence of the abyss recedes, replaced by the chaotic, comforting sounds of the surface.",
+        "You blink against the sunlight, your ears still ringing from the phantom echoes of Kaza-Kor.",
+        "The oppressive weight of the void lifts from your shoulders. You have climbed out of the darkness and into the light.",
+        "A sudden noise makes you flinch, but it is only the city wind. You have escaped the Chasm's maddening song.",
+    ],
     "guild_arena": [
         "The cheers (or jeers) of the crowd fade. You step out of the ring, your test concluded.",
         "Sand pours from your boots. The Arena has measured your worth.",

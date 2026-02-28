@@ -39,7 +39,13 @@ class TestCreateDatabase(unittest.TestCase):
             # or a tuple. Extract the key name.
             if args:
                 index_keys = args[0]
-                if isinstance(index_keys, tuple) and index_keys[0] == "active":
+                if isinstance(index_keys, list):
+                    key_name = index_keys[0][0]
+                    if key_name == "active":
+                        active_index_found = True
+                    elif key_name == "end_time":
+                        end_time_index_found = True
+                elif isinstance(index_keys, tuple) and index_keys[0] == "active":
                     active_index_found = True
                 elif isinstance(index_keys, tuple) and index_keys[0] == "end_time":
                     end_time_index_found = True
