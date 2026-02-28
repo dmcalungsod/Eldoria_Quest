@@ -530,6 +530,8 @@ class AdventureSession:
         action: str = None,
         background: bool = False,
         persist: bool = True,
+        weather: Weather | None = None,
+        time_phase: TimePhase | None = None,
     ) -> dict[str, Any]:
         """
         Executes one segment of an adventure.
@@ -566,8 +568,10 @@ class AdventureSession:
                 )
 
             # --- Weather & Time System Check ---
-            weather = WorldTime.get_current_weather(self.location_id)
-            time_phase = WorldTime.get_current_phase()
+            if weather is None:
+                weather = WorldTime.get_current_weather(self.location_id)
+            if time_phase is None:
+                time_phase = WorldTime.get_current_phase()
 
             # --- 0.5. Environmental Hazards ---
             # Only apply if not already in combat

@@ -35,13 +35,11 @@ class AdventureLoop(commands.Cog):
 
         logger.info(f"[AdventureLoop] Found {len(due_sessions)} adventures to resolve.")
 
-        for session in due_sessions:
-            try:
-                self.engine.resolve_session(session)
-            except Exception as e:
-                logger.error(
-                    f"[AdventureLoop] Failed to resolve session {session.get('discord_id')}: {e}", exc_info=True
-                )
+        # Batch resolution to pre-fetch context
+        try:
+            self.engine.resolve_sessions_batch(due_sessions)
+        except Exception as e:
+            logger.error(f"[AdventureLoop] Failed batch resolution: {e}", exc_info=True)
 
     @adventure_worker.before_loop
     async def before_worker(self):
