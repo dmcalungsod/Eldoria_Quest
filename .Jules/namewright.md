@@ -103,3 +103,38 @@
 *   Shifted "Phial" to "Bomb" for the active skill to imply impact/aggression, kept "Phial" for the item.
 *   "Equivalent Exchange" resonates strongly with the "Science/Trade" theme of Alchemy.
 *   Warrior titles kept short (one word) to feel punchy and legendary.
+
+## 2026-03-08 — Rogue Skill Tree Expansion ("Shadow's Edge")
+
+**Request:** Proactive / Assigned by Foreman (via Architect's Design `.Jules/architect_designs/skill_tree_rogue.md`)
+**Context:** Grim Survival, Dark Fantasy, Lethal Precision, Evasion.
+**Tone:** Lethal, elusive, shadowy, professional. Avoid "Thief" or anime-esque cliches where possible. Grounded in survival.
+
+### 📜 Generated Names
+
+#### 🗡️ Skills (Assassin Path)
+1.  **Twin Fangs** (Alternative to Double Strike) – More evocative of a snake strike.
+2.  **Envenomed Edge** (Alternative to Toxic Blade) – Sounds more deliberate and professional.
+3.  **Toxic Ruin** (Alternative to Venomous Strike) – Implies devastating consequences of poison.
+4.  **Toxin's End** (Alternative to Venomous Strike) – Sounds like an execution.
+
+#### 🌫️ Skills (Phantom Path)
+1.  **Veil of Shadows** (Alternative to Stealth) – Gives stealth a more mystical/learned quality.
+2.  **Fade** (Alternative to Stealth) – Simple, punchy, action-oriented.
+3.  **Shadowslip** (Alternative to Shadow Step) – Sounds fluid and practiced.
+4.  **Gloom-Spark** (Alternative to Flash Powder) – Fits the dark fantasy aesthetic better than generic "flash powder".
+
+#### 💀 Skills (Ultimate)
+1.  **Reaper's Dance** (Alternative to Death Blossom) – Less anime-styled, more grounded in grim reality.
+2.  **Crimson Gale** (Alternative to Death Blossom) – Focuses on the resulting bloodshed and speed.
+
+#### 🏷️ Titles & Achievements
+1.  **Nightblade** (Assassin Title) – Classic but fits well.
+2.  **Venom-Kissed** (Assassin Title) – Emphasizes the DoT/poison aspect.
+3.  **Ghost-Walker** (Phantom Title) – Highlights the evasion/unseen nature.
+4.  **The Unseen** (Phantom Title) – Simple and legendary.
+5.  **Without a Trace** (Achievement: Unseen Death) – Tells a better story than the original.
+
+### 📝 Notes
+- "Death Blossom" felt a bit too flashy/dramatic for a grim survival setting; "Reaper's Dance" or "Crimson Gale" grounds the lethality.
+- Renamed foundational skills to feel more like learned techniques ("Twin Fangs", "Veil of Shadows") rather than generic actions ("Double Strike", "Stealth").

@@ -27,23 +27,43 @@ SchemaType = dict[str, Any]
 LOCATION_SCHEMA = {
     "name": {"type": str, "required": True},
     "emoji": {"type": str, "required": True},
-    "min_rank": {"type": str, "required": True, "options": ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"]},
+    "min_rank": {
+        "type": str,
+        "required": True,
+        "options": ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"],
+    },
     "level_req": {"type": int, "required": True, "min": 1},
-    "duration_options": {"type": list, "required": True, "element_schema": {"type": int, "min": 1}},
+    "duration_options": {
+        "type": list,
+        "required": True,
+        "element_schema": {"type": int, "min": 1},
+    },
     "monsters": {
         "type": list,
         "required": True,
-        "element_schema": {"type": list, "length": 2, "elements": [{"type": str}, {"type": int}]},
+        "element_schema": {
+            "type": list,
+            "length": 2,
+            "elements": [{"type": str}, {"type": int}],
+        },
     },
     "description": {"type": str, "required": True},
     # Optional Fields
     "night_monsters": {
         "type": list,
-        "element_schema": {"type": list, "length": 2, "elements": [{"type": str}, {"type": int}]},
+        "element_schema": {
+            "type": list,
+            "length": 2,
+            "elements": [{"type": str}, {"type": int}],
+        },
     },
     "gatherables": {
         "type": list,
-        "element_schema": {"type": list, "length": 2, "elements": [{"type": str}, {"type": int}]},
+        "element_schema": {
+            "type": list,
+            "length": 2,
+            "elements": [{"type": str}, {"type": int}],
+        },
     },
     "conditional_monsters": {
         "type": list,
@@ -64,14 +84,22 @@ MONSTER_SCHEMA = {
     "id": {"type": int, "required": True},
     "name": {"type": str, "required": True},
     "level": {"type": int, "required": True, "min": 1},
-    "tier": {"type": str, "required": True, "options": ["Normal", "Elite", "Boss", "Raid"]},
+    "tier": {
+        "type": str,
+        "required": True,
+        "options": ["Normal", "Elite", "Boss", "Raid"],
+    },
     "hp": {"type": int, "required": True, "min": 1},
     "atk": {"type": int, "required": True, "min": 0},
     "def": {"type": int, "required": True, "min": 0},
     "xp": {"type": int, "required": True, "min": 0},
     "drops": {
         "type": list,
-        "element_schema": {"type": list, "length": 2, "elements": [{"type": str}, {"type": int, "min": 0, "max": 100}]},
+        "element_schema": {
+            "type": list,
+            "length": 2,
+            "elements": [{"type": str}, {"type": int, "min": 0, "max": 100}],
+        },
     },
     "skills": {"type": list, "element_schema": {"type": str}},
     "description": {"type": str, "required": True},
@@ -103,7 +131,12 @@ EQUIPMENT_SCHEMA = {
         "options": ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"],
     },
     "level_req": {"type": int, "required": True, "min": 1},
-    "stats_bonus": {"type": dict, "required": True, "keys_schema": {"type": str}, "values_schema": {"type": int}},
+    "stats_bonus": {
+        "type": dict,
+        "required": True,
+        "keys_schema": {"type": str},
+        "values_schema": {"type": int},
+    },
     "description": {"type": str, "required": True},
     # Optional
     "class_restrictions": {"type": list, "element_schema": {"type": str}},
@@ -120,4 +153,16 @@ MATERIAL_SCHEMA = {
         "options": ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"],
     },
     "value": {"type": int, "required": True, "min": 0},
+}
+
+# --- Quest Items Schema ---
+QUEST_ITEM_SCHEMA = {
+    "id": {"type": str, "required": True},
+    "name": {"type": str, "required": True},
+    "rarity": {
+        "type": str,
+        "required": True,
+        "options": ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"],
+    },
+    "notes": {"type": str, "required": True},
 }
