@@ -69,6 +69,27 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         mock_ext.tasks.loop = MagicMock(side_effect=loop_decorator)
 
+
+        class MockView:
+            def __init__(self, *args, **kwargs):
+                self.items = []
+                self.timeout = kwargs.get('timeout', None)
+            def add_item(self, item):
+                self.items.append(item)
+            def clear_items(self):
+                self.items.clear()
+
+        mock_discord.ui = MagicMock()
+        mock_discord.ui.View = MockView
+        mock_discord.ui.Button = MagicMock()
+        mock_discord.ButtonStyle = MagicMock()
+        mock_discord.ButtonStyle.primary = 1
+        mock_discord.ButtonStyle.secondary = 2
+        mock_discord.ButtonStyle.success = 3
+        mock_discord.ButtonStyle.danger = 4
+
+        sys.modules["discord.ui"] = mock_discord.ui
+
         sys.modules["discord"] = mock_discord
         sys.modules["discord.app_commands"] = mock_discord.app_commands
         sys.modules["discord.ext"] = mock_ext
@@ -113,7 +134,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.modules_patcher.stop()
 
     async def test_event_status_no_active(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         self.cog.system.get_current_event.return_value = None
 
         await self.cog.event_status(interaction)
@@ -123,7 +146,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("No Active Event", kwargs["embed"].title)
 
     async def test_event_status_active(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         future = (datetime.datetime.now() + datetime.timedelta(days=1)).isoformat()
 
         active = {"name": "Blood Moon", "description": "Scary", "end_time": future, "modifiers": {"exp": 2.0}}
@@ -139,7 +164,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(any("Global Effects" in f.name for f in fields))
 
     async def test_admin_start_success(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
         self.cog.system.start_event.return_value = True
 
         await self.cog.admin_start(interaction, "blood_moon", 24)
@@ -149,7 +176,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Started Event", interaction.response.send_message.call_args[0][0])
 
     async def test_admin_start_invalid(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
 
         await self.cog.admin_start(interaction, "invalid_event", 24)
 
@@ -158,7 +187,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Invalid type", interaction.response.send_message.call_args[0][0])
 
     async def test_admin_end(self):
-        interaction = AsyncMock()
+        interaction = MagicMock()
+        interaction.response = AsyncMock()
+        interaction.response.is_done = MagicMock(return_value=False)
 
         await self.cog.admin_end(interaction)
 
