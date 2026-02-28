@@ -2,8 +2,6 @@ import os
 import sys
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 # Add root dir to sys.path
 sys.path.append(os.getcwd())
 
@@ -13,7 +11,6 @@ sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["discord"] = MagicMock()
 
 from game_systems.adventure.adventure_manager import AdventureManager
-from game_systems.player.player_stats import PlayerStats
 
 
 @patch("game_systems.adventure.adventure_manager.AdventureSession")

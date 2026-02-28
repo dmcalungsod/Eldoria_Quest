@@ -4,8 +4,10 @@ Security Test Suite - Pip Version
 Verifies that the runtime environment is not using a vulnerable pip version.
 CVE-2026-1703 affects pip 25.3.
 """
-import pip
 import unittest
+
+import pip
+
 
 class TestPipSecurity(unittest.TestCase):
     def test_pip_version_is_safe(self):

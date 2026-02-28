@@ -12,16 +12,19 @@ import sys
 
 # Mock pymongo to allow import of EquipmentManager
 from unittest.mock import MagicMock
+
 sys.modules['pymongo'] = MagicMock()
 sys.modules['pymongo.errors'] = MagicMock()
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from game_systems.data.class_data import CLASSES
 from game_systems.data.class_equipments import CLASS_EQUIPMENTS
+
 # Import EquipmentManager after mocking pymongo
 from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.data.class_data import CLASSES
+
 
 def verify_alchemist_generation():
     print("--- Verifying Alchemist Equipment Generation ---")

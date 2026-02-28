@@ -4,8 +4,8 @@ tests/test_alchemist_equipment.py
 Tests specifically for Alchemist equipment logic, stat budgets, and slot conflicts.
 """
 
-import sys
 import os
+import sys
 from unittest.mock import MagicMock
 
 # Mock Database / Pymongo
@@ -16,8 +16,10 @@ sys.modules['pymongo.errors'] = MagicMock()
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pytest
+
+from game_systems.data.class_equipments import CLASS_EQUIPMENTS, STAT_BUDGETS
 from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.data.class_equipments import STAT_BUDGETS, CLASS_EQUIPMENTS
+
 
 @pytest.fixture
 def eq_manager():

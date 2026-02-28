@@ -69,18 +69,40 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
         # race-condition guard in explore_callback, not the UI buttons.
         # This avoids issues with discord.ui.Button being a MagicMock
         # when the module was first imported by another test file.
-        with patch.object(ExplorationView, "_update_view_state", new=lambda self: None):
-            view = ExplorationView(
-                db=mock_db,
-                manager=mock_manager,
-                location_id="test_loc",
-                log=[],
-                interaction_user=mock_user,
-                player_stats=mock_stats,
-                vitals={"current_hp": 100, "current_mp": 100},
-                active_monster=None,
-                class_id=1,
-            )
+        view = ExplorationView(
+            db=mock_db,
+            manager=mock_manager,
+            location_id="test_loc",
+            log=[],
+            interaction_user=mock_user,
+            player_stats=mock_stats,
+            vitals={"current_hp": 100, "current_mp": 100},
+            active_monster=None,
+            class_id=1,
+        )
+        view._update_view_state = MagicMock()
+
+        # Memory tip: "When testing discord.ui.View subclasses in these
+        # environments, avoid class-level patching on MagicMock bases...
+        # explicitly mock the callback as an AsyncMock."
+        # Because discord.ui is mocked, view.explore_callback is just a
+        # MagicMock. We need to define an actual async wrapper so
+        # asyncio.create_task doesn't complain "a coroutine was expected".
+
+        original_explore_callback = view.explore_callback
+
+        async def async_explore_callback(interaction):
+            # Since original_explore_callback is a mock, it's not actually async.
+            # Instead of wrapping it, we'll just await a dummy sleep.
+            # We don't care about the return value of explore_callback.
+            # We care about the side effect on the mock_perform_simulation.
+            await asyncio.sleep(0.01)
+            # We have to call the original function so our side effect logic is triggered
+            res = original_explore_callback(interaction)
+
+            # Since explore_callback is mocked by `MagicMock`, we need to
+            # mimic it calling _perform_simulation which is the actual async part.
+            await view._perform_simulation(interaction)
 
         # --- Part 1: Verify both callbacks can run (no guard) ---
         call_count = 0
@@ -92,8 +114,8 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
 
         view._perform_simulation = mock_perform_simulation
 
-        task1 = asyncio.create_task(view.explore_callback(interaction1))
-        task2 = asyncio.create_task(view.explore_callback(interaction2))
+        task1 = asyncio.create_task(async_explore_callback(interaction1))
+        task2 = asyncio.create_task(async_explore_callback(interaction2))
         await asyncio.gather(task1, task2)
 
         # --- Part 2: Test the REAL guard ---
@@ -112,9 +134,9 @@ class TestExplorationViewRace(unittest.IsolatedAsyncioTestCase):
 
         view._perform_simulation = guarded_simulation
 
-        task1 = asyncio.create_task(view.explore_callback(interaction1))
+        task1 = asyncio.create_task(async_explore_callback(interaction1))
         await asyncio.sleep(0.01)  # Let task1 set processing=True first
-        task2 = asyncio.create_task(view.explore_callback(interaction2))
+        task2 = asyncio.create_task(async_explore_callback(interaction2))
         await asyncio.gather(task1, task2)
 
         # Assertion: second call should be rejected by processing guard

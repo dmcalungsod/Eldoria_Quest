@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch, ANY
+from unittest.mock import MagicMock, patch
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,8 +18,8 @@ from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
 from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
 from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.player.player_stats import PlayerStats
 from game_systems.core.world_time import TimePhase, Weather
+from game_systems.player.player_stats import PlayerStats
 
 
 class TestAutoAdventureRegression(unittest.TestCase):

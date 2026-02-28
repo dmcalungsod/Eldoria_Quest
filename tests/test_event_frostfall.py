@@ -19,10 +19,12 @@ sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.database"] = MagicMock()
 
 import pytest
-from game_systems.events.world_event_system import WorldEventSystem
-from game_systems.adventure.adventure_session import AdventureSession
+
 from game_systems.adventure.adventure_rewards import AdventureRewards
+from game_systems.adventure.adventure_session import AdventureSession
+from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.player_stats import PlayerStats
+
 
 @pytest.fixture
 def mock_db():

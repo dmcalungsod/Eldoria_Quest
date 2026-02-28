@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from game_systems.combat.combat_engine import CombatEngine
 
 
