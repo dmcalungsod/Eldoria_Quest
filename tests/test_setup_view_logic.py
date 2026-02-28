@@ -1,11 +1,12 @@
-import os
-import sys
+
 import unittest
 from unittest.mock import MagicMock, patch
+import sys
+import os
+import importlib
 
 # Add project root to path for local execution
 sys.path.append(os.getcwd())
-
 
 # Define dummy classes
 class DummyView:
@@ -14,7 +15,6 @@ class DummyView:
 
     def add_item(self, item):
         self.items.append(item)
-
 
 class DummySelect:
     def __init__(self, placeholder=None, min_values=1, max_values=1, row=None, options=None):
@@ -27,7 +27,6 @@ class DummySelect:
     def add_option(self, label, value, description=None, emoji=None):
         self.options.append({"label": label, "value": value})
 
-
 class TestAdventureSetupViewLogic(unittest.TestCase):
     def setUp(self):
         # Prepare mocks
@@ -38,31 +37,32 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
         self.mock_discord_ui.Button = MagicMock()
 
         # Modules to patch - ensure we mock EVERYTHING setup_view imports that might depend on discord
-        self.modules_patcher = patch.dict(
-            sys.modules,
-            {
-                "discord": self.mock_discord,
-                "discord.ui": self.mock_discord_ui,
-                "discord.ext": MagicMock(),
-                "discord.ext.commands": MagicMock(),
-                # Mock cogs utils
-                "cogs": MagicMock(),
-                "cogs.utils": MagicMock(),
-                "cogs.utils.ui_helpers": MagicMock(),
-                # Mock Database
-                "pymongo": MagicMock(),
-                "pymongo.errors": MagicMock(),
-                "database": MagicMock(),
-                "database.database_manager": MagicMock(),
-                # Mock internal game systems that setup_view imports
-                "game_systems.adventure.adventure_manager": MagicMock(),
-                "game_systems.adventure.ui.adventure_embeds": MagicMock(),
-                "game_systems.adventure.ui.status_view": MagicMock(),
-                # We can let data modules load if they are pure data
-                # "game_systems.data.adventure_locations": ...
-                # "game_systems.data.consumables": ...
-            },
-        )
+        self.modules_patcher = patch.dict(sys.modules, {
+            "discord": self.mock_discord,
+            "discord.ui": self.mock_discord_ui,
+            "discord.ext": MagicMock(),
+            "discord.ext.commands": MagicMock(),
+
+            # Mock cogs utils
+            "cogs": MagicMock(),
+            "cogs.utils": MagicMock(),
+            "cogs.utils.ui_helpers": MagicMock(),
+
+            # Mock Database
+            "pymongo": MagicMock(),
+            "pymongo.errors": MagicMock(),
+            "database": MagicMock(),
+            "database.database_manager": MagicMock(),
+
+            # Mock internal game systems that setup_view imports
+            "game_systems.adventure.adventure_manager": MagicMock(),
+            "game_systems.adventure.ui.adventure_embeds": MagicMock(),
+            "game_systems.adventure.ui.status_view": MagicMock(),
+
+            # We can let data modules load if they are pure data
+            # "game_systems.data.adventure_locations": ...
+            # "game_systems.data.consumables": ...
+        })
         self.modules_patcher.start()
 
         # Ensure we import a fresh version of the module using the mocks
@@ -72,7 +72,6 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
 
         # Import the module
         import game_systems.adventure.ui.setup_view
-
         self.module = game_systems.adventure.ui.setup_view
         self.AdventureSetupView = self.module.AdventureSetupView
 
@@ -92,7 +91,12 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
         # Create 30 different supplies
         supplies = []
         for i in range(30):
-            supplies.append({"item_key": f"supply_{i}", "item_name": f"Supply {i}", "count": 1, "type": "supply"})
+            supplies.append({
+                "item_key": f"supply_{i}",
+                "item_name": f"Supply {i}",
+                "count": 1,
+                "type": "supply"
+            })
 
         view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
 
@@ -105,23 +109,15 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
         view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
 
         # max_values must be <= len(options)
-        self.assertLessEqual(
-            view.supply_select.max_values,
-            len(view.supply_select.options),
-            "max_values must be <= options count (1 supply)",
-        )
+        self.assertLessEqual(view.supply_select.max_values, len(view.supply_select.options), "max_values must be <= options count (1 supply)")
 
         # Case 2: 2 supplies
         supplies = [
             {"item_key": "s1", "item_name": "S1", "count": 1},
-            {"item_key": "s2", "item_name": "S2", "count": 1},
+            {"item_key": "s2", "item_name": "S2", "count": 1}
         ]
         view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
-        self.assertLessEqual(
-            view.supply_select.max_values,
-            len(view.supply_select.options),
-            "max_values must be <= options count (2 supplies)",
-        )
+        self.assertLessEqual(view.supply_select.max_values, len(view.supply_select.options), "max_values must be <= options count (2 supplies)")
 
         # Case 3: 0 supplies (No Supplies placeholder)
         supplies = []
@@ -132,6 +128,5 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
         # max_values should be 1
         self.assertEqual(view.supply_select.max_values, 1, "max_values must be 1 for No Supplies placeholder")
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

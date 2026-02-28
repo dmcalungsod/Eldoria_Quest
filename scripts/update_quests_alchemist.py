@@ -10,8 +10,17 @@ new_quest = {
     "location": "Grey Ward District",
     "summary": "Collect rare reagents to prove your mastery of alchemy.",
     "description": "To truly understand the nature of the Veil, one must deconstruct it. Bring me Primordial Ooze, Brimstone, and Lunawort. Only then can you begin the Great Work.",
-    "objectives": {"collect": {"primordial_ooze": 3, "brimstone": 3, "lunawort": 3}},
-    "rewards": {"exp": 500, "aurum": 300},
+    "objectives": {
+        "collect": {
+            "primordial_ooze": 3,
+            "brimstone": 3,
+            "lunawort": 3
+        }
+    },
+    "rewards": {
+        "exp": 500,
+        "aurum": 300
+    }
 }
 
 try:

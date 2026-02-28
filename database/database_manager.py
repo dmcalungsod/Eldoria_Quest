@@ -2048,7 +2048,9 @@ class DatabaseManager:
         )
         return {doc["item_key"]: doc["count"] for doc in cursor}
 
-    def increment_daily_shop_purchase(self, discord_id: int, item_key: str, amount: int, date_str: str):
+    def increment_daily_shop_purchase(
+        self, discord_id: int, item_key: str, amount: int, date_str: str
+    ):
         """Increments the daily purchase count for an item."""
         self._col("daily_shop_purchases").update_one(
             {"discord_id": discord_id, "item_key": item_key, "date_str": date_str},

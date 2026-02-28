@@ -123,7 +123,7 @@ class TestShopViewIntegration(unittest.TestCase):
         mock_user.id = 12345
         current_aurum = 1000
 
-        custom_inv = {"hp_potion_1": 500}  # Old format: int
+        custom_inv = {"hp_potion_1": 500} # Old format: int
 
         view = ShopView(mock_db, mock_user, current_aurum, inventory=custom_inv)
 

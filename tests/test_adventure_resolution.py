@@ -38,7 +38,7 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     mock_session._fetch_session_context.return_value = {
         "vitals": {"current_hp": 100, "current_mp": 100},
         "player_stats": MagicMock(max_hp=100, max_mp=100),
-        "player": {"current_hp": 100, "current_mp": 100},  # Include player dict for persistence check
+        "player": {"current_hp": 100, "current_mp": 100} # Include player dict for persistence check
     }
 
     session_doc = {
@@ -90,7 +90,7 @@ def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock
     mock_session._fetch_session_context.return_value = {
         "vitals": {"current_hp": 100, "current_mp": 100},
         "player_stats": MagicMock(max_hp=100, max_mp=100),
-        "player": {"current_hp": 100, "current_mp": 100},
+        "player": {"current_hp": 100, "current_mp": 100}
     }
 
     # First step ok, second step dead
@@ -134,7 +134,7 @@ def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_b
     mock_session._fetch_session_context.return_value = {
         "vitals": {"current_hp": 100, "current_mp": 100},
         "player_stats": MagicMock(max_hp=100, max_mp=100),
-        "player": {"current_hp": 100, "current_mp": 100},
+        "player": {"current_hp": 100, "current_mp": 100}
     }
 
     session_doc = {
@@ -173,8 +173,8 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
     context_dict = {
         "player": {"current_hp": 100, "current_mp": 100},
         "stats": {"HP": 100, "MP": 100},
-        "vitals": {"current_hp": 100, "current_mp": 100},  # Engine uses this
-        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "vitals": {"current_hp": 100, "current_mp": 100}, # Engine uses this
+        "player_stats": MagicMock(max_hp=100, max_mp=100)
     }
     mock_session._fetch_session_context.return_value = context_dict
 

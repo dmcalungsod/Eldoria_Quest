@@ -22,7 +22,7 @@ from game_systems.player.player_stats import PlayerStats
 # Modular imports
 from .abilities_view import AbilitiesView
 from .adventure_menu import AdventureView
-from .title_view import TitleSelectView
+from .settings_view import SettingsView
 
 logger = logging.getLogger("eldoria.ui.profile")
 
@@ -81,17 +81,6 @@ class CharacterTabView(View):
         )
         btn_guild.callback = self.guild_hall_callback
         self.add_item(btn_guild)
-
-        # --- Titles (Row 2) ---
-        btn_titles = Button(
-            label="Titles",
-            style=discord.ButtonStyle.secondary,
-            custom_id="title_mgr",
-            emoji="🎖️",
-            row=2,
-        )
-        btn_titles.callback = self.titles_callback
-        self.add_item(btn_titles)
 
         # --- Settings (Row 2) ---
         btn_settings = Button(
@@ -164,25 +153,7 @@ class CharacterTabView(View):
 
             stats = PlayerStats.from_dict(json.loads(s_row["stats_json"]))
 
-            # --- TITLES VISIBILITY ---
-            # Fetch earned titles
-            titles = p_data.get("titles", [])
-            active_title = p_data.get("active_title")
-
             embed = StatusUpdateView.build_status_embed(p_data, stats, s_row)
-
-            # Add Titles Field
-            if active_title:
-                embed.add_field(name="🎖️ Active Title", value=f"**{active_title}**", inline=False)
-
-            if titles:
-                recent_titles = titles[-5:]
-                titles_str = ", ".join(recent_titles)
-                if len(titles) > 5:
-                    titles_str += f" ...and {len(titles) - 5} more"
-
-                embed.add_field(name="🏅 Earned Titles", value=titles_str, inline=False)
-
             view = StatusUpdateView(self.db, self.interaction_user, p_data, stats, s_row)
 
             # Assign profile return callback via helper
@@ -204,21 +175,15 @@ class CharacterTabView(View):
         # Calls shared logic in ui_helpers to load the Guild Hall
         await ui_helpers.back_to_guild_hall_callback(interaction)
 
-    async def titles_callback(self, interaction: discord.Interaction):
-        """Opens the Title Management UI."""
-        await interaction.response.defer()
-
-        p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
-
-        embed = discord.Embed(
-            title="🎖️ Title Manager",
-            description="Select a title from the dropdown below to display on your profile.",
-            color=discord.Color.gold(),
-        )
-
-        view = TitleSelectView(self.db, self.interaction_user, p_data)
-        await interaction.edit_original_response(embed=embed, view=view)
-
     async def settings_callback(self, interaction: discord.Interaction):
         """Opens the Settings Menu."""
-        await ui_helpers.navigate_to_settings(interaction, self.db, self.interaction_user)
+        await interaction.response.defer()
+
+        embed = discord.Embed(
+            title="⚙️ Settings",
+            description="Manage your account and preferences.",
+            color=discord.Color.light_grey(),
+        )
+
+        view = SettingsView(self.db, self.interaction_user)
+        await interaction.edit_original_response(embed=embed, view=view)

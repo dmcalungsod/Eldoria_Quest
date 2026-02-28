@@ -7,20 +7,20 @@ new_materials = {
         "name": "Primordial Ooze",
         "description": "A shifting, viscous substance found in ancient slimes.",
         "rarity": "Uncommon",
-        "value": 25,
+        "value": 25
     },
     "brimstone": {
         "name": "Brimstone",
         "description": "Yellowish rock that smells of rotten eggs and fire.",
         "rarity": "Uncommon",
-        "value": 30,
+        "value": 30
     },
     "lunawort": {
         "name": "Lunawort",
         "description": "A pale herb that glows faintly under moonlight.",
         "rarity": "Uncommon",
-        "value": 45,
-    },
+        "value": 45
+    }
 }
 
 try:

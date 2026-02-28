@@ -34,8 +34,6 @@ class AdventureResolutionEngine:
         if not session_docs:
             return
 
-        discord_ids = [doc["discord_id"] for doc in session_docs]
-
         # We fetch the active boosts once for all sessions to avoid DB overhead.
         # This is safe because active boosts don't change per player in this loop.
         self.db.get_active_boosts() # Cache it in DB layer if not already
@@ -116,11 +114,11 @@ class AdventureResolutionEngine:
             initial_mp = context["vitals"]["current_mp"]
 
         if context.get("player_stats"):
-            max_hp = context["player_stats"].max_hp
-            max_mp = context["player_stats"].max_mp
+             max_hp = context["player_stats"].max_hp
+             max_mp = context["player_stats"].max_mp
         elif context.get("stats_dict"):
-            max_hp = context["stats_dict"].get("HP", 100)
-            max_mp = context["stats_dict"].get("MP", 100)
+             max_hp = context["stats_dict"].get("HP", 100)
+             max_mp = context["stats_dict"].get("MP", 100)
 
         final_vitals = None
 

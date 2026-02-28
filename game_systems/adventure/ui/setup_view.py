@@ -83,7 +83,7 @@ class AdventureSetupView(View):
                 label="No Destinations Available",
                 value="none",
                 description="You do not meet requirements for any location.",
-                emoji=E.LOCKED,
+                emoji=E.LOCKED
             )
             self.location_select.disabled = True
 

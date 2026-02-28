@@ -53,7 +53,9 @@ class HandbookView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.user.id:
-            await interaction.response.send_message("This handbook belongs to another.", ephemeral=True)
+            await interaction.response.send_message(
+                "This handbook belongs to another.", ephemeral=True
+            )
             return False
         return True
 
@@ -63,11 +65,13 @@ class HandbookView(View):
 
         # Update default selection visually
         for option in self.select_menu.options:
-            option.default = option.value == selected_key
+            option.default = (option.value == selected_key)
 
         content = HANDBOOK_CONTENT.get(selected_key)
         if not content:
-            await interaction.response.send_message("Page torn out.", ephemeral=True)
+            await interaction.response.send_message(
+                "Page torn out.", ephemeral=True
+            )
             return
 
         embed = discord.Embed(
