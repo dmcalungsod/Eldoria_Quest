@@ -95,9 +95,9 @@ class TestShopStaleState(unittest.IsolatedAsyncioTestCase):
         new_view = kwargs.get("view")
 
         # The Bug: new_view.current_aurum is currently 100 (stale), but should be 5 (fresh)
-        if hasattr(view, 'current_aurum'):
+        if hasattr(view, "current_aurum"):
             print(f"Old View Aurum: {view.current_aurum}")
-        if hasattr(new_view, 'current_aurum'):
+        if hasattr(new_view, "current_aurum"):
             print(f"New View Aurum: {new_view.current_aurum}")
 
         # Assert that the new view reflects the fresh state (5), not the stale state (100)
