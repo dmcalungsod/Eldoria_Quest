@@ -12,6 +12,7 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
+from discord.ui import Button, View
 
 import game_systems.data.emojis as E
 from database.database_manager import DatabaseManager
@@ -20,6 +21,71 @@ from game_systems.events.world_event_system import WorldEventSystem
 
 logger = logging.getLogger("eldoria.cogs.events")
 
+
+
+
+class EventView(View):
+    def __init__(self, system):
+        super().__init__(timeout=None)
+        self.system = system
+        self._update_buttons()
+
+    def _update_buttons(self):
+        self.clear_items()
+
+        # Refresh button is always present
+        refresh_btn = Button(label="Refresh", style=discord.ButtonStyle.secondary, custom_id="event_refresh", emoji="🔄")
+        refresh_btn.callback = self.refresh_callback
+        self.add_item(refresh_btn)
+
+    async def _render_status(self, interaction: discord.Interaction):
+        active = self.system.get_current_event()
+
+        if not active:
+            embed = discord.Embed(
+                title="🌙 No Active Event",
+                description="The world is calm. The skies are clear.",
+                color=discord.Color.dark_grey(),
+            )
+            self.clear_items()
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+            else:
+                await interaction.edit_original_response(embed=embed, view=None)
+            return
+
+        end_time = datetime.datetime.fromisoformat(active["end_time"])
+        time_remaining = end_time - WorldTime.now()
+        days = time_remaining.days
+        hours = time_remaining.seconds // 3600
+        minutes = (time_remaining.seconds % 3600) // 60
+
+        embed = discord.Embed(
+            title=f"🌍 Active Event: {active['name']}",
+            description=active["description"],
+            color=discord.Color.red(),
+        )
+        embed.add_field(name="Ends In", value=f"{days}d {hours}h {minutes}m", inline=True)
+
+        modifiers = []
+        for key, val in active.get("modifiers", {}).items():
+            name = key.replace("_", " ").title()
+            val_str = f"x{val}" if val < 2.0 else f"x{val} 🔥"
+            modifiers.append(f"• **{name}**: {val_str}")
+
+        if modifiers:
+            embed.add_field(name="Global Effects", value="\n".join(modifiers), inline=False)
+
+        self._update_buttons()
+
+        if not interaction.response.is_done():
+            await interaction.response.send_message(embed=embed, view=self)
+        else:
+            await interaction.edit_original_response(embed=embed, view=self)
+
+    async def refresh_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        await self._render_status(interaction)
 
 class EventCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -76,6 +142,19 @@ class EventCog(commands.Cog):
                         )
                         logger.info("Auto-started Mystic Merchant.")
 
+                # Guild Expedition Drive: Every Weekend (Saturday 00:00 to Sunday 23:59)
+                elif now.weekday() == 5 and now.hour == 0:  # Saturday midnight
+                    success = self.system.start_event(WorldEventSystem.GUILD_EXPEDITION_DRIVE, 48)
+                    if success:
+                        config = self.system.EVENT_CONFIGS[WorldEventSystem.GUILD_EXPEDITION_DRIVE]
+                        await self._announce(
+                            f"🗺️ **GUILD EXPEDITION DRIVE!** 🗺️\n\n"
+                            f"**{config['name']}**\n"
+                            f"{config['description']}\n\n"
+                            f"Set out on long adventures this weekend! 🏕️"
+                        )
+                        logger.info("Auto-started Guild Expedition Drive.")
+
         except Exception as e:
             logger.error(f"Error in event cycle: {e}", exc_info=True)
 
@@ -103,40 +182,8 @@ class EventCog(commands.Cog):
     @app_commands.command(name="event_status", description="View the current active World Event.")
     async def event_status(self, interaction: discord.Interaction):
         """Displays the current world event status."""
-        active = self.system.get_current_event()
-
-        if not active:
-            embed = discord.Embed(
-                title="🌙 No Active Event",
-                description="The world is calm. The skies are clear.",
-                color=discord.Color.dark_grey(),
-            )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            return
-
-        end_time = datetime.datetime.fromisoformat(active["end_time"])
-        time_remaining = end_time - WorldTime.now()
-        days = time_remaining.days
-        hours = time_remaining.seconds // 3600
-        minutes = (time_remaining.seconds % 3600) // 60
-
-        embed = discord.Embed(
-            title=f"🌍 Active Event: {active['name']}",
-            description=active["description"],
-            color=discord.Color.red(),
-        )
-        embed.add_field(name="Ends In", value=f"{days}d {hours}h {minutes}m", inline=True)
-
-        modifiers = []
-        for key, val in active.get("modifiers", {}).items():
-            name = key.replace("_", " ").title()
-            val_str = f"x{val}" if val < 2.0 else f"x{val} 🔥"
-            modifiers.append(f"• **{name}**: {val_str}")
-
-        if modifiers:
-            embed.add_field(name="Global Effects", value="\n".join(modifiers), inline=False)
-
-        await interaction.response.send_message(embed=embed)
+        view = EventView(self.system)
+        await view._render_status(interaction)
 
     # ==================================================================
     # ADMIN COMMANDS
