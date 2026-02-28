@@ -12,18 +12,6 @@ def log_summary(message):
             f.write(message + "\n")
 
 
-def run_command(command_list):
-    try:
-        # Use shell=False and pass list for safety
-        result = subprocess.run(command_list, capture_output=True, text=True, check=True)  # nosec B603
-        return result.stdout.strip()
-    except subprocess.CalledProcessError as e:
-        # Avoid printing full command if it contains secrets (though here it's just branch names)
-        # But for debugging, print stderr
-        print(f"Error running command: {e.stderr}")
-        return None
-
-
 def main():
     log_summary("### 🧹 Branch Pruning Report")
 
@@ -33,7 +21,18 @@ def main():
     print(f"Pruning merged branches older than {cutoff_date.isoformat()} ({hours_threshold} hours retention)...")
 
     # Get current repository
-    current_repo_json = run_command(["gh", "repo", "view", "--json", "nameWithOwner"])
+    try:
+        result = subprocess.run(
+            ["gh", "repo", "view", "--json", "nameWithOwner"],
+            capture_output=True,
+            text=True,
+            check=True
+        )  # nosec B603
+        current_repo_json = result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error running command: {e.stderr}")
+        sys.exit(1)
+
     if not current_repo_json:
         sys.exit(1)
 
@@ -44,19 +43,28 @@ def main():
 
     # Get merged PRs (limit 1000 to catch older branches that might have been missed)
     # We fetch enough fields to determine branch and merge time.
-    prs_json = run_command(
-        [
-            "gh",
-            "pr",
-            "list",
-            "--state",
-            "merged",
-            "--json",
-            "number,headRefName,mergedAt,headRepository",
-            "--limit",
-            "1000",
-        ]
-    )
+    try:
+        prs_result = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "list",
+                "--state",
+                "merged",
+                "--json",
+                "number,headRefName,mergedAt,headRepository",
+                "--limit",
+                "1000",
+            ],
+            capture_output=True,
+            text=True,
+            check=True
+        )  # nosec B603
+        prs_json = prs_result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error running command: {e.stderr}")
+        print("No merged PRs found or error fetching them.")
+        return
 
     if not prs_json:
         print("No merged PRs found or error fetching them.")
@@ -114,14 +122,17 @@ def main():
         print(f"Deleting branch '{head_ref}' (merged {merged_at_str})...")
 
         # Delete the branch
-        delete_cmd = [
-            "gh",
-            "api",
-            "--method",
-            "DELETE",
-            f"repos/{current_repo}/git/refs/heads/{head_ref}",
-        ]
-        delete_result = subprocess.run(delete_cmd, capture_output=True, text=True)  # nosec B603
+        delete_result = subprocess.run(
+            [
+                "gh",
+                "api",
+                "--method",
+                "DELETE",
+                f"repos/{current_repo}/git/refs/heads/{head_ref}",
+            ],
+            capture_output=True,
+            text=True
+        )  # nosec B603
 
         if delete_result.returncode == 0:
             print(f"Successfully deleted branch '{head_ref}'.")

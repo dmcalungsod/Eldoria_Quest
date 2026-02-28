@@ -1,7 +1,6 @@
 
 import json
 import logging
-from pathlib import Path
 import sys
 
 # Configure logging
@@ -10,8 +9,8 @@ logger = logging.getLogger("json_verifier")
 
 def verify_json_file(filepath):
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        with open(filepath, encoding='utf-8') as f:
+            json.load(f)
         logger.info(f"✅ JSON Valid: {filepath}")
         return True
     except json.JSONDecodeError as e:

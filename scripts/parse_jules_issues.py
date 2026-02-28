@@ -179,29 +179,23 @@ def ensure_labels(labels_csv: str, repo: str):
 
 def create_issue(title: str, body: str, labels_csv: str, repo: str) -> bool:
     """Create a GitHub Issue. Return True on success."""
-    label_args = []
+    cmd = [
+        "gh",
+        "issue",
+        "create",
+        "--repo",
+        repo,
+        "--title",
+        title,
+        "--body",
+        body,
+        "--assignee",
+        "google-labs-jules",
+    ]
     for label in labels_csv.split(","):
-        label_args += ["--label", label.strip()]
+        cmd += ["--label", label.strip()]
     try:
-        subprocess.run(  # nosec B603
-            [
-                "gh",
-                "issue",
-                "create",
-                "--repo",
-                repo,
-                "--title",
-                title,
-                "--body",
-                body,
-                "--assignee",
-                "google-labs-jules",
-            ]
-            + label_args,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+        subprocess.run(cmd, capture_output=True, text=True, check=True)  # nosec B603
         return True
     except subprocess.CalledProcessError as exc:
         print(f"  ⚠️  Failed to create issue '{title}': {exc.stderr.strip()}", file=sys.stderr)
