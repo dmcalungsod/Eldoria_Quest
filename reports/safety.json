@@ -1,3 +1,17 @@
+
+
++===========================================================================================================================================================================================+
+
+
+DEPRECATED: this command (`check`) has been DEPRECATED, and will be unsupported beyond 01 June 2024.
+
+
+We highly encourage switching to the new `scan` command which is easier to use, more powerful, and can be set up to mimic the deprecated command if required.
+
+
++===========================================================================================================================================================================================+
+
+
 {
     "report_meta": {
         "scan_target": "environment",
@@ -17,8 +31,8 @@
         "account": "",
         "local_database_path": null,
         "safety_version": "3.7.0",
-        "timestamp": "2026-02-26 03:26:32",
-        "packages_found": 57,
+        "timestamp": "2026-02-28 03:12:05",
+        "packages_found": 62,
         "vulnerabilities_found": 0,
         "vulnerabilities_ignored": 0,
         "remediations_recommended": 0,
@@ -37,10 +51,10 @@
             "safety_command": "check"
         },
         "git": {
-            "branch": "jules-8435245665559205475-0a707b62",
+            "branch": "jules-8348061030221534560-08bdbe2d",
             "tag": "",
-            "commit": "81c05017d8564e773791b754252174e1401556f8",
-            "dirty": "False",
+            "commit": "e6ec1f8cf632fb75249893859e8f5d90c17b799d",
+            "dirty": "True",
             "origin": "https://github.com/dmcalungsod/Eldoria_Quest"
         },
         "project": null,
@@ -395,6 +409,21 @@
                 }
             ]
         },
+        "pytest-cov": {
+            "name": "pytest-cov",
+            "version": "7.0.0",
+            "requirements": [
+                {
+                    "raw": "pytest-cov==7.0.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pytest-cov",
+                    "specifier": "==7.0.0",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pytest_cov-7.0.0.dist-info"
+                }
+            ]
+        },
         "six": {
             "name": "six",
             "version": "1.17.0",
@@ -455,21 +484,6 @@
                 }
             ]
         },
-        "regex": {
-            "name": "regex",
-            "version": "2026.2.19",
-            "requirements": [
-                {
-                    "raw": "regex==2026.2.19",
-                    "extras": [],
-                    "marker": null,
-                    "name": "regex",
-                    "specifier": "==2026.2.19",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/regex-2026.2.19.dist-info"
-                }
-            ]
-        },
         "bandit": {
             "name": "bandit",
             "version": "1.9.4",
@@ -512,6 +526,21 @@
                     "specifier": "==3.0",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pycparser-3.0.dist-info"
+                }
+            ]
+        },
+        "regex": {
+            "name": "regex",
+            "version": "2026.2.28",
+            "requirements": [
+                {
+                    "raw": "regex==2026.2.28",
+                    "extras": [],
+                    "marker": null,
+                    "name": "regex",
+                    "specifier": "==2026.2.28",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/regex-2026.2.28.dist-info"
                 }
             ]
         },
@@ -605,6 +634,21 @@
                 }
             ]
         },
+        "pluggy": {
+            "name": "pluggy",
+            "version": "1.6.0",
+            "requirements": [
+                {
+                    "raw": "pluggy==1.6.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pluggy",
+                    "specifier": "==1.6.0",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pluggy-1.6.0.dist-info"
+                }
+            ]
+        },
         "httpcore": {
             "name": "httpcore",
             "version": "1.0.9",
@@ -632,6 +676,21 @@
                     "specifier": "==0.7.0",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/mccabe-0.7.0.dist-info"
+                }
+            ]
+        },
+        "coverage": {
+            "name": "coverage",
+            "version": "7.13.4",
+            "requirements": [
+                {
+                    "raw": "coverage==7.13.4",
+                    "extras": [],
+                    "marker": null,
+                    "name": "coverage",
+                    "specifier": "==7.13.4",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/coverage-7.13.4.dist-info"
                 }
             ]
         },
@@ -692,6 +751,21 @@
                     "specifier": "==1.6.8",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/authlib-1.6.8.dist-info"
+                }
+            ]
+        },
+        "iniconfig": {
+            "name": "iniconfig",
+            "version": "2.3.0",
+            "requirements": [
+                {
+                    "raw": "iniconfig==2.3.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "iniconfig",
+                    "specifier": "==2.3.0",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/iniconfig-2.3.0.dist-info"
                 }
             ]
         },
@@ -890,6 +964,21 @@
                 }
             ]
         },
+        "pytest": {
+            "name": "pytest",
+            "version": "9.0.2",
+            "requirements": [
+                {
+                    "raw": "pytest==9.0.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pytest",
+                    "specifier": "==9.0.2",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pytest-9.0.2.dist-info"
+                }
+            ]
+        },
         "pydantic": {
             "name": "pydantic",
             "version": "2.12.5",
@@ -917,3 +1006,15 @@
         "remediations_skipped": {}
     }
 }
+
+
++===========================================================================================================================================================================================+
+
+
+DEPRECATED: this command (`check`) has been DEPRECATED, and will be unsupported beyond 01 June 2024.
+
+
+We highly encourage switching to the new `scan` command which is easier to use, more powerful, and can be set up to mimic the deprecated command if required.
+
+
++===========================================================================================================================================================================================+
