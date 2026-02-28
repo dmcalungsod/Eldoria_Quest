@@ -13,10 +13,10 @@ import game_systems.data.emojis as E
 from game_systems.core.world_time import TimePhase, Weather
 
 from ..monsters.monster_actions import MonsterAI
-from ..player.player_stats import calculate_tiered_bonus
 from ..rewards.aurum_calculator import AurumCalculator
 from ..rewards.exp_calculator import ExpCalculator
 from . import combat_weather
+from .combat_effects import CombatEffects
 from .combat_phrases import CombatPhrases
 from .damage_formula import DamageFormula
 
@@ -169,37 +169,8 @@ class CombatEngine:
             self.dmg_taken_mult = 0.8
 
     def _get_effective_monster_stats(self):
-        """
-        Calculates monster stats with active debuffs applied.
-        Returns a copy of the monster dict with modified stats.
-        """
-        eff_monster = self.monster.copy()
-
-        if "debuffs" in self.monster:
-            for debuff in self.monster["debuffs"]:
-                if debuff.get("type") == "stat_mod":
-                    # Apply percentage modifiers
-                    for stat in ["ATK", "DEF", "AGI", "DEX"]:
-                        key = f"{stat}_percent"
-                        if key in debuff:
-                            mod = float(debuff[key])
-                            base_val = eff_monster.get(stat, 0)
-                            # Apply modifier (additive compounding? No, simple multiplicative for now)
-                            # If multiple debuffs affect same stat, order matters if we chain.
-                            # Better: Sum modifiers then apply?
-                            # Current logic: Iterative multiplication.
-                            # e.g. -20% -> * 0.8. Two -20% -> 0.8 * 0.8 = 0.64 (-36%)
-                            # This is acceptable for RPG mechanics.
-                            new_val = max(0, int(base_val * (1.0 + mod)))
-                            eff_monster[stat] = new_val
-
-                    # Special Rogue Debuff: Accuracy
-                    if "accuracy_percent" in debuff:
-                        acc_mod = float(debuff["accuracy_percent"])
-                        # Additive to base accuracy (0.0 means 100% base)
-                        eff_monster["accuracy_percent"] = eff_monster.get("accuracy_percent", 0.0) + acc_mod
-
-        return eff_monster
+        """Shim: delegates to CombatEffects."""
+        return CombatEffects.get_effective_monster_stats(self.monster)
 
     def _check_and_consume_crit_buff(self) -> bool:
         """
@@ -332,7 +303,7 @@ class CombatEngine:
             log.extend(buff_msgs)
 
         # Process Debuffs
-        debuff_msgs = self._process_monster_debuffs()
+        self.monster_hp, debuff_msgs = CombatEffects.process_monster_debuffs(self.monster, self.monster_hp)
         if debuff_msgs:
             log.extend(debuff_msgs)
 
@@ -669,7 +640,8 @@ class CombatEngine:
             skill_processed = True
 
         elif skill.get("buff_data"):
-            self._apply_skill_buffs(skill)
+            new_buffs = CombatEffects.apply_skill_buffs(skill, self.base_stats_dict)
+            self.new_buffs.extend(new_buffs)
             log.append(CombatPhrases.player_buff(self.player, skill))
             skill_processed = True
 
@@ -713,7 +685,7 @@ class CombatEngine:
 
         # Shared mechanics: debuffs, recoil, status effects
         if skill.get("debuff"):
-            debuff_msg = self._apply_monster_debuff(skill)
+            debuff_msg = CombatEffects.apply_monster_debuff(self.monster, skill, self.stats_dict)
             if debuff_msg:
                 log.append(debuff_msg)
 
@@ -749,136 +721,6 @@ class CombatEngine:
             if buff.get("stat") == f"immunity_{status_type}":
                 return True
         # Check new buffs applied this turn
-        for buff in self.new_buffs:
-            if buff.get("stat") == f"immunity_{status_type}":
-                return True
-        return False
-
-    def _process_monster_debuffs(self):
-        """
-        Handles damage over time from debuffs on the monster.
-        """
-        if "debuffs" not in self.monster or not self.monster["debuffs"]:
-            return []
-
-        msgs = []
-        active_debuffs = []
-
-        for debuff in self.monster["debuffs"]:
-            debuff_type = debuff.get("type")
-
-            # Legacy Support: If type is missing but damage exists, treat as poison
-            if not debuff_type and "damage" in debuff:
-                debuff_type = "poison"
-
-            name = debuff.get("name", "Debuff")
-
-            if debuff_type in ["poison", "bleed"]:
-                dmg = debuff.get("damage", 0)
-                # Apply Damage
-                self.monster_hp -= dmg
-                if debuff_type == "poison":
-                    msgs.append(f"☠️ **{self.monster.get('name', 'Enemy')}** takes {dmg} {name.lower()} damage!")
-                else:
-                    msgs.append(f"🩸 **{self.monster.get('name', 'Enemy')}** bleeds for {dmg} damage!")
-
-            # Decrement Duration
-            debuff["duration"] -= 1
-            if debuff["duration"] > 0:
-                active_debuffs.append(debuff)
-            else:
-                msgs.append(f"✅ {name} on **{self.monster.get('name', 'Enemy')}** has worn off.")
-
-        self.monster["debuffs"] = active_debuffs
-        return msgs
-
-    def _apply_monster_debuff(self, skill):
-        """
-        Applies a debuff to the monster (e.g., Poison, Stat Down).
-        Scales damage based on player stats.
-        """
-        debuff_data = skill.get("debuff", {})
-        if not debuff_data:
-            return None
-
-        # Initialize debuffs list if missing
-        if "debuffs" not in self.monster:
-            self.monster["debuffs"] = []
-
-        # Check for Poison
-        if "poison" in debuff_data:
-            base_dmg = float(debuff_data["poison"])
-            duration = int(debuff_data.get("duration", 3))
-
-            # Scaling: Base + Tiered Bonus (Factor 0.3)
-            # Default scaling stat for Rogue is DEX
-            scaling_stat = skill.get("scaling_stat", "DEX").upper()
-            stat_val = self.stats_dict.get(scaling_stat, 10)
-
-            # Equilibrium Fix: Use Tiered Scaling (0.3) to match direct damage progression.
-            # Prevents DoTs from becoming obsolete at high levels due to super-linear stat growth.
-            stat_bonus = calculate_tiered_bonus(stat_val, 0.3)
-            scaled_dmg = int(base_dmg + stat_bonus)
-
-            # Avoid duplicate stacking (refresh duration instead)
-            existing = next((d for d in self.monster["debuffs"] if d["type"] == "poison"), None)
-            if existing:
-                existing["duration"] = duration
-                existing["damage"] = max(existing["damage"], scaled_dmg)  # Keep higher damage
-                return f"☠️ **{self.monster.get('name', 'Enemy')}**'s poison is refreshed!"
-            else:
-                self.monster["debuffs"].append(
-                    {
-                        "type": "poison",
-                        "damage": scaled_dmg,
-                        "duration": duration,
-                        "name": "Poison",
-                    }
-                )
-                return f"☠️ **{self.monster.get('name', 'Enemy')}** is poisoned for {scaled_dmg} dmg/turn!"
-
-        # Check for Stat Modifiers (ATK_percent, DEF_percent, etc.)
-        stat_mods = {}
-        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent", "accuracy_percent"]:
-            if key in debuff_data:
-                stat_mods[key] = debuff_data[key]
-
-        if stat_mods:
-            duration = int(debuff_data.get("duration", 3))
-            name = skill.get("name", "Debuff")
-
-            # Avoid duplicate stacking of the SAME skill (refresh duration)
-            existing = next(
-                (d for d in self.monster["debuffs"] if d.get("name") == name and d.get("type") == "stat_mod"), None
-            )
-
-            if existing:
-                existing["duration"] = duration
-                return f"💢 **{self.monster.get('name', 'Enemy')}**'s {name} is refreshed!"
-            else:
-                new_debuff = {
-                    "type": "stat_mod",
-                    "duration": duration,
-                    "name": name,
-                }
-                new_debuff.update(stat_mods)
-                self.monster["debuffs"].append(new_debuff)
-                return f"💢 **{self.monster.get('name', 'Enemy')}** is weakened by {name}!"
-
-        # Check for Bleed
-        if debuff_data.get("type") == "bleed":
-            damage = int(debuff_data.get("damage", 5))
-            duration = int(debuff_data.get("duration", 3))
-            existing = next((d for d in self.monster["debuffs"] if d.get("type") == "bleed"), None)
-            if existing:
-                existing["duration"] = duration
-                existing["damage"] = max(existing["damage"], damage)
-                return f"🩸 **{self.monster.get('name', 'Enemy')}**'s bleed is refreshed!"
-            else:
-                self.monster["debuffs"].append({"type": "bleed", "damage": damage, "duration": duration})
-                return f"🩸 **{self.monster.get('name', 'Enemy')}** is bleeding for {damage} dmg/turn!"
-
-        return None
 
     def _perform_basic_attack(self, log, turn_report, force_crit=False):
         effective_monster = self._get_effective_monster_stats()
@@ -915,64 +757,6 @@ class CombatEngine:
 
         self.monster_hp -= dmg
         log.append(CombatPhrases.player_attack(self.player, self.monster, dmg, crit, self.player_class_id))
-
-    def _apply_skill_buffs(self, skill):
-        """
-        Calculates and records buffs from a skill.
-        Converts % bonuses to flat values based on current stats.
-        """
-        buff_data = skill.get("buff_data", skill.get("buff", {}))
-        if not buff_data:
-            return
-
-        duration = int(buff_data.get("duration", 3))
-
-        def add_buff(stat, amount):
-            self.new_buffs.append(
-                {
-                    "name": skill.get("name", "Unknown Buff"),
-                    "stat": stat,
-                    "amount": int(amount),
-                    "duration": duration,
-                }
-            )
-
-        for key, val in buff_data.items():
-            if key == "duration":
-                continue
-
-            if key == "all_stats_percent":
-                # Apply to all primary stats
-                for stat_code in ["STR", "END", "DEX", "AGI", "MAG", "LCK"]:
-                    # Equilibrium Fix: Use base stats for % calculation to prevent compounding
-                    current_val = self.base_stats_dict.get(stat_code, 10)
-                    bonus = current_val * float(val)
-                    if bonus > 0:
-                        add_buff(stat_code, bonus)
-
-            elif key == "next_hit_crit":
-                if val:
-                    add_buff("next_hit_crit", 1)
-
-            elif key.endswith("_percent"):
-                # e.g., "END_percent": 0.25 -> +25% END
-                stat_code = key.replace("_percent", "").upper()
-                # Equilibrium Fix: Use base stats for % calculation to prevent compounding
-                current_val = self.base_stats_dict.get(stat_code, 10)
-                bonus = current_val * float(val)
-                if bonus > 0:
-                    add_buff(stat_code, bonus)
-
-            elif key == "status_immunity":
-                # Handle Status Immunity List (e.g. ["stun", "slow"])
-                # Creates individual buffs like immunity_stun, immunity_slow
-                for status in val:
-                    add_buff(f"immunity_{status}", 1)
-
-            else:
-                # Generic flag-style buff (e.g. next_hit_crit, mana_shield)
-                # Pass through with raw value so downstream systems can consume it
-                add_buff(key, val)
 
     def _tag_damage_type(self, skill, report):
         """Helper to categorize skill damage for stat growth."""

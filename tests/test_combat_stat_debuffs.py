@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import MagicMock
 
 from game_systems.combat.combat_engine import CombatEngine
+from game_systems.combat.combat_effects import CombatEffects
 
 
 class TestCombatDebuffs(unittest.TestCase):
@@ -91,7 +92,7 @@ class TestCombatDebuffs(unittest.TestCase):
         # Test crash on process_monster_debuffs with stat mod (should pass now)
         try:
             # We need to simulate next turn or call private method
-            msgs = engine._process_monster_debuffs()
+            engine.monster_hp, msgs = CombatEffects.process_monster_debuffs(engine.monster, engine.monster_hp)
 
             # Check duration decrement
             debuffs = engine.monster.get("debuffs", [])
