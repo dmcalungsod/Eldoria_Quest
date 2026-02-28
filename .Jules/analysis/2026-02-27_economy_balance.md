@@ -1,10 +1,11 @@
-# 📊 Economy Balance Analysis — 2026-03-01
+# 📊 Economy Balance Analysis — 2026-02-27
 
-**Data Period:** Current Codebase (March 2026)
+**Data Period:** Current Codebase (February 2026)
 **Methodology:** 1000-Hour Monte Carlo Simulation & Expected Value Calculation
 **Focus:** Auto-Adventure Economy (Aurum/Material Yield per Hour)
 
 ## 🚨 Executive Summary
+
 The economy simulation reveals a **critical imbalance** in the early-game progression. The **Deepgrove Roots (Rank D, Level 10)** zone currently yields **689.1 Total Value/Hour**, which is higher than nearly all mid-game zones and comparable to late-game zones like **The Molten Caldera (Rank A, Level 30)**. This creates a massive exploit where low-level players can farm end-game currency and materials efficiently.
 
 Additionally, **The Shrouded Fen (Rank C)** and **Clockwork Halls (Rank B)** are significantly under-tuned, offering poor rewards for their difficulty level.
@@ -12,23 +13,27 @@ Additionally, **The Shrouded Fen (Rank C)** and **Clockwork Halls (Rank B)** are
 ## 🔍 Key Findings
 
 ### 1. The Deepgrove Roots Anomaly (Critical)
-*   **Yield:** 689.1/hr (vs Expected ~150-200/hr for Rank D).
-*   **Cause:** The **Feral Stag (Boss, Level 11)** has a high spawn weight (15/85 ≈ 17.6%) and drops **Epic Tier Materials** (`magic_stone_flawless`, `celestial_dust`).
-*   **Impact:** Players will farm this zone indefinitely, bypassing mid-game content and inflating the economy with high-value materials.
+
+* **Yield:** 689.1/hr (vs Expected ~150-200/hr for Rank D).
+* **Cause:** The **Feral Stag (Boss, Level 11)** has a high spawn weight (15/85 ≈ 17.6%) and drops **Epic Tier Materials** (`magic_stone_flawless`, `celestial_dust`).
+* **Impact:** Players will farm this zone indefinitely, bypassing mid-game content and inflating the economy with high-value materials.
 
 ### 2. The Shrouded Fen Bottleneck
-*   **Yield:** 152.6/hr.
-*   **Issue:** Despite being Rank C (Level 15+), the zone drops predominantly **Common** materials (`medicinal_herb`, `magic_stone_small`) with low sell values (5-15 Aurum).
-*   **Impact:** Players are incentivized to skip this zone or return to lower-level areas for better profit.
+
+* **Yield:** 152.6/hr.
+* **Issue:** Despite being Rank C (Level 15+), the zone drops predominantly **Common** materials (`medicinal_herb`, `magic_stone_small`) with low sell values (5-15 Aurum).
+* **Impact:** Players are incentivized to skip this zone or return to lower-level areas for better profit.
 
 ### 3. High-Tier Compression
-*   **Gale-Scarred Heights (Rank A, Lvl 35)** yields **768.7/hr**.
-*   **The Void Sanctum (Rank S, Lvl 40)** yields **774.8/hr**.
-*   **Issue:** The reward gap between Rank A and Rank S is negligible (<1%), reducing the incentive to push for the hardest content.
+
+* **Gale-Scarred Heights (Rank A, Lvl 35)** yields **768.7/hr**.
+* **The Void Sanctum (Rank S, Lvl 40)** yields **774.8/hr**.
+* **Issue:** The reward gap between Rank A and Rank S is negligible (<1%), reducing the incentive to push for the hardest content.
 
 ### 4. Clockwork Halls Underperformance
-*   **Yield:** 310.6/hr (vs Crystal Caverns ~415/hr).
-*   **Issue:** Low drop weights for valuable materials compared to its peer zones.
+
+* **Yield:** 310.6/hr (vs Crystal Caverns ~415/hr).
+* **Issue:** Low drop weights for valuable materials compared to its peer zones.
 
 ## 📊 Data Table: Simulated Yields
 
@@ -53,20 +58,23 @@ Additionally, **The Shrouded Fen (Rank C)** and **Clockwork Halls (Rank B)** are
 ## 🎯 Recommendations
 
 ### Immediate Actions (Hotfix)
-1.  **Nerf Deepgrove Roots:**
-    *   **Action:** Move `Feral Stag` (ID 17) to `conditional_monsters` with a low weight (e.g., 5) and strict level requirement (e.g., Level 15+).
-    *   **Alternative:** Remove `magic_stone_flawless` and `celestial_dust` from its drop table. These are Rank S materials.
+
+1. **Nerf Deepgrove Roots:**
+    * **Action:** Move `Feral Stag` (ID 17) to `conditional_monsters` with a low weight (e.g., 5) and strict level requirement (e.g., Level 15+).
+    * **Alternative:** Remove `magic_stone_flawless` and `celestial_dust` from its drop table. These are Rank S materials.
 
 ### Balance Adjustments
-2.  **Buff Shrouded Fen:**
-    *   **Action:** Upgrade drops to `magic_stone_medium` (Value 50) and `ancient_wood` (Value 25). Increase quantities for gatherables.
 
-3.  **Buff Void Sanctum:**
-    *   **Action:** Increase drop rate of `void_heart` (Epic, 1500) or add `magic_stone_flawless` to more monsters to justify the difficulty.
+2. **Buff Shrouded Fen:**
+    * **Action:** Upgrade drops to `magic_stone_medium` (Value 50) and `ancient_wood` (Value 25). Increase quantities for gatherables.
 
-4.  **Tune Clockwork Halls:**
-    *   **Action:** Increase drop weight of `steam_core` (Rare, 150) or `clockwork_heart` (Epic, 850) slightly.
+2. **Buff Void Sanctum:**
+    * **Action:** Increase drop rate of `void_heart` (Epic, 1500) or add `magic_stone_flawless` to more monsters to justify the difficulty.
+
+3. **Tune Clockwork Halls:**
+    * **Action:** Increase drop weight of `steam_core` (Rare, 150) or `clockwork_heart` (Epic, 850) slightly.
 
 ## 🤝 Coordination
-*   @GameBalancer: Please review the proposed drop table changes.
-*   @GameForge: Ensure `Feral Stag` is correctly categorized as a Boss for Rank D.
+
+* @GameBalancer: Please review the proposed drop table changes.
+* @GameForge: Ensure `Feral Stag` is correctly categorized as a Boss for Rank D.

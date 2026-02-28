@@ -1,10 +1,11 @@
-# 🔍 Eldoria Quest Codebase Audit — 2026-03-01
+# 🔍 Eldoria Quest Codebase Audit — 2026-02-27
 
 **Auditor:** Repo Auditor
 **Scope:** Entire repository
 **Tools Used:** flake8, bandit, vulture, radon, safety, ruff, manual review, pytest-cov
 
 ## Executive Summary
+
 The codebase is generally healthy with no critical security vulnerabilities (secrets, SQL injection) found in the scanned files. However, there are significant gaps in **test coverage for the UI layer (Cogs)** and **maintainability issues** due to high cyclomatic complexity in core systems. Violations of the **ONE UI** policy were detected in event and tournament handlers.
 
 - **Total Issues Found:** 200+ (mostly style/low severity)
@@ -60,25 +61,30 @@ The codebase is generally healthy with no critical security vulnerabilities (sec
   **Recommendation**: Ensure `shell=False` is used (it is in most cases) and inputs are validated.
 
 ## 📦 Dependency Issues
+
 - **Status**: ✅ Clean.
 - **Tools**: `safety` check passed with 63 packages scanned. No known vulnerabilities.
 
 ## 📚 Documentation Gaps
+
 - **Missing Docstrings**: Many Cogs and UI Views lack docstrings explaining their purpose and interaction flows.
 - **README**: The `README.md` is well-structured but could document the "ONE UI" policy explicitly for new contributors.
 
 ## 🧪 Test Coverage Gaps
+
 - **Critical Gap**: `cogs/*.py` files have **0-16% coverage**.
 - **Strong Coverage**: `game_systems/player/` and `game_systems/combat/` have excellent coverage (>90%).
 
 ## ✅ Positive Findings
+
 - **Security**: No hardcoded secrets (API keys, tokens) found in the codebase.
 - **Sanitization**: No SQL injection vulnerabilities detected; parameters appear to be handled correctly by the ODM/DatabaseManager.
 - **Code Style**: formatting is largely consistent, though `E501` (line length) is frequent.
 - **Architecture**: Clear separation between `cogs` (UI) and `game_systems` (Logic).
 
 ## 📌 Recommendations
-1.  **Enforce ONE UI**: Add a pre-commit hook or linter rule to flag `interaction.response.send_message` without `ephemeral=True`.
-2.  **Refactor Giants**: Prioritize breaking down `validate_location_schema` and `simulate_step`.
-3.  **UI Testing**: Task **BugHunter** with creating a "Cogs Test Suite" to verify command flows.
-4.  **Linting**: Configure `ruff` or `flake8` to enforce line lengths or explicitly ignore E501 if "literary text" justifies it (as mentioned in `pyproject.toml`).
+
+1. **Enforce ONE UI**: Add a pre-commit hook or linter rule to flag `interaction.response.send_message` without `ephemeral=True`.
+2. **Refactor Giants**: Prioritize breaking down `validate_location_schema` and `simulate_step`.
+3. **UI Testing**: Task **BugHunter** with creating a "Cogs Test Suite" to verify command flows.
+4. **Linting**: Configure `ruff` or `flake8` to enforce line lengths or explicitly ignore E501 if "literary text" justifies it (as mentioned in `pyproject.toml`).
