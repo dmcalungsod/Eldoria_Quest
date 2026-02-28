@@ -14,6 +14,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 import game_systems.data.emojis as E
+from cogs.utils.announcer import announce_to_guilds
 from database.database_manager import DatabaseManager
 from game_systems.core.world_time import WorldTime
 from game_systems.events.world_event_system import WorldEventSystem
@@ -55,7 +56,7 @@ class EventCog(commands.Cog):
                     success = self.system.start_event(WorldEventSystem.HARVEST_FESTIVAL, 24 * 7)
                     if success:
                         config = self.system.EVENT_CONFIGS[WorldEventSystem.HARVEST_FESTIVAL]
-                        await self._announce(
+                        await announce_to_guilds(self.bot,
                             f"🍂 **SEASONAL EVENT STARTED!** 🍂\n\n"
                             f"**{config['name']}**\n"
                             f"{config['description']}\n\n"
@@ -68,7 +69,7 @@ class EventCog(commands.Cog):
                     success = self.system.start_event(WorldEventSystem.MYSTIC_MERCHANT, 24)
                     if success:
                         config = self.system.EVENT_CONFIGS[WorldEventSystem.MYSTIC_MERCHANT]
-                        await self._announce(
+                        await announce_to_guilds(self.bot,
                             f"🔮 **THE MYSTIC MERCHANT ARRIVES!** 🔮\n\n"
                             f"**{config['name']}**\n"
                             f"{config['description']}\n\n"
@@ -82,19 +83,6 @@ class EventCog(commands.Cog):
     @check_event_cycle.before_loop
     async def before_check_event_cycle(self):
         await self.bot.wait_until_ready()
-
-    async def _announce(self, message: str):
-        """Attempts to announce to a guild channel (guild-hall or general)."""
-        for guild in self.bot.guilds:
-            channel = discord.utils.get(guild.text_channels, name="guild-hall")
-            if not channel:
-                channel = discord.utils.get(guild.text_channels, name="general")
-
-            if channel:
-                try:
-                    await channel.send(message)
-                except Exception as e:
-                    logger.error(f"Failed to announce in {guild.name}: {e}")
 
     # ==================================================================
     # USER COMMANDS
@@ -165,7 +153,7 @@ class EventCog(commands.Cog):
                 f"{E.CHECK} Started Event: **{config['name']}** for {hours} hours.",
                 ephemeral=True,
             )
-            await self._announce(
+            await announce_to_guilds(self.bot,
                 f"🚨 **WORLD EVENT STARTED!** 🚨\n\n"
                 f"**{config['name']}**\n"
                 f"{config['description']}\n\n"
@@ -183,7 +171,7 @@ class EventCog(commands.Cog):
         """Manually ends the event."""
         self.system.end_current_event()
         await interaction.response.send_message(f"{E.CHECK} Event ended manually.", ephemeral=True)
-        await self._announce("✅ **The world returns to normal.** The event has ended.")
+        await announce_to_guilds(self.bot, "✅ **The world returns to normal.** The event has ended.")
 
 
 async def setup(bot: commands.Bot):

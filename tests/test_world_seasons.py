@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-from game_systems.core.world_time import LOCATION_WEATHER_WEIGHTS, Season, TimePhase, Weather, WorldTime
+from game_systems.core.world_time import Season, Weather, WorldTime
 
 
 class TestWorldSeasons(unittest.TestCase):
@@ -63,7 +63,7 @@ class TestWorldSeasons(unittest.TestCase):
 
         # 1. Test WINTER in 'frostfall_expanse' (Already Snowy)
         # Expect SNOW and BLIZZARD to be boosted
-        mock_now.return_value = datetime(2025, 1, 15) # Winter
+        mock_now.return_value = datetime(2025, 1, 15)  # Winter
 
         # frostfall_expanse base: [(SNOW, 40), (BLIZZARD, 30), (CLEAR, 20), (FOG, 10)]
         # Winter Modifiers: SNOW x2.0, BLIZZARD x1.5, RAIN x0.5, CLEAR x0.8
@@ -75,14 +75,14 @@ class TestWorldSeasons(unittest.TestCase):
         # choices(population, weights=..., k=1)
         args, kwargs = mock_rng.choices.call_args
         population = args[0]
-        weights = kwargs['weights']
+        weights = kwargs["weights"]
 
         weight_map = dict(zip(population, weights))
 
         self.assertAlmostEqual(weight_map[Weather.SNOW], 80.0)
         self.assertAlmostEqual(weight_map[Weather.BLIZZARD], 45.0)
         self.assertAlmostEqual(weight_map[Weather.CLEAR], 16.0)
-        self.assertAlmostEqual(weight_map[Weather.FOG], 10.0) # Unchanged
+        self.assertAlmostEqual(weight_map[Weather.FOG], 10.0)  # Unchanged
 
     @patch("game_systems.core.world_time.WorldTime.now")
     @patch("random.Random")
@@ -95,7 +95,7 @@ class TestWorldSeasons(unittest.TestCase):
         mock_random_cls.return_value = mock_rng
         mock_rng.choices.return_value = [Weather.ASH]
 
-        mock_now.return_value = datetime(2025, 1, 15) # Winter
+        mock_now.return_value = datetime(2025, 1, 15)  # Winter
 
         # molten_caldera base: [(CLEAR, 50), (ASH, 40), (STORM, 10)]
         # Even with Winter modifiers, SNOW is not in the base list, so it should not appear.

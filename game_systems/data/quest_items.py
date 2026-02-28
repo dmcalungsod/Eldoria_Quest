@@ -204,5 +204,5 @@ QUEST_ITEMS = {
         "name": "Grey Ward Mask",
         "rarity": "Uncommon",
         "notes": "A bird-like mask stuffed with herbs to filter out toxins.",
-    }
+    },
 }

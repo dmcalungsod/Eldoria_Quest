@@ -97,8 +97,7 @@ def calculate_ev(location_key, location_data, player_luck=10):
             combat_ev_materials += prob * avg_drop_value
 
     # --- Totals ---
-    step_val = (REGEN_CHANCE * (gather_ev + fallback_ev)) + \
-               (COMBAT_CHANCE * (combat_ev_aurum + combat_ev_materials))
+    step_val = (REGEN_CHANCE * (gather_ev + fallback_ev)) + (COMBAT_CHANCE * (combat_ev_aurum + combat_ev_materials))
 
     return step_val * STEPS_PER_HOUR
 
@@ -113,12 +112,9 @@ def main():
             continue
 
         ev = calculate_ev(key, data)
-        data_points.append({
-            "name": data["name"],
-            "rank": data.get("min_rank", "F"),
-            "level": data.get("level_req", 1),
-            "ev": ev
-        })
+        data_points.append(
+            {"name": data["name"], "rank": data.get("min_rank", "F"), "level": data.get("level_req", 1), "ev": ev}
+        )
 
     # Sort by Level Requirement
     data_points.sort(key=lambda x: x["level"])
@@ -144,6 +140,7 @@ def main():
         print(f"{dp['name']:<25} | {dp['rank']:<2} | {dp['level']:<3} | {dp['ev']:<8.1f} | {delta_str:<8} | {status}")
 
         prev_ev = dp["ev"]
+
 
 if __name__ == "__main__":
     main()
