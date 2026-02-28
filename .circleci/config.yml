@@ -62,22 +62,38 @@ jobs:
   test:
     docker:
       - image: cimg/python:3.12
+    parallelism: 4
     steps:
       - checkout
       - install-deps
       - run:
           name: Install Test Dependencies
-          command: pip install "pip==24.0" && pip install pytest pytest-cov pytest-xdist
+          command: pip install "pip==24.0" && pip install pytest pytest-cov
       - run:
-          name: Run Tests with Coverage
-          command: python -m pytest -n auto --tb=short -q --cov=. --cov-report=xml:coverage.xml
+          name: Split and Run Tests
+          command: |
+            TESTFILES=$(circleci tests glob "tests/**/test_*.py" | circleci tests split --split-by=timings)
+            python -m pytest $TESTFILES --tb=short -q --cov=. --cov-report=xml:coverage.xml
       - run:
-          name: Upload Coverage to Codacy
+          name: Upload Partial Coverage to Codacy
           command: |
             export CODACY_ORGANIZATION_PROVIDER=gh
             export CODACY_USERNAME=dmcalungsod
             export CODACY_PROJECT_NAME=Eldoria_Quest
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Python -r coverage.xml --partial
+
+  finalize-coverage:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Finalize Codacy Coverage
+          command: |
+            export CODACY_ORGANIZATION_PROVIDER=gh
+            export CODACY_USERNAME=dmcalungsod
+            export CODACY_PROJECT_NAME=Eldoria_Quest
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) final
 
   auto-merge:
     docker:
@@ -146,9 +162,16 @@ workflows:
           filters:
             branches:
               ignore: main
+      - finalize-coverage:
+          requires:
+            - test
+          filters:
+            branches:
+              ignore: main
       - auto-merge:
           requires:
             - static-analysis
+            - finalize-coverage
           filters:
             branches:
               ignore: main
