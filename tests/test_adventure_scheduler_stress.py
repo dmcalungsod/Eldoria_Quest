@@ -1,15 +1,21 @@
-import logging
 import os
 import sys
 import time
+import logging
+import unittest
 from unittest.mock import MagicMock, patch
 
 # Add root to sys.path
 sys.path.append(os.getcwd())
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger("stress_test")
+# Mock modules before importing
+if "pymongo" not in sys.modules:
+    sys.modules["pymongo"] = MagicMock()
+    sys.modules["pymongo.errors"] = MagicMock()
+if "discord" not in sys.modules:
+    sys.modules["discord"] = MagicMock()
+
+from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
 
 
 class MockDatabase:
@@ -39,7 +45,6 @@ class MockDatabase:
     def end_adventure_session(self, *args):
         pass
 
-    # Add other methods if needed by AdventureResolutionEngine initialization
     def _col(self, name):
         return MagicMock()
 
@@ -57,15 +62,12 @@ class FastAdventureSession:
         self.version = 1
 
     def simulate_step(self, context_bundle=None, background=False, persist=False, weather=None, time_phase=None):
-        # Simulate CPU work if needed
-        # time.sleep(0.0001)
         return {"dead": False, "vitals": {"current_hp": 100, "current_mp": 100}}
 
     def save_state(self):
         pass
 
     def _fetch_session_context(self, bundle=None):
-        # Return a dummy context matching what AdventureResolutionEngine expects
         player_stats = MagicMock()
         player_stats.max_hp = 100
         player_stats.max_mp = 100
@@ -81,59 +83,48 @@ class FastAdventureSession:
         }
 
 
-def run_stress_test():
-    logger.info("Initializing Stress Test (Scheduler Only)...")
+class TestAdventureSchedulerStress(unittest.TestCase):
+    @patch("game_systems.adventure.adventure_resolution.AdventureSession", side_effect=FastAdventureSession)
+    def test_scheduler_stress_10k_sessions(self, mock_session_cls):
+        """Stress test resolving 10,000 adventure sessions to verify throughput and integrity."""
+        mock_db = MockDatabase()
+        mock_bot = MagicMock()
 
-    # Mock discord and pymongo only when running the test
-    sys.modules["discord"] = MagicMock()
-    sys.modules["pymongo"] = MagicMock()
-    sys.modules["pymongo.errors"] = MagicMock()
-
-    # Import inside the function to avoid top-level side effects
-    from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
-
-    mock_db = MockDatabase()
-    mock_bot = MagicMock()
-
-    # Generate 10k sessions
-    NUM_SESSIONS = 10000
-    sessions = []
-    for i in range(NUM_SESSIONS):
-        sessions.append(
+        NUM_SESSIONS = 10000
+        sessions = [
             {
                 "discord_id": 100000 + i,
                 "duration_minutes": 60,
                 "steps_completed": 0,
                 "start_time": "2023-01-01T00:00:00",
-                # ... other fields ignored by mocked session
             }
-        )
+            for i in range(NUM_SESSIONS)
+        ]
 
-    logger.info(f"Generated {NUM_SESSIONS} sessions.")
+        engine = AdventureResolutionEngine(mock_bot, mock_db)
 
-    # Initialize Engine
-    engine = AdventureResolutionEngine(mock_bot, mock_db)
+        # We disable info logging to prevent I/O bottleneck during the stress test
+        logger = logging.getLogger("eldoria.resolution")
+        old_level = logger.getEffectiveLevel()
+        logger.setLevel(logging.WARNING)
 
-    # Patch AdventureSession to avoid complex logic
-    # We simulate a session that processes steps and returns simple results
-    with patch("game_systems.adventure.adventure_resolution.AdventureSession", side_effect=FastAdventureSession):
-        logger.info("Starting Resolution Loop...")
         start_time = time.time()
 
         for session_doc in sessions:
             engine.resolve_session(session_doc)
 
         end_time = time.time()
+        logger.setLevel(old_level)
+
         duration = end_time - start_time
-
         throughput = NUM_SESSIONS / duration if duration > 0 else NUM_SESSIONS
-        logger.info(f"Finished in {duration:.4f}s")
-        logger.info(f"Throughput: {throughput:.2f} sessions/sec")
 
-        # Verification
-        assert len(mock_db.status_updates) == NUM_SESSIONS
-        logger.info("✅ Verified: All sessions updated.")
+        print(f"\nStress Test Finished: 10,000 sessions in {duration:.4f}s ({throughput:.2f} sessions/sec)")
+
+        self.assertEqual(len(mock_db.status_updates), NUM_SESSIONS, "Not all sessions were updated.")
+        self.assertGreater(throughput, 1000, "Throughput is too low; should be >1000 sessions/sec")
 
 
 if __name__ == "__main__":
-    run_stress_test()
+    import logging
+    unittest.main()
