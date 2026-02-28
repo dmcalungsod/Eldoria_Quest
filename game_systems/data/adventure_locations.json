@@ -54,7 +54,9 @@
         "special_events": [
             "safe_room",
             "hidden_stash"
-        ]
+        ],
+        "floor_depth": 1,
+        "danger_level": 2
     },
     "whispering_thicket": {
         "name": "Whispering Thicket",
@@ -120,7 +122,9 @@
         "special_events": [
             "hidden_stash",
             "trap_pit"
-        ]
+        ],
+        "floor_depth": 5,
+        "danger_level": 3
     },
     "deepgrove_roots": {
         "name": "Deepgrove Roots",
@@ -185,7 +189,9 @@
         "special_events": [
             "trap_pit",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 10,
+        "danger_level": 4
     },
     "the_ashlands": {
         "name": "The Ashlands",
@@ -259,7 +265,9 @@
             "trap_pit",
             "hidden_stash",
             "safe_room"
-        ]
+        ],
+        "floor_depth": 12,
+        "danger_level": 4
     },
     "shrouded_fen": {
         "name": "The Shrouded Fen",
@@ -338,7 +346,9 @@
         "special_events": [
             "safe_room",
             "trap_pit"
-        ]
+        ],
+        "floor_depth": 15,
+        "danger_level": 5
     },
     "sunken_grotto": {
         "name": "The Sunken Grotto",
@@ -412,7 +422,9 @@
         "special_events": [
             "hidden_stash",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 18,
+        "danger_level": 5
     },
     "crystal_caverns": {
         "name": "The Crystal Caverns",
@@ -482,7 +494,9 @@
         "special_events": [
             "safe_room",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 20,
+        "danger_level": 6
     },
     "clockwork_halls": {
         "name": "The Clockwork Halls",
@@ -568,7 +582,9 @@
         "special_events": [
             "trap_pit",
             "hidden_stash"
-        ]
+        ],
+        "floor_depth": 22,
+        "danger_level": 6
     },
     "forgotten_ossuary": {
         "name": "The Forgotten Ossuary",
@@ -639,7 +655,9 @@
             "trap_pit",
             "hidden_stash",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 24,
+        "danger_level": 6
     },
     "molten_caldera": {
         "name": "The Molten Caldera",
@@ -713,7 +731,9 @@
         "special_events": [
             "trap_pit",
             "safe_room"
-        ]
+        ],
+        "floor_depth": 30,
+        "danger_level": 7
     },
     "thunder_crag_coast": {
         "name": "The Thunder-Crag Coast",
@@ -788,7 +808,9 @@
             "trap_pit",
             "ancient_shrine",
             "hidden_stash"
-        ]
+        ],
+        "floor_depth": 33,
+        "danger_level": 7
     },
     "frostfall_expanse": {
         "name": "The Frostfall Expanse",
@@ -858,7 +880,9 @@
         "special_events": [
             "safe_room",
             "hidden_stash"
-        ]
+        ],
+        "floor_depth": 25,
+        "danger_level": 6
     },
     "void_sanctum": {
         "name": "The Void Sanctum",
@@ -940,7 +964,9 @@
         "special_events": [
             "trap_pit",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 40,
+        "danger_level": 8
     },
     "gale_scarred_heights": {
         "name": "Gale-Scarred Heights",
@@ -1014,7 +1040,9 @@
         "special_events": [
             "trap_pit",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 35,
+        "danger_level": 7
     },
     "celestial_archipelago": {
         "name": "The Celestial Archipelago",
@@ -1089,7 +1117,9 @@
             "trap_pit",
             "safe_room",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 28,
+        "danger_level": 6
     },
     "shimmering_wastes": {
         "name": "The Shimmering Wastes",
@@ -1163,7 +1193,9 @@
         "special_events": [
             "trap_pit",
             "ancient_shrine"
-        ]
+        ],
+        "floor_depth": 37,
+        "danger_level": 7
     },
     "guild_arena": {
         "name": "Guild Proving Grounds",
@@ -1172,7 +1204,9 @@
         "level_req": 1,
         "duration_options": [],
         "monsters": [],
-        "description": "The dedicated arena for Adventurer rank examinations."
+        "description": "The dedicated arena for Adventurer rank examinations.",
+        "floor_depth": 1,
+        "danger_level": 1
     },
     "whispering_archives": {
         "name": "The Whispering Archives",
@@ -1247,7 +1281,9 @@
             "trap_pit",
             "ancient_shrine",
             "hidden_stash"
-        ]
+        ],
+        "floor_depth": 26,
+        "danger_level": 6
     },
     "rust_wastes": {
         "name": "The Rust-Wastes",
@@ -1320,6 +1356,8 @@
         "special_events": [
             "trap_pit",
             "hidden_stash"
-        ]
+        ],
+        "floor_depth": 8,
+        "danger_level": 3
     }
 }
