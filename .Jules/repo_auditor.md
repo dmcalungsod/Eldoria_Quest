@@ -39,3 +39,13 @@
 - **Recurring Issues:** High cyclomatic complexity in UI components (e.g., `ShopView`, `QuestBoardView`). Consistent use of `send_message` in UI logic which violates the ONE UI pattern.
 - **Recommendations for future:** Add pre-commit hooks for `flake8` and `vulture`. Ensure `bandit` is run in CI. Create specific lint rules for the ONE UI policy if possible (e.g., a custom flake8 plugin).
 - **Limitations:** Cannot automatically determine if an `assert` in test code is a security flaw (expected) vs in production code (flaw), though `bandit` flagged test files. Ignored test files for `bandit` severity. `safety` command deprecated.
+# Repo Auditor Journal
+
+## 2026-03-01
+**Critical Learnings:**
+- `flake8` and `radon` are incredibly effective at identifying high-complexity technical debt in newly added game systems (`detect_element` and `apply_weather_modifiers`).
+- `vulture` is useful for finding unused variables in tests and analysis scripts, though less reliable on dynamic codebases.
+- `bandit` reliably flags the `urllib.request.urlopen` issue and hardcoded asserts in tests.
+- `safety check` is deprecated and failed during execution (`safety scan` also failed due to environment issues). Future audits should rely on updated dependency checking tools like `pip-audit`.
+- Manual grep for "send_message" in `cogs/` is still the most reliable way to find ONE UI Policy violations, as automated linters don't understand the semantic difference between `send_message` and `edit_original_response`.
+- **Suggestion for prevention:** Implement a `pre-commit` hook that runs `flake8`, `vulture`, and `radon` with strict thresholds to prevent complexity and unused variables from entering the main branch. Add `bandit` to the CI pipeline to block simple security regressions like `urlopen` or hardcoded tokens.
