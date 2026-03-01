@@ -65,3 +65,17 @@
 **Player Impact:**
 - Restores value to the Defense stat during night cycles.
 - Maintains the "danger" of night travel (50% mitigation penalty) without being unfair to high-level players.
+
+## 2026-03-08 — Formula Review & Exploit Check
+
+**Learning:** When reviewing current gameplay formulas against Foreman's task list, no critical exploits or mathematical imbalances were detected in the auto-adventure systems or classes.
+**The Observation:**
+1.  **Stat Scaling:** Exponential growth on stat upgrades is safely bounded by the `_execute_upgrade` logic and `hp_gain` limits.
+2.  **Regeneration:** HP/MP regeneration is strictly capped at 5% max HP/MP per step to prevent infinite loops, and `SURGE` logic properly aborts regen at full HP.
+3.  **Ability Scaling:** `calculate_skill_attack_power` properly bounds scaling.
+4.  **Special Abilities:** `Smite` and others are correctly balanced (0.8x multiplier for Smite as per previous adjustment).
+5.  **Foreman Tasks:** No tasks were assigned to Equilibrium in `.Jules/foreman_plan.md` for this sprint.
+
+**Outcome:**
+- Verified the integrity of mathematical models.
+- Since no explicit imbalances were found and no active tasks were assigned by Foreman, no code changes were made, and no PR will be submitted today as per instructions.
