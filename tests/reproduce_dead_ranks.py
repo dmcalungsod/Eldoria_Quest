@@ -13,6 +13,7 @@ class TestRankProgression(unittest.TestCase):
     def setUp(self):
         self.mock_db = MagicMock()
         self.rank_system = RankSystem(self.mock_db)
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 50}
 
     def test_s_rank_promotion_requirements(self):
         # Setup: Player is Rank S, wanting to go to SS.
@@ -30,10 +31,11 @@ class TestRankProgression(unittest.TestCase):
         self.assertFalse(eligible, "Rank S should NOT be eligible with low stats.")
 
         # 2. Test Eligibility (Met Requirements)
-        # S -> SS Reqs: 60 Quests, 35 Boss, 120 Elite
+        # S -> SS Reqs: 60 Quests, 35 Boss, 120 Elite, 1000 normal kills
         self.mock_db.get_guild_member.return_value = {
             "rank": "S",
             "quests_completed": 60,
+            "normal_kills": 1000,
             "boss_kills": 35,
             "elite_kills": 120,
         }
@@ -56,10 +58,11 @@ class TestRankProgression(unittest.TestCase):
         self.assertFalse(eligible, "Rank SS should NOT be eligible with low stats.")
 
         # 2. Test Eligibility (Met Requirements)
-        # SS -> SSS Reqs: 65 Quests, 50 Boss, 200 Elite
+        # SS -> SSS Reqs: 65 Quests, 50 Boss, 200 Elite, 1500 normal kills
         self.mock_db.get_guild_member.return_value = {
             "rank": "SS",
             "quests_completed": 65,
+            "normal_kills": 1500,
             "boss_kills": 50,
             "elite_kills": 200,
         }

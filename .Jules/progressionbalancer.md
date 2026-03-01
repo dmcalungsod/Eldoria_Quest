@@ -35,3 +35,8 @@
    - Rank A: 8 -> **6**
    - Rank S: 15 -> **10**
    - Rank SS: 25 -> **20**
+
+## 2026-03-02 — Integrating Auto-Adventure Progress into Ranks
+
+**Learning:** The auto-adventure system (TimeWeaver) introduced a massive new core loop, but it was not integrated into rank progression. This meant players could engage exclusively with the new system but still be gatekept by manual quest completion or kill requirements they weren't organically achieving.
+**Action:** Integrated `total_expeditions` as a core requirement for all ranks (F: 2 -> SS: 50) in `rank_system.py` using data from `get_exploration_stats`. This formally links the new auto-adventure loop to guild advancement.
