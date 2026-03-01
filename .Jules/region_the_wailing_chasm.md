@@ -3,7 +3,7 @@
 ## Core Identity
 - **Name:** The Wailing Chasm
 - **Theme:** A claustrophobic, pitch-black subterranean abyss where echoes of The Sundering are physically trapped.
-- **History:** Once a bustling underground Dwarven trade route known as Kaza-Kor. During The Sundering, a massive fissure opened, swallowing the city and exposing it to Void energies. The screams of the fallen are said to still bounce off the walls, never fading.
+- **History:** Once a bustling underground trade route known as Kaza-Kor. During The Sundering, a massive fissure opened, swallowing the city and exposing it to Void energies. The screams of the fallen are said to still bounce off the walls, never fading.
 - **Culture:** The only survivors are the Deep Delvers, who have gone mad and adapted to the dark, worshipping the void below.
 
 ## Geography

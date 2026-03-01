@@ -38,7 +38,53 @@ class GeneralCog(commands.Cog):
 
         except Exception as e:
             logger.error(f"Ping command failed: {e}")
-            await interaction.response.send_message("Error calculating latency.", ephemeral=True)
+            await interaction.response.send_message(
+                "Error calculating latency.", ephemeral=True
+            )
+
+    @app_commands.command(
+        name="help", description="Access the Guild Handbook to learn about Eldoria."
+    )
+    async def help_command(self, interaction: discord.Interaction):
+        """
+        Sends the Guild Handbook explaining core game concepts.
+        """
+        try:
+            embed = discord.Embed(
+                title="Guild Handbook",
+                description="*The pages are worn, bearing the stains of countless adventurers before you.*",
+                color=discord.Color.dark_gold(),
+            )
+            embed.add_field(
+                name="/start",
+                value="Begin your journey in Astraeon City and register with the Guild.",
+                inline=False,
+            )
+            embed.add_field(
+                name="🗺️ Expeditions",
+                value="Time-based exploration. Select a destination and duration, then wait for your return. The wilds do not sleep, nor should your guard drop.",
+                inline=False,
+            )
+            embed.add_field(
+                name="📜 Quests & Guild Hall",
+                value="Review available contracts and report successes at the Guild Hall. Access the Shop, Infirmary, and Training Grounds.",
+                inline=False,
+            )
+            embed.add_field(
+                name="👤 Profile",
+                value="View your Guild Card, manage your abilities, and prepare your kit for the next expedition.",
+                inline=False,
+            )
+            embed.set_footer(text="May your light hold against the darkness.")
+
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            logger.info(f"Help handbook requested by {interaction.user}")
+
+        except Exception as e:
+            logger.error(f"Help command failed: {e}")
+            await interaction.response.send_message(
+                "Error accessing the Guild Handbook.", ephemeral=True
+            )
 
 
 async def setup(bot: commands.Bot):

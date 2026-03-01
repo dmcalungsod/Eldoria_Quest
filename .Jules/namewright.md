@@ -138,3 +138,23 @@
 ### 📝 Notes
 - "Death Blossom" felt a bit too flashy/dramatic for a grim survival setting; "Reaper's Dance" or "Crimson Gale" grounds the lethality.
 - Renamed foundational skills to feel more like learned techniques ("Twin Fangs", "Veil of Shadows") rather than generic actions ("Double Strike", "Stealth").
+
+## 2026-02-28 — The Wailing Chasm (Monsters)
+
+**Request:** Proactive / Assigned by Foreman (via Realmwright's design `.Jules/region_the_wailing_chasm.md`, Issue #9)
+**Context:** The Wailing Chasm (Rank A, Level 35+). Subterranean abyss, void-corrupted, pitch-black, sound-based mechanics.
+**Tone:** Horrific, sensory-deprived, corrupted, echoing. Avoiding generic terms like "Bat" or "Hulk".
+
+### 📜 Generated Names
+
+#### 🐺 Monsters (Replacing Placeholders)
+1.  **Gloom-Crawler** (Replaces *Chasm Crawler*) – A pale, many-legged insectoid with translucent armor, built to navigate sheer rock faces in the absolute dark.
+2.  **Shriek-Wing** (Replaces *Echo Bat*) – A massive, leathery predator without eyes. Its screeches cause physical trauma and shatter light sources.
+3.  **Sundered Goliath** (Replaces *Void-Touched Hulk*) – A towering, twisted remnant of a former Kaza-Kor inhabitant, its body warped by Void energies into a weapon of blunt force.
+4.  **Whisper-Fiend** (Replaces *Sightless Stalker*) – An emaciated, silent horror that perfectly mimics the dying echoes of lost delvers to lure its prey into the dark.
+5.  **Resonance Husk** (New Concept) – An undead entity animated entirely by the trapped sonic vibrations of The Sundering.
+
+### 📝 Learnings
+*   Replacing "Echo Bat" with "Shriek-Wing" emphasizes the danger of its sound rather than just describing the animal.
+*   "Sundered Goliath" ties the monster directly to the lore of "The Sundering" that destroyed Kaza-Kor, making it feel native to the setting rather than generic "Void-Touched".
+*   "Whisper-Fiend" plays directly into the chasm's psychological horror and light-management mechanics.

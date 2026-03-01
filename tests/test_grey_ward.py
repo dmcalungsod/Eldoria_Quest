@@ -46,7 +46,7 @@ class TestGreyWard(unittest.TestCase):
         self.assertEqual(ranks[3]["reward"]["amount"], 3)
         self.assertEqual(ranks[4]["reward"]["key"], "gathering_boost")
         self.assertEqual(ranks[4]["reward"]["value"], 0.1)
-        self.assertEqual(ranks[5]["reward"]["value"], "Master Apothecary")
+        self.assertEqual(ranks[5]["reward"]["value"], "Transmuter")
 
         # Verify Interests
         self.assertEqual(faction["interests"]["gathering"], 1.5)
