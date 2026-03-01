@@ -1367,5 +1367,81 @@
         ],
         "floor_depth": 8,
         "danger_level": 3
+    },
+    "silent_city_ouros": {
+        "name": "The Silent City of Ouros",
+        "emoji": "🕰️",
+        "min_rank": "S",
+        "level_req": 42,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "temporal_wraith",
+                30
+            ],
+            [
+                "hollowed_sentinel",
+                30
+            ],
+            [
+                "abyssal_creeper",
+                25
+            ],
+            [
+                "monster_119",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "temporal_wraith",
+                40
+            ],
+            [
+                "hollowed_sentinel",
+                40
+            ],
+            [
+                "monster_119",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "echoing_behemoth",
+                "weight": 5,
+                "min_level": 45
+            }
+        ],
+        "description": "An eerie, dead metropolis swallowed by the earth during The Sundering. Its perfect preservation is unnerving, and the absolute silence is deafening.",
+        "gatherables": [
+            [
+                "chronal_dust",
+                40
+            ],
+            [
+                "perfected_glass",
+                30
+            ],
+            [
+                "ancient_ourosan_coin",
+                20
+            ],
+            [
+                "void_touched_relic",
+                10
+            ]
+        ],
+        "special_events": [
+            "temporal_rift",
+            "ancient_shrine"
+        ],
+        "floor_depth": 42,
+        "danger_level": 8
     }
 }
