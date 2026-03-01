@@ -25,6 +25,18 @@ class MockDatabase:
         self.status_updates = {}
         self.vitals_updates = []
 
+
+    def get_combat_context_bundles_batch(self, discord_ids):
+        return {
+            did: {
+                "player": {"current_hp": 100, "current_mp": 100},
+                "stats": {"HP": 100, "MP": 100},
+                "buffs": [],
+                "skills": [],
+            }
+            for did in discord_ids
+        }
+
     def get_combat_context_bundle(self, discord_id):
         return {
             "player": {"current_hp": 100, "current_mp": 100},

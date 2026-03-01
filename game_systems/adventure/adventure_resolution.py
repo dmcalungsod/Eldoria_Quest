@@ -38,15 +38,17 @@ class AdventureResolutionEngine:
         # This is safe because active boosts don't change per player in this loop.
         self.db.get_active_boosts() # Cache it in DB layer if not already
 
-        # In a real scenario with a proper DB method, we would fetch context_bundles in bulk here
-        # For now, we rely on existing individual fetching within resolve_session to maintain
-        # consistency until batch fetching is implemented in DatabaseManager
+        # Fetch all context bundles in a single database query to resolve the N+1 query problem
+        discord_ids = [doc["discord_id"] for doc in session_docs]
+        context_bundles = self.db.get_combat_context_bundles_batch(discord_ids)
 
         for session_doc in session_docs:
+            discord_id = session_doc["discord_id"]
+            bundle = context_bundles.get(discord_id)
             try:
-                self.resolve_session(session_doc)
+                self.resolve_session(session_doc, context_bundle=bundle)
             except Exception as e:
-                logger.error(f"Failed to resolve session {session_doc.get('discord_id')}: {e}", exc_info=True)
+                logger.error(f"Failed to resolve session {discord_id}: {e}", exc_info=True)
 
     def resolve_session(self, session_doc: dict[str, Any], context_bundle: dict | None = None) -> bool:
         """
