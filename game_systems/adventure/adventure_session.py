@@ -377,7 +377,9 @@ class AdventureSession:
                 max_hp, _ = self._get_max_vitals(context)
 
                 if (current_hp / max_hp) < 0.30:
-                    return self._attempt_flee(context, persist=persist)
+                    flee_result = self._attempt_flee(context, persist=persist)
+                    flee_result["auto_retreat"] = True
+                    return flee_result
 
             return self._resolve_auto_combat(
                 context,
@@ -752,6 +754,8 @@ class AdventureSession:
                 else:
                     if not background:
                         sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                    else:
+                        sequence.append(["\n⚠️ **HP Critical! Auto-Retreating to save your life!**"])
                     # If background, we break silently. Next simulate_step will trigger _attempt_flee
                     break
 
@@ -770,6 +774,12 @@ class AdventureSession:
         delta_mp = context["vitals"]["current_mp"] - initial_mp
 
         max_hp, max_mp = self._get_max_vitals(context)
+
+        # Auto-Retreat checks
+        if background and not player_won and not is_dead and result["hp_current"] / max_hp < 0.30:
+            # We broke early due to HP and couldn't potion
+            # So next step will be a flee, but we can also just mark it now
+            pass
 
         # Final Results Block
         final_block = []

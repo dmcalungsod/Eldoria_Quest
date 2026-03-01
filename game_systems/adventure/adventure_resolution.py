@@ -46,14 +46,34 @@ class AdventureResolutionEngine:
             discord_id = session_doc["discord_id"]
             bundle = context_bundles.get(discord_id)
             try:
-                self.resolve_session(session_doc, context_bundle=bundle)
+                auto_retreated = self.resolve_session(session_doc, context_bundle=bundle)
+                if auto_retreated == "auto_retreat":
+                    # Send a DM to the player notifying them of the auto-retreat
+                    # Because we are in a sync thread, we must schedule the coroutine on the bot's loop
+                    import asyncio
+                    import discord
+
+                    async def notify_retreat():
+                        try:
+                            user = self.bot.get_user(discord_id) or await self.bot.fetch_user(discord_id)
+                            if user:
+                                await user.send("⚠️ **Your adventure was automatically aborted!**\n\nYour health dropped to critical levels and you were forced to retreat back to town to save your life. Check your adventure status for the full report.")
+                        except discord.Forbidden:
+                            logger.info(f"Could not DM user {discord_id} about auto-retreat.")
+                        except Exception as dm_e:
+                            logger.error(f"Failed to DM user {discord_id}: {dm_e}")
+
+                    if self.bot and self.bot.loop:
+                        asyncio.run_coroutine_threadsafe(notify_retreat(), self.bot.loop)
+
             except Exception as e:
                 logger.error(f"Failed to resolve session {discord_id}: {e}", exc_info=True)
 
-    def resolve_session(self, session_doc: dict[str, Any], context_bundle: dict | None = None) -> bool:
+    def resolve_session(self, session_doc: dict[str, Any], context_bundle: dict | None = None) -> bool | str:
         """
         Processes a time-based adventure session to completion (or death).
-        Returns True if session was marked completed/processed.
+        Returns True if session was marked completed/processed naturally.
+        Returns "auto_retreat" if it triggered the auto-retreat condition.
         """
         discord_id = session_doc["discord_id"]
         logger.info(f"Starting resolution for session {discord_id}")
@@ -176,6 +196,36 @@ class AdventureResolutionEngine:
 
                 self._handle_death(discord_id, session)
                 return True
+
+            if result.get("auto_retreat", False):
+                logger.info(f"Player {discord_id} auto-retreated during simulation step {session.steps_completed}.")
+
+                # Auto retreat logic
+                session.logs.append("\n⚠️ **Auto-Retreat Triggered!** Returning to town to prevent death.")
+                self._mark_complete(discord_id)
+                session.save_state()
+
+                if final_vitals:
+                    current_hp = final_vitals.get("current_hp", initial_hp)
+                    current_mp = final_vitals.get("current_mp", initial_mp)
+
+                    # Fetch max stats safely in case it's missing from result
+                    # Default values (e.g. 100) are assigned earlier in the function
+                    if result.get("player_stats"):
+                        p_stats = result["player_stats"]
+                        max_hp = p_stats.max_hp
+                        max_mp = p_stats.max_mp
+                    elif context_bundle and context_bundle.get("player_stats"):
+                        p_stats = context_bundle["player_stats"]
+                        max_hp = p_stats.max_hp
+                        max_mp = p_stats.max_mp
+
+                    delta_hp = current_hp - initial_hp
+                    delta_mp = current_mp - initial_mp
+                    if delta_hp != 0 or delta_mp != 0:
+                        self.db.update_player_vitals_delta(discord_id, delta_hp, delta_mp, max_hp, max_mp)
+
+                return "auto_retreat"
 
         # 4. Finalize Success
         self._mark_complete(discord_id)
