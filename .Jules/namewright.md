@@ -158,3 +158,21 @@
 *   Replacing "Echo Bat" with "Shriek-Wing" emphasizes the danger of its sound rather than just describing the animal.
 *   "Sundered Goliath" ties the monster directly to the lore of "The Sundering" that destroyed Kaza-Kor, making it feel native to the setting rather than generic "Void-Touched".
 *   "Whisper-Fiend" plays directly into the chasm's psychological horror and light-management mechanics.
+
+## 2026-03-01 — The Silent City of Ouros (NPCs and Statues)
+
+**Request:** Proactive / Assigned by Foreman (via Realmwright's design `.Jules/region_silent_city_ouros.md`)
+**Context:** The Silent City of Ouros (Rank S, Level 42+). Eerie, dead metropolis, perfectly preserved, temporal magic, clockwork, absolute silence.
+**Tone:** Horrific, sensory-deprived, echoing, oppressive silence, unsettling perfection.
+
+### 📜 Generated Names
+
+#### 👥 NPCs
+1.  **"Echo" Vane** – A member of The Void Seekers who has been driven mad by the silence, communicating only in written warnings.
+2.  **The Time-Lost Curator** – An ancient Ourosan trapped in a temporal loop, endlessly organizing the same non-existent archives.
+3.  **Hollow-Eyed Seraph** – A clockwork automaton whose internal ticking is the only sound it makes; a terrifyingly silent guardian.
+
+#### 🗿 Statues & Landmarks
+1.  **The Petrified Arbiter** – A massive statue of a long-dead judge in The Grand Promenade, perfectly preserved in a state of eternal judgment.
+2.  **The Frozen Oracle** – A statue near The Chronomancer's Spire, its eyes seemingly following explorers, hinting at unseen watchers.
+3.  **The Silent Monument** – A towering obelisk dedicated to the city's founders, its inscriptions perfectly legible but the meaning lost to time.
