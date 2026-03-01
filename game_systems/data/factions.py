@@ -169,32 +169,32 @@ FACTIONS = {
         "emoji": "⚕️",
         "description": "A pragmatic order of alchemists and doctors who believe the only way to survive the Veil is to adapt to it. They operate the city's quarantine zones.",
         "ranks": {
-            1: {"title": "Scavenger", "reputation_needed": 0, "reward": None},
+            1: {"title": "Gleaner", "reputation_needed": 0, "reward": None},
             2: {
-                "title": "Mixologist",
+                "title": "Brewer",
                 "reputation_needed": 500,
-                "reward": {"type": "item", "key": "bitter_panacea", "amount": 3},
+                "reward": {"type": "item", "key": "phial_of_vitriol", "amount": 2},
             },
             3: {
                 "title": "Apothecary",
                 "reputation_needed": 1500,
-                "reward": {"type": "item", "key": "phial_of_vitriol", "amount": 3},
+                "reward": {"type": "item", "key": "bitter_panacea", "amount": 3},
             },
             4: {
-                "title": "Chirurgeon",
+                "title": "Catalyst",
                 "reputation_needed": 3000,
                 "reward": {"type": "buff", "key": "gathering_boost", "value": 0.1},
             },
             5: {
-                "title": "Transmuter",
+                "title": "Synthesist",
                 "reputation_needed": 5000,
-                "reward": {"type": "title", "value": "Transmuter"},
+                "reward": {"type": "title", "value": "Warden of Ash"},
             },
         },
         "interests": {
             "gathering": 1.5,
-            "crafting": 1.5,
-            "monster_types": ["Plant", "Slime"],
+            "crafting": 1.2,
+            "monster_types": ["Beast", "Plant", "Slime"],
         },
         "favored_locations": [
             "whispering_thicket",

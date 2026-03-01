@@ -118,7 +118,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Subtask 5.2b:** `AdventureEvents.regeneration`
     - **Subtask 5.2c:** `AdventureSession.simulate_step`
     - **Due:** 2026-03-10
-- [ ] **Task 5.3:** Update Grey Ward Faction (Issue #17).
+- [x] **Task 5.3:** Update Grey Ward Faction (Issue #17).
     - **Agent:** @GameForge
     - **Details:** Update `factions.py` to match Namewright's design.
     - **Due:** 2026-03-08
