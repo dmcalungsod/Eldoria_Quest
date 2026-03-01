@@ -22,3 +22,7 @@
 ## 2024-05-26 - [Pre-parsing JSON in Database Layer]
 **Learning:** `CombatHandler` was parsing `buff_data` (JSON string) for every skill on every combat turn because MongoDB stores it as a string. This deserialization overhead accumulated in loops.
 **Action:** Implemented caching in `DatabaseManager` (`_skill_cache`) that parses `buff_data` once on load. Exposed pre-parsed dicts to consumers, removing redundant parsing logic from the hot path.
+
+## 2026-03-01 - [Auto-Adventure Scheduler N+1 Query Fix]
+**Learning:** `AdventureResolutionEngine.resolve_sessions_batch` fetched combat context bundles inside a loop calling `get_combat_context_bundle` for each `discord_id`, resulting in an N+1 query problem that slowed down the auto-adventure scheduler.
+**Action:** Introduced `get_combat_context_bundles_batch` using MongoDB's `$in` operator to fetch all context bundles in a single query. `resolve_sessions_batch` now parses and maps these bundles, passing them efficiently into `resolve_session`.
