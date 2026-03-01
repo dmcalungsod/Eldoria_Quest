@@ -453,7 +453,7 @@ class OnboardingCog(commands.Cog):
                 color=discord.Color.gold(),
             )
             view = StartMenuView(self.db, interaction.user)
-            await interaction.response.send_message(embed=embed, view=view)
+            await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 
 async def setup(bot: commands.Bot):
