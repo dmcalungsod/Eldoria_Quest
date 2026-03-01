@@ -7,3 +7,8 @@
 
 **Learning:** Migrating procedural Python monster generation to static JSON improves maintainability but requires careful hydration of related objects (skills) and conversion of types (lists to tuples for drops) to maintain backward compatibility.
 **Action:** Use intermediate scripts to extract complex data structures from Python code into JSON, and ensure the loading layer handles type reconstruction to keep the external API consistent.
+
+## 2026-03-01 — Centralizing Factions Data
+
+**Learning:** Static data like `FACTIONS` was previously hardcoded in `game_systems/data/factions.py` without schema validation, increasing the risk of inconsistent data entry for future updates.
+**Action:** Extracted faction data to `game_systems/data/factions.json` and implemented a `FACTION_SCHEMA` in `schemas.py`. Python files should act as loaders and validators, keeping data decoupled from logic. Ensure `ranks` keys are cast back to integers during load for backward compatibility.
