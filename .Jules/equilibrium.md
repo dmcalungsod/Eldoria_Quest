@@ -66,7 +66,7 @@
 - Restores value to the Defense stat during night cycles.
 - Maintains the "danger" of night travel (50% mitigation penalty) without being unfair to high-level players.
 
-## 2026-03-08 — Formula Review & Exploit Check
+## 2026-03-01 — Formula Review & Exploit Check
 
 **Learning:** When reviewing current gameplay formulas against Foreman's task list, no critical exploits or mathematical imbalances were detected in the auto-adventure systems or classes.
 **The Observation:**
