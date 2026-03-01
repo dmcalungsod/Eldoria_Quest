@@ -558,6 +558,10 @@ class AdventureSession:
             if self.location_id == "frostfall_expanse" and context.get("active_boosts"):
                 threat_reduction = float(context["active_boosts"].get("frostfall_threat_reduction", 1.0))
 
+            # EVENT HOOK: Check for Wailing Chasm Threat Reduction
+            if self.location_id == "the_wailing_chasm" and context.get("active_boosts"):
+                threat_reduction = float(context["active_boosts"].get("wailing_chasm_threat_reduction", 1.0))
+
             # --- Weather & Time System Check ---
             if weather is None:
                 weather = WorldTime.get_current_weather(self.location_id)
