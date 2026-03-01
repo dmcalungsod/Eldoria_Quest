@@ -620,6 +620,58 @@ class AdventureEvents:
     }
 
     @classmethod
+    def _get_base_regeneration_logs(cls, location_id: str | None, class_name: str, hp_percent: float) -> list:
+        # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
+        if hp_percent < 0.30 and random.random() < 0.50:
+            return [random.choice(cls.REGEN_LOW_HP)]
+
+        # 2. High HP (> 80%): 30% chance for confident flavor
+        if hp_percent > 0.80 and random.random() < 0.30:
+            return [random.choice(cls.REGEN_HIGH_HP)]
+
+        # 3. Class-Specific Flavor: 30% chance
+        if class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:
+            return [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]
+
+        # 4. Location-Specific or Generic Fallback
+        phrases = cls._LOCATION_REGEN_PHRASES.get(location_id, cls.REGEN_PHRASES)
+        return [random.choice(phrases)]
+
+    @classmethod
+    def _get_atmospheric_prepend(
+        cls,
+        location_id: str | None,
+        time_phase: TimePhase,
+        weather: Weather,
+        season: Season | None,
+        event_type: str | None,
+    ) -> str | None:
+        # 40% chance to add an atmospheric intro line
+        if random.random() >= 0.40:
+            return None
+
+        atmosphere_pool = cls._LOCATION_ATMOSPHERE.get(location_id, cls.ATMOSPHERE_FOREST)
+
+        # Event Override (High Priority)
+        if event_type in cls._EVENT_ATMOSPHERE:
+            atmosphere_pool = cls._EVENT_ATMOSPHERE[event_type]
+
+        # Time Phase Override (30% chance)
+        elif time_phase in cls._TIME_PHASE_ATMOSPHERE and random.random() < 0.3:
+            atmosphere_pool = cls._TIME_PHASE_ATMOSPHERE[time_phase]
+
+        # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
+        weather_chance = 0.5 if weather in (Weather.STORM, Weather.ASH) else 0.3
+        if weather in cls.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+            atmosphere_pool = cls.ATMOSPHERE_WEATHER[weather]
+
+        # Seasonal Override (25% chance)
+        elif season in cls._SEASONAL_ATMOSPHERE and random.random() < 0.25:
+            atmosphere_pool = cls._SEASONAL_ATMOSPHERE[season]
+
+        return random.choice(atmosphere_pool)
+
+    @classmethod
     def regeneration(
         cls,
         location_id: str | None = None,
@@ -630,50 +682,10 @@ class AdventureEvents:
         season: Season | None = None,
         event_type: str | None = None,
     ) -> list:
-        # Define the base message list
-        base_logs = []
+        base_logs = cls._get_base_regeneration_logs(location_id, class_name, hp_percent)
 
-        # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
-        if hp_percent < 0.30 and random.random() < 0.50:
-            base_logs = [random.choice(cls.REGEN_LOW_HP)]
-
-        # 2. High HP (> 80%): 30% chance for confident flavor
-        elif hp_percent > 0.80 and random.random() < 0.30:
-            base_logs = [random.choice(cls.REGEN_HIGH_HP)]
-
-        # 3. Class-Specific Flavor: 30% chance
-        elif class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:
-            base_logs = [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]
-
-        # 4. Location-Specific or Generic Fallback
-        else:
-            phrases = cls._LOCATION_REGEN_PHRASES.get(location_id, cls.REGEN_PHRASES)
-            base_logs = [random.choice(phrases)]
-
-        # --- ATMOSPHERIC PREPEND ---
-        # 40% chance to add an atmospheric intro line
-        if random.random() < 0.40:
-            atmosphere_pool = cls._LOCATION_ATMOSPHERE.get(location_id, cls.ATMOSPHERE_FOREST)
-
-            # Event Override (High Priority)
-            if event_type in cls._EVENT_ATMOSPHERE:
-                atmosphere_pool = cls._EVENT_ATMOSPHERE[event_type]
-
-            # Time Phase Override (30% chance)
-            elif time_phase in cls._TIME_PHASE_ATMOSPHERE and random.random() < 0.3:
-                atmosphere_pool = cls._TIME_PHASE_ATMOSPHERE[time_phase]
-
-            # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
-            weather_chance = 0.5 if weather in (Weather.STORM, Weather.ASH) else 0.3
-            if weather in cls.ATMOSPHERE_WEATHER and random.random() < weather_chance:
-                atmosphere_pool = cls.ATMOSPHERE_WEATHER[weather]
-
-            # Seasonal Override (25% chance)
-            elif season in cls._SEASONAL_ATMOSPHERE and random.random() < 0.25:
-                atmosphere_pool = cls._SEASONAL_ATMOSPHERE[season]
-
-            # Select and prepend
-            atmospheric_line = random.choice(atmosphere_pool)
+        atmospheric_line = cls._get_atmospheric_prepend(location_id, time_phase, weather, season, event_type)
+        if atmospheric_line:
             base_logs.insert(0, atmospheric_line)
 
         return base_logs
