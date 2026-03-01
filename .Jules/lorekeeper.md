@@ -42,3 +42,15 @@ Reviewed `.Jules/region_the_wailing_chasm.md` and noticed a reference to a "Dwar
 
 **Next Steps:**
 - Ensure the Codex entry for The Wailing Chasm adheres to this revised lore.
+
+## 2026-03-08 — Integrating The Silent City of Ouros
+
+**Learning:**
+Reviewed `.Jules/region_silent_city_ouros.md` and confirmed that the narrative design created by @Realmwright fits beautifully within the world's lore. The concept of an ancient city preserved by temporal anomalies caused by The Sundering aligns with the established canon of reality-bending effects near the Void.
+
+**Action:**
+1. Added **The Silent City of Ouros (Rank S)** to `.Jules/lore_canon.md`, detailing its perfectly preserved, silent stasis.
+
+**Next Steps:**
+- Monitor the addition of new monsters for this region (Temporal Wraith, Hollowed Sentinel) to ensure their descriptions align with the temporal stasis lore.
+- Ensure any quests written for this area respect the absolute silence mechanic narrative.
