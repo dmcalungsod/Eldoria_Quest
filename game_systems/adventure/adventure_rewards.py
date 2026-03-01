@@ -173,6 +173,11 @@ class AdventureRewards:
             frostfall_bonus = combat_result.get("active_boosts", {}).get("frostfall_loot_bonus", 1.0)
             loot_boost *= float(frostfall_bonus)
 
+        # EVENT HOOK: Wailing Chasm Loot Bonus
+        if location_id == "the_wailing_chasm":
+            wailing_chasm_bonus = combat_result.get("active_boosts", {}).get("wailing_chasm_loot_bonus", 1.0)
+            loot_boost *= float(wailing_chasm_bonus)
+
         # Check for World Event: Elemental Surge or Spectral Tide
         try:
             active_event = self.db.get_active_world_event()

@@ -25,6 +25,7 @@ class WorldEventSystem:
     MYSTIC_MERCHANT = "mystic_merchant"
     FROSTFALL_EXPEDITION = "frostfall_expedition"
     SPECTRAL_TIDE = "spectral_tide"
+    ECHOES_OF_THE_DEEP = "echoes_of_the_deep"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -99,6 +100,16 @@ class WorldEventSystem:
                 "loot_boost": 1.1,
                 "spectral_ambush_chance": 0.15,  # +15% ambush chance at night
                 "night_danger_mod": 0.10,  # +10% combat chance at night
+            },
+        },
+        ECHOES_OF_THE_DEEP: {
+            "name": "Echoes of the Deep",
+            "description": "The Wailing Chasm reverberates with ancient, lost power. Explorers report increased resilience and greater treasures in its depths.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.1,
+                "wailing_chasm_threat_reduction": 0.9,  # 10% reduction in damage taken in Wailing Chasm
+                "wailing_chasm_loot_bonus": 1.5,  # 50% more loot from Wailing Chasm
             },
         },
     }
