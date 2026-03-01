@@ -173,6 +173,12 @@
         "rarity": "Epic",
         "value": 800
     },
+    "abyssal_ore": {
+        "name": "Abyssal Ore",
+        "description": "A dense, light-absorbing ore found in the deepest chasms.",
+        "rarity": "Epic",
+        "value": 1500
+    },
     "shadow_essence": {
         "name": "Shadow Essence",
         "description": "A vial of swirling darkness gathered from spirits.",
