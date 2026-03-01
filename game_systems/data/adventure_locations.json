@@ -789,19 +789,23 @@
         "gatherables": [
             [
                 "fulgurite_shard",
-                40
-            ],
-            [
-                "storm_essence",
                 30
             ],
             [
+                "storm_essence",
+                25
+            ],
+            [
                 "magic_stone_large",
-                10
+                20
             ],
             [
                 "mithril_ore",
-                20
+                15
+            ],
+            [
+                "charged_core",
+                10
             ]
         ],
         "special_events": [
@@ -1047,7 +1051,7 @@
     "celestial_archipelago": {
         "name": "The Celestial Archipelago",
         "emoji": "☁️",
-        "min_rank": "B",
+        "min_rank": "A",
         "level_req": 28,
         "duration_options": [
             60,
@@ -1175,11 +1179,11 @@
         "gatherables": [
             [
                 "prism_shard",
-                40
+                30
             ],
             [
                 "concentrated_light",
-                30
+                39
             ],
             [
                 "magic_stone_flawless",
@@ -1188,6 +1192,10 @@
             [
                 "mithril_ore",
                 10
+            ],
+            [
+                "glass_heart",
+                1
             ]
         ],
         "special_events": [

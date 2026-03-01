@@ -2645,11 +2645,11 @@
         "drops": [
             [
                 "fulgurite_shard",
-                50
+                60
             ],
             [
                 "magic_stone_medium",
-                40
+                50
             ]
         ],
         "skills": [
@@ -2670,11 +2670,11 @@
         "drops": [
             [
                 "iron_ingot",
-                50
+                60
             ],
             [
                 "magic_stone_medium",
-                40
+                50
             ]
         ],
         "skills": [
@@ -2695,11 +2695,11 @@
         "drops": [
             [
                 "storm_essence",
-                30
+                40
             ],
             [
                 "magic_stone_medium",
-                40
+                50
             ]
         ],
         "skills": [
@@ -2724,11 +2724,15 @@
             ],
             [
                 "storm_essence",
-                40
+                60
             ],
             [
                 "magic_stone_large",
-                20
+                35
+            ],
+            [
+                "tempest_heart",
+                2
             ]
         ],
         "skills": [
@@ -2754,11 +2758,11 @@
             ],
             [
                 "storm_essence",
-                80
+                100
             ],
             [
                 "magic_stone_flawless",
-                50
+                75
             ],
             [
                 "steel_ingot",
@@ -2785,11 +2789,11 @@
         "drops": [
             [
                 "prism_shard",
-                60
+                70
             ],
             [
                 "magic_stone_large",
-                40
+                50
             ]
         ],
         "skills": [
@@ -2810,11 +2814,11 @@
         "drops": [
             [
                 "prism_shard",
-                70
+                80
             ],
             [
                 "obsidian_shard",
-                30
+                40
             ]
         ],
         "skills": [
@@ -2835,11 +2839,11 @@
         "drops": [
             [
                 "magic_stone_large",
-                50
+                60
             ],
             [
                 "concentrated_light",
-                30
+                40
             ]
         ],
         "skills": [
@@ -2859,12 +2863,12 @@
         "xp": 3600,
         "drops": [
             [
-                "magic_stone_medium",
-                60
+                "magic_stone_large",
+                40
             ],
             [
                 "concentrated_light",
-                20
+                35
             ]
         ],
         "skills": [
@@ -2889,7 +2893,7 @@
             ],
             [
                 "magic_stone_flawless",
-                80
+                100
             ],
             [
                 "prism_shard",

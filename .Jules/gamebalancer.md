@@ -23,3 +23,12 @@
 1.  **Clockwork Halls (Rank B):** Added `steam_core` (10%) and `clockwork_heart` (1%) to gatherables. Increased `magic_stone_medium` gatherable chance to 35% and `magic_stone_large` to 10%. Buffed Cogwork Spider and Automaton Knight drops.
 2.  **The Void Sanctum (Rank S):** Added `void_heart` (2%) and `null_stone` (10%) to gatherables. Increased `magic_stone_flawless` gatherable chance to 30%. Buffed Void Stalker and Entropy Drake drops.
 **Result:** These changes should make end-game farming more viable and less reliant on boss spawns for key crafting materials.
+
+## 2026-03-08 — Buffing High-Tier Adventure Zones & Rank Logic Conflict
+
+**Learning:** "Thunder-Crag Coast" and "Shimmering Wastes" (Rank A) lacked end-game material viability. Gatherables did not provide top-tier items consistently, and monster drop rates were too low to justify the danger relative to easier zones. Furthermore, a logical inconsistency existed between "Frostfall Expanse" (Level 25) and "Celestial Archipelago" (Level 28) both being Rank B, disrupting the intended difficulty-to-rank scaling up to Rank A (Level 30+).
+
+**Action:**
+1.  **Thunder-Crag Coast (Rank A):** Added `charged_core` (10%) to gatherables. Increased `magic_stone_large` chance to 20% by reducing lower tier items. Buffed drop amounts/chances across all native monsters and added `tempest_heart` to the elite Siren Matriarch drops.
+2.  **Shimmering Wastes (Rank A):** Added `glass_heart` (1%) and buffed `concentrated_light` and `magic_stone_flawless` gatherable chances. Improved specific drop rates for all native monsters.
+3.  **Celestial Archipelago:** Promoted from Rank B to Rank A to resolve the Level 28 vs Rank A/B inconsistency, realigning the late-game rank transition.

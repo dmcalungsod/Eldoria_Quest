@@ -54,13 +54,13 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
     - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops). **[x] Completed**
     - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives). **[ ] In Progress**
-    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Underperforming rewards). **[ ] Assigned**
+    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Underperforming rewards). **[x] Completed**
     - **Due:** 2026-03-08
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
     - **Details:** Modify `AdventureSession` to increase monster damage scaling for long durations.
     - **Status:** **Completed** (Verified `_calculate_fatigue_multiplier` in `adventure_session.py`).
-- [ ] **Task 2.4:** Resolve Rank Logic Conflict (Frostfall vs Archipelago).
+- [x] **Task 2.4:** Resolve Rank Logic Conflict (Frostfall vs Archipelago).
     - **Agent:** @GameBalancer / @GameForge
     - **Details:** Resolve Level 25/28 vs Rank A/B inconsistency.
     - **Due:** 2026-03-08
