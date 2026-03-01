@@ -32,6 +32,7 @@ import test_crafting_ui  # New Crafting UI tests
 import test_developer_cog
 import test_dos_prevention  # New DoS prevention tests
 import test_event_cog
+import test_echoes_of_the_deep_event
 import test_exploration_view_ux  # New UX test
 import test_faction_system  # New Faction System tests
 import test_game_systems
@@ -206,6 +207,7 @@ def run_cog_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_developer_cog)
     suite.addTests(loader.loadTestsFromModule(test_event_cog))
+    suite.addTests(loader.loadTestsFromModule(test_echoes_of_the_deep_event))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
