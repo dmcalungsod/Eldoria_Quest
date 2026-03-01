@@ -25,6 +25,7 @@ class TestWarriorExpansion:
         player.add_exp = MagicMock()
         # Default stun state
         player.is_stunned = False
+        player.is_silenced = False
 
         # Mock Monster
         monster = {
