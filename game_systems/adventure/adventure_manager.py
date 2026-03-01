@@ -44,12 +44,16 @@ class AdventureManager:
     ) -> bool:
         # --- SECURITY FIX: Input Validation ---
         if location_id not in LOCATIONS:
-            logger.warning(f"Invalid location_id attempted: {location_id} by {discord_id}")
+            logger.warning(
+                f"Invalid location_id attempted: {location_id} by {discord_id}"
+            )
             return False
 
         # Max duration: 1 year (approx 525,600 minutes) to prevent overflow
         if duration_minutes != -1 and not (0 < duration_minutes <= 525600):
-            logger.warning(f"Invalid adventure duration: {duration_minutes} by {discord_id}")
+            logger.warning(
+                f"Invalid adventure duration: {duration_minutes} by {discord_id}"
+            )
             return False
 
         # Verify and Deduct Supplies
@@ -74,7 +78,9 @@ class AdventureManager:
             for item_key, count in supplies.items():
                 total = item_totals.get(item_key, 0)
                 if total < count:
-                    logger.warning(f"User {discord_id} lacks supply {item_key} (Has {total}, Needs {count})")
+                    logger.warning(
+                        f"User {discord_id} lacks supply {item_key} (Has {total}, Needs {count})"
+                    )
                     return False
 
             # 2. Deduction Phase with Rollback
@@ -85,7 +91,9 @@ class AdventureManager:
                 if self.db.remove_inventory_item(discord_id, item_key, count):
                     deducted_items.append((item_key, count))
                 else:
-                    logger.error(f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)")
+                    logger.error(
+                        f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)"
+                    )
                     rollback_needed = True
                     break
 
@@ -159,7 +167,9 @@ class AdventureManager:
                 "active_monster": None,
             }
 
-        session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, session_row)
+        session = AdventureSession(
+            self.db, self.quest_system, self.inventory_manager, discord_id, session_row
+        )
 
         result = session.simulate_step(context_bundle=bundle, action=action)
 
@@ -181,33 +191,49 @@ class AdventureManager:
             session.loot.pop("exp", None)
             session.loot.pop("aurum", None)
 
-            # 2. Aurum Penalty (10%)
+            # 2. Aurum Penalty (5%)
             current_aurum = self.db.get_player_field(discord_id, "aurum") or 0
-            aurum_loss = int(current_aurum * 0.10)
+            aurum_loss = int(current_aurum * 0.05)
             if aurum_loss > 0:
                 self.db.deduct_aurum(discord_id, aurum_loss)
                 loss_report.append(f"• -{aurum_loss} {AURUM} (Lost)")
 
-            # 3. Material Penalty (50% of gathered loot)
+            # 3. Material Penalty (100% of gathered loot)
             material_losses = []
             keys_to_remove = []
 
             for item_key, count in session.loot.items():
-                kept_amount = int(count * 0.5)
-                lost_amount = count - kept_amount
+                lost_amount = count
 
                 if lost_amount > 0:
                     mat = MATERIALS.get(item_key)
                     name = mat["name"] if mat else item_key
                     material_losses.append(f"• -{lost_amount}x {name}")
 
-                if kept_amount > 0:
-                    session.loot[item_key] = kept_amount
-                else:
-                    keys_to_remove.append(item_key)
+                keys_to_remove.append(item_key)
 
             for k in keys_to_remove:
                 del session.loot[k]
+
+            # 4. Supply Penalty (All allocated supplies lost)
+            supply_losses = []
+            keys_to_remove_supplies = []
+
+            for item_key, count in session.supplies.items():
+                lost_amount = count
+
+                if lost_amount > 0:
+                    con = CONSUMABLES.get(item_key)
+                    name = con["name"] if con else item_key
+                    supply_losses.append(f"• -{lost_amount}x {name} (Abandoned)")
+
+                keys_to_remove_supplies.append(item_key)
+
+            for k in keys_to_remove_supplies:
+                del session.supplies[k]
+
+            if supply_losses:
+                loss_report.extend(supply_losses)
 
             if material_losses:
                 loss_report.extend(material_losses)
@@ -231,7 +257,9 @@ class AdventureManager:
 
             if failed_items:
                 failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
-                loss_report.append(f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}")
+                loss_report.append(
+                    f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}"
+                )
 
             self.db.end_adventure_session(discord_id)
 
@@ -267,7 +295,9 @@ class AdventureManager:
             if not row:
                 return None
 
-            session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
+            session = AdventureSession(
+                self.db, self.quest_system, self.inventory_manager, discord_id, row
+            )
 
             # --- EXPLOIT FIX: Retreating while in Combat ---
             # If the player manually ends the adventure (Retreat) while an active monster is present,
@@ -320,13 +350,15 @@ class AdventureManager:
                 if count > 0:
                     c_data = CONSUMABLES.get(item_key)
                     if c_data:
-                        items_to_add.append({
-                            "key": item_key,
-                            "name": c_data["name"],
-                            "type": c_data["type"],
-                            "rarity": c_data.get("rarity", "Common"),
-                            "amount": count,
-                        })
+                        items_to_add.append(
+                            {
+                                "key": item_key,
+                                "name": c_data["name"],
+                                "type": c_data["type"],
+                                "rarity": c_data.get("rarity", "Common"),
+                                "amount": count,
+                            }
+                        )
                         refund_logs.append(f"🎒 Refunded: {count}x {c_data['name']}")
 
             # Capture state after rewards
@@ -377,12 +409,16 @@ class AdventureManager:
             # --- EXPLORATION ACHIEVEMENTS ---
             try:
                 # 1. Update Stats
-                self.db.update_exploration_stats(discord_id, row.get("location_id", "unknown"), duration_min)
+                self.db.update_exploration_stats(
+                    discord_id, row.get("location_id", "unknown"), duration_min
+                )
 
                 # 2. Check Achievements
                 ach_system = AchievementSystem(self.db)
                 new_title_msg = ach_system.check_exploration_achievements(discord_id)
-                new_duration_msg = ach_system.check_duration_achievements(discord_id, duration_min)
+                new_duration_msg = ach_system.check_duration_achievements(
+                    discord_id, duration_min
+                )
 
                 msgs = []
                 if new_title_msg:
@@ -499,7 +535,9 @@ class AdventureManager:
                     "end_time": end.isoformat(),
                     "duration_minutes": -1,
                     "active": 1,
-                    "logs": json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
+                    "logs": json.dumps(
+                        [f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]
+                    ),
                     "loot_collected": "{}",
                     "active_monster_json": json.dumps(active_monster),
                     "version": 1,
