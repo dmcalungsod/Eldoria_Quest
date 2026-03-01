@@ -138,3 +138,23 @@ Detailed Design Document: `.Jules/architect_designs/expansion_survival_logistics
 - **Outcome:** Designed the Elementalist (DPS/AoE) and Arcanist (Utility/Control) paths.
 - **Key Insight:** Balancing MP cost and AoE is crucial for mages, introduced a passive (Mana Syphon) to help sustain high MP costs in long fights.
 - **Artifact:** `.Jules/architect_designs/skill_tree_mage.md`
+
+## 2026-03-01 — Class Expansion: Cleric Skill Tree
+
+**Design Choice:**
+Skill Tree Expansion for the Cleric Class.
+
+**Reasoning:**
+- **Depth:** Like the Warrior, the Cleric needs branching paths for varied playstyles. The current "just a healer" identity is too basic.
+- **Identity:** Establishes the "Zealot" (DPS/Debuffer) and "Penitent" (Healer/Support) archetypes, offering an aggressive holy caster playstyle and a dedicated self-sacrificing healer playstyle.
+
+**Theme Alignment:**
+- "Grim Survival": The Light is described not as gentle, but as a "searing flame." Penitent healing is themed around self-sacrifice, tying into the broader game philosophy.
+
+**Integration Notes:**
+- **CombatEngine:** Requires new mechanics: `conditional_multiplier` (for healing based on low HP), `regen_percent` (heal over time), `cure_status: ["all"]`, and `invulnerable` status.
+- **GameForge:** Needs 5 new skills added to `skills_data.py`.
+- **ChronicleKeeper:** Titles for mastering paths and a new achievement encourage replayability and thematic engagement.
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/skill_tree_cleric.md`
