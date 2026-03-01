@@ -1,0 +1,15 @@
+{
+    "monsters": {
+        "monster_001": {
+            "lore_extended": "Goblins are ubiquitous pests found in almost every corner of Eldoria. Scavengers by nature, they travel in packs and attack the weak.",
+            "unlock_thresholds": {
+                "basic": 1,
+                "stats": 10,
+                "lore": 50
+            }
+        }
+    },
+    "items": {},
+    "locations": {},
+    "factions": {}
+}
