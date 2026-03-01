@@ -136,7 +136,7 @@ class EventCog(commands.Cog):
         if modifiers:
             embed.add_field(name="Global Effects", value="\n".join(modifiers), inline=False)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # ==================================================================
     # ADMIN COMMANDS

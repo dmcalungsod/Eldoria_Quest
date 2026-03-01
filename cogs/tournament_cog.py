@@ -124,7 +124,7 @@ class TournamentCog(commands.Cog):
         embed.add_field(name="Your Score", value=f"{score} pts", inline=True)
 
         embed.set_footer(text="Use /tournament_leaderboard to see top players.")
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(
         name="tournament_leaderboard",
@@ -158,7 +158,7 @@ class TournamentCog(commands.Cog):
                 lines.append(f"{rank_emoji} **{name}**: {score} pts")
             embed.description = "\n".join(lines)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # ==================================================================
     # ADMIN COMMANDS
