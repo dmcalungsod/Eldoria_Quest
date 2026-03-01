@@ -1,5 +1,22 @@
 # 📓 Chronicler Journal
 
+## 2026-03-01: Martius Update
+**Status:** 🚀 Dispatched
+
+### Summary
+The **Martius 2026** update focuses on the launch of the **Auto-Adventure Overhaul**, **Frostfall Expanse** opening, **The Wailing Chasm**, **The Blind Choir's Requiem** questline, and various balance decrees.
+
+### Key Highlights (In-World Translation)
+- **Auto-Adventure Expeditions Now Available:** The Chronomancer's Guild has perfected temporal dilation.
+- **The Wailing Chasm & Frostfall Expanse Open:** New subterranean abyss and eternal ice open for exploration.
+- **New Questline: The Blind Choir's Requiem:** A cult of void-corrupted Delvers to investigate.
+- **The Mystic Merchant in the Shadows:** Dynamic appearance during the night.
+- **Guild Council Decrees & Balance Adjustments:** Bounties improved in Shrouded Fen, Thunder-Crag Coast, Shimmering Wastes. Feral Stag culling in Deepgrove Roots.
+- **On the Horizon:** Alchemist class training, advanced mastery for Warriors/Rogues, Codex System.
+
+### Learnings
+- **Webhook Authentication:** When sending Discord webhooks, setting the `User-Agent` header is often necessary to avoid 403 Forbidden errors. The `requests` module does this automatically, but `urllib.request` does not. Setting it to a generic value like `ChroniclerAgent/1.0` works.
+
 ## 2026-02-25: Februarius Update
 **Status:** 🚀 Dispatched
 
