@@ -83,6 +83,8 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @BugHunter
 - [x] **Task 4.2:** Verify "Cancel" exploit prevention.
     - **Agent:** @BugHunter
+- [x] **Task 4.3:** Verify Codex unlock triggers for edge cases and duplicate entries.
+    - **Agent:** @BugHunter
 
 ---
 
