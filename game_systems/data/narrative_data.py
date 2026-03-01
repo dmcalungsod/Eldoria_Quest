@@ -96,6 +96,12 @@ MISSION_FLAVOR_TEXT = {
         "Sand that sparkles like diamonds falls from your gear. You have walked the mirror lands and returned.",
         "The disorientation passes as you see the city gates. The Wastes are beautiful, but deadly.",
     ],
+    "silent_city_ouros": [
+        "The oppressive perfection of the silent streets fades behind you. Your own footsteps finally make a sound again.",
+        "You wipe unnervingly clean dust from your armor. The preserved city slumbers on, undisturbed by your passing.",
+        "The air grows warm and chaotic once more. You have escaped the cold, beautiful stasis of Ouros.",
+        "You glance back, half-expecting the statues to follow. They don't. The city remains a perfectly frozen nightmare.",
+    ],
     "wailing_chasm": [
         "The crushing silence of the abyss recedes, replaced by the chaotic, comforting sounds of the surface.",
         "You blink against the sunlight, your ears still ringing from the phantom echoes of Kaza-Kor.",

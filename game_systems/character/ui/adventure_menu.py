@@ -62,7 +62,34 @@ class AdventureView(View):
         btn_back.callback = back_to_profile_callback
         self.add_item(btn_back)
 
+        # Tutorial Button
+        btn_tutorial = Button(
+            label="How Expeditions Work",
+            style=discord.ButtonStyle.secondary,
+            custom_id="tutorial_adv",
+            emoji="❓",
+            row=2,
+        )
+        btn_tutorial.callback = self.tutorial_callback
+        self.add_item(btn_tutorial)
+
     # ------------------------------------------------------------
+
+    async def tutorial_callback(self, interaction: discord.Interaction):
+        embed = discord.Embed(
+            title="🧭 Expedition Guide",
+            description=(
+                "**Time-Based Exploration**\n"
+                "Expeditions in Eldoria are unforgiving. You select a destination and duration, then wait while your character explores the wilds automatically.\n\n"
+                "**Supplies**\n"
+                "Pack Hardtack to reduce fatigue over long journeys, and Pitch Torches to avoid deadly night ambushes.\n\n"
+                "**Hazards & Retreat**\n"
+                "If your HP drops below 30%, you will automatically retreat, though you may lose gathered loot. "
+                "You can also check your status and retreat manually at any time to secure your findings."
+            ),
+            color=discord.Color.blue()
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """

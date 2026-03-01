@@ -105,6 +105,38 @@ class TestSkillAchievements(unittest.TestCase):
         self.assertIn("Scholar", msg)
         self.assertIn("Expert", msg)
 
+    def test_rogue_class_achievements_assassin(self):
+        """Test awarding 'Assassin' title for learning all Assassin skills."""
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": "double_strike", "skill_level": 1},
+            {"skill_key": "toxic_blade", "skill_level": 1},
+            {"skill_key": "venomous_strike", "skill_level": 1},
+            {"skill_key": "death_blossom", "skill_level": 1},
+        ]
+        self.mock_db.add_title.side_effect = lambda uid, title: True
+
+        msg = self.ach_system.check_skill_achievements(123)
+
+        self.assertIsNotNone(msg)
+        self.assertIn("Assassin", msg)
+        self.mock_db.add_title.assert_any_call(123, "Assassin")
+
+    def test_rogue_class_achievements_phantom(self):
+        """Test awarding 'Phantom' title for learning all Phantom skills."""
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": "stealth", "skill_level": 1},
+            {"skill_key": "shadow_step", "skill_level": 1},
+            {"skill_key": "flash_powder", "skill_level": 1},
+            {"skill_key": "extra_skill", "skill_level": 1},
+        ]
+        self.mock_db.add_title.side_effect = lambda uid, title: True
+
+        msg = self.ach_system.check_skill_achievements(123)
+
+        self.assertIsNotNone(msg)
+        self.assertIn("Phantom", msg)
+        self.mock_db.add_title.assert_any_call(123, "Phantom")
+
 
 if __name__ == "__main__":
     unittest.main()
