@@ -37,8 +37,8 @@ def test_monsters_balance():
     spider = MONSTERS.get("monster_126")
     assert spider, "Cogwork Spider not found"
     drops = dict(spider["drops"])
-    assert drops.get("magic_stone_medium") == 25, (
-        f"Cogwork Spider magic_stone_medium expected 25, got {drops.get('magic_stone_medium')}"
+    assert drops.get("magic_stone_large") == 20, (
+        f"Cogwork Spider magic_stone_large expected 20, got {drops.get('magic_stone_large')}"
     )
 
     # Void Stalker (monster_116)
@@ -57,10 +57,10 @@ def test_locations_balance():
     fen = LOCATIONS.get("shrouded_fen")
     assert fen, "Shrouded Fen not found"
     gather = dict(fen["gatherables"])
-    assert gather.get("magic_stone_medium") == 30, (
-        f"Shrouded Fen magic_stone_medium expected 30, got {gather.get('magic_stone_medium')}"
+    assert gather.get("magic_stone_medium") == 50, (
+        f"Shrouded Fen magic_stone_medium expected 50, got {gather.get('magic_stone_medium')}"
     )
-    assert gather.get("ancient_wood") == 35, f"Shrouded Fen ancient_wood expected 35, got {gather.get('ancient_wood')}"
+    assert gather.get("ancient_wood") == 40, f"Shrouded Fen ancient_wood expected 40, got {gather.get('ancient_wood')}"
 
     # Clockwork Halls
     halls = LOCATIONS.get("clockwork_halls")
@@ -69,8 +69,8 @@ def test_locations_balance():
     assert gather.get("magic_stone_medium") == 35, (
         f"Clockwork Halls magic_stone_medium expected 35, got {gather.get('magic_stone_medium')}"
     )
-    assert gather.get("magic_stone_large") == 10, (
-        f"Clockwork Halls magic_stone_large expected 10, got {gather.get('magic_stone_large')}"
+    assert gather.get("magic_stone_large") == 30, (
+        f"Clockwork Halls magic_stone_large expected 30, got {gather.get('magic_stone_large')}"
     )
 
     # Void Sanctum

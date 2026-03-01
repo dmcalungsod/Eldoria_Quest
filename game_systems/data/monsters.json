@@ -662,8 +662,12 @@
         "xp": 420,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                40
+            ],
+            [
+                "shadow_essence",
+                15
             ]
         ],
         "skills": [
@@ -682,8 +686,12 @@
         "xp": 420,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "medicinal_herb",
+                50
+            ],
+            [
+                "magic_stone_medium",
+                20
             ]
         ],
         "skills": [
@@ -727,8 +735,12 @@
         "xp": 450,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                30
+            ],
+            [
+                "storm_essence",
+                10
             ]
         ],
         "skills": [
@@ -775,8 +787,12 @@
         "xp": 510,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_medium",
+                30
+            ],
+            [
+                "ancient_wood",
+                30
             ]
         ],
         "skills": [
@@ -2108,15 +2124,19 @@
         "drops": [
             [
                 "brass_gear",
-                60
+                100
             ],
             [
                 "spring_coil",
-                40
+                60
             ],
             [
-                "magic_stone_medium",
-                25
+                "magic_stone_large",
+                20
+            ],
+            [
+                "steam_core",
+                10
             ]
         ],
         "skills": [
@@ -2137,11 +2157,15 @@
         "drops": [
             [
                 "brass_gear",
-                60
+                100
             ],
             [
                 "copper_wire",
-                40
+                70
+            ],
+            [
+                "steam_core",
+                10
             ]
         ],
         "skills": [
@@ -2161,12 +2185,16 @@
         "xp": 520,
         "drops": [
             [
-                "magic_stone_medium",
-                70
+                "magic_stone_large",
+                30
             ],
             [
                 "copper_wire",
-                30
+                60
+            ],
+            [
+                "steam_core",
+                10
             ]
         ],
         "skills": [
@@ -2187,15 +2215,15 @@
         "drops": [
             [
                 "steam_core",
-                40
+                60
             ],
             [
                 "brass_gear",
-                50
+                80
             ],
             [
                 "magic_stone_large",
-                20
+                40
             ]
         ],
         "skills": [
@@ -2511,11 +2539,15 @@
         "drops": [
             [
                 "aether_stone",
-                60
+                100
             ],
             [
                 "star_metal_fragment",
-                30
+                60
+            ],
+            [
+                "ancient_tablet",
+                20
             ]
         ],
         "skills": [
@@ -2536,11 +2568,15 @@
         "drops": [
             [
                 "aether_stone",
-                80
+                100
             ],
             [
-                "magic_stone_medium",
+                "magic_stone_large",
                 40
+            ],
+            [
+                "ancient_tablet",
+                20
             ]
         ],
         "skills": [
@@ -2561,11 +2597,15 @@
         "drops": [
             [
                 "star_metal_fragment",
-                40
+                80
             ],
             [
-                "magic_stone_medium",
+                "magic_stone_large",
                 50
+            ],
+            [
+                "ancient_tablet",
+                30
             ]
         ],
         "skills": [
@@ -2586,11 +2626,15 @@
         "drops": [
             [
                 "ancient_tablet",
-                40
+                80
             ],
             [
                 "star_metal_fragment",
-                50
+                100
+            ],
+            [
+                "celestial_core",
+                15
             ]
         ],
         "skills": [
@@ -2645,11 +2689,15 @@
         "drops": [
             [
                 "fulgurite_shard",
+                100
+            ],
+            [
+                "magic_stone_large",
                 60
             ],
             [
-                "magic_stone_medium",
-                50
+                "storm_essence",
+                30
             ]
         ],
         "skills": [
@@ -2669,12 +2717,16 @@
         "xp": 1050,
         "drops": [
             [
-                "iron_ingot",
+                "steel_ingot",
+                50
+            ],
+            [
+                "magic_stone_large",
                 60
             ],
             [
-                "magic_stone_medium",
-                50
+                "storm_essence",
+                30
             ]
         ],
         "skills": [
@@ -2695,11 +2747,15 @@
         "drops": [
             [
                 "storm_essence",
-                40
+                80
             ],
             [
-                "magic_stone_medium",
-                50
+                "magic_stone_large",
+                60
+            ],
+            [
+                "charged_core",
+                20
             ]
         ],
         "skills": [
@@ -2720,19 +2776,23 @@
         "drops": [
             [
                 "siren_scale",
-                50
+                80
             ],
             [
                 "storm_essence",
-                60
+                100
             ],
             [
                 "magic_stone_large",
-                35
+                70
             ],
             [
                 "tempest_heart",
                 2
+            ],
+            [
+                "charged_core",
+                30
             ]
         ],
         "skills": [
@@ -2789,11 +2849,15 @@
         "drops": [
             [
                 "prism_shard",
-                70
+                100
             ],
             [
                 "magic_stone_large",
-                50
+                80
+            ],
+            [
+                "concentrated_light",
+                30
             ]
         ],
         "skills": [
@@ -2814,11 +2878,15 @@
         "drops": [
             [
                 "prism_shard",
-                80
+                100
             ],
             [
-                "obsidian_shard",
-                40
+                "magic_stone_large",
+                60
+            ],
+            [
+                "concentrated_light",
+                30
             ]
         ],
         "skills": [
@@ -2839,11 +2907,15 @@
         "drops": [
             [
                 "magic_stone_large",
-                60
+                100
             ],
             [
                 "concentrated_light",
-                40
+                80
+            ],
+            [
+                "magic_stone_flawless",
+                15
             ]
         ],
         "skills": [
@@ -2864,11 +2936,15 @@
         "drops": [
             [
                 "magic_stone_large",
-                40
+                80
             ],
             [
                 "concentrated_light",
-                35
+                70
+            ],
+            [
+                "magic_stone_flawless",
+                20
             ]
         ],
         "skills": [

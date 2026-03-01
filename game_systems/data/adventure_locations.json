@@ -328,19 +328,23 @@
         "gatherables": [
             [
                 "medicinal_herb",
-                30
+                40
             ],
             [
                 "ancient_wood",
-                35
+                40
             ],
             [
                 "iron_ore",
-                20
+                10
             ],
             [
                 "magic_stone_medium",
-                30
+                50
+            ],
+            [
+                "shadow_essence",
+                10
             ]
         ],
         "special_events": [
@@ -552,15 +556,15 @@
         "gatherables": [
             [
                 "brass_gear",
-                40
+                60
             ],
             [
                 "copper_wire",
-                30
+                50
             ],
             [
                 "spring_coil",
-                20
+                40
             ],
             [
                 "magic_stone_medium",
@@ -568,11 +572,11 @@
             ],
             [
                 "steam_core",
-                10
+                25
             ],
             [
                 "magic_stone_large",
-                10
+                30
             ],
             [
                 "clockwork_heart",
@@ -789,15 +793,15 @@
         "gatherables": [
             [
                 "fulgurite_shard",
-                30
+                50
             ],
             [
                 "storm_essence",
-                25
+                50
             ],
             [
                 "magic_stone_large",
-                20
+                40
             ],
             [
                 "mithril_ore",
@@ -805,7 +809,7 @@
             ],
             [
                 "charged_core",
-                10
+                30
             ]
         ],
         "special_events": [
@@ -1102,18 +1106,22 @@
         "gatherables": [
             [
                 "aether_stone",
-                40
+                60
             ],
             [
                 "star_metal_fragment",
-                30
+                50
             ],
             [
                 "ancient_tablet",
-                20
+                40
             ],
             [
                 "magic_stone_large",
+                30
+            ],
+            [
+                "celestial_core",
                 10
             ]
         ],
@@ -1179,15 +1187,15 @@
         "gatherables": [
             [
                 "prism_shard",
-                30
+                50
             ],
             [
                 "concentrated_light",
-                39
+                60
             ],
             [
                 "magic_stone_flawless",
-                20
+                35
             ],
             [
                 "mithril_ore",
