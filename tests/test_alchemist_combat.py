@@ -15,6 +15,7 @@ class TestAlchemistCombatSkills(unittest.TestCase):
         # Mock Player
         self.player = MagicMock()
         self.player.is_stunned = False
+        self.player.is_silenced = False
         self.player.stats = PlayerStats(str_base=10, mag_base=10, dex_base=10)
         self.player.stats.get_total_stats_dict = MagicMock(
             return_value={"STR": 10, "MAG": 10, "DEX": 10, "HP": 100, "MP": 100}
