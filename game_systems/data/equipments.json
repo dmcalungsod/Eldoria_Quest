@@ -495,28 +495,5 @@
             "MP": 20
         },
         "description": "A delicate silver ring that hums when near ley lines."
-    },
-    "acc_echolocation_helm": {
-        "name": "Echolocation Helm",
-        "slot": "accessory",
-        "rarity": "Epic",
-        "level_req": 25,
-        "stats_bonus": {
-            "DEX": 20,
-            "AGI": 25,
-            "END": 15
-        },
-        "description": "A helm crafted from Abyssal Ore that heightens hearing to navigate pitch-black chasms."
-    },
-    "acc_hymnal_of_the_void": {
-        "name": "Hymnal of the Void",
-        "slot": "accessory",
-        "rarity": "Epic",
-        "level_req": 25,
-        "stats_bonus": {
-            "MAG": 30,
-            "MP": 50
-        },
-        "description": "Bound in cold, flayed skin, this unholy scripture contains musical notation written in rusted blood."
     }
 }
