@@ -1,4 +1,5 @@
-## 2023-10-27 — Dynamic Time-Based Encounters
+## 2026-03-01 — Enforcing the Grimwarden's Toll
 
-**Learning:** Static encounter tables break immersion by ignoring the passage of time. Implementing a simple real-time check (UTC hour) allows for nocturnal predators, making the world feel alive and dangerous at night without complex simulation systems.
-**Action:** Future location designs should always consider "Day" and "Night" variants for monster pools to reinforce the survival horror aspect of darkness.
+**Learning:** Discovered that the initial implementation of the auto-adventure death penalty in `adventure_manager.py` did not align with the strict "Grimwarden's Toll" specs outlined in the design document (`timeweaver_design.md`). Specifically, the material loss was only 50% (instead of 100%), the aurum penalty was 10% (instead of 5%), and allocated supplies were not being lost upon death. A half-measure on death penalties reduces the survival tension that makes Eldoria Quest engaging.
+
+**Action:** Enforced strict adherence to the design spec by updating `adventure_manager.py` to completely wipe session loot and supplies on death, while reducing the baseline Aurum penalty to 5%. This aligns the consequence of failure with the intended dark survival tone without being overwhelmingly punishing on permanent wealth. Updated associated regression tests to assert 100% loss. Next time, always cross-reference completed assignments against the primary design spec for accurate realism enforcement.
