@@ -224,22 +224,9 @@ class CombatEngine:
             monster_stunned, bonus_crit, player_defending = self._check_interrupt_mechanic(log)
 
             # --- 1. PLAYER'S TURN ---
-            if self.player_stunned:
-                log.append("💫 **Stunned!** You cannot move!")
-                monster_defeated = False
-                # Reset stun for next turn (or decrement if we had duration)
-                self.player_stunned = False
-                # We need to signal this back to caller if state persists,
-                # but currently engine returns result dict.
-                # We'll add 'player_stunned' to result dict.
-            else:
-                monster_defeated, player_defending = self._process_player_turn(
-                    log, turn_report, bonus_crit, player_defending
-                )
-
-            # Check if player skill stunned the monster
-            if self.monster.pop("is_stunned", False):
-                monster_stunned = True
+            monster_defeated, player_defending, monster_stunned = self._handle_player_turn_phase(
+                log, turn_report, bonus_crit, player_defending, monster_stunned
+            )
 
             if monster_defeated:
                 logger.info("Combat End: Monster defeated.")
@@ -280,6 +267,22 @@ class CombatEngine:
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
             }
+
+    def _handle_player_turn_phase(self, log, turn_report, bonus_crit, player_defending, monster_stunned):
+        """Processes the player's phase of the combat turn."""
+        if self.player_stunned:
+            log.append("💫 **Stunned!** You cannot move!")
+            monster_defeated = False
+            self.player_stunned = False
+        else:
+            monster_defeated, player_defending = self._process_player_turn(
+                log, turn_report, bonus_crit, player_defending
+            )
+
+        if self.monster.pop("is_stunned", False):
+            monster_stunned = True
+
+        return monster_defeated, player_defending, monster_stunned
 
     def _handle_start_of_turn(self, log: list):
         """Processes start-of-turn effects (buffs, debuffs, weather)."""

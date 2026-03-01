@@ -27,3 +27,7 @@
 
 **Learning:** `EquipmentManager` and `ItemManager` were crashing on `int(item_key)` conversion when encountering malformed data (non-numeric item keys), potentially zeroing out player stats on recalculation.
 **Action:** Always wrap type conversions of database keys in `try-except` blocks and log warnings instead of allowing uncaught exceptions to propagate, ensuring system resilience against data corruption.
+## 2026-03-01 — Refactored High-Complexity Methods
+
+**Learning:** `CombatEngine.run_combat_turn`, `AdventureEvents.regeneration`, and `AdventureSession.simulate_step` were monoliths with high cyclomatic complexity, making them difficult to maintain.
+**Action:** Extract specific phases (like player turn, atmospheric prepend generation, or context fetching) into helper methods to improve modularity and reduce complexity. Ensure state objects or returned values correctly mimic the flow of the original monolithic design.
