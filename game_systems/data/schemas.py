@@ -170,6 +170,38 @@ QUEST_ITEM_SCHEMA = {
 }
 
 
+# --- Faction Schema ---
+FACTION_SCHEMA = {
+    "name": {"type": str, "required": True},
+    "emoji": {"type": str, "required": True},
+    "description": {"type": str, "required": True},
+    "ranks": {
+        "type": dict,
+        "required": True,
+        "keys_schema": {"type": str},
+        "values_schema": {
+            "type": dict,
+            "schema": {
+                "title": {"type": str, "required": True},
+                "reputation_needed": {"type": int, "required": True, "min": 0},
+                "reward": {"type": (dict, type(None)), "required": True},
+            },
+        },
+    },
+    "interests": {
+        "type": dict,
+        "required": True,
+        "keys_schema": {"type": str},
+        "values_schema": {"type": (int, float, list)},
+    },
+    "favored_locations": {
+        "type": list,
+        "required": True,
+        "element_schema": {"type": str},
+    },
+}
+
+
 # --- Codex Schema ---
 CODEX_SCHEMA = {
     "monsters": {
