@@ -21,6 +21,7 @@
 *   **The Sundering's Child:** A monster that seems intelligent – do you kill it or try to communicate?
 *   **The Clockwork Heart:** A moral dilemma involving a sentient construct in the Clockwork Halls.
 *   **The Blind Choir's Requiem:** A dark, atmospheric cult storyline for The Wailing Chasm, focusing on corrupted harmony and a choice between silencing the void or claiming its secrets.
+*   **The Celestial Tether:** A questline dealing with the failing gravity of The Celestial Archipelago. Explores a moral dilemma between preserving a dying wonder or plundering it for immediate gain, emphasizing the dark fantasy theme where "good" choices often demand sacrifice.
 
 ## 🚫 Avoids
 *   **Generic fetch/kill quests** without context.
