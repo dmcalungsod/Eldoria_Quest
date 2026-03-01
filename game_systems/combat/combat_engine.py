@@ -160,6 +160,7 @@ class CombatEngine:
         # Current architecture suggests CombatEngine is transient.
         # We will check if player object has a 'stunned' attribute or similar.
         self.player_stunned = getattr(player, "is_stunned", False)
+        self.player_silenced = getattr(player, "is_silenced", False)
 
         if self.player_stance == "aggressive":
             self.dmg_dealt_mult = 1.2
@@ -250,6 +251,7 @@ class CombatEngine:
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
                 "player_stunned": self.player_stunned,
+                "player_silenced": self.player_silenced,
                 "consumed_buff_ids": self.consumed_buff_ids,
             }
 
@@ -342,6 +344,19 @@ class CombatEngine:
         Executes player action logic.
         Returns (monster_defeated, updated_player_defending).
         """
+
+        # Check silence
+        if self.player_silenced:
+            if self.action.startswith("skill:"):
+                skill_key = self.action.split(":", 1)[1]
+                use_skill = next((s for s in self.player_skills if s.get("key_id") == skill_key), None)
+                if use_skill and use_skill.get("mp_cost", 0) > 0:
+                    log.append("🔇 **Silenced!** You are unable to cast spells or use skills!")
+                    self.player_silenced = False
+                    return False, player_defending
+            # If not a skill, or zero MP skill, consume the silence and proceed normally
+            self.player_silenced = False
+
         if self.action == "defend":
             player_defending = True
             # Regenerate 5% MP
@@ -435,6 +450,14 @@ class CombatEngine:
                         else:
                             log.append("💫 **Stunned!** You are reeling from the blow!")
                             self.player_stunned = True
+
+                    silence_chance = status_effect.get("silence_chance", 0)
+                    if silence_chance > 0 and random.random() < silence_chance:  # nosec B311
+                        if self._is_player_immune("silence"):
+                            log.append("🛡️ **Immune!** You shrug off the silence effect!")
+                        else:
+                            log.append("🔇 **Silenced!** A suffocating hush falls over you!")
+                            self.player_silenced = True
 
         elif action["type"] == "buff":
             buff = action["buff"]
@@ -779,7 +802,10 @@ class CombatEngine:
         if roll > self.PLAYER_SKILL_CHANCE:
             return {"skill": None, "reason": "RNG check failed."}
 
-        usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
+        if self.player_silenced:
+            usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp and s.get("mp_cost", 0) == 0]
+        else:
+            usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
 
         if not usable_skills:
             return {"skill": None, "reason": "Not enough MP."}
