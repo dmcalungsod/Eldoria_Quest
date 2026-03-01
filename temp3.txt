@@ -1,0 +1,52 @@
+{
+  "key": "monster_141",
+  "drops": [
+    [
+      "aether_stone",
+      60
+    ],
+    [
+      "star_metal_fragment",
+      30
+    ]
+  ]
+}
+{
+  "key": "monster_142",
+  "drops": [
+    [
+      "aether_stone",
+      80
+    ],
+    [
+      "magic_stone_medium",
+      40
+    ]
+  ]
+}
+{
+  "key": "monster_143",
+  "drops": [
+    [
+      "star_metal_fragment",
+      40
+    ],
+    [
+      "magic_stone_medium",
+      50
+    ]
+  ]
+}
+{
+  "key": "monster_144",
+  "drops": [
+    [
+      "ancient_tablet",
+      40
+    ],
+    [
+      "star_metal_fragment",
+      50
+    ]
+  ]
+}

@@ -32,8 +32,3 @@
 1.  **Thunder-Crag Coast (Rank A):** Added `charged_core` (10%) to gatherables. Increased `magic_stone_large` chance to 20% by reducing lower tier items. Buffed drop amounts/chances across all native monsters and added `tempest_heart` to the elite Siren Matriarch drops.
 2.  **Shimmering Wastes (Rank A):** Added `glass_heart` (1%) and buffed `concentrated_light` and `magic_stone_flawless` gatherable chances. Improved specific drop rates for all native monsters.
 3.  **Celestial Archipelago:** Promoted from Rank B to Rank A to resolve the Level 28 vs Rank A/B inconsistency, realigning the late-game rank transition.
-
-## 2026-03-01 — Auto-Adventure Economy Rebalancing (Phase 2)
-
-**Learning:** The initial static drop rates and gatherable weights in mid-to-high tier adventure locations (e.g., The Shrouded Fen, The Clockwork Halls, The Thunder-Crag Coast, The Shimmering Wastes, The Celestial Archipelago) resulted in an inconsistent progression curve where Expected Value (EV) per trip did not properly scale with risk and level requirements. Lower-tier locations were often more lucrative than higher-tier ones.
-**Action:** Implemented a targeted buff across these zones by scaling up material quantities, introducing higher-tier resources (e.g., `magic_stone_medium`, `magic_stone_large`, `celestial_core`) to monster drop tables, and recalibrating gatherable weights. Always cross-reference expected yields against the EV model (`scripts/analysis/2026_03_01_economy_balance.py`) to ensure late-game incentives match the difficulty.
