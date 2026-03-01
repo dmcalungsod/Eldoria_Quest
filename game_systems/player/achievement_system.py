@@ -120,6 +120,11 @@ CRAFTING_MILESTONES = {
     50: ("Grandmaster of the Forge", "Reached Crafting Level 50."),
 }
 
+CLASS_MASTERY_MILESTONES = {
+    "Assassin": {"double_strike", "toxic_blade", "venomous_strike", "death_blossom"},
+    "Phantom": {"stealth", "shadow_step", "flash_powder"},
+}
+
 
 class AchievementSystem:
     def __init__(self, db_manager: DatabaseManager):
@@ -251,7 +256,7 @@ class AchievementSystem:
 
     def check_skill_achievements(self, discord_id: int) -> str | None:
         """
-        Checks if the player has reached skill milestones (count or max level).
+        Checks if the player has reached skill milestones (count or max level) or class mastery.
         Returns a success message if a new title is awarded, else None.
         """
         try:
@@ -264,6 +269,14 @@ class AchievementSystem:
 
             newly_awarded = self._check_milestones(discord_id, SKILL_COUNT_MILESTONES, skill_count)
             newly_awarded += self._check_milestones(discord_id, SKILL_LEVEL_MILESTONES, max_skill_level)
+
+            player_skill_keys = {s.get("skill_key") for s in skills}
+            for title, required_skills in CLASS_MASTERY_MILESTONES.items():
+                if required_skills.issubset(player_skill_keys):
+                    if self.db.add_title(discord_id, title):
+                        newly_awarded.append(title)
+                        logger.info(f"Awarded title '{title}' to {discord_id}")
+
             return self._format_title_message(newly_awarded)
 
         except Exception as e:
