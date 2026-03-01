@@ -168,3 +168,51 @@ QUEST_ITEM_SCHEMA = {
     },
     "notes": {"type": str, "required": True},
 }
+
+
+# --- Codex Schema ---
+CODEX_SCHEMA = {
+    "monsters": {
+        "type": dict,
+        "keys_schema": {"type": str},
+        "values_schema": {
+            "type": dict,
+            "schema": {
+                "lore_extended": {"type": str, "required": True},
+                "unlock_thresholds": {
+                    "type": dict,
+                    "required": True,
+                    "schema": {
+                        "basic": {"type": int, "required": True},
+                        "stats": {"type": int, "required": True},
+                        "lore": {"type": int, "required": True},
+                    },
+                },
+            },
+        },
+    },
+    "items": {
+        "type": dict,
+        "keys_schema": {"type": str},
+        "values_schema": {
+            "type": dict,
+            "schema": {"lore_extended": {"type": str, "required": True}},
+        },
+    },
+    "locations": {
+        "type": dict,
+        "keys_schema": {"type": str},
+        "values_schema": {
+            "type": dict,
+            "schema": {"lore_extended": {"type": str, "required": True}},
+        },
+    },
+    "factions": {
+        "type": dict,
+        "keys_schema": {"type": str},
+        "values_schema": {
+            "type": dict,
+            "schema": {"lore_extended": {"type": str, "required": True}},
+        },
+    },
+}

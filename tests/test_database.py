@@ -39,7 +39,9 @@ class TestDatabaseManager(unittest.TestCase):
         self.mock_db.__getitem__.side_effect = get_collection
 
         # Patch MongoClient in DatabaseManager
-        self.mongo_patcher = patch("database.database_manager.MongoClient", return_value=self.mock_client)
+        self.mongo_patcher = patch(
+            "database.database_manager.MongoClient", return_value=self.mock_client
+        )
         self.mongo_patcher.start()
 
         # Initialize DatabaseManager (singleton)
@@ -58,7 +60,9 @@ class TestDatabaseManager(unittest.TestCase):
         # Test
         player = self.db.get_player(12345)
         self.assertEqual(player, mock_player)
-        self.mock_db.players.find_one.assert_called_with({"discord_id": 12345}, {"_id": 0})
+        self.mock_db.players.find_one.assert_called_with(
+            {"discord_id": 12345}, {"_id": 0}
+        )
 
     def test_create_player(self):
         stats_data = {"STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10}
@@ -101,10 +105,15 @@ class TestDatabaseManager(unittest.TestCase):
             patch.object(self.db, "get_inventory_slot_count", return_value=0),
             patch.object(self.db, "calculate_inventory_limit", return_value=20),
         ):
-            self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
+            self.db.add_inventory_item(
+                12345, "potion_hp", "Health Potion", "consumable", "Common", 5
+            )
 
         # Verify it inserts new item(s)
-        self.assertTrue(self.mock_db.inventory.insert_many.called or self.mock_db.inventory.insert_one.called)
+        self.assertTrue(
+            self.mock_db.inventory.insert_many.called
+            or self.mock_db.inventory.insert_one.called
+        )
 
     def test_add_inventory_item_stacking(self):
         # Mock finding an existing item with space
@@ -114,12 +123,16 @@ class TestDatabaseManager(unittest.TestCase):
             patch.object(self.db, "get_inventory_slot_count", return_value=1),
             patch.object(self.db, "calculate_inventory_limit", return_value=20),
         ):
-            self.db.add_inventory_item(12345, "potion_hp", "Health Potion", "consumable", "Common", 5)
+            self.db.add_inventory_item(
+                12345, "potion_hp", "Health Potion", "consumable", "Common", 5
+            )
 
         # Verify it updates existing item
         # Max stack is 5. Existing 2. Adding 5.
         # Should fill by 3 (2+3=5) and create new stack of 2.
-        self.mock_db.inventory.update_one.assert_called_with({"id": 50}, {"$inc": {"count": 3}})
+        self.mock_db.inventory.update_one.assert_called_with(
+            {"id": 50}, {"$inc": {"count": 3}}
+        )
 
     def test_deduct_aurum(self):
         # Mock successful deduction
@@ -197,6 +210,48 @@ class TestDatabaseManager(unittest.TestCase):
 
         # Verify aggregation called
         self.assertTrue(self.mock_db.players.aggregate.called)
+
+    def test_get_codex_default(self):
+        """Test getting a codex for a new user returns the default structure."""
+        user_id = 999888
+
+        # Mock find_one to return None (no document found)
+        self.mock_db["player_codex"].find_one.return_value = None
+
+        codex = self.db.get_codex(user_id)
+
+        self.assertEqual(codex["user_id"], user_id)
+        self.assertEqual(codex["bestiary"], {})
+        self.assertEqual(codex["atlas"], {})
+        self.assertEqual(codex["armory"], {})
+        self.assertEqual(codex["factions"], {})
+        self.assertEqual(codex["quests"], [])
+
+    def test_update_codex_and_get(self):
+        """Test updating a specific field in the codex and retrieving it."""
+        user_id = 999888
+
+        # Test 1: verify update is called properly
+        self.db.update_codex(user_id, "bestiary", "106", {"kills": 5, "seen": True})
+        self.mock_db["player_codex"].update_one.assert_called_with(
+            {"user_id": user_id},
+            {"$set": {"bestiary.106": {"kills": 5, "seen": True}}},
+            upsert=True,
+        )
+
+        # Test 2: verify partial document retrieval fills missing keys
+        self.mock_db["player_codex"].find_one.return_value = {
+            "user_id": user_id,
+            "bestiary": {"106": {"kills": 5, "seen": True}},
+            # Missing atlas, armory, etc. due to partial upsert creation
+        }
+
+        codex = self.db.get_codex(user_id)
+
+        self.assertEqual(codex["user_id"], user_id)
+        self.assertEqual(codex["bestiary"]["106"]["kills"], 5)
+        self.assertEqual(codex["atlas"], {})  # Verify defaults are injected
+        self.assertEqual(codex["quests"], [])
 
 
 def run_all_tests():
