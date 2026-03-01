@@ -7,7 +7,7 @@ commands:
     steps:
       - run:
           name: Install Tools
-          command: pip install "pip==24.0" && pip install ruff bandit pip-audit
+          command: pip install "pip==26.0.1" && pip install ruff bandit pip-audit
 
   install-deps:
     description: Install project dependencies with caching
@@ -18,7 +18,7 @@ commands:
             - deps-v1-
       - run:
           name: Install Dependencies
-          command: pip install "pip==24.0" && pip install -r requirements.txt
+          command: pip install "pip==26.0.1" && pip install -r requirements.txt
       - save_cache:
           key: deps-v1-{{ checksum "requirements.txt" }}
           paths:
@@ -114,7 +114,7 @@ jobs:
       - install-deps
       - run:
           name: Install Test Dependencies
-          command: pip install "pip==24.0" && pip install pytest pytest-cov
+          command: pip install "pip==26.0.1" && pip install pytest pytest-cov
       - run:
           name: Split and Run Tests
           command: |
