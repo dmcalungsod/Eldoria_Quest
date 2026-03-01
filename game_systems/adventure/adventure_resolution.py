@@ -4,10 +4,13 @@ game_systems/adventure/adventure_resolution.py
 Engine for resolving time-based background adventures.
 """
 
+import asyncio
 import json
 import logging
 import math
 from typing import Any
+
+import discord
 
 from database.database_manager import DatabaseManager
 from game_systems.adventure.adventure_manager import AdventureManager
@@ -50,8 +53,6 @@ class AdventureResolutionEngine:
                 if auto_retreated == "auto_retreat":
                     # Send a DM to the player notifying them of the auto-retreat
                     # Because we are in a sync thread, we must schedule the coroutine on the bot's loop
-                    import asyncio
-                    import discord
 
                     async def notify_retreat():
                         try:
