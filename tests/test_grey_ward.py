@@ -33,24 +33,25 @@ class TestGreyWard(unittest.TestCase):
 
         # Verify Ranks (Updated to match Alchemist Lore)
         ranks = faction["ranks"]
-        self.assertEqual(ranks[1]["title"], "Scavenger")
-        self.assertEqual(ranks[2]["title"], "Mixologist")
+        self.assertEqual(ranks[1]["title"], "Gleaner")
+        self.assertEqual(ranks[2]["title"], "Brewer")
         self.assertEqual(ranks[3]["title"], "Apothecary")
-        self.assertEqual(ranks[4]["title"], "Chirurgeon")
-        self.assertEqual(ranks[5]["title"], "Transmuter")
+        self.assertEqual(ranks[4]["title"], "Catalyst")
+        self.assertEqual(ranks[5]["title"], "Synthesist")
 
         # Verify Rewards
-        self.assertEqual(ranks[2]["reward"]["key"], "bitter_panacea")
-        self.assertEqual(ranks[2]["reward"]["amount"], 3)
-        self.assertEqual(ranks[3]["reward"]["key"], "phial_of_vitriol")
+        self.assertEqual(ranks[2]["reward"]["key"], "phial_of_vitriol")
+        self.assertEqual(ranks[2]["reward"]["amount"], 2)
+        self.assertEqual(ranks[3]["reward"]["key"], "bitter_panacea")
         self.assertEqual(ranks[3]["reward"]["amount"], 3)
         self.assertEqual(ranks[4]["reward"]["key"], "gathering_boost")
         self.assertEqual(ranks[4]["reward"]["value"], 0.1)
-        self.assertEqual(ranks[5]["reward"]["value"], "Transmuter")
+        self.assertEqual(ranks[5]["reward"]["value"], "Warden of Ash")
 
         # Verify Interests
         self.assertEqual(faction["interests"]["gathering"], 1.5)
-        self.assertEqual(faction["interests"]["crafting"], 1.5)
+        self.assertEqual(faction["interests"]["crafting"], 1.2)
+        self.assertIn("Beast", faction["interests"]["monster_types"])
         self.assertIn("Plant", faction["interests"]["monster_types"])
         self.assertIn("Slime", faction["interests"]["monster_types"])
         self.assertNotIn("Undead", faction["interests"]["monster_types"])

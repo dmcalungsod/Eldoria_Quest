@@ -50,3 +50,8 @@
 - **Progression:** Ranks from Gleaner to Master Apothecary.
 - **Rewards:** Utility consumables (`bitter_panacea`, `phial_of_vitriol`) and gathering buffs.
 - **Integration:** Favored locations include `whispering_thicket` and `deepgrove_roots`, encouraging exploration of corrupted zones.
+
+## 2026-03-01 — The Grey Ward Update
+
+**Learning:** Coordinated with Namewright design to adjust Grey Ward progression.
+**Action:** Updated ranks (Gleaner to Synthesist) and adjusted crafting reputation values.
