@@ -216,6 +216,125 @@ class DatabaseManager:
         doc = self._col("players").find_one({"discord_id": discord_id}, {"_id": 0})
         return doc
 
+
+    def get_combat_context_bundles_batch(self, discord_ids: list[int]) -> dict[int, dict[str, Any]]:
+        """
+        Fetches all necessary data for combat in a single batch for multiple players.
+        Returns a dictionary mapping discord_id to a dict with 'player', 'stats', 'buffs', 'skills'.
+        """
+        if not discord_ids:
+            return {}
+
+        now_iso = WorldTime.now().isoformat()
+
+        # Optimized: Single Aggregation Pipeline to reduce DB round-trips for multiple players
+        pipeline = [
+            {"$match": {"discord_id": {"$in": discord_ids}}},
+            {
+                "$lookup": {
+                    "from": "stats",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$discord_id", "$$did"]}}},
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "stats_docs",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "active_buffs",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$discord_id", "$$did"]},
+                                        {"$gt": ["$end_time", now_iso]},
+                                    ]
+                                }
+                            }
+                        },
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "buffs",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "player_skills",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {"$match": {"$expr": {"$eq": ["$discord_id", "$$did"]}}},
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "player_skills",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "adventure_sessions",
+                    "let": {"did": "$discord_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$discord_id", "$$did"]},
+                                        {"$eq": ["$active", 1]},
+                                    ]
+                                }
+                            }
+                        },
+                        {"$project": {"_id": 0}},
+                    ],
+                    "as": "active_session",
+                }
+            },
+            {"$project": {"_id": 0}},
+        ]
+
+        results = list(self._col("players").aggregate(pipeline))
+
+        bundles = {}
+        self._ensure_skill_cache()
+        for data in results:
+            did = data["discord_id"]
+
+            # 1. Process Stats
+            stats_data = self._parse_stats_json(data["stats_docs"][0] if data.get("stats_docs") else {}, did)
+
+            # 2. Process Buffs
+            buffs = data.get("buffs", [])
+
+            # 3. Process Skills
+            player_skill_docs = data.get("player_skills", [])
+            skills = [
+                self._build_skill_dict(skill_def, ps)
+                for ps in player_skill_docs
+                if (skill_def := self._skill_cache.get(ps["skill_key"])) and skill_def["type"] == "Active"
+            ]
+
+            # 4. Extract Session
+            active_session = data.get("active_session", [])
+            session_data = active_session[0] if active_session else None
+
+            # 5. Extract Player Row (remove joined fields)
+            player_row = {
+                k: v for k, v in data.items() if k not in ["stats_docs", "buffs", "player_skills", "active_session"]
+            }
+
+            bundles[did] = {
+                "player": player_row,
+                "stats": stats_data,
+                "buffs": buffs,
+                "skills": skills,
+                "active_session": session_data,
+            }
+
+        return bundles
+
     def get_combat_context_bundle(self, discord_id: int) -> dict[str, Any] | None:
         """
         Fetches all necessary data for combat in a single batch.
