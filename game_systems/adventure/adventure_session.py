@@ -517,6 +517,15 @@ class AdventureSession:
 
         return self._build_result([result["log"]], False, context)
 
+    def _prepare_simulation_context(self, context_bundle: dict | None) -> dict[str, Any] | None:
+        if (
+            context_bundle
+            and "player_stats" in context_bundle
+            and isinstance(context_bundle["player_stats"], PlayerStats)
+        ):
+            return context_bundle
+        return self._fetch_session_context(context_bundle)
+
     def simulate_step(
         self,
         context_bundle: dict | None = None,
@@ -536,21 +545,7 @@ class AdventureSession:
 
         try:
             # --- 0. Pre-fetch Context (Optimized) ---
-            # We fetch context ONCE at the start for both combat and non-combat.
-            # This ensures Active Buffs are always available and reduces N+1 queries.
-
-            # ⚡ OPTIMIZATION: If context_bundle is ALREADY a valid context dict (with 'player_stats'), reuse it.
-            # This allows AdventureResolutionEngine to pre-parse the bundle ONCE and pass the ready-to-use context object,
-            # avoiding redundant processing in _fetch_session_context.
-
-            if (
-                context_bundle
-                and "player_stats" in context_bundle
-                and isinstance(context_bundle["player_stats"], PlayerStats)
-            ):
-                context = context_bundle
-            else:
-                context = self._fetch_session_context(context_bundle)
+            context = self._prepare_simulation_context(context_bundle)
 
             if not context:
                 return self._build_result([["Error: Failed to load player data."]], False, None)
