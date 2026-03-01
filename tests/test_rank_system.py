@@ -25,6 +25,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_f_requirements(self):
         # Rank F -> E requires 3 quests and 50 normal kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 2}
 
         # Case 1: Not enough quests
         self.mock_db.get_guild_member.return_value = {
@@ -58,6 +59,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_e_requirements(self):
         # Rank E -> D requires 10 quests, 150 normal kills, 5 elite kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 5}
 
         # Case 1: Not enough kills
         self.mock_db.get_guild_member.return_value = {
@@ -91,6 +93,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_d_requirements(self):
         # Rank D -> C requires 20 quests, 300 normal kills, 20 elite kills, 1 boss kill
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 10}
 
         # Case 1: Not enough kills (Testing 299 < 300)
         self.mock_db.get_guild_member.return_value = {
@@ -114,6 +117,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_b_requirements(self):
         # Rank B -> A requires 40 quests, 600 normal kills, 65 elite kills, 4 boss kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 20}
 
         # Case 1: Not enough quests
         self.mock_db.get_guild_member.return_value = {
@@ -147,6 +151,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_a_requirements(self):
         # Rank A -> S requires 50 quests, 800 normal kills, 80 elite kills, 6 boss kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 30}
 
         # Case 1: Not enough boss kills (5 < 6)
         self.mock_db.get_guild_member.return_value = {
@@ -170,6 +175,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_s_requirements(self):
         # Rank S -> SS requires 60 quests, 1000 normal kills, 120 elite kills, 10 boss kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 40}
 
         # Case 1: Not enough boss kills (9 < 10)
         self.mock_db.get_guild_member.return_value = {
@@ -193,6 +199,7 @@ class TestRankSystem(unittest.TestCase):
 
     def test_rank_ss_requirements(self):
         # Rank SS -> SSS requires 65 quests, 1500 normal kills, 200 elite kills, 20 boss kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 50}
 
         # Case 1: Not enough boss kills (19 < 20)
         self.mock_db.get_guild_member.return_value = {

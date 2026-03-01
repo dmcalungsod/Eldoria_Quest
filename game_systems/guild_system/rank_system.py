@@ -13,7 +13,11 @@ class RankSystem:
         "F": {
             "title": "Initiate",
             "next_rank": "E",
-            "requirements": {"quests_completed": 3, "normal_kills": 50},
+            "requirements": {
+                "quests_completed": 3,
+                "normal_kills": 50,
+                "total_expeditions": 2,
+            },
         },
         "E": {
             "title": "Novice",
@@ -22,6 +26,7 @@ class RankSystem:
                 "quests_completed": 10,
                 "normal_kills": 150,
                 "elite_kills": 5,
+                "total_expeditions": 5,
             },
         },
         "D": {
@@ -32,6 +37,7 @@ class RankSystem:
                 "normal_kills": 300,
                 "elite_kills": 20,
                 "boss_kills": 1,
+                "total_expeditions": 10,
             },
         },
         "C": {
@@ -42,6 +48,7 @@ class RankSystem:
                 "normal_kills": 400,
                 "elite_kills": 50,
                 "boss_kills": 2,
+                "total_expeditions": 15,
             },
         },
         "B": {
@@ -52,6 +59,7 @@ class RankSystem:
                 "normal_kills": 600,
                 "boss_kills": 4,
                 "elite_kills": 65,
+                "total_expeditions": 20,
             },
         },
         "A": {
@@ -62,6 +70,7 @@ class RankSystem:
                 "normal_kills": 800,
                 "boss_kills": 6,
                 "elite_kills": 80,
+                "total_expeditions": 30,
             },
         },
         "S": {
@@ -72,6 +81,7 @@ class RankSystem:
                 "normal_kills": 1000,
                 "boss_kills": 10,
                 "elite_kills": 120,
+                "total_expeditions": 40,
             },
         },
         "SS": {
@@ -82,6 +92,7 @@ class RankSystem:
                 "normal_kills": 1500,
                 "boss_kills": 20,
                 "elite_kills": 200,
+                "total_expeditions": 50,
             },
         },
         "SSS": {"title": "Mythic", "next_rank": None, "requirements": {}},
@@ -92,7 +103,14 @@ class RankSystem:
 
     def get_rank_info(self, discord_id: int) -> dict | None:
         row = self.db.get_guild_member(discord_id)
-        return dict(row) if row else None
+        if not row:
+            return None
+
+        player_data = dict(row)
+        exploration = self.db.get_exploration_stats(discord_id) or {}
+        player_data["total_expeditions"] = exploration.get("total_expeditions", 0)
+
+        return player_data
 
     def check_promotion_eligibility(self, discord_id: int) -> bool:
         player_data = self.get_rank_info(discord_id)
