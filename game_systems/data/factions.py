@@ -188,7 +188,7 @@ FACTIONS = {
             5: {
                 "title": "Transmuter",
                 "reputation_needed": 5000,
-                "reward": {"type": "title", "value": "Master Apothecary"},
+                "reward": {"type": "title", "value": "Transmuter"},
             },
         },
         "interests": {
