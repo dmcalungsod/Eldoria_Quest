@@ -854,6 +854,7 @@ class AdventureSession:
         # Let's attach the attribute to the player object in context.
         if context and "player_stats" in context:
             context["player_stats"].is_stunned = is_stunned
+            context["player_stats"].is_silenced = self.active_monster.get("player_silenced", False)
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
@@ -885,6 +886,9 @@ class AdventureSession:
         # Update Persistence for Stun State
         if "player_stunned" in result:
             self.active_monster["player_stunned"] = result["player_stunned"]
+
+        if "player_silenced" in result:
+            self.active_monster["player_silenced"] = result["player_silenced"]
 
         turn_logs = result["phrases"]
         if prepend_logs:
