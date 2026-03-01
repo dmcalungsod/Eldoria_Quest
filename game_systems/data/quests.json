@@ -1586,7 +1586,7 @@
     "quest_giver": "\"Whispering\" Thorne",
     "location": "The Wailing Chasm",
     "summary": "Investigate the harmonic humming in the chasm.",
-    "description": "Thorne, a paranoid survivor, warns of 'The Blind Choir', a cult of former Delvers who sing to the void below. Their requiem threatens to widen the chasm and swallow everything. Travel to The Echoing Hollow and destroy their Resonance Crystals to disrupt their harmony.",
+    "description": "\"They aren't just screaming into the dark, they're singing to it,\" Thorne whispers, eyes darting at shadows. \"The Blind Choir. Cultists who found meaning in the void's hunger. Their requiem is physically widening the fissure.\" He thrusts a map toward you. \"Descend to The Echoing Hollow. Shatter their Resonance Crystals to disrupt the harmony, and tear their dark hymnal from their hands before Kaza-Kor is swallowed whole.\"",
     "objectives": {
       "destroy": {
         "Resonance Crystal": 3
@@ -1596,8 +1596,8 @@
       }
     },
     "flavor_text": {
-      "destroy:Resonance Crystal": "The crystal shatters with a discordant shriek, throwing the cultists' chanting off balance.",
-      "retrieve:Hymnal of the Void": "The pages of the hymnal are written in dried blood. Just looking at the notes makes your head throb."
+      "destroy:Resonance Crystal": "The crystal shatters with a piercing, discordant shriek. For a moment, the ambient wailing of the chasm stutters and breaks.",
+      "retrieve:Hymnal of the Void": "The pages of the hymnal are bound in flayed skin and written in dried, rusted blood. A cold vibration pulses through the tome as your fingers brush the cover, making your teeth ache."
     },
     "rewards": {
       "exp": 4000,
@@ -1611,7 +1611,7 @@
     "quest_giver": "\"Whispering\" Thorne",
     "location": "The Wailing Chasm",
     "summary": "Destroy the Hymnal and silence the Choirmaster. (Choice A)",
-    "description": "Thorne begs you to destroy the Hymnal of the Void, fearing its corrupting influence. With the book burned, he gives you a sonic-dampening bomb. Take it to the edge of the fissure and silence the Choirmaster permanently.",
+    "description": "Thorne recoils as you present the Hymnal. \"Burn it! Now!\" he snarls, pressing an alchemical device into your palm. \"With their scripture gone, they will falter. Take this sonic-dampening bomb to the edge of the great fissure. When the Choirmaster begins his grand crescendo, unleash absolute silence and end his song permanently.\"",
     "prerequisites": [
       79
     ],
@@ -1624,8 +1624,8 @@
       "use": "Sonic-Dampening Bomb"
     },
     "flavor_text": {
-      "use:Sonic-Dampening Bomb": "The bomb detonates in a flash of absolute silence, staggering the Choirmaster and cutting his song short.",
-      "defeat:Choirmaster": "The Choirmaster falls silently into the abyss, his final note unfinished."
+      "use:Sonic-Dampening Bomb": "The bomb detonates, but there is no sound. A wave of absolute, terrifying silence violently expands, extinguishing the Choirmaster's void-song and leaving a breathless vacuum in its wake.",
+      "defeat:Choirmaster": "The Choirmaster stumbles backward, mouth wide in a silent scream. As he plummets into the black abyss, the oppressive wailing of the chasm finally lessens into a dull, manageable drone."
     },
     "rewards": {
       "exp": 5500,
@@ -1641,7 +1641,7 @@
     "quest_giver": "\"Whispering\" Thorne",
     "location": "The Wailing Chasm",
     "summary": "Keep the Hymnal and confront the Choirmaster. (Choice B)",
-    "description": "You refuse to destroy the Hymnal, believing its secrets might be useful. Thorne, terrified and suspicious, refuses to help you further. You must confront the Choirmaster at the edge of the fissure and resist his mind-altering void whispers on your own.",
+    "description": "You refuse to burn the Hymnal, the dark whispers of its pages promising hidden strength. Thorne backs away, terror overriding his paranoia. \"Then you are already lost to the dark,\" he spits, fleeing into the shadows. You must descend alone to the precipice of the fissure and confront the Choirmaster. This time, the cult will face you with the full, unfiltered power of their corrupted requiem.",
     "prerequisites": [
       79
     ],
@@ -1653,7 +1653,7 @@
       }
     },
     "flavor_text": {
-      "defeat:Choirmaster": "The Choirmaster shrieks as he falls into the void. You clutch the Hymnal tightly; its whispers seem louder now."
+      "defeat:Choirmaster": "The Choirmaster shrieks a final, reality-bending note before the void drags him down. You clutch the Hymnal tightly to your chest; its whispers are no longer a faint hum, but a clear, commanding voice in the back of your mind."
     },
     "rewards": {
       "exp": 6500,

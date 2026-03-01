@@ -6,3 +6,8 @@
 
 **Learning:** Mission reports were static and dry. By using a dictionary mapping location IDs to atmospheric text, I significantly increased immersion without changing mechanics.
 **Action:** In future narrative enhancements, look for opportunities to replace static strings with context-aware, randomized lists to keep the experience fresh.
+
+## 2026-02-28 — The Wailing Chasm & The Blind Choir
+
+**Learning:** When writing for subterranean or sensory-deprived environments (like The Wailing Chasm), focusing on the *absence* of something (e.g., "absolute, terrifying silence") or the physical sensation of sound (e.g., "a cold vibration pulses through the tome", "making your teeth ache") creates a much stronger emotional reaction than simply describing what is seen in the dark.
+**Action:** In future updates to sound-based or void-corrupted mechanics, emphasize the physical, bodily impact of the corruption rather than just visual descriptors. Allow NPCs like "Whispering" Thorne to reflect the psychological toll of the environment in their dialogue.

@@ -71,7 +71,8 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 15. **Gale-Scarred Heights (Rank A):** High peaks where the wind howls like a living thing. Only the sure-footed survive.
 16. **The Shimmering Wastes (Rank A):** A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.
 17. **The Thunder-Crag Coast (Rank A):** A storm-battered shoreline teeming with elemental fury and high-value materials like storm essence.
-18. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
+18. **The Wailing Chasm (Rank A):** A pitch-black subterranean abyss where echoes of The Sundering are physically trapped. Home to the madness of the Deep Delvers and the corrupted Blind Choir.
+19. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
 
 ---
 

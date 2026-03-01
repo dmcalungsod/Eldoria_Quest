@@ -14,6 +14,7 @@ from game_systems.core.world_time import WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
+from game_systems.data.consumables import CONSUMABLES
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager
@@ -313,6 +314,21 @@ class AdventureManager:
 
             items_to_add = self._grant_rewards_internal(session, total_exp, p_stats)
 
+            # Refund unused supplies
+            refund_logs = []
+            for item_key, count in session.supplies.items():
+                if count > 0:
+                    c_data = CONSUMABLES.get(item_key)
+                    if c_data:
+                        items_to_add.append({
+                            "key": item_key,
+                            "name": c_data["name"],
+                            "type": c_data["type"],
+                            "rarity": c_data.get("rarity", "Common"),
+                            "amount": count,
+                        })
+                        refund_logs.append(f"🎒 Refunded: {count}x {c_data['name']}")
+
             # Capture state after rewards
             new_level = self.db.get_player_field(discord_id, "level")
 
@@ -340,6 +356,7 @@ class AdventureManager:
                 "leveled_up": new_level > old_level,
                 "faction_logs": faction_logs,
                 "penalty_logs": penalty_logs,
+                "refund_logs": refund_logs,
             }
 
             bulk_items = [
