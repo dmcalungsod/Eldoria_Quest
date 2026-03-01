@@ -142,17 +142,23 @@ class EmbedBuilder:
         )
 
     @staticmethod
-    def services_menu() -> discord.Embed:
+    def services_menu(dynamic_flavor: str = "") -> discord.Embed:
+        desc = "*The Guild offers a suite of services designed to keep its members alive and capable.*\n\n"
+
+        if dynamic_flavor:
+            desc = f"{dynamic_flavor}\n\n{desc}"
+
+        desc += (
+            "**Available Services:**\n"
+            "• **Guild Exchange** — Trade materials for Aurum.\n"
+            "• **Guild Supply** — Purchase provisions.\n"
+            "• **Infirmary** — Receive medical treatment.\n"
+            "• **Skill Trainer** — Train and acquire new abilities."
+        )
+
         return discord.Embed(
             title="🏦 Guild Services",
-            description=(
-                "*The Guild offers a suite of services designed to keep its members alive and capable.*\n\n"
-                "**Available Services:**\n"
-                "• **Guild Exchange** — Trade materials for Aurum.\n"
-                "• **Guild Supply** — Purchase provisions.\n"
-                "• **Infirmary** — Receive medical treatment.\n"
-                "• **Skill Trainer** — Train and acquire new abilities."
-            ),
+            description=desc,
             color=discord.Color.dark_blue(),
         )
 
