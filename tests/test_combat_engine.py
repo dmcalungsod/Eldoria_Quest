@@ -23,6 +23,7 @@ def mock_player():
         "MP": 50,
     }
     player.is_stunned = False
+    player.is_silenced = False
     return player
 
 

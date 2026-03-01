@@ -14,3 +14,8 @@
 
 **Learning:** Designing an abstraction formula to replace turn-based simulation requires creating "expected values" for variable mechanics (like crits, accuracy, and skill triggers). By taking average base power and multiplying by expected multipliers (e.g., 1 + crit_chance*(crit_mult-1)), we can derive a stable "DPS" value. Flooring chip damage and putting a ceiling on turns-to-kill prevents infinite math loops in extreme defense cases.
 **Action:** Implemented `AutoCombatFormula.resolve_clash` taking into account stats, stances, and weather modifiers for background expedition resolution without invoking `CombatEngine` iteratively.
+
+## 2026-03-01 — Implementing the Silence Mechanic
+
+**Learning:** When implementing transient combat state effects in the Eldoria Quest engine (like the Silence mechanic, which mirrors the Stun mechanic), it is critical to not only process and return the state from the `CombatEngine`, but to manually propagate that state back into the `player_stats` object in `adventure_session.py`. Because the Discord bot is stateless between turns, failure to explicitly map `self.active_monster["player_silenced"]` into `context["player_stats"].is_silenced` will result in the state immediately dropping on the next turn. Additionally, any new binary flags for state must be manually added to mock player objects in all relevant test files.
+**Action:** Always verify the full lifecycle of a status effect: `Status Applied (Engine) -> Saved (Session/Database) -> Re-Injected (Next Turn Context) -> Enforced (Engine) -> Consumed`.
