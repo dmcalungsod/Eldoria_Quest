@@ -574,8 +574,54 @@ class AdventureEvents:
         f"{E.TRAP} You step on a rune that explodes with magical force!",
     ]
 
-    @staticmethod
+    _LOCATION_REGEN_PHRASES = {
+        "whispering_thicket": REGEN_PHRASES_THICKET,
+        "deepgrove_roots": REGEN_PHRASES_ROOTS,
+        "crystal_caverns": REGEN_PHRASES_CRYSTAL,
+        "molten_caldera": REGEN_PHRASES_MAGMA,
+        "sunken_grotto": REGEN_PHRASES_GROTTO,
+        "clockwork_halls": REGEN_PHRASES_CLOCKWORK,
+        "guild_arena": REGEN_PHRASES_ARENA,
+        "the_ashlands": REGEN_PHRASES_ASHLANDS,
+        "forgotten_ossuary": REGEN_PHRASES_OSSUARY,
+        "whispering_archives": REGEN_PHRASES_ARCHIVES,
+    }
+
+    _LOCATION_ATMOSPHERE = {
+        "whispering_thicket": ATMOSPHERE_THICKET,
+        "deepgrove_roots": ATMOSPHERE_ROOTS,
+        "crystal_caverns": ATMOSPHERE_CRYSTAL,
+        "molten_caldera": ATMOSPHERE_MAGMA,
+        "sunken_grotto": ATMOSPHERE_GROTTO,
+        "clockwork_halls": ATMOSPHERE_CLOCKWORK,
+        "guild_arena": ATMOSPHERE_ARENA,
+        "the_ashlands": ATMOSPHERE_ASHLANDS,
+        "forgotten_ossuary": ATMOSPHERE_OSSUARY,
+        "whispering_archives": ATMOSPHERE_ARCHIVES,
+    }
+
+    _EVENT_ATMOSPHERE = {
+        "blood_moon": ATMOSPHERE_BLOOD_MOON,
+        "harvest_festival": ATMOSPHERE_HARVEST,
+        "frostfall_expedition": ATMOSPHERE_FROSTFALL,
+    }
+
+    _TIME_PHASE_ATMOSPHERE = {
+        TimePhase.NIGHT: ATMOSPHERE_NIGHT,
+        TimePhase.DAWN: ATMOSPHERE_DAWN,
+        TimePhase.DUSK: ATMOSPHERE_DUSK,
+    }
+
+    _SEASONAL_ATMOSPHERE = {
+        Season.SPRING: ATMOSPHERE_SPRING,
+        Season.SUMMER: ATMOSPHERE_SUMMER,
+        Season.AUTUMN: ATMOSPHERE_AUTUMN,
+        Season.WINTER: ATMOSPHERE_WINTER,
+    }
+
+    @classmethod
     def regeneration(
+        cls,
         location_id: str | None = None,
         class_name: str = "Adventurer",
         hp_percent: float = 1.0,
@@ -589,104 +635,42 @@ class AdventureEvents:
 
         # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
         if hp_percent < 0.30 and random.random() < 0.50:
-            base_logs = [random.choice(AdventureEvents.REGEN_LOW_HP)]
+            base_logs = [random.choice(cls.REGEN_LOW_HP)]
 
         # 2. High HP (> 80%): 30% chance for confident flavor
         elif hp_percent > 0.80 and random.random() < 0.30:
-            base_logs = [random.choice(AdventureEvents.REGEN_HIGH_HP)]
+            base_logs = [random.choice(cls.REGEN_HIGH_HP)]
 
         # 3. Class-Specific Flavor: 30% chance
-        elif class_name in AdventureEvents.REGEN_CLASS_PHRASES and random.random() < 0.30:
-            base_logs = [random.choice(AdventureEvents.REGEN_CLASS_PHRASES[class_name])]
+        elif class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:
+            base_logs = [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]
 
-        # 4. Location-Specific Fallback
-        elif location_id == "whispering_thicket":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_THICKET)]
-        elif location_id == "deepgrove_roots":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ROOTS)]
-        elif location_id == "crystal_caverns":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CRYSTAL)]
-        elif location_id == "molten_caldera":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_MAGMA)]
-        elif location_id == "sunken_grotto":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_GROTTO)]
-        elif location_id == "clockwork_halls":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_CLOCKWORK)]
-        elif location_id == "guild_arena":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARENA)]
-        elif location_id == "the_ashlands":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ASHLANDS)]
-        elif location_id == "forgotten_ossuary":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_OSSUARY)]
-        elif location_id == "whispering_archives":
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES_ARCHIVES)]
-
-        # 5. Generic Fallback
+        # 4. Location-Specific or Generic Fallback
         else:
-            base_logs = [random.choice(AdventureEvents.REGEN_PHRASES)]
+            phrases = cls._LOCATION_REGEN_PHRASES.get(location_id, cls.REGEN_PHRASES)
+            base_logs = [random.choice(phrases)]
 
         # --- ATMOSPHERIC PREPEND ---
         # 40% chance to add an atmospheric intro line
         if random.random() < 0.40:
-            atmosphere_pool = AdventureEvents.ATMOSPHERE_FOREST  # Default
-
-            if location_id == "whispering_thicket":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_THICKET
-            elif location_id == "deepgrove_roots":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ROOTS
-            elif location_id == "crystal_caverns":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_CRYSTAL
-            elif location_id == "molten_caldera":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_MAGMA
-            elif location_id == "sunken_grotto":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_GROTTO
-            elif location_id == "clockwork_halls":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_CLOCKWORK
-            elif location_id == "guild_arena":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ARENA
-            elif location_id == "the_ashlands":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ASHLANDS
-            elif location_id == "forgotten_ossuary":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_OSSUARY
-            elif location_id == "whispering_archives":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_ARCHIVES
+            atmosphere_pool = cls._LOCATION_ATMOSPHERE.get(location_id, cls.ATMOSPHERE_FOREST)
 
             # Event Override (High Priority)
-            if event_type == "blood_moon":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_BLOOD_MOON
-            elif event_type == "harvest_festival":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_HARVEST
-            elif event_type == "frostfall_expedition":
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_FROSTFALL
+            if event_type in cls._EVENT_ATMOSPHERE:
+                atmosphere_pool = cls._EVENT_ATMOSPHERE[event_type]
 
             # Time Phase Override (30% chance)
-            elif time_phase == TimePhase.NIGHT and random.random() < 0.3:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_NIGHT
-            elif time_phase == TimePhase.DAWN and random.random() < 0.3:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_DAWN
-            elif time_phase == TimePhase.DUSK and random.random() < 0.3:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_DUSK
+            elif time_phase in cls._TIME_PHASE_ATMOSPHERE and random.random() < 0.3:
+                atmosphere_pool = cls._TIME_PHASE_ATMOSPHERE[time_phase]
 
             # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
-            weather_chance = 0.3
-            if weather in (Weather.STORM, Weather.ASH):
-                weather_chance = 0.5
-
-            if weather in AdventureEvents.ATMOSPHERE_WEATHER and random.random() < weather_chance:
-                atmosphere_pool = AdventureEvents.ATMOSPHERE_WEATHER[weather]
+            weather_chance = 0.5 if weather in (Weather.STORM, Weather.ASH) else 0.3
+            if weather in cls.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+                atmosphere_pool = cls.ATMOSPHERE_WEATHER[weather]
 
             # Seasonal Override (25% chance)
-            elif season:
-                seasonal_chance = 0.25
-                if random.random() < seasonal_chance:
-                    if season == Season.SPRING:
-                        atmosphere_pool = AdventureEvents.ATMOSPHERE_SPRING
-                    elif season == Season.SUMMER:
-                        atmosphere_pool = AdventureEvents.ATMOSPHERE_SUMMER
-                    elif season == Season.AUTUMN:
-                        atmosphere_pool = AdventureEvents.ATMOSPHERE_AUTUMN
-                    elif season == Season.WINTER:
-                        atmosphere_pool = AdventureEvents.ATMOSPHERE_WINTER
+            elif season in cls._SEASONAL_ATMOSPHERE and random.random() < 0.25:
+                atmosphere_pool = cls._SEASONAL_ATMOSPHERE[season]
 
             # Select and prepend
             atmospheric_line = random.choice(atmosphere_pool)

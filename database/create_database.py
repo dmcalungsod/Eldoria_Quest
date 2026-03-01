@@ -38,34 +38,34 @@ def create_tables(db=None):
     # -------------------------
     # Format: "collection_name": [ (keys, unique, partialFilter) ]
     INDEX_DEFINITIONS = {
-        "players": [(("discord_id", ASCENDING), True, None)],
-        "stats": [(("discord_id", ASCENDING), True, None)],
+        "players": [([("discord_id", ASCENDING)], True, None)],
+        "stats": [([("discord_id", ASCENDING)], True, None)],
         "monsters": [
-            (("id", ASCENDING), True, None),
-            (("biome", ASCENDING), False, None),
-            (("tier", ASCENDING), False, None),
+            ([("id", ASCENDING)], True, None),
+            ([("biome", ASCENDING)], False, None),
+            ([("tier", ASCENDING)], False, None),
         ],
-        "quest_items": [(("id", ASCENDING), True, None)],
-        "consumables": [(("id", ASCENDING), True, None)],
-        "equipment": [(("id", ASCENDING), True, None)],
-        "class_equipment": [(("id", ASCENDING), True, None)],
-        "item_sets": [(("id", ASCENDING), True, None)],
-        "guild_members": [(("discord_id", ASCENDING), True, None)],
+        "quest_items": [([("id", ASCENDING)], True, None)],
+        "consumables": [([("id", ASCENDING)], True, None)],
+        "equipment": [([("id", ASCENDING)], True, None)],
+        "class_equipment": [([("id", ASCENDING)], True, None)],
+        "item_sets": [([("id", ASCENDING)], True, None)],
+        "guild_members": [([("discord_id", ASCENDING)], True, None)],
         "quests": [
-            (("id", ASCENDING), True, None),
-            (("tier", ASCENDING), False, None),
+            ([("id", ASCENDING)], True, None),
+            ([("tier", ASCENDING)], False, None),
         ],
         "player_quests": [
             ([("discord_id", ASCENDING), ("quest_id", ASCENDING)], False, None),
-            (("discord_id", ASCENDING), False, None),
+            ([("discord_id", ASCENDING)], False, None),
         ],
         "materials": [
-            (("id", ASCENDING), True, None),
-            (("key_id", ASCENDING), True, None),
+            ([("id", ASCENDING)], True, None),
+            ([("key_id", ASCENDING)], True, None),
         ],
         "inventory": [
-            (("id", ASCENDING), True, None),
-            (("discord_id", ASCENDING), False, None),
+            ([("id", ASCENDING)], True, None),
+            ([("discord_id", ASCENDING)], False, None),
             (
                 [
                     ("discord_id", ASCENDING),
@@ -83,31 +83,31 @@ def create_tables(db=None):
             ),
         ],
         "adventure_sessions": [
-            (("discord_id", ASCENDING), True, None),
+            ([("discord_id", ASCENDING)], True, None),
             ([("discord_id", ASCENDING), ("active", ASCENDING)], False, None),
         ],
         "skills": [
-            (("id", ASCENDING), True, None),
-            (("key_id", ASCENDING), True, None),
+            ([("id", ASCENDING)], True, None),
+            ([("key_id", ASCENDING)], True, None),
         ],
         "player_skills": [
             ([("discord_id", ASCENDING), ("skill_key", ASCENDING)], True, None),
-            (("discord_id", ASCENDING), False, None),
+            ([("discord_id", ASCENDING)], False, None),
         ],
         "global_boosts": [
-            (("boost_key", ASCENDING), True, None),
-            (("end_time", ASCENDING), False, None),
+            ([("boost_key", ASCENDING)], True, None),
+            ([("end_time", ASCENDING)], False, None),
         ],
         "active_buffs": [
-            (("discord_id", ASCENDING), False, None),
+            ([("discord_id", ASCENDING)], False, None),
             ([("discord_id", ASCENDING), ("end_time", ASCENDING)], False, None),
         ],
-        "classes": [(("id", ASCENDING), True, None)],
-        "locations": [(("id", ASCENDING), True, None)],
+        "classes": [([("id", ASCENDING)], True, None)],
+        "locations": [([("id", ASCENDING)], True, None)],
         "tournaments": [
-            (("id", ASCENDING), True, None),
-            (("active", ASCENDING), False, None),
-            (("end_time", ASCENDING), False, None),
+            ([("id", ASCENDING)], True, None),
+            ([("active", ASCENDING)], False, None),
+            ([("end_time", ASCENDING)], False, None),
         ],
         "tournament_scores": [
             (
@@ -118,8 +118,8 @@ def create_tables(db=None):
             ([("tournament_id", ASCENDING), ("score", -1)], False, None),
         ],
         "world_events": [
-            (("active", ASCENDING), False, None),
-            (("end_time", ASCENDING), False, None),
+            ([("active", ASCENDING)], False, None),
+            ([("end_time", ASCENDING)], False, None),
         ],
     }
 

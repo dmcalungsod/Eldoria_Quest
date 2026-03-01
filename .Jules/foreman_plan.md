@@ -79,10 +79,31 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ### Phase 4: Testing & Launch
 **Focus:** Stress testing and final verification.
-- [ ] **Task 4.1:** Stress test Scheduler (10k simulated sessions).
+- [x] **Task 4.1:** Stress test Scheduler (10k simulated sessions).
     - **Agent:** @BugHunter
-- [ ] **Task 4.2:** Verify "Cancel" exploit prevention.
+- [x] **Task 4.2:** Verify "Cancel" exploit prevention.
     - **Agent:** @BugHunter
+
+---
+
+## 📌 Tracked Issues
+**Focus:** Addressing issues reported by Issue Crafter.
+- [ ] **Issue #1:** [Feature] Auto-Adventure: Loot Table & Drop Rate Tuning
+    - **Agent:** @DataSteward, @GameBalancer
+- [ ] **Issue #2:** [Feature] Auto-Adventure: Fatigue System
+    - **Agent:** @GameBalancer
+- [ ] **Issue #3:** [Feature] Auto-Adventure: Travel Supplies (Rations & Torches)
+    - **Agent:** @Equipper
+- [ ] **Issue #4:** [Test] Auto-Adventure: Stress Test Scheduler
+    - **Agent:** @BugHunter
+- [ ] **Issue #5:** [Test] Auto-Adventure: Exploit Verification
+    - **Agent:** @BugHunter
+- [ ] **Issue #6:** [Feature] The Eldoria Codex System
+    - **Agent:** @CodexKeeper
+- [ ] **Issue #7:** [Feature] Alchemist Class Implementation
+    - **Agent:** @Namewright, @GameForge
+- [ ] **Issue #8:** [UX] Implement One UI Policy
+    - **Agent:** @Palette
 
 ---
 
