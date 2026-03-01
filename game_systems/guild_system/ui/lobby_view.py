@@ -79,14 +79,24 @@ class GuildLobbyView(View, GuildViewMixin):
 
         await interaction.response.defer()
         view = QuestsMenuView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.quest_menu(), view=view)
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.quest_menu(), view=view
+        )
 
     async def _services_btn_callback(self, interaction: discord.Interaction):
         from .services_menu import GuildServicesView
+        from game_systems.core.world_time import WorldTime, TimePhase
 
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
-        await interaction.edit_original_response(embed=EmbedBuilder.services_menu(), view=view)
+
+        dynamic_flavor = ""
+        if WorldTime.get_current_phase() == TimePhase.NIGHT:
+            dynamic_flavor = "🌙 *The sun has set. The Mystic Merchant has arrived under the cover of darkness.*"
+
+        await interaction.edit_original_response(
+            embed=EmbedBuilder.services_menu(dynamic_flavor=dynamic_flavor), view=view
+        )
 
     async def _advisor_callback(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
