@@ -29,3 +29,16 @@ The flavor text in `narrative_data.py` is exceptionally strong, adhering well to
 
 **Next Steps:**
 - Monitor the implementation of the "Codex" to ensure these locations are correctly categorized in the UI.
+
+## 2026-03-02 — Integrating The Wailing Chasm
+
+**Learning:**
+Reviewed `.Jules/region_the_wailing_chasm.md` and noticed a reference to a "Dwarven trade route". Eldoria Quest is a human-centric survival setting, and the introduction of classic high-fantasy races (like Dwarves or Elves) dilutes the grounded, dark fantasy tone. Recontextualizing the location as an ancient human or unknown precursor trade route preserves the mystery without violating canon. The lore surrounding the Deep Delvers and the Blind Choir, however, perfectly aligns with the grim, void-corrupted themes.
+
+**Action:**
+1. Edited `.Jules/region_the_wailing_chasm.md` to remove the word "Dwarven", changing the history to "Once a bustling underground trade route known as Kaza-Kor."
+2. Added **The Wailing Chasm (Rank A)** to `.Jules/lore_canon.md`, summarizing the presence of the Deep Delvers and the Blind Choir.
+3. Notified @Realmwright and @StoryWeaver to maintain this consistency in future implementations and dialogue.
+
+**Next Steps:**
+- Ensure the Codex entry for The Wailing Chasm adheres to this revised lore.

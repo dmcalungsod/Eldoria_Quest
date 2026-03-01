@@ -518,6 +518,7 @@ class TestAutoAdventureRegression(unittest.TestCase):
                     # Base (0.20) would fail. Torch (0.10) should save.
                     with patch("random.random", return_value=0.15):
                         with patch.object(session, "_fetch_session_context", return_value=self.mock_context_bundle):
+                            session.steps_completed = 1 # Avoid consuming torch instantly
                             result = session.simulate_step()
                             logs = "".join([str(x) for x in result['sequence'][0]])
                             self.assertNotIn("AMBUSH!", logs)
