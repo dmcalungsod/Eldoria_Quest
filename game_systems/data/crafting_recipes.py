@@ -305,4 +305,14 @@ EQUIPMENT_RECIPES = {
         "cost": 700,
         "description": "Rivet brass plating onto an iron frame.",
     },
+    "craft_echolocation_helm": {
+        "id": "craft_echolocation_helm",
+        "name": "Echolocation Helm",
+        "output_key": "acc_echolocation_helm",
+        "type": "equipment",
+        "rarity": "Epic",
+        "materials": {"abyssal_ore": 5, "abyssal_pearl": 1},
+        "cost": 1000,
+        "description": "Craft an Echolocation Helm to navigate the darkness.",
+    },
 }
