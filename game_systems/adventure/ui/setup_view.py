@@ -112,7 +112,7 @@ class AdventureSetupView(View):
         self.supply_select = Select(
             placeholder="Select Supplies (Optional)...",
             min_values=0,
-            max_values=3,  # Will be adjusted dynamically
+            max_values=3,
             row=2,
         )
 
@@ -148,15 +148,11 @@ class AdventureSetupView(View):
 
                 self.supply_select.add_option(label=label, value=value, description=desc, emoji="🎒")
 
-            # Dynamically adjust max_values based on available options and inventory capacity
+            # Dynamically adjust max_values based on available options
+            # max_values cannot exceed the number of options
             num_options = len(self.supply_select.options)
             if num_options > 0:
-                # Carrier Integration: Scale max supplies player can bring based on their max capacity
-                # Base is 3, +1 for every 5 slots beyond 15.
-                current, max_cap = self.capacity if self.capacity else (0, 10)
-                allowed_supplies = 3 + max(0, (max_cap - 15) // 5)
-                self.supply_select.max_values = min(allowed_supplies, num_options)
-
+                self.supply_select.max_values = min(3, num_options)
             else:
                 self.supply_select.disabled = True
         else:
