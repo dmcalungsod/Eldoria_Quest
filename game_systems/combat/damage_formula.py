@@ -78,8 +78,8 @@ class DamageFormula:
         return max(1, damage), is_crit, event_type
 
     @staticmethod
-    def player_skill(player_stats, monster, skill_data, skill_level: int):
-        # Data-driven scaling
+    def calculate_skill_attack_power(player_stats, skill_data, skill_level: int) -> float:
+        """Calculates the raw attack power of a skill before defense reduction and variance."""
         scaling_stat = skill_data.get("scaling_stat", "MAG").upper()
         scaling_factor = float(skill_data.get("scaling_factor", 1.0))
 
@@ -95,7 +95,11 @@ class DamageFormula:
 
         base_multiplier = float(skill_data.get("power_multiplier", 1.0))
         final_multiplier = base_multiplier + (0.08 * (skill_level - 1))
-        attack_power *= final_multiplier
+        return attack_power * final_multiplier
+
+    @staticmethod
+    def player_skill(player_stats, monster, skill_data, skill_level: int):
+        attack_power = DamageFormula.calculate_skill_attack_power(player_stats, skill_data, skill_level)
 
         monster_def = monster.get("DEF", 0)
         defense_reduction = monster_def * (0.3 + (0.2 * min(1, monster_def / 100)))

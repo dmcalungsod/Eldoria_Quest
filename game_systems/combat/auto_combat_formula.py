@@ -34,20 +34,24 @@ class AutoCombatFormula:
         str_bonus = calculate_tiered_bonus(str_val, 2.0)
         dex_bonus = calculate_tiered_bonus(dex_val, 1.0)
         mag_bonus = calculate_tiered_bonus(mag_val, 0.5)
-        attack_power = str_bonus + dex_bonus + mag_bonus
+        basic_attack_power = str_bonus + dex_bonus + mag_bonus
 
-        # Skill abstraction: Assume 25% of turns use an average offensive skill
-        # that deals 1.5x basic attack power, representing MP usage.
-        # This increases base attack power effectively by 12.5%.
-        has_offensive_skills = False
+        # Skill abstraction: Assume 25% of turns use the player's best offensive skill
+        # Calculate expected power based on DamageFormula's logic
+        best_skill_power = 0.0
         if skills:
             for s in skills:
-                if s.get("power_multiplier") or s.get("scaling_stat"):
-                    has_offensive_skills = True
-                    break
+                if s.get("power_multiplier"):
+                    skill_level = s.get("skill_level", 1)
+                    skill_power = DamageFormula.calculate_skill_attack_power(player_stats, s, skill_level)
+                    if skill_power > best_skill_power:
+                        best_skill_power = skill_power
 
-        if has_offensive_skills:
-            attack_power *= 1.125
+        # Blended Attack Power
+        if best_skill_power > basic_attack_power:
+            attack_power = (basic_attack_power * 0.75) + (best_skill_power * 0.25)
+        else:
+            attack_power = basic_attack_power
 
         # Crit expected value
         crit_chance = 0.03 + (luck_val * 0.002)
