@@ -32,6 +32,9 @@ import test_crafting_ui  # New Crafting UI tests
 import test_developer_cog
 import test_dos_prevention  # New DoS prevention tests
 import test_event_cog
+import test_adventure_loop
+import test_character_cog
+import test_adventure_menu
 import test_echoes_of_the_deep_event
 import test_exploration_view_ux  # New UX test
 import test_faction_system  # New Faction System tests
@@ -152,6 +155,7 @@ def run_ux_tests():
     print("-" * 70)
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_exploration_view_ux)
+    suite.addTests(loader.loadTestsFromModule(test_adventure_menu))
     suite.addTests(loader.loadTestsFromModule(test_adventure_embeds))
     suite.addTests(loader.loadTestsFromModule(test_onboarding_ux))
     suite.addTests(loader.loadTestsFromModule(test_shop_ux_enhancement))
@@ -207,6 +211,8 @@ def run_cog_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_developer_cog)
     suite.addTests(loader.loadTestsFromModule(test_event_cog))
+    suite.addTests(loader.loadTestsFromModule(test_adventure_loop))
+    suite.addTests(loader.loadTestsFromModule(test_character_cog))
     suite.addTests(loader.loadTestsFromModule(test_echoes_of_the_deep_event))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
