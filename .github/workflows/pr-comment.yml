@@ -1,0 +1,18 @@
+name: PR Comment
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - main
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment on new PR
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6
+        with:
+          message: |
+            Have you logged the correct system time in your files? @${{ github.actor }}!
+          reactions: eyes, rocket
