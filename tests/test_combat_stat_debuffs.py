@@ -9,6 +9,7 @@ class TestCombatDebuffs(unittest.TestCase):
     def setUp(self):
         self.player = MagicMock()
         self.player.is_stunned = False
+        self.player.is_silenced = False
         self.player.stats.max_hp = 100
         self.player.hp_current = 100
         self.player.level = 10

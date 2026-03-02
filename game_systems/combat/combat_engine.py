@@ -160,6 +160,7 @@ class CombatEngine:
         # Current architecture suggests CombatEngine is transient.
         # We will check if player object has a 'stunned' attribute or similar.
         self.player_stunned = getattr(player, "is_stunned", False)
+        self.player_silenced = getattr(player, "is_silenced", False)
 
         if self.player_stance == "aggressive":
             self.dmg_dealt_mult = 1.2
@@ -224,22 +225,9 @@ class CombatEngine:
             monster_stunned, bonus_crit, player_defending = self._check_interrupt_mechanic(log)
 
             # --- 1. PLAYER'S TURN ---
-            if self.player_stunned:
-                log.append("💫 **Stunned!** You cannot move!")
-                monster_defeated = False
-                # Reset stun for next turn (or decrement if we had duration)
-                self.player_stunned = False
-                # We need to signal this back to caller if state persists,
-                # but currently engine returns result dict.
-                # We'll add 'player_stunned' to result dict.
-            else:
-                monster_defeated, player_defending = self._process_player_turn(
-                    log, turn_report, bonus_crit, player_defending
-                )
-
-            # Check if player skill stunned the monster
-            if self.monster.pop("is_stunned", False):
-                monster_stunned = True
+            monster_defeated, player_defending, monster_stunned = self._handle_player_turn_phase(
+                log, turn_report, bonus_crit, player_defending, monster_stunned
+            )
 
             if monster_defeated:
                 logger.info("Combat End: Monster defeated.")
@@ -263,6 +251,7 @@ class CombatEngine:
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
                 "player_stunned": self.player_stunned,
+                "player_silenced": self.player_silenced,
                 "consumed_buff_ids": self.consumed_buff_ids,
             }
 
@@ -280,6 +269,22 @@ class CombatEngine:
                 "new_buffs": self.new_buffs,
                 "new_titles": self.new_titles,
             }
+
+    def _handle_player_turn_phase(self, log, turn_report, bonus_crit, player_defending, monster_stunned):
+        """Processes the player's phase of the combat turn."""
+        if self.player_stunned:
+            log.append("💫 **Stunned!** You cannot move!")
+            monster_defeated = False
+            self.player_stunned = False
+        else:
+            monster_defeated, player_defending = self._process_player_turn(
+                log, turn_report, bonus_crit, player_defending
+            )
+
+        if self.monster.pop("is_stunned", False):
+            monster_stunned = True
+
+        return monster_defeated, player_defending, monster_stunned
 
     def _handle_start_of_turn(self, log: list):
         """Processes start-of-turn effects (buffs, debuffs, weather)."""
@@ -339,6 +344,19 @@ class CombatEngine:
         Executes player action logic.
         Returns (monster_defeated, updated_player_defending).
         """
+
+        # Check silence
+        if self.player_silenced:
+            if self.action.startswith("skill:"):
+                skill_key = self.action.split(":", 1)[1]
+                use_skill = next((s for s in self.player_skills if s.get("key_id") == skill_key), None)
+                if use_skill and use_skill.get("mp_cost", 0) > 0:
+                    log.append("🔇 **Silenced!** You are unable to cast spells or use skills!")
+                    self.player_silenced = False
+                    return False, player_defending
+            # If not a skill, or zero MP skill, consume the silence and proceed normally
+            self.player_silenced = False
+
         if self.action == "defend":
             player_defending = True
             # Regenerate 5% MP
@@ -432,6 +450,14 @@ class CombatEngine:
                         else:
                             log.append("💫 **Stunned!** You are reeling from the blow!")
                             self.player_stunned = True
+
+                    silence_chance = status_effect.get("silence_chance", 0)
+                    if silence_chance > 0 and random.random() < silence_chance:  # nosec B311
+                        if self._is_player_immune("silence"):
+                            log.append("🛡️ **Immune!** You shrug off the silence effect!")
+                        else:
+                            log.append("🔇 **Silenced!** A suffocating hush falls over you!")
+                            self.player_silenced = True
 
         elif action["type"] == "buff":
             buff = action["buff"]
@@ -776,7 +802,10 @@ class CombatEngine:
         if roll > self.PLAYER_SKILL_CHANCE:
             return {"skill": None, "reason": "RNG check failed."}
 
-        usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
+        if self.player_silenced:
+            usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp and s.get("mp_cost", 0) == 0]
+        else:
+            usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
 
         if not usable_skills:
             return {"skill": None, "reason": "Not enough MP."}

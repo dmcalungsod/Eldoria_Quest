@@ -25,7 +25,9 @@ class TestAdventureDeathPenalty(unittest.TestCase):
         self.mock_bot = MagicMock()
 
         # Patch InventoryManager since it's instantiated in AdventureManager.__init__
-        with patch("game_systems.adventure.adventure_manager.InventoryManager") as MockInventoryManager:
+        with patch(
+            "game_systems.adventure.adventure_manager.InventoryManager"
+        ) as MockInventoryManager:
             self.manager = AdventureManager(self.mock_db, self.mock_bot)
             self.mock_inventory_manager = MockInventoryManager.return_value
             # Ensure the manager instance uses our mock inventory manager
@@ -35,8 +37,8 @@ class TestAdventureDeathPenalty(unittest.TestCase):
     def test_death_penalty_calculation(self, MockAdventureSession):
         """
         Regression Test: Verify death penalty logic (Aurum loss, Material loss).
-        - Aurum: 10% of CURRENT (banked) Aurum is lost.
-        - Materials: 50% of GATHERED (session) materials are lost.
+        - Aurum: 5% of CURRENT (banked) Aurum is lost.
+        - Materials: 100% of GATHERED (session) materials are lost.
         - Session Rewards: XP and Aurum collected IN SESSION are completely lost.
         """
         discord_id = 12345
@@ -52,7 +54,9 @@ class TestAdventureDeathPenalty(unittest.TestCase):
         }
 
         # Player has 1000 Aurum banked
-        self.mock_db.get_player_field.side_effect = lambda uid, field: 1000 if field == "aurum" else 1
+        self.mock_db.get_player_field.side_effect = lambda uid, field: (
+            1000 if field == "aurum" else 1
+        )
 
         # Mock PlayerStats (needed for _grant_rewards_internal call inside _handle_death_rewards)
         self.mock_db.get_player_stats_json.return_value = {
@@ -83,10 +87,11 @@ class TestAdventureDeathPenalty(unittest.TestCase):
         mock_session_instance.loot = {
             "exp": 500,  # Should be lost completely
             "aurum": 200,  # Should be lost completely
-            "iron_ore": 10,  # Material: 50% kept -> 5
-            "potion": 4,  # Material/Consumable: 50% kept -> 2
-            "rare_gem": 1,  # Material: 50% of 1 is 0.5 -> int(0.5) = 0 kept (Total loss)
+            "iron_ore": 10,  # Material: 100% lost
+            "potion": 4,  # Material/Consumable: 100% lost
+            "rare_gem": 1,  # Material: 100% lost
         }
+        mock_session_instance.supplies = {"pitch_torch": 2}
 
         # Simulate step returns DEAD
         mock_session_instance.simulate_step.return_value = {
@@ -99,26 +104,34 @@ class TestAdventureDeathPenalty(unittest.TestCase):
 
         # 4. Verifications
 
-        # A. Verify Aurum Penalty (10% of 1000 banked Aurum)
-        # deduct_aurum should be called with 100
-        self.mock_db.deduct_aurum.assert_called_with(discord_id, 100)
+        # A. Verify Aurum Penalty (5% of 1000 banked Aurum)
+        # deduct_aurum should be called with 50
+        self.mock_db.deduct_aurum.assert_called_with(discord_id, 50)
 
         # B. Verify Session Loot (XP/Aurum) is removed from session.loot
         # The code pops "exp" and "aurum" from the loot dict directly
         self.assertNotIn("exp", mock_session_instance.loot)
         self.assertNotIn("aurum", mock_session_instance.loot)
 
-        # C. Verify Material Penalty (50% kept)
+        # C. Verify Material Penalty (0% kept)
         # inventory_manager.add_items_bulk is called with the items to KEEP
         call_args = self.manager.inventory_manager.add_items_bulk.call_args
-        self.assertIsNotNone(call_args, "InventoryManager.add_items_bulk was not called!")
+        self.assertIsNotNone(
+            call_args, "InventoryManager.add_items_bulk was not called!"
+        )
 
         added_items = call_args[0][1]  # Second arg is the list of items
         item_map = {item["item_key"]: item["amount"] for item in added_items}
 
-        self.assertEqual(item_map.get("iron_ore"), 5, "Should keep 50% of 10 Iron Ore")
-        self.assertEqual(item_map.get("potion"), 2, "Should keep 50% of 4 Potions")
-        self.assertIsNone(item_map.get("rare_gem"), "Should lose 1 Rare Gem (50% of 1 = 0)")
+        self.assertNotIn("iron_ore", item_map, "Should keep 0% of 10 Iron Ore")
+        self.assertNotIn("potion", item_map, "Should keep 0% of 4 Potions")
+        self.assertNotIn("rare_gem", item_map, "1 rare gem should be 0 kept")
+
+        # D. Verify Supply Penalty
+        self.assertNotIn("pitch_torch", mock_session_instance.supplies)
+        self.assertIsNone(
+            item_map.get("rare_gem"), "Should lose 1 Rare Gem (50% of 1 = 0)"
+        )
 
         # D. Verify Session End
         self.mock_db.end_adventure_session.assert_called_with(discord_id)
@@ -131,9 +144,11 @@ class TestAdventureDeathPenalty(unittest.TestCase):
         last_frame = result["sequence"][-1]
         loss_text = "\n".join(last_frame)
         self.assertIn("Losses Incurred", loss_text)
-        self.assertIn("-100", loss_text)  # Aurum loss
-        self.assertIn("-5x Iron Ore", loss_text)  # 5 lost
-        self.assertIn("-2x", loss_text)  # 2 potions lost (name might vary if not in MATERIALS)
+        self.assertIn("-50", loss_text)  # Aurum loss
+        self.assertIn("-10x Iron Ore", loss_text)  # 10 lost
+        self.assertIn(
+            "-2x", loss_text
+        )  # 2 potions lost (name might vary if not in MATERIALS)
         # Note: "potion" is not in MATERIALS, so it uses "potion" as name.
         # "rare_gem" is not in MATERIALS, so it uses "rare_gem" as name.
         self.assertIn("-1x rare_gem", loss_text)  # 1 lost

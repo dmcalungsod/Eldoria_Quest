@@ -28,7 +28,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
         self.mock_bot = MagicMock()
 
         # Patch InventoryManager since it's instantiated in AdventureManager.__init__
-        with patch("game_systems.adventure.adventure_manager.InventoryManager") as MockInventoryManager:
+        with patch(
+            "game_systems.adventure.adventure_manager.InventoryManager"
+        ) as MockInventoryManager:
             self.manager = AdventureManager(self.mock_db, self.mock_bot)
             self.mock_inventory_manager = MockInventoryManager.return_value
             self.manager.inventory_manager = self.mock_inventory_manager
@@ -48,7 +50,7 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "MAG": {"base": 10},
             "LCK": {"base": 10},
             "HP": {"base": 100},
-            "MP": {"base": 100}
+            "MP": {"base": 100},
         }
         self.mock_db.get_player_stats_json.return_value = self.mock_player_stats
 
@@ -59,7 +61,7 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "current_hp": 100,
             "current_mp": 100,
             "vestige_pool": 0,
-            "class_id": 1
+            "class_id": 1,
         }
         self.mock_db.get_player.return_value = self.mock_player_data
 
@@ -67,14 +69,14 @@ class TestAutoAdventureRegression(unittest.TestCase):
         stats_obj = PlayerStats.from_dict(self.mock_player_stats)
         self.mock_context_bundle = {
             "player": self.mock_player_data,
-            "player_row": self.mock_player_data, # Added missing key
+            "player_row": self.mock_player_data,  # Added missing key
             "stats": self.mock_player_stats,
             "buffs": [],
             "skills": [],
             "player_stats": stats_obj,
             "vitals": {"current_hp": 100, "current_mp": 100},
             "active_boosts": {},
-            "stats_dict": stats_obj.get_total_stats_dict() # Added missing key
+            "stats_dict": stats_obj.get_total_stats_dict(),  # Added missing key
         }
         self.mock_db.get_combat_context_bundle.return_value = self.mock_context_bundle
 
@@ -85,9 +87,13 @@ class TestAutoAdventureRegression(unittest.TestCase):
             if field == "aurum":
                 return 1000
             return 0
+
         self.mock_db.get_player_field.side_effect = side_effect_get_player_field
 
-    @patch("game_systems.adventure.adventure_manager.LOCATIONS", {"forest_outskirts": {"name": "Forest", "level_req": 1}})
+    @patch(
+        "game_systems.adventure.adventure_manager.LOCATIONS",
+        {"forest_outskirts": {"name": "Forest", "level_req": 1}},
+    )
     @patch("game_systems.adventure.adventure_manager.WorldTime")
     def test_full_adventure_lifecycle(self, mock_world_time):
         """
@@ -101,10 +107,7 @@ class TestAutoAdventureRegression(unittest.TestCase):
 
         # Call start_adventure
         success = self.manager.start_adventure(
-            self.discord_id,
-            "forest_outskirts",
-            duration_minutes=60,
-            supplies={}
+            self.discord_id, "forest_outskirts", duration_minutes=60, supplies={}
         )
 
         self.assertTrue(success, "Failed to start adventure")
@@ -114,8 +117,8 @@ class TestAutoAdventureRegression(unittest.TestCase):
         args, kwargs = self.mock_db.insert_adventure_session.call_args
         self.assertEqual(args[0], self.discord_id)
         self.assertEqual(args[1], "forest_outskirts")
-        self.assertEqual(args[4], 60) # duration
-        self.assertEqual(kwargs['status'], "in_progress")
+        self.assertEqual(args[4], 60)  # duration
+        self.assertEqual(kwargs["status"], "in_progress")
 
         # --- 2. Resolve Session (Simulation) ---
 
@@ -129,22 +132,31 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "start_time": "2023-01-01T00:00:00",
             "loot_collected": "{}",
             "logs": "[]",
-            "active_monster_json": None
+            "active_monster_json": None,
         }
 
         # Mock AdventureSession behavior within Engine
-        with patch("game_systems.adventure.adventure_resolution.AdventureSession") as MockSession:
+        with patch(
+            "game_systems.adventure.adventure_resolution.AdventureSession"
+        ) as MockSession:
             mock_session_instance = MockSession.return_value
             mock_session_instance.steps_completed = 0
-            mock_session_instance.simulate_step.return_value = {"dead": False, "vitals": {"current_hp": 90, "current_mp": 90}}
-            mock_session_instance._fetch_session_context.return_value = self.mock_context_bundle
+            mock_session_instance.simulate_step.return_value = {
+                "dead": False,
+                "vitals": {"current_hp": 90, "current_mp": 90},
+            }
+            mock_session_instance._fetch_session_context.return_value = (
+                self.mock_context_bundle
+            )
 
             # Run Resolution
             self.engine.resolve_session(session_doc)
 
             # Verify 4 steps for 60 mins (15 min/step)
             self.assertEqual(mock_session_instance.simulate_step.call_count, 4)
-            self.mock_db.update_adventure_status.assert_called_with(self.discord_id, "completed")
+            self.mock_db.update_adventure_status.assert_called_with(
+                self.discord_id, "completed"
+            )
 
         # --- 3. End Adventure (Claim Rewards) ---
 
@@ -158,11 +170,14 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "logs": "[]",
             "active_monster_json": None,
             "duration_minutes": 60,
-            "start_time": "2023-01-01T00:00:00"
+            "start_time": "2023-01-01T00:00:00",
         }
 
         # Mock MATERIALS for reward lookup
-        with patch("game_systems.adventure.adventure_manager.MATERIALS", {"iron_ore": {"name": "Iron Ore", "rarity": "Common"}}):
+        with patch(
+            "game_systems.adventure.adventure_manager.MATERIALS",
+            {"iron_ore": {"name": "Iron Ore", "rarity": "Common"}},
+        ):
             # Run End Adventure
             summary = self.manager.end_adventure(self.discord_id)
 
@@ -181,7 +196,10 @@ class TestAutoAdventureRegression(unittest.TestCase):
             # Verify Session Closure
             self.mock_db.end_adventure_session.assert_called_with(self.discord_id)
 
-    @patch("game_systems.adventure.adventure_session.LOCATIONS", {"forest_outskirts": {"name": "Forest"}})
+    @patch(
+        "game_systems.adventure.adventure_session.LOCATIONS",
+        {"forest_outskirts": {"name": "Forest"}},
+    )
     def test_fatigue_scaling_regression(self):
         """
         Regression Test: Fatigue Damage Scaling
@@ -197,9 +215,11 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {}
+            "supplies": {},
         }
-        session = AdventureSession(self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data)
+        session = AdventureSession(
+            self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data
+        )
 
         # 1. Base Case: < 16 steps (4 hours)
         session.steps_completed = 10
@@ -225,7 +245,10 @@ class TestAutoAdventureRegression(unittest.TestCase):
         # Expected Bonus = 0.05 * 0.8 = 0.04. Total = 1.04
         self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.04)
 
-    @patch("game_systems.adventure.adventure_manager.LOCATIONS", {"forest": {"name": "Forest", "level_req": 1}})
+    @patch(
+        "game_systems.adventure.adventure_manager.LOCATIONS",
+        {"forest": {"name": "Forest", "level_req": 1}},
+    )
     @patch("game_systems.adventure.adventure_manager.WorldTime")
     def test_supply_consumption_regression(self, mock_world_time):
         """
@@ -237,19 +260,24 @@ class TestAutoAdventureRegression(unittest.TestCase):
 
         # --- 1. Supply Deduction ---
         self.mock_inventory_manager.get_inventory.return_value = [
-            {"item_key": "pitch_torch", "count": 5, "item_name": "Pitch Torch", "item_type": "supply", "rarity": "Common"}
+            {
+                "item_key": "pitch_torch",
+                "count": 5,
+                "item_name": "Pitch Torch",
+                "item_type": "supply",
+                "rarity": "Common",
+            }
         ]
         self.mock_db.remove_inventory_item.return_value = True
 
         success = self.manager.start_adventure(
-            self.discord_id,
-            "forest",
-            duration_minutes=30,
-            supplies={"pitch_torch": 1}
+            self.discord_id, "forest", duration_minutes=30, supplies={"pitch_torch": 1}
         )
 
         self.assertTrue(success)
-        self.mock_db.remove_inventory_item.assert_called_with(self.discord_id, "pitch_torch", 1)
+        self.mock_db.remove_inventory_item.assert_called_with(
+            self.discord_id, "pitch_torch", 1
+        )
 
         # --- 2. Supply Effect Logic (Ambush Reduction) ---
         # Pitch Torch should reduce ambush chance by 50%
@@ -262,19 +290,31 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {"pitch_torch": 1}
+            "supplies": {"pitch_torch": 1},
         }
 
         # Use patch on AdventureSession to ensure LOCATIONS is patched INSIDE the session methods if needed
         # But LOCATIONS is imported at module level in adventure_session.py
         # We need to patch it THERE
-        with patch("game_systems.adventure.adventure_session.LOCATIONS", {"forest": {"name": "Forest"}}):
-            session = AdventureSession(self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data)
+        with patch(
+            "game_systems.adventure.adventure_session.LOCATIONS",
+            {"forest": {"name": "Forest"}},
+        ):
+            session = AdventureSession(
+                self.mock_db,
+                MagicMock(),
+                MagicMock(),
+                self.discord_id,
+                row_data=row_data,
+            )
 
             # Mock Dependencies for Simulation
             mock_monster = {"name": "Goblin", "ATK": 10, "level": 1}
             session.combat = MagicMock()
-            session.combat.initiate_combat.return_value = (mock_monster, "Goblin appears!")
+            session.combat.initiate_combat.return_value = (
+                mock_monster,
+                "Goblin appears!",
+            )
 
             # FIX: Mock _resolve_auto_combat to prevent TypeError and avoid complex combat logic in this test
             # We only care about the ambush check which happens BEFORE auto_combat
@@ -318,7 +358,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
             # Fix: Reset active_monster before the second call.
 
             # Mock Time (Night)
-            with patch("game_systems.adventure.adventure_session.WorldTime") as MockTime:
+            with patch(
+                "game_systems.adventure.adventure_session.WorldTime"
+            ) as MockTime:
                 MockTime.get_current_weather.return_value = Weather.CLEAR
                 MockTime.get_current_phase.return_value = TimePhase.NIGHT
                 MockTime.get_weather_flavor.return_value = "Clear Night"
@@ -327,16 +369,22 @@ class TestAutoAdventureRegression(unittest.TestCase):
                 # 1. regen_threshold check (fail regen -> combat) -> return 100
                 # 2. ambush chance check -> return 0.15 (15%)
 
-                with patch("random.randint", return_value=100): # Force combat encounter check to pass
-                    with patch("random.random", return_value=0.15): # Ambush roll
-                        with patch.object(session, "_fetch_session_context", return_value=self.mock_context_bundle):
+                with patch(
+                    "random.randint", return_value=100
+                ):  # Force combat encounter check to pass
+                    with patch("random.random", return_value=0.15):  # Ambush roll
+                        with patch.object(
+                            session,
+                            "_fetch_session_context",
+                            return_value=self.mock_context_bundle,
+                        ):
 
                             # First Run: With Torch
                             # Ambush Check: 0.15 > 0.10 (Torch Threshold) -> NO Ambush
                             # But Combat DOES start (because regen failed).
                             result = session.simulate_step()
 
-                            logs = "".join([str(x) for x in result['sequence'][0]])
+                            logs = "".join([str(x) for x in result["sequence"][0]])
                             self.assertNotIn("AMBUSH!", logs)
 
                             # RESET MONSTER for second run
@@ -347,7 +395,7 @@ class TestAutoAdventureRegression(unittest.TestCase):
                             # Ambush Check: 0.15 < 0.20 (Base Threshold) -> AMBUSH!
                             result = session.simulate_step()
 
-                            logs = "".join([str(x) for x in result['sequence'][0]])
+                            logs = "".join([str(x) for x in result["sequence"][0]])
                             self.assertIn("AMBUSH!", logs)
 
     def test_retreat_penalty_regression(self):
@@ -365,11 +413,14 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "logs": "[]",
             "active_monster_json": '{"name": "Dragon", "hp": 100}',
             "duration_minutes": 60,
-            "start_time": "2023-01-01T00:00:00"
+            "start_time": "2023-01-01T00:00:00",
         }
         self.mock_db.lock_adventure_for_claiming.return_value = True
 
-        with patch("game_systems.adventure.adventure_manager.MATERIALS", {"wood": {"name": "Wood"}, "stone": {"name": "Stone"}}):
+        with patch(
+            "game_systems.adventure.adventure_manager.MATERIALS",
+            {"wood": {"name": "Wood"}, "stone": {"name": "Stone"}},
+        ):
             summary = self.manager.end_adventure(self.discord_id)
 
             self.assertIsNotNone(summary)
@@ -394,12 +445,15 @@ class TestAutoAdventureRegression(unittest.TestCase):
             wood_inv = next(i for i in added if i["item_key"] == "wood")
             self.assertEqual(wood_inv["amount"], 7)
 
-    @patch("game_systems.adventure.adventure_session.LOCATIONS", {"forest_outskirts": {"name": "Forest"}})
+    @patch(
+        "game_systems.adventure.adventure_session.LOCATIONS",
+        {"forest_outskirts": {"name": "Forest"}},
+    )
     def test_death_penalty_regression(self):
         """
         Regression Test: Death Penalty
         - Verify _handle_death_rewards cleans session loot and deducts Aurum.
-        - 10% Aurum Loss, 50% Material Loss, 100% XP Loss.
+        - 5% Aurum Loss, 100% Material Loss, 100% XP Loss.
         """
         # Setup Session State (Dying)
         # FIX: Provide required row_data fields to avoid KeyError in __init__
@@ -408,26 +462,28 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "active": 1,
             "logs": "[]",
             "loot_collected": "{}",
-            "active_monster_json": None
+            "active_monster_json": None,
         }
-        session = AdventureSession(self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data)
-        session.loot = {
-            "exp": 1000,
-            "aurum": 500,
-            "wood": 10
-        }
+        session = AdventureSession(
+            self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data
+        )
+        session.loot = {"exp": 1000, "aurum": 500, "wood": 10}
+        session.supplies = {"pitch_torch": 2}
 
         # Note: get_player_field is already mocked in setUp to return 1000 for aurum
 
-        with patch("game_systems.adventure.adventure_manager.MATERIALS", {"wood": {"name": "Wood"}}):
+        with patch(
+            "game_systems.adventure.adventure_manager.MATERIALS",
+            {"wood": {"name": "Wood"}},
+        ):
             # Execute Death Handler
             msg = self.manager._handle_death_rewards(self.discord_id, session)
 
             self.assertIn("Losses Incurred", msg)
 
-            # 1. Aurum Penalty: 10% of 1000 = 100
-            self.mock_db.deduct_aurum.assert_called_with(self.discord_id, 100)
-            self.assertIn("-100", msg)
+            # 1. Aurum Penalty: 5% of 1000 = 50
+            self.mock_db.deduct_aurum.assert_called_with(self.discord_id, 50)
+            self.assertIn("-50", msg)
 
             # 2. Session Loot Loss:
             # - exp should be removed (None in session loot)
@@ -435,15 +491,22 @@ class TestAutoAdventureRegression(unittest.TestCase):
             # - aurum should be removed
             self.assertNotIn("aurum", session.loot)
 
-            # 3. Material Loss: 50% of 10 Wood = 5 Lost, 5 Kept
-            # session.loot should now contain 5 wood
-            self.assertEqual(session.loot["wood"], 5)
-            self.assertIn("-5x Wood", msg)
+            # 3. Material Loss: 100% of 10 Wood = 10 Lost
+            # session.loot should not contain wood
+            self.assertNotIn("wood", session.loot)
+            self.assertIn("-10x Wood", msg)
+
+            # 4. Supply Loss: All allocated supplies lost
+            self.assertNotIn("pitch_torch", session.supplies)
+            self.assertIn("-2x Pitch Torch", msg)
 
             # 4. Session Ended
             self.mock_db.end_adventure_session.assert_called_with(self.discord_id)
 
-    @patch("game_systems.adventure.adventure_manager.LOCATIONS", {"high_level_zone": {"name": "High Zone", "level_req": 50}})
+    @patch(
+        "game_systems.adventure.adventure_manager.LOCATIONS",
+        {"high_level_zone": {"name": "High Zone", "level_req": 50}},
+    )
     def test_start_adventure_requirements(self):
         """
         Regression Test: Level Requirements
@@ -453,9 +516,7 @@ class TestAutoAdventureRegression(unittest.TestCase):
 
         # Try to start in High Level Zone (Req 50)
         success = self.manager.start_adventure(
-            self.discord_id,
-            "high_level_zone",
-            duration_minutes=60
+            self.discord_id, "high_level_zone", duration_minutes=60
         )
 
         # Currently, start_adventure ONLY checks if location exists, not level req.
@@ -490,12 +551,21 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "logs": "[]",
             "loot_collected": "{}",
             "active_monster_json": None,
-            "supplies": {"hardtack": 1, "pitch_torch": 1}
+            "supplies": {"hardtack": 1, "pitch_torch": 1},
         }
 
         # Use patch for LOCATIONS
-        with patch("game_systems.adventure.adventure_session.LOCATIONS", {"forest_outskirts": {"name": "Forest"}}):
-            session = AdventureSession(self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data)
+        with patch(
+            "game_systems.adventure.adventure_session.LOCATIONS",
+            {"forest_outskirts": {"name": "Forest"}},
+        ):
+            session = AdventureSession(
+                self.mock_db,
+                MagicMock(),
+                MagicMock(),
+                self.discord_id,
+                row_data=row_data,
+            )
 
             # A. Check Fatigue (Hardtack Effect)
             # 20 steps (4 excess). Base Bonus 0.05.
@@ -505,22 +575,33 @@ class TestAutoAdventureRegression(unittest.TestCase):
 
             # B. Check Ambush (Pitch Torch Effect)
             # Mock RNG for Ambush
-            with patch("game_systems.adventure.adventure_session.WorldTime") as MockTime:
+            with patch(
+                "game_systems.adventure.adventure_session.WorldTime"
+            ) as MockTime:
                 MockTime.get_current_weather.return_value = Weather.CLEAR
                 MockTime.get_current_phase.return_value = TimePhase.NIGHT
                 MockTime.get_weather_flavor.return_value = "Clear Night"
 
                 session.combat = MagicMock()
-                session.combat.initiate_combat.return_value = ({"name": "Goblin", "ATK": 10, "level": 1}, "Goblin!")
+                session.combat.initiate_combat.return_value = (
+                    {"name": "Goblin", "ATK": 10, "level": 1},
+                    "Goblin!",
+                )
 
-                with patch("random.randint", return_value=100): # Force combat
+                with patch("random.randint", return_value=100):  # Force combat
                     # Ambush Roll: 0.15.
                     # Base (0.20) would fail. Torch (0.10) should save.
                     with patch("random.random", return_value=0.15):
-                        with patch.object(session, "_fetch_session_context", return_value=self.mock_context_bundle):
-                            session.steps_completed = 1 # Avoid consuming torch instantly
+                        with patch.object(
+                            session,
+                            "_fetch_session_context",
+                            return_value=self.mock_context_bundle,
+                        ):
+                            session.steps_completed = (
+                                1  # Avoid consuming torch instantly
+                            )
                             result = session.simulate_step()
-                            logs = "".join([str(x) for x in result['sequence'][0]])
+                            logs = "".join([str(x) for x in result["sequence"][0]])
                             self.assertNotIn("AMBUSH!", logs)
 
     def test_retreat_penalty_empty_loot(self):
@@ -531,12 +612,12 @@ class TestAutoAdventureRegression(unittest.TestCase):
         self.mock_db.get_active_adventure.return_value = {
             "discord_id": self.discord_id,
             "location_id": "forest",
-            "loot_collected": '{}', # Empty
+            "loot_collected": "{}",  # Empty
             "active": 1,
             "logs": "[]",
             "active_monster_json": '{"name": "Dragon", "hp": 100}',
             "duration_minutes": 60,
-            "start_time": "2023-01-01T00:00:00"
+            "start_time": "2023-01-01T00:00:00",
         }
         self.mock_db.lock_adventure_for_claiming.return_value = True
 

@@ -52,9 +52,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
     - **Agent:** @GameBalancer
     - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
-    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops). **[x] Completed**
-    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives). **[ ] In Progress**
-    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Underperforming rewards). **[x] Completed**
+    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops. EV target > ~350 Aurum per 30m). **[ ] Reopened**
+    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[ ] In Progress**
+    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Must scale past Molten Caldera's high EV 1500.50). **[ ] Reopened**
     - **Due:** 2026-03-08
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
@@ -82,6 +82,8 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 4.1:** Stress test Scheduler (10k simulated sessions).
     - **Agent:** @BugHunter
 - [x] **Task 4.2:** Verify "Cancel" exploit prevention.
+    - **Agent:** @BugHunter
+- [x] **Task 4.3:** Verify Codex unlock triggers for edge cases and duplicate entries.
     - **Agent:** @BugHunter
 
 ---
@@ -121,10 +123,20 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 5.3:** Update Grey Ward Faction (Issue #17).
     - **Agent:** @GameForge
     - **Details:** Update `factions.py` to match Namewright's design.
-    - **Due:** 2026-03-08
+    - **Status:** **Completed**
 - [ ] **Task 5.4:** Add Alchemist Materials (Issue #18).
     - **Agent:** @DataSteward
     - **Details:** Add `primordial_ooze`, `brimstone`, `lunawort` to `materials.py`.
+    - **Due:** 2026-03-08
+- [ ] **Task 5.5:** Fix `"buff_data"` typo in `skills_data.py`.
+    - **Agent:** @GameForge
+    - **Details:** Bulk rename `"buff_data"` to `"buff"` for Alchemist, Warrior, and Rogue Class Skills.
+    - **Due:** 2026-03-08
+- [ ] **Task 5.6:** Add missing `"wailing_chasm"` to `adventure_locations.json`.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-08
+- [ ] **Task 5.7:** Add missing "Choirmaster", "Blind Choir Zealot" monsters to `monsters.json`.
+    - **Agent:** @GameForge
     - **Due:** 2026-03-08
 
 ---
