@@ -332,7 +332,7 @@
             ],
             [
                 "ancient_wood",
-                35
+                45
             ],
             [
                 "iron_ore",
@@ -340,7 +340,11 @@
             ],
             [
                 "magic_stone_medium",
-                30
+                45
+            ],
+            [
+                "shadow_essence",
+                10
             ]
         ],
         "special_events": [
@@ -713,19 +717,19 @@
         "gatherables": [
             [
                 "obsidian_shard",
-                40
+                25
             ],
             [
                 "fire_essence",
-                30
+                15
             ],
             [
                 "magma_core",
-                20
+                5
             ],
             [
                 "magic_stone_large",
-                10
+                2
             ]
         ],
         "special_events": [

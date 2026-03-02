@@ -31,3 +31,8 @@
 
 **Learning:** `CombatEngine.run_combat_turn`, `AdventureEvents.regeneration`, and `AdventureSession.simulate_step` were monoliths with high cyclomatic complexity, making them difficult to maintain.
 **Action:** Extract specific phases (like player turn, atmospheric prepend generation, or context fetching) into helper methods to improve modularity and reduce complexity. Ensure state objects or returned values correctly mimic the flow of the original monolithic design.
+
+## 2026-03-02 — Refactoring High-Complexity Methods in CombatEngine
+
+**Learning:** `CombatEngine` in `game_systems/combat/combat_engine.py` was highly monolithic, containing massive cyclomatic complexity within its core loop methods (`_process_monster_turn` and `_execute_player_skill`). This was a significant structural limitation for future updates.
+**Action:** Extracting sub-logic into private helper functions (e.g. `_handle_healing_skill`, `_monster_action_attack`) drastically reduces cyclomatic complexity while preserving all expected side-effects for combat (state changes on `self.monster`, `self.player`, and appending to the `log` array). Always run `radon cc -s` post-refactor to verify the complexity improvements.

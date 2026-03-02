@@ -64,6 +64,48 @@ class TestAchievementLogic(unittest.TestCase):
         self.mock_db.add_title.assert_any_call(discord_id, "Adventurer")
         self.assertIn("**Title Unlocked:** Adventurer", msg)
 
+    def test_check_combat_achievements_rogue_no_damage(self):
+        discord_id = 123
+        class_name = "Rogue"
+        damage_taken = 0
+
+        self.mock_db.add_title.return_value = True
+
+        msg = self.achievements.check_combat_achievements(
+            discord_id, class_name, damage_taken
+        )
+
+        self.mock_db.add_title.assert_any_call(discord_id, "Without a Trace")
+        self.assertIn("**Title Unlocked:** Without a Trace", msg)
+
+    def test_check_combat_achievements_wrong_class(self):
+        discord_id = 123
+        class_name = "Warrior"
+        damage_taken = 0
+
+        self.mock_db.add_title.return_value = True
+
+        msg = self.achievements.check_combat_achievements(
+            discord_id, class_name, damage_taken
+        )
+
+        self.mock_db.add_title.assert_not_called()
+        self.assertIsNone(msg)
+
+    def test_check_combat_achievements_took_damage(self):
+        discord_id = 123
+        class_name = "Rogue"
+        damage_taken = 5
+
+        self.mock_db.add_title.return_value = True
+
+        msg = self.achievements.check_combat_achievements(
+            discord_id, class_name, damage_taken
+        )
+
+        self.mock_db.add_title.assert_not_called()
+        self.assertIsNone(msg)
+
 
 if __name__ == "__main__":
     unittest.main()
