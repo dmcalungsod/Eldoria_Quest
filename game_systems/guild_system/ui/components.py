@@ -73,8 +73,7 @@ class GuildViewMixin:
         """
         if interaction.user.id != self.interaction_user.id:
             await interaction.response.send_message(
-                "This menu isn't yours to interact with.",
-                ephemeral=True,
+                "This menu isn't yours to interact with.", ephemeral=True
             )
             return False
         return True
