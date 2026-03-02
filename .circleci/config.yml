@@ -5,9 +5,16 @@ commands:
   install-tools:
     description: Install static analysis tools (Ruff, Bandit, pip-audit)
     steps:
+      - restore_cache:
+          keys:
+            - tools-v1
       - run:
           name: Install Tools
-          command: pip install "pip==26.0.1" && pip install ruff bandit pip-audit
+          command: pip install "pip==26.0.1" && pip install --user ruff bandit pip-audit
+      - save_cache:
+          key: tools-v1
+          paths:
+            - ~/.local
 
   install-deps:
     description: Install project dependencies with caching
@@ -18,7 +25,7 @@ commands:
             - deps-v1-
       - run:
           name: Install Dependencies
-          command: pip install "pip==26.0.1" && pip install -r requirements.txt
+          command: pip install "pip==26.0.1" && pip install --user -r requirements.txt
       - save_cache:
           key: deps-v1-{{ checksum "requirements.txt" }}
           paths:
@@ -107,14 +114,21 @@ jobs:
   test:
     docker:
       - image: cimg/python:3.12
-    parallelism: 4
+    parallelism: 2
     steps:
       - checkout
       - check-md-only
       - install-deps
+      - restore_cache:
+          keys:
+            - test-tools-v1
       - run:
           name: Install Test Dependencies
-          command: pip install "pip==26.0.1" && pip install pytest pytest-cov
+          command: pip install "pip==26.0.1" && pip install --user pytest pytest-cov
+      - save_cache:
+          key: test-tools-v1
+          paths:
+            - ~/.local
       - run:
           name: Split and Run Tests
           command: |
@@ -200,16 +214,18 @@ workflows:
       equal: [ "https://github.com/dmcalungsod/Eldoria_Quest", << pipeline.project.git_url >> ]
     jobs:
       - static-analysis
-      - test:
-          requires:
-            - static-analysis
+      - test
       - finalize-coverage:
           requires:
             - test
+            - static-analysis
+          filters:
+            branches:
+              only: main
       - auto-merge:
           requires:
             - static-analysis
-            - finalize-coverage
+            - test
           filters:
             branches:
               ignore: main
