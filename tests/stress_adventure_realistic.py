@@ -71,28 +71,28 @@ class RealisticMockDatabase:
     def get_player_vitals(self, discord_id):
         return self.static_vitals.copy()
 
-    def update_player_vitals_delta(self, discord_id, dhp, dmp, mhp, mmp):
+    def update_player_vitals_delta(self, discord_id, _dhp, _dmp, _mhp, _mmp):
         return True
 
-    def update_adventure_session(self, discord_id, **kwargs):
+    def update_adventure_session(self, discord_id, **_kwargs):
         return True
 
-    def update_adventure_status(self, discord_id, status):
+    def update_adventure_status(self, discord_id, _status):
         return True
 
-    def set_player_vitals(self, discord_id, hp, mp):
+    def set_player_vitals(self, discord_id, _hp, _mp):
         return True
 
-    def add_active_buffs_bulk(self, discord_id, buffs):
+    def add_active_buffs_bulk(self, discord_id, _buffs):
         return True
 
-    def add_title(self, discord_id, title):
+    def add_title(self, discord_id, _title):
         return True
 
     def get_player_quests(self, discord_id):
         return []
 
-    def update_progress(self, discord_id, quest_id, obj_type, task, amount):
+    def update_progress(self, discord_id, _quest_id, _obj_type, _task, _amount):
         return True
 
     def get_active_tournament(self):
@@ -121,10 +121,10 @@ class RealisticMockDatabase:
     def get_active_buffs(self, discord_id):
         return []
 
-    def increment_guild_stat(self, discord_id, field, amount=1):
+    def increment_guild_stat(self, discord_id, field, _amount=1):
         return True
 
-    def increment_specific_monster_kill(self, discord_id, monster_name, amount=1):
+    def increment_specific_monster_kill(self, discord_id, _monster_name, _amount=1):
         return True
 
     def get_stat_exp_row(self, discord_id):
@@ -148,13 +148,13 @@ class RealisticMockDatabase:
             "lck_exp": 0,
         }
 
-    def update_stat_exp(self, *args, **kwargs):
+    def update_stat_exp(self, *_args, **_kwargs):
         return True
 
     def get_skill_with_definition(self, discord_id, skill_key):
         return {"skill_level": 1, "skill_exp": 0, "name": skill_key}
 
-    def update_player_skill(self, *args, **kwargs):
+    def update_player_skill(self, *_args, **_kwargs):
         return True
 
     def get_guild_member_field(self, discord_id, field):
@@ -162,16 +162,16 @@ class RealisticMockDatabase:
             return "F"
         return None
 
-    def add_inventory_item(self, *args, **kwargs):
+    def add_inventory_item(self, *_args, **_kwargs):
         return True
 
-    def update_player_mixed(self, *args, **kwargs):
+    def update_player_mixed(self, *_args, **_kwargs):
         return True
 
-    def end_adventure_session(self, *args, **kwargs):
+    def end_adventure_session(self, *_args, **_kwargs):
         return True
 
-    def _col(self, name):
+    def _col(self, _name):
         # Return a mock collection that can handle find()
         mock_col = MagicMock()
         mock_col.find.return_value = []  # Return empty list for find
