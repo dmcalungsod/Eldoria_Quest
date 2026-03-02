@@ -40,3 +40,8 @@
 
 **Learning:** The auto-adventure system (TimeWeaver) introduced a massive new core loop, but it was not integrated into rank progression. This meant players could engage exclusively with the new system but still be gatekept by manual quest completion or kill requirements they weren't organically achieving.
 **Action:** Integrated `total_expeditions` as a core requirement for all ranks (F: 2 -> SS: 50) in `rank_system.py` using data from `get_exploration_stats`. This formally links the new auto-adventure loop to guild advancement.
+
+## 2026-03-02 — Rank C Kill Requirement Trivialized by Quests
+
+**Learning:** Rank C required +10 quests and +100 normal kills compared to Rank D (300 -> 400). Since 10 quests naturally yield ~150-200 kills, the `normal_kills` requirement for Rank C was completely redundant, removing the intended exploration gap.
+**Action:** Increased Rank C `normal_kills` to 500 (+200 delta) to enforce dedicated exploration and auto-adventure sessions outside of quest objectives, consistent with the pacing used for Rank B and Rank A.

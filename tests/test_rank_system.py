@@ -115,6 +115,30 @@ class TestRankSystem(unittest.TestCase):
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
+    def test_rank_c_requirements(self):
+        # Rank C -> B requires 30 quests, 500 normal kills, 50 elite kills, 2 boss kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 15}
+
+        # Case 1: Not enough normal kills (Testing 499 < 500)
+        self.mock_db.get_guild_member.return_value = {
+            "rank": "C",
+            "quests_completed": 30,
+            "normal_kills": 499,
+            "elite_kills": 50,
+            "boss_kills": 2,
+        }
+        self.assertFalse(self.rank_system.check_promotion_eligibility(123))
+
+        # Case 2: Meets requirements (500)
+        self.mock_db.get_guild_member.return_value = {
+            "rank": "C",
+            "quests_completed": 30,
+            "normal_kills": 500,
+            "elite_kills": 50,
+            "boss_kills": 2,
+        }
+        self.assertTrue(self.rank_system.check_promotion_eligibility(123))
+
     def test_rank_b_requirements(self):
         # Rank B -> A requires 40 quests, 600 normal kills, 65 elite kills, 4 boss kills
         self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 20}
