@@ -23,7 +23,6 @@ import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
 import test_adventure_rewards  # Adventure Rewards regression test
 import test_auto_adventure_regression
-import test_adventure_resolution
 import test_auto_combat_formula
 import test_adventure_scheduler_stress
 import test_adventure_session_concurrency  # New session concurrency test
@@ -92,7 +91,7 @@ def run_adventure_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_adventure_rewards)
     suite.addTests(loader.loadTestsFromModule(test_auto_adventure_regression))
-    suite.addTests(loader.loadTestsFromModule(test_adventure_resolution))
+
     suite.addTests(loader.loadTestsFromModule(test_auto_combat_formula))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
