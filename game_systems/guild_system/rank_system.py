@@ -45,7 +45,7 @@ class RankSystem:
             "next_rank": "B",
             "requirements": {
                 "quests_completed": 30,
-                "normal_kills": 500,
+                "normal_kills": 400,
                 "elite_kills": 50,
                 "boss_kills": 2,
                 "total_expeditions": 15,
