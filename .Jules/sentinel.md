@@ -15,3 +15,8 @@
 **Learning:** `app_commands` rely on the interaction tree for checks. Traditional `ext.commands` decorators might not integrate seamlessly with the slash command system's error handling pipeline, or might be ignored if the command is not a hybrid command.
 
 **Prevention:** Always use explicit checks within the command body (e.g., `if not await bot.is_owner(user): return`) or use dedicated `app_commands.checks` decorators. Defense in depth (manual check + decorator) is preferred for critical administrative functions.
+## 2026-03-02 — Test Environment Masking Vulnerability
+
+**Vulnerability:** A critical security check (`tests/test_pip_security.py`) designed to prevent the use of a known vulnerable `pip` version (25.3 / CVE-2026-1703) was implemented with a `skipTest` condition. This effectively masked the vulnerability by allowing the test suite to pass even when the test environment was running the vulnerable version.
+**Learning:** Security tests must be fail-secure. Implementing safety valves (like `skipTest`) in security validations defeats their purpose and provides a false sense of security, allowing vulnerabilities to persist in CI/CD or local environments undetected.
+**Prevention:** Avoid using `skipTest` or similar bypass mechanisms in security-critical assertions. If an environment is expected to fail a security check, the environment itself must be patched, rather than bypassing the test.
