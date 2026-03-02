@@ -117,7 +117,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Status:** **Completed** (skipTest logic removed)
 - [ ] **Task 5.2:** Refactor High-Complexity Methods.
     - **Agent:** @SystemSmith
-    - **Subtask 5.2a:** `CombatEngine.run_combat_turn`
+    - **Subtask 5.2a:** `CombatEngine.run_combat_turn` **[x] Completed**
     - **Subtask 5.2b:** `AdventureEvents.regeneration`
     - **Subtask 5.2c:** `AdventureSession.simulate_step`
     - **Due:** 2026-03-10
