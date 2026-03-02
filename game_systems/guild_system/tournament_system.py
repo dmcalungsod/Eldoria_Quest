@@ -53,7 +53,7 @@ class TournamentSystem:
 
         # Create in DB
         t_id = self.db.create_tournament(
-            type=event_type,
+            tournament_type=event_type,
             start_time=start_time.isoformat(),
             end_time=end_time.isoformat(),
         )
