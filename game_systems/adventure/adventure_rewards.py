@@ -152,6 +152,18 @@ class AdventureRewards:
             if group_ach_msg:
                 logs.append(f"\n{group_ach_msg}")
 
+            # Check Combat Achievements
+            player_doc = self.db.get_player(self.discord_id)
+            if player_doc:
+                class_name = player_doc.get("class_name", "Unknown")
+                damage_taken = battle_report.get("damage_taken")
+                if damage_taken is not None:
+                    combat_ach_msg = self.achievement_system.check_combat_achievements(
+                        self.discord_id, class_name, damage_taken
+                    )
+                    if combat_ach_msg:
+                        logs.append(f"\n{combat_ach_msg}")
+
             # 7. Faction Reputation
             faction_logs = self.faction_system.grant_reputation_for_kill(
                 self.discord_id, combat_result.get("monster_data", {})

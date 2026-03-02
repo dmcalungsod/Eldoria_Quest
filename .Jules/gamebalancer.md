@@ -32,3 +32,8 @@
 1.  **Thunder-Crag Coast (Rank A):** Added `charged_core` (10%) to gatherables. Increased `magic_stone_large` chance to 20% by reducing lower tier items. Buffed drop amounts/chances across all native monsters and added `tempest_heart` to the elite Siren Matriarch drops.
 2.  **Shimmering Wastes (Rank A):** Added `glass_heart` (1%) and buffed `concentrated_light` and `magic_stone_flawless` gatherable chances. Improved specific drop rates for all native monsters.
 3.  **Celestial Archipelago:** Promoted from Rank B to Rank A to resolve the Level 28 vs Rank A/B inconsistency, realigning the late-game rank transition.
+
+## 2026-03-02 — Rebalancing The Shrouded Fen and The Molten Caldera Economy
+
+**Learning:** Analyst EV modeling highlighted massive imbalances: The Shrouded Fen (mid-game) under-rewarded players, while The Molten Caldera (late-game) vastly over-rewarded them. This broke the "material-driven survival" scarcity philosophy, allowing players to stockpile late-game materials too quickly while struggling mid-game.
+**Action:** Rebalanced the gatherables and native monster drop tables for both zones to correct EV and align with intended tier difficulty. Increased EV for Shrouded Fen and decreased EV for Molten Caldera.
