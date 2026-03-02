@@ -49,7 +49,7 @@ class TestRegenFormula(unittest.TestCase):
         # Case 1: Low Endurance (10)
         # Old Formula: 10 * 0.5 + 1 = 6.
         # New Formula: 10 * 0.25 + 1 = 2.5 -> 2 + 1 = 3.
-        regen_10, max_hp_10 = run_regen(10)
+        regen_10, _max_hp_10 = run_regen(10)
         self.assertEqual(regen_10, 3, "Low Endurance regen incorrect")
 
         # Case 2: Mid Endurance (100)
@@ -57,7 +57,7 @@ class TestRegenFormula(unittest.TestCase):
         # New Formula: 100 * 0.25 + 1 = 26.
         # Cap 5% of 1050 = 52. Cap 10% = 105.
         # So it should be 26 (limited by base).
-        regen_100, max_hp_100 = run_regen(100)
+        regen_100, _max_hp_100 = run_regen(100)
         self.assertEqual(regen_100, 26, "Mid Endurance regen incorrect")
 
         # Case 3: High Endurance (1000)
@@ -66,7 +66,7 @@ class TestRegenFormula(unittest.TestCase):
         # MaxHP ~ 21300.
         # Cap 5% = 1065. Cap 10% = 2130.
         # So it should be 251 (limited by base).
-        regen_1000, max_hp_1000 = run_regen(1000)
+        regen_1000, _max_hp_1000 = run_regen(1000)
         self.assertEqual(regen_1000, 251, "High Endurance regen incorrect")
 
 
