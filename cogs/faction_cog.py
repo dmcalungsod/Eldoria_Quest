@@ -24,7 +24,9 @@ class FactionCog(commands.Cog):
         self.db = DatabaseManager()
         self.faction_system = FactionSystem(self.db)
 
-    faction_group = app_commands.Group(name="faction", description="Faction management commands")
+    faction_group = app_commands.Group(
+        name="faction", description="Faction management commands"
+    )
 
     @faction_group.command(name="list", description="List all available factions.")
     async def list_factions(self, interaction: discord.Interaction):
@@ -34,7 +36,9 @@ class FactionCog(commands.Cog):
         for fid, data in FACTIONS.items():
             name = f"{data['emoji']} {data['name']}"
             desc = data["description"]
-            interests = ", ".join(data.get("interests", {}).keys()).replace("_", " ").title()
+            interests = (
+                ", ".join(data.get("interests", {}).keys()).replace("_", " ").title()
+            )
 
             # Resolve location names (truncate if too long)
             fav_locs = data.get("favored_locations", [])
@@ -46,16 +50,27 @@ class FactionCog(commands.Cog):
                 loc_str = ", ".join(loc_names) if loc_names else "None"
 
             embed.add_field(
-                name=name, value=f"{desc}\n*Interests: {interests}*\n*Favored Territory: {loc_str}*", inline=False
+                name=name,
+                value=f"{desc}\n*Interests: {interests}*\n*Favored Territory: {loc_str}*",
+                inline=False,
             )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @faction_group.command(name="join", description="Join a faction.")
-    @app_commands.choices(faction=[app_commands.Choice(name=data["name"], value=fid) for fid, data in FACTIONS.items()])
-    async def join_faction(self, interaction: discord.Interaction, faction: app_commands.Choice[str]):
+    @app_commands.choices(
+        faction=[
+            app_commands.Choice(name=data["name"], value=fid)
+            for fid, data in FACTIONS.items()
+        ]
+    )
+    async def join_faction(
+        self, interaction: discord.Interaction, faction: app_commands.Choice[str]
+    ):
         """Joins a selected faction."""
-        success, msg = self.faction_system.join_faction(interaction.user.id, faction.value)
+        success, msg = self.faction_system.join_faction(
+            interaction.user.id, faction.value
+        )
         await interaction.response.send_message(msg, ephemeral=True)
 
     @faction_group.command(name="status", description="Check your faction status.")
@@ -88,7 +103,9 @@ class FactionCog(commands.Cog):
         if fav_locs:
             loc_names = [LOCATIONS.get(lid, {}).get("name", lid) for lid in fav_locs]
             loc_str = "\n".join(f"• {name}" for name in loc_names)
-            embed.add_field(name="Favored Territory (+50% Rep)", value=loc_str, inline=False)
+            embed.add_field(
+                name="Favored Territory (+50% Rep)", value=loc_str, inline=False
+            )
 
         next_rank = data.get("next_rank")
         if next_rank:
@@ -99,7 +116,9 @@ class FactionCog(commands.Cog):
                 inline=False,
             )
         else:
-            embed.add_field(name="Next Rank", value="Maximum Rank Achieved", inline=False)
+            embed.add_field(
+                name="Next Rank", value="Maximum Rank Achieved", inline=False
+            )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

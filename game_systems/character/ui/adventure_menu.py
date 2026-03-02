@@ -87,7 +87,7 @@ class AdventureView(View):
                 "If your HP drops below 30%, you will automatically retreat, though you may lose gathered loot. "
                 "You can also check your status and retreat manually at any time to secure your findings."
             ),
-            color=discord.Color.blue()
+            color=discord.Color.blue(),
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -96,7 +96,9 @@ class AdventureView(View):
         Restricts interaction to the original user.
         """
         if interaction.user.id != self.interaction_user.id:
-            await interaction.response.send_message("This is not your session.", ephemeral=True)
+            await interaction.response.send_message(
+                "This is not your session.", ephemeral=True
+            )
             return False
         return True
 
@@ -120,7 +122,9 @@ class AdventureView(View):
             return
 
         # Check if an adventure is already active (threaded)
-        session = await asyncio.to_thread(adventure_cog.manager.get_active_session, self.interaction_user.id)
+        session = await asyncio.to_thread(
+            adventure_cog.manager.get_active_session, self.interaction_user.id
+        )
 
         # --------------------------------------------------------
         # Resume existing adventure
@@ -134,9 +138,13 @@ class AdventureView(View):
             try:
                 # CASE 1: Completed -> Show Rewards
                 if status == "completed":
-                    summary = await asyncio.to_thread(adventure_cog.manager.end_adventure, self.interaction_user.id)
+                    summary = await asyncio.to_thread(
+                        adventure_cog.manager.end_adventure, self.interaction_user.id
+                    )
                     if not summary:
-                        await interaction.followup.send("Error processing rewards.", ephemeral=True)
+                        await interaction.followup.send(
+                            "Error processing rewards.", ephemeral=True
+                        )
                         return
 
                     loc_id = session.get("location_id")
@@ -144,7 +152,9 @@ class AdventureView(View):
 
                     # Create a simple view with just "Back"
                     view = View()
-                    back_btn = Button(label="Return to Profile", style=discord.ButtonStyle.grey)
+                    back_btn = Button(
+                        label="Return to Profile", style=discord.ButtonStyle.grey
+                    )
                     back_btn.callback = back_to_profile_callback
                     view.add_item(back_btn)
 
@@ -154,12 +164,16 @@ class AdventureView(View):
                 # CASE 2: Active / In Progress / Failed
                 # Show Status View
                 embed = AdventureEmbeds.build_adventure_status_embed(session)
-                view = AdventureStatusView(self.db, adventure_cog.manager, self.interaction_user, session)
+                view = AdventureStatusView(
+                    self.db, adventure_cog.manager, self.interaction_user, session
+                )
                 await interaction.edit_original_response(embed=embed, view=view)
 
             except Exception as e:
                 logger.error(f"Resume adventure failed: {e}", exc_info=True)
-                await interaction.followup.send("Error resuming session.", ephemeral=True)
+                await interaction.followup.send(
+                    "Error resuming session.", ephemeral=True
+                )
             return
 
         # --------------------------------------------------------
@@ -169,18 +183,38 @@ class AdventureView(View):
 
         try:
             # Parallel fetch of guild rank, player level, and inventory data
-            guild_member, player_data, inventory_items, max_slots, current_slots = await asyncio.gather(
-                asyncio.to_thread(self.db.get_guild_member_data, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_player, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_inventory_items, self.interaction_user.id, equipped=0),
-                asyncio.to_thread(self.db.calculate_inventory_limit, self.interaction_user.id),
-                asyncio.to_thread(self.db.get_inventory_slot_count, self.interaction_user.id),
+            guild_member, player_data, inventory_items, max_slots, current_slots = (
+                await asyncio.gather(
+                    asyncio.to_thread(
+                        self.db.get_guild_member_data, self.interaction_user.id
+                    ),
+                    asyncio.to_thread(self.db.get_player, self.interaction_user.id),
+                    asyncio.to_thread(
+                        self.db.get_inventory_items,
+                        self.interaction_user.id,
+                        equipped=0,
+                    ),
+                    asyncio.to_thread(
+                        self.db.calculate_inventory_limit, self.interaction_user.id
+                    ),
+                    asyncio.to_thread(
+                        self.db.get_inventory_slot_count, self.interaction_user.id
+                    ),
+                )
             )
             rank = guild_member["rank"] if guild_member else "F"
             level = player_data["level"] if player_data else 1
 
             # Filter valid supplies (supply, hp, mp, buff, etc.)
-            valid_types = {"supply", "hp", "mp", "buff", "antidote", "food", "throwable"}
+            valid_types = {
+                "supply",
+                "hp",
+                "mp",
+                "buff",
+                "antidote",
+                "food",
+                "throwable",
+            }
             supplies = []
             for item in inventory_items:
                 c_data = CONSUMABLES.get(item["item_key"])
@@ -219,7 +253,9 @@ class AdventureView(View):
             await interaction.edit_original_response(embed=embed, view=view)
         except Exception as e:
             logger.error(f"Start adventure menu failed: {e}", exc_info=True)
-            await interaction.followup.send("Error loading destinations.", ephemeral=True)
+            await interaction.followup.send(
+                "Error loading destinations.", ephemeral=True
+            )
 
     # ------------------------------------------------------------
 
