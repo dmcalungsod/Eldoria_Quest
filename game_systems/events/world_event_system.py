@@ -26,6 +26,7 @@ class WorldEventSystem:
     FROSTFALL_EXPEDITION = "frostfall_expedition"
     SPECTRAL_TIDE = "spectral_tide"
     ECHOES_OF_THE_DEEP = "echoes_of_the_deep"
+    TIME_QUAKE = "time_quake"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -112,6 +113,16 @@ class WorldEventSystem:
                 "wailing_chasm_loot_bonus": 1.5,  # 50% more loot from Wailing Chasm
             },
         },
+        TIME_QUAKE: {
+            "name": "Time Quake",
+            "description": "A Time Quake ripples through Eldoria. The Silent City of Ouros briefly awakens, its temporal anomalies stabilizing. Explorers report lessened danger and incredible treasures.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.1,
+                "ouros_threat_reduction": 0.8,
+                "ouros_loot_bonus": 2.0,
+            },
+        },
     }
 
     def __init__(self, db: DatabaseManager):
@@ -155,7 +166,9 @@ class WorldEventSystem:
         start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(hours=duration_hours)
 
-        self.db.set_active_world_event(event_type, start_time.isoformat(), end_time.isoformat())
+        self.db.set_active_world_event(
+            event_type, start_time.isoformat(), end_time.isoformat()
+        )
         logger.info(f"Started World Event: {event_type} for {duration_hours}h")
         return True
 

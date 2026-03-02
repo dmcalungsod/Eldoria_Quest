@@ -55,11 +55,3 @@
 
 **Learning:** Coordinated with Namewright design to adjust Grey Ward progression.
 **Action:** Updated ranks (Gleaner to Synthesist) and adjusted crafting reputation values.
-
-## 2026-03-01 — The Silent City of Ouros Connection
-
-**Learning:** The Realmwright added a new Rank S deep floor, "The Silent City of Ouros," which needed to be "connected beneath the Void Sanctum." Rather than just adding it to the UI, I realized this was an opportunity to implement a true "Deep Floor Unlock System."
-**Action:** Implemented a generic `prerequisite_location` schema field for adventure locations.
-- **Mechanics:** Modified `AdventureSetupView._is_unlocked` to verify if the player's `exploration_stats["unique_locations"]` contains the required prerequisite location before allowing access.
-- **Progression:** The Silent City of Ouros now explicitly requires players to have explored the Void Sanctum at least once, establishing clear vertical progression at the endgame.
-- **World Building:** Integrated Ouros into the `pathfinders` and `arcane_assembly` favored locations, and added `MIASMA`/`FOG`/`CLEAR` weather patterns to `world_time.py`.

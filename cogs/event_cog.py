@@ -67,6 +67,19 @@ class EventCog(commands.Cog):
                         )
                         logger.info("Auto-started Harvest Festival.")
 
+                # Time Quake: Random Chance (2%)
+                elif random.random() < 0.02:
+                    success = self.system.start_event(WorldEventSystem.TIME_QUAKE, 24)
+                    if success:
+                        config = self.system.EVENT_CONFIGS[WorldEventSystem.TIME_QUAKE]
+                        await self._announce(
+                            f"⏳ **A TIME QUAKE HAS OCCURRED!** ⏳\n\n"
+                            f"**{config['name']}**\n"
+                            f"{config['description']}\n\n"
+                            f"The Silent City of Ouros is stabilizing for the next 24 hours! 🕰️"
+                        )
+                        logger.info("Auto-started Time Quake.")
+
                 # Mystic Merchant: Random Chance (2%)
                 elif random.random() < 0.02:
                     success = self.system.start_event(

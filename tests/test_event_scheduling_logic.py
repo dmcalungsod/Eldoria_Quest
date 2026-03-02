@@ -59,6 +59,7 @@ class TestEventScheduling(unittest.TestCase):
         # Set attributes on the mocks
         mock_wes_module.WorldEventSystem.MYSTIC_MERCHANT = "mystic_merchant"
         mock_wes_module.WorldEventSystem.HARVEST_FESTIVAL = "harvest_festival"
+        mock_wes_module.WorldEventSystem.TIME_QUAKE = "time_quake"
 
         # 3. Import cogs.event_cog inside the patched environment
         # We must ensure it's not already cached from real imports (handled by patch.dict, sort of)
@@ -81,7 +82,11 @@ class TestEventScheduling(unittest.TestCase):
         self.cog._announce = AsyncMock()
 
         self.cog.system.EVENT_CONFIGS = {
-            "mystic_merchant": {"name": "The Mystic Merchant", "description": "Test Description"}
+            "mystic_merchant": {
+                "name": "The Mystic Merchant",
+                "description": "Test Description",
+            },
+            "time_quake": {"name": "Time Quake", "description": "Test Time Quake"},
         }
 
     @patch("game_systems.core.world_time.WorldTime")
@@ -90,7 +95,8 @@ class TestEventScheduling(unittest.TestCase):
         # 1. Setup
         self.cog.system.get_current_event.return_value = None
         mock_world_time.now.return_value = datetime.datetime(2023, 1, 1, 12, 0, 0)
-        mock_random.return_value = 0.01
+        # First call fails Time Quake roll (0.5), second call succeeds Mystic Merchant (0.01)
+        mock_random.side_effect = [0.5, 0.01]
         self.cog.system.start_event.return_value = True
 
         # 2. Run
@@ -121,6 +127,25 @@ class TestEventScheduling(unittest.TestCase):
         asyncio.run(self.cog.check_event_cycle())
 
         self.cog.system.start_event.assert_not_called()
+
+    @patch("game_systems.core.world_time.WorldTime")
+    @patch("random.random")
+    def test_time_quake_starts_on_roll(self, mock_random, mock_world_time):
+        # 1. Setup
+        self.cog.system.get_current_event.return_value = None
+        mock_world_time.now.return_value = datetime.datetime(2023, 1, 1, 12, 0, 0)
+        # First call succeeds Time Quake roll (0.01)
+        mock_random.side_effect = [0.01]
+        self.cog.system.start_event.return_value = True
+
+        # 2. Run
+        asyncio.run(self.cog.check_event_cycle())
+
+        # 3. Verify
+        self.cog.system.start_event.assert_called_with("time_quake", 24)
+        self.cog._announce.assert_called()
+        args, _ = self.cog._announce.call_args
+        self.assertIn("TIME QUAKE", args[0])
 
 
 if __name__ == "__main__":

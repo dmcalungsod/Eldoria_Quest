@@ -79,7 +79,6 @@ LOCATION_SCHEMA = {
         },
     },
     "special_events": {"type": list, "element_schema": {"type": str}},
-    "prerequisite_location": {"type": str},
 }
 
 # --- Monsters Schema ---

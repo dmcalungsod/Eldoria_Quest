@@ -183,7 +183,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         mock_date = datetime.datetime(2023, 5, 1, 12, 0, 0)
         with patch("game_systems.core.world_time.WorldTime.now", return_value=mock_date):
-            with patch("random.random", return_value=0.01):  # < 0.02
+            # First call for time_quake (0.5 > 0.02 fails), second call for mystic_merchant (0.01 < 0.02 succeeds)
+            with patch("random.random", side_effect=[0.5, 0.01]):
                 self.cog.system.start_event.return_value = True
 
                 await self.cog.check_event_cycle.callback(self.cog)
