@@ -83,6 +83,11 @@ LOCATION_WEATHER_WEIGHTS = {
         (Weather.FOG, 20),
         (Weather.STORM, 20),
     ],
+    "silent_city_ouros": [
+        (Weather.MIASMA, 60),
+        (Weather.FOG, 30),
+        (Weather.CLEAR, 10),
+    ],
     "sunken_grotto": [
         (Weather.FOG, 40),
         (Weather.RAIN, 30),

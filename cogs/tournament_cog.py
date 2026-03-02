@@ -50,7 +50,9 @@ class TournamentCog(commands.Cog):
                     # End it
                     result_msg = self.system.end_current_tournament()
                     logger.info(f"Tournament Ended Automatically: {result_msg}")
-                    await self._announce(f"🏆 **Tournament Concluded!**\n\n{result_msg}")
+                    await self._announce(
+                        f"🏆 **Tournament Concluded!**\n\n{result_msg}"
+                    )
             else:
                 # Start new one if it's Monday
                 if now.weekday() == 0:  # Monday
@@ -135,7 +137,9 @@ class TournamentCog(commands.Cog):
         active, leaders = self.system.get_leaderboard()
 
         if not active:
-            await interaction.response.send_message(f"{E.WARNING} No tournament is currently active.", ephemeral=True)
+            await interaction.response.send_message(
+                f"{E.WARNING} No tournament is currently active.", ephemeral=True
+            )
             return
 
         embed = discord.Embed(
@@ -151,7 +155,11 @@ class TournamentCog(commands.Cog):
                 rank_emoji = (
                     "🥇"
                     if entry["rank"] == 1
-                    else ("🥈" if entry["rank"] == 2 else "🥉" if entry["rank"] == 3 else f"#{entry['rank']}")
+                    else (
+                        "🥈"
+                        if entry["rank"] == 2
+                        else "🥉" if entry["rank"] == 3 else f"#{entry['rank']}"
+                    )
                 )
                 name = entry.get("name", "Unknown")
                 score = entry["score"]
@@ -172,7 +180,9 @@ class TournamentCog(commands.Cog):
         event_type="Type of event (monster_kills, quests_completed, boss_kills, spectral_tide, elemental_harvest)"
     )
     @app_commands.checks.has_permissions(administrator=True)
-    async def admin_start(self, interaction: discord.Interaction, event_type: str = "monster_kills"):
+    async def admin_start(
+        self, interaction: discord.Interaction, event_type: str = "monster_kills"
+    ):
         """Manually starts a tournament."""
         if event_type not in self.system.TOURNAMENT_TYPES:
             await interaction.response.send_message(
@@ -192,9 +202,13 @@ class TournamentCog(commands.Cog):
         start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(days=7)
 
-        t_id = self.db.create_tournament(event_type, start_time.isoformat(), end_time.isoformat())
+        t_id = self.db.create_tournament(
+            event_type, start_time.isoformat(), end_time.isoformat()
+        )
 
-        await interaction.response.send_message(f"{E.CHECK} Started Tournament #{t_id}: {event_type}", ephemeral=True)
+        await interaction.response.send_message(
+            f"{E.CHECK} Started Tournament #{t_id}: {event_type}", ephemeral=True
+        )
 
     @app_commands.command(
         name="tournament_admin_end",
@@ -204,7 +218,9 @@ class TournamentCog(commands.Cog):
     async def admin_end(self, interaction: discord.Interaction):
         """Manually ends the tournament."""
         result = self.system.end_current_tournament()
-        await interaction.response.send_message(f"{E.CHECK} Tournament ended manually.\n\n{result}", ephemeral=True)
+        await interaction.response.send_message(
+            f"{E.CHECK} Tournament ended manually.\n\n{result}", ephemeral=True
+        )
 
 
 async def setup(bot: commands.Bot):
