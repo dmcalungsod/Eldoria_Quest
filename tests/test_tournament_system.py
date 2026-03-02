@@ -36,7 +36,7 @@ class TestTournamentSystem(unittest.TestCase):
         args = self.mock_db.create_tournament.call_args_list[0]
         # In python 3.8+ call_args is a tuple (args, kwargs) or just use .args
         # checking args
-        created_type = args.kwargs.get("type")
+        created_type = args.kwargs.get("tournament_type")
         self.assertIn(created_type, self.system.TOURNAMENT_TYPES)
 
     def test_start_weekly_tournament_returns_existing(self):
