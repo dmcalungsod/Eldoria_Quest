@@ -158,3 +158,26 @@ Skill Tree Expansion for the Cleric Class.
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/skill_tree_cleric.md`
+
+## 2026-03-02 — Expansion Blueprint: Guild Halls
+
+**Design Choice:**
+Major Content Expansion: Guild Halls (Player Housing & Shared Resources).
+
+**Reasoning:**
+- **Economy:** Players accumulate massive stockpiles of common and uncommon materials from auto-adventures. We need a meaningful, long-term material sink.
+- **Engagement:** Provides a tangible, upgradable representation of a player's progress and a hub for displaying Codex/Bestiary achievements (Trophies).
+- **Roadmap:** Fulfills the "Guild Halls" concept listed in the future roadmap.
+- **Multiplayer Foundation:** Establishes the infrastructure for true "Companies" (multiplayer guilds) sharing a physical space and pooled resources.
+
+**Theme Alignment:**
+- "Grim Survival": Halls are not luxury estates; they are fortified strongholds reclaimed from the Sundering. Upgrades directly impact survival (Infirmary, Apothecary) rather than just being cosmetic.
+- The cost to maintain them (upkeep) reinforces the constant pressure of Eldoria.
+
+**Integration Notes:**
+- **Economy:** Requires new crafted "Building Materials" (GameForge) and exponential upgrade costs to drain the economy (GameBalancer).
+- **Combat/Exploration:** The Infirmary provides a small pre-expedition shield and reduces rest penalties, directly hooking into `AdventureSession`.
+- **UI:** The Hall interface needs to follow the One UI Policy, acting as a persistent management screen (Palette).
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/expansion_guild_halls.md`
