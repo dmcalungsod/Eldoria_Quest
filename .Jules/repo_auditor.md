@@ -49,3 +49,12 @@
 - `safety check` is deprecated and failed during execution (`safety scan` also failed due to environment issues). Future audits should rely on updated dependency checking tools like `pip-audit`.
 - Manual grep for "send_message" in `cogs/` is still the most reliable way to find ONE UI Policy violations, as automated linters don't understand the semantic difference between `send_message` and `edit_original_response`.
 - **Suggestion for prevention:** Implement a `pre-commit` hook that runs `flake8`, `vulture`, and `radon` with strict thresholds to prevent complexity and unused variables from entering the main branch. Add `bandit` to the CI pipeline to block simple security regressions like `urlopen` or hardcoded tokens.
+
+
+### 2026-03-02 Audit Learnings
+- **Tooling Effectiveness**: `bandit` and `radon` provided the most valuable insights this week, specifically finding B310 (URL open) and high cyclomatic complexity in core combat/inventory classes. `safety` found no vulnerabilities, but the test environment still has older `pip` versions. `flake8` is too noisy due to line length and missing docstrings; needs to be integrated into pre-commit.
+- **Recurring Patterns**: ONE UI Policy violations are still frequent in the `cogs/` directory. The use of `send_message` without `ephemeral=True` for non-initial responses is a common anti-pattern here.
+- **Prevention Suggestions**:
+  - Implement a custom lint rule or pre-commit regex to catch `send_message` uses that don't pass `ephemeral=True` or aren't preceded by `edit_original_response`.
+  - Migrate from `safety check` to `safety scan` as `check` is deprecated.
+- **Limitations**: Could not automatically assess test coverage effectively as `pytest-cov` output wasn't generated due to the test suite potentially taking too long or missing configs. Manual code review was needed to verify ONE UI policy violations.
