@@ -1442,6 +1442,7 @@
             "ancient_shrine"
         ],
         "floor_depth": 42,
-        "danger_level": 8
+        "danger_level": 8,
+        "prerequisite_location": "void_sanctum"
     }
 }

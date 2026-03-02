@@ -85,11 +85,6 @@ def create_tables(db=None):
         "adventure_sessions": [
             ([("discord_id", ASCENDING)], True, None),
             ([("discord_id", ASCENDING), ("active", ASCENDING)], False, None),
-            (
-                [("active", ASCENDING), ("status", ASCENDING), ("end_time", ASCENDING)],
-                False,
-                None,
-            ),
         ],
         "skills": [
             ([("id", ASCENDING)], True, None),
