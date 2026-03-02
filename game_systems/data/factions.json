@@ -57,7 +57,8 @@
             "forest_outskirts",
             "whispering_thicket",
             "deepgrove_roots",
-            "shrouded_fen"
+            "shrouded_fen",
+            "silent_city_ouros"
         ]
     },
     "iron_vanguard": {
@@ -181,7 +182,8 @@
             "celestial_archipelago",
             "shimmering_wastes",
             "sunken_grotto",
-            "whispering_archives"
+            "whispering_archives",
+            "silent_city_ouros"
         ]
     },
     "stone_harvesters": {

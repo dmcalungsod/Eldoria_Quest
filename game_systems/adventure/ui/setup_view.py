@@ -180,7 +180,7 @@ class AdventureSetupView(View):
         self.add_item(self.back_btn)
 
     def _is_unlocked(self, loc_data: dict) -> bool:
-        """Checks if the player meets rank and level requirements."""
+        """Checks if the player meets rank, level, and prerequisite requirements."""
         req_rank = loc_data["min_rank"]
         req_level = loc_data["level_req"]
 
@@ -198,6 +198,13 @@ class AdventureSetupView(View):
             # Fallback if rank is unknown (shouldn't happen)
             logger.warning(f"Unknown rank encountered: {self.player_rank} or {req_rank}")
             return False
+
+        # Prerequisite Check
+        prereq = loc_data.get("prerequisite_location")
+        if prereq:
+            visited = self.exploration_stats.get("unique_locations", [])
+            if prereq not in visited:
+                return False
 
         return True
 
@@ -222,7 +229,7 @@ class AdventureSetupView(View):
 
         if not self._is_unlocked(loc_data):
             await interaction.response.send_message(
-                f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}** and **Rank {loc_data['min_rank']}** to enter {loc_data['name']}.",
+                f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}**, **Rank {loc_data['min_rank']}**, and potentially specific exploration achievements to enter {loc_data['name']}.",
                 ephemeral=True,
             )
             return
