@@ -26,8 +26,3 @@
 ## 2026-03-01 - [Auto-Adventure Scheduler N+1 Query Fix]
 **Learning:** `AdventureResolutionEngine.resolve_sessions_batch` fetched combat context bundles inside a loop calling `get_combat_context_bundle` for each `discord_id`, resulting in an N+1 query problem that slowed down the auto-adventure scheduler.
 **Action:** Introduced `get_combat_context_bundles_batch` using MongoDB's `$in` operator to fetch all context bundles in a single query. `resolve_sessions_batch` now parses and maps these bundles, passing them efficiently into `resolve_session`.
-
-## 2026-03-02 — Optimizing the Auto-Adventure Scheduler Query
-
-**Learning:** The auto-adventure background scheduler (`cogs/adventure_loop.py`) runs frequently (every minute) and searches for completed adventures using a specific time-based query (`get_adventures_ending_before` in `database/database_manager.py`). Without a proper composite index covering all the query's match conditions (`active`, `status`, `end_time`), MongoDB falls back to a collection scan, leading to O(N) performance degradation as the active user base grows (which is catastrophic for a scheduler intended to handle 10k+ concurrent sessions).
-**Action:** Always ensure that background polling queries targeting expanding collections have covering indexes. In Eldoria Quest, these indexes must be explicitly registered within the `INDEX_DEFINITIONS` dictionary in `database/create_database.py` to be correctly initialized.
