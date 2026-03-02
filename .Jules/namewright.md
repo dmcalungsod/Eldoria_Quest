@@ -176,3 +176,34 @@
 1.  **The Petrified Arbiter** – A massive statue of a long-dead judge in The Grand Promenade, perfectly preserved in a state of eternal judgment.
 2.  **The Frozen Oracle** – A statue near The Chronomancer's Spire, its eyes seemingly following explorers, hinting at unseen watchers.
 3.  **The Silent Monument** – A towering obelisk dedicated to the city's founders, its inscriptions perfectly legible but the meaning lost to time.
+
+## 2026-03-02 — Guild Halls (Building Materials & Trophies)
+
+**Request:** Proactive / Assigned by Foreman (via Architect's design `.Jules/architect_designs/expansion_guild_halls.md`)
+**Context:** Guild Halls Expansion. Needs names for basic building materials (Stone/Wood equivalents) and rare boss trophies to act as material sinks.
+**Tone:** Industrial, fortified, survival-focused, visceral (for trophies). Avoid generic "Wood" or "Stone".
+
+### 📜 Generated Names
+
+#### 🧱 Building Materials (Masonry/Stone)
+1.  **Ash-Forged Brick** – Stone tempered in volcanic ash, extremely durable.
+2.  **Deep-Quarry Block** – Massive, dense stone cut from the lower floors.
+3.  **Iron-Vein Cobble** – Rough stone interlaced with unrefined iron, used for fortifications.
+4.  **Void-Touched Basalt** – A risky but incredibly hard building material.
+
+#### 🪵 Building Materials (Lumber/Wood)
+1.  **Ironwood Plank** – Dense, heavy timber that requires specialized saws to cut.
+2.  **Resin-Treated Timber** – Wood coated in monster sap to prevent rot and fire.
+3.  **Petrified Heartwood** – Fossilized wood from the deepest parts of the dungeon.
+4.  **Gloom-Pine Log** – Timber from trees that grow without sunlight.
+
+#### 🏆 Boss Trophies (The Hearth Upgrades)
+1.  **Smoldering Core** (Generic Boss Drop) – A still-hot essence from a fire-based boss.
+2.  **Glacial Wyrm Spine** (Specific to Glacial Wyrm) – Used to construct an unmelting Hearth.
+3.  **Sundered Goliath Heart** (Specific to Sundered Goliath) – A massive, pulsing organ encased in Void crystal.
+4.  **Shriek-Wing Mandible** (Specific to Shriek-Wing) – A terrifying, serrated jawbone.
+5.  **Hollowed Sentinel Plating** (Specific to Hollowed Sentinel) – Clockwork armor repurposed as a mantle.
+
+### 📝 Learnings
+*   Building materials need to sound heavy and labored-over to justify their use as an economy sink. Prefixes like "Ash-Forged" and "Resin-Treated" imply crafting effort.
+*   Boss trophies should be visceral ("Spine", "Heart", "Mandible") to emphasize the hunter/survivalist theme of the Guild Halls.
