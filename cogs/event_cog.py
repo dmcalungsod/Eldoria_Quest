@@ -134,7 +134,8 @@ class EventCog(commands.Cog):
                 description="The world is calm. The skies are clear.",
                 color=discord.Color.dark_grey(),
             )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(embed=embed)
             return
 
         end_time = datetime.datetime.fromisoformat(active["end_time"])
@@ -163,7 +164,8 @@ class EventCog(commands.Cog):
                 name="Global Effects", value="\n".join(modifiers), inline=False
             )
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        await interaction.edit_original_response(embed=embed)
 
     # ==================================================================
     # ADMIN COMMANDS
@@ -182,9 +184,9 @@ class EventCog(commands.Cog):
     ):
         """Manually starts an event."""
         if event_type not in self.system.EVENT_CONFIGS:
-            await interaction.response.send_message(
-                f"{E.ERROR} Invalid type. Options: {', '.join(self.system.EVENT_CONFIGS.keys())}",
-                ephemeral=True,
+            await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(
+                content=f"{E.ERROR} Invalid type. Options: {', '.join(self.system.EVENT_CONFIGS.keys())}"
             )
             return
 
@@ -192,9 +194,9 @@ class EventCog(commands.Cog):
 
         if success:
             config = self.system.EVENT_CONFIGS[event_type]
-            await interaction.response.send_message(
-                f"{E.CHECK} Started Event: **{config['name']}** for {hours} hours.",
-                ephemeral=True,
+            await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(
+                content=f"{E.CHECK} Started Event: **{config['name']}** for {hours} hours."
             )
             await self._announce(
                 f"🚨 **WORLD EVENT STARTED!** 🚨\n\n"
@@ -203,9 +205,8 @@ class EventCog(commands.Cog):
                 f"Check `/event_status` for details!"
             )
         else:
-            await interaction.response.send_message(
-                f"{E.ERROR} Failed to start event.", ephemeral=True
-            )
+            await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(content=f"{E.ERROR} Failed to start event.")
 
     @app_commands.command(
         name="admin_event_end",
@@ -215,9 +216,8 @@ class EventCog(commands.Cog):
     async def admin_end(self, interaction: discord.Interaction):
         """Manually ends the event."""
         self.system.end_current_event()
-        await interaction.response.send_message(
-            f"{E.CHECK} Event ended manually.", ephemeral=True
-        )
+        await interaction.response.defer(ephemeral=True)
+        await interaction.edit_original_response(content=f"{E.CHECK} Event ended manually.")
         await self._announce("✅ **The world returns to normal.** The event has ended.")
 
 

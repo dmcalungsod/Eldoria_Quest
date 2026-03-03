@@ -223,6 +223,11 @@ class AdventureSetupView(View):
         if not self._is_unlocked(loc_data):
             await interaction.response.send_message(
                 f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}** and **Rank {loc_data['min_rank']}** to enter {loc_data['name']}.",
+        is_unlocked, reason = self._is_unlocked(loc_data)
+        if not is_unlocked:
+            await interaction.response.defer(ephemeral=True)
+            await interaction.followup.send(
+                content=f"{E.LOCKED} **Access Denied**\n{reason} to enter {loc_data['name']}.",
                 ephemeral=True,
             )
             return

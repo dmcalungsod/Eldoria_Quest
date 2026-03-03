@@ -89,7 +89,8 @@ class AdventureView(View):
             ),
             color=discord.Color.blue()
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """
@@ -113,8 +114,9 @@ class AdventureView(View):
         adventure_cog = interaction.client.get_cog("AdventureCommands")
 
         if not adventure_cog:
-            await interaction.response.send_message(
-                f"{E.ERROR} The adventure system is currently unavailable.",
+            await interaction.response.defer(ephemeral=True)
+            await interaction.followup.send(
+                content=f"{E.ERROR} The adventure system is currently unavailable.",
                 ephemeral=True,
             )
             return
