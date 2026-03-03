@@ -21,7 +21,7 @@ dist/
 .coverage
 .coverage.*
 htmlcov/
-.pytest_cache/
+.my
 pip-audit-output/
 .tox/
 

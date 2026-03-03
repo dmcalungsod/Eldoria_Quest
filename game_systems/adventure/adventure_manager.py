@@ -22,7 +22,7 @@ from game_systems.player.achievement_system import AchievementSystem
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
 
-from .adventure_session import AdventureSession
+from .adventure_session import AdventureSession  # noqa: I001
 
 logger = logging.getLogger("eldoria.adventure_mgr")
 
@@ -44,16 +44,12 @@ class AdventureManager:
     ) -> bool:
         # --- SECURITY FIX: Input Validation ---
         if location_id not in LOCATIONS:
-            logger.warning(
-                f"Invalid location_id attempted: {location_id} by {discord_id}"
-            )
+            logger.warning(f"Invalid location_id attempted: {location_id} by {discord_id}")
             return False
 
         # Max duration: 1 year (approx 525,600 minutes) to prevent overflow
         if duration_minutes != -1 and not (0 < duration_minutes <= 525600):
-            logger.warning(
-                f"Invalid adventure duration: {duration_minutes} by {discord_id}"
-            )
+            logger.warning(f"Invalid adventure duration: {duration_minutes} by {discord_id}")
             return False
 
         # Verify and Deduct Supplies
@@ -78,9 +74,7 @@ class AdventureManager:
             for item_key, count in supplies.items():
                 total = item_totals.get(item_key, 0)
                 if total < count:
-                    logger.warning(
-                        f"User {discord_id} lacks supply {item_key} (Has {total}, Needs {count})"
-                    )
+                    logger.warning(f"User {discord_id} lacks supply {item_key} (Has {total}, Needs {count})")
                     return False
 
             # 2. Deduction Phase with Rollback
@@ -91,9 +85,7 @@ class AdventureManager:
                 if self.db.remove_inventory_item(discord_id, item_key, count):
                     deducted_items.append((item_key, count))
                 else:
-                    logger.error(
-                        f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)"
-                    )
+                    logger.error(f"Failed to deduct supply {item_key} for {discord_id} (Race Condition?)")
                     rollback_needed = True
                     break
 
@@ -167,9 +159,7 @@ class AdventureManager:
                 "active_monster": None,
             }
 
-        session = AdventureSession(
-            self.db, self.quest_system, self.inventory_manager, discord_id, session_row
-        )
+        session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, session_row)
 
         result = session.simulate_step(context_bundle=bundle, action=action)
 
@@ -257,9 +247,7 @@ class AdventureManager:
 
             if failed_items:
                 failed_names = sorted(list(set(f["item_name"] for f in failed_items)))
-                loss_report.append(
-                    f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}"
-                )
+                loss_report.append(f"• {SKULL} Lost (Full Pack): {', '.join(failed_names)}")
 
             self.db.end_adventure_session(discord_id)
 
@@ -295,9 +283,7 @@ class AdventureManager:
             if not row:
                 return None
 
-            session = AdventureSession(
-                self.db, self.quest_system, self.inventory_manager, discord_id, row
-            )
+            session = AdventureSession(self.db, self.quest_system, self.inventory_manager, discord_id, row)
 
             # --- EXPLOIT FIX: Retreating while in Combat ---
             # If the player manually ends the adventure (Retreat) while an active monster is present,
@@ -409,16 +395,12 @@ class AdventureManager:
             # --- EXPLORATION ACHIEVEMENTS ---
             try:
                 # 1. Update Stats
-                self.db.update_exploration_stats(
-                    discord_id, row.get("location_id", "unknown"), duration_min
-                )
+                self.db.update_exploration_stats(discord_id, row.get("location_id", "unknown"), duration_min)
 
                 # 2. Check Achievements
                 ach_system = AchievementSystem(self.db)
                 new_title_msg = ach_system.check_exploration_achievements(discord_id)
-                new_duration_msg = ach_system.check_duration_achievements(
-                    discord_id, duration_min
-                )
+                new_duration_msg = ach_system.check_duration_achievements(discord_id, duration_min)
 
                 msgs = []
                 if new_title_msg:
@@ -535,9 +517,7 @@ class AdventureManager:
                     "end_time": end.isoformat(),
                     "duration_minutes": -1,
                     "active": 1,
-                    "logs": json.dumps(
-                        [f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]
-                    ),
+                    "logs": json.dumps([f"{COMBAT} **PROMOTION TRIAL**\nThe Examiner awaits."]),
                     "loot_collected": "{}",
                     "active_monster_json": json.dumps(active_monster),
                     "version": 1,
