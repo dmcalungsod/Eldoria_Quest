@@ -104,8 +104,8 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.dev_panel(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        self.assertIn("not the bot owner", interaction.response.send_message.call_args[0][0])
+        interaction.edit_original_response.assert_called_once()
+        self.assertIn("not the bot owner", interaction.edit_original_response.call_args.kwargs['content'])
 
     async def test_dev_panel_no_character(self):
         interaction = AsyncMock()
@@ -118,7 +118,8 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.dev_panel(interaction)
 
         interaction.followup.send.assert_called_once()
-        self.assertIn("No character found", interaction.followup.send.call_args[0][0])
+        content = interaction.followup.send.call_args[0][0]
+        self.assertIn("No character found.", content)
 
     async def test_dev_panel_success(self):
         interaction = AsyncMock()
