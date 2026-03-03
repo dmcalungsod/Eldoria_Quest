@@ -175,7 +175,7 @@ class GuildAdvisor:
         else:
             embed.add_field(
                 name="4. First Expedition",
-                value="❌ **Pending**\n*Start an adventure via **Profile** -> **Adventure**.*",
+                value="❌ **Pending**\n*Start an adventure via **Profile** -> **Expeditions**.*",
                 inline=False,
             )
 
