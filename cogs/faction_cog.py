@@ -49,14 +49,16 @@ class FactionCog(commands.Cog):
                 name=name, value=f"{desc}\n*Interests: {interests}*\n*Favored Territory: {loc_str}*", inline=False
             )
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        await interaction.edit_original_response(embed=embed)
 
     @faction_group.command(name="join", description="Join a faction.")
     @app_commands.choices(faction=[app_commands.Choice(name=data["name"], value=fid) for fid, data in FACTIONS.items()])
     async def join_faction(self, interaction: discord.Interaction, faction: app_commands.Choice[str]):
         """Joins a selected faction."""
         success, msg = self.faction_system.join_faction(interaction.user.id, faction.value)
-        await interaction.response.send_message(msg, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        await interaction.edit_original_response(content=msg)
 
     @faction_group.command(name="status", description="Check your faction status.")
     async def faction_status(self, interaction: discord.Interaction):
@@ -64,9 +66,9 @@ class FactionCog(commands.Cog):
         data = self.faction_system.get_player_faction(interaction.user.id)
 
         if not data:
-            await interaction.response.send_message(
-                "You are not in a faction. Use `/faction list` to see options.",
-                ephemeral=True,
+            await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(
+                content="You are not in a faction. Use `/faction list` to see options."
             )
             return
 
@@ -101,7 +103,8 @@ class FactionCog(commands.Cog):
         else:
             embed.add_field(name="Next Rank", value="Maximum Rank Achieved", inline=False)
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        await interaction.edit_original_response(embed=embed)
 
     @faction_group.command(
         name="leave",
@@ -111,7 +114,8 @@ class FactionCog(commands.Cog):
         """Leaves the current faction."""
         # Confirmation could be added here with a View, but for simplicity we'll just do it.
         success, msg = self.faction_system.leave_faction(interaction.user.id)
-        await interaction.response.send_message(msg, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        await interaction.edit_original_response(content=msg)
 
 
 async def setup(bot: commands.Bot):
