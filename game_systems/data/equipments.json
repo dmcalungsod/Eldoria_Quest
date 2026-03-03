@@ -477,7 +477,9 @@
         "slot": "accessory",
         "rarity": "Uncommon",
         "level_req": 5,
-        "class_restrictions": ["Warrior"],
+        "class_restrictions": [
+            "Warrior"
+        ],
         "stats_bonus": {
             "STR": 5,
             "END": 5
@@ -489,7 +491,9 @@
         "slot": "accessory",
         "rarity": "Uncommon",
         "level_req": 5,
-        "class_restrictions": ["Mage"],
+        "class_restrictions": [
+            "Mage"
+        ],
         "stats_bonus": {
             "MAG": 8,
             "MP": 20
@@ -518,5 +522,60 @@
             "MP": 50
         },
         "description": "Bound in cold, flayed skin, this unholy scripture contains musical notation written in rusted blood."
+    },
+    "gen_sword_abyssal": {
+        "name": "Abyssal Greatsword",
+        "slot": "greatsword",
+        "rarity": "Rare",
+        "level_req": 35,
+        "stats_bonus": {
+            "STR": 50,
+            "DEX": 15
+        },
+        "description": "A heavy blade forged from Abyssal Ore. It absorbs light and heat."
+    },
+    "gen_dagger_abyssal": {
+        "name": "Abyssal Dagger",
+        "slot": "dagger",
+        "rarity": "Rare",
+        "level_req": 35,
+        "stats_bonus": {
+            "DEX": 40,
+            "AGI": 25
+        },
+        "description": "A jagged dagger crafted from Abyssal Ore. It slices through shadows."
+    },
+    "gen_robe_abyssal": {
+        "name": "Abyssal Robes",
+        "slot": "robe",
+        "rarity": "Rare",
+        "level_req": 35,
+        "stats_bonus": {
+            "MAG": 40,
+            "MP": 30
+        },
+        "description": "Robes woven from shadow essence and void dust. They hum with dark energy."
+    },
+    "gen_heavyarmor_abyssal": {
+        "name": "Abyssal Plate",
+        "slot": "heavy_armor",
+        "rarity": "Rare",
+        "level_req": 35,
+        "stats_bonus": {
+            "END": 55,
+            "STR": 10
+        },
+        "description": "Heavy armor plates crafted from Abyssal Ore. It's surprisingly cold to the touch."
+    },
+    "gen_accessory_abyssal": {
+        "name": "Abyssal Pearl Ring",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 35,
+        "stats_bonus": {
+            "MAG": 25,
+            "LCK": 20
+        },
+        "description": "A dark pearl set in an abyssal ore ring. It whispers secrets of the deep."
     }
 }
