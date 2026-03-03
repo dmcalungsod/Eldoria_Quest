@@ -8,6 +8,9 @@ on:
     branches:
       - '**'
 
+permissions:
+  contents: read
+
 jobs:
   static-analysis:
     if: github.repository == 'dmcalungsod/Eldoria_Quest'
