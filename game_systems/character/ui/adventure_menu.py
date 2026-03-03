@@ -153,6 +153,9 @@ class AdventureView(View):
 
                 # CASE 2: Active / In Progress / Failed
                 # Show Status View
+                vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+                if vitals:
+                    session["vitals"] = vitals
                 embed = AdventureEmbeds.build_adventure_status_embed(session)
                 view = AdventureStatusView(self.db, adventure_cog.manager, self.interaction_user, session)
                 await interaction.edit_original_response(embed=embed, view=view)

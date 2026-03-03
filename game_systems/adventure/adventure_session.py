@@ -257,7 +257,7 @@ class AdventureSession:
                 max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
             else:
                 max_hp = max(context["player_stats"].max_hp, 1)
-            return (current_hp / max_hp) >= 0.30
+            return (current_hp / max_hp) >= 0.15
         except Exception:
             return False
 
@@ -401,7 +401,7 @@ class AdventureSession:
                 current_hp = context["vitals"]["current_hp"]
                 max_hp, _ = self._get_max_vitals(context)
 
-                if (current_hp / max_hp) < 0.30:
+                if (current_hp / max_hp) < 0.15:
                     flee_result = self._attempt_flee(context, persist=persist)
                     flee_result["auto_retreat"] = True
                     return flee_result
@@ -722,7 +722,7 @@ class AdventureSession:
         self, context: dict, result: dict, max_hp: int, background: bool, sequence: list
     ) -> bool:
         """Checks and uses auto-potion if HP is critical, returns True if combat should abort."""
-        if result["hp_current"] / max_hp < 0.30:
+        if result["hp_current"] / max_hp < 0.15:
             potion_used = self._try_auto_potion(context, max_hp)
             if potion_used:
                 sequence.append([potion_used])
@@ -855,7 +855,7 @@ class AdventureSession:
         max_hp, max_mp = self._get_max_vitals(context)
 
         # Auto-Retreat checks
-        if background and not player_won and not is_dead and result["hp_current"] / max_hp < 0.30:
+        if background and not player_won and not is_dead and result["hp_current"] / max_hp < 0.15:
             # We broke early due to HP and couldn't potion
             # So next step will be a flee, but we can also just mark it now
             pass

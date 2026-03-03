@@ -227,20 +227,73 @@ class AdventureEmbeds:
         embed.add_field(name="⏳ Time Remaining", value=f"`{remaining_str}`", inline=True)
         embed.add_field(name="👣 Steps Taken", value=f"`{session.get('steps_completed', 0)}`", inline=True)
 
-        # Loot Count
+        # Player Vitals & Kills
+        # The session should have these in context if updated during simulation, but since we are fetching just the session
+        # we might need to rely on the main stats. If they aren't available, we skip.
+        if "vitals" in session and session["vitals"]:
+            hp = session["vitals"].get("current_hp", 0)
+            mp = session["vitals"].get("current_mp", 0)
+            embed.add_field(name="❤️ Vitals", value=f"**HP:** {hp} | **MP:** {mp}", inline=True)
+
+        try:
+            logs_raw = session.get("logs", "[]")
+            logs = json.loads(logs_raw) if isinstance(logs_raw, str) else logs_raw
+            # Count kills by searching logs
+            kills = 0
+            for log in logs:
+                if "Defeated" in log or "Victory" in log or "slain" in log:
+                    kills += 1
+            if kills > 0:
+                 embed.add_field(name="⚔️ Kills", value=f"`{kills}` Monsters Defeated", inline=True)
+        except:
+            pass
+
+        # Loot Details
         try:
             loot_raw = session.get("loot_collected", "{}")
             loot = json.loads(loot_raw) if isinstance(loot_raw, str) else loot_raw
-            # Filter out non-item keys like 'exp' or 'aurum' if they are in loot dict
-            # AdventureSession stores actual items in loot dict, exp/aurum are special but check anyway
-            loot_count = sum(v for k, v in loot.items() if k not in ("exp", "aurum"))
-        except Exception:
-            loot_count = 0
 
-        embed.add_field(name="🎒 Loot Gathered", value=f"`{loot_count}` items", inline=True)
+            loot_details = []
+            item_count = 0
+            for item_key, count in list(loot.items()):
+                if item_key in ("exp", "aurum"):
+                    continue
+                if item_count < 5:
+                    from game_systems.data.materials import MATERIALS
+                    mat = MATERIALS.get(item_key)
+                    name = mat["name"] if mat else item_key.replace('_', ' ').title()
+                    loot_details.append(f"• {name}: {count}")
+                item_count += 1
+
+            if item_count > 5:
+                loot_details.append(f"...and {item_count-5} more types")
+
+            loot_text = "\n".join(loot_details) if loot_details else "None yet."
+            embed.add_field(name="🎒 Loot Gathered", value=loot_text, inline=True)
+
+        except Exception as e:
+            embed.add_field(name="🎒 Loot Gathered", value="Data Error", inline=True)
+
+        # Recent Events
+        try:
+            logs_raw = session.get("logs", "[]")
+            logs = json.loads(logs_raw) if isinstance(logs_raw, str) else logs_raw
+
+            if logs:
+                # Get the last 3 meaningful logs, strip ANSI codes for display if needed
+                recent_logs = logs[-3:]
+                log_text = "\n".join(f"• {log.strip()}" for log in recent_logs)
+                # Keep it under 1024 chars for embed field
+                if len(log_text) > 1000:
+                    log_text = log_text[:1000] + "..."
+                embed.add_field(name="📜 Recent Events", value=log_text, inline=False)
+            else:
+                embed.add_field(name="📜 Recent Events", value="The journey has just begun...", inline=False)
+        except Exception as e:
+            embed.add_field(name="📜 Recent Events", value="Could not load logs.", inline=False)
 
         # Flavor footer
-        embed.set_footer(text="Your party is exploring automatically.")
+        embed.set_footer(text="Your party is exploring automatically. Click 'Refresh Status' to update.")
 
         return embed
 

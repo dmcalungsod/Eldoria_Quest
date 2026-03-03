@@ -291,6 +291,10 @@ class AdventureSetupView(View):
                 await interaction.followup.send("Error starting session.", ephemeral=True)
                 return
 
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+            if vitals:
+                session["vitals"] = vitals
+
             # 3. Build Status Embed
             embed = AdventureEmbeds.build_adventure_status_embed(session)
 
