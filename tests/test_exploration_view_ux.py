@@ -151,7 +151,7 @@ class TestExplorationViewUX(unittest.TestCase):
 
     def test_forward_button_danger(self):
         """Danger state: No monster, LOW HP (<30%)."""
-        vitals = {"current_hp": 20, "current_mp": 50}  # 20/100 = 20%
+        vitals = {"current_hp": 10, "current_mp": 50}  # 10/100 = 10%
 
         view = self.ExplorationView(
             self.mock_db,

@@ -88,7 +88,9 @@ class TestEchoesOfTheDeepEvent(unittest.TestCase):
         args, kwargs = self.session._handle_active_combat.call_args
         passed_threat_reduction = args[6]
 
-        self.assertEqual(passed_threat_reduction, 1.0, "Threat reduction was incorrectly applied outside Wailing Chasm.")
+        self.assertEqual(
+            passed_threat_reduction, 1.0, "Threat reduction was incorrectly applied outside Wailing Chasm."
+        )
 
     @patch("game_systems.adventure.adventure_rewards.LootCalculator")
     def test_loot_bonus_in_wailing_chasm(self, mock_loot_calc):
@@ -103,9 +105,9 @@ class TestEchoesOfTheDeepEvent(unittest.TestCase):
             "monster_data": {"name": "Test Boss", "tier": "Boss"},
             "drops": ["test_item"],
             "active_boosts": {
-                "loot_boost": 1.25, # Base global event boost
+                "loot_boost": 1.25,  # Base global event boost
                 "wailing_chasm_loot_bonus": 1.5,
-            }
+            },
         }
 
         self.rewards._process_loot_and_quests(
@@ -114,7 +116,7 @@ class TestEchoesOfTheDeepEvent(unittest.TestCase):
             inventory_manager=self.inventory_manager_mock,
             session_loot={},
             logs=[],
-            location_id="the_wailing_chasm"
+            location_id="the_wailing_chasm",
         )
 
         mock_loot_calc.roll_drops.assert_called_once()
@@ -123,7 +125,9 @@ class TestEchoesOfTheDeepEvent(unittest.TestCase):
         passed_loot_boost = args[2]
 
         # Expected: 1.25 (global) * 1.5 (local Wailing Chasm) = 1.875
-        self.assertAlmostEqual(passed_loot_boost, 1.875, places=3, msg="Loot boost was not calculated correctly in Wailing Chasm.")
+        self.assertAlmostEqual(
+            passed_loot_boost, 1.875, places=3, msg="Loot boost was not calculated correctly in Wailing Chasm."
+        )
 
     @patch("game_systems.adventure.adventure_rewards.LootCalculator")
     def test_loot_bonus_not_applied_elsewhere(self, mock_loot_calc):
@@ -138,9 +142,9 @@ class TestEchoesOfTheDeepEvent(unittest.TestCase):
             "monster_data": {"name": "Test Boss", "tier": "Boss"},
             "drops": ["test_item"],
             "active_boosts": {
-                "loot_boost": 1.25, # Base global event boost
+                "loot_boost": 1.25,  # Base global event boost
                 "wailing_chasm_loot_bonus": 1.5,
-            }
+            },
         }
 
         self.rewards._process_loot_and_quests(
@@ -149,14 +153,17 @@ class TestEchoesOfTheDeepEvent(unittest.TestCase):
             inventory_manager=self.inventory_manager_mock,
             session_loot={},
             logs=[],
-            location_id="some_other_place"
+            location_id="some_other_place",
         )
 
         args, kwargs = mock_loot_calc.roll_drops.call_args
         passed_loot_boost = args[2]
 
         # Expected: 1.25 (global only)
-        self.assertAlmostEqual(passed_loot_boost, 1.25, places=3, msg="Loot boost was incorrectly calculated outside Wailing Chasm.")
+        self.assertAlmostEqual(
+            passed_loot_boost, 1.25, places=3, msg="Loot boost was incorrectly calculated outside Wailing Chasm."
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

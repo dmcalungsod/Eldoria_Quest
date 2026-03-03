@@ -55,10 +55,12 @@ class TestServicesMenuExtended(unittest.IsolatedAsyncioTestCase):
 
         # Import components module normally but mock what we need
         import game_systems.guild_system.ui.components
+
         importlib.reload(game_systems.guild_system.ui.components)
 
         # Import target module
         import game_systems.guild_system.ui.services_menu
+
         importlib.reload(game_systems.guild_system.ui.services_menu)
 
         self.services_module = game_systems.guild_system.ui.services_menu
@@ -113,6 +115,7 @@ class TestServicesMenuExtended(unittest.IsolatedAsyncioTestCase):
         # We can't easily assert exactly what embed.description contains because it's built internally
         # but we know the path was hit and didn't crash
         self.assertTrue(interaction.edit_original_response.called)
+
 
 if __name__ == "__main__":
     unittest.main()

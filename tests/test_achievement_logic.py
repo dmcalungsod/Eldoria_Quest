@@ -71,9 +71,7 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.return_value = True
 
-        msg = self.achievements.check_combat_achievements(
-            discord_id, class_name, damage_taken
-        )
+        msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
 
         self.mock_db.add_title.assert_any_call(discord_id, "Without a Trace")
         self.assertIn("**Title Unlocked:** Without a Trace", msg)
@@ -85,9 +83,7 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.return_value = True
 
-        msg = self.achievements.check_combat_achievements(
-            discord_id, class_name, damage_taken
-        )
+        msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
 
         self.mock_db.add_title.assert_not_called()
         self.assertIsNone(msg)
@@ -99,9 +95,7 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.return_value = True
 
-        msg = self.achievements.check_combat_achievements(
-            discord_id, class_name, damage_taken
-        )
+        msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
 
         self.mock_db.add_title.assert_not_called()
         self.assertIsNone(msg)

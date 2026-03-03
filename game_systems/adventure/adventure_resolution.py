@@ -39,7 +39,7 @@ class AdventureResolutionEngine:
 
         # We fetch the active boosts once for all sessions to avoid DB overhead.
         # This is safe because active boosts don't change per player in this loop.
-        self.db.get_active_boosts() # Cache it in DB layer if not already
+        self.db.get_active_boosts()  # Cache it in DB layer if not already
 
         # Fetch all context bundles in a single database query to resolve the N+1 query problem
         discord_ids = [doc["discord_id"] for doc in session_docs]
@@ -58,7 +58,9 @@ class AdventureResolutionEngine:
                         try:
                             user = self.bot.get_user(discord_id) or await self.bot.fetch_user(discord_id)
                             if user:
-                                await user.send("⚠️ **Your adventure was automatically aborted!**\n\nYour health dropped to critical levels and you were forced to retreat back to town to save your life. Check your adventure status for the full report.")
+                                await user.send(
+                                    "⚠️ **Your adventure was automatically aborted!**\n\nYour health dropped to critical levels and you were forced to retreat back to town to save your life. Check your adventure status for the full report."
+                                )
                         except discord.Forbidden:
                             logger.info(f"Could not DM user {discord_id} about auto-retreat.")
                         except Exception as dm_e:
@@ -137,18 +139,18 @@ class AdventureResolutionEngine:
             initial_mp = context["vitals"]["current_mp"]
 
         if context.get("player_stats"):
-             max_hp = context["player_stats"].max_hp
-             max_mp = context["player_stats"].max_mp
+            max_hp = context["player_stats"].max_hp
+            max_mp = context["player_stats"].max_mp
         elif context.get("stats_dict"):
-             max_hp = context["stats_dict"].get("HP", 100)
-             max_mp = context["stats_dict"].get("MP", 100)
+            max_hp = context["stats_dict"].get("HP", 100)
+            max_mp = context["stats_dict"].get("MP", 100)
 
         final_vitals = None
 
         # 3. Simulation Loop
         # Pre-fetch weather and time phase to avoid duplicate lookups per step
         location_id = getattr(session, "location_id", "forest_outskirts")
-        if not isinstance(location_id, str): # Handle MagicMock in tests
+        if not isinstance(location_id, str):  # Handle MagicMock in tests
             location_id = "forest_outskirts"
         weather = WorldTime.get_current_weather(location_id)
         time_phase = WorldTime.get_current_phase()
@@ -157,11 +159,7 @@ class AdventureResolutionEngine:
             # Pass PRE-PARSED context object directly to simulate_step
             # AdventureSession was updated to check if context_bundle has "player_stats" and reuse it.
             result = session.simulate_step(
-                context_bundle=context,
-                background=True,
-                persist=False,
-                weather=weather,
-                time_phase=time_phase
+                context_bundle=context, background=True, persist=False, weather=weather, time_phase=time_phase
             )
 
             # Increment step counter
@@ -277,9 +275,11 @@ class AdventureResolutionEngine:
             # Use direct DB update targeting inactive sessions
             self.db._col("adventure_sessions").update_one(
                 {"discord_id": discord_id, "active": 0},
-                {"$set": {
-                    "logs": json.dumps(trimmed_logs),
-                    "loot_collected": json.dumps(session.loot),
-                    "steps_completed": session.steps_completed
-                }}
+                {
+                    "$set": {
+                        "logs": json.dumps(trimmed_logs),
+                        "loot_collected": json.dumps(session.loot),
+                        "steps_completed": session.steps_completed,
+                    }
+                },
             )

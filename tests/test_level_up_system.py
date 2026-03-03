@@ -1,13 +1,13 @@
-import unittest
 import os
 import sys
-from unittest.mock import MagicMock
+import unittest
 
 # Ensure root dir is in path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
+
 
 class TestLevelUpSystem(unittest.TestCase):
     def setUp(self):
@@ -30,7 +30,7 @@ class TestLevelUpSystem(unittest.TestCase):
         self.assertEqual(self.system.level, 2)
         # exp_to_next should update: 200 * 2^2 + 800 * 2 = 800 + 1600 = 2400
         self.assertEqual(self.system.exp_to_next, 2400)
-        self.assertEqual(self.system.exp, 20) # 120 - 100
+        self.assertEqual(self.system.exp, 20)  # 120 - 100
 
     def test_to_dict_from_dict(self):
         self.system.add_exp(50)
@@ -40,6 +40,7 @@ class TestLevelUpSystem(unittest.TestCase):
         self.assertEqual(new_system.level, 1)
         self.assertEqual(new_system.exp, 50)
         self.assertEqual(new_system.exp_to_next, 100)
+
 
 if __name__ == "__main__":
     unittest.main()

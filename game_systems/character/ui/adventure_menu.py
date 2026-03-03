@@ -87,7 +87,7 @@ class AdventureView(View):
                 "If your HP drops below 30%, you will automatically retreat, though you may lose gathered loot. "
                 "You can also check your status and retreat manually at any time to secure your findings."
             ),
-            color=discord.Color.blue()
+            color=discord.Color.blue(),
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -153,6 +153,9 @@ class AdventureView(View):
 
                 # CASE 2: Active / In Progress / Failed
                 # Show Status View
+                vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+                if vitals:
+                    session["vitals"] = vitals
                 embed = AdventureEmbeds.build_adventure_status_embed(session)
                 view = AdventureStatusView(self.db, adventure_cog.manager, self.interaction_user, session)
                 await interaction.edit_original_response(embed=embed, view=view)
