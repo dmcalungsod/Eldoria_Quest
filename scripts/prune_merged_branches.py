@@ -23,10 +23,7 @@ def main():
     # Get current repository
     try:
         result = subprocess.run(
-            ["gh", "repo", "view", "--json", "nameWithOwner"],
-            capture_output=True,
-            text=True,
-            check=True
+            ["gh", "repo", "view", "--json", "nameWithOwner"], capture_output=True, text=True, check=True
         )  # nosec B603
         current_repo_json = result.stdout.strip()
     except subprocess.CalledProcessError as e:
@@ -58,7 +55,7 @@ def main():
             ],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )  # nosec B603
         prs_json = prs_result.stdout.strip()
     except subprocess.CalledProcessError as e:
@@ -131,7 +128,7 @@ def main():
                 f"repos/{current_repo}/git/refs/heads/{head_ref}",
             ],
             capture_output=True,
-            text=True
+            text=True,
         )  # nosec B603
 
         if delete_result.returncode == 0:

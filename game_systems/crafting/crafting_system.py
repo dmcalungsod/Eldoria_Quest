@@ -336,7 +336,9 @@ class CraftingSystem:
                 if original_data:
                     original_name = original_data["name"]
             except Exception as e:
-                logger.debug(f"Could not resolve original name for dismantled item {inv_id}: {e}")  # Fallback to stored name
+                logger.debug(
+                    f"Could not resolve original name for dismantled item {inv_id}: {e}"
+                )  # Fallback to stored name
 
         # 4. Calculate Rewards
         rewards = self.get_dismantle_rewards(original_name, item["rarity"])

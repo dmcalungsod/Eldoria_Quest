@@ -76,9 +76,11 @@ class LocationData:
             cls._locations = load_locations()
         return cls._locations
 
+
 def __getattr__(name):
-    if name == 'LOCATIONS':
+    if name == "LOCATIONS":
         return LocationData.get_all()
     raise AttributeError(f"module {__name__} has no attribute {name}")
+
 
 __all__ = ["LocationData"]

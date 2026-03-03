@@ -109,3 +109,19 @@
 **Notes:**
 - The B310 vulnerability is an actionable security issue assigned to Sentinel.
 - Dead code identified by Vulture requires cleanup by SystemSmith and BugHunter.
+
+## 2026-03-08
+**Summary:**
+- Scanned recent agent logs (2026-03-02, 2026-03-03, 2026-03-08) and design documents (expansion_guild_halls.md, region_ironhaven.md).
+- Identified 3 new issues requiring tracking: 2 major feature expansions and 1 testing bug.
+- Created `NEW_ISSUES.md` with detailed descriptions.
+
+**Created Issues:**
+29. **[Feature] Implement Guild Halls Expansion** (Source: Architect)
+30. **[Feature] Implement Ironhaven Region Mechanics & Content** (Source: Realmwright)
+31. **[Bug] Fix missing discord mock in test_guild_advisor.py** (Source: Jules)
+
+**Notes:**
+- Guild Halls expansion requires major economy balancing and database integration.
+- Ironhaven region introduces Cold and Altitude survival mechanics which require input from multiple agents, specifically Grimwarden.
+- A minor bug in `test_guild_advisor.py` was caught by Jules during a lint pass and requires a proper mock.
