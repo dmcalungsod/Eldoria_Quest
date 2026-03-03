@@ -154,7 +154,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @SystemSmith
     - **Details:** `combat_engine.py`, `consumable_manager.py`, `adventure_session.py`, `equipment_manager.py`.
     - **Due:** 2026-03-10
-- [ ] **Task 5.11:** Improve test coverage for Discord cogs.
+- [x] **Task 5.11:** Improve test coverage for Discord cogs.
     - **Agent:** @BugHunter
     - **Due:** 2026-03-10
 
