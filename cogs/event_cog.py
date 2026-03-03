@@ -68,7 +68,7 @@ class EventCog(commands.Cog):
                         logger.info("Auto-started Harvest Festival.")
 
                 # Time Quake: Random Chance (2%)
-                elif random.random() < 0.02:
+                elif random.random() < 0.02:  # nosec B311
                     success = self.system.start_event(WorldEventSystem.TIME_QUAKE, 24)
                     if success:
                         config = self.system.EVENT_CONFIGS[WorldEventSystem.TIME_QUAKE]
@@ -81,7 +81,7 @@ class EventCog(commands.Cog):
                         logger.info("Auto-started Time Quake.")
 
                 # Mystic Merchant: Random Chance (2%)
-                elif random.random() < 0.02:
+                elif random.random() < 0.02:  # nosec B311
                     success = self.system.start_event(
                         WorldEventSystem.MYSTIC_MERCHANT, 24
                     )
