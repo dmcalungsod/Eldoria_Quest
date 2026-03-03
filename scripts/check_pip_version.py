@@ -4,6 +4,7 @@ Security Utility: Check installed pip version.
 
 Verifies that the installed pip version is not the vulnerable 25.3.
 """
+
 import sys
 
 import pip
@@ -20,6 +21,7 @@ def check_pip_version():
 
     print("✅ Pip version is safe.")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     check_pip_version()

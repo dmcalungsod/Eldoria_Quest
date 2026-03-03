@@ -147,7 +147,11 @@ class CombatHandler:
             # Prepend Seasonal Migrant Flavor
             current_season = WorldTime.get_current_season()
             loc_name = location.get("name")
-            if monster_key == "monster_111" and current_season == Season.WINTER and loc_name in ["Willowcreek Outskirts", "Whispering Thicket"]:
+            if (
+                monster_key == "monster_111"
+                and current_season == Season.WINTER
+                and loc_name in ["Willowcreek Outskirts", "Whispering Thicket"]
+            ):
                 phrase = f"❄️ **Driven south by the biting cold of winter, a Frost Wolf prowls outside its normal territory.**\n{phrase}"
 
             # Prepend Spectral Flavor

@@ -1,12 +1,12 @@
-import unittest
 import os
 import sys
-from unittest.mock import MagicMock
+import unittest
 
 # Ensure root dir is in path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold, calculate_tiered_bonus
+
 
 class TestPlayerStats(unittest.TestCase):
     def setUp(self):
@@ -33,13 +33,13 @@ class TestPlayerStats(unittest.TestCase):
 
     def test_bonus_stats(self):
         self.stats.add_bonus_stat("STR", 5)
-        self.assertEqual(self.stats.strength, 15) # 10 base + 5 bonus
+        self.assertEqual(self.stats.strength, 15)  # 10 base + 5 bonus
 
         # Test recalculate_bonuses
         items = [{"stats_bonus": {"STR": 10, "END": 5}}]
         self.stats.recalculate_bonuses(items)
-        self.assertEqual(self.stats.strength, 20) # 10 base + 10 bonus
-        self.assertEqual(self.stats.endurance, 15) # 10 base + 5 bonus
+        self.assertEqual(self.stats.strength, 20)  # 10 base + 10 bonus
+        self.assertEqual(self.stats.endurance, 15)  # 10 base + 5 bonus
 
     def test_serialization(self):
         self.stats.add_bonus_stat("STR", 5)
@@ -52,6 +52,7 @@ class TestPlayerStats(unittest.TestCase):
         self.assertEqual(calculate_practice_threshold(10), 150)
         # calculate_tiered_bonus: Tier 1 (1-100) is 1.0x
         self.assertEqual(calculate_tiered_bonus(50, 10.0), 500)
+
 
 if __name__ == "__main__":
     unittest.main()

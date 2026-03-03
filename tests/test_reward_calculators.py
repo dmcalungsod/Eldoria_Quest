@@ -1,8 +1,9 @@
 import unittest
-from unittest.mock import MagicMock
-from game_systems.rewards.exp_calculator import ExpCalculator
+
 from game_systems.rewards.aurum_calculator import AurumCalculator
+from game_systems.rewards.exp_calculator import ExpCalculator
 from game_systems.rewards.loot_calculator import LootCalculator
+
 
 class TestRewardCalculators(unittest.TestCase):
     def test_exp_calculation(self):
@@ -23,6 +24,7 @@ class TestRewardCalculators(unittest.TestCase):
         # base_chance, rarity, luck, loot_boost
         chance = calc.calculate_drop_chance(10.0, "Common", 0, 1.0)
         self.assertEqual(chance, 10.0)
+
 
 if __name__ == "__main__":
     unittest.main()

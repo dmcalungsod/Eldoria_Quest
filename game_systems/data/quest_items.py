@@ -51,9 +51,7 @@ def load_quest_items():
         logger.warning("Loaded quest item data contains schema errors.")
 
     validated_quest_items = data
-    logger.info(
-        f"Loaded {len(validated_quest_items)} quest items from {data_path.name}"
-    )
+    logger.info(f"Loaded {len(validated_quest_items)} quest items from {data_path.name}")
     return validated_quest_items
 
 

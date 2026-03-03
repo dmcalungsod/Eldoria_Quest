@@ -30,6 +30,7 @@ if "discord" not in sys.modules or not hasattr(sys.modules["discord"], "__versio
     class DummyView:
         def __init__(self, *args, **kwargs):
             self.children = []
+
         def add_item(self, item):
             self.children.append(item)
 

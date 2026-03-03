@@ -63,11 +63,7 @@ class ConsumableManager:
                 skill_levels = self.db.get_player_skill_levels(discord_id)
                 for s_key, s_level in skill_levels.items():
                     skill_def = SKILLS.get(s_key)
-                    if (
-                        skill_def
-                        and skill_def.get("type") == "Passive"
-                        and "passive_bonus" in skill_def
-                    ):
+                    if skill_def and skill_def.get("type") == "Passive" and "passive_bonus" in skill_def:
                         bonuses = skill_def["passive_bonus"]
                         if "healing_item_potency" in bonuses:
                             # Equilibrium Fix: Prevent runaway scaling. Base bonus + 2% per extra level.
@@ -161,9 +157,7 @@ class ConsumableManager:
                 for key, val in effect.items():
                     if key not in ignored_keys:
                         # Defer DB write until after consumption
-                        buffs_to_apply.append(
-                            {"key": key, "val": val, "duration": duration}
-                        )
+                        buffs_to_apply.append({"key": key, "val": val, "duration": duration})
                         buff_names_for_msg.append(f"{key.upper()} +{val}")
 
                 if buff_names_for_msg:
@@ -210,9 +204,7 @@ class ConsumableManager:
 
             except Exception as e:
                 # Rollback: Refund item if effect application fails
-                logger.error(
-                    f"Item use error for {discord_id} (Refunding): {e}", exc_info=True
-                )
+                logger.error(f"Item use error for {discord_id} (Refunding): {e}", exc_info=True)
                 self.db.increment_inventory_count(inventory_db_id, 1)
                 # Re-raise to be caught by outer block for generic error message
                 raise e

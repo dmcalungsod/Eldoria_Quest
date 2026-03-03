@@ -22,21 +22,24 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import test_adventure_embeds  # New Embed test
 import test_adventure_race  # New race condition test
 import test_adventure_rewards  # Adventure Rewards regression test
+import test_adventure_scheduler_stress
 import test_auto_adventure_regression
 import test_auto_combat_formula
-import test_adventure_scheduler_stress
+import test_adventure_loop_regression
+import test_adventure_race
 import test_adventure_session_concurrency  # New session concurrency test
-import test_combat_actions  # New Combat Actions test
+import test_auto_adventure_regression
+import test_auto_combat_formula
 import test_codex_unlocks
+import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
 
 # New Coverage Tests
 import test_developer_cog
 import test_dos_prevention  # New DoS prevention tests
-import test_event_cog
 import test_echoes_of_the_deep_event
-import test_time_quake_event
+import test_event_cog
 import test_exploration_view_ux  # New UX test
 import test_faction_system  # New Faction System tests
 import test_game_systems
@@ -50,6 +53,7 @@ import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_security  # General security test
 import test_shop_ux_enhancement  # New Shop UX test
 import test_stack_limits  # New Stack Limits tests
+import test_time_quake_event
 import test_tournament_cog
 import test_tournament_system  # New Tournament System tests
 
@@ -91,7 +95,7 @@ def run_adventure_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_adventure_rewards)
     suite.addTests(loader.loadTestsFromModule(test_auto_adventure_regression))
-
+    suite.addTests(loader.loadTestsFromModule(test_adventure_loop_regression))
     suite.addTests(loader.loadTestsFromModule(test_auto_combat_formula))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
@@ -175,7 +179,6 @@ def run_race_tests():
     loader = unittest.TestLoader()
     suite = loader.loadTestsFromModule(test_adventure_race)
     suite.addTests(loader.loadTestsFromModule(test_adventure_session_concurrency))
-    suite.addTests(loader.loadTestsFromModule(test_adventure_scheduler_stress))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()

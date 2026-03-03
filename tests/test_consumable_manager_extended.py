@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
+
 from game_systems.items.consumable_manager import ConsumableManager
+
 
 class TestConsumableManagerExtended(unittest.TestCase):
     def setUp(self):
@@ -14,10 +16,11 @@ class TestConsumableManagerExtended(unittest.TestCase):
         self.mock_db.get_inventory_item.return_value = item
         # Mock consumable data
         from game_systems.data import consumables
+
         consumables.CONSUMABLES["health_potion"] = {
             "id": "health_potion",
             "effect": {"heal": 20},
-            "name": "Health Potion"
+            "name": "Health Potion",
         }
         self.mock_db.get_player_vitals.return_value = {"current_hp": 50, "current_mp": 50}
         self.mock_db.get_player_stats_json.return_value = {"END": {"base": 10, "bonus": 0}}
@@ -34,6 +37,7 @@ class TestConsumableManagerExtended(unittest.TestCase):
         success, msg = self.manager.use_item(123, 999)
         self.assertFalse(success)
         self.assertIn("not found", msg)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -117,10 +117,12 @@ class TestMysticMerchantEvent(unittest.TestCase):
 
     def test_button_missing_when_no_event(self):
         # Patch WorldEventSystem in services_menu
-        with patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES, \
-             patch("game_systems.core.world_time.WorldTime.get_current_phase") as mock_get_current_phase:
+        with (
+            patch("game_systems.guild_system.ui.services_menu.WorldEventSystem") as MockWES,
+            patch("game_systems.core.world_time.WorldTime.get_current_phase") as mock_get_current_phase,
+        ):
             MockWES.return_value.get_current_event.return_value = None
-            mock_get_current_phase.return_value = "DAY" # Assuming day phase
+            mock_get_current_phase.return_value = "DAY"  # Assuming day phase
             view = GuildServicesView(self.mock_db, self.mock_user)
 
         mystic_btn = None

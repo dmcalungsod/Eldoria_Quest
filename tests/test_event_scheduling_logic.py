@@ -88,7 +88,7 @@ class TestEventScheduling(unittest.TestCase):
                 "description": "Test Description",
             },
             "time_quake": {"name": "Time Quake", "description": "Test Time Quake"},
-            "builders_boon": {"name": "The Builder\'s Boon", "description": "Test Builders Boon"},
+            "builders_boon": {"name": "The Builder's Boon", "description": "Test Builders Boon"},
         }
 
     @patch("game_systems.core.world_time.WorldTime")
@@ -149,8 +149,6 @@ class TestEventScheduling(unittest.TestCase):
         args, _ = self.cog._announce.call_args
         self.assertIn("TIME QUAKE", args[0])
 
-
-
     @patch("game_systems.core.world_time.WorldTime")
     @patch("random.random")
     def test_builders_boon_starts_on_roll(self, mock_random, mock_world_time):
@@ -169,6 +167,7 @@ class TestEventScheduling(unittest.TestCase):
         self.cog._announce.assert_called()
         args, _ = self.cog._announce.call_args
         self.assertIn("BUILDER", args[0])
+
 
 if __name__ == "__main__":
     unittest.main()

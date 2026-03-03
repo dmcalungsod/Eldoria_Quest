@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
 
-from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.combat_effects import CombatEffects
+from game_systems.combat.combat_engine import CombatEngine
 
 
 class TestCombatDebuffs(unittest.TestCase):

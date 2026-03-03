@@ -25,27 +25,21 @@ def load_codex_data() -> dict:
         with open(data_path, encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError:
-        logger.warning(
-            f"Codex data file not found at {data_path}, returning empty schema."
-        )
+        logger.warning(f"Codex data file not found at {data_path}, returning empty schema.")
         return {"monsters": {}, "items": {}, "locations": {}, "factions": {}}
     except json.JSONDecodeError as e:
         logger.error(f"CRITICAL: codex.json is invalid JSON: {e}")
         return {"monsters": {}, "items": {}, "locations": {}, "factions": {}}
 
     # Validate Schema
-    errors = DataValidator.validate(
-        data, {"type": dict, "schema": CODEX_SCHEMA}, "codex_data"
-    )
+    errors = DataValidator.validate(data, {"type": dict, "schema": CODEX_SCHEMA}, "codex_data")
     if errors:
         for err in errors:
             logger.error(f"Validation Error in codex data: {err}")
         logger.warning("Loaded codex data contains schema errors.")
 
     validated_codex_data = data
-    logger.info(
-        f"Loaded codex definitions for {len(validated_codex_data.get('monsters', {}))} monsters."
-    )
+    logger.info(f"Loaded codex definitions for {len(validated_codex_data.get('monsters', {}))} monsters.")
     return validated_codex_data
 
 

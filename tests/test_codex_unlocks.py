@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # Add root dir to sys.path
 sys.path.append(os.getcwd())
@@ -32,9 +32,7 @@ class TestCodexUnlocks(unittest.TestCase):
 
         import unittest.mock as mock
 
-        with mock.patch(
-            "database.database_manager.MongoClient", return_value=self.mock_client
-        ):
+        with mock.patch("database.database_manager.MongoClient", return_value=self.mock_client):
             self.db = DatabaseManager()
 
         self.user_id = 12345
@@ -87,7 +85,7 @@ class TestCodexUnlocks(unittest.TestCase):
         col.find_one.return_value = {
             "user_id": self.user_id,
             "bestiary": {"106": {"kills": 5, "seen": True}},
-            "extra_unneeded_field": True, # Edge case: unknown field
+            "extra_unneeded_field": True,  # Edge case: unknown field
         }
 
         codex = self.db.get_codex(self.user_id)
@@ -102,6 +100,7 @@ class TestCodexUnlocks(unittest.TestCase):
 
         # Original field should still exist
         self.assertTrue(codex["extra_unneeded_field"])
+
 
 if __name__ == "__main__":
     unittest.main()
