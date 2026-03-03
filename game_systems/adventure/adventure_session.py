@@ -991,6 +991,8 @@ class AdventureSession:
                 max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
                 max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
 
+                self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
+
         return self._build_result([turn_logs], is_dead, context)
 
     def _get_best_healing_potion(self) -> str | None:
