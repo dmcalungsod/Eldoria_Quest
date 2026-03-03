@@ -1,458 +1,52 @@
-"""
-skills_data.py
+import json
+import logging
+from pathlib import Path
 
-Contains all skill definitions for Eldoria Quest.
-This data is imported by populate_database.py.
-"""
+from game_systems.data.data_validator import DataValidator
+from game_systems.data.schemas import SKILL_SCHEMA
 
-SKILLS = {
-    # === WARRIOR (Class 1) ===
-    "power_strike": {
-        "key_id": "power_strike",
-        "name": "Power Strike",
-        "description": "A heavy, focused blow that aims to break an enemy's guard.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 5,
-        "power_multiplier": 1.5,
-        "learn_cost": 0,  # Default skill
-        "upgrade_cost": 200,  # Base Vestige cost
-        "scaling_stat": "STR",
-        "scaling_factor": 2.7,
-    },
-    "cleave": {
-        "key_id": "cleave",
-        "name": "Cleave",
-        "description": "A wide, sweeping attack that strikes all foes.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 10,
-        "power_multiplier": 1.1,  # Lower multiplier, but hits all
-        "learn_cost": 2000,
-        "upgrade_cost": 300,
-        "scaling_stat": "STR",
-        "scaling_factor": 2.7,
-    },
-    "endure": {
-        "key_id": "endure",
-        "name": "Endure",
-        "description": "Brace for impact, temporarily boosting your END.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 8,
-        "buff": {"END_percent": 0.25, "duration": 3},  # +25% END for 3 turns
-        "learn_cost": 1500,
-        "upgrade_cost": 250,
-        "scaling_stat": "END",
-        "scaling_factor": 1.0,
-    },
-    # === WARRIOR EXPANSION ===
-    "shield_bash": {
-        "key_id": "shield_bash",
-        "name": "Shield Bash",
-        "description": "A concussive blow that may stun the enemy.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 8,
-        "power_multiplier": 0.8,
-        "status_effect": {"stun_chance": 0.3},
-        "learn_cost": 500,
-        "upgrade_cost": 150,
-        "scaling_stat": "STR",
-        "scaling_factor": 2.0,
-    },
-    "reckless_swing": {
-        "key_id": "reckless_swing",
-        "name": "Reckless Swing",
-        "description": "Sacrifice safety for power. Deals massive damage but hurts the user.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 10,
-        "power_multiplier": 1.8,
-        "self_damage_percent": 0.1,  # 10% recoil
-        "learn_cost": 500,
-        "upgrade_cost": 150,
-        "scaling_stat": "STR",
-        "scaling_factor": 3.0,
-    },
-    "iron_skin": {
-        "key_id": "iron_skin",
-        "name": "Iron Skin",
-        "description": "Increases Endurance by 10%.",
-        "type": "Passive",
-        "class_id": 1,
-        "passive_bonus": {"END_percent": 0.1},
-        "learn_cost": 1500,
-        "upgrade_cost": 250,
-        "scaling_stat": "END",
-        "scaling_factor": 1.0,
-    },
-    "bloodlust": {
-        "key_id": "bloodlust",
-        "name": "Bloodlust",
-        "description": "Heal 5% HP on enemy kill.",
-        "type": "Passive",
-        "class_id": 1,
-        "passive_bonus": {"kill_heal_percent": 0.05},
-        "learn_cost": 1500,
-        "upgrade_cost": 250,
-        "scaling_stat": "STR",
-        "scaling_factor": 1.0,
-    },
-    "taunt": {
-        "key_id": "taunt",
-        "name": "Taunt",
-        "description": "Intimidate foes, reducing their attack power.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 12,
-        "debuff": {"ATK_percent": -0.2, "duration": 3},
-        "learn_cost": 3000,
-        "upgrade_cost": 400,
-        "scaling_stat": "END",
-        "scaling_factor": 1.5,
-    },
-    "whirlwind": {
-        "key_id": "whirlwind",
-        "name": "Whirlwind",
-        "description": "A spinning attack that hits all enemies.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 20,
-        "power_multiplier": 1.2,
-        "is_aoe": True,
-        "learn_cost": 3000,
-        "upgrade_cost": 400,
-        "scaling_stat": "STR",
-        "scaling_factor": 2.5,
-    },
-    "unstoppable_force": {
-        "key_id": "unstoppable_force",
-        "name": "Unstoppable Force",
-        "description": "Become a juggernaut of destruction for a short time.",
-        "type": "Active",
-        "class_id": 1,
-        "mp_cost": 50,
-        "buff": {
-            "ATK_percent": 0.5,
-            "DEF_percent": 0.5,
-            "status_immunity": ["stun", "slow"],
-            "duration": 3,
-        },
-        "learn_cost": 10000,
-        "upgrade_cost": 800,
-        "scaling_stat": "STR",
-        "scaling_factor": 1.0,
-    },
-    # === MAGE (Class 2) ===
-    "fireball": {
-        "key_id": "fireball",
-        "name": "Fireball",
-        "description": "A basic incantation that hurls a sphere of fire.",
-        "type": "Active",
-        "class_id": 2,
-        "mp_cost": 5,
-        "power_multiplier": 1.2,
-        "learn_cost": 0,  # Default skill
-        "upgrade_cost": 200,
-        "scaling_stat": "MAG",
-        "scaling_factor": 2.8,
-    },
-    "ice_lance": {
-        "key_id": "ice_lance",
-        "name": "Ice Lance",
-        "description": "Forms a spear of magical ice and hurls it at one foe.",
-        "type": "Active",
-        "class_id": 2,
-        "mp_cost": 8,
-        "power_multiplier": 1.4,
-        "learn_cost": 2000,
-        "upgrade_cost": 300,
-        "scaling_stat": "MAG",
-        "scaling_factor": 2.8,
-    },
-    "mana_shield": {
-        "key_id": "mana_shield",
-        "name": "Mana Shield",
-        "description": "Create a barrier that converts damage taken from HP to MP.",
-        "type": "Active",
-        "class_id": 2,
-        "mp_cost": 15,  # Cost to activate
-        "buff": {"mana_shield": True, "duration": 5},
-        "learn_cost": 3000,
-        "upgrade_cost": 400,
-        "scaling_stat": "MAG",
-        "scaling_factor": 1.0,
-    },
-    "explosion": {
-        "key_id": "explosion",
-        "name": "Explosion",
-        "description": "The ultimate offensive magic. Annihilates the target.",
-        "type": "Active",
-        "class_id": 2,
-        "mp_cost": 25,
-        "power_multiplier": 2.5,
-        "learn_cost": 10000,
-        "upgrade_cost": 800,
-        "scaling_stat": "MAG",
-        "scaling_factor": 2.8,
-    },
-    # === ROGUE (Class 3) ===
-    "stealth": {
-        "key_id": "stealth",
-        "name": "Stealth",
-        "description": "Fade into the shadows, becoming harder to detect.",
-        "type": "Passive",
-        "class_id": 3,
-        "mp_cost": 0,
-        "passive_bonus": {"AGI_percent": 0.1},  # +10% AGI
-        "learn_cost": 0,  # Default skill
-        "upgrade_cost": 500,
-        "scaling_stat": "AGI",
-        "scaling_factor": 1.0,
-    },
-    "double_strike": {
-        "key_id": "double_strike",
-        "name": "Double Strike",
-        "description": "A rapid two-hit attack that scales with DEX.",
-        "type": "Active",
-        "class_id": 3,
-        "mp_cost": 10,
-        "power_multiplier": 1.8,  # Scaled with DEX
-        "learn_cost": 2500,
-        "upgrade_cost": 350,
-        "scaling_stat": "DEX",
-        "scaling_factor": 2.6,
-    },
-    "toxic_blade": {
-        "key_id": "toxic_blade",
-        "name": "Toxic Blade",
-        "description": "A weak strike that applies a potent poison.",
-        "type": "Active",
-        "class_id": 3,
-        "mp_cost": 12,
-        "power_multiplier": 0.8,
-        "debuff": {"poison": 5, "duration": 3},  # 5 damage per turn for 3 turns
-        "learn_cost": 2000,
-        "upgrade_cost": 300,
-        "scaling_stat": "DEX",
-        "scaling_factor": 2.6,
-    },
-    # === ROGUE EXPANSION ===
-    "shadow_step": {
-        "key_id": "shadow_step",
-        "name": "Shadow Step",
-        "description": "Dash through shadows to evade attacks and prepare a critical strike.",
-        "type": "Active",
-        "class_id": 3,
-        "mp_cost": 15,
-        "buff": {
-            "next_hit_crit": 1,
-            "AGI_percent": 0.5,
-            "duration": 2,
-        },
-        "learn_cost": 1500,
-        "upgrade_cost": 300,
-        "scaling_stat": "AGI",
-        "scaling_factor": 1.5,
-    },
-    "venomous_strike": {
-        "key_id": "venomous_strike",
-        "name": "Venomous Strike",
-        "description": "Deals massive damage to poisoned targets.",
-        "type": "Active",
-        "class_id": 3,
-        "mp_cost": 20,
-        "power_multiplier": 1.5,
-        "conditional_multiplier": {"condition": "target_poisoned", "multiplier": 2.0},
-        "learn_cost": 3000,
-        "upgrade_cost": 450,
-        "scaling_stat": "DEX",
-        "scaling_factor": 2.8,
-    },
-    "flash_powder": {
-        "key_id": "flash_powder",
-        "name": "Flash Powder",
-        "description": "Blinds all enemies, reducing their accuracy.",
-        "type": "Active",
-        "class_id": 3,
-        "mp_cost": 18,
-        "power_multiplier": 0.0,
-        "is_aoe": True,
-        "debuff": {"type": "stat_mod", "accuracy_percent": -0.4, "duration": 3},
-        "learn_cost": 3000,
-        "upgrade_cost": 400,
-        "scaling_stat": "AGI",
-        "scaling_factor": 2.0,
-    },
-    "death_blossom": {
-        "key_id": "death_blossom",
-        "name": "Death Blossom",
-        "description": "Unleash a storm of blades, damaging and bleeding all foes.",
-        "type": "Active",
-        "class_id": 3,
-        "mp_cost": 50,
-        "power_multiplier": 2.5,
-        "is_aoe": True,
-        "debuff": {"type": "bleed", "damage": 10, "duration": 3},
-        "learn_cost": 10000,
-        "upgrade_cost": 1000,
-        "scaling_stat": "DEX",
-        "scaling_factor": 3.0,
-    },
-    # === CLERIC (Class 4) ===
-    "heal": {
-        "key_id": "heal",
-        "name": "Heal",
-        "description": "A gentle prayer that mends minor wounds.",
-        "type": "Active",
-        "class_id": 4,
-        "mp_cost": 10,
-        # --- BUFFED: 30 -> 45 ---
-        "heal_power": 45,
-        "learn_cost": 0,  # Default skill
-        "upgrade_cost": 200,
-        "scaling_stat": "MAG",
-        "scaling_factor": 1.5,
-    },
-    "smite": {
-        "key_id": "smite",
-        "name": "Smite",
-        "description": "Call down holy energy to strike a foe. Scales with MAG.",
-        "type": "Active",
-        "class_id": 4,
-        "mp_cost": 8,
-        # --- BUFFED: 1.5 -> 1.7 ---
-        "power_multiplier": 1.7,
-        "learn_cost": 1500,
-        "upgrade_cost": 250,
-        "scaling_stat": "MAG",
-        "scaling_factor": 2.8,
-    },
-    "blessing": {
-        "key_id": "blessing",
-        "name": "Blessing",
-        "description": "Grants a divine blessing, increasing all stats temporarily.",
-        "type": "Active",
-        "class_id": 4,
-        "mp_cost": 15,
-        "buff": {"all_stats_percent": 0.1, "duration": 3},  # +10% all stats
-        "learn_cost": 3000,
-        "upgrade_cost": 400,
-        "scaling_stat": "MAG",
-        "scaling_factor": 1.0,
-    },
-    # === RANGER (Class 5) ===
-    "true_shot": {
-        "key_id": "true_shot",
-        "name": "True Shot",
-        "description": "A focused arrow shot that pierces vital points.",
-        "type": "Active",
-        "class_id": 5,
-        "mp_cost": 8,
-        "power_multiplier": 1.4,
-        "learn_cost": 0,  # Default skill
-        "upgrade_cost": 200,
-        "scaling_stat": "DEX",
-        "scaling_factor": 2.6,
-    },
-    "multi_shot": {
-        "key_id": "multi_shot",
-        "name": "Multi-Shot",
-        "description": "Fire a spray of arrows at all foes.",
-        "type": "Active",
-        "class_id": 5,
-        "mp_cost": 12,
-        "power_multiplier": 1.1,  # Lower multiplier, hits all
-        "learn_cost": 2000,
-        "upgrade_cost": 300,
-        "scaling_stat": "DEX",
-        "scaling_factor": 2.6,
-    },
-    "survivalist": {
-        "key_id": "survivalist",
-        "name": "Survivalist",
-        "description": "Your knowledge of the wild hardens your resolve.",
-        "type": "Passive",
-        "class_id": 5,
-        "mp_cost": 0,
-        "passive_bonus": {"END_percent": 0.1, "AGI_percent": 0.05},  # +10% END, +5% AGI
-        "learn_cost": 3000,
-        "upgrade_cost": 500,
-        "scaling_stat": "END",
-        "scaling_factor": 1.0,
-    },
-    # === ALCHEMIST (Class 6) ===
-    "vitriol_bomb": {
-        "key_id": "vitriol_bomb",
-        "name": "Vitriol Bomb",
-        "description": "Shatters a vial of acid, dealing damage and eroding armor.",
-        "type": "Active",
-        "class_id": 6,
-        "mp_cost": 8,
-        "power_multiplier": 1.2,
-        "debuff": {"DEF_percent": -0.1, "duration": 3},
-        "learn_cost": 0,  # Starting Skill
-        "upgrade_cost": 200,
-        "scaling_stat": "DEX",  # Accuracy of throw
-        "scaling_factor": 2.4,
-    },
-    "triage": {
-        "key_id": "triage",
-        "name": "Triage",
-        "description": "Increases the effectiveness of healing items.",
-        "type": "Passive",
-        "class_id": 6,
-        "passive_bonus": {"healing_item_potency": 0.2},
-        "learn_cost": 500,
-        "upgrade_cost": 250,
-        "scaling_stat": "MAG",
-        "scaling_factor": 1.0,
-    },
-    "fulminating_compound": {
-        "key_id": "fulminating_compound",
-        "name": "Fulminating Compound",
-        "description": "Throw a volatile cocktail that explodes on impact.",
-        "type": "Active",
-        "class_id": 6,
-        "mp_cost": 15,
-        "power_multiplier": 1.0,
-        "is_aoe": True,
-        "status_effect": {"stun_chance": 0.2},
-        "learn_cost": 1500,
-        "upgrade_cost": 300,
-        "scaling_stat": "MAG",
-        "scaling_factor": 2.5,
-    },
-    "equivalent_exchange": {
-        "key_id": "equivalent_exchange",
-        "name": "Equivalent Exchange",
-        "description": "Deep knowledge of reactions boosts magical potency.",
-        "type": "Passive",
-        "class_id": 6,
-        "passive_bonus": {"MAG_percent": 0.1},
-        "learn_cost": 1500,
-        "upgrade_cost": 250,
-        "scaling_stat": "MAG",
-        "scaling_factor": 1.0,
-    },
-    "mutagenic_serum": {
-        "key_id": "mutagenic_serum",
-        "name": "Mutagenic Serum",
-        "description": "Drink a dangerous concoction that mutates the body for combat.",
-        "type": "Active",
-        "class_id": 6,
-        "mp_cost": 50,
-        "buff": {
-            "STR_percent": 0.3,
-            "AGI_percent": 0.3,
-            "END_percent": 0.3,
-            "duration": 3,
-        },
-        "self_damage_percent": 0.1,  # Recoil
-        "learn_cost": 10000,
-        "upgrade_cost": 800,
-        "scaling_stat": "MAG",
-        "scaling_factor": 1.0,
-    },
-}
+logger = logging.getLogger("eldoria.data")
+
+def load_skills():
+    """
+    Loads skill data from JSON file, validates it, and returns the dictionary.
+    """
+    data_path = Path(__file__).parent / "skills.json"
+
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        logger.error(f"CRITICAL: skills.json not found at {data_path}")
+        return {}
+    except json.JSONDecodeError as e:
+        logger.error(f"CRITICAL: skills.json is invalid JSON: {e}")
+        return {}
+
+    # Validate Schema
+    top_schema = {"type": dict, "values_schema": {"type": dict, "schema": SKILL_SCHEMA}}
+
+    errors = DataValidator.validate(data, top_schema, "skills")
+    if errors:
+        for err in errors:
+            logger.error(f"Validation Error: {err}")
+        logger.warning("Loaded skill data contains schema errors.")
+
+    logger.info(f"Loaded {len(data)} skills from {data_path.name}")
+    return data
+
+class SkillData:
+    _skills = None
+
+    @classmethod
+    def get_all(cls):
+        if cls._skills is None:
+            cls._skills = load_skills()
+        return cls._skills
+
+def __getattr__(name):
+    if name == "SKILLS":
+        return SkillData.get_all()
+    raise AttributeError(f"module {__name__} has no attribute {name}")
+
+__all__ = ["SkillData"]
