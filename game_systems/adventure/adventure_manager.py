@@ -22,7 +22,7 @@ from game_systems.player.achievement_system import AchievementSystem
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
 
-from .adventure_session import AdventureSession  # noqa: I001
+from .adventure_session import AdventureSession
 
 logger = logging.getLogger("eldoria.adventure_mgr")
 

@@ -82,8 +82,8 @@ class GuildLobbyView(View, GuildViewMixin):
         await interaction.edit_original_response(embed=EmbedBuilder.quest_menu(), view=view)
 
     async def _services_btn_callback(self, interaction: discord.Interaction):
-        from .services_menu import GuildServicesView
-        from game_systems.core.world_time import WorldTime, TimePhase  # noqa: I001
+        from game_systems.core.world_time import TimePhase, WorldTime  # noqa: E402
+        from .services_menu import GuildServicesView  # noqa: E402
 
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
