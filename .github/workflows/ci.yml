@@ -10,6 +10,7 @@ on:
 
 jobs:
   static-analysis:
+    if: github.repository == 'dmcalungsod/Eldoria_Quest'
     runs-on: ubuntu-latest
     steps:
       - name: Generate Workflow Summary
