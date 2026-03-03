@@ -36,6 +36,7 @@ class AdventureSetupView(View):
         player_level: int,
         supplies: list = None,
         capacity: tuple = None,
+        visited_locations: list = None,
     ):
         super().__init__(timeout=180)
         self.db = db
@@ -45,6 +46,7 @@ class AdventureSetupView(View):
         self.player_level = player_level
         self.supplies_list = supplies or []
         self.capacity = capacity
+        self.visited_locations = visited_locations or []
 
         self.selected_location = None
         self.selected_duration = None
@@ -59,17 +61,17 @@ class AdventureSetupView(View):
         )
         # Populate Locations
         for loc_id, loc_data in LOCATIONS.items():
-            is_unlocked = self._is_unlocked(loc_data)
+            is_unlocked, reason = self._is_unlocked(loc_data)
 
             if is_unlocked:
                 label = loc_data["name"]
-                depth = loc_data.get("floor_depth", "?")
-                danger = loc_data.get("danger_level", "?")
+                depth = loc_data.get('floor_depth', '?')
+                danger = loc_data.get('danger_level', '?')
                 desc = f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']}) | Depth {depth} | Danger {danger}"
                 emoji = loc_data.get("emoji", E.MAP)
             else:
                 label = f"{E.LOCKED} {loc_data['name']}"
-                desc = f"[LOCKED] Req: Lv.{loc_data['level_req']}, Rank {loc_data['min_rank']}"
+                desc = f"[LOCKED] {reason}"
                 emoji = E.LOCKED
 
             self.location_select.add_option(
@@ -85,7 +87,7 @@ class AdventureSetupView(View):
                 label="No Destinations Available",
                 value="none",
                 description="You do not meet requirements for any location.",
-                emoji=E.LOCKED,
+                emoji=E.LOCKED
             )
             self.location_select.disabled = True
 
@@ -179,27 +181,33 @@ class AdventureSetupView(View):
         self.back_btn.callback = self.back_callback
         self.add_item(self.back_btn)
 
-    def _is_unlocked(self, loc_data: dict) -> bool:
+    def _is_unlocked(self, loc_data: dict) -> tuple[bool, str]:
         """Checks if the player meets rank and level requirements."""
         req_rank = loc_data["min_rank"]
         req_level = loc_data["level_req"]
 
         # Level Check
         if self.player_level < req_level:
-            return False
+            return False, f"Req: Lv.{req_level}"
 
         # Rank Check
         try:
             player_rank_idx = RANK_ORDER.index(self.player_rank)
             req_rank_idx = RANK_ORDER.index(req_rank)
             if player_rank_idx < req_rank_idx:
-                return False
+                return False, f"Req: Rank {req_rank}"
         except ValueError:
             # Fallback if rank is unknown (shouldn't happen)
             logger.warning(f"Unknown rank encountered: {self.player_rank} or {req_rank}")
-            return False
+            return False, f"Req: Rank {req_rank}"
 
-        return True
+        # Prerequisite Check
+        prereq = loc_data.get("prerequisite_location")
+        if prereq and prereq not in self.visited_locations:
+            prereq_name = LOCATIONS.get(prereq, {}).get("name", "Unknown Area")
+            return False, f"Clear {prereq_name} first"
+
+        return True, ""
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.interaction_user.id:
@@ -220,10 +228,10 @@ class AdventureSetupView(View):
         loc_id = self.location_select.values[0]
         loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
 
-        if not self._is_unlocked(loc_data):
-            await interaction.response.defer(ephemeral=True)
-            await interaction.followup.send(
-                content=f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}** and **Rank {loc_data['min_rank']}** to enter {loc_data['name']}.",
+        is_unlocked, reason = self._is_unlocked(loc_data)
+        if not is_unlocked:
+            await interaction.response.send_message(
+                f"{E.LOCKED} **Access Denied**\n{reason} to enter {loc_data['name']}.",
                 ephemeral=True,
             )
             return

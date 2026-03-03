@@ -8,7 +8,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT_DIR)
 
 # Mock environment variables BEFORE import
-os.environ["DISCORD_BOT_TOKEN"] = "dummy_test_token"  # nosec B105
+os.environ["DISCORD_BOT_TOKEN"] = "mock_token"
 os.environ["GUILD_ID"] = "123456789"
 
 # --- MOCKING SETUP ---

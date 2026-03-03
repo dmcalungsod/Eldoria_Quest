@@ -236,6 +236,7 @@ def insert_quests(db):
 
 def insert_materials(db):
     logger.info("Inserting materials...")
+    db["materials"].delete_many({})
     data = []
     auto_id = 1
     for k, m in materials.MATERIALS.items():
@@ -250,7 +251,8 @@ def insert_materials(db):
             }
         )
         auto_id += 1
-    _upsert_many(db["materials"], "key_id", data)
+    if data:
+        db["materials"].insert_many(data)
 
 
 def insert_skills(db):

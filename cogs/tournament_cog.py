@@ -104,8 +104,7 @@ class TournamentCog(commands.Cog):
                 description="The guild hall is quiet. The next tournament will begin on Monday.",
                 color=discord.Color.dark_grey(),
             )
-            await interaction.response.defer(ephemeral=True)
-            await interaction.edit_original_response(embed=embed)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         end_time = datetime.datetime.fromisoformat(active["end_time"])
@@ -125,8 +124,7 @@ class TournamentCog(commands.Cog):
         embed.add_field(name="Your Score", value=f"{score} pts", inline=True)
 
         embed.set_footer(text="Use /tournament_leaderboard to see top players.")
-        await interaction.response.defer(ephemeral=True)
-        await interaction.edit_original_response(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(
         name="tournament_leaderboard",
@@ -137,8 +135,7 @@ class TournamentCog(commands.Cog):
         active, leaders = self.system.get_leaderboard()
 
         if not active:
-            await interaction.response.defer(ephemeral=True)
-            await interaction.edit_original_response(content=f"{E.WARNING} No tournament is currently active.")
+            await interaction.response.send_message(f"{E.WARNING} No tournament is currently active.", ephemeral=True)
             return
 
         embed = discord.Embed(
@@ -161,8 +158,7 @@ class TournamentCog(commands.Cog):
                 lines.append(f"{rank_emoji} **{name}**: {score} pts")
             embed.description = "\n".join(lines)
 
-        await interaction.response.defer(ephemeral=True)
-        await interaction.edit_original_response(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # ==================================================================
     # ADMIN COMMANDS
@@ -179,9 +175,9 @@ class TournamentCog(commands.Cog):
     async def admin_start(self, interaction: discord.Interaction, event_type: str = "monster_kills"):
         """Manually starts a tournament."""
         if event_type not in self.system.TOURNAMENT_TYPES:
-            await interaction.response.defer(ephemeral=True)
-            await interaction.edit_original_response(
-                content=f"{E.ERROR} Invalid type. Options: {', '.join(self.system.TOURNAMENT_TYPES)}"
+            await interaction.response.send_message(
+                f"{E.ERROR} Invalid type. Options: {', '.join(self.system.TOURNAMENT_TYPES)}",
+                ephemeral=True,
             )
             return
 
@@ -198,8 +194,7 @@ class TournamentCog(commands.Cog):
 
         t_id = self.db.create_tournament(event_type, start_time.isoformat(), end_time.isoformat())
 
-        await interaction.response.defer(ephemeral=True)
-        await interaction.edit_original_response(content=f"{E.CHECK} Started Tournament #{t_id}: {event_type}")
+        await interaction.response.send_message(f"{E.CHECK} Started Tournament #{t_id}: {event_type}", ephemeral=True)
 
     @app_commands.command(
         name="tournament_admin_end",
@@ -209,8 +204,7 @@ class TournamentCog(commands.Cog):
     async def admin_end(self, interaction: discord.Interaction):
         """Manually ends the tournament."""
         result = self.system.end_current_tournament()
-        await interaction.response.defer(ephemeral=True)
-        await interaction.edit_original_response(content=f"{E.CHECK} Tournament ended manually.\n\n{result}")
+        await interaction.response.send_message(f"{E.CHECK} Tournament ended manually.\n\n{result}", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

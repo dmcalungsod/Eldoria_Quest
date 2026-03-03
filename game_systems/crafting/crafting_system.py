@@ -166,15 +166,24 @@ class CraftingSystem:
             # 1. Deduct Gold
             self.db.increment_player_fields(discord_id, aurum=-cost)
 
+            # --- Alchemist Material Retention Hook ---
+            player = self.db.get_player(discord_id)
+            retain_materials = False
+            success_msg_extras = ""
+            if player and player.get("class_id") == 6 and recipe_type == "consumable":
+                if random.random() < 0.10:
+                    retain_materials = True
+                    success_msg_extras += "\n🧪 **Alchemist's Touch:** Materials were retained!"
+
             # 2. Remove Materials
-            for mat_key, amount in materials.items():
-                if not self.db.remove_inventory_item(discord_id, mat_key, amount):
-                    logger.error(f"CRITICAL: Failed to remove {mat_key} during crafting for {discord_id}")
-                    # Continue best effort
+            if not retain_materials:
+                for mat_key, amount in materials.items():
+                    if not self.db.remove_inventory_item(discord_id, mat_key, amount):
+                        logger.error(f"CRITICAL: Failed to remove {mat_key} during crafting for {discord_id}")
+                        # Continue best effort
 
             # 3. Add Output Item
             item_data = None
-            success_msg_extras = ""
 
             if recipe_type == "equipment":
                 # Equipment Crafting Logic

@@ -25,7 +25,6 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
             return decorator
 
         mock_discord.app_commands.command = MagicMock(side_effect=command_decorator)
-        mock_discord.app_commands.default_permissions = MagicMock(side_effect=lambda **kwargs: lambda f: f)
 
         # Mock discord.ui
         mock_discord.ui = MagicMock()
@@ -105,8 +104,8 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.dev_panel(interaction)
 
-        interaction.edit_original_response.assert_called_once()
-        self.assertIn("not the bot owner", interaction.edit_original_response.call_args.kwargs["content"])
+        interaction.response.send_message.assert_called_once()
+        self.assertIn("not the bot owner", interaction.response.send_message.call_args[0][0])
 
     async def test_dev_panel_no_character(self):
         interaction = AsyncMock()
@@ -119,8 +118,7 @@ class TestDeveloperCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.dev_panel(interaction)
 
         interaction.followup.send.assert_called_once()
-        content = interaction.followup.send.call_args[0][0]
-        self.assertIn("No character found.", content)
+        self.assertIn("No character found", interaction.followup.send.call_args[0][0])
 
     async def test_dev_panel_success(self):
         interaction = AsyncMock()

@@ -89,8 +89,7 @@ class AdventureView(View):
             ),
             color=discord.Color.blue()
         )
-        await interaction.response.defer(ephemeral=True)
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """
@@ -114,9 +113,8 @@ class AdventureView(View):
         adventure_cog = interaction.client.get_cog("AdventureCommands")
 
         if not adventure_cog:
-            await interaction.response.defer(ephemeral=True)
-            await interaction.followup.send(
-                content=f"{E.ERROR} The adventure system is currently unavailable.",
+            await interaction.response.send_message(
+                f"{E.ERROR} The adventure system is currently unavailable.",
                 ephemeral=True,
             )
             return
@@ -207,6 +205,9 @@ class AdventureView(View):
                 color=discord.Color.dark_green(),
             )
 
+            exploration_stats = self.db.get_exploration_stats(self.interaction_user.id)
+            visited_locations = exploration_stats.get("unique_locations", []) if exploration_stats else []
+
             view = AdventureSetupView(
                 self.db,
                 adventure_cog.manager,
@@ -215,6 +216,7 @@ class AdventureView(View):
                 level,
                 supplies=supplies,
                 capacity=(current_slots, max_slots),
+                visited_locations=visited_locations,
             )
             view.back_btn.callback = back_to_profile_callback
 

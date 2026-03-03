@@ -36,7 +36,6 @@ class TestCodexUnlocks(unittest.TestCase):
             "database.database_manager.MongoClient", return_value=self.mock_client
         ):
             self.db = DatabaseManager()
-            self.db._col = MagicMock(return_value=self.mock_db["player_codex"])
 
         self.user_id = 12345
 
@@ -62,7 +61,7 @@ class TestCodexUnlocks(unittest.TestCase):
         # Since _col returns self.db[collection_name] and we patched __getitem__, it hits self.mock_db["player_codex"]
 
         # assert_called_with works on the mock
-        col = self.db._col("player_codex")
+        col = self.mock_db["player_codex"]
         col.update_one.assert_called_with(
             {"user_id": self.user_id},
             {"$set": {"bestiary.1": {"kills": 15, "seen": True}}},
@@ -73,7 +72,7 @@ class TestCodexUnlocks(unittest.TestCase):
         """Test updating a deeply nested key to ensure path formatting works."""
         self.db.update_codex(self.user_id, "atlas", "forest_outskirts", {"visits": 5})
 
-        col = self.db._col("player_codex")
+        col = self.mock_db["player_codex"]
         col.update_one.assert_called_with(
             {"user_id": self.user_id},
             {"$set": {"atlas.forest_outskirts": {"visits": 5}}},
@@ -84,7 +83,7 @@ class TestCodexUnlocks(unittest.TestCase):
         """Test fetching a document merges it properly even if the original structure has duplicates or unexpected fields."""
 
         # database_manager get_codex uses find_one on _col
-        col = self.db._col("player_codex")
+        col = self.mock_db["player_codex"]
         col.find_one.return_value = {
             "user_id": self.user_id,
             "bestiary": {"106": {"kills": 5, "seen": True}},

@@ -480,6 +480,31 @@ class CombatPhrases:
             "You steel your resolve, letting **{skill_name}** harden your defenses.",
             "Adrenaline floods your veins as you prepare to withstand the onslaught.",
         ],
+        "shield_bash": [
+            "You ram your shield into the {m_name}, unleashing **{skill_name}**!",
+            "A concussive **{skill_name}** leaves the {m_name} staggering!",
+            "You step inside the {m_name}'s guard and deliver a brutal **{skill_name}**!",
+        ],
+        "reckless_swing": [
+            "Throwing caution to the wind, you execute a devastating **{skill_name}**!",
+            "You trade defense for pure power, landing a crushing **{skill_name}**!",
+            "Your muscles scream as you unleash a brutal, unguarded **{skill_name}**!",
+        ],
+        "taunt": [
+            "You strike your shield and roar a **{skill_name}**, drawing the {m_name}'s ire!",
+            "With a mocking **{skill_name}**, you force the {m_name} to focus on you!",
+            "You bellow a fierce **{skill_name}**, shaking the {m_name}'s resolve!",
+        ],
+        "whirlwind": [
+            "You become a spinning vortex of steel, unleashing **{skill_name}**!",
+            "Your weapon blurs as you execute a sweeping **{skill_name}**!",
+            "A deadly **{skill_name}** clears the space around you!",
+        ],
+        "unstoppable_force": [
+            "You tap into primal fury, becoming an **{skill_name}**!",
+            "Adrenaline surges—you are an **{skill_name}** on the battlefield!",
+            "Shrugging off pain, you charge forward as an **{skill_name}**!",
+        ],
         # --- MAGE ---
         "fireball": [
             "You chant the ancient words, and a roaring **{skill_name}** erupts from your hands!",
@@ -511,6 +536,26 @@ class CombatPhrases:
             "You coat your weapon in deadly venom and deliver a **{skill_name}**!",
             "A green glint on your steel betrays the poison of **{skill_name}**!",
             "The {m_name} hisses in pain as **{skill_name}** infects its blood!",
+        ],
+        "shadow_step": [
+            "You melt into the darkness and reappear behind the {m_name}, striking with **{skill_name}**!",
+            "Shadows cling to your form as you execute **{skill_name}**!",
+            "You become a blur of motion, landing a precise blow with **{skill_name}**!",
+        ],
+        "venomous_strike": [
+            "You twist your blade, letting the toxins of **{skill_name}** seep deep into the {m_name}!",
+            "A sickening squelch echoes as **{skill_name}** finds a vital spot!",
+            "You exploit the {m_name}'s poisoned state with a lethal **{skill_name}**!",
+        ],
+        "flash_powder": [
+            "You hurl a pouch of **{skill_name}**, blinding everyone in the vicinity!",
+            "A brilliant flash from your **{skill_name}** leaves the {m_name} staggering!",
+            "You vanish in a burst of light as **{skill_name}** disorients your foes!",
+        ],
+        "death_blossom": [
+            "You spin into a deadly dance of steel, unleashing **{skill_name}** on all nearby!",
+            "Knives fill the air as your **{skill_name}** shreds the enemy ranks!",
+            "You become a whirlwind of blades—**{skill_name}** paints the ground red!",
         ],
         # --- CLERIC ---
         "heal": [

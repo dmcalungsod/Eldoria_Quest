@@ -378,7 +378,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -399,7 +403,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -419,7 +427,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -439,7 +451,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -487,7 +503,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -566,7 +586,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -587,7 +611,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -663,7 +691,11 @@
         "drops": [
             [
                 "magic_stone_small",
-                80
+                60
+            ],
+            [
+                "magic_stone_medium",
+                15
             ]
         ],
         "skills": [
@@ -1584,11 +1616,11 @@
         "drops": [
             [
                 "fire_essence",
-                60
+                30
             ],
             [
                 "magic_stone_medium",
-                40
+                20
             ]
         ],
         "skills": [
@@ -1609,11 +1641,11 @@
         "drops": [
             [
                 "obsidian_shard",
-                70
+                35
             ],
             [
                 "magma_core",
-                25
+                10
             ]
         ],
         "skills": [
@@ -1634,11 +1666,11 @@
         "drops": [
             [
                 "obsidian_shard",
-                50
+                25
             ],
             [
                 "fire_essence",
-                40
+                20
             ]
         ],
         "skills": [
@@ -1659,11 +1691,11 @@
         "drops": [
             [
                 "dragon_scale",
-                40
+                15
             ],
             [
                 "magic_stone_large",
-                60
+                30
             ]
         ],
         "skills": [
@@ -3178,5 +3210,56 @@
             "thunder_call"
         ],
         "description": "A twisted amalgamation of flesh and machinery, crackling with stolen electricity. This horrifying elite was once an explorer who dug too deep, now fused with the very technology they sought to salvage."
+    },
+    "choirmaster": {
+        "id": 166,
+        "name": "Choirmaster",
+        "level": 38,
+        "tier": "Boss",
+        "hp": 11000,
+        "atk": 175,
+        "def": 95,
+        "xp": 17000,
+        "drops": [
+            [
+                "hymnal_of_the_void",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                60
+            ]
+        ],
+        "skills": [
+            "arcane_pulse",
+            "regenerate",
+            "silence_aura"
+        ],
+        "description": "The maddened leader of the Blind Choir, singing a requiem to the abyss."
+    },
+    "blind_choir_zealot": {
+        "id": 167,
+        "name": "Blind Choir Zealot",
+        "level": 36,
+        "tier": "Elite",
+        "hp": 3000,
+        "atk": 130,
+        "def": 55,
+        "xp": 4000,
+        "drops": [
+            [
+                "ancient_tablet",
+                40
+            ],
+            [
+                "shadow_essence",
+                30
+            ]
+        ],
+        "skills": [
+            "rapid_strike",
+            "void_slash"
+        ],
+        "description": "A corrupted delver whose eyes have rotted away, guided only by the Choirmaster's song."
     }
 }
