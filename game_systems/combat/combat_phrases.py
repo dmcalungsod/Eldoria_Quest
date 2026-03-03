@@ -790,19 +790,14 @@ class CombatPhrases:
         return random.choice(phrases)
 
     @staticmethod
-    def player_buff(player, monster, skill) -> str:
+    def player_buff(player, skill) -> str:
         skill_name = str(skill.get("name", "a buff"))
         skill_key = skill.get("key_id", "")
-
-        # Get monster name for format
-        m_name = ""
-        if monster:
-            m_name = str(monster.get("name", "the enemy"))
 
         # Check for specific skill phrases
         if skill_key in CombatPhrases.SKILL_PHRASES:
             phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
-            return f"{E.BUFF} {phrase.format(skill_name=skill_name, m_name=m_name)}"
+            return f"{E.BUFF} {phrase.format(skill_name=skill_name)}"
 
         # Generic Fallback
         phrases = [
