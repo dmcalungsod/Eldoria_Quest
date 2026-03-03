@@ -97,9 +97,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @GameBalancer
 - [x] **Issue #3:** [Feature] Auto-Adventure: Travel Supplies (Rations & Torches)
     - **Agent:** @Equipper
-- [ ] **Issue #4:** [Test] Auto-Adventure: Stress Test Scheduler
+- [x] **Issue #4:** [Test] Auto-Adventure: Stress Test Scheduler
     - **Agent:** @BugHunter
-- [ ] **Issue #5:** [Test] Auto-Adventure: Exploit Verification
+- [x] **Issue #5:** [Test] Auto-Adventure: Exploit Verification
     - **Agent:** @BugHunter
 - [ ] **Issue #6:** [Feature] The Eldoria Codex System
     - **Agent:** @CodexKeeper
