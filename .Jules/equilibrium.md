@@ -1,6 +1,6 @@
 # ⚖️ Equilibrium Journal
 
-## 2026-03-08 Fix: Auto-Combat Fatigue Multiplier Ignored for High-Defense Players
+## [Current Date] Fix: Auto-Combat Fatigue Multiplier Ignored for High-Defense Players
 
 **Formulaic Imbalance Discovered:**
 In `game_systems/combat/auto_combat_formula.py` during `resolve_clash`, the fatigue multiplier (which should increase damage taken by the player over long auto-adventure sessions) was being mathematically ignored if the player's mitigation was higher than the monster's raw DPS.
