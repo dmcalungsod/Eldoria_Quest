@@ -222,6 +222,14 @@ class AdventureSession:
                 event_type = None
             # --------------------------
 
+            # --- NOVICE PROTECTION ---
+            # Level 1-5 players get a damage reduction buff so they don't auto-flee
+            if player_row.get("level", 1) <= 5:
+                # 50% damage reduction
+                boosts_dict["novice_protection_reduction"] = 0.5
+                # Optional: a minor damage boost, e.g., 20%
+                boosts_dict["novice_protection_boost"] = 1.2
+
             return {
                 "player_stats": player_stats,
                 "stats_dict": player_stats.get_total_stats_dict(),

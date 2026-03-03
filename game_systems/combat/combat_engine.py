@@ -587,6 +587,11 @@ class CombatEngine:
         if self.dmg_taken_mult != 1.0:
             dmg = int(dmg * self.dmg_taken_mult)
 
+        # Apply Novice Protection Reduction
+        if "novice_protection_reduction" in self.active_boosts_dict:
+            reduction_mult = self.active_boosts_dict["novice_protection_reduction"]
+            dmg = int(dmg * reduction_mult)
+
         # event_type is already encoded in dmg == 0; re-derive from context:
         # If dmg is 0 at this point it was either a miss or dodge (handled by DamageFormula)
         # We rely on the caller passing dmg=0 for those cases.
@@ -707,6 +712,9 @@ class CombatEngine:
         if self.dmg_dealt_mult != 1.0:
             dmg = int(dmg * self.dmg_dealt_mult)
 
+        if "novice_protection_boost" in self.active_boosts_dict:
+            dmg = int(dmg * self.active_boosts_dict["novice_protection_boost"])
+
         # Apply crit multiplier if lucky roll OR forced crit (apply once)
         # Note: base_dmg formula may have already produced a natural crit; track that separately.
         is_lucky_crit = (
@@ -776,7 +784,7 @@ class CombatEngine:
     def _handle_buff_skill(self, skill, log):
         new_buffs = CombatEffects.apply_skill_buffs(skill, self.base_stats_dict)
         self.new_buffs.extend(new_buffs)
-        log.append(CombatPhrases.player_buff(self.player, skill))
+        log.append(CombatPhrases.player_buff(self.player, self.monster, skill))
 
     def _handle_damage_skill(
         self, skill, skill_level, log, turn_report, force_crit=False
@@ -812,6 +820,9 @@ class CombatEngine:
 
         if self.dmg_dealt_mult != 1.0:
             dmg = int(dmg * self.dmg_dealt_mult)
+
+        if "novice_protection_boost" in self.active_boosts_dict:
+            dmg = int(dmg * self.active_boosts_dict["novice_protection_boost"])
 
         if event_type == "crit":
             turn_report["player_crit"] = 1
@@ -898,6 +909,9 @@ class CombatEngine:
 
         if self.dmg_dealt_mult != 1.0:
             dmg = int(dmg * self.dmg_dealt_mult)
+
+        if "novice_protection_boost" in self.active_boosts_dict:
+            dmg = int(dmg * self.active_boosts_dict["novice_protection_boost"])
 
         if event_type == "crit":
             turn_report["player_crit"] = 1
