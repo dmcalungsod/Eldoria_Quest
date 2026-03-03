@@ -10,6 +10,8 @@ jobs:
   mirror:
     if: github.repository == 'dmcalungsod/Eldoria_Quest'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Clone & Push Mirror
         run: |
