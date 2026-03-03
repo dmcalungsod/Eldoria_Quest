@@ -316,17 +316,17 @@ class AchievementSystem:
 
     def check_combat_achievements(self, discord_id: int, class_name: str, damage_taken: int) -> str | None:
         """
-        Checks for combat-specific achievements like 'Without a Trace'.
+        Checks for combat-specific achievements like 'Unseen Death'.
         Returns a success message if a new title is awarded, else None.
         """
         try:
             newly_awarded = []
 
-            # "Without a Trace" - Win a battle without taking damage as a Rogue
+            # "Unseen Death" - Win a battle without taking damage as a Rogue
             if class_name == "Rogue" and damage_taken <= 0:
-                if self.db.add_title(discord_id, "Without a Trace"):
-                    newly_awarded.append("Without a Trace")
-                    logger.info(f"Awarded title 'Without a Trace' to {discord_id}")
+                if self.db.add_title(discord_id, "Unseen Death"):
+                    newly_awarded.append("Unseen Death")
+                    logger.info(f"Awarded title 'Unseen Death' to {discord_id}")
 
             return self._format_title_message(newly_awarded)
         except Exception as e:
