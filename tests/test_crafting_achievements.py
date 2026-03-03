@@ -53,8 +53,8 @@ class TestCraftingAchievements(unittest.TestCase):
 
         # Mock get_player to return level 4 initially, then level 5
         self.mock_db.get_player.side_effect = [
-            {"crafting_level": 4, "crafting_xp": 300}, # For _add_crafting_xp calculation
-            {"crafting_level": 5}  # For achievement check
+            {"crafting_level": 4, "crafting_xp": 300},  # For _add_crafting_xp calculation
+            {"crafting_level": 5},  # For achievement check
         ]
 
         self.mock_db.add_title.return_value = True
@@ -67,6 +67,7 @@ class TestCraftingAchievements(unittest.TestCase):
         # Check if the message contains the achievement notification
         self.assertIn("Title Unlocked", msg)
         self.assertIn("Apprentice Smith", msg)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -78,6 +78,10 @@ class AdventureStatusView(View):
         self.session_data = session
 
         try:
+            # Let's quickly inject the current vitals into the session so the embed can show them!
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.user.id)
+            if vitals:
+                session["vitals"] = vitals
             embed = AdventureEmbeds.build_adventure_status_embed(session)
             await interaction.edit_original_response(embed=embed, view=self)
         except Exception as e:

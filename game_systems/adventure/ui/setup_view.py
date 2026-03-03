@@ -65,8 +65,8 @@ class AdventureSetupView(View):
 
             if is_unlocked:
                 label = loc_data["name"]
-                depth = loc_data.get('floor_depth', '?')
-                danger = loc_data.get('danger_level', '?')
+                depth = loc_data.get("floor_depth", "?")
+                danger = loc_data.get("danger_level", "?")
                 desc = f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']}) | Depth {depth} | Danger {danger}"
                 emoji = loc_data.get("emoji", E.MAP)
             else:
@@ -87,7 +87,7 @@ class AdventureSetupView(View):
                 label="No Destinations Available",
                 value="none",
                 description="You do not meet requirements for any location.",
-                emoji=E.LOCKED
+                emoji=E.LOCKED,
             )
             self.location_select.disabled = True
 
@@ -290,6 +290,10 @@ class AdventureSetupView(View):
             if not session:
                 await interaction.followup.send("Error starting session.", ephemeral=True)
                 return
+
+            vitals = await asyncio.to_thread(self.db.get_player_vitals, self.interaction_user.id)
+            if vitals:
+                session["vitals"] = vitals
 
             # 3. Build Status Embed
             embed = AdventureEmbeds.build_adventure_status_embed(session)

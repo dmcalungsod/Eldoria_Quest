@@ -4,26 +4,29 @@ tests/test_alchemist_equipment.py
 Tests specifically for Alchemist equipment logic, stat budgets, and slot conflicts.
 """
 
-import sys
 import os
+import sys
 from unittest.mock import MagicMock
 
 # Mock Database / Pymongo
-sys.modules['pymongo'] = MagicMock()
-sys.modules['pymongo.errors'] = MagicMock()
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 # Add project root
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pytest
+
+from game_systems.data.class_equipments import CLASS_EQUIPMENTS, STAT_BUDGETS
 from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.data.class_equipments import STAT_BUDGETS, CLASS_EQUIPMENTS
+
 
 @pytest.fixture
 def eq_manager():
     # Return manager with mocked DB
     db = MagicMock()
     return EquipmentManager(db)
+
 
 def test_alchemist_coat_stat_budget():
     """Verify the stat budget for alchemist_coat is correct."""
@@ -33,11 +36,11 @@ def test_alchemist_coat_stat_budget():
     assert budget["DEX"] == 0.3
     assert budget["END"] == 0.2
 
+
 def test_alchemist_coat_generation():
     """Verify that alchemist_coat items are actually generated."""
     coats = [
-        item for item in CLASS_EQUIPMENTS.values()
-        if item["slot"] == "alchemist_coat" and item["class"] == "Alchemist"
+        item for item in CLASS_EQUIPMENTS.values() if item["slot"] == "alchemist_coat" and item["class"] == "Alchemist"
     ]
     assert len(coats) > 0, "No Alchemist Coats generated"
 
@@ -53,6 +56,7 @@ def test_alchemist_coat_generation():
     assert stats.get("MAG") >= 1
     assert stats.get("DEX") >= 1
     assert stats.get("END") >= 1
+
 
 def test_alchemist_equip_restrictions(eq_manager):
     """Test what an Alchemist can and cannot equip."""
@@ -70,7 +74,7 @@ def test_alchemist_equip_restrictions(eq_manager):
     # or just test `_get_player_allowed_slots`.
 
     # Let's test _get_player_allowed_slots first
-    eq_manager.db.get_player_field.return_value = 6 # Alchemist ID
+    eq_manager.db.get_player_field.return_value = 6  # Alchemist ID
 
     allowed = eq_manager._get_player_allowed_slots(123)
     assert "alchemist_coat" in allowed
@@ -80,13 +84,12 @@ def test_alchemist_equip_restrictions(eq_manager):
     assert "staff" not in allowed
     assert "heavy_armor" not in allowed
 
+
 def test_body_slot_conflict_logic(eq_manager):
     """Verify that alchemist_coat is mutually exclusive with other body armor."""
 
     # Mock equipped items
-    eq_manager.db.get_equipped_items.return_value = [
-        {"id": 1, "slot": "robe", "item_name": "Old Robe"}
-    ]
+    eq_manager.db.get_equipped_items.return_value = [{"id": 1, "slot": "robe", "item_name": "Old Robe"}]
 
     # Item to equip: Alchemist Coat
     new_item = {"slot": "alchemist_coat"}

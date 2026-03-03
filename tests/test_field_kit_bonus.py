@@ -1,18 +1,18 @@
-
-import pytest
-import sys
 import os
+import sys
 from unittest.mock import MagicMock
 
+import pytest
+
 # Fix path to include app root so imports work
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Mock database_manager if it attempts to import pymongo
-sys.modules['pymongo'] = MagicMock()
-sys.modules['pymongo.errors'] = MagicMock()
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
 
 from game_systems.items.consumable_manager import ConsumableManager
-from game_systems.player.player_stats import PlayerStats
+
 
 class TestFieldKit:
     def test_field_kit_duration_bonus(self):
@@ -34,7 +34,7 @@ class TestFieldKit:
         mock_db.get_inventory_item.return_value = {
             "item_key": "dragonblood_ale",
             "item_type": "consumable",
-            "amount": 1
+            "amount": 1,
         }
 
         # Mock Player Vitals & Stats
@@ -47,7 +47,7 @@ class TestFieldKit:
         # Scenario 1: No Field Kit
         # ------------------------
         mock_db.get_active_adventure.return_value = None
-        mock_inv.get_inventory.return_value = [] # Empty inventory
+        mock_inv.get_inventory.return_value = []  # Empty inventory
 
         success, msg = manager.use_item(discord_id, item_id)
 
@@ -57,7 +57,7 @@ class TestFieldKit:
         # Check duration_s for first buff. Base is 180s.
         args, _ = mock_db.add_active_buffs_bulk.call_args
         buffs = args[1]
-        assert buffs[0]['duration_s'] == 180
+        assert buffs[0]["duration_s"] == 180
 
         # Scenario 2: With Field Kit in Inventory
         # ---------------------------------------
@@ -69,8 +69,9 @@ class TestFieldKit:
         args, _ = mock_db.add_active_buffs_bulk.call_args
         buffs = args[1]
         # 180 * 1.05 = 189
-        assert buffs[0]['duration_s'] == 189
+        assert buffs[0]["duration_s"] == 189
         assert "(Field Kit: Duration +5%)" in msg
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
