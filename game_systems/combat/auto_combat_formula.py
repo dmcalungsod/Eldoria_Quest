@@ -43,7 +43,9 @@ class AutoCombatFormula:
             for s in skills:
                 if s.get("power_multiplier"):
                     skill_level = s.get("skill_level", 1)
-                    skill_power = DamageFormula.calculate_skill_attack_power(player_stats, s, skill_level)
+                    skill_power = DamageFormula.calculate_skill_attack_power(
+                        player_stats, s, skill_level
+                    )
                     if skill_power > best_skill_power:
                         best_skill_power = skill_power
 
