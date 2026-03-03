@@ -1,0 +1,21 @@
+Location                  | Rk | Lvl | EV/Hr    | Delta    | Status
+---------------------------------------------------------------------------
+Willowcreek Outskirts     | F  | 1   | 39.6     | -        |
+Whispering Thicket        | E  | 5   | 63.1     | +59.1%   | 🟢 Spike
+The Rust-Wastes           | E  | 8   | 123.9    | +96.4%   | 🟢 Spike
+Deepgrove Roots           | D  | 10  | 134.4    | +8.5%    |
+The Ashlands              | D  | 12  | 214.1    | +59.3%   | 🟢 Spike
+The Shrouded Fen          | C  | 15  | 165.7    | -22.6%   | 🔴 CRITICAL DROP
+The Sunken Grotto         | C  | 18  | 302.1    | +82.3%   | 🟢 Spike
+The Crystal Caverns       | B  | 20  | 415.0    | +37.4%   |
+The Clockwork Halls       | B  | 22  | 353.9    | -14.7%   | 🔴 CRITICAL DROP
+The Forgotten Ossuary     | B  | 24  | 396.7    | +12.1%   |
+The Frostfall Expanse     | B  | 25  | 534.7    | +34.8%   |
+The Whispering Archives   | B  | 26  | 551.4    | +3.1%    |
+The Celestial Archipelago | A  | 28  | 429.9    | -22.0%   | 🔴 CRITICAL DROP
+The Molten Caldera        | A  | 30  | 483.8    | +12.5%   |
+The Thunder-Crag Coast    | A  | 33  | 555.4    | +14.8%   |
+Gale-Scarred Heights      | A  | 35  | 768.7    | +38.4%   |
+The Shimmering Wastes     | A  | 37  | 631.9    | -17.8%   | 🔴 CRITICAL DROP
+The Void Sanctum          | S  | 40  | 915.8    | +44.9%   |
+The Silent City of Ouros  | S  | 42  | 307.0    | -66.5%   | 🔴 CRITICAL DROP
