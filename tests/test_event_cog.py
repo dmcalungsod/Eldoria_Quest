@@ -118,8 +118,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.event_status(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        kwargs = interaction.response.send_message.call_args.kwargs
+        interaction.edit_original_response.assert_called_once()
+        kwargs = interaction.edit_original_response.call_args.kwargs
         self.assertIn("No Active Event", kwargs["embed"].title)
 
     async def test_event_status_active(self):
@@ -131,8 +131,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.event_status(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        kwargs = interaction.response.send_message.call_args.kwargs
+        interaction.edit_original_response.assert_called_once()
+        kwargs = interaction.edit_original_response.call_args.kwargs
         self.assertIn("Blood Moon", kwargs["embed"].title)
         # Check modifiers
         fields = kwargs["embed"].fields
@@ -145,8 +145,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.admin_start(interaction, "blood_moon", 24)
 
         self.cog.system.start_event.assert_called_with("blood_moon", 24)
-        interaction.response.send_message.assert_called_once()
-        self.assertIn("Started Event", interaction.response.send_message.call_args[0][0])
+        interaction.edit_original_response.assert_called_once()
+        self.assertIn("Started Event", interaction.edit_original_response.call_args.kwargs['content'])
 
     async def test_admin_start_invalid(self):
         interaction = AsyncMock()
@@ -154,8 +154,8 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.admin_start(interaction, "invalid_event", 24)
 
         self.cog.system.start_event.assert_not_called()
-        interaction.response.send_message.assert_called_once()
-        self.assertIn("Invalid type", interaction.response.send_message.call_args[0][0])
+        interaction.edit_original_response.assert_called_once()
+        self.assertIn("Invalid type", interaction.edit_original_response.call_args.kwargs['content'])
 
     async def test_admin_end(self):
         interaction = AsyncMock()
@@ -163,7 +163,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.admin_end(interaction)
 
         self.cog.system.end_current_event.assert_called_once()
-        interaction.response.send_message.assert_called_once()
+        interaction.edit_original_response.assert_called_once()
 
     async def test_check_event_cycle_harvest_festival(self):
         # Setup: No active event, Date is Oct 1st, 12:00

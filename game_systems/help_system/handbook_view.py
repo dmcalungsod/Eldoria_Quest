@@ -69,8 +69,9 @@ class HandbookView(View):
 
         content = HANDBOOK_CONTENT.get(selected_key)
         if not content:
-            await interaction.response.send_message(
-                "Page torn out.", ephemeral=True
+            await interaction.response.defer(ephemeral=True)
+            await interaction.followup.send(
+                content="Page torn out.", ephemeral=True
             )
             return
 
