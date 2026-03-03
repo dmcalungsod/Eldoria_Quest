@@ -210,6 +210,20 @@ class AdventureView(View):
 
             exploration_stats = self.db.get_exploration_stats(self.interaction_user.id)
             visited_locations = exploration_stats.get("unique_locations", []) if exploration_stats else []
+            total_expeditions = exploration_stats.get("total_expeditions", 0) if exploration_stats else 0
+
+            if total_expeditions == 0:
+                embed.add_field(
+                    name="🎓 Mentor's Advice: Auto-Adventure",
+                    value=(
+                        "*"
+                        "Eldoria's wilds are dangerous. Select **The Whispering Forest**, "
+                        "set your duration to **30 Minutes**, and begin the expedition. "
+                        "Your character will explore automatically. Check back later to claim your rewards."
+                        "*"
+                    ),
+                    inline=False,
+                )
 
             view = AdventureSetupView(
                 self.db,
