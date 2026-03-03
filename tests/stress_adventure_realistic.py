@@ -103,8 +103,7 @@ class RealisticMockDatabase:
     def get_player_quests(self, discord_id):
         return []
 
-    def update_progress(self, discord_id, _quest_id, _obj_type, _task,
-                        _amount):
+    def update_progress(self, discord_id, _quest_id, _obj_type, _task, _amount):
         return True
 
     def get_active_tournament(self):
@@ -136,10 +135,7 @@ class RealisticMockDatabase:
     def increment_guild_stat(self, discord_id, field, _amount=1):
         return True
 
-    def increment_specific_monster_kill(self,
-                                        discord_id,
-                                        _monster_name,
-                                        _amount=1):
+    def increment_specific_monster_kill(self, discord_id, _monster_name, _amount=1):
         return True
 
     def get_stat_exp_row(self, discord_id):

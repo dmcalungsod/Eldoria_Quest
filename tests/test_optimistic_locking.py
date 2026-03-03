@@ -18,7 +18,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 
 # Define a MockView that accepts init args and has methods used by StatusUpdateView
 class MockView:
-    def __init__(self, timeout=None):
+    def __init__(self, *args, **kwargs):
         self.children = []
 
     def add_item(self, item):
@@ -101,7 +101,7 @@ class TestOptimisticLocking(unittest.TestCase):
         # 2. Update Success
         self.mock_db.update_player_stats_optimistic.return_value = True
 
-        success, msg, new_vestige = self.view._execute_upgrade("STR", 1)
+        success, _msg, _new_vestige = self.view._execute_upgrade("STR", 1)
 
         self.assertTrue(success)
         self.mock_db.deduct_vestige.assert_called_once()
@@ -114,7 +114,7 @@ class TestOptimisticLocking(unittest.TestCase):
         # 1. Deduct Fail
         self.mock_db.deduct_vestige.return_value = False
 
-        success, msg, new_vestige = self.view._execute_upgrade("STR", 1)
+        success, msg, _new_vestige = self.view._execute_upgrade("STR", 1)
 
         self.assertFalse(success)
         self.assertIn("Insufficient Vestige", msg)
@@ -130,7 +130,7 @@ class TestOptimisticLocking(unittest.TestCase):
         # 2. Update Fail (Optimistic Lock)
         self.mock_db.update_player_stats_optimistic.return_value = False
 
-        success, msg, new_vestige = self.view._execute_upgrade("STR", 1)
+        success, msg, _new_vestige = self.view._execute_upgrade("STR", 1)
 
         self.assertFalse(success)
         self.assertIn("System busy", msg)
