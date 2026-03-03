@@ -40,3 +40,10 @@
 
 **Learning:** The auto-adventure system (TimeWeaver) introduced a massive new core loop, but it was not integrated into rank progression. This meant players could engage exclusively with the new system but still be gatekept by manual quest completion or kill requirements they weren't organically achieving.
 **Action:** Integrated `total_expeditions` as a core requirement for all ranks (F: 2 -> SS: 50) in `rank_system.py` using data from `get_exploration_stats`. This formally links the new auto-adventure loop to guild advancement.
+
+## 2026-03-03 — Rank C & B Curve Smoothing (Exploration Gap)
+
+**Learning:** While Rank D `normal_kills` were increased to 300 to enforce an exploration gap, Rank C's requirement was 400. This created a mere 100 kill delta, whereas Rank C required 10 additional quests (yielding ~50-80 kills). This rendered the Rank C exploration gap too small compared to adjacent ranks. Additionally, Rank B's `elite_kills` requirement (65) created an uneven +15 delta from Rank C (50), compared to the +20 delta between other higher ranks.
+**Action:**
+1. Increased Rank C `normal_kills` to **450** (from 400) to ensure a consistent +150 delta from Rank D, enforcing exploration.
+2. Smoothed Elite Kills scaling: Adjusted Rank C `elite_kills` to **40** (from 50) and Rank B `elite_kills` to **60** (from 65) to create a clean, consistent +20 delta per rank (D:20 -> C:40 -> B:60 -> A:80).
