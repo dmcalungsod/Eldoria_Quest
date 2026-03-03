@@ -181,25 +181,3 @@ Major Content Expansion: Guild Halls (Player Housing & Shared Resources).
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/expansion_guild_halls.md`
-
-## 2026-03-03 — Expansion Blueprint: The Crimson Mire
-
-**Design Choice:**
-Major Content Expansion: The Crimson Mire (Blood-Magic Corrupted Swamp).
-
-**Reasoning:**
-- **High-Tier Content Gap:** The game needs a challenging new region for high-level players (Rank S) after the Void Sanctum.
-- **Mechanics Focus:** The game lacks a region heavily focused on status effects like Poison and Bleed, testing the player's preparation and Alchemist/Cleric support capabilities.
-- **Narrative Depth:** Adds a tragic backstory involving a failed cult sacrifice during the Sundering, tying into the broader Void lore.
-
-**Theme Alignment:**
-- **Grim Survival:** The environment itself is hostile (Toxic Miasma), requiring specific loadouts and consumables to survive. The aesthetic is gruesome and decaying.
-- **Desperation:** The "Blood Frenzy" mechanic makes monsters more dangerous as they near death, creating tense encounters.
-
-**Integration Notes:**
-- **Combat Mechanics:** `Tactician` needs to implement the "Toxic Miasma" environmental debuff and the "Blood Frenzy" monster passive.
-- **Economy:** Introduces highly valuable resources (`Sanguine Sap`, `Crimson Lotus`) that drop from challenging enemies, feeding the Alchemist's crafting loop.
-- **Progression:** Fits as a Rank S challenge, possibly unlocked after completing specific Void Sanctum quests.
-
-**Deliverable:**
-Detailed Design Document: `.Jules/architect_designs/region_crimson_mire.md`
