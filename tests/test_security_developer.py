@@ -84,6 +84,7 @@ def _load_developer_cog():
         return decorator
 
     mock_discord.app_commands.command = command_decorator
+    mock_discord.app_commands.default_permissions = lambda **kwargs: lambda f: f
 
     # Create module dictionary to patch
     modules_to_patch = {
@@ -128,16 +129,16 @@ class TestSecurityDeveloper(unittest.IsolatedAsyncioTestCase):
         interaction = MagicMock()
         interaction.user = MagicMock()
         interaction.response = MagicMock()
-        interaction.response.send_message = AsyncMock()
         interaction.response.defer = AsyncMock()
+        interaction.edit_original_response = AsyncMock()
 
         # Execute the command callback
         # Since we mocked the decorator to return the function, cog.dev_panel is the bound method.
         await cog.dev_panel(interaction)
 
         bot.is_owner.assert_awaited_once_with(interaction.user)
-        interaction.response.send_message.assert_awaited_with("⛔ You are not the bot owner.", ephemeral=True)
-        interaction.response.defer.assert_not_awaited()
+        interaction.response.defer.assert_awaited_with(ephemeral=True)
+        interaction.edit_original_response.assert_awaited_with(content="⛔ You are not the bot owner.")
 
     async def test_dev_panel_access_granted_for_owner(self):
         """Verify that dev_panel grants access to owners."""

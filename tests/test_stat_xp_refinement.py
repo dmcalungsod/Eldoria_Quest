@@ -154,13 +154,13 @@ class TestStatXPRefinement(unittest.TestCase):
         # Case 1: 5 hits, 50 damage
         report1 = {"hits_taken": 5, "damage_taken": 50}
         exp1 = STAT_EXP_GAINS["end_exp"](report1)
-        _expected1 = (5 * 1.0) + (50 * 0.1)  # 5 + 5 = 10
+        expected1 = (5 * 1.0) + (50 * 0.1)  # 5 + 5 = 10
         self.assertEqual(exp1, 10.0)
 
         # Case 2: 5 hits, 0 damage (Perfect tanking)
         report2 = {"hits_taken": 5, "damage_taken": 0}
         exp2 = STAT_EXP_GAINS["end_exp"](report2)
-        _expected2 = (5 * 1.0) + (0 * 0.1)  # 5 + 0 = 5
+        expected2 = (5 * 1.0) + (0 * 0.1)  # 5 + 0 = 5
         self.assertEqual(exp2, 5.0)
 
     def test_luck_xp_formula(self):
@@ -175,5 +175,5 @@ class TestStatXPRefinement(unittest.TestCase):
         # Case 2: 2 Crits, 1 Dodge
         report2 = {"player_crit": 2, "player_dodge": 1}
         exp2 = STAT_EXP_GAINS["lck_exp"](report2)
-        _expected2 = 0.5 + (2 * 0.5) + (1 * 0.5)  # 0.5 + 1.0 + 0.5 = 2.0
+        expected2 = 0.5 + (2 * 0.5) + (1 * 0.5)  # 0.5 + 1.0 + 0.5 = 2.0
         self.assertEqual(exp2, 2.0)

@@ -89,10 +89,6 @@ def parse_markdown_to_embed(content):
 
 def send_webhook(webhook_url, embed):
     """Sends the embed to the Discord webhook."""
-    if not webhook_url.startswith(("http://", "https://")):
-        print("❌ Error: Webhook URL must use HTTP or HTTPS.")
-        return
-
     payload = {"username": "Guild Chronicler", "avatar_url": "https://i.imgur.com/4M34hi2.png", "embeds": [embed]}
 
     data = json.dumps(payload).encode("utf-8")
@@ -101,7 +97,7 @@ def send_webhook(webhook_url, embed):
     )
 
     try:
-        with urllib.request.urlopen(req) as response:  # nosec B310
+        with urllib.request.urlopen(req) as response:
             if response.status in [200, 204]:
                 print("✅ Successfully sent update via webhook.")
             else:

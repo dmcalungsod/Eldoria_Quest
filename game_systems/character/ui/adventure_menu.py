@@ -207,9 +207,6 @@ class AdventureView(View):
                 color=discord.Color.dark_green(),
             )
 
-            exploration_stats = self.db.get_exploration_stats(self.interaction_user.id)
-            visited_locations = exploration_stats.get("unique_locations", []) if exploration_stats else []
-
             view = AdventureSetupView(
                 self.db,
                 adventure_cog.manager,
@@ -218,7 +215,6 @@ class AdventureView(View):
                 level,
                 supplies=supplies,
                 capacity=(current_slots, max_slots),
-                visited_locations=visited_locations,
             )
             view.back_btn.callback = back_to_profile_callback
 

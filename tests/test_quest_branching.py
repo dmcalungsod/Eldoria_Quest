@@ -51,7 +51,7 @@ class TestQuestBranching(unittest.TestCase):
         self.mock_db.get_guild_member_field.return_value = "B"
 
         # Mock DB queries
-        def mock_find(query, _projection=None):
+        def mock_find(query, projection=None):
             # Simple filter simulation
             results = []
             if "tier" in query:
@@ -70,7 +70,7 @@ class TestQuestBranching(unittest.TestCase):
         # Mock completed quests query
         mock_col.find.side_effect = None
 
-        def mock_find_dynamic(query, _projection=None):
+        def mock_find_dynamic(query, projection=None):
             # Query for getting all player quests
             if "discord_id" in query and "quest_id" not in query:
                 return [{"quest_id": 67, "status": "completed"}]
@@ -95,7 +95,7 @@ class TestQuestBranching(unittest.TestCase):
         # Update mock to simulate Quest 68 being in progress
         self.mock_db.get_player_quest_ids.return_value = [67, 68]
 
-        def mock_find_dynamic_2(query, _projection=None):
+        def mock_find_dynamic_2(query, projection=None):
             if "discord_id" in query and "quest_id" not in query:
                 return [{"quest_id": 67, "status": "completed"}, {"quest_id": 68, "status": "in_progress"}]
             if "tier" in query:
@@ -121,7 +121,7 @@ class TestQuestBranching(unittest.TestCase):
         self.mock_db.get_guild_member_field.return_value = "B"
 
         # Mock finding the quest to accept
-        def mock_find_one(query, _projection=None):
+        def mock_find_one(query, projection=None):
             q_id = query.get("id")
             if q_id == 68:
                 return self.quest_choice_a
@@ -151,7 +151,7 @@ class TestQuestBranching(unittest.TestCase):
         self.mock_db._col.return_value.find_one.side_effect = mock_find_one
 
         # Mock finding quests by exclusive_group
-        def mock_find(query, _projection=None):
+        def mock_find(query, projection=None):
             if "exclusive_group" in query:
                 return [{"id": 68}, {"id": 69}]
             return []
@@ -170,7 +170,7 @@ class TestQuestBranching(unittest.TestCase):
         # Case B: Player has no quests in group.
         # We need to change the mock behavior.
 
-        def mock_find_one_clean(query, _projection=None):
+        def mock_find_one_clean(query, projection=None):
             q_id = query.get("id")
             if q_id == 69:
                 return self.quest_choice_b

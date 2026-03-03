@@ -143,9 +143,7 @@ class AchievementSystem:
             return f"🏆 **Title Unlocked:** {newly_awarded[0]}"
         return f"🏆 **Titles Unlocked:** {', '.join(newly_awarded)}"
 
-    def _check_milestones(
-        self, discord_id: int, milestones: dict, current_count: int
-    ) -> list:
+    def _check_milestones(self, discord_id: int, milestones: dict, current_count: int) -> list:
         """
         Awards any milestone titles that the player has reached but not yet earned.
         Returns a list of newly awarded title names.
@@ -181,9 +179,7 @@ class AchievementSystem:
 
             field, milestones = field_map[kill_type]
             current_count = member_data.get(field, 0)
-            newly_awarded = self._check_milestones(
-                discord_id, milestones, current_count
-            )
+            newly_awarded = self._check_milestones(discord_id, milestones, current_count)
             return self._format_title_message(newly_awarded)
 
         except Exception as e:
@@ -201,27 +197,21 @@ class AchievementSystem:
                 return None
 
             current_count = member_data.get("quests_completed", 0)
-            newly_awarded = self._check_milestones(
-                discord_id, QUEST_MILESTONES, current_count
-            )
+            newly_awarded = self._check_milestones(discord_id, QUEST_MILESTONES, current_count)
             return self._format_title_message(newly_awarded)
 
         except Exception as e:
             logger.error(f"Error checking quest achievements for {discord_id}: {e}")
             return None
 
-    def check_group_achievements(
-        self, discord_id: int, monster_name: str
-    ) -> str | None:
+    def check_group_achievements(self, discord_id: int, monster_name: str) -> str | None:
         """
         Checks if the player has reached a milestone for a monster group.
         Returns a success message if a new title is awarded, else None.
         """
         try:
             relevant_groups = [
-                group
-                for group, keywords in MONSTER_GROUPS.items()
-                if any(k in monster_name for k in keywords)
+                group for group, keywords in MONSTER_GROUPS.items() if any(k in monster_name for k in keywords)
             ]
             if not relevant_groups:
                 return None
@@ -237,14 +227,8 @@ class AchievementSystem:
                     continue
 
                 keywords = MONSTER_GROUPS[group]
-                total_kills = sum(
-                    count
-                    for m_name, count in kill_data.items()
-                    if any(k in m_name for k in keywords)
-                )
-                newly_awarded.extend(
-                    self._check_milestones(discord_id, milestones, total_kills)
-                )
+                total_kills = sum(count for m_name, count in kill_data.items() if any(k in m_name for k in keywords))
+                newly_awarded.extend(self._check_milestones(discord_id, milestones, total_kills))
 
             return self._format_title_message(newly_awarded)
 
@@ -262,18 +246,12 @@ class AchievementSystem:
             total_expeditions = stats.get("total_expeditions", 0)
             loc_count = len(stats.get("unique_locations", []))
 
-            newly_awarded = self._check_milestones(
-                discord_id, EXPLORATION_MILESTONES, total_expeditions
-            )
-            newly_awarded += self._check_milestones(
-                discord_id, LOCATION_MILESTONES, loc_count
-            )
+            newly_awarded = self._check_milestones(discord_id, EXPLORATION_MILESTONES, total_expeditions)
+            newly_awarded += self._check_milestones(discord_id, LOCATION_MILESTONES, loc_count)
             return self._format_title_message(newly_awarded)
 
         except Exception as e:
-            logger.error(
-                f"Error checking exploration achievements for {discord_id}: {e}"
-            )
+            logger.error(f"Error checking exploration achievements for {discord_id}: {e}")
             return None
 
     def check_skill_achievements(self, discord_id: int) -> str | None:
@@ -289,12 +267,8 @@ class AchievementSystem:
             skill_count = len(skills)
             max_skill_level = max(s["skill_level"] for s in skills)
 
-            newly_awarded = self._check_milestones(
-                discord_id, SKILL_COUNT_MILESTONES, skill_count
-            )
-            newly_awarded += self._check_milestones(
-                discord_id, SKILL_LEVEL_MILESTONES, max_skill_level
-            )
+            newly_awarded = self._check_milestones(discord_id, SKILL_COUNT_MILESTONES, skill_count)
+            newly_awarded += self._check_milestones(discord_id, SKILL_LEVEL_MILESTONES, max_skill_level)
 
             player_skill_keys = {s.get("skill_key") for s in skills}
             for title, required_skills in CLASS_MASTERY_MILESTONES.items():
@@ -309,17 +283,13 @@ class AchievementSystem:
             logger.error(f"Error checking skill achievements for {discord_id}: {e}")
             return None
 
-    def check_duration_achievements(
-        self, discord_id: int, duration_minutes: int
-    ) -> str | None:
+    def check_duration_achievements(self, discord_id: int, duration_minutes: int) -> str | None:
         """
         Checks if the player has reached an adventure duration milestone.
         Returns a success message if a new title is awarded, else None.
         """
         try:
-            newly_awarded = self._check_milestones(
-                discord_id, DURATION_MILESTONES, duration_minutes
-            )
+            newly_awarded = self._check_milestones(discord_id, DURATION_MILESTONES, duration_minutes)
             return self._format_title_message(newly_awarded)
 
         except Exception as e:
@@ -337,32 +307,9 @@ class AchievementSystem:
                 return None
 
             crafting_level = player.get("crafting_level", 1)
-            newly_awarded = self._check_milestones(
-                discord_id, CRAFTING_MILESTONES, crafting_level
-            )
+            newly_awarded = self._check_milestones(discord_id, CRAFTING_MILESTONES, crafting_level)
             return self._format_title_message(newly_awarded)
 
         except Exception as e:
             logger.error(f"Error checking crafting achievements for {discord_id}: {e}")
-            return None
-
-    def check_combat_achievements(
-        self, discord_id: int, class_name: str, damage_taken: int
-    ) -> str | None:
-        """
-        Checks for combat-specific achievements like 'Without a Trace'.
-        Returns a success message if a new title is awarded, else None.
-        """
-        try:
-            newly_awarded = []
-
-            # "Without a Trace" - Win a battle without taking damage as a Rogue
-            if class_name == "Rogue" and damage_taken <= 0:
-                if self.db.add_title(discord_id, "Without a Trace"):
-                    newly_awarded.append("Without a Trace")
-                    logger.info(f"Awarded title 'Without a Trace' to {discord_id}")
-
-            return self._format_title_message(newly_awarded)
-        except Exception as e:
-            logger.error(f"Error checking combat achievements for {discord_id}: {e}")
             return None

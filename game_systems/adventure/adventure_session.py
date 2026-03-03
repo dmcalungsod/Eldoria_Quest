@@ -104,7 +104,6 @@ class AdventureSession:
         """
         Calculates monster damage multiplier based on session duration.
         Logic: > 4 hours (16 steps) -> +5% damage per hour (4 steps).
-        For silent_city_ouros: sensory deprivation doubles the fatigue buildup (+10% per hour).
         """
         steps = getattr(self, "steps_completed", 0)
         if steps <= 16:
@@ -113,9 +112,8 @@ class AdventureSession:
         # Steps past threshold
         excess_steps = steps - 16
 
-        # 5% per hour (4 steps) => 1.25% per step. Double for silent_city_ouros.
-        base_rate = 0.10 if getattr(self, "location_id", None) == "silent_city_ouros" else 0.05
-        bonus = (excess_steps / 4.0) * base_rate
+        # 5% per hour (4 steps) => 1.25% per step
+        bonus = (excess_steps / 4.0) * 0.05
 
         # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
         if self.supplies.get("hardtack", 0) > 0:
@@ -302,9 +300,8 @@ class AdventureSession:
         return damage, message
 
     def _apply_sanity_drain(self, context: dict, persist: bool):
-        """Applies MP drain if in the Wailing Chasm or Silent City of Ouros."""
-        location_id = getattr(self, "location_id", None)
-        if location_id in ("the_wailing_chasm", "silent_city_ouros") and random.random() < 0.30:  # nosec B311
+        """Applies MP drain if in the Wailing Chasm."""
+        if getattr(self, "location_id", None) == "the_wailing_chasm" and random.random() < 0.30:  # nosec B311
             max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
             max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
             mp_drain = max(1, int(max_mp * 0.02))
@@ -312,13 +309,9 @@ class AdventureSession:
             if current_mp > 0:
                 new_mp = max(0, current_mp - mp_drain)
                 context["vitals"]["current_mp"] = new_mp
-
-                if location_id == "the_wailing_chasm":
-                    msg = f"🧠 **Sanity Drain:** The maddening echoes of the chasm sap **{current_mp - new_mp}** MP."
-                else:
-                    msg = f"🧠 **Sensory Deprivation:** The absolute silence of the city saps your mind, draining **{current_mp - new_mp}** MP."
-
-                self.logs.append(msg)
+                self.logs.append(
+                    f"🧠 **Sanity Drain:** The maddening echoes of the chasm sap **{current_mp - new_mp}** MP."
+                )
                 if persist:
                     self.db.update_player_vitals_delta(self.discord_id, 0, -(current_mp - new_mp), max_hp, max_mp)
 
@@ -994,14 +987,15 @@ class AdventureSession:
             if context:
                 final_hp = context["vitals"]["current_hp"]
                 final_mp = context["vitals"]["current_mp"]
-                delta_hp = final_hp - initial_hp
-                delta_mp = final_mp - initial_mp
-
                 # Get max stats safely
                 player_stats = context["player_stats"]
                 stats_dict = context.get("stats_dict")
                 max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
                 max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
+
+                self.db.update_player_vitals_delta(
+                    self.discord_id, final_hp - initial_hp, final_mp - initial_mp, max_hp, max_mp
+                )
 
         return self._build_result([turn_logs], is_dead, context)
 
