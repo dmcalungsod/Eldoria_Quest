@@ -9,7 +9,8 @@ from unittest.mock import MagicMock
 sys.path.append(os.getcwd())
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("stress_test_realistic")
 
 # --- MOCK MODULES ---
@@ -22,6 +23,7 @@ from game_systems.adventure.adventure_resolution import AdventureResolutionEngin
 
 
 class RealisticMockDatabase:
+
     def __init__(self):
         self.sessions = {}
         self.players = {}
@@ -36,7 +38,16 @@ class RealisticMockDatabase:
                 "exp_to_next": 1000,
                 "name": "TestPlayer",
             },
-            "stats": {"HP": 100, "MP": 100, "STR": 10, "END": 10, "DEX": 10, "AGI": 10, "MAG": 10, "LCK": 10},
+            "stats": {
+                "HP": 100,
+                "MP": 100,
+                "STR": 10,
+                "END": 10,
+                "DEX": 10,
+                "AGI": 10,
+                "MAG": 10,
+                "LCK": 10
+            },
             "buffs": [],
             "skills": [
                 {
@@ -130,22 +141,39 @@ class RealisticMockDatabase:
     def get_stat_exp_row(self, discord_id):
         # Return mock row for stat exp
         return {
-            "stats_json": json.dumps(
-                {
-                    "STR": {"base": 10},
-                    "DEX": {"base": 10},
-                    "INT": {"base": 10},
-                    "END": {"base": 10},
-                    "LCK": {"base": 10},
-                    "AGI": {"base": 10},
-                }
-            ),
-            "str_exp": 0,
-            "end_exp": 0,
-            "dex_exp": 0,
-            "agi_exp": 0,
-            "mag_exp": 0,
-            "lck_exp": 0,
+            "stats_json":
+            json.dumps({
+                "STR": {
+                    "base": 10
+                },
+                "DEX": {
+                    "base": 10
+                },
+                "INT": {
+                    "base": 10
+                },
+                "END": {
+                    "base": 10
+                },
+                "LCK": {
+                    "base": 10
+                },
+                "AGI": {
+                    "base": 10
+                },
+            }),
+            "str_exp":
+            0,
+            "end_exp":
+            0,
+            "dex_exp":
+            0,
+            "agi_exp":
+            0,
+            "mag_exp":
+            0,
+            "lck_exp":
+            0,
         }
 
     def update_stat_exp(self, *_args, **_kwargs):
@@ -195,23 +223,22 @@ def run_realistic_stress_test():
     location_id = "shrouded_fen"
 
     for i in range(NUM_SESSIONS):
-        sessions.append(
-            {
-                "discord_id": 100000 + i,
-                "duration_minutes": 60,  # 4 steps (15 min each)
-                "steps_completed": 0,
-                "start_time": "2023-01-01T00:00:00",
-                "location_id": location_id,
-                "active": 1,
-                "version": 1,
-                "logs": "[]",
-                "loot_collected": "{}",
-                "active_monster_json": None,
-                "supplies": {},
-            }
-        )
+        sessions.append({
+            "discord_id": 100000 + i,
+            "duration_minutes": 60,  # 4 steps (15 min each)
+            "steps_completed": 0,
+            "start_time": "2023-01-01T00:00:00",
+            "location_id": location_id,
+            "active": 1,
+            "version": 1,
+            "logs": "[]",
+            "loot_collected": "{}",
+            "active_monster_json": None,
+            "supplies": {},
+        })
 
-    logger.info(f"Generated {NUM_SESSIONS} sessions (Duration: 60m / 4 steps).")
+    logger.info(
+        f"Generated {NUM_SESSIONS} sessions (Duration: 60m / 4 steps).")
     logger.info("Starting Resolution Loop...")
 
     start_time = time.time()
@@ -223,7 +250,9 @@ def run_realistic_stress_test():
 
         if processed_count % 1000 == 0:
             elapsed = time.time() - start_time
-            logger.info(f"Processed {processed_count} sessions... ({processed_count / elapsed:.2f} sess/s)")
+            logger.info(
+                f"Processed {processed_count} sessions... ({processed_count / elapsed:.2f} sess/s)"
+            )
 
     end_time = time.time()
     duration = end_time - start_time
@@ -237,7 +266,9 @@ def run_realistic_stress_test():
     logger.info(f"Step Throughput: {steps_throughput:.2f} steps/sec")
 
     if throughput < 167:
-        logger.warning("⚠️ Throughput is below target (10k/60s = 167/s). Optimization needed.")
+        logger.warning(
+            "⚠️ Throughput is below target (10k/60s = 167/s). Optimization needed."
+        )
     else:
         logger.info("✅ Throughput meets requirements.")
 
