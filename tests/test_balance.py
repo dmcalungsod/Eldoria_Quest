@@ -37,16 +37,16 @@ def test_monsters_balance():
     spider = MONSTERS.get("monster_126")
     assert spider, "Cogwork Spider not found"
     drops = dict(spider["drops"])
-    assert drops.get("magic_stone_medium") == 25, (
-        f"Cogwork Spider magic_stone_medium expected 25, got {drops.get('magic_stone_medium')}"
+    assert drops.get("steam_core") == 80, (
+        f"Cogwork Spider steam_core expected 80, got {drops.get('magic_stone_medium')}"
     )
 
     # Void Stalker (monster_116)
     stalker = MONSTERS.get("monster_116")
     assert stalker, "Void Stalker not found"
     drops = dict(stalker["drops"])
-    assert drops.get("magic_stone_large") == 60, (
-        f"Void Stalker magic_stone_large expected 60, got {drops.get('magic_stone_large')}"
+    assert drops.get("magic_stone_large") == 100, (
+        f"Void Stalker magic_stone_large expected 100, got {drops.get('magic_stone_large')}"
     )
 
 
@@ -57,28 +57,28 @@ def test_locations_balance():
     fen = LOCATIONS.get("shrouded_fen")
     assert fen, "Shrouded Fen not found"
     gather = dict(fen["gatherables"])
-    assert gather.get("magic_stone_medium") == 45, (
-        f"Shrouded Fen magic_stone_medium expected 45, got {gather.get('magic_stone_medium')}"
+    assert gather.get("magic_stone_medium") == 100, (
+        f"Shrouded Fen magic_stone_medium expected 100, got {gather.get('magic_stone_medium')}"
     )
-    assert gather.get("ancient_wood") == 45, f"Shrouded Fen ancient_wood expected 45, got {gather.get('ancient_wood')}"
+    assert gather.get("ancient_wood") == 60, f"Shrouded Fen ancient_wood expected 60, got {gather.get('ancient_wood')}"
 
     # Clockwork Halls
     halls = LOCATIONS.get("clockwork_halls")
     assert halls, "Clockwork Halls not found"
     gather = dict(halls["gatherables"])
-    assert gather.get("magic_stone_medium") == 35, (
-        f"Clockwork Halls magic_stone_medium expected 35, got {gather.get('magic_stone_medium')}"
+    assert gather.get("steam_core") == 100, (
+        f"Clockwork Halls steam_core expected 100, got {gather.get('magic_stone_medium')}"
     )
-    assert gather.get("magic_stone_large") == 10, (
-        f"Clockwork Halls magic_stone_large expected 10, got {gather.get('magic_stone_large')}"
+    assert gather.get("magic_stone_large") == 100, (
+        f"Clockwork Halls magic_stone_large expected 100, got {gather.get('magic_stone_large')}"
     )
 
     # Void Sanctum
     void = LOCATIONS.get("void_sanctum")
     assert void, "Void Sanctum not found"
     gather = dict(void["gatherables"])
-    assert gather.get("magic_stone_flawless") == 30, (
-        f"Void Sanctum magic_stone_flawless expected 30, got {gather.get('magic_stone_flawless')}"
+    assert gather.get("magic_stone_flawless") == 100, (
+        f"Void Sanctum magic_stone_flawless expected 100, got {gather.get('magic_stone_flawless')}"
     )
 
 

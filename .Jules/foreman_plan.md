@@ -49,13 +49,13 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 2.1:** Design new Adventure Locations (data).
     - **Agent:** @GameForge
     - **Status:** **Completed** (Verified `adventure_locations.py` contains 12+ locations including Frostfall Expanse).
-- [ ] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
+- [x] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
     - **Agent:** @GameBalancer
     - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
-    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops. EV target > ~350 Aurum per 30m). **[ ] Reopened**
-    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[ ] Reopened**
-    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Must scale past Molten Caldera's high EV 1500.50). **[ ] Reopened**
-    - **Subtask 2.2e (New):** Address "Celestial Archipelago" EV (EV 624.25 < Rank B). Raise to > 1300 Aurum. **[ ] Unstarted**
+    - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops. EV target > ~350 Aurum per 30m). **[x] Completed**
+    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[x] Completed**
+    - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Must scale past Molten Caldera's high EV 1500.50). **[x] Completed**
+    - **Subtask 2.2e (New):** Address "Celestial Archipelago" EV (EV 624.25 < Rank B). Raise to > 1300 Aurum. **[x] Completed**
     - **Due:** 2026-03-08
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
