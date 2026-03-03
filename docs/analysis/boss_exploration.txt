@@ -1,0 +1,10 @@
+Running boss exploration analysis...
+
+Name                      Level  Drops
+------------------------------------------------------------
+The Celestial Arbiter        31  celestial_core(100%), ancient_tablet(80%), star_metal_fragment(80%), magic_stone_flawless(50%)
+Ignis, Lord of Cinders       35  magic_stone_flawless(100%), magma_core(100%), dragon_scale(50%)
+Admiral Racker               35  admiral_insignia(100%), storm_essence(100%), magic_stone_flawless(75%), steel_ingot(50%)
+Tempest Guardian             39  tempest_heart(100%), magic_stone_flawless(80%), charged_core(100%)
+The Radiance                 39  glass_heart(100%), magic_stone_flawless(100%), prism_shard(100%)
+Omega, The Void Heart        45  void_heart(100%), magic_stone_flawless(100%), null_stone(80%)

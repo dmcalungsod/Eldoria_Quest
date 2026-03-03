@@ -53,8 +53,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @GameBalancer
     - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
     - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops. EV target > ~350 Aurum per 30m). **[ ] Reopened**
-    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[ ] In Progress**
+    - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[ ] Reopened**
     - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Must scale past Molten Caldera's high EV 1500.50). **[ ] Reopened**
+    - **Subtask 2.2e (New):** Address "Celestial Archipelago" EV (EV 624.25 < Rank B). Raise to > 1300 Aurum. **[ ] Unstarted**
     - **Due:** 2026-03-08
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
@@ -63,7 +64,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 2.4:** Resolve Rank Logic Conflict (Frostfall vs Archipelago).
     - **Agent:** @GameBalancer / @GameForge
     - **Details:** Resolve Level 25/28 vs Rank A/B inconsistency.
-    - **Due:** 2026-03-08
+    - **Status:** **Completed** (Confirmed by Analyst EV Model)
 
 ### Phase 3: Integration & Polish
 **Focus:** Flavor, depth, and safety nets.
@@ -111,12 +112,12 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ## 🛠️ Phase 5: Tech Debt & Maintenance (New)
 **Focus:** Resolving critical issues identified by Issue Crafter.
-- [ ] **Task 5.1:** Fix Critical `pip` Vulnerability (CVE-2026-1703).
+- [x] **Task 5.1:** Fix Critical `pip` Vulnerability (CVE-2026-1703).
     - **Agent:** @Sentinel
-    - **Due:** **IMMEDIATE (CRITICAL)**
+    - **Status:** **Completed** (skipTest logic removed)
 - [ ] **Task 5.2:** Refactor High-Complexity Methods.
     - **Agent:** @SystemSmith
-    - **Subtask 5.2a:** `CombatEngine.run_combat_turn`
+    - **Subtask 5.2a:** `CombatEngine.run_combat_turn` **[x] Completed**
     - **Subtask 5.2b:** `AdventureEvents.regeneration`
     - **Subtask 5.2c:** `AdventureSession.simulate_step`
     - **Due:** 2026-03-10
@@ -128,16 +129,33 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @DataSteward
     - **Details:** Add `primordial_ooze`, `brimstone`, `lunawort` to `materials.py`.
     - **Due:** 2026-03-08
-- [ ] **Task 5.5:** Fix `"buff_data"` typo in `skills_data.py`.
+- [x] **Task 5.5:** Fix `"buff_data"` typo in `skills_data.py`.
     - **Agent:** @GameForge
     - **Details:** Bulk rename `"buff_data"` to `"buff"` for Alchemist, Warrior, and Rogue Class Skills.
+    - **Status:** **Completed**
     - **Due:** 2026-03-08
-- [ ] **Task 5.6:** Add missing `"wailing_chasm"` to `adventure_locations.json`.
+- [x] **Task 5.6:** Add missing `"wailing_chasm"` to `adventure_locations.json`.
     - **Agent:** @GameForge
+    - **Status:** **Completed**
     - **Due:** 2026-03-08
-- [ ] **Task 5.7:** Add missing "Choirmaster", "Blind Choir Zealot" monsters to `monsters.json`.
+- [x] **Task 5.7:** Add missing "Choirmaster", "Blind Choir Zealot" monsters to `monsters.json`.
     - **Agent:** @GameForge
+    - **Status:** **Completed**
     - **Due:** 2026-03-08
+- [ ] **Task 5.8:** Investigate medium-severity B310 finding in `scripts/chronicler/post_update.py:100`.
+    - **Agent:** @Sentinel
+    - **Due:** 2026-03-10
+- [ ] **Task 5.9:** Address ONE UI Policy violations in cogs and UI components.
+    - **Agent:** @Palette
+    - **Details:** `event_cog.py`, `tournament_cog.py`, `faction_cog.py`, `general_cog.py`, `developer_cog.py`, `adventure_menu.py`, `setup_view.py`, `components.py`, `handbook_view.py`.
+    - **Due:** 2026-03-10
+- [ ] **Task 5.10:** Refactor high cyclomatic complexity functions & clean dead code.
+    - **Agent:** @SystemSmith
+    - **Details:** `combat_engine.py`, `consumable_manager.py`, `adventure_session.py`, `equipment_manager.py`.
+    - **Due:** 2026-03-10
+- [ ] **Task 5.11:** Improve test coverage for Discord cogs.
+    - **Agent:** @BugHunter
+    - **Due:** 2026-03-10
 
 ---
 
@@ -149,9 +167,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task A.1:** Create Alchemist Skills (Vitriol Bomb, Triage, etc.).
     - **Agent:** @GameForge / @Tactician
     - **Due:** 2026-03-08
-- [ ] **Task A.2:** Create Alchemist Equipment & Items.
+- [x] **Task A.2:** Create Alchemist Equipment & Items.
     - **Agent:** @Equipper
-    - **Due:** 2026-03-08
+    - **Status:** **Completed** (Items already exist)
 - [ ] **Task A.3:** Update Character Creation/Job Selection.
     - **Agent:** @GameForge
     - **Due:** 2026-03-09
@@ -179,9 +197,42 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @ChronicleKeeper
     - **Due:** 2026-03-10
 
+### The Guild Halls Expansion (New)
+**Design:** `.Jules/architect_designs/expansion_guild_halls.md`
+**Status:** **Design Approved / Foundation Phase**
+- [ ] **Task GH.1:** Create `player_halls` collection and schema.
+    - **Agent:** @DataSteward / @SystemSmith
+    - **Due:** 2026-03-12
+- [ ] **Task GH.2:** Tune exponential material costs for room upgrades.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-12
+- [ ] **Task GH.3:** Implement "Building Materials" and Boss Trophies.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-12
+- [ ] **Task GH.4:** Design interactive Guild Hall management View (One UI).
+    - **Agent:** @Palette
+    - **Due:** 2026-03-12
+
+### The Silent City of Ouros (New)
+**Design:** `.Jules/region_silent_city_ouros.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task SC.1:** Connect Ouros beneath the Void Sanctum.
+    - **Agent:** @DepthsWarden
+    - **Due:** 2026-03-14
+- [ ] **Task SC.2:** Create Temporal Wraiths, Hollowed Sentinels, and Chronal Dust.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-14
+- [ ] **Task SC.3:** Design the absolute silence mechanic.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-14
+- [ ] **Task SC.4:** Write oppressive flavor text for the dead city.
+    - **Agent:** @StoryWeaver
+    - **Due:** 2026-03-14
+
 ---
 
 ## 📝 Activity Log
+- **2026-03-02 (Update):** Added "Guild Halls" and "Silent City" parallel projects. Marked Tasks 5.1, A.2, and 2.4 completed based on 03-01/03-02 logs. Added Repo Auditor tasks (5.8-5.11). Updated 2.2 subtasks based on EV report.
 - **2026-02-27:** Verified Task 3.3 (Supplies) as Complete. Added Rogue Skill Tree project and Analyst Integration tasks (2.2c/d, 2.4). Flagged Task 5.1 as CRITICAL.
 - **2026-02-25 (Update):** Integrated Analyst findings (Task 2.2 split), Namewright updates (Task 3.3/Alchemist), and Issue Crafter reports (Phase 5). Marked Tasks 2.1 and 3.2 as Complete.
 - **2026-02-26:** Confirmed Phase 1 (UI) and key Phase 2/3 tasks (Locations, Death Penalty, Flavor Text) are Complete. Updated plan to reflect rapid progress. Assigned remaining Fatigue and Supply tasks.
