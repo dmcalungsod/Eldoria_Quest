@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Workflow Summary
+        run: |
+          echo "### ⚙️ Eldoria Quest CI/CD Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "This automated workflow ensures the stability and security of the repository. It performs the following operations:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🛠️ **Static Analysis:** Strictly enforces code style and fixes formatting using \`Ruff\`." >> $GITHUB_STEP_SUMMARY
+          echo "- 🛡️ **Security Scanning:** Scans for standard vulnerabilities using \`Bandit\` and \`Pip-Audit\`." >> $GITHUB_STEP_SUMMARY
+          echo "- 🧪 **Automated Testing:** Validates game mechanics using \`Pytest\`." >> $GITHUB_STEP_SUMMARY
+          echo "- 📊 **Coverage Tracking:** Uploads code coverage metrics to Codacy." >> $GITHUB_STEP_SUMMARY
+          echo "- 🔄 **Mirroring:** Automatically syncs approved changes to a secure backup repository." >> $GITHUB_STEP_SUMMARY
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          
+      - name: Install Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff bandit pip-audit
+          
+      - name: Ruff Auto-Fix & Format
+        run: |
+          ruff check . --fix
+          ruff format .
+
+      - name: Ruff Check
+        run: ruff check .
+
+      - name: Ruff Format Check
+        run: ruff format --check .
+        
+      - name: Bandit Security Scan
+        run: bandit -r . -c pyproject.toml -ll
+        
+      - name: Dependency Vulnerability Scan
+        run: pip-audit -r requirements.txt
+
+  test:
+    needs: static-analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+          
+      - name: Run Tests with Coverage
+        run: |
+          set -o pipefail
+          python -m pytest tests/ --tb=short -q --cov=. --cov-report=xml:coverage.xml | tee pytest_output.txt
+          
+      - name: Generate Test Summary
+        if: always()
+        run: |
+          if [ -f pytest_output.txt ]; then
+            PASSED=$(grep -oP '\d+(?= passed)' pytest_output.txt || echo "0")
+            FAILED=$(grep -oP '\d+(?= failed)' pytest_output.txt || echo "0")
+            SKIPPED=$(grep -oP '\d+(?= skipped)' pytest_output.txt || echo "0")
+            
+            echo "### 🧪 Pytest Results" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Passed:** $PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "- ❌ **Failed:** $FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "- ⏭️ **Skipped:** $SKIPPED" >> $GITHUB_STEP_SUMMARY
+            
+            if grep -q "failed" pytest_output.txt; then
+              echo "⚠️ **Some tests failed. Check the logs for details.**" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "🎉 **All tests passed successfully!**" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+      - name: Upload Coverage to Artifacts
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 1
+
+  codacy-coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Download coverage report
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: coverage-report
+          
+      - name: Run Codacy Coverage Reporter
+        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
+
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage.xml
+
+  mirror:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [static-analysis, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone & Push Mirror
+        run: |
+          git clone --mirror "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" repo-mirror
+          cd repo-mirror
+          git for-each-ref --format='delete %(refname)' refs/pull | git update-ref --stdin
+          git push --mirror "https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/DeeEmSea/Eldoria-Quest-Bot"

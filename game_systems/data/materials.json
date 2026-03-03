@@ -1,0 +1,518 @@
+{
+    "magic_stone_fragment": {
+        "name": "Magic Stone Fragment",
+        "description": "A tiny, impure shard of crystallized mana.",
+        "rarity": "Common",
+        "value": 8
+    },
+    "magic_stone_small": {
+        "name": "Magic Stone (Small)",
+        "description": "A small, cloudy stone of mana harvested from a low-level monster.",
+        "rarity": "Common",
+        "value": 15
+    },
+    "magic_stone_medium": {
+        "name": "Magic Stone (Medium)",
+        "description": "A decent-sized stone pulsating with the energy of the Veil.",
+        "rarity": "Uncommon",
+        "value": 50
+    },
+    "magic_stone_large": {
+        "name": "Magic Stone (Large)",
+        "description": "A heavy, fist-sized stone that hums with the raw power of the Sundering.",
+        "rarity": "Rare",
+        "value": 180
+    },
+    "magic_stone_flawless": {
+        "name": "Magic Stone (Flawless)",
+        "description": "A brilliant, pure crystal of condensed mana. The lifeblood of Astraeon.",
+        "rarity": "Epic",
+        "value": 750
+    },
+    "ectoplasm": {
+        "name": "Ectoplasm",
+        "description": "A glowing, viscous substance left by spectral entities.",
+        "rarity": "Uncommon",
+        "value": 50
+    },
+    "blood_shard": {
+        "name": "Blood Shard",
+        "description": "A jagged crystal pulsing with a crimson light. It feels warm to the touch.",
+        "rarity": "Rare",
+        "value": 200
+    },
+    "elemental_mote": {
+        "name": "Elemental Mote",
+        "description": "A flickering spark of raw elemental energy, unstable and valuable.",
+        "rarity": "Uncommon",
+        "value": 40
+    },
+    "goblin_ear": {
+        "name": "Goblin Ear",
+        "description": "Proof of defeating a goblin.",
+        "rarity": "Common",
+        "value": 10
+    },
+    "wolf_fang": {
+        "name": "Wolf Fang",
+        "description": "A sharp, unbroken fang from a forest wolf.",
+        "rarity": "Common",
+        "value": 18
+    },
+    "slime_gel": {
+        "name": "Slime Gel",
+        "description": "Sticky, caustic residue from a slime.",
+        "rarity": "Common",
+        "value": 8
+    },
+    "spider_silk": {
+        "name": "Spider Silk",
+        "description": "Strong, lightweight thread from a forest spider.",
+        "rarity": "Uncommon",
+        "value": 25
+    },
+    "treant_branch": {
+        "name": "Treant Branch",
+        "description": "A branch from a Treant, still thrumming with faint life magic.",
+        "rarity": "Uncommon",
+        "value": 35
+    },
+    "boar_tusk": {
+        "name": "Corrupted Tusk",
+        "description": "A tusk from a Ravaged Boar.",
+        "rarity": "Uncommon",
+        "value": 40
+    },
+    "boar_meat": {
+        "name": "Raw Boar Meat",
+        "description": "A slab of meat from a wild boar.",
+        "rarity": "Common",
+        "value": 15
+    },
+    "boss_talon": {
+        "name": "Forest Boss Talon",
+        "description": "A massive talon from a guardian of the forest.",
+        "rarity": "Rare",
+        "value": 400
+    },
+    "medicinal_herb": {
+        "name": "Medicinal Herb",
+        "description": "A common herb with slight healing properties.",
+        "rarity": "Common",
+        "value": 5
+    },
+    "iron_ore": {
+        "name": "Iron Ore",
+        "description": "A chunk of raw iron suitable for smelting.",
+        "rarity": "Common",
+        "value": 12
+    },
+    "luminescent_crystal": {
+        "name": "Luminescent Crystal",
+        "description": "A crystal that glows with a cold inner light.",
+        "rarity": "Uncommon",
+        "value": 45
+    },
+    "ancient_wood": {
+        "name": "Ancient Wood",
+        "description": "A dense piece of wood from an old tree.",
+        "rarity": "Uncommon",
+        "value": 25
+    },
+    "bone_shard": {
+        "name": "Bone Shard",
+        "description": "A sharp, jagged fragment of ancient bone.",
+        "rarity": "Common",
+        "value": 20
+    },
+    "grave_dust": {
+        "name": "Grave Dust",
+        "description": "Cold, grey dust gathered from the deepest tombs.",
+        "rarity": "Common",
+        "value": 25
+    },
+    "necrotic_essence": {
+        "name": "Necrotic Essence",
+        "description": "A swirling vial of death energy.",
+        "rarity": "Uncommon",
+        "value": 55
+    },
+    "lich_skull": {
+        "name": "Lich Skull",
+        "description": "The grinning skull of an undying mage, still whispering secrets.",
+        "rarity": "Epic",
+        "value": 900
+    },
+    "coral_fragment": {
+        "name": "Coral Fragment",
+        "description": "A piece of colorful, hardened coral.",
+        "rarity": "Common",
+        "value": 12
+    },
+    "bioluminescent_scale": {
+        "name": "Bioluminescent Scale",
+        "description": "A fish scale that glows faintly in the dark.",
+        "rarity": "Uncommon",
+        "value": 30
+    },
+    "pearl": {
+        "name": "Pearl",
+        "description": "A lustrous sphere formed inside a giant clam.",
+        "rarity": "Rare",
+        "value": 120
+    },
+    "siren_voice_box": {
+        "name": "Siren Voice Box",
+        "description": "An organ that can mimic any sound.",
+        "rarity": "Rare",
+        "value": 150
+    },
+    "abyssal_pearl": {
+        "name": "Abyssal Pearl",
+        "description": "A pearl as black as the depths, radiating cold energy.",
+        "rarity": "Epic",
+        "value": 800
+    },
+    "abyssal_ore": {
+        "name": "Abyssal Ore",
+        "description": "A dense, light-absorbing ore found in the deepest chasms.",
+        "rarity": "Epic",
+        "value": 1500
+    },
+    "shadow_essence": {
+        "name": "Shadow Essence",
+        "description": "A vial of swirling darkness gathered from spirits.",
+        "rarity": "Rare",
+        "value": 150
+    },
+    "mithril_ore": {
+        "name": "Mithril Ore",
+        "description": "Lightweight, silvery ore prized by smiths.",
+        "rarity": "Rare",
+        "value": 120
+    },
+    "ironwood_heart": {
+        "name": "Ironwood Heart",
+        "description": "The petrified heart of an Elder Treant.",
+        "rarity": "Rare",
+        "value": 200
+    },
+    "crystal_heart": {
+        "name": "Crystal Heart",
+        "description": "The pulsating core of a crystalline construct.",
+        "rarity": "Epic",
+        "value": 900
+    },
+    "titan_shard": {
+        "name": "Titan Shard",
+        "description": "A fragment of metal so hard it feels impossible.",
+        "rarity": "Epic",
+        "value": 800
+    },
+    "celestial_dust": {
+        "name": "Celestial Dust",
+        "description": "Glimmering dust that falls from the cracks in the sky, cold as the Void.",
+        "rarity": "Epic",
+        "value": 1000
+    },
+    "brass_gear": {
+        "name": "Brass Gear",
+        "description": "A precisely machined gear that still spins on its own.",
+        "rarity": "Common",
+        "value": 15
+    },
+    "copper_wire": {
+        "name": "Copper Wire",
+        "description": "A coil of conductive wire.",
+        "rarity": "Common",
+        "value": 18
+    },
+    "spring_coil": {
+        "name": "Spring Coil",
+        "description": "A tense spring ready to snap.",
+        "rarity": "Common",
+        "value": 12
+    },
+    "steam_core": {
+        "name": "Steam Core",
+        "description": "A canister of pressurized steam and mana.",
+        "rarity": "Rare",
+        "value": 150
+    },
+    "clockwork_heart": {
+        "name": "Clockwork Heart",
+        "description": "The complex engine of a master automaton.",
+        "rarity": "Epic",
+        "value": 850
+    },
+    "obsidian_shard": {
+        "name": "Obsidian Shard",
+        "description": "A razor-sharp shard of volcanic glass.",
+        "rarity": "Common",
+        "value": 20
+    },
+    "fire_essence": {
+        "name": "Fire Essence",
+        "description": "A flickering mote of elemental fire.",
+        "rarity": "Uncommon",
+        "value": 55
+    },
+    "magma_core": {
+        "name": "Magma Core",
+        "description": "The cooling heart of a magma construct.",
+        "rarity": "Rare",
+        "value": 200
+    },
+    "dragon_scale": {
+        "name": "Dragon Scale",
+        "description": "A scale from a Lava Drake, hot to the touch.",
+        "rarity": "Epic",
+        "value": 1100
+    },
+    "frost_crystal": {
+        "name": "Frost Crystal",
+        "description": "A shard of ice that never melts.",
+        "rarity": "Uncommon",
+        "value": 45
+    },
+    "winter_wolf_pelt": {
+        "name": "Winter Wolf Pelt",
+        "description": "Thick white fur, warm enough to survive the tundra.",
+        "rarity": "Common",
+        "value": 25
+    },
+    "ice_core": {
+        "name": "Ice Core",
+        "description": "The frozen heart of an ice construct.",
+        "rarity": "Rare",
+        "value": 180
+    },
+    "frozen_scale": {
+        "name": "Frozen Scale",
+        "description": "A scale radiating intense cold.",
+        "rarity": "Epic",
+        "value": 950
+    },
+    "void_dust": {
+        "name": "Void Dust",
+        "description": "A pile of fine, dark dust that drinks the light around it.",
+        "rarity": "Common",
+        "value": 30
+    },
+    "abyssal_shackle": {
+        "name": "Abyssal Shackle",
+        "description": "A broken chain link made of an unknown, cold metal.",
+        "rarity": "Common",
+        "value": 35
+    },
+    "entropy_crystal": {
+        "name": "Entropy Crystal",
+        "description": "A crystal that constantly shifts its shape.",
+        "rarity": "Uncommon",
+        "value": 60
+    },
+    "null_stone": {
+        "name": "Null Stone",
+        "description": "A heavy stone that feels like it weighs nothing. A paradox of the Void.",
+        "rarity": "Rare",
+        "value": 250
+    },
+    "void_heart": {
+        "name": "Void Heart",
+        "description": "A pulsating core of pure nothingness. It hungers for the light.",
+        "rarity": "Epic",
+        "value": 1500
+    },
+    "ash_blossom": {
+        "name": "Ash Blossom",
+        "description": "A pale, hardy flower that grows in volcanic soil.",
+        "rarity": "Common",
+        "value": 15
+    },
+    "scorched_chitin": {
+        "name": "Scorched Chitin",
+        "description": "A piece of insect shell, hardened by heat.",
+        "rarity": "Uncommon",
+        "value": 35
+    },
+    "iron_ingot": {
+        "name": "Iron Ingot",
+        "description": "A solid bar of refined iron, ready for the forge.",
+        "rarity": "Common",
+        "value": 40
+    },
+    "steel_ingot": {
+        "name": "Steel Ingot",
+        "description": "An alloy of iron and carbon, harder and more durable.",
+        "rarity": "Uncommon",
+        "value": 70
+    },
+    "refined_magic_stone": {
+        "name": "Refined Magic Stone",
+        "description": "A pure, cut stone that hums with stable mana.",
+        "rarity": "Uncommon",
+        "value": 45
+    },
+    "cured_leather": {
+        "name": "Cured Leather",
+        "description": "Tough, treated leather suitable for armor.",
+        "rarity": "Common",
+        "value": 30
+    },
+    "hardwood_plank": {
+        "name": "Hardwood Plank",
+        "description": "A smooth, sturdy plank of ancient wood.",
+        "rarity": "Uncommon",
+        "value": 80
+    },
+    "slag": {
+        "name": "Alchemical Slag",
+        "description": "A useless lump of burnt material from a failed experiment.",
+        "rarity": "Common",
+        "value": 1
+    },
+    "cloud_wisp": {
+        "name": "Cloud Wisp",
+        "description": "A captured breath of living wind, soft to the touch.",
+        "rarity": "Common",
+        "value": 35
+    },
+    "griffon_feather": {
+        "name": "Griffon Feather",
+        "description": "A striped feather that hums with static electricity.",
+        "rarity": "Uncommon",
+        "value": 50
+    },
+    "charged_core": {
+        "name": "Charged Core",
+        "description": "The sparking heart of a storm construct.",
+        "rarity": "Rare",
+        "value": 220
+    },
+    "tempest_heart": {
+        "name": "Tempest Heart",
+        "description": "A swirling sphere of concentrated storm energy, dropped by a high guardian.",
+        "rarity": "Epic",
+        "value": 1200
+    },
+    "aether_stone": {
+        "name": "Aether Stone",
+        "description": "A stone infused with the raw magic of the upper atmosphere.",
+        "rarity": "Common",
+        "value": 20
+    },
+    "star_metal_fragment": {
+        "name": "Star Metal Fragment",
+        "description": "A shard of metal that fell from the stars, cold and heavy.",
+        "rarity": "Uncommon",
+        "value": 45
+    },
+    "ancient_tablet": {
+        "name": "Ancient Tablet",
+        "description": "A stone tablet inscribed with pre-Sundering runes.",
+        "rarity": "Rare",
+        "value": 150
+    },
+    "celestial_core": {
+        "name": "Celestial Core",
+        "description": "The beating heart of a high-altitude construct.",
+        "rarity": "Epic",
+        "value": 1000
+    },
+    "prism_shard": {
+        "name": "Prism Shard",
+        "description": "A sharp, multi-faceted shard that splits light into a rainbow.",
+        "rarity": "Common",
+        "value": 35
+    },
+    "concentrated_light": {
+        "name": "Concentrated Light",
+        "description": "A vial of blindingly bright liquid mana.",
+        "rarity": "Uncommon",
+        "value": 60
+    },
+    "glass_heart": {
+        "name": "Glass Heart",
+        "description": "The transparent core of a light-based entity, warm to the touch.",
+        "rarity": "Epic",
+        "value": 1300
+    },
+    "fulgurite_shard": {
+        "name": "Fulgurite Shard",
+        "description": "A jagged shard of glass formed by lightning striking sand.",
+        "rarity": "Common",
+        "value": 30
+    },
+    "rusted_scrap": {
+        "name": "Rusted Scrap",
+        "description": "A piece of ancient, rusted metal. A skilled smith might refine it.",
+        "rarity": "Common",
+        "value": 10
+    },
+    "storm_essence": {
+        "name": "Storm Essence",
+        "description": "A vial of crackling energy, collected from a storm elemental.",
+        "rarity": "Uncommon",
+        "value": 50
+    },
+    "siren_scale": {
+        "name": "Siren Scale",
+        "description": "A shimmering scale that reflects the colors of a stormy sea.",
+        "rarity": "Rare",
+        "value": 150
+    },
+    "admiral_insignia": {
+        "name": "Admiral's Insignia",
+        "description": "The tarnished badge of a long-dead admiral.",
+        "rarity": "Epic",
+        "value": 1200
+    },
+    "encrypted_log_cylinder": {
+        "name": "Encrypted Log Cylinder",
+        "description": "A brass cylinder etched with code. It feels warm.",
+        "rarity": "Uncommon",
+        "value": 100
+    },
+    "artificers_alloy": {
+        "name": "Artificer's Alloy",
+        "description": "A bar of metal that seems to reshape itself slightly when touched.",
+        "rarity": "Rare",
+        "value": 300
+    },
+    "heart_of_the_machine": {
+        "name": "Heart of the Machine",
+        "description": "A pulsing core saved from a unique golem. It hums with gratitude.",
+        "rarity": "Epic",
+        "value": 1000
+    },
+    "primordial_ooze": {
+        "name": "Primordial Ooze",
+        "description": "A sticky, glowing residue harvested from slimes.",
+        "rarity": "Uncommon",
+        "value": 25
+    },
+    "brimstone": {
+        "name": "Brimstone",
+        "description": "A chunk of sulfurous rock that smells of rotten eggs.",
+        "rarity": "Uncommon",
+        "value": 30
+    },
+    "lunawort": {
+        "name": "Lunawort",
+        "description": "A pale herb that only blooms under moonlight.",
+        "rarity": "Rare",
+        "value": 45
+    },
+    "paper_scrap": {
+        "name": "Paper Scrap",
+        "description": "A tattered piece of parchment with illegible scribbles.",
+        "rarity": "Common",
+        "value": 15
+    },
+    "enchanted_ink": {
+        "name": "Enchanted Ink",
+        "description": "Ink that shimmers with a faint, magical glow.",
+        "rarity": "Uncommon",
+        "value": 35
+    }
+}

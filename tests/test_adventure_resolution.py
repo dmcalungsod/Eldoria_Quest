@@ -1,0 +1,214 @@
+import sys
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+# Mock modules before importing
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["discord"] = MagicMock()
+
+from game_systems.adventure.adventure_resolution import AdventureResolutionEngine  # noqa: E402
+
+
+@pytest.fixture
+def mock_db():
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_bot():
+    return MagicMock()
+
+
+@patch("game_systems.adventure.adventure_resolution.AdventureSession")
+@patch("game_systems.adventure.adventure_resolution.QuestSystem")
+@patch("game_systems.adventure.adventure_resolution.InventoryManager")
+@patch("game_systems.adventure.adventure_resolution.AdventureManager")
+def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
+    # Setup
+    engine = AdventureResolutionEngine(mock_bot, mock_db)
+
+    mock_session = mock_session_cls.return_value
+    mock_session.steps_completed = 0
+    # Simulate step returns success (not dead)
+    mock_session.simulate_step.return_value = {"dead": False}
+
+    # Mock _fetch_session_context to return a valid context dict
+    mock_session._fetch_session_context.return_value = {
+        "vitals": {"current_hp": 100, "current_mp": 100},
+        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "player": {"current_hp": 100, "current_mp": 100} # Include player dict for persistence check
+    }
+
+    session_doc = {
+        "discord_id": 123,
+        "duration_minutes": 30,  # 2 steps
+        "steps_completed": 0,
+    }
+
+    # Execute
+    result = engine.resolve_session(session_doc)
+
+    # Verify
+    assert result is True
+    # Should create session
+    mock_session_cls.assert_called_once()
+    # Should simulate 2 steps (30 / 15)
+    assert mock_session.simulate_step.call_count == 2
+
+    # Should be called with the parsed context (return value of _fetch_session_context)
+    # The engine now calls _fetch_session_context ONCE and passes the result
+    expected_context = mock_session._fetch_session_context.return_value
+
+    # It now also passes weather and time_phase, but we can verify using ANY
+    from unittest.mock import ANY
+    mock_session.simulate_step.assert_called_with(
+        context_bundle=expected_context, background=True, persist=False, weather=ANY, time_phase=ANY
+    )
+    # Should save state 1 time (only at end)
+    assert mock_session.save_state.call_count == 1
+    # Should update status to completed
+    mock_db.update_adventure_status.assert_called_with(123, "completed")
+
+
+@patch("game_systems.adventure.adventure_resolution.AdventureSession")
+@patch("game_systems.adventure.adventure_resolution.QuestSystem")
+@patch("game_systems.adventure.adventure_resolution.InventoryManager")
+@patch("game_systems.adventure.adventure_resolution.AdventureManager")
+def test_resolution_death(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
+    # Setup
+    engine = AdventureResolutionEngine(mock_bot, mock_db)
+
+    mock_session = mock_session_cls.return_value
+    mock_session.steps_completed = 0
+    mock_session.logs = []
+    mock_session.loot = {}
+    mock_session.version = 1
+
+    # Mock context
+    mock_session._fetch_session_context.return_value = {
+        "vitals": {"current_hp": 100, "current_mp": 100},
+        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "player": {"current_hp": 100, "current_mp": 100}
+    }
+
+    # First step ok, second step dead
+    mock_session.simulate_step.side_effect = [{"dead": False}, {"dead": True}]
+
+    # Mock death handler return
+    mock_mgr.return_value._handle_death_rewards.return_value = "You died."
+
+    session_doc = {
+        "discord_id": 123,
+        "duration_minutes": 45,  # 3 steps
+        "steps_completed": 0,
+    }
+
+    # Execute
+    result = engine.resolve_session(session_doc)
+
+    # Verify
+    assert result is True
+    # Should simulate 2 steps only
+    assert mock_session.simulate_step.call_count == 2
+    # Should handle death
+    engine.adventure_manager._handle_death_rewards.assert_called_once_with(123, mock_session)
+    # Should update status to failed
+    mock_db.update_adventure_status.assert_called_with(123, "failed")
+
+
+@patch("game_systems.adventure.adventure_resolution.AdventureSession")
+@patch("game_systems.adventure.adventure_resolution.QuestSystem")
+@patch("game_systems.adventure.adventure_resolution.InventoryManager")
+@patch("game_systems.adventure.adventure_resolution.AdventureManager")
+def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
+    # Setup
+    engine = AdventureResolutionEngine(mock_bot, mock_db)
+
+    mock_session = mock_session_cls.return_value
+    # Resuming from step 2 of 4
+    mock_session.steps_completed = 2
+    mock_session.simulate_step.return_value = {"dead": False}
+
+    mock_session._fetch_session_context.return_value = {
+        "vitals": {"current_hp": 100, "current_mp": 100},
+        "player_stats": MagicMock(max_hp=100, max_mp=100),
+        "player": {"current_hp": 100, "current_mp": 100}
+    }
+
+    session_doc = {
+        "discord_id": 123,
+        "duration_minutes": 60,  # 4 steps total
+        "steps_completed": 2,
+    }
+
+    # Execute
+    engine.resolve_session(session_doc)
+
+    # Verify
+    # Should simulate remaining 2 steps
+    assert mock_session.simulate_step.call_count == 2
+    mock_db.update_adventure_status.assert_called_with(123, "completed")
+
+
+@patch("game_systems.adventure.adventure_resolution.AdventureSession")
+@patch("game_systems.adventure.adventure_resolution.QuestSystem")
+@patch("game_systems.adventure.adventure_resolution.InventoryManager")
+@patch("game_systems.adventure.adventure_resolution.AdventureManager")
+def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_bot, mock_db):
+    """
+    Verifies that player vitals are updated in the context bundle between simulation steps.
+    This prevents the 'infinite healing' bug where vitals would reset to initial state.
+    """
+    engine = AdventureResolutionEngine(mock_bot, mock_db)
+    mock_session = mock_session_cls.return_value
+    mock_session.steps_completed = 0
+
+    # Setup context bundle
+    # Note: engine now calls _fetch_session_context, so we mock THAT return value
+    # instead of get_combat_context_bundle directly (though engine calls get_combat... first,
+    # then passes it to _fetch..., so mocking _fetch is cleaner for testing the engine logic).
+
+    context_dict = {
+        "player": {"current_hp": 100, "current_mp": 100},
+        "stats": {"HP": 100, "MP": 100},
+        "vitals": {"current_hp": 100, "current_mp": 100}, # Engine uses this
+        "player_stats": MagicMock(max_hp=100, max_mp=100)
+    }
+    mock_session._fetch_session_context.return_value = context_dict
+
+    # Side effect: Reduce HP by 10 each step
+    def simulate_side_effect(context_bundle, background, persist, weather=None, time_phase=None):
+        # Engine passes the context_dict as context_bundle
+        current_hp = context_bundle["vitals"]["current_hp"]
+        new_hp = current_hp - 10
+        return {
+            "dead": False,
+            "vitals": {"current_hp": new_hp, "current_mp": 100},
+            "player_stats": MagicMock(max_hp=100, max_mp=100),
+        }
+
+    mock_session.simulate_step.side_effect = simulate_side_effect
+
+    session_doc = {
+        "discord_id": 123,
+        "duration_minutes": 30,  # 2 steps
+        "steps_completed": 0,
+    }
+
+    # Execute
+    engine.resolve_session(session_doc)
+
+    # Verify calls
+    assert mock_session.simulate_step.call_count == 2
+
+    # Check that the final call received the updated HP
+    # Step 1: 100 -> 90. Context updated to 90.
+    # Step 2: 90 -> 80. Context updated to 80.
+    calls = mock_session.simulate_step.call_args_list
+    final_bundle = calls[-1].kwargs["context_bundle"]
+
+    # The bundle object is mutated in place, so we check its final state
+    # Engine updates context["vitals"]["current_hp"]
+    assert final_bundle["vitals"]["current_hp"] == 80

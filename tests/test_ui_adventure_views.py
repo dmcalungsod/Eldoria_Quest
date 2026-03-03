@@ -1,0 +1,156 @@
+import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
+
+# Mock pymongo globally
+sys.modules["pymongo"] = MagicMock()
+sys.modules["pymongo.errors"] = MagicMock()
+sys.modules["pymongo.collection"] = MagicMock()
+sys.modules["pymongo.results"] = MagicMock()
+
+# Adjust path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+# --- Mocking Discord UI ---
+class MockItem:
+    def __init__(self, *args, **kwargs):
+        self.label = kwargs.get("label")
+        self.custom_id = kwargs.get("custom_id")
+        self.disabled = kwargs.get("disabled", False)
+        self.options = kwargs.get("options", [])
+        self.callback = None
+        self.values = []  # For Select
+
+    def add_option(self, label, value, **kwargs):
+        self.options.append(MagicMock(label=label, value=str(value)))
+
+
+class MockButton(MockItem):
+    pass
+
+
+class MockSelect(MockItem):
+    pass
+
+
+class MockView:
+    def __init__(self, timeout=180):
+        self.children = []
+        self.timeout = timeout
+
+    def add_item(self, item):
+        self.children.append(item)
+
+    def clear_items(self):
+        self.children = []
+
+
+# Mock discord module
+mock_discord = MagicMock()
+mock_discord.ButtonStyle = MagicMock()
+mock_discord.Color = MagicMock()
+mock_discord.ui.View = MockView
+mock_discord.ui.Button = MockButton
+mock_discord.ui.Select = MockSelect
+sys.modules["discord"] = mock_discord
+sys.modules["discord.ui"] = mock_discord.ui
+sys.modules["discord.ext"] = MagicMock()
+sys.modules["discord.ext.commands"] = MagicMock()
+
+from game_systems.adventure.ui.status_view import AdventureStatusView
+
+
+class TestAdventureStatusView(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.mock_db = MagicMock()
+        self.mock_manager = MagicMock()
+        self.mock_user = MagicMock()
+        self.mock_user.id = 12345
+        self.session_data = {"location_id": "forest"}
+        self.mock_interaction = AsyncMock()
+        self.mock_interaction.user = self.mock_user
+        self.mock_interaction.response = AsyncMock()
+        self.mock_interaction.response.is_done.return_value = False
+
+    def test_init(self):
+        """Test initialization."""
+        view = AdventureStatusView(self.mock_db, self.mock_manager, self.mock_user, self.session_data)
+
+        self.assertEqual(len(view.children), 3)  # Refresh, Retreat, Back
+        labels = [c.label for c in view.children]
+        self.assertIn("Refresh Status", labels)
+        self.assertIn("Retreat Early", labels)
+        self.assertIn("Return to Profile", labels)
+
+    async def test_interaction_check(self):
+        """Test interaction check."""
+        view = AdventureStatusView(self.mock_db, self.mock_manager, self.mock_user, self.session_data)
+
+        # Valid user
+        result = await view.interaction_check(self.mock_interaction)
+        self.assertTrue(result)
+
+        # Invalid user
+        other_user = MagicMock()
+        other_user.id = 999
+        self.mock_interaction.user = other_user
+        result = await view.interaction_check(self.mock_interaction)
+        self.assertFalse(result)
+
+    @patch("game_systems.adventure.ui.status_view.AdventureEmbeds")
+    async def test_refresh_callback_success(self, MockEmbeds):
+        """Test successful refresh."""
+        self.mock_manager.get_active_session.return_value = self.session_data
+        MockEmbeds.build_adventure_status_embed.return_value = MagicMock()
+
+        view = AdventureStatusView(self.mock_db, self.mock_manager, self.mock_user, self.session_data)
+
+        await view.refresh_callback(self.mock_interaction)
+
+        self.mock_manager.get_active_session.assert_called_with(12345)
+        self.mock_interaction.edit_original_response.assert_called()
+
+    async def test_refresh_callback_session_ended(self):
+        """Test refresh when session is ended."""
+        self.mock_manager.get_active_session.return_value = None
+
+        view = AdventureStatusView(self.mock_db, self.mock_manager, self.mock_user, self.session_data)
+
+        await view.refresh_callback(self.mock_interaction)
+
+        # Should verify buttons are disabled (except back)
+        # Assuming refresh_btn is index 0, retreat_btn is index 1, back_btn is index 2
+        self.assertTrue(view.children[0].disabled)
+        self.assertTrue(view.children[1].disabled)
+        self.assertFalse(view.children[2].disabled)
+
+        self.mock_interaction.followup.send.assert_called_with(
+            "Adventure session not found or already ended.", ephemeral=True
+        )
+
+    @patch("game_systems.adventure.ui.status_view.AdventureEmbeds")
+    async def test_retreat_callback_success(self, MockEmbeds):
+        """Test successful retreat."""
+        summary = {"xp": 100}
+        self.mock_manager.end_adventure.return_value = summary
+        MockEmbeds.build_summary_embed.return_value = MagicMock()
+
+        view = AdventureStatusView(self.mock_db, self.mock_manager, self.mock_user, self.session_data)
+
+        await view.retreat_callback(self.mock_interaction)
+
+        self.mock_manager.end_adventure.assert_called_with(12345)
+
+        # View items should be cleared and replaced with Back button
+        # clear_items calls children = []
+        # then add_item adds Back button
+        self.assertEqual(len(view.children), 1)
+        self.assertEqual(view.children[0].label, "Return to Profile")
+
+        self.mock_interaction.edit_original_response.assert_called()
+
+
+if __name__ == "__main__":
+    unittest.main()

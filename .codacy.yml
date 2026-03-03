@@ -1,0 +1,8 @@
+---
+exclude_paths:
+  - "tests/**"
+  - ".circleci/**"
+engines:
+  bandit:
+    exclude_paths:
+      - "tests/**"

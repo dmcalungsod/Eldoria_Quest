@@ -1,0 +1,522 @@
+{
+    "gen_sword_001": {
+        "name": "Rusted Shortsword",
+        "slot": "sword",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "STR": 2
+        },
+        "description": "A pitted, rusted blade. It's better than a sharp rock."
+    },
+    "gen_staff_001": {
+        "name": "Gnarled Branch",
+        "slot": "staff",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "MAG": 2
+        },
+        "description": "A thick, gnarled branch picked up from the forest floor. It hums faintly."
+    },
+    "gen_wand_001": {
+        "name": "Apprentice Wand",
+        "slot": "wand",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "MAG": 2,
+            "MP": 5
+        },
+        "description": "A simple wooden wand carved with basic runes."
+    },
+    "gen_dagger_001": {
+        "name": "Iron Shiv",
+        "slot": "dagger",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "DEX": 2
+        },
+        "description": "A crude iron blade, sharp enough to cut a purse or a throat."
+    },
+    "gen_dagger_002": {
+        "name": "Chirurgeon's Scalpel",
+        "slot": "dagger",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "DEX": 1,
+            "MAG": 1
+        },
+        "description": "A delicate, razor-sharp blade meant for flesh, not armor."
+    },
+    "gen_bow_001": {
+        "name": "Hunter's Bow",
+        "slot": "bow",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "DEX": 2
+        },
+        "description": "A simple wooden bow used for hunting small game."
+    },
+    "gen_mace_001": {
+        "name": "Acolyte's Mace",
+        "slot": "mace",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "STR": 1,
+            "MAG": 1
+        },
+        "description": "A sturdy mace, balanced for both combat and ceremony."
+    },
+    "gen_mace_002": {
+        "name": "Iron Pestle",
+        "slot": "mace",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "STR": 1,
+            "MAG": 1
+        },
+        "description": "A heavy iron tool used for grinding herbs—and bones."
+    },
+    "gen_wand_005": {
+        "name": "Crystal Focus",
+        "slot": "wand",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "MAG": 15,
+            "MP": 20
+        },
+        "description": "A polished quartz crystal set in a silver handle."
+    },
+    "gen_armor_001": {
+        "name": "Tattered Tunic",
+        "slot": "medium_armor",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "END": 1,
+            "AGI": 1
+        },
+        "description": "Moth-eaten and stained, but it's another layer between you and the world."
+    },
+    "gen_mediumarmor_002": {
+        "name": "Apothecary's Leathers",
+        "slot": "medium_armor",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "END": 1,
+            "DEX": 1
+        },
+        "description": "Sturdy leather stained with various chemical reagents."
+    },
+    "gen_rogue_armor_001": {
+        "name": "Worn Leather Vest",
+        "slot": "rogue_armor",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "AGI": 2
+        },
+        "description": "Supple leather, worn thin by use, but allows freedom of movement."
+    },
+    "gen_accessory_001": {
+        "name": "Twine Bracelet",
+        "slot": "accessory",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "LCK": 1
+        },
+        "description": "A simple loop of twine. Smells faintly of moss."
+    },
+    "gen_accessory_002": {
+        "name": "Bandolier of Vials",
+        "slot": "accessory",
+        "rarity": "Common",
+        "level_req": 1,
+        "stats_bonus": {
+            "MAG": 1
+        },
+        "description": "A leather strap holding several empty glass vials."
+    },
+    "gen_dagger_003": {
+        "name": "Iron Dirk",
+        "slot": "dagger",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "stats_bonus": {
+            "DEX": 8
+        },
+        "description": "A standard-issue iron dagger. Dependable and sharp."
+    },
+    "gen_robe_003": {
+        "name": "Acolyte's Robe",
+        "slot": "robe",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "stats_bonus": {
+            "MAG": 5,
+            "END": 3
+        },
+        "description": "A heavy wool robe dyed deep indigo."
+    },
+    "gen_heavyarmor_003": {
+        "name": "Iron Cuirass",
+        "slot": "heavy_armor",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "stats_bonus": {
+            "END": 8
+        },
+        "description": "A breastplate of beaten iron."
+    },
+    "gen_accessory_003c": {
+        "name": "Polished Stone",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "stats_bonus": {
+            "LCK": 4,
+            "MP": 15
+        },
+        "description": "A smooth river stone warm to the touch."
+    },
+    "gen_sword_005": {
+        "name": "Hunter's Falchion",
+        "slot": "sword",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "STR": 16,
+            "DEX": 6
+        },
+        "description": "A curved heavy blade designed for hide and bone."
+    },
+    "gen_staff_005": {
+        "name": "Aether-Channeling Staff",
+        "slot": "staff",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "MAG": 22,
+            "MP": 40
+        },
+        "description": "A willow staff capped with raw magic stone."
+    },
+    "gen_bow_005": {
+        "name": "Elm Recurve Bow",
+        "slot": "bow",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "DEX": 18,
+            "AGI": 4
+        },
+        "description": "A beautifully crafted recurve bow."
+    },
+    "gen_accessory_005c": {
+        "name": "Signet of the Old Guild",
+        "slot": "accessory",
+        "rarity": "Rare",
+        "level_req": 10,
+        "stats_bonus": {
+            "LCK": 10,
+            "STR": 5,
+            "MAG": 5
+        },
+        "description": "A silver ring bearing an ancient guild crest."
+    },
+    "gen_sword_007": {
+        "name": "Kingslayer Claymore",
+        "slot": "sword",
+        "rarity": "Epic",
+        "level_req": 20,
+        "rank_restriction": "B",
+        "stats_bonus": {
+            "STR": 45,
+            "DEX": 15
+        },
+        "description": "A massive blade rumored to end dynasties."
+    },
+    "gen_dagger_006": {
+        "name": "Nightshade Stiletto",
+        "slot": "dagger",
+        "rarity": "Epic",
+        "level_req": 20,
+        "stats_bonus": {
+            "DEX": 40,
+            "AGI": 20
+        },
+        "description": "Coated in a poison feared by nobles."
+    },
+    "gen_staff_007": {
+        "name": "Eldertree Soulbranch",
+        "slot": "staff",
+        "rarity": "Epic",
+        "level_req": 20,
+        "rank_restriction": "B",
+        "stats_bonus": {
+            "MAG": 50,
+            "MP": 75
+        },
+        "description": "Carved from the roots of a mythical eldertree."
+    },
+    "gen_accessory_007": {
+        "name": "Charm of Windsong",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 20,
+        "stats_bonus": {
+            "LCK": 20,
+            "AGI": 10
+        },
+        "description": "Sings softly when fortune favors you."
+    },
+    "gen_sword_008": {
+        "name": "Blade of the Fallen Star",
+        "slot": "sword",
+        "rarity": "Legendary",
+        "level_req": 35,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "STR": 110,
+            "DEX": 30
+        },
+        "description": "Forged from celestial fragments."
+    },
+    "gen_staff_008": {
+        "name": "Cosmic Arcanum",
+        "slot": "staff",
+        "rarity": "Legendary",
+        "level_req": 35,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "MAG": 120,
+            "MP": 150
+        },
+        "description": "Pulses with astral scripture."
+    },
+    "gen_heavyarmor_006c": {
+        "name": "Colossusplate Shell",
+        "slot": "heavy_armor",
+        "rarity": "Legendary",
+        "level_req": 35,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "END": 100,
+            "STR": 40
+        },
+        "description": "Made from the remains of a colossal titan."
+    },
+    "gen_accessory_008": {
+        "name": "Emblem of Infinite Fortune",
+        "slot": "accessory",
+        "rarity": "Legendary",
+        "level_req": 35,
+        "stats_bonus": {
+            "LCK": 50,
+            "MAG": 25
+        },
+        "description": "Whispers with the winds of destiny."
+    },
+    "gen_sword_009": {
+        "name": "Eclipsebreaker",
+        "slot": "sword",
+        "rarity": "Mythical",
+        "level_req": 50,
+        "rank_restriction": "S",
+        "stats_bonus": {
+            "STR": 200,
+            "DEX": 75
+        },
+        "description": "Forged in the heart of a dying star."
+    },
+    "gen_staff_009": {
+        "name": "Staff of the Worldheart",
+        "slot": "staff",
+        "rarity": "Mythical",
+        "level_req": 50,
+        "rank_restriction": "S",
+        "stats_bonus": {
+            "MAG": 225,
+            "MP": 250
+        },
+        "description": "Contains a spark from creation itself."
+    },
+    "gen_heavyarmor_007": {
+        "name": "World-Titan Carapace",
+        "slot": "heavy_armor",
+        "rarity": "Mythical",
+        "level_req": 50,
+        "rank_restriction": "S",
+        "stats_bonus": {
+            "END": 200,
+            "STR": 75
+        },
+        "description": "Forged from the armor of an elder titan."
+    },
+    "gen_accessory_009": {
+        "name": "Mythic Soul Sigil",
+        "slot": "accessory",
+        "rarity": "Mythical",
+        "level_req": 50,
+        "stats_bonus": {
+            "LCK": 100,
+            "MAG": 15
+        },
+        "description": "Hums with the echo of a forgotten god."
+    },
+    "gen_sword_molten": {
+        "name": "Molten Greatsword",
+        "slot": "greatsword",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "STR": 25,
+            "DEX": 10
+        },
+        "description": "A heavy blade that glows with the heat of the caldera."
+    },
+    "gen_dagger_molten": {
+        "name": "Obsidian Dagger",
+        "slot": "dagger",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "DEX": 28,
+            "AGI": 8
+        },
+        "description": "A jagged dagger carved from volcanic glass. Exceptionally sharp."
+    },
+    "gen_robe_molten": {
+        "name": "Magma-Infused Robes",
+        "slot": "robe",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "MAG": 30,
+            "END": 10
+        },
+        "description": "Robes woven with fire essence, warm to the touch."
+    },
+    "gen_heavyarmor_molten": {
+        "name": "Drake Scale Mail",
+        "slot": "heavy_armor",
+        "rarity": "Rare",
+        "level_req": 15,
+        "stats_bonus": {
+            "END": 35,
+            "STR": 10
+        },
+        "description": "Armor crafted from the heat-resistant scales of a Lava Drake."
+    },
+    "gen_accessory_molten": {
+        "name": "Heart of the Volcano",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 25,
+        "stats_bonus": {
+            "LCK": 25,
+            "MAG": 15
+        },
+        "description": "A pulsating magma core set in gold. It beats in time with your heart."
+    },
+    "gen_bow_clockwork": {
+        "name": "Clockwork Repeating Crossbow",
+        "slot": "bow",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "DEX": 35,
+            "AGI": 15
+        },
+        "description": "A mechanical crossbow with a self-loading mechanism."
+    },
+    "gen_mace_clockwork": {
+        "name": "Piston-Driven Greatmaul",
+        "slot": "mace",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "STR": 40,
+            "END": 10
+        },
+        "description": "A massive hammer powered by a steam piston."
+    },
+    "gen_heavyarmor_clockwork": {
+        "name": "Reinforced Brass Plate",
+        "slot": "heavy_armor",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "END": 45,
+            "STR": 5
+        },
+        "description": "Heavy brass plating riveted over steel."
+    },
+    "gen_accessory_clockwork": {
+        "name": "Artificer's Lenses",
+        "slot": "accessory",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "MAG": 15,
+            "DEX": 15
+        },
+        "description": "Goggles that reveal the flow of magic and mechanism."
+    },
+    "acc_warrior_ring": {
+        "name": "Ring of Iron Will",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "class_restrictions": ["Warrior"],
+        "stats_bonus": {
+            "STR": 5,
+            "END": 5
+        },
+        "description": "A heavy iron band inscribed with the code of the shield-bearer."
+    },
+    "acc_mage_ring": {
+        "name": "Ring of Arcane Focus",
+        "slot": "accessory",
+        "rarity": "Uncommon",
+        "level_req": 5,
+        "class_restrictions": ["Mage"],
+        "stats_bonus": {
+            "MAG": 8,
+            "MP": 20
+        },
+        "description": "A delicate silver ring that hums when near ley lines."
+    },
+    "acc_echolocation_helm": {
+        "name": "Echolocation Helm",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 25,
+        "stats_bonus": {
+            "DEX": 20,
+            "AGI": 25,
+            "END": 15
+        },
+        "description": "A helm crafted from Abyssal Ore that heightens hearing to navigate pitch-black chasms."
+    },
+    "acc_hymnal_of_the_void": {
+        "name": "Hymnal of the Void",
+        "slot": "accessory",
+        "rarity": "Epic",
+        "level_req": 25,
+        "stats_bonus": {
+            "MAG": 30,
+            "MP": 50
+        },
+        "description": "Bound in cold, flayed skin, this unholy scripture contains musical notation written in rusted blood."
+    }
+}
