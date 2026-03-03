@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   comment:
-    if: github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]' && github.repository == 'dmcalungsod/Eldoria_Quest'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

@@ -8,6 +8,7 @@ name: Auto Merge
 
 jobs:
   auto-merge:
+    if: github.repository == 'dmcalungsod/Eldoria_Quest'
     runs-on: ubuntu-latest
     permissions:
       contents: write
