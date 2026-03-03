@@ -115,8 +115,42 @@ class TestRankSystem(unittest.TestCase):
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
+    def test_rank_c_requirements(self):
+        # Rank C -> B requires 30 quests, 450 normal kills, 40 elite kills, 2 boss kills
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 15}
+
+        # Case 1: Not enough quests
+        self.mock_db.get_guild_member.return_value = {
+            "rank": "C",
+            "quests_completed": 29,
+            "normal_kills": 450,
+            "elite_kills": 40,
+            "boss_kills": 2,
+        }
+        self.assertFalse(self.rank_system.check_promotion_eligibility(123))
+
+        # Case 2: Not enough normal kills
+        self.mock_db.get_guild_member.return_value = {
+            "rank": "C",
+            "quests_completed": 30,
+            "normal_kills": 449,
+            "elite_kills": 40,
+            "boss_kills": 2,
+        }
+        self.assertFalse(self.rank_system.check_promotion_eligibility(123))
+
+        # Case 3: Meets requirements
+        self.mock_db.get_guild_member.return_value = {
+            "rank": "C",
+            "quests_completed": 30,
+            "normal_kills": 450,
+            "elite_kills": 40,
+            "boss_kills": 2,
+        }
+        self.assertTrue(self.rank_system.check_promotion_eligibility(123))
+
     def test_rank_b_requirements(self):
-        # Rank B -> A requires 40 quests, 600 normal kills, 65 elite kills, 4 boss kills
+        # Rank B -> A requires 40 quests, 600 normal kills, 60 elite kills, 4 boss kills
         self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 20}
 
         # Case 1: Not enough quests
@@ -134,7 +168,7 @@ class TestRankSystem(unittest.TestCase):
             "rank": "B",
             "quests_completed": 40,
             "normal_kills": 599,
-            "elite_kills": 65,
+            "elite_kills": 60,
             "boss_kills": 4,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
@@ -144,7 +178,7 @@ class TestRankSystem(unittest.TestCase):
             "rank": "B",
             "quests_completed": 40,
             "normal_kills": 600,
-            "elite_kills": 65,
+            "elite_kills": 60,
             "boss_kills": 4,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
