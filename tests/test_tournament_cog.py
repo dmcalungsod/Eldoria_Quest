@@ -135,8 +135,8 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.tournament_status(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        args, kwargs = interaction.response.send_message.call_args
+        interaction.edit_original_response.assert_called_once()
+        args, kwargs = interaction.edit_original_response.call_args
         embed = kwargs.get("embed")
         self.assertIn("No Active Tournament", embed.title)
 
@@ -150,8 +150,8 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.tournament_status(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        args, kwargs = interaction.response.send_message.call_args
+        interaction.edit_original_response.assert_called_once()
+        args, kwargs = interaction.edit_original_response.call_args
         embed = kwargs.get("embed")
         self.assertIn("Active Tournament", embed.title)
         # Check fields. Our MockEmbed stores fields as objects with .value
@@ -163,9 +163,9 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.tournament_leaderboard(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        args = interaction.response.send_message.call_args[0]
-        self.assertIn("No tournament is currently active", args[0])
+        interaction.edit_original_response.assert_called_once()
+        content = interaction.edit_original_response.call_args.kwargs.get('content', '')
+        self.assertIn("No tournament is currently active", content)
 
     async def test_leaderboard_active(self):
         interaction = AsyncMock()
@@ -175,8 +175,8 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         await self.cog.tournament_leaderboard(interaction)
 
-        interaction.response.send_message.assert_called_once()
-        args, kwargs = interaction.response.send_message.call_args
+        interaction.edit_original_response.assert_called_once()
+        args, kwargs = interaction.edit_original_response.call_args
         embed = kwargs.get("embed")
         self.assertIn("Leaderboard", embed.title)
         self.assertIn("Player1", embed.description)
@@ -192,8 +192,8 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
 
         self.cog.system.end_current_tournament.assert_called_once()
         self.cog.db.create_tournament.assert_called_once()
-        interaction.response.send_message.assert_called_once()
-        self.assertIn("Started Tournament #101", interaction.response.send_message.call_args[0][0])
+        interaction.edit_original_response.assert_called_once()
+        self.assertIn("Started Tournament #101", interaction.edit_original_response.call_args.kwargs['content'])
 
     async def test_admin_start_invalid(self):
         interaction = AsyncMock()
@@ -202,8 +202,8 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.admin_start(interaction, "invalid_type")
 
         self.cog.db.create_tournament.assert_not_called()
-        interaction.response.send_message.assert_called_once()
-        self.assertIn("Invalid type", interaction.response.send_message.call_args[0][0])
+        interaction.edit_original_response.assert_called_once()
+        self.assertIn("Invalid type", interaction.edit_original_response.call_args.kwargs['content'])
 
     async def test_admin_end(self):
         interaction = AsyncMock()
@@ -212,7 +212,7 @@ class TestTournamentCog(unittest.IsolatedAsyncioTestCase):
         await self.cog.admin_end(interaction)
 
         self.cog.system.end_current_tournament.assert_called_once()
-        interaction.response.send_message.assert_called_once()
+        interaction.edit_original_response.assert_called_once()
 
     async def test_check_tournament_cycle_ends_expired(self):
         # Setup

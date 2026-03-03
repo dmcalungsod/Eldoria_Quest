@@ -622,20 +622,20 @@ class AdventureEvents:
     @classmethod
     def _get_base_regeneration_logs(cls, location_id: str | None, class_name: str, hp_percent: float) -> list:
         # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
-        if hp_percent < 0.30 and random.random() < 0.50:
-            return [random.choice(cls.REGEN_LOW_HP)]
+        if hp_percent < 0.30 and random.random() < 0.50:  # nosec B311
+            return [random.choice(cls.REGEN_LOW_HP)]  # nosec B311
 
         # 2. High HP (> 80%): 30% chance for confident flavor
-        if hp_percent > 0.80 and random.random() < 0.30:
-            return [random.choice(cls.REGEN_HIGH_HP)]
+        if hp_percent > 0.80 and random.random() < 0.30:  # nosec B311
+            return [random.choice(cls.REGEN_HIGH_HP)]  # nosec B311
 
         # 3. Class-Specific Flavor: 30% chance
-        if class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:
-            return [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]
+        if class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:  # nosec B311
+            return [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]  # nosec B311
 
         # 4. Location-Specific or Generic Fallback
         phrases = cls._LOCATION_REGEN_PHRASES.get(location_id, cls.REGEN_PHRASES)
-        return [random.choice(phrases)]
+        return [random.choice(phrases)]  # nosec B311
 
     @classmethod
     def _get_atmospheric_prepend(
@@ -647,7 +647,7 @@ class AdventureEvents:
         event_type: str | None,
     ) -> str | None:
         # 40% chance to add an atmospheric intro line
-        if random.random() >= 0.40:
+        if random.random() >= 0.40:  # nosec B311
             return None
 
         atmosphere_pool = cls._LOCATION_ATMOSPHERE.get(location_id, cls.ATMOSPHERE_FOREST)
@@ -657,19 +657,19 @@ class AdventureEvents:
             atmosphere_pool = cls._EVENT_ATMOSPHERE[event_type]
 
         # Time Phase Override (30% chance)
-        elif time_phase in cls._TIME_PHASE_ATMOSPHERE and random.random() < 0.3:
+        elif time_phase in cls._TIME_PHASE_ATMOSPHERE and random.random() < 0.3:  # nosec B311
             atmosphere_pool = cls._TIME_PHASE_ATMOSPHERE[time_phase]
 
         # Weather Override (30-50% chance, overrides Time Phase/Location if selected)
         weather_chance = 0.5 if weather in (Weather.STORM, Weather.ASH) else 0.3
-        if weather in cls.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+        if weather in cls.ATMOSPHERE_WEATHER and random.random() < weather_chance:  # nosec B311
             atmosphere_pool = cls.ATMOSPHERE_WEATHER[weather]
 
         # Seasonal Override (25% chance)
-        elif season in cls._SEASONAL_ATMOSPHERE and random.random() < 0.25:
+        elif season in cls._SEASONAL_ATMOSPHERE and random.random() < 0.25:  # nosec B311
             atmosphere_pool = cls._SEASONAL_ATMOSPHERE[season]
 
-        return random.choice(atmosphere_pool)
+        return random.choice(atmosphere_pool)  # nosec B311
 
     @classmethod
     def regeneration(
@@ -693,26 +693,26 @@ class AdventureEvents:
     @staticmethod
     def quest_event(objective_type: str, target_name: str) -> str:
         if objective_type == "gather":
-            return random.choice(AdventureEvents.GATHER_PHRASES).format(target_name)
+            return random.choice(AdventureEvents.GATHER_PHRASES).format(target_name)  # nosec B311
         if objective_type == "locate":
-            return random.choice(AdventureEvents.LOCATE_PHRASES).format(target_name)
+            return random.choice(AdventureEvents.LOCATE_PHRASES).format(target_name)  # nosec B311
         if objective_type in ("examine", "survey"):
-            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
-        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)  # nosec B311
+        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)  # nosec B311
 
     @staticmethod
     def wild_gather_event(item_name: str) -> str:
-        return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
+        return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)  # nosec B311
 
     @staticmethod
     def surge_event() -> str:
-        return random.choice(AdventureEvents.SURGE_PHRASES)
+        return random.choice(AdventureEvents.SURGE_PHRASES)  # nosec B311
 
     @staticmethod
     def scavenge_event(reward_type: str, amount: int) -> str:
         if reward_type == "aurum":
-            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
-        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)  # nosec B311
+        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)  # nosec B311
 
     @staticmethod
     def special_event_flavor(event_key: str) -> str:
@@ -728,4 +728,4 @@ class AdventureEvents:
 
     @staticmethod
     def no_event_found() -> str:
-        return random.choice(AdventureEvents.NO_EVENT_PHRASES)
+        return random.choice(AdventureEvents.NO_EVENT_PHRASES)  # nosec B311

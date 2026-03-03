@@ -63,8 +63,8 @@ class AdventureSetupView(View):
 
             if is_unlocked:
                 label = loc_data["name"]
-                depth = loc_data.get('floor_depth', '?')
-                danger = loc_data.get('danger_level', '?')
+                depth = loc_data.get("floor_depth", "?")
+                danger = loc_data.get("danger_level", "?")
                 desc = f"Lv.{loc_data['level_req']} (Rank {loc_data['min_rank']}) | Depth {depth} | Danger {danger}"
                 emoji = loc_data.get("emoji", E.MAP)
             else:
@@ -85,7 +85,7 @@ class AdventureSetupView(View):
                 label="No Destinations Available",
                 value="none",
                 description="You do not meet requirements for any location.",
-                emoji=E.LOCKED
+                emoji=E.LOCKED,
             )
             self.location_select.disabled = True
 
@@ -221,8 +221,9 @@ class AdventureSetupView(View):
         loc_data = LOCATIONS.get(loc_id, {"name": "Unknown Zone"})
 
         if not self._is_unlocked(loc_data):
-            await interaction.response.send_message(
-                f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}** and **Rank {loc_data['min_rank']}** to enter {loc_data['name']}.",
+            await interaction.response.defer(ephemeral=True)
+            await interaction.followup.send(
+                content=f"{E.LOCKED} **Access Denied**\nYou need **Level {loc_data['level_req']}** and **Rank {loc_data['min_rank']}** to enter {loc_data['name']}.",
                 ephemeral=True,
             )
             return

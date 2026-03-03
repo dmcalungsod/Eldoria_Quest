@@ -3,3 +3,12 @@ python-dotenv==1.2.1
 cryptography==46.0.5
 pymongo==4.16.0
 tzdata==2025.3
+aiohttp
+cryptography==46.0.5
+discord.py==2.6.4
+pymongo==4.16.0
+python-dotenv==1.2.1
+tzdata==2025.3
+pytest
+pytest-asyncio
+pytest-cov

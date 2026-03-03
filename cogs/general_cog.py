@@ -24,6 +24,7 @@ class GeneralCog(commands.Cog):
         Returns the bot's current websocket latency.
         """
         try:
+            await interaction.response.defer(ephemeral=True)
             # Latency is in seconds, convert to ms
             latency_ms = round(self.bot.latency * 1000)
 
@@ -33,13 +34,15 @@ class GeneralCog(commands.Cog):
                 color=discord.Color.blue(),
             )
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.edit_original_response(embed=embed)
             logger.info(f"Ping requested by {interaction.user} ({latency_ms}ms)")
 
         except Exception as e:
             logger.error(f"Ping command failed: {e}")
-            await interaction.response.send_message(
-                "Error calculating latency.", ephemeral=True
+            if not interaction.response.is_done():
+                await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(
+                content="Error calculating latency."
             )
 
     @app_commands.command(
@@ -50,6 +53,7 @@ class GeneralCog(commands.Cog):
         Sends the Guild Handbook explaining core game concepts.
         """
         try:
+            await interaction.response.defer(ephemeral=True)
             embed = discord.Embed(
                 title="Guild Handbook",
                 description="*The pages are worn, bearing the stains of countless adventurers before you.*",
@@ -77,13 +81,15 @@ class GeneralCog(commands.Cog):
             )
             embed.set_footer(text="May your light hold against the darkness.")
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.edit_original_response(embed=embed)
             logger.info(f"Help handbook requested by {interaction.user}")
 
         except Exception as e:
             logger.error(f"Help command failed: {e}")
-            await interaction.response.send_message(
-                "Error accessing the Guild Handbook.", ephemeral=True
+            if not interaction.response.is_done():
+                await interaction.response.defer(ephemeral=True)
+            await interaction.edit_original_response(
+                content="Error accessing the Guild Handbook."
             )
 
 
