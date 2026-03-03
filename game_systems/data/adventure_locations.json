@@ -1377,6 +1377,7 @@
         "emoji": "🕰️",
         "min_rank": "S",
         "level_req": 42,
+        "prerequisite_location": "void_sanctum",
         "duration_options": [
             60,
             120,
