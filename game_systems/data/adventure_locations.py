@@ -67,18 +67,6 @@ def load_locations():
     return processed_locations
 
 
-class LocationData:
-    _locations = None
+LOCATIONS = load_locations()
 
-    @classmethod
-    def get_all(cls):
-        if cls._locations is None:
-            cls._locations = load_locations()
-        return cls._locations
-
-def __getattr__(name):
-    if name == 'LOCATIONS':
-        return LocationData.get_all()
-    raise AttributeError(f"module {__name__} has no attribute {name}")
-
-__all__ = ["LocationData"]
+__all__ = ["LOCATIONS"]

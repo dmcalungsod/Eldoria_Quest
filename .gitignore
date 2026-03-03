@@ -9,6 +9,9 @@ venv.bak/
 
 # Python Byte-compiled / optimized files
 __pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 *.py[cod]
 *$py.class
 
@@ -21,7 +24,7 @@ dist/
 .coverage
 .coverage.*
 htmlcov/
-.pytest_cache/
+.my
 pip-audit-output/
 .tox/
 

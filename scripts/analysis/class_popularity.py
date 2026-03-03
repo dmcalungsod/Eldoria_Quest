@@ -13,7 +13,7 @@ from collections import Counter
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from db_helper import get_players  # noqa: E402
+from db_helper import get_players  # noqa: E402, I001
 
 
 # Map class_id -> name (mirrors classes defined in the DB/game data)

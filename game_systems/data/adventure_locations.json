@@ -332,7 +332,7 @@
             ],
             [
                 "ancient_wood",
-                45
+                35
             ],
             [
                 "iron_ore",
@@ -340,11 +340,7 @@
             ],
             [
                 "magic_stone_medium",
-                45
-            ],
-            [
-                "shadow_essence",
-                10
+                30
             ]
         ],
         "special_events": [
@@ -717,19 +713,19 @@
         "gatherables": [
             [
                 "obsidian_shard",
-                25
+                40
             ],
             [
                 "fire_essence",
-                15
+                30
             ],
             [
                 "magma_core",
-                5
+                20
             ],
             [
                 "magic_stone_large",
-                2
+                10
             ]
         ],
         "special_events": [
@@ -1377,7 +1373,6 @@
         "emoji": "🕰️",
         "min_rank": "S",
         "level_req": 42,
-        "prerequisite_location": "void_sanctum",
         "duration_options": [
             60,
             120,
@@ -1448,64 +1443,5 @@
         ],
         "floor_depth": 42,
         "danger_level": 8
-    },
-    "wailing_chasm": {
-        "name": "The Wailing Chasm",
-        "emoji": "🕳️",
-        "min_rank": "A",
-        "level_req": 35,
-        "duration_options": [
-            60,
-            120,
-            240,
-            480
-        ],
-        "monsters": [
-            [
-                "blind_choir_zealot",
-                40
-            ],
-            [
-                "monster_116",
-                30
-            ],
-            [
-                "monster_158",
-                30
-            ]
-        ],
-        "night_monsters": [
-            [
-                "blind_choir_zealot",
-                50
-            ],
-            [
-                "monster_116",
-                50
-            ]
-        ],
-        "conditional_monsters": [
-            {
-                "monster_key": "choirmaster",
-                "weight": 5,
-                "min_level": 38
-            }
-        ],
-        "description": "A claustrophobic, pitch-black subterranean abyss where echoes of The Sundering are physically trapped.",
-        "gatherables": [
-            [
-                "ancient_tablet",
-                40
-            ],
-            [
-                "shadow_essence",
-                30
-            ]
-        ],
-        "special_events": [
-            "trap_pit"
-        ],
-        "floor_depth": 36,
-        "danger_level": 7
     }
 }
