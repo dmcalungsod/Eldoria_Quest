@@ -990,19 +990,6 @@ class AdventureSession:
         if persist:
             self.save_state()
 
-            # Update vitals only after successful save
-            if context:
-                final_hp = context["vitals"]["current_hp"]
-                final_mp = context["vitals"]["current_mp"]
-                delta_hp = final_hp - initial_hp
-                delta_mp = final_mp - initial_mp
-
-                # Get max stats safely
-                player_stats = context["player_stats"]
-                stats_dict = context.get("stats_dict")
-                max_hp = stats_dict.get("HP", player_stats.max_hp) if stats_dict else player_stats.max_hp
-                max_mp = stats_dict.get("MP", player_stats.max_mp) if stats_dict else player_stats.max_mp
-
         return self._build_result([turn_logs], is_dead, context)
 
     def _get_best_healing_potion(self) -> str | None:

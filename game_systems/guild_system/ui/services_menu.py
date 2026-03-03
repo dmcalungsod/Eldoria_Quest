@@ -79,7 +79,7 @@ class GuildServicesView(View, GuildViewMixin):
             )
         )
 
-        from game_systems.core.world_time import WorldTime, TimePhase
+        from game_systems.core.world_time import TimePhase, WorldTime
 
         # Check for Mystic Merchant Event & Dynamic Time Effects
         self.event_system = WorldEventSystem(self.db)
@@ -286,7 +286,7 @@ class GuildServicesView(View, GuildViewMixin):
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def back_to_services(self, interaction: discord.Interaction):
-        from game_systems.core.world_time import WorldTime, TimePhase
+        from game_systems.core.world_time import TimePhase, WorldTime
 
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)
