@@ -1,0 +1,9 @@
+[db_helper] 📂 Stored snapshot — 1 players loaded from /app/scripts/analysis/data/players.json
+
+========================================
+  Class Popularity (1 players total)
+========================================
+Class            Count    Share
+--------------- ------ --------
+Warrior              1   100.0% ████████████████████
+========================================

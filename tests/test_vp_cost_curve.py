@@ -20,7 +20,7 @@ sys.modules["pymongo.results"] = MagicMock()
 
 # Mock discord.ui.View
 class MockView:
-    def __init__(self, timeout=None):
+    def __init__(self, *args, **kwargs):
         pass
 
     def add_item(self, item):

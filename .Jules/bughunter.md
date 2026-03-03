@@ -11,3 +11,8 @@
 
 **Learning:** When developing the Codex System, it's crucial to correctly handle edge cases where multiple database updates might occur simultaneously or where existing documents may not have a complete schema structure. By implementing explicit fallback defaults inside the `DatabaseManager.get_codex` method, we ensure that new top-level schema additions (like `"atlas"` or `"armory"`) are automatically retrofitted onto legacy player documents during the fetch operation, preventing unexpected `KeyError` crashes in UI or logic layers. Furthermore, using precise path updates (e.g. `$set: {"bestiary.106": ...}`) prevents data overwrites when tracking discrete unlock triggers like monster kills and location visits.
 **Action:** Added `tests/test_codex_unlocks.py` to assert that Codex unlocks via `update_codex` and fetches via `get_codex` behave cleanly, preserving sub-document schemas and defaulting missing top-level components during object merges. Added this file to `run_all_tests.py` so standard regression suites catch any deviation.
+
+## 2026-03-02 — Test failure regarding `tournament_type`
+
+**Learning:** Mock calls need to be tested for the actual expected keyword arguments. `test_start_weekly_tournament_creates_new` tested against `type` whereas `DatabaseManager.create_tournament` takes `tournament_type`.
+**Action:** When updating database manager keyword arguments, always check `test_tournament_system.py` or other tests using mocked args to prevent test failures.

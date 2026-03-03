@@ -16,16 +16,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from game_systems.data.adventure_locations import LOCATIONS
 from scripts.analysis.economy_utils import calculate_expected_value_stats
 
-# Constants
-STEPS_PER_HOUR = 4
-REGEN_CHANCE = 0.40
-COMBAT_CHANCE = 0.60
-
-# Aurum Multipliers
-TIER_MULTIPLIER = {"Normal": 1.5, "Elite": 5.0, "Boss": 20.0}
 
 
-def calculate_expected_value(location_key, location_data, player_luck=10):
+def calculate_expected_value(location_data, player_luck=10):
     """
     Calculates the expected Aurum and Material value per hour for a given location.
     """
@@ -43,7 +36,7 @@ def main():
         if key == "guild_arena":
             continue  # Skip arena
 
-        stats = calculate_expected_value(key, data)
+        stats = calculate_expected_value(data)
 
         print(
             f"| {data['name']:<25} | {stats['min_rank']:<4} | {stats['min_level']:<3} | {stats['hourly_aurum']:<10.1f} | {stats['hourly_materials']:<10.1f} | {stats['total_hourly']:<10.1f} |"
