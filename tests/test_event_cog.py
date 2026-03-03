@@ -27,6 +27,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         mock_discord.app_commands.command = MagicMock(side_effect=pass_decorator)
         mock_discord.app_commands.checks.has_permissions = MagicMock(side_effect=pass_decorator)
         mock_discord.app_commands.describe = MagicMock(side_effect=pass_decorator)
+        mock_discord.app_commands.default_permissions = MagicMock(side_effect=pass_decorator)
 
         # Mock Embed
         class MockEmbed:
@@ -146,7 +147,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         self.cog.system.start_event.assert_called_with("blood_moon", 24)
         interaction.edit_original_response.assert_called_once()
-        self.assertIn("Started Event", interaction.edit_original_response.call_args.kwargs['content'])
+        self.assertIn("Started Event", interaction.edit_original_response.call_args.kwargs["content"])
 
     async def test_admin_start_invalid(self):
         interaction = AsyncMock()
@@ -155,7 +156,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         self.cog.system.start_event.assert_not_called()
         interaction.edit_original_response.assert_called_once()
-        self.assertIn("Invalid type", interaction.edit_original_response.call_args.kwargs['content'])
+        self.assertIn("Invalid type", interaction.edit_original_response.call_args.kwargs["content"])
 
     async def test_admin_end(self):
         interaction = AsyncMock()

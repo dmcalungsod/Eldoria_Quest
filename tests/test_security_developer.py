@@ -84,6 +84,7 @@ def _load_developer_cog():
         return decorator
 
     mock_discord.app_commands.command = command_decorator
+    mock_discord.app_commands.default_permissions = lambda **kwargs: lambda f: f
 
     # Create module dictionary to patch
     modules_to_patch = {

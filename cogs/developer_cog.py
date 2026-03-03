@@ -179,6 +179,7 @@ class DeveloperCog(commands.Cog):
         self.db = DatabaseManager()
 
     @app_commands.command(name="devpanel", description="[Owner Only] Developer Controls")
+    @app_commands.default_permissions(administrator=True)
     async def dev_panel(self, interaction: discord.Interaction):
         # SECURITY: Manual check to ensure only the owner can access this panel.
         # This is more robust than relying solely on decorators for app_commands.
@@ -206,9 +207,7 @@ class DeveloperCog(commands.Cog):
         logger.error(f"Dev panel error: {error}", exc_info=True)
         if not interaction.response.is_done():
             await interaction.response.defer(ephemeral=True)
-        await interaction.edit_original_response(
-            content="❌ An error occurred while loading the developer panel."
-        )
+        await interaction.edit_original_response(content="❌ An error occurred while loading the developer panel.")
 
 
 async def setup(bot: commands.Bot):
