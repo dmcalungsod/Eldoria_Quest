@@ -12,9 +12,9 @@ import logging
 from database.database_manager import DatabaseManager
 from game_systems.core.world_time import WorldTime
 from game_systems.data.adventure_locations import LOCATIONS
+from game_systems.data.consumables import CONSUMABLES
 from game_systems.data.emojis import AURUM, COMBAT, SKULL
 from game_systems.data.materials import MATERIALS
-from game_systems.data.consumables import CONSUMABLES
 from game_systems.guild_system.faction_system import FactionSystem
 from game_systems.guild_system.quest_system import QuestSystem
 from game_systems.items.inventory_manager import InventoryManager

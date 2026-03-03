@@ -17,7 +17,6 @@ from game_systems.data.adventure_locations import LOCATIONS
 from scripts.analysis.economy_utils import calculate_expected_value_stats
 
 
-
 def calculate_expected_value(location_data, player_luck=10):
     """
     Calculates the expected Aurum and Material value per hour for a given location.
