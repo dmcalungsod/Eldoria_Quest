@@ -21,9 +21,7 @@ class AutoCombatFormula:
     """
 
     @staticmethod
-    def calculate_player_dps(
-        player_stats, skills=None, stance="balanced", weather_multiplier=1.0
-    ) -> float:
+    def calculate_player_dps(player_stats, skills=None, stance="balanced", weather_multiplier=1.0) -> float:
         """Calculates expected average Damage Per Turn (DPT) for the player."""
         str_val = DamageFormula._get_stat(player_stats, "STR")
         dex_val = DamageFormula._get_stat(player_stats, "DEX")
@@ -131,9 +129,7 @@ class AutoCombatFormula:
             }
         """
         # 1. Power Abstraction
-        player_dps_raw = AutoCombatFormula.calculate_player_dps(
-            player_stats, player_skills, stance, weather_multiplier
-        )
+        player_dps_raw = AutoCombatFormula.calculate_player_dps(player_stats, player_skills, stance, weather_multiplier)
         monster_mitigation = AutoCombatFormula.calculate_monster_mitigation(monster)
 
         # Player net damage per turn

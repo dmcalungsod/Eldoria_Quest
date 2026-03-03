@@ -1,5 +1,5 @@
 import unittest
-import math
+
 from game_systems.combat.auto_combat_formula import AutoCombatFormula
 
 
@@ -71,12 +71,8 @@ class TestAutoCombatFormula(unittest.TestCase):
 
     def test_stance_impact(self):
         # Aggressive should take fewer turns but maybe more damage per turn
-        agg = AutoCombatFormula.resolve_clash(
-            self.player_stats, self.monster, stance="aggressive"
-        )
-        dfn = AutoCombatFormula.resolve_clash(
-            self.player_stats, self.monster, stance="defensive"
-        )
+        agg = AutoCombatFormula.resolve_clash(self.player_stats, self.monster, stance="aggressive")
+        dfn = AutoCombatFormula.resolve_clash(self.player_stats, self.monster, stance="defensive")
 
         self.assertGreater(agg["player_dps"], dfn["player_dps"])
         # In this specific setup, aggressive will kill much faster

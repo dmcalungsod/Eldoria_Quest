@@ -45,9 +45,7 @@ class EventHandler:
         """Decides between Regen or Quest Event."""
         try:
             if random.randint(1, 100) <= regen_chance:
-                return self._perform_regeneration(
-                    context, location_id, weather, event_type
-                )
+                return self._perform_regeneration(context, location_id, weather, event_type)
             else:
                 # --- SPECIAL EXPLORATION EVENT (15% Chance) ---
                 if location_id and location_id in LOCATIONS:
@@ -61,13 +59,9 @@ class EventHandler:
                             result["log"][0] = f"\n{result['log'][0]}"
                         return result
 
-                return self._perform_quest_event(
-                    context, location_name, location_id, supplies, weather
-                )
+                return self._perform_quest_event(context, location_name, location_id, supplies, weather)
         except Exception as e:
-            logger.error(
-                f"Event resolution error for {self.discord_id}: {e}", exc_info=True
-            )
+            logger.error(f"Event resolution error for {self.discord_id}: {e}", exc_info=True)
             # Fallback safe state
             return {"log": ["*You wander in silence, finding nothing.*"], "dead": False}
 
@@ -93,9 +87,7 @@ class EventHandler:
             # If already full, prevent SURGE exploit (infinite farming)
             if current_hp >= stats.max_hp and current_mp >= stats.max_mp:
                 return {
-                    "log": [
-                        "\n**You are already fully rested.** The moment of peace passes."
-                    ],
+                    "log": ["\n**You are already fully rested.** The moment of peace passes."],
                     "dead": False,
                 }
 
@@ -218,9 +210,7 @@ class EventHandler:
                                 if success:
                                     # Check for custom flavor text
                                     flavor_key = f"{obj_type}:{task}"
-                                    flavor = quest.get("flavor_text", {}).get(
-                                        flavor_key
-                                    )
+                                    flavor = quest.get("flavor_text", {}).get(flavor_key)
 
                                     if flavor:
                                         event_text = f"\n{E.QUEST_SCROLL} **{flavor}**"
@@ -236,9 +226,7 @@ class EventHandler:
                                     }
 
             # If no matching quest event was found, try wild gathering
-            return self._perform_wild_gathering(
-                context, location_id, supplies=supplies, weather=weather
-            )
+            return self._perform_wild_gathering(context, location_id, supplies=supplies, weather=weather)
 
         except Exception as e:
             logger.error(f"Quest event error for {self.discord_id}: {e}")

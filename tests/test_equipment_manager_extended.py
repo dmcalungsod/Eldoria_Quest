@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
+
 from game_systems.items.equipment_manager import EquipmentManager
 from game_systems.player.player_stats import PlayerStats
 

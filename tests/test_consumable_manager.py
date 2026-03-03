@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from game_systems.items.consumable_manager import ConsumableManager
 
 
@@ -48,11 +50,13 @@ def test_triage_potency(manager, mock_db):
 
     with patch(
         "game_systems.items.consumable_manager.CONSUMABLES",
-        {"hp_potion_1": {
-            "effect": {"heal": 50},
-            "name": "Potion",
-            "type": "hp",
-        }},
+        {
+            "hp_potion_1": {
+                "effect": {"heal": 50},
+                "name": "Potion",
+                "type": "hp",
+            }
+        },
     ):
         with patch(
             "game_systems.items.consumable_manager.SKILLS",
@@ -66,9 +70,7 @@ def test_triage_potency(manager, mock_db):
             mock_db.consume_item_atomic.return_value = True
 
             # Need to patch PlayerStats.from_dict because it calculates max_hp
-            with patch(
-                "game_systems.items.consumable_manager.PlayerStats"
-            ) as MockStats:
+            with patch("game_systems.items.consumable_manager.PlayerStats") as MockStats:
                 mock_stats_instance = MagicMock()
                 mock_stats_instance.max_hp = 150
                 mock_stats_instance.max_mp = 100
@@ -81,9 +83,7 @@ def test_triage_potency(manager, mock_db):
                 assert "Boosted" in msg
 
                 # Verify DB call
-                mock_db.set_player_vitals.assert_called_with(
-                    discord_id, 110, 50
-                )
+                mock_db.set_player_vitals.assert_called_with(discord_id, 110, 50)
 
 
 def test_triage_potency_uncapped(manager, mock_db):
@@ -104,11 +104,13 @@ def test_triage_potency_uncapped(manager, mock_db):
 
     with patch(
         "game_systems.items.consumable_manager.CONSUMABLES",
-        {"hp_potion_1": {
-            "effect": {"heal": 50},
-            "name": "Potion",
-            "type": "hp",
-        }},
+        {
+            "hp_potion_1": {
+                "effect": {"heal": 50},
+                "name": "Potion",
+                "type": "hp",
+            }
+        },
     ):
         with patch(
             "game_systems.items.consumable_manager.SKILLS",
@@ -121,9 +123,7 @@ def test_triage_potency_uncapped(manager, mock_db):
         ):
             mock_db.consume_item_atomic.return_value = True
 
-            with patch(
-                "game_systems.items.consumable_manager.PlayerStats"
-            ) as MockStats:
+            with patch("game_systems.items.consumable_manager.PlayerStats") as MockStats:
                 mock_stats_instance = MagicMock()
                 mock_stats_instance.max_hp = 150
                 mock_stats_instance.max_mp = 100
@@ -133,6 +133,4 @@ def test_triage_potency_uncapped(manager, mock_db):
 
                 # 50 * 1.2 = 60
                 assert "60 HP" in msg
-                mock_db.set_player_vitals.assert_called_with(
-                    discord_id, 70, 50
-                )
+                mock_db.set_player_vitals.assert_called_with(discord_id, 70, 50)

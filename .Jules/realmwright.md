@@ -16,3 +16,9 @@
 - **Design Pattern:** Introduced a new survival mechanic: Light Management and Sound-based ambushes. This adds depth to exploration beyond standard HP/MP management.
 - **Thematic Consistency:** Built on the lore of The Sundering, focusing on a lost civilization (Kaza-Kor) swallowed by the disaster.
 - **Coordination:** The new region will require cross-agent coordination to implement new mechanics (Light, Sound, Sanity).
+
+## 2026-03-03: Ironhaven
+- Designed a new fortified city region: Ironhaven.
+- **Design Pattern:** A militant, high-altitude city serving as a northern shield against aerial Void horrors.
+- **Thematic Consistency:** Deeply tied to the Iron Vanguard faction and the ongoing struggle against The Sundering's aftermath.
+- **Coordination:** Will require cross-agent coordination to implement new cold/altitude mechanics and an aerial combat dimension.
