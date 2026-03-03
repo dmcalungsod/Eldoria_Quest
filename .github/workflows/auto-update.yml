@@ -9,6 +9,7 @@ on:
 
 jobs:
   autoupdate:
+    if: github.repository == 'dmcalungsod/Eldoria_Quest'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
