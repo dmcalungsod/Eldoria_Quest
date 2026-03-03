@@ -1,0 +1,2519 @@
+Run started:2026-03-03 03:18:22.032803+00:00
+
+Test results:
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./cogs/event_cog.py:71:21
+70	                # Time Quake: Random Chance (2%)
+71	                elif random.random() < 0.02:
+72	                    success = self.system.start_event(WorldEventSystem.TIME_QUAKE, 24)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./cogs/event_cog.py:84:21
+83	                # Mystic Merchant: Random Chance (2%)
+84	                elif random.random() < 0.02:
+85	                    success = self.system.start_event(
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:625:33
+624	        # 1. Critical HP (< 30%): 50% chance for dramatic low-health flavor
+625	        if hp_percent < 0.30 and random.random() < 0.50:
+626	            return [random.choice(cls.REGEN_LOW_HP)]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:626:20
+625	        if hp_percent < 0.30 and random.random() < 0.50:
+626	            return [random.choice(cls.REGEN_LOW_HP)]
+627
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:629:33
+628	        # 2. High HP (> 80%): 30% chance for confident flavor
+629	        if hp_percent > 0.80 and random.random() < 0.30:
+630	            return [random.choice(cls.REGEN_HIGH_HP)]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:630:20
+629	        if hp_percent > 0.80 and random.random() < 0.30:
+630	            return [random.choice(cls.REGEN_HIGH_HP)]
+631
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:633:53
+632	        # 3. Class-Specific Flavor: 30% chance
+633	        if class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:
+634	            return [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:634:20
+633	        if class_name in cls.REGEN_CLASS_PHRASES and random.random() < 0.30:
+634	            return [random.choice(cls.REGEN_CLASS_PHRASES[class_name])]
+635
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:638:16
+637	        phrases = cls._LOCATION_REGEN_PHRASES.get(location_id, cls.REGEN_PHRASES)
+638	        return [random.choice(phrases)]
+639
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:650:11
+649	        # 40% chance to add an atmospheric intro line
+650	        if random.random() >= 0.40:
+651	            return None
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:660:58
+659	        # Time Phase Override (30% chance)
+660	        elif time_phase in cls._TIME_PHASE_ATMOSPHERE and random.random() < 0.3:
+661	            atmosphere_pool = cls._TIME_PHASE_ATMOSPHERE[time_phase]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:665:49
+664	        weather_chance = 0.5 if weather in (Weather.STORM, Weather.ASH) else 0.3
+665	        if weather in cls.ATMOSPHERE_WEATHER and random.random() < weather_chance:
+666	            atmosphere_pool = cls.ATMOSPHERE_WEATHER[weather]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:669:52
+668	        # Seasonal Override (25% chance)
+669	        elif season in cls._SEASONAL_ATMOSPHERE and random.random() < 0.25:
+670	            atmosphere_pool = cls._SEASONAL_ATMOSPHERE[season]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:672:15
+671
+672	        return random.choice(atmosphere_pool)
+673
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:696:19
+695	        if objective_type == "gather":
+696	            return random.choice(AdventureEvents.GATHER_PHRASES).format(target_name)
+697	        if objective_type == "locate":
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:698:19
+697	        if objective_type == "locate":
+698	            return random.choice(AdventureEvents.LOCATE_PHRASES).format(target_name)
+699	        if objective_type in ("examine", "survey"):
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:700:19
+699	        if objective_type in ("examine", "survey"):
+700	            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
+701	        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:701:15
+700	            return random.choice(AdventureEvents.EXAMINE_PHRASES).format(target_name)
+701	        return random.choice(AdventureEvents.FALLBACK_QUEST_PHRASES).format(target_name)
+702
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:705:15
+704	    def wild_gather_event(item_name: str) -> str:
+705	        return random.choice(AdventureEvents.WILD_GATHER_PHRASES).format(item_name)
+706
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:709:15
+708	    def surge_event() -> str:
+709	        return random.choice(AdventureEvents.SURGE_PHRASES)
+710
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:714:19
+713	        if reward_type == "aurum":
+714	            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
+715	        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:715:15
+714	            return random.choice(AdventureEvents.SCAVENGE_AURUM_PHRASES).format(amount)
+715	        return random.choice(AdventureEvents.SCAVENGE_EXP_PHRASES).format(amount)
+716
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/adventure_events.py:731:15
+730	    def no_event_found() -> str:
+731	        return random.choice(AdventureEvents.NO_EVENT_PHRASES)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/combat_handler.py:69:26
+68	            choices, weights = zip(*monster_pool)
+69	            monster_key = random.choices(choices, weights=weights, k=1)[0]
+70
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/combat_handler.py:109:27
+108	                        # 30% chance for Blood-Crazed prefix
+109	                        if random.random() < 0.30:
+110	                            active_monster["name"] = f"Blood-Crazed {active_monster['name']}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/combat_handler.py:133:23
+132	                    # 20% Chance for Spectral variant
+133	                    if random.random() < 0.20:
+134	                        active_monster["name"] = f"Spectral {active_monster['name']}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:47:15
+46	        try:
+47	            if random.randint(1, 100) <= regen_chance:
+48	                return self._perform_regeneration(context, location_id, weather, event_type)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:54:42
+53	                    # 15% chance to trigger a special event if available
+54	                    if special_events and random.random() < 0.15:
+55	                        event_key = random.choice(special_events)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:55:36
+54	                    if special_events and random.random() < 0.15:
+55	                        event_key = random.choice(special_events)
+56	                        result = self.exploration.handle_event(event_key, context)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:272:11
+271
+272	        if random.randint(1, 100) <= base_chance:
+273	            # Weighted Selection
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:275:23
+274	            choices, weights = zip(*gatherables)
+275	            item_key = random.choices(choices, weights=weights, k=1)[0]
+276	            mat_data = MATERIALS.get(item_key)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:288:19
+287	                # Random variance: 20% chance to get +1 extra
+288	                if random.random() < 0.20:
+289	                    quantity += 1
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:334:11
+333	        # 50% Aurum / 50% XP
+334	        if random.random() < 0.5:
+335	            # Aurum
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:336:21
+335	            # Aurum
+336	            amount = random.randint(1, 5)
+337	            msg = f"\n{AdventureEvents.scavenge_event('aurum', amount)}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/event_handler.py:341:21
+340	            # XP
+341	            amount = random.randint(5, 10)
+342	            msg = f"\n{AdventureEvents.scavenge_event('exp', amount)}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:58:23
+57	        # Heal 50-100% of Max HP/MP
+58	        heal_percent = random.uniform(0.5, 1.0)
+59
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:85:11
+84
+85	        if random.random() < 0.6:
+86	            # Aurum
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:87:21
+86	            # Aurum
+87	            amount = random.randint(50, 200)
+88	            loot["aurum"] = amount
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:94:27
+93	            if rare_mats:
+94	                item_key = random.choice(rare_mats)
+95	                mat_name = MATERIALS[item_key]["name"]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:103:17
+102	        # Grant XP
+103	        amount = random.randint(100, 300)
+104	        loot = {"exp": amount}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:118:25
+117	        # Damage 10-25% of Max HP
+118	        damage_percent = random.uniform(0.10, 0.25)
+119	        damage = int(stats.max_hp * damage_percent)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/exploration_events.py:126:11
+125	        mitigated = False
+126	        if random.randint(1, 100) <= dodge_chance:
+127	            damage = damage // 2
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/ui/adventure_embeds.py:271:26
+270	        if s.get("leveled_up"):
+271	            flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["level_up"])
+272	        else:
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/ui/adventure_embeds.py:276:30
+275	            if loc_flavors:
+276	                flavor_text = random.choice(loc_flavors)
+277	            else:
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/adventure/ui/adventure_embeds.py:278:30
+277	            else:
+278	                flavor_text = random.choice(OUTCOME_FLAVOR_TEXT["default"])
+279
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:529:43
+528	                if (
+529	                    silence_chance > 0 and random.random() < silence_chance
+530	                ):  # nosec B311
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_engine.py:714:16
+713	            bool(spec.get("crit_bonus"))
+714	            and random.randint(1, 100) <= spec["crit_bonus"]
+715	        )  # nosec B311
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:617:20
+616
+617	        return f"**{random.choice(phrase_list).format(name=name)}**"
+618
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:752:15
+751
+752	        return random.choice(pool)
+753
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:763:21
+762	        if skill_key in CombatPhrases.SKILL_PHRASES:
+763	            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+764	            return f"{phrase.format(skill_name=skill_name, m_name=m_name)} (`{damage}` damage){crit_text}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:772:15
+771	        ]
+772	        return random.choice(phrases)
+773
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:781:21
+780	        if skill_key in CombatPhrases.SKILL_PHRASES:
+781	            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+782	            return f"{phrase.format(skill_name=skill_name)} (+`{heal_amount}` HP)"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:790:15
+789	        ]
+790	        return random.choice(phrases)
+791
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:799:21
+798	        if skill_key in CombatPhrases.SKILL_PHRASES:
+799	            phrase = random.choice(CombatPhrases.SKILL_PHRASES[skill_key])
+800	            return f"{E.BUFF} {phrase.format(skill_name=skill_name)}"
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:808:27
+807	        ]
+808	        return f"{E.BUFF} {random.choice(phrases)}"
+809
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:831:15
+830
+831	        return random.choice(pool).format(name=m_name, dmg=damage)
+832
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:843:15
+842	        ]
+843	        return random.choice(phrases)
+844
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:853:15
+852	        ]
+853	        return random.choice(phrases)
+854
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:887:15
+886	            ]
+887	        return random.choice(phrases)
+888
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:911:17
+910	        ]
+911	        phrase = random.choice(victory_phrases)
+912
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/combat/combat_phrases.py:936:15
+935	        ]
+936	        return random.choice(phrases)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/crafting/crafting_system.py:137:11
+136	        # Roll
+137	        if random.random() < base_chance:
+138	            if current_index + 1 < len(tiers):
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/crafting/crafting_system.py:141:22
+140	                # Cascade: 50% reduced chance for subsequent upgrades
+141	                while random.random() < (base_chance * 0.5) and current_index + 1 < len(tiers):
+142	                    current_index += 1
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/crafting/crafting_system.py:174:19
+173	            if player and player.get("class_id") == 6 and recipe_type == "consumable":
+174	                if random.random() < 0.10:
+175	                    retain_materials = True
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:36:27
+35	                if max_hp > 0 and (current_hp / max_hp) < 0.3:
+36	                    return random.choice(
+37	                        [
+38	                            "You look pale, adventurer. Visit the **Infirmary** before you collapse.",
+39	                            "Bleeding out is bad for business. Get patched up at the **Infirmary**.",
+40	                            "Don't be a hero. Heal your wounds before heading out again.",
+41	                        ]
+42	                    )
+43
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:49:19
+48	        if quests_completed == 0:
+49	            return random.choice(
+50	                [
+51	                    "Welcome to the Guild. The **Quest Board** is to your left. Don't stare at it all day.",
+52	                    "First time? Pick a simple contract from the **Quests** menu. Try not to die.",
+53	                    "Your reputation is non-existent. Complete a **Quest** to change that.",
+54	                ]
+55	            )
+56
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:60:19
+59	        if not active_quests:
+60	            return random.choice(
+61	                [
+62	                    "You have no active contracts. The Guild doesn't pay for loitering.",
+63	                    "Idle hands earn no coin. Check the **Quest Board**.",
+64	                    "The monsters are waiting. You should pick up a **Quest**.",
+65	                ]
+66	            )
+67
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:78:23
+77	            if not has_weapon:
+78	                return random.choice(
+79	                    [
+80	                        "You have coin, but no weapon. Visit the **Shop** before you become monster chow.",
+81	                        "A full purse won't protect you like a good sword. Buy gear at the **Shop**.",
+82	                        "Invest in your survival. The **Shop** has what you need.",
+83	                    ]
+84	                )
+85
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/advisor.py:87:15
+86	        # 5. Generic Advice (Fallback)
+87	        return random.choice(
+88	            [
+89	                "Always check your supplies before leaving the city.",
+90	                "If you find yourself overwhelmed, retreat is a valid strategy.",
+91	                "The deeper you go, the darker it gets. Bring a torch... or a wizard.",
+92	                "Keep your blade sharp and your wits sharper.",
+93	                "Report your success at the Quest Board to claim your rewards.",
+94	            ]
+95	        )
+96
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/guild_system/tournament_system.py:48:21
+47	        # Pick a random event type
+48	        event_type = random.choice(self.TOURNAMENT_TYPES)
+49
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/items/item_manager.py:102:12
+101	        }
+102	        r = random.randint(1, sum(rolls.values()))
+103	        current = 0
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/items/item_manager.py:113:11
+112	        loot = []
+113	        if random.randint(1, 100) > 20:  # 80% chance of no equipment
+114	            return loot
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:38:23
+37	                    # 70% chance to heal if critical
+38	                    if random.randint(1, 100) <= 70:
+39	                        chosen = random.choice(heal_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:39:33
+38	                    if random.randint(1, 100) <= 70:
+39	                        chosen = random.choice(heal_skills)
+40	                        return {"type": "skill", "skill": chosen}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:56:19
+55
+56	                if random.randint(1, 100) <= skill_chance:
+57	                    chosen = random.choice(offensive_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:57:29
+56	                if random.randint(1, 100) <= skill_chance:
+57	                    chosen = random.choice(offensive_skills)
+58
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:66:42
+65	                        should_telegraph = True  # Always telegraph massive attacks
+66	                    elif power >= 1.4 and random.randint(1, 100) <= 50:
+67	                        should_telegraph = True  # 50% chance for heavy attacks
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:78:19
+77	                # 25% chance to use a buff if available
+78	                if random.randint(1, 100) <= 25:
+79	                    chosen = random.choice(buff_skills)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/monsters/monster_actions.py:79:29
+78	                if random.randint(1, 100) <= 25:
+79	                    chosen = random.choice(buff_skills)
+80	                    return {"type": "buff", "buff": chosen}
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/rewards/aurum_calculator.py:33:19
+32	        # Variance: 0.8 to 1.2
+33	        variance = random.uniform(0.8, 1.2)
+34
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./game_systems/rewards/loot_calculator.py:70:19
+69	            # random.uniform(0, 100) returns a float between 0.0 and 100.0
+70	            roll = random.uniform(0, 100)
+71
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./scripts/parse_jules_issues.py:6:0
+5	import re
+6	import subprocess
+7	import sys
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/parse_jules_issues.py:153:17
+152	    try:
+153	        result = subprocess.run(  # nosec B603
+154	            ["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "1000", "--json", "title"],
+155	            capture_output=True,
+156	            text=True,
+157	            check=True,
+158	        )
+159	        issues = json.loads(result.stdout or "[]")
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/parse_jules_issues.py:171:15
+170	        color = LABEL_COLORS.get(label, "cccccc")
+171	        proc = subprocess.run(  # nosec B603
+172	            ["gh", "label", "create", label, "--color", color, "--force", "--repo", repo],
+173	            capture_output=True,
+174	            text=True,
+175	        )
+176	        if proc.returncode != 0:
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/parse_jules_issues.py:184:8
+183	    try:
+184	        subprocess.run(  # nosec B603
+185	            [
+186	                "gh",
+187	                "issue",
+188	                "create",
+189	                "--repo",
+190	                repo,
+191	                "--title",
+192	                title,
+193	                "--body",
+194	                body,
+195	                "--assignee",
+196	                "google-labs-jules",
+197	                "--label",
+198	                labels,
+199	            ],
+200	            capture_output=True,
+201	            text=True,
+202	            check=True,
+203	        )
+204	        return True
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/parse_jules_issues.py:222:15
+221	    try:
+222	        proc = subprocess.run(  # nosec B603
+223	            ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
+224	            capture_output=True,
+225	            text=True,
+226	            check=True,
+227	        )
+228	        return [f for f in proc.stdout.splitlines() if f.startswith(JULES_DIR + "/") and f.endswith(".md")]
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./scripts/prune_merged_branches.py:3:0
+2	import os
+3	import subprocess
+4	import sys
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/prune_merged_branches.py:25:17
+24	    try:
+25	        result = subprocess.run(
+26	            ["gh", "repo", "view", "--json", "nameWithOwner"],
+27	            capture_output=True,
+28	            text=True,
+29	            check=True
+30	        )  # nosec B603
+31	        current_repo_json = result.stdout.strip()
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/prune_merged_branches.py:47:21
+46	    try:
+47	        prs_result = subprocess.run(
+48	            [
+49	                "gh",
+50	                "pr",
+51	                "list",
+52	                "--state",
+53	                "merged",
+54	                "--json",
+55	                "number,headRefName,mergedAt,headRepository",
+56	                "--limit",
+57	                "1000",
+58	            ],
+59	            capture_output=True,
+60	            text=True,
+61	            check=True
+62	        )  # nosec B603
+63	        prs_json = prs_result.stdout.strip()
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/prune_merged_branches.py:113:23
+112	        # Check if branch still exists
+113	        branch_check = subprocess.run(  # nosec B603
+114	            ["gh", "api", f"repos/{current_repo}/branches/{head_ref}", "--silent"],
+115	            capture_output=True,
+116	        )
+117
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: ./scripts/prune_merged_branches.py:125:24
+124	        # Delete the branch
+125	        delete_result = subprocess.run(
+126	            [
+127	                "gh",
+128	                "api",
+129	                "--method",
+130	                "DELETE",
+131	                f"repos/{current_repo}/git/refs/heads/{head_ref}",
+132	            ],
+133	            capture_output=True,
+134	            text=True
+135	        )  # nosec B603
+136
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:40:8
+39	        session.steps_completed = 4
+40	        assert session._calculate_fatigue_multiplier() == 1.0
+41
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:44:8
+43	        session.steps_completed = 16
+44	        assert session._calculate_fatigue_multiplier() == 1.0
+45
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:48:8
+47	        session.steps_completed = 20
+48	        assert session._calculate_fatigue_multiplier() == 1.05
+49
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:52:8
+51	        session.steps_completed = 32
+52	        assert session._calculate_fatigue_multiplier() == 1.20
+53
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:56:8
+55	        session.steps_completed = 96
+56	        assert session._calculate_fatigue_multiplier() == 2.00
+57
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:88:8
+87	        # Verify damage taken = 10 (base) * 1.0
+88	        assert result["turn_report"]["damage_taken"] == 10
+89
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:99:8
+98	        # Verify damage taken = 10 (base) * 1.5 = 15
+99	        assert result["turn_report"]["damage_taken"] == 15
+100
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_fatigue.py:108:8
+107	        # Verify damage taken = 20 (base skill) * 1.5 = 30
+108	        assert result["turn_report"]["damage_taken"] == 30
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:54:4
+53	    # Verify
+54	    assert result is True
+55	    # Should create session
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:58:4
+57	    # Should simulate 2 steps (30 / 15)
+58	    assert mock_session.simulate_step.call_count == 2
+59
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:70:4
+69	    # Should save state 1 time (only at end)
+70	    assert mock_session.save_state.call_count == 1
+71	    # Should update status to completed
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:112:4
+111	    # Verify
+112	    assert result is True
+113	    # Should simulate 2 steps only
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:114:4
+113	    # Should simulate 2 steps only
+114	    assert mock_session.simulate_step.call_count == 2
+115	    # Should handle death
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:151:4
+150	    # Should simulate remaining 2 steps
+151	    assert mock_session.simulate_step.call_count == 2
+152	    mock_db.update_adventure_status.assert_called_with(123, "completed")
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:204:4
+203	    # Verify calls
+204	    assert mock_session.simulate_step.call_count == 2
+205
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_resolution.py:214:4
+213	    # Engine updates context["vitals"]["current_hp"]
+214	    assert final_bundle["vitals"]["current_hp"] == 80
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:64:8
+63	        calls = embed.add_field.call_args_list
+64	        assert len(calls) >= 3
+65
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:69:8
+68	        args, kwargs = calls[0]
+69	        assert "Time Remaining" in kwargs["name"]
+70
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:73:8
+72	        args, kwargs = calls[1]
+73	        assert "Steps Taken" in kwargs["name"]
+74	        assert "15" in kwargs["value"]
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:74:8
+73	        assert "Steps Taken" in kwargs["name"]
+74	        assert "15" in kwargs["value"]
+75
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:78:8
+77	        args, kwargs = calls[2]
+78	        assert "Loot Gathered" in kwargs["name"]
+79	        assert "5" in kwargs["value"]  # item_1 only
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:79:8
+78	        assert "Loot Gathered" in kwargs["name"]
+79	        assert "5" in kwargs["value"]  # item_1 only
+80
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_adventure_status_embed.py:98:8
+97	        args, kwargs = calls[0]
+98	        assert "Complete!" in kwargs["value"]
+99
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:31:4
+30	    budget = STAT_BUDGETS.get("alchemist_coat")
+31	    assert budget is not None, "alchemist_coat budget missing"
+32	    assert budget["MAG"] == 0.5
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:32:4
+31	    assert budget is not None, "alchemist_coat budget missing"
+32	    assert budget["MAG"] == 0.5
+33	    assert budget["DEX"] == 0.3
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:33:4
+32	    assert budget["MAG"] == 0.5
+33	    assert budget["DEX"] == 0.3
+34	    assert budget["END"] == 0.2
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:34:4
+33	    assert budget["DEX"] == 0.3
+34	    assert budget["END"] == 0.2
+35
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:42:4
+41	    ]
+42	    assert len(coats) > 0, "No Alchemist Coats generated"
+43
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:46:4
+45	    sample = next((c for c in coats if c["rarity"] == "Common"), None)
+46	    assert sample is not None
+47
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:53:4
+52	    # ceil(1 * 0.2) = 1 END
+53	    assert stats.get("MAG") >= 1
+54	    assert stats.get("DEX") >= 1
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:54:4
+53	    assert stats.get("MAG") >= 1
+54	    assert stats.get("DEX") >= 1
+55	    assert stats.get("END") >= 1
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:55:4
+54	    assert stats.get("DEX") >= 1
+55	    assert stats.get("END") >= 1
+56
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:76:4
+75	    allowed = eq_manager._get_player_allowed_slots(123)
+76	    assert "alchemist_coat" in allowed
+77	    assert "tome" in allowed
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:77:4
+76	    assert "alchemist_coat" in allowed
+77	    assert "tome" in allowed
+78	    assert "medium_armor" in allowed
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:78:4
+77	    assert "tome" in allowed
+78	    assert "medium_armor" in allowed
+79	    assert "robe" in allowed
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:79:4
+78	    assert "medium_armor" in allowed
+79	    assert "robe" in allowed
+80	    assert "staff" not in allowed
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:80:4
+79	    assert "robe" in allowed
+80	    assert "staff" not in allowed
+81	    assert "heavy_armor" not in allowed
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:81:4
+80	    assert "staff" not in allowed
+81	    assert "heavy_armor" not in allowed
+82
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:104:4
+103
+104	    assert "robe" in slots_to_check
+105	    assert "heavy_armor" in slots_to_check
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:105:4
+104	    assert "robe" in slots_to_check
+105	    assert "heavy_armor" in slots_to_check
+106	    assert "alchemist_coat" in slots_to_check
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:106:4
+105	    assert "heavy_armor" in slots_to_check
+106	    assert "alchemist_coat" in slots_to_check
+107
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_alchemist_equipment.py:109:4
+108	    # Verify strict logic
+109	    assert "helm" not in slots_to_check
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:16:4
+15	    stag = MONSTERS.get("monster_017")
+16	    assert stag, "Feral Stag not found"
+17
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:20:4
+19	    # Expected Nerf
+20	    assert drops.get("magic_stone_medium") == 50, (
+21	        f"Feral Stag magic_stone_medium expected 50, got {drops.get('magic_stone_medium')}"
+22	    )
+23	    assert drops.get("boss_talon") == 80, f"Feral Stag boss_talon expected 80, got {drops.get('boss_talon')}"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:23:4
+22	    )
+23	    assert drops.get("boss_talon") == 80, f"Feral Stag boss_talon expected 80, got {drops.get('boss_talon')}"
+24	    assert drops.get("celestial_dust") == 10, (
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:24:4
+23	    assert drops.get("boss_talon") == 80, f"Feral Stag boss_talon expected 80, got {drops.get('boss_talon')}"
+24	    assert drops.get("celestial_dust") == 10, (
+25	        f"Feral Stag celestial_dust expected 10, got {drops.get('celestial_dust')}"
+26	    )
+27
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:30:4
+29	    duskling = MONSTERS.get("monster_028")
+30	    assert duskling, "Duskling not found"
+31	    drops = dict(duskling["drops"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:32:4
+31	    drops = dict(duskling["drops"])
+32	    assert drops.get("magic_stone_medium") == 90, (
+33	        f"Duskling magic_stone_medium expected 90, got {drops.get('magic_stone_medium')}"
+34	    )
+35
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:38:4
+37	    spider = MONSTERS.get("monster_126")
+38	    assert spider, "Cogwork Spider not found"
+39	    drops = dict(spider["drops"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:40:4
+39	    drops = dict(spider["drops"])
+40	    assert drops.get("magic_stone_medium") == 25, (
+41	        f"Cogwork Spider magic_stone_medium expected 25, got {drops.get('magic_stone_medium')}"
+42	    )
+43
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:46:4
+45	    stalker = MONSTERS.get("monster_116")
+46	    assert stalker, "Void Stalker not found"
+47	    drops = dict(stalker["drops"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:48:4
+47	    drops = dict(stalker["drops"])
+48	    assert drops.get("magic_stone_large") == 60, (
+49	        f"Void Stalker magic_stone_large expected 60, got {drops.get('magic_stone_large')}"
+50	    )
+51
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:58:4
+57	    fen = LOCATIONS.get("shrouded_fen")
+58	    assert fen, "Shrouded Fen not found"
+59	    gather = dict(fen["gatherables"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:60:4
+59	    gather = dict(fen["gatherables"])
+60	    assert gather.get("magic_stone_medium") == 45, (
+61	        f"Shrouded Fen magic_stone_medium expected 45, got {gather.get('magic_stone_medium')}"
+62	    )
+63	    assert gather.get("ancient_wood") == 45, f"Shrouded Fen ancient_wood expected 45, got {gather.get('ancient_wood')}"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:63:4
+62	    )
+63	    assert gather.get("ancient_wood") == 45, f"Shrouded Fen ancient_wood expected 45, got {gather.get('ancient_wood')}"
+64
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:67:4
+66	    halls = LOCATIONS.get("clockwork_halls")
+67	    assert halls, "Clockwork Halls not found"
+68	    gather = dict(halls["gatherables"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:69:4
+68	    gather = dict(halls["gatherables"])
+69	    assert gather.get("magic_stone_medium") == 35, (
+70	        f"Clockwork Halls magic_stone_medium expected 35, got {gather.get('magic_stone_medium')}"
+71	    )
+72	    assert gather.get("magic_stone_large") == 10, (
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:72:4
+71	    )
+72	    assert gather.get("magic_stone_large") == 10, (
+73	        f"Clockwork Halls magic_stone_large expected 10, got {gather.get('magic_stone_large')}"
+74	    )
+75
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:78:4
+77	    void = LOCATIONS.get("void_sanctum")
+78	    assert void, "Void Sanctum not found"
+79	    gather = dict(void["gatherables"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_balance.py:80:4
+79	    gather = dict(void["gatherables"])
+80	    assert gather.get("magic_stone_flawless") == 30, (
+81	        f"Void Sanctum magic_stone_flawless expected 30, got {gather.get('magic_stone_flawless')}"
+82	    )
+83
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:81:12
+80	            # Player started with 100, should be 95
+81	            assert engine.player_hp == 95
+82
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:116:8
+115	        # Started at 50, should be 55
+116	        assert engine.player_hp == 55
+117
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:154:12
+153	            # Verify player was NOT stunned
+154	            assert not engine.player_stunned
+155	            assert "🛡️ **Immune!**" in str(engine.run_combat_turn()["phrases"])
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:155:12
+154	            assert not engine.player_stunned
+155	            assert "🛡️ **Immune!**" in str(engine.run_combat_turn()["phrases"])
+156
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:187:8
+186	        # In engine, self.monster is modified.
+187	        assert len(engine.monster["debuffs"]) > 0
+188	        assert engine.monster["debuffs"][0]["DEF_percent"] == -0.1
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:188:8
+187	        assert len(engine.monster["debuffs"]) > 0
+188	        assert engine.monster["debuffs"][0]["DEF_percent"] == -0.1
+189	        # Explicitly consume result to satisfy linter (F841)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_combat_engine.py:190:8
+189	        # Explicitly consume result to satisfy linter (F841)
+190	        assert result is not None
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_consumable_manager.py:79:16
+78
+79	                assert success
+80	                assert "60 HP" in msg
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_consumable_manager.py:80:16
+79	                assert success
+80	                assert "60 HP" in msg
+81	                assert "Boosted" in msg
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_consumable_manager.py:81:16
+80	                assert "60 HP" in msg
+81	                assert "Boosted" in msg
+82
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_consumable_manager.py:135:16
+134	                # 50 * 1.2 = 60
+135	                assert "60 HP" in msg
+136	                mock_db.set_player_vitals.assert_called_with(
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:30:8
+29	        req_1 = calculate_crafting_xp_req(1)
+30	        assert req_1 == 50
+31
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:34:8
+33	        # 50 * 2^1.3 = 50 * 2.46 = 123
+34	        assert req_2 == 123
+35
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:46:8
+45	        )
+46	        assert "+10 Craft XP" in msg
+47
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:58:8
+57	        self.mock_db.update_player_fields.assert_called_with(123, crafting_level=2, crafting_xp=5)
+58	        assert "Level Up!" in msg
+59	        assert "Level **2**" in msg
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:59:8
+58	        assert "Level Up!" in msg
+59	        assert "Level **2**" in msg
+60
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:76:8
+75	        args, kwargs = self.mock_db.update_player_fields.call_args
+76	        assert kwargs["crafting_level"] >= 3
+77	        assert "Level Up!" in msg
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:77:8
+76	        assert kwargs["crafting_level"] >= 3
+77	        assert "Level Up!" in msg
+78
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:89:12
+88	            result = self.system._roll_quality("Common", 123)
+89	            assert result == "Uncommon"
+90
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:94:12
+93	            result = self.system._roll_quality("Common", 123)
+94	            assert result == "Common"
+95
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_crafting_proficiency.py:102:12
+101	            result = self.system._roll_quality("Common", 123)
+102	            assert result == "Uncommon"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:13:8
+12	        schema = {"type": str}
+13	        assert DataValidator.validate("hello", schema) == []
+14	        assert len(DataValidator.validate(123, schema)) == 1
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:14:8
+13	        assert DataValidator.validate("hello", schema) == []
+14	        assert len(DataValidator.validate(123, schema)) == 1
+15
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:20:8
+19	        valid_data = {"name": "Alice", "age": 30}
+20	        assert DataValidator.validate(valid_data, schema) == []
+21
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:23:8
+22	        invalid_data = {"age": 30}  # Missing name
+23	        assert len(DataValidator.validate(invalid_data, schema)) == 1
+24
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:26:8
+25	        invalid_type = {"name": "Bob", "age": "thirty"}
+26	        assert len(DataValidator.validate(invalid_type, schema)) == 1
+27
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:32:8
+31	        valid_data = [1, 2, 3]
+32	        assert DataValidator.validate(valid_data, schema) == []
+33
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:35:8
+34	        invalid_data = [1, "two", 3]
+35	        assert len(DataValidator.validate(invalid_data, schema)) == 1
+36
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:41:8
+40	        valid_data = ["item", 10]
+41	        assert DataValidator.validate(valid_data, schema) == []
+42
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:44:8
+43	        invalid_data = ["item", "10"]
+44	        assert len(DataValidator.validate(invalid_data, schema)) == 1
+45
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:49:8
+48
+49	        assert len(LOCATIONS) > 0
+50	        # If LOCATIONS loaded, it means validation passed (or logged warnings)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:55:8
+54	        # But we can check basic fields
+55	        assert isinstance(first_loc["name"], str)
+56
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:60:8
+59
+60	        assert len(MONSTERS) > 0
+61	        # In memory, drops are tuples, skills are objects
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:67:8
+66
+67	        assert len(CONSUMABLES) > 0
+68
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_data_validation.py:72:8
+71
+72	        assert len(EQUIPMENT_DATA) > 0
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_equipment_robustness.py:92:4
+91
+92	    assert stats.strength == 15, "Should have 10 base + 5 bonus from valid item"
+93	    assert stats.endurance == 10, "Should have 10 base + 0 bonus"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_equipment_robustness.py:93:4
+92	    assert stats.strength == 15, "Should have 10 base + 5 bonus from valid item"
+93	    assert stats.endurance == 10, "Should have 10 base + 0 bonus"
+94
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_equipment_robustness.py:98:4
+97	    saved_stats = mock_db.update_player_stats.call_args[0][1]
+98	    assert saved_stats["STR"]["bonus"] == 5
+99
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_equipment_robustness.py:117:4
+116
+117	    assert stats.strength == 10  # Base only
+118	    mock_db.update_player_stats.assert_called_once()
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:52:4
+51
+52	    assert event["name"] == "The Frostfall Expedition"
+53	    assert modifiers["frostfall_threat_reduction"] == 0.9
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:53:4
+52	    assert event["name"] == "The Frostfall Expedition"
+53	    assert modifiers["frostfall_threat_reduction"] == 0.9
+54	    assert modifiers["frostfall_loot_bonus"] == 1.5
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:54:4
+53	    assert modifiers["frostfall_threat_reduction"] == 0.9
+54	    assert modifiers["frostfall_loot_bonus"] == 1.5
+55	    assert modifiers["loot_boost"] == 1.25
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:55:4
+54	    assert modifiers["frostfall_loot_bonus"] == 1.5
+55	    assert modifiers["loot_boost"] == 1.25
+56
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:100:8
+99	        # Check kwargs for fatigue_multiplier
+100	        assert kwargs["fatigue_multiplier"] == 0.5
+101
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:128:8
+127	        # Ensure simulate_step didn't crash
+128	        assert session.combat.resolve_turn.called
+129
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:132:8
+131	        # Should be 1.0 (standard)
+132	        assert kwargs["fatigue_multiplier"] == 1.0
+133
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:165:8
+164	        passed_boost = args[2]
+165	        assert passed_boost == 2.0
+166
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_event_frostfall.py:193:8
+192	        passed_boost = args[2]
+193	        assert passed_boost == 1.0
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_field_kit_bonus.py:54:8
+53
+54	        assert success
+55	        # Verify Buff Duration in DB Call
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_field_kit_bonus.py:60:8
+59	        buffs = args[1]
+60	        assert buffs[0]['duration_s'] == 180
+61
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_field_kit_bonus.py:68:8
+67
+68	        assert success
+69	        args, _ = mock_db.add_active_buffs_bulk.call_args
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_field_kit_bonus.py:72:8
+71	        # 180 * 1.05 = 189
+72	        assert buffs[0]['duration_s'] == 189
+73	        assert "(Field Kit: Duration +5%)" in msg
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_field_kit_bonus.py:73:8
+72	        assert buffs[0]['duration_s'] == 189
+73	        assert "(Field Kit: Duration +5%)" in msg
+74
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_infirmary_fallback.py:84:8
+83	        # Check max_hp
+84	        assert self.stale_stats.max_hp == 100, f"Setup error: Expected 100 HP, got {self.stale_stats.max_hp}"
+85
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:15:4
+14	    # Formula: 100 + (current * 5)
+15	    assert calculate_practice_threshold(1) == 105
+16	    assert calculate_practice_threshold(10) == 150
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:16:4
+15	    assert calculate_practice_threshold(1) == 105
+16	    assert calculate_practice_threshold(10) == 150
+17	    assert calculate_practice_threshold(20) == 200
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:17:4
+16	    assert calculate_practice_threshold(10) == 150
+17	    assert calculate_practice_threshold(20) == 200
+18	    assert calculate_practice_threshold(100) == 600
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:18:4
+17	    assert calculate_practice_threshold(20) == 200
+18	    assert calculate_practice_threshold(100) == 600
+19
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:47:4
+46
+47	    assert levels_gained == 1
+48	    assert current_val == 2
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:48:4
+47	    assert levels_gained == 1
+48	    assert current_val == 2
+49	    assert current_exp_val == 95
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:49:4
+48	    assert current_val == 2
+49	    assert current_exp_val == 95
+50
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:83:4
+82
+83	    assert levels_gained == 3
+84	    assert current_val == 4
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:84:4
+83	    assert levels_gained == 3
+84	    assert current_val == 4
+85	    assert current_exp_val == 10
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_progression_scaling.py:85:4
+84	    assert current_val == 4
+85	    assert current_exp_val == 10
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'mock_token'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: ./tests/test_sync_logic.py:11:11
+10	# Mock environment variables BEFORE import
+11	os.environ["DISCORD_BOT_TOKEN"] = "mock_token"
+12	os.environ["GUILD_ID"] = "123456789"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:68:12
+67	            stun_msg_present = any("Stunned!" in phrase for phrase in result["phrases"])
+68	            assert stun_msg_present, "Combat log should mention Stun."
+69
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:72:12
+71	            monster_skip_msg = any("reeling and misses its turn" in phrase for phrase in result["phrases"])
+72	            assert monster_skip_msg, "Monster should skip turn when stunned."
+73
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:95:8
+94
+95	        assert "ATK" in buff_names, "Should have ATK buff."
+96	        assert "DEF" in buff_names, "Should have DEF buff."
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:96:8
+95	        assert "ATK" in buff_names, "Should have ATK buff."
+96	        assert "DEF" in buff_names, "Should have DEF buff."
+97	        assert "immunity_stun" in buff_names, "Should have Stun Immunity."
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:97:8
+96	        assert "DEF" in buff_names, "Should have DEF buff."
+97	        assert "immunity_stun" in buff_names, "Should have Stun Immunity."
+98
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:136:12
+135	            immune_msg_present = any("Immune!" in phrase for phrase in result["phrases"])
+136	            assert immune_msg_present, "Combat log should mention Immunity."
+137
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:140:12
+139	            stun_msg_present = any("You are reeling" in phrase for phrase in result["phrases"])
+140	            assert not stun_msg_present, "Player should not be stunned."
+141	            assert not engine.player_stunned, "Engine state should not be stunned."
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:141:12
+140	            assert not stun_msg_present, "Player should not be stunned."
+141	            assert not engine.player_stunned, "Engine state should not be stunned."
+142
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:163:8
+162	        # Verify Stun Message
+163	        assert any("You cannot move!" in phrase for phrase in result["phrases"]), "Log should say player cannot move."
+164
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:166:8
+165	        # Verify Player did NOT attack (monster HP same)
+166	        assert result["monster_hp"] == 1000, "Monster should not take damage."
+167
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:169:8
+168	        # Verify result reports stun cleared
+169	        assert "player_stunned" in result
+170	        assert result["player_stunned"] is False, "Stun should be consumed/cleared."
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_warrior_expansion.py:170:8
+169	        assert "player_stunned" in result
+170	        assert result["player_stunned"] is False, "Stun should be consumed/cleared."
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:16:8
+15	        """Ensure Weather enum is correctly defined."""
+16	        assert Weather.CLEAR.value == "Clear"
+17	        assert Weather.STORM.value == "Storm"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:17:8
+16	        assert Weather.CLEAR.value == "Clear"
+17	        assert Weather.STORM.value == "Storm"
+18	        assert Weather.ASH.value == "Ash Storm"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:18:8
+17	        assert Weather.STORM.value == "Storm"
+18	        assert Weather.ASH.value == "Ash Storm"
+19
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:38:12
+37
+38	            assert w1 == w2, "Weather must be consistent for same location/time"
+39
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:58:12
+57
+58	            assert len(results) > 0
+59
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:73:12
+72
+73	            assert isinstance(w1, Weather)
+74	            assert isinstance(w2, Weather)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:74:12
+73	            assert isinstance(w1, Weather)
+74	            assert isinstance(w2, Weather)
+75
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:89:16
+88	                weather = WorldTime.get_current_weather(location_id)
+89	                assert weather in [
+90	                    Weather.CLEAR,
+91	                    Weather.ASH,
+92	                    Weather.STORM,
+93	                ], f"Molten Caldera had unexpected weather: {weather}"
+94
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:97:8
+96	        """Ensure flavor text returns strings."""
+97	        assert "Rain" in WorldTime.get_weather_flavor(Weather.RAIN)
+98	        assert "Ash" in WorldTime.get_weather_flavor(Weather.ASH)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:98:8
+97	        assert "Rain" in WorldTime.get_weather_flavor(Weather.RAIN)
+98	        assert "Ash" in WorldTime.get_weather_flavor(Weather.ASH)
+99	        assert "Clear" in WorldTime.get_weather_flavor(Weather.CLEAR)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: ./tests/test_weather_system.py:99:8
+98	        assert "Ash" in WorldTime.get_weather_flavor(Weather.ASH)
+99	        assert "Clear" in WorldTime.get_weather_flavor(Weather.CLEAR)
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 38368
+	Total lines skipped (#nosec): 1
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 44
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 239
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 1
+		High: 238
+Files skipped (0):

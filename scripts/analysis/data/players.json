@@ -1,0 +1,25 @@
+[
+  {
+    "discord_id": 663028195616096256,
+    "name": "Leonidas I - King of Sparta",
+    "class_id": 1,
+    "race": null,
+    "gender": null,
+    "level": 1,
+    "experience": 0,
+    "exp_to_next": 1000,
+    "current_hp": 47,
+    "current_mp": 19,
+    "vestige_pool": 0,
+    "aurum": 0,
+    "titles": [
+      "Day Tripper",
+      "Endurance Runner",
+      "Marathoner"
+    ],
+    "active_title": null,
+    "crafting_level": 1,
+    "crafting_xp": 0,
+    "last_regen_time": "2026-02-28T10:46:46.703467"
+  }
+]

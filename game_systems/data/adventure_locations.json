@@ -1,0 +1,1511 @@
+{
+    "forest_outskirts": {
+        "name": "Willowcreek Outskirts",
+        "emoji": "🌲",
+        "min_rank": "F",
+        "level_req": 1,
+        "duration_options": [
+            15,
+            30,
+            60
+        ],
+        "monsters": [
+            [
+                "monster_001",
+                40
+            ],
+            [
+                "monster_002",
+                40
+            ],
+            [
+                "monster_003",
+                20
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_003",
+                60
+            ],
+            [
+                "monster_007",
+                40
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_007",
+                "weight": 10,
+                "min_level": 3
+            }
+        ],
+        "description": "The safe edge of the forest. Slimes and weak goblins lurk here.",
+        "gatherables": [
+            [
+                "medicinal_herb",
+                70
+            ],
+            [
+                "magic_stone_fragment",
+                30
+            ]
+        ],
+        "special_events": [
+            "safe_room",
+            "hidden_stash"
+        ],
+        "floor_depth": 1,
+        "danger_level": 2
+    },
+    "whispering_thicket": {
+        "name": "Whispering Thicket",
+        "emoji": "🍃",
+        "min_rank": "E",
+        "level_req": 5,
+        "duration_options": [
+            30,
+            60,
+            120
+        ],
+        "monsters": [
+            [
+                "monster_004",
+                30
+            ],
+            [
+                "monster_005",
+                30
+            ],
+            [
+                "monster_006",
+                20
+            ],
+            [
+                "monster_008",
+                10
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_008",
+                40
+            ],
+            [
+                "monster_005",
+                20
+            ],
+            [
+                "monster_006",
+                20
+            ],
+            [
+                "monster_010",
+                20
+            ]
+        ],
+        "description": "Sunlight struggles to pierce the canopy. The creatures here hunt in packs.",
+        "gatherables": [
+            [
+                "medicinal_herb",
+                40
+            ],
+            [
+                "ancient_wood",
+                40
+            ],
+            [
+                "magic_stone_small",
+                20
+            ]
+        ],
+        "special_events": [
+            "hidden_stash",
+            "trap_pit"
+        ],
+        "floor_depth": 5,
+        "danger_level": 3
+    },
+    "deepgrove_roots": {
+        "name": "Deepgrove Roots",
+        "emoji": "🍄",
+        "min_rank": "D",
+        "level_req": 10,
+        "duration_options": [
+            60,
+            120,
+            240
+        ],
+        "monsters": [
+            [
+                "monster_010",
+                25
+            ],
+            [
+                "monster_016",
+                25
+            ],
+            [
+                "monster_020",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_017",
+                "weight": 5,
+                "min_level": 12
+            }
+        ],
+        "night_monsters": [
+            [
+                "monster_010",
+                40
+            ],
+            [
+                "monster_020",
+                40
+            ],
+            [
+                "monster_016",
+                20
+            ]
+        ],
+        "description": "The corrupted heart of the forest. Roots coil like serpents, and the air tastes of rot.",
+        "gatherables": [
+            [
+                "ancient_wood",
+                50
+            ],
+            [
+                "iron_ore",
+                30
+            ],
+            [
+                "magic_stone_medium",
+                20
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine"
+        ],
+        "floor_depth": 10,
+        "danger_level": 4
+    },
+    "the_ashlands": {
+        "name": "The Ashlands",
+        "emoji": "🌋",
+        "min_rank": "D",
+        "level_req": 12,
+        "duration_options": [
+            60,
+            120,
+            240
+        ],
+        "monsters": [
+            [
+                "monster_131",
+                30
+            ],
+            [
+                "monster_132",
+                30
+            ],
+            [
+                "monster_133",
+                25
+            ],
+            [
+                "monster_134",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_133",
+                40
+            ],
+            [
+                "monster_134",
+                40
+            ],
+            [
+                "monster_132",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_135",
+                "weight": 5,
+                "min_level": 16
+            }
+        ],
+        "description": "A grey wasteland of volcanic ash and skeletal trees. The heat is oppressive.",
+        "gatherables": [
+            [
+                "obsidian_shard",
+                40
+            ],
+            [
+                "ash_blossom",
+                30
+            ],
+            [
+                "iron_ore",
+                20
+            ],
+            [
+                "magic_stone_medium",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "hidden_stash",
+            "safe_room"
+        ],
+        "floor_depth": 12,
+        "danger_level": 4
+    },
+    "shrouded_fen": {
+        "name": "The Shrouded Fen",
+        "emoji": "🌫️",
+        "min_rank": "C",
+        "level_req": 15,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_022",
+                30
+            ],
+            [
+                "monster_023",
+                20
+            ],
+            [
+                "monster_025",
+                20
+            ],
+            [
+                "monster_027",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_027",
+                50
+            ],
+            [
+                "monster_022",
+                30
+            ],
+            [
+                "monster_025",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_028",
+                "weight": 10,
+                "min_level": 16
+            },
+            {
+                "monster_key": "monster_034",
+                "weight": 5,
+                "min_level": 18
+            }
+        ],
+        "description": "A mist-choked wetland where the veil is thin. Shadows move in the fog, and the ground hungers for the unwary.",
+        "gatherables": [
+            [
+                "medicinal_herb",
+                30
+            ],
+            [
+                "ancient_wood",
+                45
+            ],
+            [
+                "iron_ore",
+                20
+            ],
+            [
+                "magic_stone_medium",
+                45
+            ],
+            [
+                "shadow_essence",
+                10
+            ]
+        ],
+        "special_events": [
+            "safe_room",
+            "trap_pit"
+        ],
+        "floor_depth": 15,
+        "danger_level": 5
+    },
+    "sunken_grotto": {
+        "name": "The Sunken Grotto",
+        "emoji": "🌊",
+        "min_rank": "C",
+        "level_req": 18,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_121",
+                30
+            ],
+            [
+                "monster_122",
+                30
+            ],
+            [
+                "monster_123",
+                25
+            ],
+            [
+                "monster_124",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_122",
+                40
+            ],
+            [
+                "monster_124",
+                40
+            ],
+            [
+                "monster_123",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_125",
+                "weight": 5,
+                "min_level": 23
+            }
+        ],
+        "description": "A submerged cavern network lit by bioluminescence. The water here is deep and cold.",
+        "gatherables": [
+            [
+                "coral_fragment",
+                40
+            ],
+            [
+                "pearl",
+                30
+            ],
+            [
+                "magic_stone_medium",
+                20
+            ],
+            [
+                "bioluminescent_scale",
+                10
+            ]
+        ],
+        "special_events": [
+            "hidden_stash",
+            "ancient_shrine"
+        ],
+        "floor_depth": 18,
+        "danger_level": 5
+    },
+    "crystal_caverns": {
+        "name": "The Crystal Caverns",
+        "emoji": "💎",
+        "min_rank": "B",
+        "level_req": 20,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_101",
+                30
+            ],
+            [
+                "monster_102",
+                30
+            ],
+            [
+                "monster_103",
+                25
+            ],
+            [
+                "monster_104",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_104",
+                40
+            ],
+            [
+                "monster_103",
+                30
+            ],
+            [
+                "monster_102",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_105",
+                "weight": 5,
+                "min_level": 25
+            }
+        ],
+        "description": "A breathtaking subterranean world of glowing crystals and ancient technology.",
+        "gatherables": [
+            [
+                "luminescent_crystal",
+                40
+            ],
+            [
+                "mithril_ore",
+                30
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ]
+        ],
+        "special_events": [
+            "safe_room",
+            "ancient_shrine"
+        ],
+        "floor_depth": 20,
+        "danger_level": 6
+    },
+    "clockwork_halls": {
+        "name": "The Clockwork Halls",
+        "emoji": "⚙️",
+        "min_rank": "B",
+        "level_req": 22,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_126",
+                30
+            ],
+            [
+                "monster_127",
+                30
+            ],
+            [
+                "monster_128",
+                25
+            ],
+            [
+                "monster_129",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_126",
+                40
+            ],
+            [
+                "monster_128",
+                40
+            ],
+            [
+                "monster_129",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_130",
+                "weight": 5,
+                "min_level": 26
+            }
+        ],
+        "description": "A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.",
+        "gatherables": [
+            [
+                "brass_gear",
+                40
+            ],
+            [
+                "copper_wire",
+                30
+            ],
+            [
+                "spring_coil",
+                20
+            ],
+            [
+                "magic_stone_medium",
+                35
+            ],
+            [
+                "steam_core",
+                10
+            ],
+            [
+                "magic_stone_large",
+                10
+            ],
+            [
+                "clockwork_heart",
+                1
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "hidden_stash"
+        ],
+        "floor_depth": 22,
+        "danger_level": 6
+    },
+    "forgotten_ossuary": {
+        "name": "The Forgotten Ossuary",
+        "emoji": "💀",
+        "min_rank": "B",
+        "level_req": 24,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_051",
+                30
+            ],
+            [
+                "monster_052",
+                30
+            ],
+            [
+                "monster_053",
+                25
+            ],
+            [
+                "monster_054",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_053",
+                40
+            ],
+            [
+                "monster_054",
+                30
+            ],
+            [
+                "monster_052",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_055",
+                "weight": 5,
+                "min_level": 26
+            }
+        ],
+        "description": "A silent labyrinth of bone and shadow. The air is cold and smells of ancient dust.",
+        "gatherables": [
+            [
+                "bone_shard",
+                40
+            ],
+            [
+                "grave_dust",
+                30
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "hidden_stash",
+            "ancient_shrine"
+        ],
+        "floor_depth": 24,
+        "danger_level": 6
+    },
+    "molten_caldera": {
+        "name": "The Molten Caldera",
+        "emoji": "🌋",
+        "min_rank": "A",
+        "level_req": 30,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_106",
+                30
+            ],
+            [
+                "monster_107",
+                30
+            ],
+            [
+                "monster_108",
+                25
+            ],
+            [
+                "monster_109",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_108",
+                40
+            ],
+            [
+                "monster_109",
+                30
+            ],
+            [
+                "monster_106",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_110",
+                "weight": 5,
+                "min_level": 35
+            }
+        ],
+        "description": "A churning lake of fire and obsidian. The heat alone is enough to kill the unprepared.",
+        "gatherables": [
+            [
+                "obsidian_shard",
+                25
+            ],
+            [
+                "fire_essence",
+                15
+            ],
+            [
+                "magma_core",
+                5
+            ],
+            [
+                "magic_stone_large",
+                2
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "safe_room"
+        ],
+        "floor_depth": 30,
+        "danger_level": 7
+    },
+    "thunder_crag_coast": {
+        "name": "The Thunder-Crag Coast",
+        "emoji": "⛈️",
+        "min_rank": "A",
+        "level_req": 33,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_146",
+                30
+            ],
+            [
+                "monster_147",
+                30
+            ],
+            [
+                "monster_148",
+                25
+            ],
+            [
+                "monster_149",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_149",
+                40
+            ],
+            [
+                "monster_147",
+                30
+            ],
+            [
+                "monster_148",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_150",
+                "weight": 5,
+                "min_level": 36
+            }
+        ],
+        "description": "A treacherous shoreline of jagged cliffs and shipwrecks, battered by an endless storm.",
+        "gatherables": [
+            [
+                "fulgurite_shard",
+                30
+            ],
+            [
+                "storm_essence",
+                25
+            ],
+            [
+                "magic_stone_large",
+                20
+            ],
+            [
+                "mithril_ore",
+                15
+            ],
+            [
+                "charged_core",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine",
+            "hidden_stash"
+        ],
+        "floor_depth": 33,
+        "danger_level": 7
+    },
+    "frostfall_expanse": {
+        "name": "The Frostfall Expanse",
+        "emoji": "❄️",
+        "min_rank": "B",
+        "level_req": 25,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_111",
+                30
+            ],
+            [
+                "monster_112",
+                25
+            ],
+            [
+                "monster_113",
+                30
+            ],
+            [
+                "monster_114",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_111",
+                40
+            ],
+            [
+                "monster_113",
+                30
+            ],
+            [
+                "monster_114",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_115",
+                "weight": 5,
+                "min_level": 29
+            }
+        ],
+        "description": "A frozen wasteland where the wind cuts like a knife and only the strong survive.",
+        "gatherables": [
+            [
+                "frost_crystal",
+                40
+            ],
+            [
+                "winter_wolf_pelt",
+                30
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ]
+        ],
+        "special_events": [
+            "safe_room",
+            "hidden_stash"
+        ],
+        "floor_depth": 25,
+        "danger_level": 6
+    },
+    "void_sanctum": {
+        "name": "The Void Sanctum",
+        "emoji": "⚫",
+        "min_rank": "S",
+        "level_req": 40,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_116",
+                30
+            ],
+            [
+                "monster_118",
+                30
+            ],
+            [
+                "monster_117",
+                25
+            ],
+            [
+                "monster_119",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_116",
+                50
+            ],
+            [
+                "monster_119",
+                30
+            ],
+            [
+                "monster_118",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_120",
+                "weight": 5,
+                "min_level": 44
+            }
+        ],
+        "description": "A realm where reality frays and silence screams. The final frontier of the known world.",
+        "gatherables": [
+            [
+                "void_dust",
+                40
+            ],
+            [
+                "abyssal_shackle",
+                30
+            ],
+            [
+                "entropy_crystal",
+                20
+            ],
+            [
+                "magic_stone_flawless",
+                30
+            ],
+            [
+                "null_stone",
+                10
+            ],
+            [
+                "void_heart",
+                2
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine"
+        ],
+        "floor_depth": 40,
+        "danger_level": 8
+    },
+    "gale_scarred_heights": {
+        "name": "Gale-Scarred Heights",
+        "emoji": "🌪️",
+        "min_rank": "A",
+        "level_req": 35,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_136",
+                30
+            ],
+            [
+                "monster_137",
+                30
+            ],
+            [
+                "monster_138",
+                25
+            ],
+            [
+                "monster_139",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_138",
+                40
+            ],
+            [
+                "monster_139",
+                30
+            ],
+            [
+                "monster_137",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_140",
+                "weight": 5,
+                "min_level": 39
+            }
+        ],
+        "description": "High peaks where the wind howls like a living thing. Only the sure-footed survive.",
+        "gatherables": [
+            [
+                "cloud_wisp",
+                40
+            ],
+            [
+                "mithril_ore",
+                30
+            ],
+            [
+                "magic_stone_large",
+                20
+            ],
+            [
+                "charged_core",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine"
+        ],
+        "floor_depth": 35,
+        "danger_level": 7
+    },
+    "celestial_archipelago": {
+        "name": "The Celestial Archipelago",
+        "emoji": "☁️",
+        "min_rank": "A",
+        "level_req": 28,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_141",
+                30
+            ],
+            [
+                "monster_142",
+                30
+            ],
+            [
+                "monster_143",
+                25
+            ],
+            [
+                "monster_144",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_144",
+                40
+            ],
+            [
+                "monster_143",
+                30
+            ],
+            [
+                "monster_142",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_145",
+                "weight": 5,
+                "min_level": 32
+            }
+        ],
+        "description": "Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.",
+        "gatherables": [
+            [
+                "aether_stone",
+                40
+            ],
+            [
+                "star_metal_fragment",
+                30
+            ],
+            [
+                "ancient_tablet",
+                20
+            ],
+            [
+                "magic_stone_large",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "safe_room",
+            "ancient_shrine"
+        ],
+        "floor_depth": 28,
+        "danger_level": 6
+    },
+    "shimmering_wastes": {
+        "name": "The Shimmering Wastes",
+        "emoji": "✨",
+        "min_rank": "A",
+        "level_req": 37,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_151",
+                30
+            ],
+            [
+                "monster_152",
+                30
+            ],
+            [
+                "monster_153",
+                25
+            ],
+            [
+                "monster_154",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_153",
+                40
+            ],
+            [
+                "monster_154",
+                30
+            ],
+            [
+                "monster_151",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_155",
+                "weight": 5,
+                "min_level": 40
+            }
+        ],
+        "description": "A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.",
+        "gatherables": [
+            [
+                "prism_shard",
+                30
+            ],
+            [
+                "concentrated_light",
+                39
+            ],
+            [
+                "magic_stone_flawless",
+                20
+            ],
+            [
+                "mithril_ore",
+                10
+            ],
+            [
+                "glass_heart",
+                1
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine"
+        ],
+        "floor_depth": 37,
+        "danger_level": 7
+    },
+    "guild_arena": {
+        "name": "Guild Proving Grounds",
+        "emoji": "🏟️",
+        "min_rank": "F",
+        "level_req": 1,
+        "duration_options": [],
+        "monsters": [],
+        "description": "The dedicated arena for Adventurer rank examinations.",
+        "floor_depth": 1,
+        "danger_level": 1
+    },
+    "whispering_archives": {
+        "name": "The Whispering Archives",
+        "emoji": "📚",
+        "min_rank": "B",
+        "level_req": 26,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_156",
+                30
+            ],
+            [
+                "monster_157",
+                30
+            ],
+            [
+                "monster_158",
+                25
+            ],
+            [
+                "monster_159",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_158",
+                40
+            ],
+            [
+                "monster_157",
+                30
+            ],
+            [
+                "monster_156",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_160",
+                "weight": 5,
+                "min_level": 30
+            }
+        ],
+        "description": "Endless rows of floating books and whispering shadows. Knowledge here comes at a price.",
+        "gatherables": [
+            [
+                "ancient_tablet",
+                40
+            ],
+            [
+                "magic_stone_medium",
+                30
+            ],
+            [
+                "paper_scrap",
+                20
+            ],
+            [
+                "enchanted_ink",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine",
+            "hidden_stash"
+        ],
+        "floor_depth": 26,
+        "danger_level": 6
+    },
+    "rust_wastes": {
+        "name": "The Rust-Wastes",
+        "emoji": "⚙️",
+        "min_rank": "E",
+        "level_req": 8,
+        "duration_options": [
+            30,
+            60,
+            120
+        ],
+        "monsters": [
+            [
+                "monster_161",
+                40
+            ],
+            [
+                "monster_162",
+                30
+            ],
+            [
+                "monster_163",
+                20
+            ],
+            [
+                "monster_164",
+                10
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_161",
+                30
+            ],
+            [
+                "monster_163",
+                40
+            ],
+            [
+                "monster_164",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_165",
+                "weight": 5,
+                "min_level": 12
+            }
+        ],
+        "description": "A valley of jagged scrap metal and pools of oil, prowled by scavengers and constructs.",
+        "gatherables": [
+            [
+                "rusted_scrap",
+                60
+            ],
+            [
+                "iron_ore",
+                30
+            ],
+            [
+                "copper_wire",
+                20
+            ],
+            [
+                "magic_stone_small",
+                20
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "hidden_stash"
+        ],
+        "floor_depth": 8,
+        "danger_level": 3
+    },
+    "silent_city_ouros": {
+        "name": "The Silent City of Ouros",
+        "emoji": "🕰️",
+        "min_rank": "S",
+        "level_req": 42,
+        "prerequisite_location": "void_sanctum",
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "temporal_wraith",
+                30
+            ],
+            [
+                "hollowed_sentinel",
+                30
+            ],
+            [
+                "abyssal_creeper",
+                25
+            ],
+            [
+                "monster_119",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "temporal_wraith",
+                40
+            ],
+            [
+                "hollowed_sentinel",
+                40
+            ],
+            [
+                "monster_119",
+                20
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "echoing_behemoth",
+                "weight": 5,
+                "min_level": 45
+            }
+        ],
+        "description": "An eerie, dead metropolis swallowed by the earth during The Sundering. Its perfect preservation is unnerving, and the absolute silence is deafening.",
+        "gatherables": [
+            [
+                "chronal_dust",
+                40
+            ],
+            [
+                "perfected_glass",
+                30
+            ],
+            [
+                "ancient_ourosan_coin",
+                20
+            ],
+            [
+                "void_touched_relic",
+                10
+            ]
+        ],
+        "special_events": [
+            "temporal_rift",
+            "ancient_shrine"
+        ],
+        "floor_depth": 42,
+        "danger_level": 8
+    },
+    "wailing_chasm": {
+        "name": "The Wailing Chasm",
+        "emoji": "🕳️",
+        "min_rank": "A",
+        "level_req": 35,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "blind_choir_zealot",
+                40
+            ],
+            [
+                "monster_116",
+                30
+            ],
+            [
+                "monster_158",
+                30
+            ]
+        ],
+        "night_monsters": [
+            [
+                "blind_choir_zealot",
+                50
+            ],
+            [
+                "monster_116",
+                50
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "choirmaster",
+                "weight": 5,
+                "min_level": 38
+            }
+        ],
+        "description": "A claustrophobic, pitch-black subterranean abyss where echoes of The Sundering are physically trapped.",
+        "gatherables": [
+            [
+                "ancient_tablet",
+                40
+            ],
+            [
+                "shadow_essence",
+                30
+            ]
+        ],
+        "special_events": [
+            "trap_pit"
+        ],
+        "floor_depth": 36,
+        "danger_level": 7
+    }
+}

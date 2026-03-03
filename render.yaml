@@ -1,0 +1,18 @@
+# Render Blueprint – Eldoria Quest Discord Bot
+# https://docs.render.com/blueprint-spec
+
+services:
+  - type: worker
+    name: eldoria-quest-bot
+    runtime: python
+    buildCommand: bash scripts/build.sh
+    startCommand: python main.py
+    envVars:
+      - key: DISCORD_BOT_TOKEN
+        sync: false          # Set manually in Render dashboard
+      - key: GUILD_ID
+        sync: false
+      - key: MONGO_URI
+        sync: false          # Set manually in Render dashboard
+      - key: PYTHON_VERSION
+        value: "3.13.9"

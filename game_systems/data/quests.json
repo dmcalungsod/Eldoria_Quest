@@ -1,0 +1,1665 @@
+[
+  {
+    "id": 1,
+    "title": "The Ooze that Whispers",
+    "tier": "F",
+    "quest_giver": "Farmer Tallen",
+    "location": "Willowcreek Outskirts",
+    "summary": "Farmer Tallen fears the slimes are watching him.",
+    "description": "Farmer Tallen is terrified. The slimes aren't just eating crops; they are *watching* him. He swears one formed a face that looked like his late wife. He needs you to kill them and bring back samples to the Alchemist, but he's too scared to touch them.",
+    "objectives": {
+      "defeat": {
+        "Verdant Slime": 5
+      },
+      "collect": {
+        "slime_gel": 3
+      },
+      "examine": {
+        "pulsing_puddle": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Verdant Slime": "The slime dissolves with a sound like a sigh. Was that... relief?",
+      "collect:slime_gel": "The gel is warm and vibrates faintly in your flask.",
+      "examine:pulsing_puddle": "You find a puddle of slime that isn't evaporating. It ripples in a pattern... almost like a heartbeat."
+    },
+    "rewards": {
+      "exp": 300,
+      "aurum": 80,
+      "item": "Dewfall Tonic"
+    }
+  },
+  {
+    "id": 2,
+    "title": "Gathering Healing Herbs",
+    "tier": "F",
+    "quest_giver": "Herbalist Mirra",
+    "location": "Whispering Thicket",
+    "summary": "The local healer needs fresh medicinal plants.",
+    "description": "The Whispering Thicket grows herbs found nowhere else, especially Moonleaf—gleaming silver leaves used to treat fevers. With monsters stirring, Mirra can’t safely gather them herself. She requests an adventurer to harvest the plants before night-dew poisons their potency.",
+    "objectives": {
+      "gather": {
+        "Moonleaf Herb": 5
+      }
+    },
+    "rewards": {
+      "exp": 200,
+      "aurum": 45,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 3,
+    "title": "Lost Child of the Creek",
+    "tier": "F",
+    "quest_giver": "Guard Orlin",
+    "location": "Willowcreek",
+    "summary": "A villager’s child wandered into the forest.",
+    "description": "A young girl, Lina, chased her pet sprite into the treeline and never returned. The local guard is stretched thin and needs someone swift to search the nearby clearings. Time is short—nightfall brings predators hungrier than wolves.",
+    "objectives": {
+      "locate": "Lina",
+      "escort": "Lina"
+    },
+    "rewards": {
+      "exp": 300,
+      "aurum": 75
+    }
+  },
+  {
+    "id": 4,
+    "title": "A Pest Problem",
+    "tier": "F",
+    "quest_giver": "Supply Merchant Doran",
+    "location": "Forest Edge",
+    "summary": "Giant forest rats are tearing into supply crates.",
+    "description": "Doran’s shipments have been gnawed open by oversized rodents infused with Veil-sickness. Their boldness grows daily, and his livelihood is at risk. Clear them out before he loses another week’s worth of grain and cloth.",
+    "objectives": {
+      "defeat": {
+        "Goblin Grunt": 8
+      }
+    },
+    "rewards": {
+      "exp": 275,
+      "aurum": 65
+    }
+  },
+  {
+    "id": 5,
+    "title": "Timber Run",
+    "tier": "F",
+    "quest_giver": "Carpenter Elwin",
+    "location": "Lumberjack’s Road",
+    "summary": "Deliver chopped timber to Willowcreek.",
+    "description": "Travelers fear the woodland paths at dusk, forcing Elwin’s workers to abandon their supply of freshly cut lumber. The carpenter needs someone resilient enough to haul the materials before thieves or creatures steal them away.",
+    "objectives": {
+      "transport": {
+        "Timber Bundle": 1
+      }
+    },
+    "rewards": {
+      "exp": 150,
+      "aurum": 90
+    }
+  },
+  {
+    "id": 6,
+    "title": "Clear the Campsite",
+    "tier": "F",
+    "quest_giver": "Young Explorer Rima",
+    "location": "Eastwood Camp",
+    "summary": "Clear goblins from a campsite Rima wants to use.",
+    "description": "Rima, an overly enthusiastic explorer, set up camp deep in goblin-infested brush. Before she can proceed with her “grand expedition,” she needs the area cleared of lurking scavenger goblins.",
+    "objectives": {
+      "defeat": {
+        "Goblin Grunt": 5
+      }
+    },
+    "rewards": {
+      "exp": 225,
+      "aurum": 50
+    }
+  },
+  {
+    "id": 7,
+    "title": "Strange Tracks",
+    "tier": "F",
+    "quest_giver": "Hunter Yorin",
+    "location": "North Ferntrail",
+    "summary": "Investigate unusual beast tracks near town.",
+    "description": "Claw marks and hoofprints twisted by corruption have appeared near the northern trail. Yorin suspects a malformed creature but needs confirmation from someone willing to venture deeper.",
+    "objectives": {
+      "examine": {
+        "Track Sites": 3
+      },
+      "report_to": "Hunter Yorin"
+    },
+    "rewards": {
+      "exp": 200,
+      "aurum": 45
+    }
+  },
+  {
+    "id": 8,
+    "title": "Lantern Delivery",
+    "tier": "F",
+    "quest_giver": "Shopkeeper Helia",
+    "location": "Willowcreek",
+    "summary": "Deliver lanterns to patrolling guards.",
+    "description": "With fog thickening earlier each day, sentries require new lanterns to maintain visibility. Highwaymen have grown bold at dusk, so the guards depend on timely supply delivery.",
+    "objectives": {
+      "deliver": {
+        "Lanterns": 3
+      }
+    },
+    "rewards": {
+      "exp": 150,
+      "aurum": 40
+    }
+  },
+  {
+    "id": 9,
+    "title": "A Meal for the Road",
+    "tier": "F",
+    "quest_giver": "Innkeeper Vero",
+    "location": "Cranelight Inn",
+    "summary": "Gather ingredients for travel rations.",
+    "description": "Vero’s inn prepares provisions for those venturing into the forest. He needs fresh mushroom caps and forest berries, both of which grow near shallow cave mouths—often watched by lurking slimes.",
+    "objectives": {
+      "collect": {
+        "Cavecap Mushroom": 4,
+        "Wild Berry": 3
+      }
+    },
+    "rewards": {
+      "exp": 220,
+      "aurum": 45,
+      "item": "Trailman's Ration"
+    }
+  },
+  {
+    "id": 10,
+    "title": "The Broken Snare",
+    "tier": "F",
+    "quest_giver": "Trapper Dane",
+    "location": "Southwood",
+    "summary": "Retrieve parts from damaged animal traps.",
+    "description": "Dane’s metal snares were shattered, bent by something far stronger than wolves. He wishes to salvage what remains before it rusts or is stolen by goblins.",
+    "objectives": {
+      "retrieve": {
+        "Trap Springs": 3
+      }
+    },
+    "rewards": {
+      "exp": 180,
+      "aurum": 55
+    }
+  },
+  {
+    "id": 11,
+    "title": "Goblin Skirmishers",
+    "tier": "E",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Eastern Forest",
+    "summary": "Goblins are organizing raids.",
+    "description": "For the first time in seasons, goblins have formed war skirmishes. Their scouts have been spotted mapping forest paths—an alarming sign of future raids. Rhea needs swift action before these pests grow bold enough to strike Willowcreek.",
+    "objectives": {
+      "defeat": {
+        "Goblin Scout": 7
+      },
+      "retrieve": {
+        "Map Fragment": 1
+      }
+    },
+    "rewards": {
+      "exp": 450,
+      "aurum": 120
+    }
+  },
+  {
+    "id": 12,
+    "title": "Venom in the Roots",
+    "tier": "E",
+    "quest_giver": "Apothecary Lune",
+    "location": "Deepgrove Roots",
+    "summary": "Collect venom samples from poisonous snakes.",
+    "description": "Strange serpents have slithered into the grove, their fangs dripping an iridescent toxin unseen since before the Sundering. Lune hopes to refine an antidote—but only if someone brings her samples.",
+    "objectives": {
+      "collect": {
+        "Serpent Venom": 3
+      }
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 100,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 13,
+    "title": "Echoes in the Hollow",
+    "tier": "E",
+    "quest_giver": "Hermit Sorin",
+    "location": "Hollowtree Den",
+    "summary": "Investigate eerie whispers from a rotten tree cavern.",
+    "description": "Travelers claim that the Hollowtree whispers names, luring wanderers closer. Sorin suspects a Veil-born sprite nesting inside. He needs someone who won’t be fooled by its illusions.",
+    "objectives": {
+      "investigate": "Hollowtree",
+      "defeat": {
+        "Burbling Sprite": 1
+      }
+    },
+    "rewards": {
+      "exp": 500,
+      "aurum": 140
+    }
+  },
+  {
+    "id": 14,
+    "title": "The Lumberjack’s Wrath",
+    "tier": "E",
+    "quest_giver": "Lumberjack Bran",
+    "location": "Birchfall Path",
+    "summary": "Eliminate a territorial Treeling.",
+    "description": "A sentient sap-creature—the Treeling—has claimed Birchfall Path, harassing workers and smashing tools. Bran asks for aid before the creature’s roots choke out the entire path.",
+    "objectives": {
+      "defeat": {
+        "Vineling": 1
+      }
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 180,
+      "item": "Elixir of Verdant Heart"
+    }
+  },
+  {
+    "id": 15,
+    "title": "Shadows Over the Water",
+    "tier": "E",
+    "quest_giver": "Fisher Amon",
+    "location": "Moonwater Shore",
+    "summary": "Water spirits are disturbing fishermen.",
+    "description": "Moonwater’s surface shimmers even without sun, revealing restless Naiads that drag nets underwater. Amon fears someone will be taken next. He needs protection.",
+    "objectives": {
+      "defeat": {
+        "Fen Wisp": 3
+      }
+    },
+    "rewards": {
+      "exp": 420,
+      "aurum": 90
+    }
+  },
+  {
+    "id": 16,
+    "title": "Broken Idol Pieces",
+    "tier": "E",
+    "quest_giver": "Traveling Scholar Firren",
+    "location": "Mossdeep Trail",
+    "summary": "Recover fragments of an ancient forest idol.",
+    "description": "Goblins shattered a woodland idol to steal its gemstones. Firren wishes to reassemble the relic before its latent magic spills into the wild.",
+    "objectives": {
+      "retrieve": {
+        "Idol Fragments": 4
+      }
+    },
+    "rewards": {
+      "exp": 380,
+      "aurum": 130
+    }
+  },
+  {
+    "id": 17,
+    "title": "A Test of Aim",
+    "tier": "E",
+    "quest_giver": "Ranger Alyss",
+    "location": "Ranger Outpost",
+    "summary": "Practice combat against agile forest beasts.",
+    "description": "Alyss trains new recruits by sending them after Swift-tail Hares—nimble creatures infused with faint forest magic. Catching them tests reflex and precision.",
+    "objectives": {
+      "defeat": {
+        "Gloam Hare": 5
+      }
+    },
+    "rewards": {
+      "exp": 350,
+      "aurum": 60,
+      "item": "Runner's Cordial"
+    }
+  },
+  {
+    "id": 18,
+    "title": "The Missing Courier",
+    "tier": "E",
+    "quest_giver": "Town Hall",
+    "location": "Northern Road",
+    "summary": "Find a courier who vanished en route to Willowcreek.",
+    "description": "A forest courier carrying urgent correspondence never arrived. Tracks suggest he was chased off-road by beasts. His satchel holds valuable village contracts.",
+    "objectives": {
+      "find": "Courier",
+      "retrieve": "Mail Satchel"
+    },
+    "rewards": {
+      "exp": 450,
+      "aurum": 100
+    }
+  },
+  {
+    "id": 19,
+    "title": "Spider Nest Purge",
+    "tier": "E",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Webwood",
+    "summary": "Destroy a growing spider nest.",
+    "description": "The Webwood’s population of brood spiders has ballooned, stringing webs across traveler roads. Their venom weakens limbs, making escape impossible. Rhea requires an adventurer to thin their numbers.",
+    "objectives": {
+      "defeat": {
+        "Thicket Spider": 6
+      }
+    },
+    "rewards": {
+      "exp": 550,
+      "aurum": 150,
+      "item": "Panacea Root Paste"
+    }
+  },
+  {
+    "id": 20,
+    "title": "Mushroom Menace",
+    "tier": "E",
+    "quest_giver": "Gatherer Pim",
+    "location": "Sporebrush Patch",
+    "summary": "Defeat aggressive fungus creatures.",
+    "description": "Sporeshrooms have sprouted beyond their usual cycle, animated by warped forest mana. Pim’s harvesting routes are blocked unless these lumbering fungi are cleared.",
+    "objectives": {
+      "defeat": {
+        "Sporeling": 4
+      }
+    },
+    "rewards": {
+      "exp": 500,
+      "aurum": 130
+    }
+  },
+  {
+    "id": 21,
+    "title": "The Goblin Lieutenant",
+    "tier": "D",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Ruined Camp",
+    "summary": "Take down a goblin commander.",
+    "description": "A cunning goblin lieutenant has unified several scattered tribes. His camp rings with stolen steel and crude banners. If left unchecked, an organized horde might rise.",
+    "objectives": {
+      "defeat": {
+        "Bramble Goblin": 1
+      }
+    },
+    "rewards": {
+      "exp": 800,
+      "aurum": 300,
+      "item": "Captains' Ale (Embolden)"
+    }
+  },
+  {
+    "id": 22,
+    "title": "Forest Spirit in Pain",
+    "tier": "D",
+    "quest_giver": "Druidess Leira",
+    "location": "Heartwood Glade",
+    "summary": "Aid a wounded forest spirit.",
+    "description": "A Heartwood Sprite has been corrupted by a splinter of Veil energy lodged in its body. Leira believes an adventurer with a steady hand can help remove it—if they can survive its thrashing.",
+    "objectives": {
+      "subdue": "Wisp-Sentinel",
+      "remove": "Veil Splinter"
+    },
+    "rewards": {
+      "exp": 750,
+      "aurum": 250,
+      "item": "Sap of Renewal"
+    }
+  },
+  {
+    "id": 23,
+    "title": "Hunt the Moonfang Wolf",
+    "tier": "D",
+    "quest_giver": "Hunter Yorin",
+    "location": "Moonfang Den",
+    "summary": "Hunt a powerful forest wolf touched by moonlight.",
+    "description": "The Moonfang Wolf is a silver-coated predator that leads lesser wolves with eerie discipline. Yorin fears it will turn its pack upon the village unless someone challenges it.",
+    "objectives": {
+      "defeat": {
+        "Ridge Wolf": 1
+      }
+    },
+    "rewards": {
+      "exp": 900,
+      "aurum": 350,
+      "item": "Glade Salve Vial"
+    }
+  },
+  {
+    "id": 24,
+    "title": "Entangled Roots",
+    "tier": "D",
+    "quest_giver": "Woodsman Eddan",
+    "location": "Rootcoil Valley",
+    "summary": "Destroy corrupted root-beasts.",
+    "description": "Tanglesap Creatures—animated roots—have begun striking at loggers. Their claws are formed of hardened bark and their bodies pulse with sickly green glow.",
+    "objectives": {
+      "defeat": {
+        "Young Treant": 3
+      }
+    },
+    "rewards": {
+      "exp": 700,
+      "aurum": 200
+    }
+  },
+  {
+    "id": 25,
+    "title": "Signs of the First Boss (Thornhide Bear)",
+    "tier": "D",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Western Deepwood",
+    "summary": "Scout territory of the Thornhide Bear.",
+    "description": "Massive claw marks and uprooted trees mark the hunting grounds of Thornhide—the first of the forest’s three boss creatures. Before a slaying party mobilizes, Rhea needs precise scouting intel.",
+    "objectives": {
+      "survey": {
+        "Bear Signs": 3
+      },
+      "report_to": "Guard Captain Rhea"
+    },
+    "rewards": {
+      "exp": 650,
+      "aurum": 180
+    }
+  },
+  {
+    "id": 26,
+    "title": "A Merchant in Tears",
+    "tier": "D",
+    "quest_giver": "Merchant Salvi",
+    "location": "Bramble Road",
+    "summary": "Recover stolen trade goods.",
+    "description": "Bandit-goblins ambushed Salvi and fled into the thicket with his fabrics and spices. The merchant begs someone to reclaim the goods before the creatures burn or eat them.",
+    "objectives": {
+      "recover": {
+        "Trade Crates": 5
+      }
+    },
+    "rewards": {
+      "exp": 750,
+      "aurum": 250,
+      "item": "Lunaris Tonic"
+    }
+  },
+  {
+    "id": 27,
+    "title": "Cleanse the Shrine",
+    "tier": "D",
+    "quest_giver": "Shrine Keeper Mara",
+    "location": "Moonshadow Shrine",
+    "summary": "Purify a shrine corrupted by Veil energy.",
+    "description": "The Moonshadow Shrine’s white stones have turned black-veined, its pool reflecting horrors instead of moonlight. Mara needs an adventurer to drive off the wraithlings haunting it.",
+    "objectives": {
+      "defeat": {
+        "Rookwood Shade": 5
+      },
+      "use": "Purification Amulet"
+    },
+    "rewards": {
+      "exp": 850,
+      "aurum": 280,
+      "item": "Wardkeeper's Vial"
+    }
+  },
+  {
+    "id": 28,
+    "title": "The Spider Matron",
+    "tier": "D",
+    "quest_giver": "Guard Captain Rhea",
+    "location": "Webwood Nest",
+    "summary": "Hunt the matriarch of the spider colony.",
+    "description": "The brood spiders answer to a single massive mother whose venom sacs can rot bark. Her growing brood threatens to spread beyond Webwood entirely.",
+    "objectives": {
+      "defeat": {
+        "Thicket Spider": 10
+      }
+    },
+    "rewards": {
+      "exp": 1000,
+      "aurum": 400,
+      "item": "Panacea Root Paste"
+    }
+  },
+  {
+    "id": 29,
+    "title": "Before the Storm",
+    "tier": "D",
+    "quest_giver": "Town Hall Council",
+    "location": "Willowcreek",
+    "summary": "Prepare the town for coming threats.",
+    "description": "The council fears an impending surge of monsters, driven outward by the forest bosses awakening. They require supplies gathered and warnings spread to outlying homes.",
+    "objectives": {
+      "deliver": {
+        "Warning Notices": 3
+      },
+      "bring": {
+        "Supply Sacks": 2
+      }
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 150
+    }
+  },
+  {
+    "id": 30,
+    "title": "The Whispering Oak",
+    "tier": "D",
+    "quest_giver": "Druidess Leira",
+    "location": "Whispering Oak Circle",
+    "summary": "Investigate a sacred tree murmuring with corrupted voices.",
+    "description": "The Whispering Oak, ancient guardian of the forest, has begun muttering in tones unlike any druidic language. Leira suspects an unseen parasite clinging to its bark—one born of the Veil.",
+    "objectives": {
+      "inspect": "Oak",
+      "defeat": {
+        "Pine Wight": 1
+      }
+    },
+    "rewards": {
+      "exp": 950,
+      "aurum": 320,
+      "item": "Luck-Blessed Cordial"
+    }
+  },
+  {
+    "id": 31,
+    "title": "Storm Warning",
+    "tier": "C",
+    "quest_giver": "Weather-Watcher Jace",
+    "location": "The Shrouded Fen",
+    "summary": "Suppress the rising number of Stormlings.",
+    "description": "Stormlings are crackling with unusual intensity, threatening to spark wildfires despite the damp. Jace needs them thinned out before the static charge becomes a lightning storm.",
+    "objectives": {
+      "defeat": {
+        "Stormling": 8
+      }
+    },
+    "rewards": {
+      "exp": 1200,
+      "aurum": 350
+    }
+  },
+  {
+    "id": 32,
+    "title": "Mire Dredging",
+    "tier": "C",
+    "quest_giver": "Blacksmith Gorn",
+    "location": "The Shrouded Fen",
+    "summary": "Gather Iron Ore from the Fen.",
+    "description": "Gorn claims the iron found in the fen is tempered by the constant magical storms. He needs a fresh supply to forge weapons capable of piercing elite hides.",
+    "objectives": {
+      "gather": {
+        "Iron Ore": 6
+      }
+    },
+    "rewards": {
+      "exp": 1100,
+      "aurum": 400
+    }
+  },
+  {
+    "id": 33,
+    "title": "Shadows in the Mist",
+    "tier": "C",
+    "quest_giver": "Scout Valen",
+    "location": "The Shrouded Fen",
+    "summary": "Hunt the elusive Dusklings.",
+    "description": "Dusklings use the fog to ambush patrols. Valen needs an adventurer to turn the tables and hunt the hunters.",
+    "objectives": {
+      "defeat": {
+        "Duskling": 5
+      }
+    },
+    "rewards": {
+      "exp": 1300,
+      "aurum": 450
+    }
+  },
+  {
+    "id": 34,
+    "title": "The Lost Patrol",
+    "tier": "C",
+    "quest_giver": "Captain Rhea",
+    "location": "The Shrouded Fen",
+    "summary": "Locate the missing patrol unit.",
+    "description": "A squad sent to map the fen has gone silent. Rhea fears they've been led astray by wisps. Find them before the bog claims them forever.",
+    "objectives": {
+      "locate": "Missing Squad"
+    },
+    "rewards": {
+      "exp": 1250,
+      "aurum": 300
+    }
+  },
+  {
+    "id": 35,
+    "title": "Essence of Decay",
+    "tier": "C",
+    "quest_giver": "Alchemist Miral",
+    "location": "The Shrouded Fen",
+    "summary": "Defeat Mire Lurkers for their essence.",
+    "description": "The slime of a Mire Lurker is potent but volatile. Miral needs samples fresh from the source to stabilize her latest brew.",
+    "objectives": {
+      "defeat": {
+        "Mire Lurker": 6
+      }
+    },
+    "rewards": {
+      "exp": 1150,
+      "aurum": 380,
+      "item": "Thicket Antidote"
+    }
+  },
+  {
+    "id": 36,
+    "title": "Revenant's Curse",
+    "tier": "C",
+    "quest_giver": "Priestess Elara",
+    "location": "The Shrouded Fen",
+    "summary": "Put Fen Revenants to rest.",
+    "description": "The restless dead in the fen are rising as Revenants. Elara asks you to grant them peace with steel and spell.",
+    "objectives": {
+      "defeat": {
+        "Fen Revenant": 4
+      }
+    },
+    "rewards": {
+      "exp": 1400,
+      "aurum": 500,
+      "item": "Dewfall Tonic"
+    }
+  },
+  {
+    "id": 37,
+    "title": "Ancient Wood Harvest",
+    "tier": "C",
+    "quest_giver": "Carpenter Elwin",
+    "location": "The Shrouded Fen",
+    "summary": "Gather Ancient Wood.",
+    "description": "The petrified wood of the fen is harder than stone. Elwin needs it for reinforcing the town gates.",
+    "objectives": {
+      "gather": {
+        "Ancient Wood": 5
+      }
+    },
+    "rewards": {
+      "exp": 1100,
+      "aurum": 420
+    }
+  },
+  {
+    "id": 38,
+    "title": "The Glade Empress",
+    "tier": "C",
+    "quest_giver": "Guildmaster Kael",
+    "location": "The Shrouded Fen",
+    "summary": "Slay the Glade Empress.",
+    "description": "The corrupted heart of the fen has manifested as the Glade Empress. Her rule spreads rot. End her reign.",
+    "objectives": {
+      "defeat": {
+        "Glade Empress": 1
+      }
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 1000,
+      "item": "Magic Stone (Large)"
+    }
+  },
+  {
+    "id": 39,
+    "title": "Survey the Ruins",
+    "tier": "C",
+    "quest_giver": "Historian Arin",
+    "location": "The Shrouded Fen",
+    "summary": "Survey the sunken ruins.",
+    "description": "Old ruins have surfaced in the mire. Arin needs a sketch of the inscriptions before they sink again.",
+    "objectives": {
+      "survey": {
+        "Sunken Inscriptions": 3
+      }
+    },
+    "rewards": {
+      "exp": 1200,
+      "aurum": 350
+    }
+  },
+  {
+    "id": 40,
+    "title": "Wisp Hunt",
+    "tier": "C",
+    "quest_giver": "Mage Lyra",
+    "location": "The Shrouded Fen",
+    "summary": "Disperse Wisp-Sentinels.",
+    "description": "The Wisp-Sentinels are coordinating the fen's defenses. Blind the enemy by removing their eyes.",
+    "objectives": {
+      "defeat": {
+        "Wisp-Sentinel": 3
+      }
+    },
+    "rewards": {
+      "exp": 1350,
+      "aurum": 450
+    }
+  },
+  {
+    "id": 41,
+    "title": "Glimmering Harvest",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Crystal Caverns Entrance",
+    "summary": "Collect crystals for lens crafting.",
+    "description": "Jolen requires high-quality Luminescent Crystals to craft lenses for the city's defenses. The ones found near the surface are too clouded, so you must venture deeper.",
+    "objectives": {
+      "collect": {
+        "Luminescent Crystal": 5
+      }
+    },
+    "rewards": {
+      "exp": 1800,
+      "aurum": 550
+    }
+  },
+  {
+    "id": 42,
+    "title": "Shattered Reflections",
+    "tier": "B",
+    "quest_giver": "Scout Mirin",
+    "location": "Crystal Caverns Deep",
+    "summary": "Clear out Prism Spiders blinding scouts.",
+    "description": "Prism Spiders are using the cavern's reflective surfaces to ambush scouts. Their numbers have grown too large for the advance team to handle safely.",
+    "objectives": {
+      "defeat": {
+        "Prism Spider": 5
+      }
+    },
+    "rewards": {
+      "exp": 1900,
+      "aurum": 580
+    }
+  },
+  {
+    "id": 43,
+    "title": "Construct of Old",
+    "tier": "B",
+    "quest_giver": "Historian Arin",
+    "location": "Crystal Caverns Ruins",
+    "summary": "Defeat Crystal Golems guarding ancient texts.",
+    "description": "Ancient texts lie within the deeper ruins of the cavern, but they are guarded by Crystal Golems—automata that have not forgotten their orders after centuries.",
+    "objectives": {
+      "defeat": {
+        "Crystal Golem": 3
+      }
+    },
+    "rewards": {
+      "exp": 2100,
+      "aurum": 620
+    }
+  },
+  {
+    "id": 44,
+    "title": "Shadows in the Light",
+    "tier": "B",
+    "quest_giver": "Captain Rhea",
+    "location": "Crystal Caverns Upper",
+    "summary": "Obsidian Gargoyles are swooping on miners.",
+    "description": "Miners extracting mithril are being targeted by Obsidian Gargoyles. These beasts dive silently from the ceiling, making them a lethal threat to the operation.",
+    "objectives": {
+      "defeat": {
+        "Obsidian Gargoyle": 3
+      }
+    },
+    "rewards": {
+      "exp": 2200,
+      "aurum": 650
+    }
+  },
+  {
+    "id": 45,
+    "title": "Heart of the Cavern",
+    "tier": "B",
+    "quest_giver": "Guildmaster Kael",
+    "location": "Crystal Core",
+    "summary": "The Crystalline Guardian has awakened.",
+    "description": "Tremors from the Crystal Caverns suggest the Crystalline Guardian has stirred. If it is not subdued, the entire cavern system could collapse.",
+    "objectives": {
+      "defeat": {
+        "Crystalline Guardian": 1
+      }
+    },
+    "rewards": {
+      "exp": 3500,
+      "aurum": 1000,
+      "item": "Magic Stone (Large)"
+    }
+  },
+  {
+    "id": 46,
+    "title": "Obsidian Mining",
+    "tier": "A",
+    "quest_giver": "Blacksmith Gorn",
+    "location": "Molten Caldera Rim",
+    "summary": "Retrieve obsidian shards for masterwork weapons.",
+    "description": "Gorn needs Obsidian Shards tempered by the caldera's heat to forge weapons capable of piercing dragon scales. Only the bravest can gather them.",
+    "objectives": {
+      "collect": {
+        "Obsidian Shard": 5
+      }
+    },
+    "rewards": {
+      "exp": 3800,
+      "aurum": 1100
+    }
+  },
+  {
+    "id": 47,
+    "title": "Living Flame",
+    "tier": "A",
+    "quest_giver": "Mage Lyra",
+    "location": "Molten Flows",
+    "summary": "Study Fire Elementals.",
+    "description": "Lyra believes the Fire Elementals of the caldera hold the secret to a lost spell. She needs field data—obtained by engaging them in combat.",
+    "objectives": {
+      "defeat": {
+        "Fire Elemental": 5
+      }
+    },
+    "rewards": {
+      "exp": 3900,
+      "aurum": 1150
+    }
+  },
+  {
+    "id": 48,
+    "title": "Magma Rising",
+    "tier": "A",
+    "quest_giver": "Captain Rhea",
+    "location": "Caldera Depths",
+    "summary": "Magma Golems are blocking the path.",
+    "description": "A lava flow has shifted, and Magma Golems have blocked the main descent path. They must be cleared for the expedition to continue.",
+    "objectives": {
+      "defeat": {
+        "Magma Golem": 4
+      }
+    },
+    "rewards": {
+      "exp": 4100,
+      "aurum": 1200
+    }
+  },
+  {
+    "id": 49,
+    "title": "Drake Hunt",
+    "tier": "A",
+    "quest_giver": "Hunter Yorin",
+    "location": "Drake's Perch",
+    "summary": "A Lava Drake has been spotting near the rim.",
+    "description": "A Lava Drake has claimed a perch dangerously close to the survey camp. Yorin needs a skilled hunter to bring the beast down before it roasts the tents.",
+    "objectives": {
+      "defeat": {
+        "Lava Drake": 2
+      }
+    },
+    "rewards": {
+      "exp": 4300,
+      "aurum": 1300
+    }
+  },
+  {
+    "id": 50,
+    "title": "Lord of Cinders",
+    "tier": "A",
+    "quest_giver": "Guildmaster Kael",
+    "location": "Heart of Fire",
+    "summary": "Ignis threatens to erupt the caldera.",
+    "description": "Ignis, Lord of Cinders, is gathering power at the caldera's heart. If his ritual completes, a volcanic eruption will consume everything. Stop him.",
+    "objectives": {
+      "defeat": {
+        "Ignis, Lord of Cinders": 1
+      }
+    },
+    "rewards": {
+      "exp": 6000,
+      "aurum": 2500,
+      "item": "Magic Stone (Flawless)"
+    }
+  },
+  {
+    "id": 51,
+    "title": "Wolf Pack Thinning",
+    "tier": "A",
+    "quest_giver": "Hunter Yorin",
+    "location": "Frostfall Border",
+    "summary": "Frost Wolves are encroaching on trade routes.",
+    "description": "The Frost Wolves have grown too numerous and are hunting near the main road. Yorin needs their numbers thinned to ensure safe passage for supply caravans.",
+    "objectives": {
+      "defeat": {
+        "Frost Wolf": 6
+      }
+    },
+    "rewards": {
+      "exp": 4500,
+      "aurum": 1400,
+      "item": "Winter Wolf Pelt"
+    }
+  },
+  {
+    "id": 52,
+    "title": "Core Collection",
+    "tier": "A",
+    "quest_giver": "Artificer Jolen",
+    "location": "Frostfall Expanse",
+    "summary": "Collect Ice Cores for research.",
+    "description": "Jolen believes Ice Cores can be used to create powerful cooling enchantments. He needs fresh samples from the constructs of the expanse.",
+    "objectives": {
+      "collect": {
+        "Ice Core": 3
+      }
+    },
+    "rewards": {
+      "exp": 4800,
+      "aurum": 1600
+    }
+  },
+  {
+    "id": 53,
+    "title": "Frozen Constructs",
+    "tier": "A",
+    "quest_giver": "Captain Rhea",
+    "location": "Glacial Valley",
+    "summary": "Ice Golems block the pass.",
+    "description": "A group of Ice Golems has blocked the only pass through the Glacial Valley. Rhea needs a heavy hitter to smash through their ranks.",
+    "objectives": {
+      "defeat": {
+        "Ice Golem": 4
+      }
+    },
+    "rewards": {
+      "exp": 5000,
+      "aurum": 1800
+    }
+  },
+  {
+    "id": 54,
+    "title": "Drake Danger",
+    "tier": "A",
+    "quest_giver": "Scout Valen",
+    "location": "Drake's Peak",
+    "summary": "Glacial Drakes are terrorizing the skies.",
+    "description": "Glacial Drakes are diving from the peaks, freezing scouts before they can report back. Valen needs someone to ground these beasts.",
+    "objectives": {
+      "defeat": {
+        "Glacial Drake": 3
+      }
+    },
+    "rewards": {
+      "exp": 5500,
+      "aurum": 2000,
+      "item": "Frozen Scale"
+    }
+  },
+  {
+    "id": 55,
+    "title": "The Frozen King",
+    "tier": "A",
+    "quest_giver": "Guildmaster Kael",
+    "location": "Cryon's Throne",
+    "summary": "Cryon threatens to freeze the world.",
+    "description": "Cryon, the Frozen King, stirs from his slumber. If he is not stopped, he will bring an eternal winter to Eldoria. End his reign.",
+    "objectives": {
+      "defeat": {
+        "Cryon, the Frozen King": 1
+      }
+    },
+    "rewards": {
+      "exp": 8000,
+      "aurum": 3000,
+      "item": "Magic Stone (Flawless)"
+    }
+  },
+  {
+    "id": 56,
+    "title": "Tide of Stone",
+    "tier": "C",
+    "quest_giver": "Marine Biologist Liora",
+    "location": "The Sunken Grotto",
+    "summary": "Coral Golems are blocking underwater passages.",
+    "description": "The Sunken Grotto's natural pathways are being sealed off by migrating Coral Golems. Liora needs them cleared to access the deeper reefs where rare specimens thrive.",
+    "objectives": {
+      "defeat": {
+        "Coral Golem": 5
+      }
+    },
+    "rewards": {
+      "exp": 1300,
+      "aurum": 420,
+      "item": "Glade Salve Vial"
+    }
+  },
+  {
+    "id": 57,
+    "title": "Lurkers in the Deep",
+    "tier": "C",
+    "quest_giver": "Marine Biologist Liora",
+    "location": "The Sunken Grotto",
+    "summary": "Abyssal Eels are attacking research probes.",
+    "description": "Liora's magical probes, sent to monitor water quality, are being snapped up by Abyssal Eels. Thin their numbers so the research can continue.",
+    "objectives": {
+      "defeat": {
+        "Abyssal Eel": 5
+      }
+    },
+    "rewards": {
+      "exp": 1250,
+      "aurum": 400
+    }
+  },
+  {
+    "id": 58,
+    "title": "Siren's Call",
+    "tier": "C",
+    "quest_giver": "Historian Arin",
+    "location": "The Sunken Grotto",
+    "summary": "Tide Sirens are luring sailors to their doom.",
+    "description": "Old shanties speak of the Tide Sirens' song. Arin has found evidence that these songs are actually a form of corrupted magic that needs to be silenced.",
+    "objectives": {
+      "defeat": {
+        "Tide Siren": 5
+      }
+    },
+    "rewards": {
+      "exp": 1350,
+      "aurum": 450,
+      "item": "Lunaris Tonic"
+    }
+  },
+  {
+    "id": 59,
+    "title": "Crushing Depths",
+    "tier": "C",
+    "quest_giver": "Blacksmith Gorn",
+    "location": "The Sunken Grotto",
+    "summary": "Deep Crawler shells are needed for armor plating.",
+    "description": "The pressure in the Grotto makes Deep Crawler shells incredibly dense. Gorn wants to test if they can be forged into superior plate armor.",
+    "objectives": {
+      "defeat": {
+        "Deep Crawler": 3
+      }
+    },
+    "rewards": {
+      "exp": 1400,
+      "aurum": 500,
+      "item": "Wardkeeper's Vial"
+    }
+  },
+  {
+    "id": 60,
+    "title": "The Leviathan's Wake",
+    "tier": "C",
+    "quest_giver": "Guildmaster Kael",
+    "location": "The Sunken Grotto",
+    "summary": "The Leviathan has surfaced.",
+    "description": "The apex predator of the Grotto, the Leviathan, has grown too bold. Its thrashing causes tidal waves that threaten the coast. It must be put down.",
+    "objectives": {
+      "defeat": {
+        "Leviathan": 1
+      }
+    },
+    "rewards": {
+      "exp": 3000,
+      "aurum": 1500,
+      "item": "Magic Stone (Large)"
+    }
+  },
+  {
+    "id": 61,
+    "title": "The Silent Witness: Evidence",
+    "tier": "E",
+    "quest_giver": "Archivist Thorne",
+    "location": "Willowcreek Outskirts",
+    "summary": "Investigate a potential traitor within the Guild.",
+    "description": "A page has been torn from a forbidden tome in the Guild Library. Archivist Thorne suspects a traitor has stolen it to perform a dark ritual. Search the grounds for clues before the trail goes cold.",
+    "objectives": {
+      "examine": {
+        "Torn Journal Page": 1,
+        "Discarded Dagger": 1
+      },
+      "locate": "Hooded Figure"
+    },
+    "flavor_text": {
+      "examine:Torn Journal Page": "You find a crumpled parchment caught in the brambles. It's covered in frantic scribbles about 'The Weaver's Return'.",
+      "examine:Discarded Dagger": "A dagger with a twisted, serpentine hilt lies half-buried in the mud. The blade hums with a faint, nauseating energy.",
+      "locate:Hooded Figure": "You spot a figure in grey robes slipping into the shadows. They leave behind a pouch of strange, glowing dust."
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 100,
+      "item": "Scholar's Draught"
+    }
+  },
+  {
+    "id": 62,
+    "title": "The Silent Witness: Justice",
+    "tier": "E",
+    "quest_giver": "Archivist Thorne",
+    "location": "Whispering Thicket",
+    "summary": "Hunt down the Veil-bound traitor.",
+    "description": "The clues point to the Whispering Thicket. The traitor, a member of the 'Veil-bound' cult, is attempting to complete the ritual. Thorne has authorized their elimination.",
+    "prerequisites": [
+      61
+    ],
+    "objectives": {
+      "defeat": {
+        "Veil-bound Assassin": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Veil-bound Assassin": "As the assassin falls, their body dissolves into black mist, leaving only the stolen page behind."
+    },
+    "rewards": {
+      "exp": 800,
+      "aurum": 300,
+      "item": "Wardkeeper's Vial"
+    }
+  },
+  {
+    "id": 63,
+    "title": "The Hissing Corridors",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls Entrance",
+    "summary": "Scout the steam-filled corridors.",
+    "description": "Jolen's instruments have picked up strange fluctuations from the ancient Clockwork Halls. The entrance is choked with steam and guarded by wisps of pure energy. Clear the way so he can set up his equipment.",
+    "objectives": {
+      "defeat": {
+        "Steam Wisp": 5
+      }
+    },
+    "flavor_text": {
+      "defeat:Steam Wisp": "The wisp dissipates with a sharp hiss, leaving the air smelling of ozone and copper."
+    },
+    "rewards": {
+      "exp": 2000,
+      "aurum": 600
+    }
+  },
+  {
+    "id": 64,
+    "title": "Gears of War",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "The Clockwork Halls",
+    "summary": "Collect parts for repairs.",
+    "description": "The machinery inside is marvelous but degraded. Jolen needs specific components—pristine brass gears and tensioned spring coils—to repair a lift that leads deeper into the complex. The local constructs should have plenty.",
+    "objectives": {
+      "collect": {
+        "Brass Gear": 5,
+        "Spring Coil": 3
+      }
+    },
+    "flavor_text": {
+      "collect:Brass Gear": "This gear is surprisingly heavy and etched with runes you don't recognize.",
+      "collect:Spring Coil": "You pry the coil loose. It snaps back with dangerous force."
+    },
+    "rewards": {
+      "exp": 2200,
+      "aurum": 650
+    }
+  },
+  {
+    "id": 65,
+    "title": "The Knight's Vigil",
+    "tier": "B",
+    "quest_giver": "Captain Rhea",
+    "location": "Clockwork Halls Depths",
+    "summary": "Defeat the Automaton Knights guarding the inner sanctum.",
+    "description": "Captain Rhea is concerned about the activation of the Automaton Knights. These ancient guardians were built for war, not patrol. Their awakening suggests something—or someone—has triggered the facility's defense protocols.",
+    "objectives": {
+      "defeat": {
+        "Automaton Knight": 4
+      }
+    },
+    "flavor_text": {
+      "defeat:Automaton Knight": "The knight freezes mid-swing, its eyes dimming as the mana core shatters."
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 700
+    }
+  },
+  {
+    "id": 66,
+    "title": "Silence the Warden",
+    "tier": "B",
+    "quest_giver": "Guildmaster Kael",
+    "location": "The Gear Heart",
+    "summary": "Defeat The Gear Warden.",
+    "description": "The source of the disturbance has been identified: The Gear Warden, the central intelligence of the Halls, has gone rogue. Its ceaseless production of war machines threatens to spill out into the caverns. Shut it down permanently.",
+    "objectives": {
+      "defeat": {
+        "The Gear Warden": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:The Gear Warden": "With a final, deafening grind of metal on metal, the massive construct collapses. The factory falls silent."
+    },
+    "rewards": {
+      "exp": 4000,
+      "aurum": 1200,
+      "item": "Magic Stone (Large)"
+    }
+  },
+  {
+    "id": 67,
+    "title": "The Clockwork Heart: Anomaly",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls",
+    "summary": "Investigate a malfunctioning Brass Golem.",
+    "description": "Artificer Jolen beckons you over, his face illuminated by the blue glow of a holo-map. 'Adventurer, I have a puzzle. My sensors picked up a Brass Golem, Unit 734, in Sector 4. It's not patrolling. It's... loitering. And its core signature is fluctuating rhythmically. Like a heartbeat. I need eyes on it. If it's malfunctioning, it could endanger the whole sector. Go find it, but clear out the scavengers targeting it first.'",
+    "prerequisites": [
+      64
+    ],
+    "objectives": {
+      "locate": "Unit 734",
+      "defeat": {
+        "Scavenger Spider": 5
+      },
+      "scan": "Unit 734"
+    },
+    "flavor_text": {
+      "locate:Unit 734": "You find the golem standing motionless in a quiet alcove, cradling a small, oil-stained flower.",
+      "defeat:Scavenger Spider": "The spider hisses and crumples, its sensors dimming.",
+      "scan:Unit 734": "The scanner hums. The golem tilts its head, watching you with strange, flickering curiosity."
+    },
+    "rewards": {
+      "exp": 2200,
+      "aurum": 650,
+      "item": "Encrypted Log Cylinder"
+    }
+  },
+  {
+    "id": 68,
+    "title": "The Clockwork Heart: Dismantle",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls",
+    "summary": "Dismantle the unstable golem. (Option A)",
+    "description": "Jolen reviews the data with a frown. 'This is bad. The corruption rewrote its code to prioritize preservation, but its core is unstable. It's a walking bomb. Look, I know it seems harmless, but we can't risk a detonation in the main support strata. The safe play is to **dismantle it**. We can use the parts to reinforce the lift. It's tough, but it's necessary.'",
+    "prerequisites": [
+      67
+    ],
+    "exclusive_group": "clockwork_heart_choice",
+    "objectives": {
+      "defeat": {
+        "Unit 734": 1
+      },
+      "retrieve": {
+        "Pristine Gear Heart": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Unit 734": "The golem raises its arms to shield the flower, not itself. As it falls, the light in its eyes fades, resigned.",
+      "retrieve:Pristine Gear Heart": "The core is warm and pulses faintly before going cold."
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 800,
+      "item": "Artificer's Alloy"
+    }
+  },
+  {
+    "id": 69,
+    "title": "The Clockwork Heart: Stabilize",
+    "tier": "B",
+    "quest_giver": "Artificer Jolen",
+    "location": "Clockwork Halls",
+    "summary": "Stabilize the golem's core. (Option B)",
+    "description": "Jolen reviews the data. 'Incredible. It's developed empathy. But it's unstable. I can write a patch to regulate the power draw, but you'll have to upload it while it's active. It's dangerous—the signal will attract every security bot in the sector. You'd be risking your life for a glitch. But... if it works, we save a unique life form. If you want to **save it**, take this patch.'",
+    "prerequisites": [
+      67
+    ],
+    "exclusive_group": "clockwork_heart_choice",
+    "objectives": {
+      "defeat": {
+        "Security Drone": 8
+      },
+      "upload": "Stabilization Patch"
+    },
+    "flavor_text": {
+      "defeat:Security Drone": "Another drone crashes down. Unit 734 shudders as the patch rewrites its core.",
+      "upload:Stabilization Patch": "Upload complete. Unit 734 stabilizes, offering you a single gear in thanks before returning to its flower."
+    },
+    "rewards": {
+      "exp": 2500,
+      "aurum": 500,
+      "item": "Heart of the Machine"
+    }
+  },
+  {
+    "id": 70,
+    "title": "The Frozen Echo: Signal",
+    "tier": "A",
+    "quest_giver": "High Arcanist Vael",
+    "location": "The Frostfall Expanse",
+    "summary": "Investigate a strange signal in Frostfall Expanse.",
+    "description": "High Arcanist Vael's instruments are going haywire. A pulse, rhythmic and precise, is emanating from the deep glacier. It's not the Frozen King. It's older. He needs someone to clear the area and find the source.",
+    "objectives": {
+      "defeat": {
+        "Ice Golem": 5
+      },
+      "investigate": "Signal Source"
+    },
+    "flavor_text": {
+      "defeat:Ice Golem": "The golem crumbles, its core humming with the same frequency as the signal.",
+      "investigate:Signal Source": "You brush away the snow. Beneath lies a metallic rod, pulsating with faint blue light. It's warm."
+    },
+    "rewards": {
+      "exp": 4500,
+      "aurum": 1500
+    }
+  },
+  {
+    "id": 71,
+    "title": "The Frozen Echo: The Expedition",
+    "tier": "A",
+    "quest_giver": "High Arcanist Vael",
+    "location": "The Frostfall Expanse",
+    "summary": "Find the lost Pathfinder expedition.",
+    "description": "The signal source was a beacon... planted by a Pathfinder team lost decades ago. If they found something worth marking, we need to know what happened to them. Tracks lead deeper into the storm.",
+    "prerequisites": [
+      70
+    ],
+    "objectives": {
+      "locate": "Frozen Camp",
+      "retrieve": "Captain's Log"
+    },
+    "flavor_text": {
+      "locate:Frozen Camp": "Tattered tents flap in the wind. The camp is preserved perfectly in the ice.",
+      "retrieve:Captain's Log": "The leather is frozen stiff. The last entry reads: 'We found it. The Fracture. It's beautiful. It's wrong.'"
+    },
+    "rewards": {
+      "exp": 4800,
+      "aurum": 1600,
+      "item": "Winter Wolf Pelt"
+    }
+  },
+  {
+    "id": 72,
+    "title": "The Frozen Echo: Seal the Fracture",
+    "tier": "A",
+    "quest_giver": "High Arcanist Vael",
+    "location": "The Frostfall Expanse",
+    "summary": "Seal the dangerous discovery. (Option A)",
+    "description": "The log speaks of a 'Void Fracture' frozen in the ice. Vael urges caution. 'We must seal it. The Guild cannot risk waking it. The local spirits are already drawn to it.' Use the Sealing Ward on the fracture.",
+    "prerequisites": [
+      71
+    ],
+    "exclusive_group": "frozen_echo_choice",
+    "objectives": {
+      "defeat": {
+        "Chill Wisp": 5
+      },
+      "use": "Sealing Ward"
+    },
+    "flavor_text": {
+      "defeat:Chill Wisp": "The wisp shrieks as it dissipates, drawn to the Fracture's energy.",
+      "use:Sealing Ward": "The ward flares. The Fracture dims, then seals shut. The humming stops. The ice is silent."
+    },
+    "rewards": {
+      "exp": 6000,
+      "aurum": 2000,
+      "item": "Frost Crystal"
+    }
+  },
+  {
+    "id": 73,
+    "title": "The Frozen Echo: Tap the Source",
+    "tier": "A",
+    "quest_giver": "Whisperer Kaelen",
+    "location": "The Frostfall Expanse",
+    "summary": "Study the fracture for power. (Option B)",
+    "description": "A rogue mage, Kaelen, intercepts you. 'Vael is a coward. That fracture is a source of infinite energy. Help me stabilize it, and we can harness it. The wolves protect it instinctively; clear them out and channel the energy.'",
+    "prerequisites": [
+      71
+    ],
+    "exclusive_group": "frozen_echo_choice",
+    "objectives": {
+      "defeat": {
+        "Frost Wolf": 5
+      },
+      "channel": "Void Energy"
+    },
+    "flavor_text": {
+      "defeat:Frost Wolf": "The wolf's eyes burned with violet light before it fell.",
+      "channel:Void Energy": "You channel the energy into the containment flask. It feels heavy, buzzing with raw power."
+    },
+    "rewards": {
+      "exp": 6000,
+      "aurum": 2500,
+      "item": "Ice Core"
+    }
+  },
+  {
+    "id": 74,
+    "title": "The Stone-Skin Symptoms",
+    "tier": "D",
+    "quest_giver": "Alchemist Vane",
+    "location": "Deepgrove Roots",
+    "summary": "Collect samples from petrified wildlife.",
+    "description": "Refugees from the outer districts are turning to stone. Alchemist Vane of the Grey Ward needs tissue samples from infected beasts in the Deepgrove to study the pathogen before it breaches the quarantine.",
+    "objectives": {
+      "collect": {
+        "Petrified Heart": 3
+      },
+      "examine": {
+        "Calcified Corpse": 1
+      }
+    },
+    "flavor_text": {
+      "collect:Petrified Heart": "The heart is heavy and cold, turned completely to grey stone.",
+      "examine:Calcified Corpse": "The victim's face is frozen in a silent scream. Moss is already growing in the cracks."
+    },
+    "rewards": {
+      "exp": 600,
+      "aurum": 150,
+      "item": "Grey Ward Mask"
+    }
+  },
+  {
+    "id": 75,
+    "title": "The Basilisk's Bile",
+    "tier": "D",
+    "quest_giver": "Alchemist Vane",
+    "location": "The Ashlands",
+    "summary": "Hunt a Basilisk for its bile.",
+    "description": "The Stone-Skin Plague is magical in nature. Vane believes the acidic bile of an Ash Basilisk can dissolve the petrification curse. These beasts prowl the borders of the Ashlands.",
+    "prerequisites": [
+      74
+    ],
+    "objectives": {
+      "defeat": {
+        "Ember Salamander": 1
+      },
+      "collect": {
+        "Basilisk Bile": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Ember Salamander": "The beast hisses one last time before dissolving into ash.",
+      "collect:Basilisk Bile": "The bile smokes in the vial, smelling of acid and old earth."
+    },
+    "rewards": {
+      "exp": 800,
+      "aurum": 200,
+      "item": "Unstable Antidote"
+    }
+  },
+  {
+    "id": 76,
+    "title": "The Cure: For the Few",
+    "tier": "D",
+    "quest_giver": "Merchant Gilded-Tongue",
+    "location": "Guild Hall",
+    "summary": "Sell the antidote to a noble house. (Choice A)",
+    "description": "A merchant intercepts you. 'Why waste such a miracle on the dregs? House Valerius will pay a fortune for that antidote. They can replicate it... eventually. Secure your future, adventurer.'",
+    "prerequisites": [
+      75
+    ],
+    "exclusive_group": "stone_skin_choice",
+    "objectives": {
+      "deliver": {
+        "Unstable Antidote": 1
+      }
+    },
+    "flavor_text": {
+      "deliver:Unstable Antidote": "The courier accepts the vial with a sneer. 'Wise choice. The coin is yours.'"
+    },
+    "rewards": {
+      "exp": 400,
+      "aurum": 1500,
+      "title": "Mercenary"
+    }
+  },
+  {
+    "id": 77,
+    "title": "The Cure: For the Many",
+    "tier": "D",
+    "quest_giver": "Alchemist Vane",
+    "location": "Grey Ward Outpost",
+    "summary": "Deliver the antidote to the Grey Ward. (Choice B)",
+    "description": "Alchemist Vane is waiting. 'It's not enough for everyone yet, but with this sample, we can save the quarantine zone. We can stop the spread. The city owes you a debt.'",
+    "prerequisites": [
+      75
+    ],
+    "exclusive_group": "stone_skin_choice",
+    "objectives": {
+      "deliver": {
+        "Unstable Antidote": 1
+      }
+    },
+    "flavor_text": {
+      "deliver:Unstable Antidote": "Vane's hands shake as he takes the vial. 'You did good. Real good.'"
+    },
+    "rewards": {
+      "exp": 1000,
+      "aurum": 500,
+      "item": "Alchemist's Retort"
+    }
+  },
+  {
+    "id": 78,
+    "title": "The Great Work",
+    "tier": "E",
+    "quest_giver": "Kaelen, the First Alchemist",
+    "location": "Grey Ward District",
+    "summary": "Collect rare reagents to prove your mastery of alchemy.",
+    "description": "To truly understand the nature of the Veil, one must deconstruct it. Bring me Primordial Ooze, Brimstone, and Lunawort. Only then can you begin the Great Work.",
+    "objectives": {
+      "collect": {
+        "primordial_ooze": 3,
+        "brimstone": 3,
+        "lunawort": 3
+      }
+    },
+    "rewards": {
+      "exp": 500,
+      "aurum": 300
+    }
+  },
+  {
+    "id": 79,
+    "title": "The Blind Choir's Requiem: Resonance",
+    "tier": "A",
+    "quest_giver": "\"Whispering\" Thorne",
+    "location": "The Wailing Chasm",
+    "summary": "Investigate the harmonic humming in the chasm.",
+    "description": "\"They aren't just screaming into the dark, they're singing to it,\" Thorne whispers, eyes darting at shadows. \"The Blind Choir. Cultists who found meaning in the void's hunger. Their requiem is physically widening the fissure.\" He thrusts a map toward you. \"Descend to The Echoing Hollow. Shatter their Resonance Crystals to disrupt the harmony, and tear their dark hymnal from their hands before Kaza-Kor is swallowed whole.\"",
+    "objectives": {
+      "destroy": {
+        "Resonance Crystal": 3
+      },
+      "retrieve": {
+        "Hymnal of the Void": 1
+      }
+    },
+    "flavor_text": {
+      "destroy:Resonance Crystal": "The crystal shatters with a piercing, discordant shriek. For a moment, the ambient wailing of the chasm stutters and breaks.",
+      "retrieve:Hymnal of the Void": "The pages of the hymnal are bound in flayed skin and written in dried, rusted blood. A cold vibration pulses through the tome as your fingers brush the cover, making your teeth ache."
+    },
+    "rewards": {
+      "exp": 4000,
+      "aurum": 1000
+    }
+  },
+  {
+    "id": 80,
+    "title": "The Blind Choir's Requiem: Silence",
+    "tier": "A",
+    "quest_giver": "\"Whispering\" Thorne",
+    "location": "The Wailing Chasm",
+    "summary": "Destroy the Hymnal and silence the Choirmaster. (Choice A)",
+    "description": "Thorne recoils as you present the Hymnal. \"Burn it! Now!\" he snarls, pressing an alchemical device into your palm. \"With their scripture gone, they will falter. Take this sonic-dampening bomb to the edge of the great fissure. When the Choirmaster begins his grand crescendo, unleash absolute silence and end his song permanently.\"",
+    "prerequisites": [
+      79
+    ],
+    "exclusive_group": "blind_choir_choice",
+    "objectives": {
+      "defeat": {
+        "Choirmaster": 1,
+        "Blind Choir Zealot": 2
+      },
+      "use": "Sonic-Dampening Bomb"
+    },
+    "flavor_text": {
+      "use:Sonic-Dampening Bomb": "The bomb detonates, but there is no sound. A wave of absolute, terrifying silence violently expands, extinguishing the Choirmaster's void-song and leaving a breathless vacuum in its wake.",
+      "defeat:Choirmaster": "The Choirmaster stumbles backward, mouth wide in a silent scream. As he plummets into the black abyss, the oppressive wailing of the chasm finally lessens into a dull, manageable drone."
+    },
+    "rewards": {
+      "exp": 5500,
+      "aurum": 1800,
+      "item": "Echolocation Helm Recipe",
+      "title": "The Silencer"
+    }
+  },
+  {
+    "id": 81,
+    "title": "The Blind Choir's Requiem: Discord",
+    "tier": "A",
+    "quest_giver": "\"Whispering\" Thorne",
+    "location": "The Wailing Chasm",
+    "summary": "Keep the Hymnal and confront the Choirmaster. (Choice B)",
+    "description": "You refuse to burn the Hymnal, the dark whispers of its pages promising hidden strength. Thorne backs away, terror overriding his paranoia. \"Then you are already lost to the dark,\" he spits, fleeing into the shadows. You must descend alone to the precipice of the fissure and confront the Choirmaster. This time, the cult will face you with the full, unfiltered power of their corrupted requiem.",
+    "prerequisites": [
+      79
+    ],
+    "exclusive_group": "blind_choir_choice",
+    "objectives": {
+      "defeat": {
+        "Choirmaster": 1,
+        "Blind Choir Zealot": 4
+      }
+    },
+    "flavor_text": {
+      "defeat:Choirmaster": "The Choirmaster shrieks a final, reality-bending note before the void drags him down. You clutch the Hymnal tightly to your chest; its whispers are no longer a faint hum, but a clear, commanding voice in the back of your mind."
+    },
+    "rewards": {
+      "exp": 6500,
+      "aurum": 2000,
+      "item": "Hymnal of the Void",
+      "title": "Discordant Hero"
+    }
+  }
+]

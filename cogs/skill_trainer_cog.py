@@ -1,0 +1,280 @@
+"""
+cogs/skill_trainer_cog.py
+
+Handles the Skill Trainer UI.
+Hardened: Atomic transactions for learning/upgrading skills.
+Atmosphere restored.
+"""
+
+import asyncio
+import logging
+import math
+
+import discord
+from discord.ext import commands
+from discord.ui import Button, Select, View
+
+import game_systems.data.emojis as E
+from database.database_manager import DatabaseManager
+from game_systems.data.skills_data import SKILLS
+from game_systems.items.equipment_manager import EquipmentManager
+from game_systems.player.achievement_system import AchievementSystem
+
+from .utils.ui_helpers import back_to_guild_hall_callback
+
+logger = logging.getLogger("eldoria.ui.trainer")
+
+
+def get_upgrade_cost(base_cost: int, current_level: int) -> int:
+    """Returns the Vestige cost to upgrade a skill."""
+    return math.ceil(base_cost * math.pow(current_level, 1.8))
+
+
+class SkillTrainerView(View):
+    """Main UI for the Skill Trainer."""
+
+    def __init__(
+        self,
+        db_manager: DatabaseManager,
+        interaction_user: discord.User,
+        player_data,
+    ):
+        super().__init__(timeout=180)
+        self.db = db_manager
+        self.interaction_user = interaction_user
+        self.player_data = dict(player_data) if not isinstance(player_data, dict) else player_data
+
+        self.vestige_pool = self.player_data["vestige_pool"]
+        self.player_class_id = self.player_data["class_id"]
+
+        # Load skills synchronously here as it is lightweight reading
+        self.player_skills = self._get_player_skills_sync()
+        self.achievements = AchievementSystem(self.db)
+
+        # Components
+        self.add_item(self.build_learn_select())
+        self.add_item(self.build_upgrade_select())
+
+        # Back Button
+        self.back_button = Button(
+            label="Return — Guild Hall",
+            style=discord.ButtonStyle.grey,
+            custom_id="back_to_guild_hall",
+            row=2,
+        )
+        self.back_button.callback = back_to_guild_hall_callback
+        self.add_item(self.back_button)
+
+    def _get_player_skills_sync(self) -> dict:
+        """Helper to get skills for UI setup."""
+        try:
+            skills = self.db.get_all_player_skills(self.interaction_user.id)
+            return {s["skill_key"]: s["skill_level"] for s in skills}
+        except Exception:
+            return {}
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.interaction_user.id:
+            await interaction.response.send_message("This session is not yours.", ephemeral=True)
+            return False
+        return True
+
+    def set_back_button(self, callback_function, label="Back"):
+        self.back_button.label = label
+        self.back_button.callback = callback_function
+
+    # --------------------------------------------------------
+    # Dropdown Builders
+    # --------------------------------------------------------
+    def build_learn_select(self) -> Select:
+        learn_select = Select(
+            placeholder="Learn a new skill...",
+            min_values=1,
+            max_values=1,
+            row=0,
+        )
+
+        learnable = [
+            s
+            for s in SKILLS.values()
+            if s.get("class_id") == self.player_class_id
+            and s.get("learn_cost", 0) > 0
+            and s["key_id"] not in self.player_skills
+        ]
+
+        if not learnable:
+            learn_select.add_option(label="No new skills available.", value="disabled")
+            learn_select.disabled = True
+            return learn_select
+
+        for skill in learnable:
+            cost = skill["learn_cost"]
+            can_afford = self.vestige_pool >= cost
+            emoji = "📖" if can_afford else "🔒"
+
+            learn_select.add_option(
+                label=f"{skill['name']} ({cost} V)",
+                value=f"{skill['key_id']}:{cost}",
+                description=skill["description"][:90],
+                emoji=emoji,
+            )
+
+        learn_select.callback = self.learn_skill_callback
+        return learn_select
+
+    def build_upgrade_select(self) -> Select:
+        upgrade_select = Select(
+            placeholder="Upgrade an existing skill...",
+            min_values=1,
+            max_values=1,
+            row=1,
+        )
+
+        if not self.player_skills:
+            upgrade_select.add_option(label="No skills to upgrade.", value="disabled")
+            upgrade_select.disabled = True
+            return upgrade_select
+
+        has_upgradable = False
+
+        for skill_key, level in self.player_skills.items():
+            data = SKILLS.get(skill_key)
+            if not data or data.get("upgrade_cost", 0) == 0:
+                continue
+
+            has_upgradable = True
+            base_cost = data["upgrade_cost"]
+            upgrade_cost = get_upgrade_cost(base_cost, level)
+            can_afford = self.vestige_pool >= upgrade_cost
+            emoji = E.LEVEL_UP if can_afford else "🔒"
+
+            upgrade_select.add_option(
+                label=f"{data['name']} (Lv. {level} → {level + 1})",
+                value=f"{skill_key}:{upgrade_cost}:{level}",
+                description=f"Cost: {upgrade_cost} Vestige",
+                emoji=emoji,
+            )
+
+        if not has_upgradable:
+            upgrade_select.add_option(label="Max level reached or not upgradable.", value="disabled")
+            upgrade_select.disabled = True
+
+        upgrade_select.callback = self.upgrade_skill_callback
+        return upgrade_select
+
+    # --------------------------------------------------------
+    # Execution Logic (Threaded)
+    # --------------------------------------------------------
+    def _execute_learn(self, skill_key: str) -> tuple[bool, str]:
+        """Calculates cost server-side to prevent tampering."""
+        try:
+            skill_data = SKILLS.get(skill_key)
+            if not skill_data:
+                return False, "Invalid skill."
+
+            cost = skill_data["learn_cost"]
+            return self.db.learn_skill(self.interaction_user.id, skill_key, cost)
+        except Exception as e:
+            logger.error(f"Learn skill error: {e}")
+            return False, "System error."
+
+    def _execute_upgrade(self, skill_key: str) -> tuple[bool, str, int]:
+        """Calculates cost server-side based on current level."""
+        try:
+            skill_data = SKILLS.get(skill_key)
+            if not skill_data:
+                return False, "Invalid skill.", 0
+
+            # SECURITY: Fetch current level from DB to prevent cost manipulation
+            ps = self.db.get_player_skill_row(self.interaction_user.id, skill_key)
+            if not ps:
+                return False, "Skill not learned.", 0
+
+            current_level = ps["skill_level"]
+            base_cost = skill_data["upgrade_cost"]
+            scaled_cost = get_upgrade_cost(base_cost, current_level)
+
+            return self.db.upgrade_skill(self.interaction_user.id, skill_key, scaled_cost)
+        except Exception as e:
+            logger.error(f"Upgrade skill error: {e}")
+            return False, "System error.", 0
+
+    # --------------------------------------------------------
+    # Callbacks
+    # --------------------------------------------------------
+    async def learn_skill_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        # Only skill_key is trusted from interaction
+        skill_key = interaction.data["values"][0].split(":")[0]
+
+        success, msg = await asyncio.to_thread(self._execute_learn, skill_key)
+
+        if success:
+            # Recalculate stats to apply potential passive bonuses
+            equip_mgr = EquipmentManager(self.db)
+            await asyncio.to_thread(equip_mgr.recalculate_player_stats, self.interaction_user.id)
+
+        await self._refresh_ui(interaction, success, msg, skill_key)
+
+        if success:
+            ach_msg = await asyncio.to_thread(self.achievements.check_skill_achievements, interaction.user.id)
+            if ach_msg:
+                await interaction.followup.send(ach_msg, ephemeral=True)
+
+    async def upgrade_skill_callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        skill_key = interaction.data["values"][0].split(":")[0]
+
+        success, msg, new_level = await asyncio.to_thread(self._execute_upgrade, skill_key)
+
+        if success:
+            # Recalculate stats to apply potential passive bonuses
+            equip_mgr = EquipmentManager(self.db)
+            await asyncio.to_thread(equip_mgr.recalculate_player_stats, self.interaction_user.id)
+
+        await self._refresh_ui(interaction, success, msg, skill_key, new_level)
+
+        if success:
+            ach_msg = await asyncio.to_thread(self.achievements.check_skill_achievements, interaction.user.id)
+            if ach_msg:
+                await interaction.followup.send(ach_msg, ephemeral=True)
+
+    async def _refresh_ui(self, interaction, success, msg, skill_key, level=1):
+        """Common refresh logic."""
+        p_data = await asyncio.to_thread(self.db.get_player, self.interaction_user.id)
+
+        embed = self.build_skill_embed(dict(p_data), msg if success else f"Error: {msg}")
+
+        new_view = SkillTrainerView(self.db, self.interaction_user, p_data)
+        new_view.set_back_button(self.back_button.callback, self.back_button.label)
+
+        await interaction.edit_original_response(embed=embed, view=new_view)
+
+    @staticmethod
+    def build_skill_embed(player_data, status_message: str = None):
+        embed = discord.Embed(
+            title="🧠 Guild Skill Trainer",
+            description=(
+                "*A quiet chamber lined with sigils, tomes, and training apparatus.*\n"
+                "*A seasoned mentor observes you, awaiting your intent.*\n\n"
+                f"**Current Vestige:** {player_data['vestige_pool']} {E.VESTIGE}"
+            ),
+            color=discord.Color.dark_blue(),
+        )
+
+        if status_message:
+            embed.add_field(name="Training Report", value=status_message, inline=False)
+        else:
+            embed.set_footer(text="Unaffordable options will appear disabled.")
+
+        return embed
+
+
+class SkillTrainerCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.db = DatabaseManager()
+
+
+async def setup(bot):
+    await bot.add_cog(SkillTrainerCog(bot))

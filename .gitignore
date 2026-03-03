@@ -1,0 +1,54 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+pip-audit-output/
+.tox/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Secrets
+secrets.json
+config.json
+
+# Logs
+*.log
+logs/
+
+# Databases
+*.db
+
+# Temp / scratch files
+temp*.txt
+fix_*.py
+NEW_ISSUES.md
+
+# Static analysis caches
+.mypy_cache/
+.ruff_cache/
+
+# Jules specific
+.Jules/agent_prompts/prepared/*
+!.Jules/agent_prompts/prepared/.gitkeep

@@ -1,0 +1,220 @@
+version: 2.1
+
+# ── Reusable Commands ──────────────────────────────────
+commands:
+  install-tools:
+    description: Install static analysis tools (Ruff, Bandit, pip-audit)
+    steps:
+      - run:
+          name: Install Tools
+          command: pip install "pip==26.0.1" && pip install ruff bandit pip-audit
+
+  install-deps:
+    description: Install project dependencies with caching
+    steps:
+      - restore_cache:
+          keys:
+            - deps-v1-{{ checksum "requirements.txt" }}
+            - deps-v1-
+      - run:
+          name: Install Dependencies
+          command: pip install "pip==26.0.1" && pip install -r requirements.txt
+      - save_cache:
+          key: deps-v1-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.local
+
+  install-gh:
+    description: Install GitHub CLI
+    steps:
+      - run:
+          name: Install GitHub CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update && sudo apt-get install gh -y
+
+  check-md-only:
+    description: Halt the job if only markdown files were changed.
+    steps:
+      - run:
+          name: Check if only Markdown files changed
+          command: |
+            # Determine changed files based on the branch
+            if [ "$CIRCLE_BRANCH" == "main" ]; then
+              # On main branch (e.g., after a merge), check files changed against the previous commit
+              echo "Running on main branch. Checking files changed in the push..."
+              # Fallback to HEAD~1 if CIRCLE_SHA1 is not set or base revision is missing
+              BASE_REV=${CIRCLE_SHA1:-HEAD}~1
+              CHANGED_FILES=$(git diff --name-only "$BASE_REV" HEAD || git diff-tree --no-commit-id --name-only -r HEAD)
+            else
+              # On a PR branch, compare against origin/main
+              echo "Running on PR branch. Comparing against origin/main..."
+              git fetch origin main || true
+
+              if ! git show-ref --verify --quiet refs/remotes/origin/main; then
+                echo "No origin/main found. Proceeding with normal execution."
+                exit 0
+              fi
+
+              CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+            fi
+
+            echo "Changed files:"
+            echo "$CHANGED_FILES"
+
+            if [ -z "$CHANGED_FILES" ]; then
+              echo "No files changed or unable to determine changes. Proceeding."
+              exit 0
+            fi
+
+            # Check if there are any non-markdown files
+            NON_MD_FILES=$(echo "$CHANGED_FILES" | grep -v "\.md$" || true)
+
+            if [ -z "$NON_MD_FILES" ]; then
+              echo "Only markdown (.md) files changed. Halting job to save compute."
+              circleci-agent step halt
+            else
+              echo "Found non-markdown file changes. Proceeding with the job."
+            fi
+
+# ── Jobs ───────────────────────────────────────────────
+jobs:
+  static-analysis:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - check-md-only
+      - install-tools
+      - run:
+          name: Ruff Auto-Fix & Format
+          command: |
+            ruff check . --fix
+            ruff format .
+      - run:
+          name: Ruff Strict Check
+          command: |
+            ruff check .
+            ruff format --check .
+      - run:
+          name: Bandit Security Scan
+          command: bandit -r . -c pyproject.toml -ll
+      - run:
+          name: Dependency Vulnerability Scan
+          command: pip-audit -r requirements.txt
+
+  test:
+    docker:
+      - image: cimg/python:3.12
+    parallelism: 4
+    steps:
+      - checkout
+      - check-md-only
+      - install-deps
+      - run:
+          name: Install Test Dependencies
+          command: pip install "pip==26.0.1" && pip install pytest pytest-cov
+      - run:
+          name: Split and Run Tests
+          command: |
+            TESTFILES=$(circleci tests glob "tests/**/test_*.py" | circleci tests split --split-by=timings)
+            python -m pytest $TESTFILES --tb=short -q --cov=. --cov-report=xml:coverage.xml
+      - run:
+          name: Upload Partial Coverage to Codacy
+          command: |
+            export CODACY_ORGANIZATION_PROVIDER=gh
+            export CODACY_USERNAME=dmcalungsod
+            export CODACY_PROJECT_NAME=Eldoria_Quest
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Python -r coverage.xml --partial
+
+  finalize-coverage:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - check-md-only
+      - run:
+          name: Finalize Codacy Coverage
+          command: |
+            export CODACY_ORGANIZATION_PROVIDER=gh
+            export CODACY_USERNAME=dmcalungsod
+            export CODACY_PROJECT_NAME=Eldoria_Quest
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) final
+
+  auto-merge:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - install-gh
+      - run:
+          name: Enable Auto-Merge on Open PRs
+          command: |
+            export GH_TOKEN="$GITHUB_TOKEN"
+
+            echo "🤖 Auto-Merge Report"
+
+            gh pr list --repo "dmcalungsod/Eldoria_Quest" --state open --json number,title,isDraft --jq '.[]' | while read -r pr_json; do
+              pr_number=$(echo "$pr_json" | jq -r '.number')
+              is_draft=$(echo "$pr_json" | jq -r '.isDraft')
+              title=$(echo "$pr_json" | jq -r '.title')
+
+              if [ "$is_draft" == "true" ]; then
+                echo "⏭️  PR #$pr_number ($title) is a draft, skipping."
+                continue
+              fi
+
+              echo "🔍 Enabling auto-merge for PR #$pr_number ($title)..."
+              if gh pr merge "$pr_number" --repo "dmcalungsod/Eldoria_Quest" --squash --auto 2>&1; then
+                echo "✅ Auto-merge enabled for PR #$pr_number"
+              else
+                echo "⚠️  Could not enable auto-merge for PR #$pr_number (may already be enabled)"
+              fi
+            done
+
+
+  mirror:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run:
+          name: Clone & Push Mirror
+          command: |
+            git clone --mirror "https://x-access-token:${GITHUB_TOKEN}@github.com/dmcalungsod/Eldoria_Quest" repo-mirror
+            cd repo-mirror
+            # Remove PR refs — GitHub rejects pushes to hidden refs
+            git for-each-ref --format='delete %(refname)' refs/pull | git update-ref --stdin
+            if git push --mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/DeeEmSea/Eldoria-Quest-Bot"; then
+              echo "✅ Mirror pushed to DeeEmSea/Eldoria-Quest-Bot"
+            else
+              echo "❌ Mirror push failed"
+              exit 1
+            fi
+
+# ── Workflows ──────────────────────────────────────────
+workflows:
+  # CI: runs on every push/PR to the main repo ONLY
+  ci:
+    when:
+      equal: [ "https://github.com/dmcalungsod/Eldoria_Quest", << pipeline.project.git_url >> ]
+    jobs:
+      - static-analysis
+      - test:
+          requires:
+            - static-analysis
+      - finalize-coverage:
+          requires:
+            - test
+      - auto-merge:
+          requires:
+            - static-analysis
+            - finalize-coverage
+          filters:
+            branches:
+              ignore: main
+      - mirror:
+          filters:
+            branches:
+              only: main
+
