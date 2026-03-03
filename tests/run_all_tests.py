@@ -235,7 +235,6 @@ def run_manager_tests():
     return result.wasSuccessful()
 
 
-
 def run_codex_tests():
     """Runs the codex tests (mock-based, no DB needed)."""
     print("\n" + "-" * 70)
@@ -246,6 +245,7 @@ def run_codex_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
+
 
 def run_stack_limit_tests():
     """Runs the stack limit tests (mock-based, no DB needed)."""

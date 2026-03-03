@@ -194,6 +194,10 @@ class AdventureRewards:
         aurum_gain = combat_result.get("aurum", 0)
         actual_drops = []  # Track items that actually dropped for quests
 
+        # Apply global aurum boost from active event modifiers
+        aurum_boost = combat_result.get("active_boosts", {}).get("aurum_boost", 1.0)
+        aurum_gain = int(aurum_gain * aurum_boost)
+
         # Add XP and Aurum to session loot immediately
         self._add_loot_to_session(session_loot, "exp", exp_gain)
         if aurum_gain > 0:

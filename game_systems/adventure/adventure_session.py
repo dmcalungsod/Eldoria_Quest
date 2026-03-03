@@ -736,9 +736,12 @@ class AdventureSession:
                 return True
         return False
 
-    def _process_auto_combat_victory(self, result: dict, turn_reports: list, report: dict, sequence: list):
+    def _process_auto_combat_victory(self, result: dict, turn_reports: list, report: dict, sequence: list, context: dict | None = None):
         """Processes victory rewards for auto combat."""
         final_block = [f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(turn_reports)} rounds."]
+
+        if context and "active_boosts" in context:
+            result["active_boosts"] = context["active_boosts"]
 
         # Grant Rewards
         reward_texts = self.rewards.process_victory(
@@ -859,7 +862,7 @@ class AdventureSession:
 
         # Final Results Block
         if player_won:
-            self._process_auto_combat_victory(result, turn_reports, report, sequence)
+            self._process_auto_combat_victory(result, turn_reports, report, sequence, context)
         elif is_dead:
             sequence.append(["\n💀 **You have been defeated.**"])
 
@@ -879,7 +882,7 @@ class AdventureSession:
     # MANUAL COMBAT TURN
     # ======================================================================
 
-    def _handle_combat_turn_outcome(self, result: dict, report: dict, turn_logs: list) -> tuple[bool, list]:
+    def _handle_combat_turn_outcome(self, result: dict, report: dict, turn_logs: list, context: dict | None = None) -> tuple[bool, list]:
         """Processes the outcome of a single manual combat turn."""
         is_dead = False
         if result.get("winner") == "monster":
@@ -889,6 +892,8 @@ class AdventureSession:
         elif result.get("winner") == "player":
             self.active_monster = None
             turn_logs.append("\n⚔️ **Victory!**")
+            if context and "active_boosts" in context:
+                result["active_boosts"] = context["active_boosts"]
             reward_texts = self.rewards.process_victory(
                 battle_report=report,
                 report_list=[report],
@@ -978,7 +983,7 @@ class AdventureSession:
         if prepend_logs:
             turn_logs = prepend_logs + turn_logs
 
-        is_dead, turn_logs = self._handle_combat_turn_outcome(result, report, turn_logs)
+        is_dead, turn_logs = self._handle_combat_turn_outcome(result, report, turn_logs, context)
 
         self.logs.extend(turn_logs)
 

@@ -27,6 +27,7 @@ class WorldEventSystem:
     SPECTRAL_TIDE = "spectral_tide"
     ECHOES_OF_THE_DEEP = "echoes_of_the_deep"
     TIME_QUAKE = "time_quake"
+    BUILDERS_BOON = "builders_boon"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -111,6 +112,14 @@ class WorldEventSystem:
                 "exp_boost": 1.1,
                 "wailing_chasm_threat_reduction": 0.9,  # 10% reduction in damage taken in Wailing Chasm
                 "wailing_chasm_loot_bonus": 1.5,  # 50% more loot from Wailing Chasm
+            },
+        },
+        BUILDERS_BOON: {
+            "name": "The Builder's Boon",
+            "description": "The Guild is preparing for a massive expansion! To encourage gathering, all building material yields are tripled, and exploration yields more Aurum.",
+            "modifiers": {
+                "builder_boost": 3.0,
+                "aurum_boost": 1.5,
             },
         },
         TIME_QUAKE: {

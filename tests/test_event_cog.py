@@ -25,7 +25,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
             return decorator
 
         mock_discord.app_commands.command = MagicMock(side_effect=pass_decorator)
-        mock_discord.app_commands.checks.has_permissions = MagicMock(side_effect=pass_decorator)
+        mock_discord.app_commands.checks.has_permissions = MagicMock(
+            side_effect=pass_decorator
+        )
         mock_discord.app_commands.describe = MagicMock(side_effect=pass_decorator)
 
         # Mock Embed
@@ -94,7 +96,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         # Mock DB and System
         self.mock_db_cls = MagicMock()
-        with patch("cogs.event_cog.DatabaseManager", return_value=self.mock_db_cls) as mock_db_cls:
+        with patch(
+            "cogs.event_cog.DatabaseManager", return_value=self.mock_db_cls
+        ) as mock_db_cls:
             self.mock_db = mock_db_cls.return_value
             self.cog = self.EventCog(self.bot)
 
@@ -126,7 +130,12 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         interaction = AsyncMock()
         future = (datetime.datetime.now() + datetime.timedelta(days=1)).isoformat()
 
-        active = {"name": "Blood Moon", "description": "Scary", "end_time": future, "modifiers": {"exp": 2.0}}
+        active = {
+            "name": "Blood Moon",
+            "description": "Scary",
+            "end_time": future,
+            "modifiers": {"exp": 2.0},
+        }
         self.cog.system.get_current_event.return_value = active
 
         await self.cog.event_status(interaction)
@@ -146,7 +155,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         self.cog.system.start_event.assert_called_with("blood_moon", 24)
         interaction.response.send_message.assert_called_once()
-        self.assertIn("Started Event", interaction.response.send_message.call_args[0][0])
+        self.assertIn(
+            "Started Event", interaction.response.send_message.call_args[0][0]
+        )
 
     async def test_admin_start_invalid(self):
         interaction = AsyncMock()
@@ -170,7 +181,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.cog.system.get_current_event.return_value = None
 
         mock_date = datetime.datetime(2023, 10, 1, 12, 0, 0)
-        with patch("game_systems.core.world_time.WorldTime.now", return_value=mock_date):
+        with patch(
+            "game_systems.core.world_time.WorldTime.now", return_value=mock_date
+        ):
             self.cog.system.start_event.return_value = True
 
             await self.cog.check_event_cycle.callback(self.cog)
@@ -182,7 +195,9 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.cog.system.get_current_event.return_value = None
 
         mock_date = datetime.datetime(2023, 5, 1, 12, 0, 0)
-        with patch("game_systems.core.world_time.WorldTime.now", return_value=mock_date):
+        with patch(
+            "game_systems.core.world_time.WorldTime.now", return_value=mock_date
+        ):
             # First call for time_quake (0.5 > 0.02 fails), second call for mystic_merchant (0.01 < 0.02 succeeds)
             with patch("random.random", side_effect=[0.5, 0.01]):
                 self.cog.system.start_event.return_value = True
@@ -221,6 +236,25 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
             await self.cog._announce("Hello World")
 
         channel.send.assert_called_with("Hello World")
+
+    async def test_check_event_cycle_builders_boon(self):
+        """Verify Builder's Boon auto-starts on random chance."""
+        self.cog.system.get_current_event.return_value = None
+        self.cog.system.start_event.return_value = True
+
+        self.cog.system.EVENT_CONFIGS = {
+            "builders_boon": {"name": "The Builder's Boon", "description": "Test"}
+        }
+
+        with patch(
+            "game_systems.core.world_time.WorldTime.now",
+            return_value=datetime.datetime(2023, 2, 1, 12, 0, 0),
+        ):
+            with patch("random.random", side_effect=[0.5, 0.5, 0.01]):
+                with patch.object(self.cog, "_announce", AsyncMock()):
+                    await self.cog.check_event_cycle.callback(self.cog)
+
+        self.cog.system.start_event.assert_called_once_with("builders_boon", 48)
 
 
 if __name__ == "__main__":

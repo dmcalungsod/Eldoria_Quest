@@ -60,6 +60,7 @@ class TestEventScheduling(unittest.TestCase):
         mock_wes_module.WorldEventSystem.MYSTIC_MERCHANT = "mystic_merchant"
         mock_wes_module.WorldEventSystem.HARVEST_FESTIVAL = "harvest_festival"
         mock_wes_module.WorldEventSystem.TIME_QUAKE = "time_quake"
+        mock_wes_module.WorldEventSystem.BUILDERS_BOON = "builders_boon"
 
         # 3. Import cogs.event_cog inside the patched environment
         # We must ensure it's not already cached from real imports (handled by patch.dict, sort of)
@@ -87,6 +88,7 @@ class TestEventScheduling(unittest.TestCase):
                 "description": "Test Description",
             },
             "time_quake": {"name": "Time Quake", "description": "Test Time Quake"},
+            "builders_boon": {"name": "The Builder\'s Boon", "description": "Test Builders Boon"},
         }
 
     @patch("game_systems.core.world_time.WorldTime")
@@ -147,6 +149,26 @@ class TestEventScheduling(unittest.TestCase):
         args, _ = self.cog._announce.call_args
         self.assertIn("TIME QUAKE", args[0])
 
+
+
+    @patch("game_systems.core.world_time.WorldTime")
+    @patch("random.random")
+    def test_builders_boon_starts_on_roll(self, mock_random, mock_world_time):
+        # 1. Setup
+        self.cog.system.get_current_event.return_value = None
+        mock_world_time.now.return_value = datetime.datetime(2023, 1, 1, 12, 0, 0)
+        # First calls fail Time Quake (0.5), Mystic Merchant (0.5), then succeed Builder's Boon (0.01)
+        mock_random.side_effect = [0.5, 0.5, 0.01]
+        self.cog.system.start_event.return_value = True
+
+        # 2. Run
+        asyncio.run(self.cog.check_event_cycle())
+
+        # 3. Verify
+        self.cog.system.start_event.assert_called_with("builders_boon", 48)
+        self.cog._announce.assert_called()
+        args, _ = self.cog._announce.call_args
+        self.assertIn("BUILDER", args[0])
 
 if __name__ == "__main__":
     unittest.main()

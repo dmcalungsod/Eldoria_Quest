@@ -97,6 +97,23 @@ class EventCog(commands.Cog):
                         )
                         logger.info("Auto-started Mystic Merchant.")
 
+                # Builder's Boon: Random Chance (3%)
+                elif random.random() < 0.03:
+                    success = self.system.start_event(
+                        WorldEventSystem.BUILDERS_BOON, 48
+                    )
+                    if success:
+                        config = self.system.EVENT_CONFIGS[
+                            WorldEventSystem.BUILDERS_BOON
+                        ]
+                        await self._announce(
+                            f"🔨 **THE BUILDER'S BOON IS ACTIVE!** 🔨\n\n"
+                            f"**{config['name']}**\n"
+                            f"{config['description']}\n\n"
+                            f"Gathering yields for building materials are tripled for the next 48 hours! 🧱"
+                        )
+                        logger.info("Auto-started Builder's Boon.")
+
         except Exception as e:
             logger.error(f"Error in event cycle: {e}", exc_info=True)
 
