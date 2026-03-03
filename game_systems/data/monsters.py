@@ -78,9 +78,11 @@ class MonsterData:
             cls._monsters = load_monsters()
         return cls._monsters
 
+
 def __getattr__(name):
-    if name == 'MONSTERS':
+    if name == "MONSTERS":
         return MonsterData.get_all()
     raise AttributeError(f"module {__name__} has no attribute {name}")
+
 
 __all__ = ["MonsterData"]

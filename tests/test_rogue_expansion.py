@@ -1,9 +1,11 @@
 import unittest
 from unittest.mock import MagicMock
+
 from game_systems.combat.combat_engine import CombatEngine
+from game_systems.data.skills_data import SKILLS
 from game_systems.player.level_up import LevelUpSystem
 from game_systems.player.player_stats import PlayerStats
-from game_systems.data.skills_data import SKILLS
+
 
 class TestRogueExpansion(unittest.TestCase):
     def setUp(self):
@@ -37,7 +39,7 @@ class TestRogueExpansion(unittest.TestCase):
             player_skills=[skill],
             player_mp=100,
             player_class_id=3,
-            action="skill:shadow_step"
+            action="skill:shadow_step",
         )
         result = engine.run_combat_turn()
 
@@ -64,10 +66,11 @@ class TestRogueExpansion(unittest.TestCase):
             player_skills=[skill],
             player_mp=100,
             player_class_id=3,
-            action="skill:venomous_strike"
+            action="skill:venomous_strike",
         )
         # Fix mock random variance
         import random
+
         random.seed(42)
         res_normal = engine_normal.run_combat_turn()
         dmg_normal = 500 - res_normal["monster_hp"]
@@ -82,14 +85,16 @@ class TestRogueExpansion(unittest.TestCase):
             player_skills=[skill],
             player_mp=100,
             player_class_id=3,
-            action="skill:venomous_strike"
+            action="skill:venomous_strike",
         )
         random.seed(42)
         res_poison = engine_poison.run_combat_turn()
         # monster hp might also go down by poison tick during debuff processing
-        dmg_poison_attack = 500 - res_poison["monster_hp"] - 5 # subtract poison tick
+        dmg_poison_attack = 500 - res_poison["monster_hp"] - 5  # subtract poison tick
 
-        self.assertTrue(dmg_poison_attack > dmg_normal * 1.5, f"Expected > {dmg_normal * 1.5} dmg, got {dmg_poison_attack}")
+        self.assertTrue(
+            dmg_poison_attack > dmg_normal * 1.5, f"Expected > {dmg_normal * 1.5} dmg, got {dmg_poison_attack}"
+        )
 
     def test_flash_powder_debuff(self):
         """Verifies flash_powder applies accuracy_percent debuff."""
@@ -100,7 +105,7 @@ class TestRogueExpansion(unittest.TestCase):
             player_skills=[skill],
             player_mp=100,
             player_class_id=3,
-            action="skill:flash_powder"
+            action="skill:flash_powder",
         )
         result = engine.run_combat_turn()
 
@@ -119,7 +124,7 @@ class TestRogueExpansion(unittest.TestCase):
             player_skills=[skill],
             player_mp=100,
             player_class_id=3,
-            action="skill:death_blossom"
+            action="skill:death_blossom",
         )
         result = engine.run_combat_turn()
 
@@ -128,5 +133,6 @@ class TestRogueExpansion(unittest.TestCase):
         has_bleed = any(d.get("type") == "bleed" and d.get("damage") == 10 for d in debuffs)
         self.assertTrue(has_bleed, "bleed debuff not found")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

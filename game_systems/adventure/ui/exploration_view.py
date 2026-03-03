@@ -202,7 +202,7 @@ class ExplorationView(View):
             # UX: Warn if HP is critically low (< 30%)
             current_hp = self.vitals.get("current_hp", 0)
             max_hp = max(self.player_stats.max_hp, 1)
-            if (current_hp / max_hp) < 0.3:
+            if (current_hp / max_hp) < 0.15:
                 label, style, emoji = "Forward", discord.ButtonStyle.danger, "⚠️"
             else:
                 label, style, emoji = "Forward", discord.ButtonStyle.success, "🥾"

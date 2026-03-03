@@ -25,9 +25,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
             return decorator
 
         mock_discord.app_commands.command = MagicMock(side_effect=pass_decorator)
-        mock_discord.app_commands.checks.has_permissions = MagicMock(
-            side_effect=pass_decorator
-        )
+        mock_discord.app_commands.checks.has_permissions = MagicMock(side_effect=pass_decorator)
         mock_discord.app_commands.describe = MagicMock(side_effect=pass_decorator)
 
         # Mock Embed
@@ -96,9 +94,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         # Mock DB and System
         self.mock_db_cls = MagicMock()
-        with patch(
-            "cogs.event_cog.DatabaseManager", return_value=self.mock_db_cls
-        ) as mock_db_cls:
+        with patch("cogs.event_cog.DatabaseManager", return_value=self.mock_db_cls) as mock_db_cls:
             self.mock_db = mock_db_cls.return_value
             self.cog = self.EventCog(self.bot)
 
@@ -155,9 +151,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
 
         self.cog.system.start_event.assert_called_with("blood_moon", 24)
         interaction.response.send_message.assert_called_once()
-        self.assertIn(
-            "Started Event", interaction.response.send_message.call_args[0][0]
-        )
+        self.assertIn("Started Event", interaction.response.send_message.call_args[0][0])
 
     async def test_admin_start_invalid(self):
         interaction = AsyncMock()
@@ -181,9 +175,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.cog.system.get_current_event.return_value = None
 
         mock_date = datetime.datetime(2023, 10, 1, 12, 0, 0)
-        with patch(
-            "game_systems.core.world_time.WorldTime.now", return_value=mock_date
-        ):
+        with patch("game_systems.core.world_time.WorldTime.now", return_value=mock_date):
             self.cog.system.start_event.return_value = True
 
             await self.cog.check_event_cycle.callback(self.cog)
@@ -195,9 +187,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.cog.system.get_current_event.return_value = None
 
         mock_date = datetime.datetime(2023, 5, 1, 12, 0, 0)
-        with patch(
-            "game_systems.core.world_time.WorldTime.now", return_value=mock_date
-        ):
+        with patch("game_systems.core.world_time.WorldTime.now", return_value=mock_date):
             # First call for time_quake (0.5 > 0.02 fails), second call for mystic_merchant (0.01 < 0.02 succeeds)
             with patch("random.random", side_effect=[0.5, 0.01]):
                 self.cog.system.start_event.return_value = True
@@ -242,9 +232,7 @@ class TestEventCog(unittest.IsolatedAsyncioTestCase):
         self.cog.system.get_current_event.return_value = None
         self.cog.system.start_event.return_value = True
 
-        self.cog.system.EVENT_CONFIGS = {
-            "builders_boon": {"name": "The Builder's Boon", "description": "Test"}
-        }
+        self.cog.system.EVENT_CONFIGS = {"builders_boon": {"name": "The Builder's Boon", "description": "Test"}}
 
         with patch(
             "game_systems.core.world_time.WorldTime.now",
