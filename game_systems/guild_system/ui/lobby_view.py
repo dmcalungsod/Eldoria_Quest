@@ -84,8 +84,9 @@ class GuildLobbyView(View, GuildViewMixin):
         )
 
     async def _services_btn_callback(self, interaction: discord.Interaction):
+        from game_systems.core.world_time import TimePhase, WorldTime
+
         from .services_menu import GuildServicesView
-        from game_systems.core.world_time import WorldTime, TimePhase
 
         await interaction.response.defer()
         view = GuildServicesView(self.db, self.interaction_user)

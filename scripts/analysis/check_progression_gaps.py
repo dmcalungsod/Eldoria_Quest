@@ -18,7 +18,6 @@ from game_systems.data.adventure_locations import LOCATIONS
 from scripts.analysis.economy_utils import calculate_expected_value_stats
 
 
-
 def calculate_ev(location_data, player_luck=10):
     """
     Calculates the expected Total Value per hour (Aurum + Material Value).
