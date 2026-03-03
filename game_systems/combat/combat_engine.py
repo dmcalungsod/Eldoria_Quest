@@ -757,7 +757,7 @@ class CombatEngine:
 
         if skill.get("heal_power", 0) > 0:
             self._handle_healing_skill(skill, skill_level, log)
-        elif skill.get("buff_data"):
+        elif skill.get("buff", skill.get("buff_data")):
             self._handle_buff_skill(skill, log)
         else:
             damage_dealt = self._handle_damage_skill(
@@ -961,7 +961,7 @@ class CombatEngine:
                 return {"skill": heal_skill, "reason": "HP Critical."}
 
         # Priority 2: Buffs (50% chance if available)
-        utility_skills = [s for s in usable_skills if s.get("buff_data")]
+        utility_skills = [s for s in usable_skills if s.get("buff", s.get("buff_data"))]
         if utility_skills and random.randint(1, 100) > 50:  # nosec B311
             chosen_skill = random.choice(utility_skills)  # nosec B311
             return {"skill": chosen_skill, "reason": "Buff chosen."}
@@ -970,7 +970,7 @@ class CombatEngine:
         offensive_skills = [
             s
             for s in usable_skills
-            if s.get("heal_power", 0) == 0 and not s.get("buff_data")
+            if s.get("heal_power", 0) == 0 and not s.get("buff", s.get("buff_data"))
         ]
         if offensive_skills:
             chosen_skill = random.choice(offensive_skills)  # nosec B311  # nosec B311

@@ -129,15 +129,18 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @DataSteward
     - **Details:** Add `primordial_ooze`, `brimstone`, `lunawort` to `materials.py`.
     - **Due:** 2026-03-08
-- [ ] **Task 5.5:** Fix `"buff_data"` typo in `skills_data.py`.
+- [x] **Task 5.5:** Fix `"buff_data"` typo in `skills_data.py`.
     - **Agent:** @GameForge
     - **Details:** Bulk rename `"buff_data"` to `"buff"` for Alchemist, Warrior, and Rogue Class Skills.
+    - **Status:** **Completed**
     - **Due:** 2026-03-08
-- [ ] **Task 5.6:** Add missing `"wailing_chasm"` to `adventure_locations.json`.
+- [x] **Task 5.6:** Add missing `"wailing_chasm"` to `adventure_locations.json`.
     - **Agent:** @GameForge
+    - **Status:** **Completed**
     - **Due:** 2026-03-08
-- [ ] **Task 5.7:** Add missing "Choirmaster", "Blind Choir Zealot" monsters to `monsters.json`.
+- [x] **Task 5.7:** Add missing "Choirmaster", "Blind Choir Zealot" monsters to `monsters.json`.
     - **Agent:** @GameForge
+    - **Status:** **Completed**
     - **Due:** 2026-03-08
 - [ ] **Task 5.8:** Investigate medium-severity B310 finding in `scripts/chronicler/post_update.py:100`.
     - **Agent:** @Sentinel
