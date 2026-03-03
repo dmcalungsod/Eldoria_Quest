@@ -628,3 +628,126 @@ class TestAutoAdventureRegression(unittest.TestCase):
         self.assertIn("Emergency Extraction", summary["penalty_logs"][0])
         # Loot should be empty
         self.assertEqual(len(summary["loot"]), 0)
+
+# ==============================================================================
+# Extra Test Additions for Auto-Adventure Overhaul (Scheduler / Resolution)
+# ==============================================================================
+
+# We append these tests to the existing file but since discord.ext.tasks mocking
+# might be tricky here, we just use a simplified version since cogs.adventure_loop
+# is tested independently now. Actually, let's just append the ones we successfully made
+# to a separate file, or integrate it here if we mock properly.
+
+class FakeCommandsCog:
+    pass
+
+class FakeCommands:
+    Cog = FakeCommandsCog
+
+def fake_loop(**kw):
+    def decorator(func):
+        func.start = MagicMock()
+        func.cancel = MagicMock()
+        func.before_loop = lambda f: f
+        return func
+    return decorator
+
+class FakeTasks:
+    loop = fake_loop
+
+class FakeExt:
+    commands = FakeCommands
+    tasks = FakeTasks
+
+class FakeDiscord:
+    ext = FakeExt
+
+import sys
+sys.modules["discord"] = FakeDiscord()
+sys.modules["discord.ext"] = FakeExt()
+sys.modules["discord.ext.commands"] = FakeCommands()
+sys.modules["discord.ext.tasks"] = FakeTasks()
+
+import cogs.adventure_loop
+
+class TestAutoAdventureLoop(unittest.TestCase):
+    @patch('cogs.adventure_loop.DatabaseManager')
+    @patch('cogs.adventure_loop.AdventureResolutionEngine')
+    def test_sync_worker_step(self, MockEngine, MockDB):
+        cog = cogs.adventure_loop.AdventureLoop(MagicMock())
+        with patch('cogs.adventure_loop.WorldTime') as mock_time:
+            mock_time.now.return_value.isoformat.return_value = "2023-01-01T00:00:00"
+            cog.db.get_adventures_ending_before.return_value = [
+                {"discord_id": 1, "location_id": "forest"}
+            ]
+
+            cog._sync_worker_step()
+
+            mock_time.now.return_value.isoformat.assert_called_once()
+            cog.db.get_adventures_ending_before.assert_called_once_with("2023-01-01T00:00:00")
+            cog.engine.resolve_sessions_batch.assert_called_once_with(
+                [{"discord_id": 1, "location_id": "forest"}]
+            )
+
+    @patch('cogs.adventure_loop.DatabaseManager')
+    @patch('cogs.adventure_loop.AdventureResolutionEngine')
+    def test_sync_worker_step_empty(self, MockEngine, MockDB):
+        cog = cogs.adventure_loop.AdventureLoop(MagicMock())
+        with patch('cogs.adventure_loop.WorldTime') as mock_time:
+            mock_time.now.return_value.isoformat.return_value = "2023-01-01T00:00:00"
+            cog.db.get_adventures_ending_before.return_value = []
+
+            cog._sync_worker_step()
+
+            mock_time.now.return_value.isoformat.assert_called_once()
+            cog.db.get_adventures_ending_before.assert_called_once_with("2023-01-01T00:00:00")
+            cog.engine.resolve_sessions_batch.assert_not_called()
+
+class TestAutoAdventureSetupAndEdge(unittest.TestCase):
+    @patch('game_systems.adventure.adventure_manager.LOCATIONS',
+           {"void_sanctum": {"name": "The Void Sanctum", "danger_level": 5}})
+    def test_start_adventure_rejects_invalid_location(self):
+        """Regression Test: Reject invalid location ID."""
+        manager = AdventureManager(MagicMock(), MagicMock())
+        # Provide an invalid location string
+        success = manager.start_adventure(12345, "invalid_location", duration_minutes=30)
+        self.assertFalse(success)
+
+    @patch('game_systems.adventure.adventure_manager.LOCATIONS',
+           {"forest": {"name": "Forest", "danger_level": 1}})
+    def test_start_adventure_rejects_invalid_duration(self):
+        """Regression Test: Reject invalid durations to prevent overflow/underflow exploits."""
+        manager = AdventureManager(MagicMock(), MagicMock())
+        # Try negative
+        success = manager.start_adventure(12345, "forest", duration_minutes=-10)
+        self.assertFalse(success)
+        # Try extreme length
+        success = manager.start_adventure(12345, "forest", duration_minutes=99999999)
+        self.assertFalse(success)
+
+    @patch('game_systems.adventure.adventure_manager.LOCATIONS',
+           {"forest": {"name": "Forest", "danger_level": 1}})
+    def test_start_adventure_rollback_on_failed_supply_deduct(self):
+        """Regression Test: Rollback supplies if deduction fails halfway."""
+        mock_db = MagicMock()
+        manager = AdventureManager(mock_db, MagicMock())
+        manager.inventory_manager = MagicMock()
+
+        # Mock inventory to have enough supplies initially
+        manager.inventory_manager.get_inventory.return_value = [
+            {"item_key": "food", "count": 2, "item_name": "Food", "item_type": "supply", "rarity": "Common"},
+            {"item_key": "water", "count": 2, "item_name": "Water", "item_type": "supply", "rarity": "Common"}
+        ]
+
+        # Mock DB to succeed on first deduction, but FAIL on second
+        mock_db.remove_inventory_item.side_effect = [True, False]
+
+        success = manager.start_adventure(12345, "forest", duration_minutes=30, supplies={"food": 1, "water": 1})
+
+        self.assertFalse(success)
+        # Should have tried to deduct 2 items total (failed on second)
+        self.assertEqual(mock_db.remove_inventory_item.call_count, 2)
+        # Should have rolled back the first item
+        manager.inventory_manager.add_item.assert_called_once_with(
+            12345, "food", "Food", "supply", "Common", 1
+        )

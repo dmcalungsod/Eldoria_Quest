@@ -1,0 +1,43 @@
+--- tests/test_codex_unlocks.py
++++ tests/test_codex_unlocks.py
+@@ -37,8 +37,9 @@
+         with mock.patch(
+             "database.database_manager.MongoClient", return_value=self.mock_client
+         ):
+             self.db = DatabaseManager()
++            self.db._col = MagicMock(return_value=self.mock_db["player_codex"])
+
+         self.user_id = 12345
+
+     def test_update_codex_duplicate_entry(self):
+@@ -58,9 +59,9 @@
+         # It calls: self._col("player_codex").update_one( ... )
+         # Since _col returns self.db[collection_name] and we patched __getitem__, it hits self.mock_db["player_codex"]
+
+         # assert_called_with works on the mock
+-        col = self.mock_db["player_codex"]
++        col = self.db._col("player_codex")
+         col.update_one.assert_called_with(
+             {"user_id": self.user_id},
+             {"$set": {"bestiary.1": {"kills": 15, "seen": True}}},
+             upsert=True,
+@@ -71,9 +72,9 @@
+         self.db.update_codex(self.user_id, "atlas", "forest_outskirts", {"visits": 5})
+
+-        col = self.mock_db["player_codex"]
++        col = self.db._col("player_codex")
+         col.update_one.assert_called_with(
+             {"user_id": self.user_id},
+             {"$set": {"atlas.forest_outskirts": {"visits": 5}}},
+             upsert=True,
+@@ -82,9 +83,9 @@
+     def test_get_codex_duplicate_merge(self):
+         """Test fetching a document merges it properly even if the original structure has duplicates or unexpected fields."""
+
+         # database_manager get_codex uses find_one on _col
+-        col = self.mock_db["player_codex"]
++        col = self.db._col("player_codex")
+         col.find_one.return_value = {
+             "user_id": self.user_id,
+             "bestiary": {"106": {"kills": 5, "seen": True}},
+             "extra_unneeded_field": True, # Edge case: unknown field
