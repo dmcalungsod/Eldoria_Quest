@@ -133,7 +133,7 @@ SKILLS = {
         "type": "Active",
         "class_id": 1,
         "mp_cost": 50,
-        "buff": {
+        "buff_data": {
             "ATK_percent": 0.5,
             "DEF_percent": 0.5,
             "status_immunity": ["stun", "slow"],
@@ -246,7 +246,7 @@ SKILLS = {
         "type": "Active",
         "class_id": 3,
         "mp_cost": 15,
-        "buff": {
+        "buff_data": {
             "next_hit_crit": 1,
             "AGI_percent": 0.5,
             "duration": 2,
@@ -443,7 +443,7 @@ SKILLS = {
         "type": "Active",
         "class_id": 6,
         "mp_cost": 50,
-        "buff": {
+        "buff_data": {
             "STR_percent": 0.3,
             "AGI_percent": 0.3,
             "END_percent": 0.3,

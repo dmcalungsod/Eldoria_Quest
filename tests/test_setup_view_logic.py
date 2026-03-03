@@ -98,7 +98,7 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
                 "type": "supply"
             })
 
-        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20), [])
+        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
 
         # Check supply_select options count
         self.assertLessEqual(len(view.supply_select.options), 25, "Supply options should not exceed 25")
@@ -106,7 +106,7 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
     def test_max_values_constraint(self):
         # Case 1: 1 supply
         supplies = [{"item_key": "s1", "item_name": "S1", "count": 1}]
-        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20), [])
+        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
 
         # max_values must be <= len(options)
         self.assertLessEqual(view.supply_select.max_values, len(view.supply_select.options), "max_values must be <= options count (1 supply)")
@@ -116,12 +116,12 @@ class TestAdventureSetupViewLogic(unittest.TestCase):
             {"item_key": "s1", "item_name": "S1", "count": 1},
             {"item_key": "s2", "item_name": "S2", "count": 1}
         ]
-        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20), [])
+        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
         self.assertLessEqual(view.supply_select.max_values, len(view.supply_select.options), "max_values must be <= options count (2 supplies)")
 
         # Case 3: 0 supplies (No Supplies placeholder)
         supplies = []
-        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20), [])
+        view = self.AdventureSetupView(self.db, self.manager, self.user, "F", 1, supplies, (10, 20))
         # Should have "No Supplies" option
         self.assertEqual(len(view.supply_select.options), 1)
         self.assertEqual(view.supply_select.options[0]["value"], "none")

@@ -95,10 +95,7 @@ def build_inventory_embed(
 
             # Categorize Slot
             cat = "Armor"  # Default
-            if (
-                slot_key in EquipmentManager.TWO_HANDED_SLOTS
-                or slot_key in EquipmentManager.MAIN_HAND_SLOTS
-            ):
+            if slot_key in EquipmentManager.TWO_HANDED_SLOTS or slot_key in EquipmentManager.MAIN_HAND_SLOTS:
                 cat = "Weapon"
             elif slot_key in EquipmentManager.OFF_HAND_SLOTS:
                 # Shields are armor, others are weapons
@@ -109,9 +106,7 @@ def build_inventory_embed(
             elif slot_key == "accessory":
                 cat = "Accessory"
 
-            equipped_groups[cat].append(
-                get_rarity_ansi(rarity, f"• {name} ({slot_display})")
-            )
+            equipped_groups[cat].append(get_rarity_ansi(rarity, f"• {name} ({slot_display})"))
         else:
             key = (itype, name, rarity)
             unequipped_counts[key] = unequipped_counts.get(key, 0) + item["count"]
@@ -128,15 +123,9 @@ def build_inventory_embed(
             # Display capacity for accessories
             acc_count = len(equipped_groups["Accessory"])
             limit = EquipmentManager.MAX_ACCESSORY_SLOTS
-            val += (
-                f"**Accessories ({acc_count}/{limit})**\n"
-                + "\n".join(equipped_groups["Accessory"])
-                + "\n"
-            )
+            val += f"**Accessories ({acc_count}/{limit})**\n" + "\n".join(equipped_groups["Accessory"]) + "\n"
 
-        embed.add_field(
-            name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False
-        )
+        embed.add_field(name="⚔️ Equipped Gear", value=f"```ansi\n{val}```", inline=False)
 
     # --- INVENTORY SECTION ---
     for (itype, name, rarity), count in sorted(unequipped_counts.items()):
@@ -195,9 +184,7 @@ async def get_profile_bundle_or_error(
     return bundle
 
 
-async def back_to_profile_callback(
-    interaction: discord.Interaction, is_new_message: bool = False
-):
+async def back_to_profile_callback(interaction: discord.Interaction, is_new_message: bool = False):
     """Navigation: Returns to Character Profile."""
     from game_systems.character.ui.profile_view import CharacterTabView
 
@@ -288,66 +275,6 @@ async def back_to_profile_callback(
         )
         embed.add_field(name="Attributes", value=stat_block, inline=False)
 
-        # --- MENTOR PROGRESSIVE ADVICE (RANK F/E) ---
-        if rank in ["F", "E"]:
-            try:
-                equipped_items = await asyncio.to_thread(
-                    db.get_equipped_items, discord_id
-                )
-                weapon_slots = {
-                    "sword",
-                    "mace",
-                    "wand",
-                    "staff",
-                    "dagger",
-                    "bow",
-                    "greatsword",
-                }
-                has_weapon = any(
-                    item.get("slot") in weapon_slots for item in equipped_items
-                )
-
-                exp_stats = await asyncio.to_thread(
-                    db.get_exploration_stats, discord_id
-                )
-                total_expeditions = (
-                    exp_stats.get("total_expeditions", 0) if exp_stats else 0
-                )
-
-                active_quests = await asyncio.to_thread(
-                    db.get_player_quests_joined, discord_id
-                )
-                has_quest = len(active_quests) > 0
-
-                advice = ""
-                if not has_weapon:
-                    advice = (
-                        "Your hands are empty. Click **Abilities & Kit**, open your "
-                        "**Inventory**, and equip your starter weapon."
-                    )
-                elif not has_quest and total_expeditions == 0:
-                    advice = (
-                        "You are armed, but untested. Click **Guild Hall**, "
-                        "visit the **Quest Board**, and accept a starter contract."
-                    )
-                elif total_expeditions == 0:
-                    advice = (
-                        "You have a contract. Now, click **Expeditions** and "
-                        "depart on a 30-minute journey to the Whispering Forest."
-                    )
-                elif rank == "F":
-                    advice = (
-                        "You survived the wilds. Return to the **Guild Hall** to "
-                        "report your quest success and sell your materials at the Shop."
-                    )
-
-                if advice:
-                    embed.add_field(
-                        name="🎓 Mentor's Advice", value=f"*{advice}*", inline=False
-                    )
-            except Exception as advice_err:
-                logger.error(f"Failed to load mentor advice: {advice_err}")
-
         view = CharacterTabView(db, interaction.user)
 
         if is_new_message:
@@ -358,9 +285,7 @@ async def back_to_profile_callback(
     except Exception as e:
         logger.error(f"Profile load error for {discord_id}: {e}", exc_info=True)
         if not interaction.response.is_done():
-            await interaction.response.send_message(
-                "Error loading profile.", ephemeral=True
-            )
+            await interaction.response.send_message("Error loading profile.", ephemeral=True)
 
 
 async def back_to_guild_hall_callback(interaction: discord.Interaction):
@@ -378,9 +303,7 @@ async def back_to_guild_hall_callback(interaction: discord.Interaction):
 
         card = await asyncio.to_thread(db.get_guild_card_data, interaction.user.id)
         if not card:
-            await interaction.followup.send(
-                "You are not a guild member.", ephemeral=True
-            )
+            await interaction.followup.send("You are not a guild member.", ephemeral=True)
             return
 
         embed = discord.Embed(

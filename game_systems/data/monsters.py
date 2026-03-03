@@ -69,18 +69,6 @@ def load_monsters():
     return validated_monsters
 
 
-class MonsterData:
-    _monsters = None
+MONSTERS = load_monsters()
 
-    @classmethod
-    def get_all(cls):
-        if cls._monsters is None:
-            cls._monsters = load_monsters()
-        return cls._monsters
-
-def __getattr__(name):
-    if name == 'MONSTERS':
-        return MonsterData.get_all()
-    raise AttributeError(f"module {__name__} has no attribute {name}")
-
-__all__ = ["MonsterData"]
+__all__ = ["MONSTERS"]

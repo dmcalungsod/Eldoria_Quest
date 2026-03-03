@@ -34,13 +34,14 @@ sys.modules["discord.ext"] = FakeExt()
 sys.modules["discord.ext.commands"] = FakeCommands()
 sys.modules["discord.ext.tasks"] = FakeTasks()
 
-import cogs.adventure_loop
+from cogs.adventure_loop import AdventureLoop
+
 
 class TestAutoAdventureLoop(unittest.TestCase):
     @patch('cogs.adventure_loop.DatabaseManager')
     @patch('cogs.adventure_loop.AdventureResolutionEngine')
     def test_sync_worker_step(self, MockEngine, MockDB):
-        cog = cogs.adventure_loop.AdventureLoop(MagicMock())
+        cog = AdventureLoop(MagicMock())
         with patch('cogs.adventure_loop.WorldTime') as mock_time:
             mock_time.now.return_value.isoformat.return_value = "2023-01-01T00:00:00"
             cog.db.get_adventures_ending_before.return_value = [
@@ -58,7 +59,7 @@ class TestAutoAdventureLoop(unittest.TestCase):
     @patch('cogs.adventure_loop.DatabaseManager')
     @patch('cogs.adventure_loop.AdventureResolutionEngine')
     def test_sync_worker_step_empty(self, MockEngine, MockDB):
-        cog = cogs.adventure_loop.AdventureLoop(MagicMock())
+        cog = AdventureLoop(MagicMock())
         with patch('cogs.adventure_loop.WorldTime') as mock_time:
             mock_time.now.return_value.isoformat.return_value = "2023-01-01T00:00:00"
             cog.db.get_adventures_ending_before.return_value = []

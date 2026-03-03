@@ -13,7 +13,7 @@ from typing import Any
 from database.database_manager import DatabaseManager
 from game_systems.combat.combat_engine import CombatEngine
 from game_systems.combat.combat_phrases import CombatPhrases
-from game_systems.core.world_time import Season, WorldTime
+from game_systems.core.world_time import WorldTime
 from game_systems.data.monsters import MONSTERS
 from game_systems.events.world_event_system import WorldEventSystem
 from game_systems.player.level_up import LevelUpSystem
@@ -53,13 +53,6 @@ class CombatHandler:
                 for cond in conditionals:
                     if player_level >= cond.get("min_level", 1):
                         monster_pool.append((cond["monster_key"], cond["weight"]))
-
-            # --- DYNAMIC SEASONAL MONSTER MIGRATIONS ---
-            current_season = WorldTime.get_current_season()
-            loc_name = location.get("name")
-            if current_season == Season.WINTER and loc_name in ["Willowcreek Outskirts", "Whispering Thicket"]:
-                # Frost Wolf (monster_111) migrates down from the Frostfall Expanse during Winter
-                monster_pool.append(("monster_111", 15))
 
             if not monster_pool:
                 return None, "The area is silent. No threats detected."
@@ -143,12 +136,6 @@ class CombatHandler:
             # ----------------------------
 
             phrase = CombatPhrases.opening(active_monster)
-
-            # Prepend Seasonal Migrant Flavor
-            current_season = WorldTime.get_current_season()
-            loc_name = location.get("name")
-            if monster_key == "monster_111" and current_season == Season.WINTER and loc_name in ["Willowcreek Outskirts", "Whispering Thicket"]:
-                phrase = f"❄️ **Driven south by the biting cold of winter, a Frost Wolf prowls outside its normal territory.**\n{phrase}"
 
             # Prepend Spectral Flavor
             if active_monster.get("is_spectral"):
