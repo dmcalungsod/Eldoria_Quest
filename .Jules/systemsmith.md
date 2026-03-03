@@ -1,38 +1,4 @@
-## 2024-05-22 — Quest Update Desync
+## 2026-03-09 — Refactoring ConsumableManager
 
-**Learning:** `AdventureRewards` was updating quest progress based on *potential* drops rather than *actual* drops, allowing players to complete collection quests without obtaining items.
-**Action:** Always verify that reward processing logic operates on the *result* of RNG checks, not the input probabilities. Use explicit `actual_drops` lists.
-
-## 2024-05-23 — Additive vs Multiplicative Luck Scaling
-
-**Learning:** `AdventureRewards` used a linear additive formula for Luck bonuses (`base_chance + luck_bonus`), which could push drop rates over 100% or multiply rare drop rates by 50x at max stats, breaking the economy.
-**Action:** Always implement stat-based scaling (like Luck or Crit) using multiplicative formulas (`base * (1 + bonus)`) to preserve the rarity curve and prevent trivializing high-tier content.
-
-## 2025-05-18 — Restore HP on Level Up
-
-**Learning:** Players were not receiving full HP restoration upon leveling up, unlike MP which was restored. This created an inconsistency and felt unrewarding.
-**Action:** Updated `AdventureManager._grant_rewards_internal` to restore `current_hp` to `max_hp` when `leveled_up` is True. This ensures a fresh start for the new level.
-
-## 2025-05-24 — Dynamic Stat Practice Thresholds
-
-**Learning:** The "Practice" system (gaining stats via XP from combat actions) used a fixed threshold (100 XP) while the Vestige Point cost scaled exponentially. This created a loophole where high-level players could grind low-level actions to bypass the intended progression curve.
-**Action:** Implemented a dynamic threshold formula (`100 + BaseStat * 5`) for practice XP. Progression systems must always scale difficulty with player power to prevent trivialization of end-game growth.
-
-## 2025-10-27 — Profile Bundle Optimization
-
-**Learning:** The "Back to Profile" UI callback was making 5-6 separate database queries (Player, Guild, Stats, Skills, Title) sequentially (or gathered), causing latency and load. Using MongoDB's `$lookup` aggregation pipeline reduced this to a single round-trip.
-**Action:** Identify frequently accessed UI paths (like Profile, Inventory) and implement dedicated "bundle" methods in `DatabaseManager` using aggregations instead of multiple `find_one` calls in the cog.
-
-## 2025-11-20 — Robust Equipment Stat Calculation
-
-**Learning:** `EquipmentManager` and `ItemManager` were crashing on `int(item_key)` conversion when encountering malformed data (non-numeric item keys), potentially zeroing out player stats on recalculation.
-**Action:** Always wrap type conversions of database keys in `try-except` blocks and log warnings instead of allowing uncaught exceptions to propagate, ensuring system resilience against data corruption.
-## 2026-03-01 — Refactored High-Complexity Methods
-
-**Learning:** `CombatEngine.run_combat_turn`, `AdventureEvents.regeneration`, and `AdventureSession.simulate_step` were monoliths with high cyclomatic complexity, making them difficult to maintain.
-**Action:** Extract specific phases (like player turn, atmospheric prepend generation, or context fetching) into helper methods to improve modularity and reduce complexity. Ensure state objects or returned values correctly mimic the flow of the original monolithic design.
-
-## 2026-03-02 — Refactoring High-Complexity Methods in CombatEngine
-
-**Learning:** `CombatEngine` in `game_systems/combat/combat_engine.py` was highly monolithic, containing massive cyclomatic complexity within its core loop methods (`_process_monster_turn` and `_execute_player_skill`). This was a significant structural limitation for future updates.
-**Action:** Extracting sub-logic into private helper functions (e.g. `_handle_healing_skill`, `_monster_action_attack`) drastically reduces cyclomatic complexity while preserving all expected side-effects for combat (state changes on `self.monster`, `self.player`, and appending to the `log` array). Always run `radon cc -s` post-refactor to verify the complexity improvements.
+**Learning:** Large handler functions in `ConsumableManager.use_item` can hit cyclomatic complexity values as high as 39, hindering maintainability.
+**Action:** Extract logic into explicitly separated methods for input validation (`_verify_consumable_data`), passive skill computation (`_get_healing_multiplier`), specific effect handling (`_apply_healing` and `_apply_mana`), and buffering and side effects (`_process_buffs`). This pattern can consistently map single-function "God Methods" down to C-grade or lower values reliably.
