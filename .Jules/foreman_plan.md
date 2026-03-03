@@ -56,6 +56,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[ ] Reopened**
     - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Must scale past Molten Caldera's high EV 1500.50). **[ ] Reopened**
     - **Subtask 2.2e (New):** Address "Celestial Archipelago" EV (EV 624.25 < Rank B). Raise to > 1300 Aurum. **[ ] Unstarted**
+- [ ] **Task 2.2f (New):** Address "The Silent City of Ouros" drops (EV 307.0 < Rank S). Raise significantly to be competitive with The Void Sanctum (915.8 EV/Hr). **[ ] Unstarted**
     - **Due:** 2026-03-08
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
@@ -232,6 +233,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 ---
 
 ## 📝 Activity Log
+- **2026-03-09 (Update):** Integrated Analyst recommendations for The Silent City of Ouros drops (Task 2.2f). Noted Tech Debt Tasks 5.5, 5.6, 5.7 are Complete.
 - **2026-03-02 (Update):** Added "Guild Halls" and "Silent City" parallel projects. Marked Tasks 5.1, A.2, and 2.4 completed based on 03-01/03-02 logs. Added Repo Auditor tasks (5.8-5.11). Updated 2.2 subtasks based on EV report.
 - **2026-02-27:** Verified Task 3.3 (Supplies) as Complete. Added Rogue Skill Tree project and Analyst Integration tasks (2.2c/d, 2.4). Flagged Task 5.1 as CRITICAL.
 - **2026-02-25 (Update):** Integrated Analyst findings (Task 2.2 split), Namewright updates (Task 3.3/Alchemist), and Issue Crafter reports (Phase 5). Marked Tasks 2.1 and 3.2 as Complete.
