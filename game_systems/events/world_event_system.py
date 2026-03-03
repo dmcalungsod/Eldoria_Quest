@@ -175,9 +175,7 @@ class WorldEventSystem:
         start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(hours=duration_hours)
 
-        self.db.set_active_world_event(
-            event_type, start_time.isoformat(), end_time.isoformat()
-        )
+        self.db.set_active_world_event(event_type, start_time.isoformat(), end_time.isoformat())
         logger.info(f"Started World Event: {event_type} for {duration_hours}h")
         return True
 

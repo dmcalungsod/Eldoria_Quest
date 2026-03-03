@@ -244,8 +244,8 @@ class AdventureEmbeds:
                 if "Defeated" in log or "Victory" in log or "slain" in log:
                     kills += 1
             if kills > 0:
-                 embed.add_field(name="⚔️ Kills", value=f"`{kills}` Monsters Defeated", inline=True)
-        except:
+                embed.add_field(name="⚔️ Kills", value=f"`{kills}` Monsters Defeated", inline=True)
+        except Exception:
             pass
 
         # Loot Details
@@ -260,13 +260,14 @@ class AdventureEmbeds:
                     continue
                 if item_count < 5:
                     from game_systems.data.materials import MATERIALS
+
                     mat = MATERIALS.get(item_key)
-                    name = mat["name"] if mat else item_key.replace('_', ' ').title()
+                    name = mat["name"] if mat else item_key.replace("_", " ").title()
                     loot_details.append(f"• {name}: {count}")
                 item_count += 1
 
             if item_count > 5:
-                loot_details.append(f"...and {item_count-5} more types")
+                loot_details.append(f"...and {item_count - 5} more types")
 
             loot_text = "\n".join(loot_details) if loot_details else "None yet."
             embed.add_field(name="🎒 Loot Gathered", value=loot_text, inline=True)

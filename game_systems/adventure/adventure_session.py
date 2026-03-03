@@ -736,7 +736,9 @@ class AdventureSession:
                 return True
         return False
 
-    def _process_auto_combat_victory(self, result: dict, turn_reports: list, report: dict, sequence: list, context: dict | None = None):
+    def _process_auto_combat_victory(
+        self, result: dict, turn_reports: list, report: dict, sequence: list, context: dict | None = None
+    ):
         """Processes victory rewards for auto combat."""
         final_block = [f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(turn_reports)} rounds."]
 
@@ -882,7 +884,9 @@ class AdventureSession:
     # MANUAL COMBAT TURN
     # ======================================================================
 
-    def _handle_combat_turn_outcome(self, result: dict, report: dict, turn_logs: list, context: dict | None = None) -> tuple[bool, list]:
+    def _handle_combat_turn_outcome(
+        self, result: dict, report: dict, turn_logs: list, context: dict | None = None
+    ) -> tuple[bool, list]:
         """Processes the outcome of a single manual combat turn."""
         is_dead = False
         if result.get("winner") == "monster":

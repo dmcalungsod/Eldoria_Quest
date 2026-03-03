@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
+
 from game_systems.items.inventory_manager import InventoryManager
+
 
 class TestInventoryManagerExtended(unittest.TestCase):
     def setUp(self):
@@ -15,6 +17,7 @@ class TestInventoryManagerExtended(unittest.TestCase):
     def test_add_item(self):
         self.manager.add_item(123, "iron_sword", "Iron Sword", "equipment")
         self.mock_db.add_inventory_item.assert_called()
+
 
 if __name__ == "__main__":
     unittest.main()

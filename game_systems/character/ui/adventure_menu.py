@@ -87,7 +87,7 @@ class AdventureView(View):
                 "If your HP drops below 30%, you will automatically retreat, though you may lose gathered loot. "
                 "You can also check your status and retreat manually at any time to secure your findings."
             ),
-            color=discord.Color.blue()
+            color=discord.Color.blue(),
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

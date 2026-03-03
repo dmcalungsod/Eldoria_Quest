@@ -46,9 +46,7 @@ class TestTimeQuakeEvent(unittest.TestCase):
         self.session._fetch_session_context = MagicMock(return_value=context)
         # Prevent actual combat/encounters from happening
         self.session._handle_new_encounter = MagicMock(return_value=None)
-        self.session._handle_exploration_event = MagicMock(
-            return_value={"log": ["Test"]}
-        )
+        self.session._handle_exploration_event = MagicMock(return_value={"log": ["Test"]})
 
         # We can mock calculate_fatigue_multiplier to see if threat reduction is applied,
         # but in simulate_step, threat_reduction is passed to _resolve_auto_combat or _process_combat_turn.
@@ -105,9 +103,7 @@ class TestTimeQuakeEvent(unittest.TestCase):
         """Test that the 50% loot bonus is passed to the LootCalculator in the Silent City of Ouros."""
         mock_loot_calc.roll_drops.return_value = ["test_item"]
         self.db_mock.get_player_stats_json.return_value = {"LUCK": {"base": 10}}
-        self.db_mock.get_active_world_event.return_value = {
-            "type": WorldEventSystem.TIME_QUAKE
-        }
+        self.db_mock.get_active_world_event.return_value = {"type": WorldEventSystem.TIME_QUAKE}
 
         combat_result = {
             "exp": 100,
@@ -147,9 +143,7 @@ class TestTimeQuakeEvent(unittest.TestCase):
         """Test that the Silent City of Ouros loot bonus is NOT applied elsewhere."""
         mock_loot_calc.roll_drops.return_value = ["test_item"]
         self.db_mock.get_player_stats_json.return_value = {"LUCK": {"base": 10}}
-        self.db_mock.get_active_world_event.return_value = {
-            "type": WorldEventSystem.TIME_QUAKE
-        }
+        self.db_mock.get_active_world_event.return_value = {"type": WorldEventSystem.TIME_QUAKE}
 
         combat_result = {
             "exp": 100,
