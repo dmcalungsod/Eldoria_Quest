@@ -316,6 +316,13 @@ class AdventureEvents:
         "Shadows on the ice seem to move, tracking your progress.",
     ]
 
+    ATMOSPHERE_ABYSSAL = [
+        "The crushing dark presses against your skin.",
+        "You feel a steady, maddening pull downward.",
+        "Whispers from the Void echo through the endless chasm.",
+        "Every step feels heavier, as if gravity is collapsing.",
+    ]
+
     ATMOSPHERE_OUROS = [
         "The silence is absolute, a crushing weight against your eardrums.",
         "Perfectly preserved buildings loom, their windows staring like empty eyes.",
@@ -435,6 +442,12 @@ class AdventureEvents:
         "📚 The smell of old paper is strangely comforting.",
         "📚 You bandage your wounds while ignoring the whispers.",
         "📚 A floating candle provides a warm light as you rest.",
+    ]
+
+    REGEN_PHRASES_ABYSSAL = [
+        f"{E.CAVE} You wedge yourself into a crack in the stone, seeking safety from the falling dark.",
+        f"{E.CAVE} In a rare moment of stillness, you bind your wounds before the descent continues.",
+        f"{E.CAVE} The heavy air fills your lungs. You steel your resolve against the abyss.",
     ]
 
     REGEN_PHRASES_OUROS = [
@@ -610,6 +623,7 @@ class AdventureEvents:
         "the_ashlands": REGEN_PHRASES_ASHLANDS,
         "forgotten_ossuary": REGEN_PHRASES_OSSUARY,
         "whispering_archives": REGEN_PHRASES_ARCHIVES,
+        "abyssal_descent": REGEN_PHRASES_ABYSSAL,
         "silent_city_ouros": REGEN_PHRASES_OUROS,
     }
 
@@ -624,6 +638,7 @@ class AdventureEvents:
         "the_ashlands": ATMOSPHERE_ASHLANDS,
         "forgotten_ossuary": ATMOSPHERE_OSSUARY,
         "whispering_archives": ATMOSPHERE_ARCHIVES,
+        "abyssal_descent": ATMOSPHERE_ABYSSAL,
         "silent_city_ouros": ATMOSPHERE_OUROS,
     }
 
