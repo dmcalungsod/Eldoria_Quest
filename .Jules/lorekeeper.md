@@ -67,7 +67,7 @@ I was assigned to verify the Codex entries and maintain world canon without intr
 **Next Steps:**
 - Await specific directives to integrate Codex lore from the Foreman.
 
-## 2026-03-09 — Integrating New Regions: Ironhaven and The Undergrove
+## 2026-03-04 — Integrating New Regions: Ironhaven and The Undergrove
 
 **Learning:**
 Reviewed the recently designed regions by Realmwright: **Ironhaven** and **The Undergrove**. Both fit the grim, survival-focused tone and existing history of Eldoria seamlessly. Ironhaven expands the lore around the Iron Vanguard and the ongoing fight against aerial Void horrors, establishing a logical northern stronghold. The Undergrove expands on the consequences of The Sundering, explaining what happened to ancient forests that were swallowed by fissures and exposed to raw mana. Neither introduces an unapproved or contradictory history.
