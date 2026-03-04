@@ -16,6 +16,10 @@
             [
                 "slime_gel",
                 40
+            ],
+            [
+                "primordial_ooze",
+                20
             ]
         ],
         "skills": [
@@ -41,6 +45,10 @@
             [
                 "slime_gel",
                 40
+            ],
+            [
+                "primordial_ooze",
+                20
             ]
         ],
         "skills": [
