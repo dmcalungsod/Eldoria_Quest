@@ -81,7 +81,7 @@
             "STR": 1,
             "MAG": 1
         },
-        "description": "A heavy iron tool used for grinding herbs—and bones."
+        "description": "A heavy iron tool used for grinding herbs\u2014and bones."
     },
     "gen_wand_005": {
         "name": "Crystal Focus",
@@ -477,7 +477,9 @@
         "slot": "accessory",
         "rarity": "Uncommon",
         "level_req": 5,
-        "class_restrictions": ["Warrior"],
+        "class_restrictions": [
+            "Warrior"
+        ],
         "stats_bonus": {
             "STR": 5,
             "END": 5
@@ -489,7 +491,9 @@
         "slot": "accessory",
         "rarity": "Uncommon",
         "level_req": 5,
-        "class_restrictions": ["Mage"],
+        "class_restrictions": [
+            "Mage"
+        ],
         "stats_bonus": {
             "MAG": 8,
             "MP": 20
@@ -518,5 +522,42 @@
             "MP": 50
         },
         "description": "Bound in cold, flayed skin, this unholy scripture contains musical notation written in rusted blood."
+    },
+    "cloak_frost_warden": {
+        "name": "Frost-Warden Cloak",
+        "slot": "accessory",
+        "rarity": "Rare",
+        "level_req": 25,
+        "stats_bonus": {
+            "END": 15,
+            "thermal_insulation": 1
+        },
+        "description": "A heavy, fur-lined cloak stitched with warming runes. Essential for surviving Ironhaven's biting cold."
+    },
+    "armor_forge_guard": {
+        "name": "Forge-Guard Carapace",
+        "slot": "heavy_armor",
+        "rarity": "Epic",
+        "level_req": 30,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "END": 60,
+            "STR": 20,
+            "thermal_insulation": 1
+        },
+        "description": "A thick, heated breastplate forged in the Deep Forges. Keeps the wearer comfortably warm even in the Howling Peaks."
+    },
+    "robe_ember_weave": {
+        "name": "Ember-Weave Robe",
+        "slot": "robe",
+        "rarity": "Epic",
+        "level_req": 30,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "MAG": 45,
+            "END": 20,
+            "thermal_insulation": 1
+        },
+        "description": "A robe woven from threads soaked in liquid magma. Radiates a comforting, constant heat."
     }
 }
