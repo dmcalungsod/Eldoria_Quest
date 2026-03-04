@@ -22,3 +22,9 @@
 - **Design Pattern:** A militant, high-altitude city serving as a northern shield against aerial Void horrors.
 - **Thematic Consistency:** Deeply tied to the Iron Vanguard faction and the ongoing struggle against The Sundering's aftermath.
 - **Coordination:** Will require cross-agent coordination to implement new cold/altitude mechanics and an aerial combat dimension.
+
+## 2026-03-09: The Undergrove
+- Designed a new subterranean region: The Undergrove.
+- **Design Pattern:** A toxic, bioluminescent underground jungle. Focuses on environmental hazards (Toxin accumulation) and provides a rich source for Alchemical reagents (Lunawort, Primordial Ooze).
+- **Thematic Consistency:** Explores the ecological impact of The Sundering on Eldoria's subterranean spaces, creating a hyper-aggressive, mutated ecosystem.
+- **Coordination:** Will require cross-agent coordination for new mechanics (Toxin meter, Respirator gear) and integrating the new alchemical materials and fungal enemies.
