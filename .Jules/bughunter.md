@@ -25,3 +25,8 @@
 1. Provided free Infirmary healing for players Level 3 or below by updating `DatabaseManager.calculate_heal_cost`.
 2. Added an HP check in `AdventureSetupView.start_callback` to prevent players from starting expeditions if their health is critically low (< 15%), forcing them to heal.
 3. Fixed `AdventureManager.end_adventure` to only penalize for "Emergency Extraction" if the player manually clicked "Retreat Early" while in combat during an active (`in_progress`) adventure, ignoring auto-retreats natively completed by the background engine.
+
+## 2026-03-04 — Fix Mock assertions in tests/test_codex_unlocks.py
+
+**Learning:** When using nested `__getitem__` calls in `DatabaseManager._col`, assertions on mock objects must mimic the exact chain of `__getitem__` calls made by the code under test (e.g., `self.mock_client().__getitem__('EQ_Game').__getitem__('player_codex')`) to ensure the correct mocked collection is targeted for assertions.
+**Action:** Updated test assertions in `tests/test_codex_unlocks.py` to fetch the correctly nested mock object before asserting `update_one` calls, fixing the pipeline.
