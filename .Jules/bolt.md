@@ -26,8 +26,3 @@
 ## 2026-03-01 - [Auto-Adventure Scheduler N+1 Query Fix]
 **Learning:** `AdventureResolutionEngine.resolve_sessions_batch` fetched combat context bundles inside a loop calling `get_combat_context_bundle` for each `discord_id`, resulting in an N+1 query problem that slowed down the auto-adventure scheduler.
 **Action:** Introduced `get_combat_context_bundles_batch` using MongoDB's `$in` operator to fetch all context bundles in a single query. `resolve_sessions_batch` now parses and maps these bundles, passing them efficiently into `resolve_session`.
-
-## 2026-03-09 — Replaced module-level print() with logger.debug()
-
-**Learning:** Module-level `print()` statements execute sequentially upon import, causing blocking I/O and reducing load-time performance and polluting consoles.
-**Action:** Replace `print()` statements in module scope (such as data generation scripts) with standard `logger.debug()` to avoid blocking I/O and unbuffered output delays.

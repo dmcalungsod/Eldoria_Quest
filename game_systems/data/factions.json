@@ -260,7 +260,7 @@
                 "reputation_needed": 500,
                 "reward": {
                     "type": "item",
-                    "key": "vitriol",
+                    "key": "phial_of_vitriol",
                     "amount": 2
                 }
             },
@@ -269,7 +269,7 @@
                 "reputation_needed": 1500,
                 "reward": {
                     "type": "item",
-                    "key": "panacea",
+                    "key": "bitter_panacea",
                     "amount": 3
                 }
             },
