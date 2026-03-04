@@ -1,8 +1,8 @@
+import asyncio
 import os
 import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
-import asyncio
 
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,8 +15,8 @@ if "pymongo" not in sys.modules:
 # Instead of blindly overriding discord, we try to use the real discord if available
 # or minimally mock it so View works
 try:
-    import discord
-    from discord.ui import View
+    import discord # noqa
+    from discord.ui import View # noqa
     has_discord = True
 except ImportError:
     has_discord = False
@@ -39,6 +39,7 @@ except ImportError:
 
 
 from database.database_manager import DatabaseManager
+
 
 class TestInfirmaryRegression(unittest.TestCase):
     def test_beginner_free_healing_regression(self):
