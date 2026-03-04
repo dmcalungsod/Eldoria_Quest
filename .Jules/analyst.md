@@ -114,7 +114,7 @@ This journal documents key insights, successful methodologies, and lessons learn
 - Mapped individual material values and drop rates to determine exactly where the value is lost.
 
 **Key Findings:**
-- The primary cause for "The Silent City of Ouros" underperforming is that three of its four monsters have completely empty drop tables and drop 0 Aurum.
+- The primary cause for "The Silent City of Ouros" underperforming is that three of its four monsters are completely missing from the monster data (not just empty drops), so they drop 0 Aurum.
 - "The Shrouded Fen", "The Clockwork Halls", and "The Celestial Archipelago" all suffer from extremely weak monster drop tables (12-43 EV per kill) relative to their level requirements.
 
 **Outcome:**

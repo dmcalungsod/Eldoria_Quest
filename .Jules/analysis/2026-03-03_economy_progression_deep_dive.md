@@ -16,7 +16,7 @@ An in-depth analysis of specific Auto-Adventure zones reveals the exact reasons 
 - **The Shimmering Wastes (Rank A, Lvl 37):**
   - Suffers from an inconsistent drop table. While some monsters drop high-value items, others like the Prism Golem only drop `prism_shard` and `obsidian_shard`, yielding a measly 36 Total EV/kill which drags down the average.
 - **The Silent City of Ouros (Rank S, Lvl 42):**
-  - 🔴 **CRITICAL:** Three out of four monsters (`temporal_wraith`, `hollowed_sentinel`, `abyssal_creeper`) have completely empty drop tables and drop zero Aurum. This entirely ruins the zone's EV.
+  - 🔴 **CRITICAL:** Three out of four monsters (`temporal_wraith`, `hollowed_sentinel`, `abyssal_creeper`) are missing entirely from the monster data (not just missing drops), and therefore drop zero Aurum. This entirely ruins the zone's EV.
 
 ## Recommendations
 
@@ -27,7 +27,7 @@ An in-depth analysis of specific Auto-Adventure zones reveals the exact reasons 
     - **The Shimmering Wastes:** Buff the drops of the Prism Golem and increase the `concentrated_light` drop rates on the Mirage Spirit and Sun-Scorched Wraith.
 
 2. **GameForge:**
-    - **The Silent City of Ouros:** Implement the missing drop tables for `temporal_wraith`, `hollowed_sentinel`, and `abyssal_creeper` immediately. They currently drop absolutely nothing, breaking the Rank S economy.
+    - **The Silent City of Ouros:** Implement the missing monster definitions for `temporal_wraith`, `hollowed_sentinel`, and `abyssal_creeper` immediately, then populate their drop tables and Aurum values. They currently drop absolutely nothing, breaking the Rank S economy.
 
 ## Methodology
 - Extracted and computed EV for each specific gatherable and monster drop in the targeted zones using the base economy utilities (`calculate_expected_value_stats`).
