@@ -108,6 +108,30 @@ MISSION_FLAVOR_TEXT = {
         "The oppressive weight of the void lifts from your shoulders. You have climbed out of the darkness and into the light.",
         "A sudden noise makes you flinch, but it is only the city wind. You have escaped the Chasm's maddening song.",
     ],
+    "thunder_crag_coast": [
+        "The ozone sting leaves your lungs as the storm recedes. The thunder is finally just a distant memory.",
+        "You wring saltwater from your cloak, your ears ringing from the endless barrage of lightning. You survived the Coast.",
+        "The static charge leaves your hair and gear. You step away from the jagged cliffs and into the calm.",
+        "The deafening roar of the tempest fades into the steady rhythm of the city. You have returned from the edge.",
+    ],
+    "whispering_archives": [
+        "The phantom whispers finally stop echoing in your mind. The silence of the city is a blessed relief.",
+        "You blink away the floating dust of ancient tomes. The forbidden knowledge stays behind in the shadows.",
+        "The suffocating scent of old parchment fades, replaced by the fresh air of the surface. You have escaped the Archives.",
+        "You rub your temples, the maddening hum of the enchanted books slowly dissipating. The Archives could not claim you.",
+    ],
+    "rust_wastes": [
+        "The smell of burning oil and grinding metal finally washes away. The Wastes are behind you.",
+        "You scrape rust and grime from your boots. Survival in the mechanical graveyard was a hard-fought battle.",
+        "The screech of tearing metal fades from your memory as you enter the city gates. The Wastes scavenge another day.",
+        "Your gear groans with the strain of the wastes, but you made it back. The valley of scrap could not bury you.",
+    ],
+    "abyssal_descent": [
+        "The crushing pressure lifts from your chest. You breathe deeply, grateful for the thin air of the surface.",
+        "You leave the absolute darkness behind, your eyes aching at the sudden brilliance of the world.",
+        "The cold of the abyss still lingers in your marrow, but the sun's warmth is slowly returning to your skin.",
+        "You pull yourself from the edge of the void, the silence of the deep finally broken by the sounds of the living.",
+    ],
     "guild_arena": [
         "The cheers (or jeers) of the crowd fade. You step out of the ring, your test concluded.",
         "Sand pours from your boots. The Arena has measured your worth.",

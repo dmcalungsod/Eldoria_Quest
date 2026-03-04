@@ -15,3 +15,7 @@
 
 **Learning:** When requested by Foreman to add narrative context to a newly implemented region (e.g., The Silent City of Ouros), appending to `MISSION_FLAVOR_TEXT` in `game_systems/data/narrative_data.py` is the safest and most effective way to enhance the player's immersion. This avoids inadvertently making gameplay changes or adding mechanical content like quests.
 **Action:** Future narrative improvements for new regions should focus on expanding `game_systems/data/narrative_data.py` or existing text repositories strictly without modifying mechanical arrays (such as `quests.json`), unless specifically tasked to update the flavor text of existing elements.
+## 2026-03-04 — Expanding Location Returns
+
+**Learning:** When expanding the game world with new regions in `adventure_locations.json` like 'Thunder-Crag Coast', it is common that the associated atmospheric string arrays inside `MISSION_FLAVOR_TEXT` in `narrative_data.py` are overlooked. Missing texts fallback to defaults, which breaks immersion.
+**Action:** Future narrative audits should periodically cross-reference `adventure_locations.json` keys with `MISSION_FLAVOR_TEXT` keys to identify missing entries.
