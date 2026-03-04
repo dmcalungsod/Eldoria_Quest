@@ -49,7 +49,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 2.1:** Design new Adventure Locations (data).
     - **Agent:** @GameForge
     - **Status:** **Completed** (Verified `adventure_locations.py` contains 12+ locations including Frostfall Expanse).
-- [ ] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
+- [x] **Task 2.2:** Configure Loot Tables & Drop Rates (Economy Fixes).
     - **Agent:** @GameBalancer
     - **Subtask 2.2a:** Nerf "Deepgrove Roots" (Move `Feral Stag` to conditional, restrict drops). **[x] Completed**
     - **Subtask 2.2b:** Buff "The Shrouded Fen" (Better mid-game drops. EV target > ~350 Aurum per 30m). **[ ] Reopened**
