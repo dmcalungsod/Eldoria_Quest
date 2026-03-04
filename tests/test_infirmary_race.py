@@ -27,6 +27,7 @@ class TestInfirmaryRace(unittest.TestCase):
             "current_hp": 50,
             "current_mp": 10,
             "aurum": 1000,
+            "level": 100,
         }
 
         # Mock update result to simulate success
@@ -72,6 +73,7 @@ class TestInfirmaryRace(unittest.TestCase):
             "current_hp": 50,
             "current_mp": 10,
             "aurum": 1000,
+            "level": 100,
         }
 
         # Mock update result to simulate FAILURE (modified_count = 0)
