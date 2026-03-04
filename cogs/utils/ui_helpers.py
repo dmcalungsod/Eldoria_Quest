@@ -310,7 +310,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
                 elif total_expeditions == 0:
                     advice = (
                         "You have a contract. Now, click **Expeditions** and "
-                        "depart on a 30-minute journey to the Whispering Forest."
+                        "depart on a 30-minute journey to the Whispering Forest. "
+                        "Your character will explore automatically, and you can "
+                        "check back later to collect your rewards."
                     )
                 elif rank == "F":
                     advice = (

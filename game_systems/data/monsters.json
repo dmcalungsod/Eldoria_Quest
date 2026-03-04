@@ -690,12 +690,12 @@
         "xp": 420,
         "drops": [
             [
-                "magic_stone_small",
-                60
+                "magic_stone_medium",
+                80
             ],
             [
-                "magic_stone_medium",
-                15
+                "shadow_essence",
+                40
             ]
         ],
         "skills": [
@@ -714,7 +714,11 @@
         "xp": 420,
         "drops": [
             [
-                "magic_stone_small",
+                "magic_stone_medium",
+                80
+            ],
+            [
+                "medicinal_herb",
                 80
             ]
         ],
@@ -759,8 +763,12 @@
         "xp": 450,
         "drops": [
             [
-                "magic_stone_small",
+                "magic_stone_medium",
                 80
+            ],
+            [
+                "shadow_essence",
+                40
             ]
         ],
         "skills": [
@@ -800,15 +808,19 @@
         "id": 27,
         "name": "Mire Lurker",
         "level": 17,
-        "tier": "Normal",
+        "tier": "Boss",
         "hp": 597,
         "atk": 39,
         "def": 18,
         "xp": 510,
         "drops": [
             [
-                "magic_stone_small",
-                80
+                "magic_stone_large",
+                100
+            ],
+            [
+                "shadow_essence",
+                100
             ]
         ],
         "skills": [
@@ -1876,11 +1888,15 @@
         "drops": [
             [
                 "void_dust",
-                70
+                100
             ],
             [
                 "magic_stone_large",
-                60
+                100
+            ],
+            [
+                "entropy_crystal",
+                80
             ]
         ],
         "skills": [
@@ -1901,11 +1917,15 @@
         "drops": [
             [
                 "abyssal_shackle",
-                60
+                100
             ],
             [
                 "magic_stone_large",
-                50
+                100
+            ],
+            [
+                "entropy_crystal",
+                80
             ]
         ],
         "skills": [
@@ -1926,11 +1946,15 @@
         "drops": [
             [
                 "entropy_crystal",
-                50
+                100
             ],
             [
                 "void_dust",
-                40
+                100
+            ],
+            [
+                "magic_stone_large",
+                80
             ]
         ],
         "skills": [
@@ -1943,19 +1967,23 @@
         "id": 119,
         "name": "Entropy Drake",
         "level": 44,
-        "tier": "Elite",
+        "tier": "Boss",
         "hp": 8500,
         "atk": 200,
         "def": 80,
         "xp": 15000,
         "drops": [
             [
+                "void_heart",
+                100
+            ],
+            [
                 "null_stone",
-                40
+                100
             ],
             [
                 "magic_stone_flawless",
-                40
+                100
             ]
         ],
         "skills": [
@@ -2140,15 +2168,15 @@
         "drops": [
             [
                 "brass_gear",
-                60
+                100
             ],
             [
                 "spring_coil",
-                40
+                100
             ],
             [
-                "magic_stone_medium",
-                25
+                "steam_core",
+                80
             ]
         ],
         "skills": [
@@ -2168,12 +2196,16 @@
         "xp": 550,
         "drops": [
             [
-                "brass_gear",
-                60
+                "copper_wire",
+                100
             ],
             [
-                "copper_wire",
-                40
+                "magic_stone_medium",
+                100
+            ],
+            [
+                "steam_core",
+                80
             ]
         ],
         "skills": [
@@ -2194,11 +2226,15 @@
         "drops": [
             [
                 "magic_stone_medium",
-                70
+                100
             ],
             [
                 "copper_wire",
-                30
+                100
+            ],
+            [
+                "steam_core",
+                80
             ]
         ],
         "skills": [
@@ -2211,23 +2247,23 @@
         "id": 129,
         "name": "Automaton Knight",
         "level": 24,
-        "tier": "Elite",
-        "hp": 1300,
-        "atk": 85,
-        "def": 55,
+        "tier": "Boss",
+        "hp": 3500,
+        "atk": 120,
+        "def": 60,
         "xp": 1800,
         "drops": [
             [
-                "steam_core",
-                40
-            ],
-            [
-                "brass_gear",
-                50
+                "clockwork_heart",
+                100
             ],
             [
                 "magic_stone_large",
-                20
+                100
+            ],
+            [
+                "steam_core",
+                100
             ]
         ],
         "skills": [
@@ -2543,11 +2579,15 @@
         "drops": [
             [
                 "aether_stone",
-                60
+                100
             ],
             [
                 "star_metal_fragment",
-                30
+                100
+            ],
+            [
+                "magic_stone_medium",
+                80
             ]
         ],
         "skills": [
@@ -2568,11 +2608,15 @@
         "drops": [
             [
                 "aether_stone",
-                80
+                100
             ],
             [
                 "magic_stone_medium",
-                40
+                100
+            ],
+            [
+                "star_metal_fragment",
+                50
             ]
         ],
         "skills": [
@@ -2593,10 +2637,14 @@
         "drops": [
             [
                 "star_metal_fragment",
-                40
+                100
             ],
             [
                 "magic_stone_medium",
+                100
+            ],
+            [
+                "ancient_tablet",
                 50
             ]
         ],
@@ -2610,19 +2658,23 @@
         "id": 144,
         "name": "Ruin Stalker",
         "level": 29,
-        "tier": "Elite",
+        "tier": "Boss",
         "hp": 2400,
         "atk": 125,
         "def": 50,
         "xp": 3200,
         "drops": [
             [
-                "ancient_tablet",
-                40
+                "celestial_core",
+                100
             ],
             [
-                "star_metal_fragment",
-                50
+                "ancient_tablet",
+                100
+            ],
+            [
+                "magic_stone_large",
+                100
             ]
         ],
         "skills": [
@@ -2677,11 +2729,15 @@
         "drops": [
             [
                 "fulgurite_shard",
-                60
+                100
             ],
             [
                 "magic_stone_medium",
-                50
+                100
+            ],
+            [
+                "storm_essence",
+                80
             ]
         ],
         "skills": [
@@ -2702,11 +2758,15 @@
         "drops": [
             [
                 "iron_ingot",
-                60
+                100
             ],
             [
                 "magic_stone_medium",
-                50
+                100
+            ],
+            [
+                "storm_essence",
+                80
             ]
         ],
         "skills": [
@@ -2727,11 +2787,15 @@
         "drops": [
             [
                 "storm_essence",
-                40
+                100
             ],
             [
                 "magic_stone_medium",
-                50
+                100
+            ],
+            [
+                "fulgurite_shard",
+                80
             ]
         ],
         "skills": [
@@ -2744,27 +2808,23 @@
         "id": 149,
         "name": "Siren Matriarch",
         "level": 34,
-        "tier": "Elite",
+        "tier": "Boss",
         "hp": 3000,
         "atk": 140,
         "def": 60,
         "xp": 3500,
         "drops": [
             [
-                "siren_scale",
-                50
-            ],
-            [
-                "storm_essence",
-                60
-            ],
-            [
-                "magic_stone_large",
-                35
-            ],
-            [
                 "tempest_heart",
-                2
+                100
+            ],
+            [
+                "charged_core",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                100
             ]
         ],
         "skills": [
@@ -2821,11 +2881,11 @@
         "drops": [
             [
                 "prism_shard",
-                70
+                100
             ],
             [
                 "magic_stone_large",
-                50
+                100
             ]
         ],
         "skills": [
@@ -2846,11 +2906,15 @@
         "drops": [
             [
                 "prism_shard",
-                80
+                100
             ],
             [
                 "obsidian_shard",
-                40
+                100
+            ],
+            [
+                "magic_stone_large",
+                50
             ]
         ],
         "skills": [
@@ -2871,11 +2935,11 @@
         "drops": [
             [
                 "magic_stone_large",
-                60
+                100
             ],
             [
                 "concentrated_light",
-                40
+                100
             ]
         ],
         "skills": [
@@ -2888,19 +2952,19 @@
         "id": 154,
         "name": "Sun-Scorched Wraith",
         "level": 35,
-        "tier": "Normal",
+        "tier": "Boss",
         "hp": 2000,
         "atk": 120,
         "def": 30,
         "xp": 3600,
         "drops": [
             [
-                "magic_stone_large",
-                40
+                "glass_heart",
+                100
             ],
             [
-                "concentrated_light",
-                35
+                "magic_stone_flawless",
+                100
             ]
         ],
         "skills": [
