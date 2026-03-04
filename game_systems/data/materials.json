@@ -1,4 +1,22 @@
 {
+    "primordial_ooze": {
+        "name": "Primordial Ooze",
+        "description": "A thick, pulsating substance harvested from slimes. Highly reactive.",
+        "rarity": "Common",
+        "value": 45
+    },
+    "brimstone": {
+        "name": "Brimstone",
+        "description": "A foul-smelling yellow mineral found near volcanic vents.",
+        "rarity": "Uncommon",
+        "value": 65
+    },
+    "lunawort": {
+        "name": "Lunawort",
+        "description": "A silver-leafed herb that glows softly under the moonlight.",
+        "rarity": "Uncommon",
+        "value": 80
+    },
     "magic_stone_fragment": {
         "name": "Magic Stone Fragment",
         "description": "A tiny, impure shard of crystallized mana.",
