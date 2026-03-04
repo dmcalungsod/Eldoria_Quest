@@ -514,5 +514,29 @@
         "description": "Ink that shimmers with a faint, magical glow.",
         "rarity": "Uncommon",
         "value": 35
+    },
+    "chronal_dust": {
+        "name": "Chronal Dust",
+        "description": "Glimmering sand that seems to fall upward.",
+        "rarity": "Epic",
+        "value": 200
+    },
+    "perfected_glass": {
+        "name": "Perfected Glass",
+        "description": "An unbreakable pane of translucent material.",
+        "rarity": "Rare",
+        "value": 150
+    },
+    "ancient_ourosan_coin": {
+        "name": "Ancient Ourosan Coin",
+        "description": "Currency from a forgotten era, still holding strange power.",
+        "rarity": "Uncommon",
+        "value": 100
+    },
+    "void_touched_relic": {
+        "name": "Void-Touched Relic",
+        "description": "A dark, twisting artifact humming with abyssal energy.",
+        "rarity": "Epic",
+        "value": 300
     }
 }

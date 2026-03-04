@@ -107,6 +107,29 @@ MONSTER_SCHEMA = {
     "description": {"type": str, "required": True},
 }
 
+# --- Skill Schema ---
+SKILL_SCHEMA = {
+    "key_id": {"type": str, "required": True},
+    "name": {"type": str, "required": True},
+    "description": {"type": str, "required": True},
+    "type": {"type": str, "required": True, "options": ["Active", "Passive"]},
+    "class_id": {"type": int, "required": True, "min": 1},
+    "mp_cost": {"type": int, "min": 0},
+    "power_multiplier": {"type": float, "min": 0.0},
+    "heal_power": {"type": int, "min": 0},
+    "buff": {"type": dict},
+    "debuff": {"type": dict},
+    "status_effect": {"type": dict},
+    "passive_bonus": {"type": dict},
+    "self_damage_percent": {"type": float, "min": 0.0, "max": 1.0},
+    "is_aoe": {"type": bool},
+    "conditional_multiplier": {"type": dict},
+    "learn_cost": {"type": int, "required": True, "min": 0},
+    "upgrade_cost": {"type": int, "required": True, "min": 0},
+    "scaling_stat": {"type": str, "required": True, "options": ["STR", "END", "DEX", "AGI", "MAG", "LCK"]},
+    "scaling_factor": {"type": float, "required": True, "min": 0.0},
+}
+
 # --- Consumables Schema ---
 CONSUMABLE_SCHEMA = {
     "id": {"type": str, "required": True},
