@@ -55,6 +55,7 @@ import test_stack_limits  # New Stack Limits tests
 import test_time_quake_event
 import test_tournament_cog
 import test_tournament_system  # New Tournament System tests
+import test_infirmary_regression  # Infirmary regression test
 
 
 def check_mongodb_connection():
@@ -122,6 +123,18 @@ def run_general_security_tests():
     suite = loader.loadTestsFromModule(test_security)
     # Add DoS prevention tests to the general security suite
     suite.addTests(loader.loadTestsFromModule(test_dos_prevention))
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
+def run_infirmary_tests():
+    """Runs the infirmary system regression tests."""
+    print("\n" + "-" * 70)
+    print("RUNNING INFIRMARY TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_infirmary_regression)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
@@ -343,6 +356,10 @@ def main():
     faction_passed = run_faction_tests()
     all_passed = all_passed and faction_passed
 
+    # 8.5 Infirmary Tests
+    infirmary_passed = run_infirmary_tests()
+    all_passed = all_passed and infirmary_passed
+
     # 9. Game Systems Tests (Mock-based, always run)
     print("\n" + "-" * 70)
     print("RUNNING GAME SYSTEMS TESTS")
@@ -385,6 +402,7 @@ def main():
     print(f"Cog Tests: {'✓ PASSED' if cogs_passed else '✗ FAILED'}")
     print(f"Manager Tests: {'✓ PASSED' if managers_passed else '✗ FAILED'}")
     print(f"Faction System Tests: {'✓ PASSED' if faction_passed else '✗ FAILED'}")
+    print(f"Infirmary Tests: {'✓ PASSED' if infirmary_passed else '✗ FAILED'}")
     print(f"Game Systems Tests: {'✓ PASSED' if game_passed else '✗ FAILED'}")
 
     if db_available:
