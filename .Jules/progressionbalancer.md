@@ -40,13 +40,3 @@
 
 **Learning:** The auto-adventure system (TimeWeaver) introduced a massive new core loop, but it was not integrated into rank progression. This meant players could engage exclusively with the new system but still be gatekept by manual quest completion or kill requirements they weren't organically achieving.
 **Action:** Integrated `total_expeditions` as a core requirement for all ranks (F: 2 -> SS: 50) in `rank_system.py` using data from `get_exploration_stats`. This formally links the new auto-adventure loop to guild advancement.
-
-## 2026-03-09 — Rank C Overlap and Elite Kill Bottleneck
-
-**Learning:**
-1. **Rank C Gap Trivialized:** Similar to Rank D, Rank C's `normal_kills` requirement (400) was too close to Rank D (300). By completing the required 10 additional quests (~8 kills/quest + incidentals), players were naturally hitting 400 without doing dedicated non-quest exploration or auto-adventure sessions.
-2. **Elite Kill Bottleneck:** The jump from Rank C (50 elite kills) to Rank B (65 elite kills) was too small of a gap, but the jump from Rank D (20 elite kills) to Rank C (50 elite kills) created a major bottleneck for players, stalling progression unnaturally while they hunted for elites.
-
-**Action:**
-1. Increased Rank C `normal_kills` to **450** to enforce a larger 150 kill gap from Rank D, restoring the importance of pure exploration.
-2. Reduced Rank C `elite_kills` to **40** to smooth the transition curve (Rank D: 20 -> Rank C: 40 -> Rank B: 65) and remove the early elite bottleneck.
