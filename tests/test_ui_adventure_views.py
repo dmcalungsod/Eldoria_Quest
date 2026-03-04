@@ -151,6 +151,105 @@ class TestAdventureStatusView(unittest.IsolatedAsyncioTestCase):
 
         self.mock_interaction.edit_original_response.assert_called()
 
+class TestAdventureSetupView(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.mock_db = MagicMock()
+        self.mock_manager = MagicMock()
+        self.mock_user = MagicMock()
+        self.mock_user.id = 12345
+
+        self.mock_interaction = AsyncMock()
+        self.mock_interaction.user = self.mock_user
+        self.mock_interaction.response = AsyncMock()
+        self.mock_interaction.followup = AsyncMock()
+
+    @patch("cogs.utils.ui_helpers.get_player_or_error")
+    async def test_start_callback_low_hp(self, mock_get_player_or_error):
+        """Test start_callback when player has critically low HP."""
+        # Setup mocks
+        mock_get_player_or_error.return_value = {"id": 12345}
+
+        # Mock vitals returning < 15% HP
+        self.mock_db.get_player_vitals.return_value = {"current_hp": 8}
+
+        from game_systems.player.player_stats import PlayerStats
+        stats = PlayerStats()
+        stats.base_health = 100
+        self.mock_db.get_player_stats_json.return_value = stats.to_dict()
+
+        from game_systems.adventure.ui.setup_view import AdventureSetupView
+        view = AdventureSetupView(
+            db=self.mock_db,
+            manager=self.mock_manager,
+            interaction_user=self.mock_user,
+            player_rank="F",
+            player_level=1
+        )
+        # Mock view state needed for callback
+        view.selected_location = "forest"
+        view.selected_duration = 30
+        view.selected_supplies = []
+
+        await view.start_callback(self.mock_interaction)
+
+        # Ensure we sent the ephemeral warning
+        self.mock_interaction.response.send_message.assert_called_once()
+        args, kwargs = self.mock_interaction.response.send_message.call_args
+        self.assertIn("health is critically low", args[0])
+        self.assertTrue(kwargs.get("ephemeral"))
+
+        # Ensure we didn't start the adventure
+        self.mock_manager.start_adventure.assert_not_called()
+
+    @patch("game_systems.adventure.ui.adventure_embeds.AdventureEmbeds.build_adventure_status_embed")
+    @patch("cogs.utils.ui_helpers.get_player_or_error")
+    async def test_start_callback_success(self, mock_get_player_or_error, mock_build_adventure_status_embed):
+        """Test start_callback handles a normal flow successfully."""
+        # Setup mocks
+        mock_get_player_or_error.return_value = {"id": 12345}
+
+        # Mock vitals returning >= 15% HP
+        self.mock_db.get_player_vitals.return_value = {"current_hp": 100}
+
+        from game_systems.player.player_stats import PlayerStats
+        stats = PlayerStats()
+        stats.base_health = 100
+        self.mock_db.get_player_stats_json.return_value = stats.to_dict()
+
+        # Mock manager start success
+        self.mock_manager.start_adventure.return_value = True
+        self.mock_manager.get_active_session.return_value = {
+            "location_id": "forest",
+        }
+
+        mock_build_adventure_status_embed.return_value = MagicMock()
+
+        from game_systems.adventure.ui.setup_view import AdventureSetupView
+        view = AdventureSetupView(
+            db=self.mock_db,
+            manager=self.mock_manager,
+            interaction_user=self.mock_user,
+            player_rank="F",
+            player_level=1
+        )
+        # Mock view state needed for callback
+        view.selected_location = "forest"
+        view.selected_duration = 30
+        view.selected_supplies = ["none"]
+
+        await view.start_callback(self.mock_interaction)
+
+        # Ensure we deferred the response
+        self.mock_interaction.response.defer.assert_called_once()
+
+        # Ensure we started the adventure
+        self.mock_manager.start_adventure.assert_called_once_with(
+            12345, "forest", 30, supplies={}
+        )
+
+        # Ensure we edited the original response with the new view
+        self.mock_interaction.edit_original_response.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
