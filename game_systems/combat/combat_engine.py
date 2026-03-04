@@ -816,28 +816,16 @@ class CombatEngine:
         hit_key = self._STAT_HIT_MAP.get(stat, "str_hits")
         report[hit_key] = 1
 
-    def _decide_player_skill(self) -> dict:
-        """
-        Player AI logic.
-        Returns a dict: {"skill": (skill_dict or None), "reason": str}
-        """
-        if not self.player_skills:
-            return {"skill": None, "reason": "No skills available."}
 
-        roll = random.randint(1, 100)  # nosec B311  # nosec B311
-        if roll > self.PLAYER_SKILL_CHANCE:
-            return {"skill": None, "reason": "RNG check failed."}
-
+    def _get_usable_skills(self) -> list:
         if self.player_silenced:
-            usable_skills = [
+            return [
                 s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp and s.get("mp_cost", 0) == 0
             ]
         else:
-            usable_skills = [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
+            return [s for s in self.player_skills if s.get("mp_cost", 0) <= self.player_mp]
 
-        if not usable_skills:
-            return {"skill": None, "reason": "Not enough MP."}
-
+    def _prioritize_and_select_skill(self, usable_skills: list) -> dict:
         # Priority 1: Healing (if below 50% HP)
         hp_threshold = self.stats_dict.get("HP", self.player.stats.max_hp) * 0.5
         if self.player_hp < hp_threshold:
@@ -847,6 +835,7 @@ class CombatEngine:
 
         # Priority 2: Buffs (50% chance if available)
         utility_skills = [s for s in usable_skills if s.get("buff", s.get("buff_data"))]
+
         if utility_skills and random.randint(1, 100) > 50:  # nosec B311
             chosen_skill = random.choice(utility_skills)  # nosec B311
             return {"skill": chosen_skill, "reason": "Buff chosen."}
@@ -860,6 +849,25 @@ class CombatEngine:
             return {"skill": chosen_skill, "reason": "Offense chosen."}
 
         return {"skill": None, "reason": "No offensive skills usable."}
+
+    def _decide_player_skill(self) -> dict:
+        """
+        Player AI logic.
+        Returns a dict: {"skill": (skill_dict or None), "reason": str}
+        """
+        if not self.player_skills:
+            return {"skill": None, "reason": "No skills available."}
+
+        roll = random.randint(1, 100)  # nosec B311  # nosec B311
+        if roll > self.PLAYER_SKILL_CHANCE:
+            return {"skill": None, "reason": "RNG check failed."}
+
+        usable_skills = self._get_usable_skills()
+
+        if not usable_skills:
+            return {"skill": None, "reason": "Not enough MP."}
+
+        return self._prioritize_and_select_skill(usable_skills)
 
     def _player_victory(self, log, turn_report):
         """Handles rewarding EXP and passing up monster drops."""
