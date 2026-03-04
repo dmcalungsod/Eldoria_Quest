@@ -1340,12 +1340,89 @@
         "floor_depth": 8,
         "danger_level": 3
     },
+    "abyssal_descent": {
+        "name": "The Abyssal Descent",
+        "emoji": "🕳️",
+        "min_rank": "S",
+        "level_req": 41,
+        "prerequisite_location": "void_sanctum",
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_116",
+                30
+            ],
+            [
+                "monster_117",
+                30
+            ],
+            [
+                "monster_118",
+                25
+            ],
+            [
+                "monster_119",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_116",
+                40
+            ],
+            [
+                "monster_118",
+                30
+            ],
+            [
+                "monster_119",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_120",
+                "weight": 5,
+                "min_level": 45
+            }
+        ],
+        "description": "A sheer drop into the crushing dark beneath the Void Sanctum. The silence of Ouros begins to bleed into the walls.",
+        "gatherables": [
+            [
+                "void_dust",
+                40
+            ],
+            [
+                "null_stone",
+                30
+            ],
+            [
+                "abyssal_shackle",
+                20
+            ],
+            [
+                "entropy_crystal",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine"
+        ],
+        "floor_depth": 41,
+        "danger_level": 8
+    },
     "silent_city_ouros": {
         "name": "The Silent City of Ouros",
         "emoji": "🕰️",
         "min_rank": "S",
         "level_req": 42,
-        "prerequisite_location": "void_sanctum",
+        "prerequisite_location": "abyssal_descent",
         "duration_options": [
             60,
             120,
