@@ -74,3 +74,12 @@
 ## Next Steps
 - Consider introducing `black` and `isort` in the pre-commit config for style fixes.
 - Audit report shared for sprint planning.
+# Repo Auditor Journal
+
+## 2026-09-04
+
+- **Tools Used**: `flake8`, `bandit`, `vulture`, `radon`, `pytest-cov`, manual `grep`.
+- **Effectiveness**: Automated tools successfully identified style violations, dead variables (Vulture), and minor security warnings (Bandit B311). The most critical finding was captured not by static analysis, but by running the test suite (`pytest-cov`), which exposed an outdated, vulnerable pip version in the test environment.
+- **Recurring Patterns**: ONE UI Policy violations (`interaction.response.send_message`) remain widespread across UI views and Cogs, confirming previous audit findings. Manual `grep` remains the most reliable method for detecting these.
+- **Limitations**: `radon` did not surface any functions with complexity > 10 in the quick parse, suggesting the codebase logic is reasonably factored. `safety` found 0 application vulnerabilities, but test execution revealed the infrastructure vulnerability.
+- **Suggestions**: Implement `ruff` and `black` via pre-commit to enforce consistent formatting and resolve unused imports/variables automatically. Upgrade `pip` in the test environment using the specific python binary to pass the failing security test.
