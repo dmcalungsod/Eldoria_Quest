@@ -261,12 +261,14 @@ class AdventureManager:
 
     def end_adventure(self, discord_id: int) -> dict | None:
         try:
+            # Determine if the session was naturally completed before locking
+            active_before_lock = self.db.get_active_adventure(discord_id)
+            if not active_before_lock:
+                return None
+            was_completed = active_before_lock.get("status") == "completed"
+
             # 1. Optimistic Locking
             if not self.db.lock_adventure_for_claiming(discord_id):
-                # If locking failed, check if it's because there is no session
-                active = self.db.get_active_adventure(discord_id)
-                if not active:
-                    return None
                 # If active session exists but lock failed, it's already being claimed
                 logger.warning(f"Adventure duplicate claim prevention for {discord_id}")
                 return None
@@ -289,7 +291,7 @@ class AdventureManager:
             # If the player manually ends the adventure (Retreat) while an active monster is present,
             # they are fleeing in panic. We apply a 25% material penalty (Emergency Extraction).
             penalty_logs = []
-            if session.active_monster:
+            if session.active_monster and not was_completed:
                 monster_name = session.active_monster.get("name", "Unknown Enemy")
                 penalty_logs.append(
                     f"⚠️ **Emergency Extraction!** You fled from {monster_name}, losing supplies in the chaos."

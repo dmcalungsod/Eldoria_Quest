@@ -258,6 +258,21 @@ class AdventureSetupView(View):
         if not await get_player_or_error(interaction, self.db):
             return
 
+        # Check for critically low HP before deferring
+        vitals = await asyncio.to_thread(self.db.get_player_vitals, interaction.user.id)
+        stats_json = await asyncio.to_thread(self.db.get_player_stats_json, interaction.user.id)
+        if vitals and stats_json:
+            from game_systems.player.player_stats import PlayerStats
+            stats = PlayerStats.from_dict(stats_json)
+            max_hp = max(stats.max_hp, 1)
+            if (vitals["current_hp"] / max_hp) < 0.15:
+                await interaction.response.send_message(
+                    "⚠️ **Your health is critically low!**\n"
+                    "You are too wounded to begin an expedition. Please visit the Infirmary to heal first.",
+                    ephemeral=True
+                )
+                return
+
         await interaction.response.defer()
 
         supplies_dict = {}
