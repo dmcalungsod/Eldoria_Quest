@@ -37,3 +37,8 @@
 
 **Learning:** Analyst EV modeling highlighted massive imbalances: The Shrouded Fen (mid-game) under-rewarded players, while The Molten Caldera (late-game) vastly over-rewarded them. This broke the "material-driven survival" scarcity philosophy, allowing players to stockpile late-game materials too quickly while struggling mid-game.
 **Action:** Rebalanced the gatherables and native monster drop tables for both zones to correct EV and align with intended tier difficulty. Increased EV for Shrouded Fen and decreased EV for Molten Caldera.
+
+## 2026-03-08 — Economy Cliff Rebalance
+
+**Learning:** When item values were previously buffed systemically, it created extreme dead zones because certain mid/end-game regions (Shrouded Fen, Clockwork Halls, Void Sanctum) had highly restricted drop rates that didn't scale effectively with the new item values, whereas other zones (Molten Caldera) accidentally maintained their high yields. This meant pushing to new zones strictly penalized players rather than rewarding them.
+**Action:** When item values (`materials.json`) undergo systemic changes, always re-run `analyze_economy.py` to identify newly formed cliffs. Rebalance gatherables and monster weights concurrently to smooth out the Expected Value (EV) progression curve. Re-aligned The Shrouded Fen, The Clockwork Halls, The Void Sanctum, Thunder-Crag Coast, Shimmering Wastes, and Celestial Archipelago to meet scaling EV targets.
