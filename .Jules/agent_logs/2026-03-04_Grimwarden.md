@@ -1,4 +1,4 @@
-## 2026-03-09
+## 2026-03-04
 **Grimwarden 🛡️**
 
 **Focus:** Implement The Undergrove Region Mechanics & Content.
