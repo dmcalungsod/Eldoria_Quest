@@ -7,10 +7,7 @@ classes, rarities, and slots, balanced for the 999-stat system.
 Total items generated: 5 Classes * 6 Rarities * 10 Slots = 300 items.
 """
 
-import logging
 from math import ceil
-
-logger = logging.getLogger(__name__)
 
 CLASSES = ["Warrior", "Mage", "Rogue", "Cleric", "Ranger", "Alchemist"]
 
@@ -165,7 +162,7 @@ STAT_BUDGETS = {
 CLASS_EQUIPMENTS = {}
 eid = 1  # Use a simple counter for the unique key
 
-logger.debug("--- Generating Class Equipment Catalog (300 items) ---")
+print("--- Generating Class Equipment Catalog (300 items) ---")
 
 for class_name in CLASSES:
     class_id = CLASSES.index(class_name) + 1
@@ -183,9 +180,7 @@ for class_name in CLASSES:
             # Get the stat distribution for this slot
             budget = STAT_BUDGETS.get(slot)
             if not budget:
-                logger.debug(
-                    f"WARNING: No stat budget found for slot '{slot}'. Skipping."
-                )
+                print(f"WARNING: No stat budget found for slot '{slot}'. Skipping.")
                 continue
 
             # Generate the item name
@@ -207,9 +202,7 @@ for class_name in CLASSES:
             for stat, percentage in budget.items():
                 if stat == "MP_MULT":
                     # Special case: Add flat MP based on a multiplier of the budget
-                    stats_bonus["MP"] = ceil(
-                        total_stat_budget * percentage * 3
-                    )  # 3 is an arbitrary value, feels good
+                    stats_bonus["MP"] = ceil(total_stat_budget * percentage * 3)  # 3 is an arbitrary value, feels good
                 else:
                     # Normal stat
                     stats_bonus[stat] = ceil(total_stat_budget * percentage)
@@ -232,7 +225,7 @@ for class_name in CLASSES:
 
             eid += 1
 
-logger.debug(f"--- Generated {len(CLASS_EQUIPMENTS)} class-specific items. ---")
+print(f"--- Generated {len(CLASS_EQUIPMENTS)} class-specific items. ---")
 
 # We no longer need to export CLASS_SETS
 __all__ = ["CLASS_EQUIPMENTS"]

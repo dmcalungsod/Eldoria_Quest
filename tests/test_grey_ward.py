@@ -1,11 +1,7 @@
 # Mock pymongo before importing anything that uses it
-import os
 import sys
 import unittest
 from unittest.mock import MagicMock
-
-# Add repo root to path so pytest can find game_systems even during full test runs
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Create a mock for pymongo
 mock_pymongo = MagicMock()
@@ -44,9 +40,9 @@ class TestGreyWard(unittest.TestCase):
         self.assertEqual(ranks[5]["title"], "Synthesist")
 
         # Verify Rewards
-        self.assertEqual(ranks[2]["reward"]["key"], "vitriol")
+        self.assertEqual(ranks[2]["reward"]["key"], "phial_of_vitriol")
         self.assertEqual(ranks[2]["reward"]["amount"], 2)
-        self.assertEqual(ranks[3]["reward"]["key"], "panacea")
+        self.assertEqual(ranks[3]["reward"]["key"], "bitter_panacea")
         self.assertEqual(ranks[3]["reward"]["amount"], 3)
         self.assertEqual(ranks[4]["reward"]["key"], "gathering_boost")
         self.assertEqual(ranks[4]["reward"]["value"], 0.1)
