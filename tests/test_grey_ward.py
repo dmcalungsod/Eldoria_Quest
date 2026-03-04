@@ -40,7 +40,7 @@ class TestGreyWard(unittest.TestCase):
         self.assertEqual(ranks[5]["title"], "Synthesist")
 
         # Verify Rewards
-        self.assertEqual(ranks[2]["reward"]["key"], "phial_of_vitriol")
+        self.assertEqual(ranks[2]["reward"]["key"], "vitriol")
         self.assertEqual(ranks[2]["reward"]["amount"], 2)
         self.assertEqual(ranks[3]["reward"]["key"], "bitter_panacea")
         self.assertEqual(ranks[3]["reward"]["amount"], 3)
