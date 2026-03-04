@@ -16,3 +16,12 @@
 
 **Learning:** Mock calls need to be tested for the actual expected keyword arguments. `test_start_weekly_tournament_creates_new` tested against `type` whereas `DatabaseManager.create_tournament` takes `tournament_type`.
 **Action:** When updating database manager keyword arguments, always check `test_tournament_system.py` or other tests using mocked args to prevent test failures.
+
+## 2026-03-04 — Fix Auto-Retreat Death Loop
+
+**Learning:** Low-level players with 0 Aurum were getting soft-locked in an infinite auto-retreat death loop because their HP was preserved after death (at 1 HP, below the 15% auto-flee threshold) to prevent "free healing" exploits, but they couldn't afford the Infirmary. When they started a new expedition, the system immediately auto-retreated them without granting EXP or loot, and incorrectly penalized them for an "Emergency Extraction."
+
+**Action:**
+1. Provided free Infirmary healing for players Level 3 or below by updating `DatabaseManager.calculate_heal_cost`.
+2. Added an HP check in `AdventureSetupView.start_callback` to prevent players from starting expeditions if their health is critically low (< 15%), forcing them to heal.
+3. Fixed `AdventureManager.end_adventure` to only penalize for "Emergency Extraction" if the player manually clicked "Retreat Early" while in combat during an active (`in_progress`) adventure, ignoring auto-retreats natively completed by the background engine.
