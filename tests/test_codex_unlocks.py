@@ -23,8 +23,8 @@ class TestCodexUnlocks(unittest.TestCase):
         self.mock_db = MagicMock()
         self.mock_client.__getitem__.return_value = self.mock_db
 
-        def get_collection(name):
-            return getattr(self.mock_db, name)
+        def get_collection(name, *args, **kwargs):
+            return getattr(self.mock_db, str(name))
 
         self.mock_db.__getitem__.side_effect = get_collection
 
@@ -59,7 +59,7 @@ class TestCodexUnlocks(unittest.TestCase):
         # Since _col returns self.db[collection_name] and we patched __getitem__, it hits self.mock_db["player_codex"]
 
         # assert_called_with works on the mock
-        col = self.mock_db["player_codex"]
+        col = self.mock_db.player_codex
         col.update_one.assert_called_with(
             {"user_id": self.user_id},
             {"$set": {"bestiary.1": {"kills": 15, "seen": True}}},
@@ -70,7 +70,7 @@ class TestCodexUnlocks(unittest.TestCase):
         """Test updating a deeply nested key to ensure path formatting works."""
         self.db.update_codex(self.user_id, "atlas", "forest_outskirts", {"visits": 5})
 
-        col = self.mock_db["player_codex"]
+        col = self.mock_db.player_codex
         col.update_one.assert_called_with(
             {"user_id": self.user_id},
             {"$set": {"atlas.forest_outskirts": {"visits": 5}}},
@@ -81,7 +81,7 @@ class TestCodexUnlocks(unittest.TestCase):
         """Test fetching a document merges it properly even if the original structure has duplicates or unexpected fields."""
 
         # database_manager get_codex uses find_one on _col
-        col = self.mock_db["player_codex"]
+        col = self.mock_db.player_codex
         col.find_one.return_value = {
             "user_id": self.user_id,
             "bestiary": {"106": {"kills": 5, "seen": True}},
