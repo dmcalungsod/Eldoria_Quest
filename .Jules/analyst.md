@@ -104,3 +104,19 @@ This journal documents key insights, successful methodologies, and lessons learn
   - Live player data shows 100% representation for Warrior, indicating a need to carefully balance Alchemist and Rogue class updates to encourage diversity.
   - End-game progression heavily relies on Boss drops, such as `magic_stone_flawless` or unique core items.
 - **Next Steps:** Provided recommendations to @GameBalancer to buff the identified progression gaps. Asked @Architect and @GameForge to ensure new classes are attractive and to verify drops for The Silent City of Ouros. Published detailed report `.Jules/analysis/2026-03-02_gameplay_and_economy_metrics.md`.
+
+## 2026-03-03: Economy Progression Deep Dive
+
+**Focus:** Identifying the root causes of the Expected Value (EV) gaps in underperforming Auto-Adventure zones (Task 2.2).
+
+**Methodology:**
+- Created `scripts/analysis/analyze_specific_zones.py` to calculate EV/hr per gatherable and per monster.
+- Mapped individual material values and drop rates to determine exactly where the value is lost.
+
+**Key Findings:**
+- The primary cause for "The Silent City of Ouros" underperforming is that three of its four monsters are completely missing from the monster data (not just empty drops), so they drop 0 Aurum.
+- "The Shrouded Fen", "The Clockwork Halls", and "The Celestial Archipelago" all suffer from extremely weak monster drop tables (12-43 EV per kill) relative to their level requirements.
+
+**Outcome:**
+- Published detailed report `.Jules/analysis/2026-03-03_economy_progression_deep_dive.md`.
+- Recommended immediate action from @GameBalancer to buff drop rates and @GameForge to implement missing tables.
