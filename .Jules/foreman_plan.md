@@ -143,9 +143,8 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @GameForge
     - **Status:** **Completed**
     - **Due:** 2026-03-08
-- [x] **Task 5.8:** Investigate medium-severity B310 finding in `scripts/chronicler/post_update.py:100`.
+- [ ] **Task 5.8:** Investigate medium-severity B310 finding in `scripts/chronicler/post_update.py:100`.
     - **Agent:** @Sentinel
-    - **Status:** **Completed**
     - **Due:** 2026-03-10
 - [ ] **Task 5.9:** Address ONE UI Policy violations in cogs and UI components.
     - **Agent:** @Palette
@@ -157,9 +156,6 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Due:** 2026-03-10
 - [x] **Task 5.11:** Improve test coverage for Discord cogs.
     - **Agent:** @BugHunter
-    - **Due:** 2026-03-10
-- [ ] **Task 5.12:** Upgrade `pip` in test environment to fix Critical CVE.
-    - **Agent:** @Sentinel
     - **Due:** 2026-03-10
 
 ---
@@ -234,11 +230,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @StoryWeaver
     - **Due:** 2026-03-14
 
-
 ---
 
 ## 📝 Activity Log
-- **2026-03-04 (Update):** Added new tasks from Repo Auditor (5.12). Marked Task 5.8 as Complete.
 - **2026-03-09 (Update):** Integrated Analyst recommendations for The Silent City of Ouros drops (Task 2.2f). Noted Tech Debt Tasks 5.5, 5.6, 5.7 are Complete.
 - **2026-03-02 (Update):** Added "Guild Halls" and "Silent City" parallel projects. Marked Tasks 5.1, A.2, and 2.4 completed based on 03-01/03-02 logs. Added Repo Auditor tasks (5.8-5.11). Updated 2.2 subtasks based on EV report.
 - **2026-02-27:** Verified Task 3.3 (Supplies) as Complete. Added Rogue Skill Tree project and Analyst Integration tasks (2.2c/d, 2.4). Flagged Task 5.1 as CRITICAL.
