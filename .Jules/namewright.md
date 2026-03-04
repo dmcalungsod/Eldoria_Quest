@@ -176,3 +176,31 @@
 1.  **The Petrified Arbiter** – A massive statue of a long-dead judge in The Grand Promenade, perfectly preserved in a state of eternal judgment.
 2.  **The Frozen Oracle** – A statue near The Chronomancer's Spire, its eyes seemingly following explorers, hinting at unseen watchers.
 3.  **The Silent Monument** – A towering obelisk dedicated to the city's founders, its inscriptions perfectly legible but the meaning lost to time.
+
+## 2026-03-09 — Ironhaven (Region Naming)
+
+**Request:** Assigned by Foreman (via Realmwright's design `.Jules/region_ironhaven.md`, Issue #30)
+**Context:** Ironhaven (Rank A, Level 35+). Militant, fortified mountain city, heavy industry, cold, aerial threats.
+**Tone:** Stoic, unyielding, industrial, martial.
+
+### 📜 Generated Names
+
+#### 📍 Locations (Specific Peaks & Districts)
+1.  **The Anvil's Edge** – The district closest to the Deep Forges, constantly ringing with hammer blows and smelling of ozone.
+2.  **Garrison's Reach** – The residential and training sector where Vanguard recruits endure harsh conditioning.
+3.  **The Shattered Spire** – A ruined peak near the city, serving as a grim reminder of a massive Void attack.
+4.  **Wyrm-Tooth Pass** – A treacherous, narrow trail winding through the Howling Peaks, littered with drake bones.
+
+#### 👥 Factions (Localized & Sub-groups)
+1.  **Iron Vanguard (Northern Chapter)** -> **Iron Watch** or **Kaelen's Shield** – The latter grounds them specifically to Mount Kaelen.
+2.  **Forge-Masters** -> **Cinder-Bound** or **Sons of the Anvil** – Focuses on their lifelong dedication and the heat of their craft.
+3.  **Drake-Riders** -> **Sky-Reavers** or **Gale-Lancers** – Emphasizes their offensive capability and the harsh winds they ride.
+
+#### 👥 NPCs (Key Drake-Riders & Others)
+1.  **Commander Kael "Wind-Scar"** – Leader of the Gale-Lancers, known for a vicious facial scar earned from a Storm Drake.
+2.  **Eira Frost-Touched** – A stoic quartermaster who manages thermal gear and supplies.
+3.  **Bram "Iron-Lung"** – A veteran Vanguard who survived the thin air of the highest peaks without magic.
+
+### 📝 Learnings
+*   "Gale-Lancers" feels more martial and active than simply "Drake-Riders".
+*   Adding "Wind-Scar" and "Iron-Lung" as titles/epithets helps convey the harshness of the environment immediately.

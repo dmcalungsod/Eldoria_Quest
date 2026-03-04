@@ -60,3 +60,8 @@
 
 **Learning:** Deep floor access should be gated behind narrative or gameplay prerequisites to enforce vertical progression, rather than strictly relying on Rank and Level requirements alone. This adds depth to the exploration loop and makes reaching deeper floors feel like a genuine accomplishment.
 **Action:** Implemented the `prerequisite_location` field in `adventure_locations.json`. Linked "The Silent City of Ouros" to "The Void Sanctum" meaning players must have visited The Void Sanctum before they can enter Ouros. Updated the `AdventureSetupView` to check for this prerequisite.
+
+## 2026-03-04 — The Abyssal Descent
+
+**Learning:** The Void Sanctum and Silent City of Ouros lacked a transitional zone. Floor 41 was created to connect them properly per Foreman's plan.
+**Action:** Add intermediate zones when major thematic changes occur between deep floors.

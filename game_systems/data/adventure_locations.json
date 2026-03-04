@@ -328,23 +328,19 @@
         "gatherables": [
             [
                 "medicinal_herb",
-                30
+                50
             ],
             [
                 "ancient_wood",
-                45
-            ],
-            [
-                "iron_ore",
-                20
+                60
             ],
             [
                 "magic_stone_medium",
-                45
+                100
             ],
             [
                 "shadow_essence",
-                10
+                50
             ]
         ],
         "special_events": [
@@ -516,11 +512,11 @@
         "monsters": [
             [
                 "monster_126",
-                30
+                25
             ],
             [
                 "monster_127",
-                30
+                25
             ],
             [
                 "monster_128",
@@ -528,7 +524,7 @@
             ],
             [
                 "monster_129",
-                15
+                25
             ]
         ],
         "night_monsters": [
@@ -555,32 +551,20 @@
         "description": "A labyrinth of grinding gears and hissing steam pipes. The ancient machines here are still running.",
         "gatherables": [
             [
-                "brass_gear",
-                40
-            ],
-            [
-                "copper_wire",
-                30
-            ],
-            [
-                "spring_coil",
+                "clockwork_heart",
                 20
             ],
             [
-                "magic_stone_medium",
-                35
+                "magic_stone_large",
+                100
             ],
             [
                 "steam_core",
-                10
+                100
             ],
             [
-                "magic_stone_large",
-                10
-            ],
-            [
-                "clockwork_heart",
-                1
+                "brass_gear",
+                100
             ]
         ],
         "special_events": [
@@ -792,24 +776,24 @@
         "description": "A treacherous shoreline of jagged cliffs and shipwrecks, battered by an endless storm.",
         "gatherables": [
             [
-                "fulgurite_shard",
-                30
-            ],
-            [
-                "storm_essence",
-                25
-            ],
-            [
-                "magic_stone_large",
+                "tempest_heart",
                 20
             ],
             [
-                "mithril_ore",
-                15
+                "charged_core",
+                100
             ],
             [
-                "charged_core",
-                10
+                "mithril_ore",
+                100
+            ],
+            [
+                "storm_essence",
+                100
+            ],
+            [
+                "magic_stone_large",
+                100
             ]
         ],
         "special_events": [
@@ -945,28 +929,20 @@
         "description": "A realm where reality frays and silence screams. The final frontier of the known world.",
         "gatherables": [
             [
-                "void_dust",
-                40
-            ],
-            [
-                "abyssal_shackle",
-                30
-            ],
-            [
-                "entropy_crystal",
+                "void_heart",
                 20
             ],
             [
-                "magic_stone_flawless",
-                30
-            ],
-            [
                 "null_stone",
-                10
+                100
             ],
             [
-                "void_heart",
-                2
+                "magic_stone_flawless",
+                100
+            ],
+            [
+                "entropy_crystal",
+                100
             ]
         ],
         "special_events": [
@@ -1105,20 +1081,20 @@
         "description": "Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.",
         "gatherables": [
             [
-                "aether_stone",
-                40
-            ],
-            [
-                "star_metal_fragment",
-                30
-            ],
-            [
-                "ancient_tablet",
+                "celestial_core",
                 20
             ],
             [
+                "star_metal_fragment",
+                100
+            ],
+            [
+                "ancient_tablet",
+                100
+            ],
+            [
                 "magic_stone_large",
-                10
+                100
             ]
         ],
         "special_events": [
@@ -1182,24 +1158,16 @@
         "description": "A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.",
         "gatherables": [
             [
-                "prism_shard",
-                30
-            ],
-            [
-                "concentrated_light",
-                39
-            ],
-            [
-                "magic_stone_flawless",
+                "glass_heart",
                 20
             ],
             [
-                "mithril_ore",
-                10
+                "concentrated_light",
+                100
             ],
             [
-                "glass_heart",
-                1
+                "magic_stone_flawless",
+                100
             ]
         ],
         "special_events": [
@@ -1372,12 +1340,89 @@
         "floor_depth": 8,
         "danger_level": 3
     },
+    "abyssal_descent": {
+        "name": "The Abyssal Descent",
+        "emoji": "🕳️",
+        "min_rank": "S",
+        "level_req": 41,
+        "prerequisite_location": "void_sanctum",
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "monster_116",
+                30
+            ],
+            [
+                "monster_117",
+                30
+            ],
+            [
+                "monster_118",
+                25
+            ],
+            [
+                "monster_119",
+                15
+            ]
+        ],
+        "night_monsters": [
+            [
+                "monster_116",
+                40
+            ],
+            [
+                "monster_118",
+                30
+            ],
+            [
+                "monster_119",
+                30
+            ]
+        ],
+        "conditional_monsters": [
+            {
+                "monster_key": "monster_120",
+                "weight": 5,
+                "min_level": 45
+            }
+        ],
+        "description": "A sheer drop into the crushing dark beneath the Void Sanctum. The silence of Ouros begins to bleed into the walls.",
+        "gatherables": [
+            [
+                "void_dust",
+                40
+            ],
+            [
+                "null_stone",
+                30
+            ],
+            [
+                "abyssal_shackle",
+                20
+            ],
+            [
+                "entropy_crystal",
+                10
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "ancient_shrine"
+        ],
+        "floor_depth": 41,
+        "danger_level": 8
+    },
     "silent_city_ouros": {
         "name": "The Silent City of Ouros",
         "emoji": "🕰️",
         "min_rank": "S",
         "level_req": 42,
-        "prerequisite_location": "void_sanctum",
+        "prerequisite_location": "abyssal_descent",
         "duration_options": [
             60,
             120,

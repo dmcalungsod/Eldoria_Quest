@@ -316,6 +316,28 @@ class AdventureEvents:
         "Shadows on the ice seem to move, tracking your progress.",
     ]
 
+    ATMOSPHERE_ABYSSAL = [
+        "The crushing dark presses against your skin.",
+        "You feel a steady, maddening pull downward.",
+        "Whispers from the Void echo through the endless chasm.",
+        "Every step feels heavier, as if gravity is collapsing.",
+    ]
+
+    ATMOSPHERE_OUROS = [
+        "The silence is absolute, a crushing weight against your eardrums.",
+        "Perfectly preserved buildings loom, their windows staring like empty eyes.",
+        "Not a speck of dust moves. The air itself feels frozen in time.",
+        "You catch yourself holding your breath to avoid breaking the stillness.",
+        "Statues line the streets, or perhaps they were once people.",
+        "Your reflection in the polished obsidian seems to move a fraction of a second too late.",
+        "A profound sense of wrongness permeates every pristine cobblestone.",
+        "You feel as though a single loud noise might shatter reality itself.",
+        "The city's unnerving perfection mocks the chaos of the living.",
+        "Time has forgotten this place, and it resents your intrusion.",
+        "You listen for a heartbeat, but the city has none.",
+        "The shadows here do not flicker; they are as static as the stone.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -420,6 +442,22 @@ class AdventureEvents:
         "📚 The smell of old paper is strangely comforting.",
         "📚 You bandage your wounds while ignoring the whispers.",
         "📚 A floating candle provides a warm light as you rest.",
+    ]
+
+    REGEN_PHRASES_ABYSSAL = [
+        f"{E.CAVE} You wedge yourself into a crack in the stone, seeking safety from the falling dark.",
+        f"{E.CAVE} In a rare moment of stillness, you bind your wounds before the descent continues.",
+        f"{E.CAVE} The heavy air fills your lungs. You steel your resolve against the abyss.",
+    ]
+
+    REGEN_PHRASES_OUROS = [
+        f"{E.TIME} You find a preserved plaza and sit, desperate for any sensation.",
+        f"{E.TIME} The deafening silence rings in your ears as you force yourself to rest.",
+        f"{E.TIME} You bind your wounds in the shadow of a motionless monument.",
+        f"{E.TIME} Staring at an unmoving fountain, you wait for your racing heart to slow.",
+        f"{E.TIME} A moment of pause stretches uncomfortably long in the dead city.",
+        f"{E.TIME} The pristine cobblestones offer a strange, unsettling comfort.",
+        f"{E.TIME} You close your eyes, trying to conjure a memory of sound.",
     ]
 
     REGEN_LOW_HP = [
@@ -585,6 +623,8 @@ class AdventureEvents:
         "the_ashlands": REGEN_PHRASES_ASHLANDS,
         "forgotten_ossuary": REGEN_PHRASES_OSSUARY,
         "whispering_archives": REGEN_PHRASES_ARCHIVES,
+        "abyssal_descent": REGEN_PHRASES_ABYSSAL,
+        "silent_city_ouros": REGEN_PHRASES_OUROS,
     }
 
     _LOCATION_ATMOSPHERE = {
@@ -598,6 +638,8 @@ class AdventureEvents:
         "the_ashlands": ATMOSPHERE_ASHLANDS,
         "forgotten_ossuary": ATMOSPHERE_OSSUARY,
         "whispering_archives": ATMOSPHERE_ARCHIVES,
+        "abyssal_descent": ATMOSPHERE_ABYSSAL,
+        "silent_city_ouros": ATMOSPHERE_OUROS,
     }
 
     _EVENT_ATMOSPHERE = {

@@ -3,6 +3,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 # Configuration
@@ -82,22 +83,34 @@ def parse_markdown_to_embed(content):
             if len(field_value) > 1024:
                 field_value = field_value[:1021] + "..."
 
-            embed["fields"].append({"name": field_name, "value": field_value, "inline": False})
+            embed["fields"].append(
+                {"name": field_name, "value": field_value, "inline": False}
+            )
 
     return embed
 
 
 def send_webhook(webhook_url, embed):
     """Sends the embed to the Discord webhook."""
-    if not webhook_url.startswith(("http://", "https://")):
+    parsed = urllib.parse.urlparse(webhook_url)
+    if parsed.scheme not in ("http", "https"):
         print("❌ Error: Webhook URL must use HTTP or HTTPS.")
         return
 
-    payload = {"username": "Guild Chronicler", "avatar_url": "https://i.imgur.com/4M34hi2.png", "embeds": [embed]}
+    payload = {
+        "username": "Guild Chronicler",
+        "avatar_url": "https://i.imgur.com/4M34hi2.png",
+        "embeds": [embed],
+    }
 
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        webhook_url, data=data, headers={"Content-Type": "application/json", "User-Agent": "GuildChronicler/1.0"}
+        webhook_url,
+        data=data,
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "GuildChronicler/1.0",
+        },
     )
 
     try:
