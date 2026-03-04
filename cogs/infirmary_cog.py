@@ -36,7 +36,8 @@ class InfirmaryView(View):
         self.missing_mp = max(0, stats.max_mp - current_mp)
 
         # Use centralized cost calculation from DatabaseManager
-        self.cost = DatabaseManager.calculate_heal_cost(current_hp, current_mp, stats.max_hp, stats.max_mp)
+        level = self.p_data.get("level", 1)
+        self.cost = DatabaseManager.calculate_heal_cost(current_hp, current_mp, stats.max_hp, stats.max_mp, level)
 
         # Heal Button
         disabled = self.missing_hp <= 0 and self.missing_mp <= 0
@@ -119,7 +120,8 @@ class InfirmaryView(View):
         mp_miss = max(0, stats.max_mp - p["current_mp"])
 
         # Use centralized cost calculation
-        cost = DatabaseManager.calculate_heal_cost(p["current_hp"], p["current_mp"], stats.max_hp, stats.max_mp)
+        level = p.get("level", 1)
+        cost = DatabaseManager.calculate_heal_cost(p["current_hp"], p["current_mp"], stats.max_hp, stats.max_mp, level)
 
         hp_bar = make_progress_bar(p["current_hp"], stats.max_hp)
         mp_bar = make_progress_bar(p["current_mp"], stats.max_mp)

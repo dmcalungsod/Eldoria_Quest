@@ -2230,16 +2230,20 @@ class DatabaseManager:
     # ============================================================
 
     @staticmethod
-    def calculate_heal_cost(current_hp: int, current_mp: int, max_hp: int, max_mp: int) -> int:
+    def calculate_heal_cost(current_hp: int, current_mp: int, max_hp: int, max_mp: int, level: int = 100) -> int:
         """
         Calculates the Aurum cost to restore HP and MP.
         Formula: 2.0 Aurum per missing HP, 3.0 Aurum per missing MP.
         Magic is biologically taxing to restore.
+        Beginners (Level 3 or below) receive free healthcare.
         """
         missing_hp = max(0, max_hp - current_hp)
         missing_mp = max(0, max_mp - current_mp)
 
         if missing_hp <= 0 and missing_mp <= 0:
+            return 0
+
+        if level <= 3:
             return 0
 
         return max(1, math.ceil(missing_hp * 2.0 + missing_mp * 3.0))
@@ -2248,7 +2252,7 @@ class DatabaseManager:
         """Atomically heals a player and deducts gold."""
         player = self._col("players").find_one(
             {"discord_id": discord_id},
-            {"_id": 0, "current_hp": 1, "current_mp": 1, "aurum": 1},
+            {"_id": 0, "current_hp": 1, "current_mp": 1, "aurum": 1, "level": 1},
         )
         if not player:
             return False, "Player not found."
@@ -2260,7 +2264,8 @@ class DatabaseManager:
             return False, "You are already healthy."
 
         # Recalculate cost from fresh data using centralized formula
-        actual_cost = self.calculate_heal_cost(current_hp, current_mp, max_hp, max_mp)
+        level = player.get("level", 1)
+        actual_cost = self.calculate_heal_cost(current_hp, current_mp, max_hp, max_mp, level)
 
         if player["aurum"] < actual_cost:
             return False, "Insufficient funds."
