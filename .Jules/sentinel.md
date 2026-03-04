@@ -20,3 +20,9 @@
 **Vulnerability:** A critical security check (`tests/test_pip_security.py`) designed to prevent the use of a known vulnerable `pip` version (25.3 / CVE-2026-1703) was implemented with a `skipTest` condition. This effectively masked the vulnerability by allowing the test suite to pass even when the test environment was running the vulnerable version.
 **Learning:** Security tests must be fail-secure. Implementing safety valves (like `skipTest`) in security validations defeats their purpose and provides a false sense of security, allowing vulnerabilities to persist in CI/CD or local environments undetected.
 **Prevention:** Avoid using `skipTest` or similar bypass mechanisms in security-critical assertions. If an environment is expected to fail a security check, the environment itself must be patched, rather than bypassing the test.
+
+## 2026-03-04 — B310: URL validation for urlopen
+
+**Vulnerability:** Medium-severity B310 (audit url open for permitted schemes). `urllib.request.urlopen` can open `file://` or custom schemes if the URL is not strictly validated, leading to potential Server-Side Request Forgery (SSRF) or local file read. The previous validation used `startswith(("http://", "https://"))`, which doesn't actually parse the URL and could be bypassed (e.g., `http://../local/file` or spaces).
+**Learning:** Even internal scripts (like `scripts/chronicler/post_update.py`) fetching webhooks must rigorously validate the protocol scheme using a true URL parser rather than string manipulation.
+**Prevention:** Always use `urllib.parse.urlparse(url).scheme` to strictly check against allowed protocols (`http`, `https`) before passing the URL to `urllib.request.urlopen` or `requests.get`.
