@@ -1,7 +1,7 @@
 {
     "forest_outskirts": {
         "name": "Willowcreek Outskirts",
-        "emoji": "🌲",
+        "emoji": "\ud83c\udf32",
         "min_rank": "F",
         "level_req": 1,
         "duration_options": [
@@ -60,7 +60,7 @@
     },
     "whispering_thicket": {
         "name": "Whispering Thicket",
-        "emoji": "🍃",
+        "emoji": "\ud83c\udf43",
         "min_rank": "E",
         "level_req": 5,
         "duration_options": [
@@ -128,7 +128,7 @@
     },
     "deepgrove_roots": {
         "name": "Deepgrove Roots",
-        "emoji": "🍄",
+        "emoji": "\ud83c\udf44",
         "min_rank": "D",
         "level_req": 10,
         "duration_options": [
@@ -195,7 +195,7 @@
     },
     "the_ashlands": {
         "name": "The Ashlands",
-        "emoji": "🌋",
+        "emoji": "\ud83c\udf0b",
         "min_rank": "D",
         "level_req": 12,
         "duration_options": [
@@ -271,7 +271,7 @@
     },
     "shrouded_fen": {
         "name": "The Shrouded Fen",
-        "emoji": "🌫️",
+        "emoji": "\ud83c\udf2b\ufe0f",
         "min_rank": "C",
         "level_req": 15,
         "duration_options": [
@@ -336,11 +336,11 @@
             ],
             [
                 "magic_stone_medium",
-                100
+                120
             ],
             [
                 "shadow_essence",
-                50
+                150
             ]
         ],
         "special_events": [
@@ -352,7 +352,7 @@
     },
     "sunken_grotto": {
         "name": "The Sunken Grotto",
-        "emoji": "🌊",
+        "emoji": "\ud83c\udf0a",
         "min_rank": "C",
         "level_req": 18,
         "duration_options": [
@@ -428,7 +428,7 @@
     },
     "crystal_caverns": {
         "name": "The Crystal Caverns",
-        "emoji": "💎",
+        "emoji": "\ud83d\udc8e",
         "min_rank": "B",
         "level_req": 20,
         "duration_options": [
@@ -500,7 +500,7 @@
     },
     "clockwork_halls": {
         "name": "The Clockwork Halls",
-        "emoji": "⚙️",
+        "emoji": "\u2699\ufe0f",
         "min_rank": "B",
         "level_req": 22,
         "duration_options": [
@@ -552,7 +552,7 @@
         "gatherables": [
             [
                 "clockwork_heart",
-                20
+                50
             ],
             [
                 "magic_stone_large",
@@ -564,7 +564,7 @@
             ],
             [
                 "brass_gear",
-                100
+                50
             ]
         ],
         "special_events": [
@@ -576,7 +576,7 @@
     },
     "forgotten_ossuary": {
         "name": "The Forgotten Ossuary",
-        "emoji": "💀",
+        "emoji": "\ud83d\udc80",
         "min_rank": "B",
         "level_req": 24,
         "duration_options": [
@@ -649,7 +649,7 @@
     },
     "molten_caldera": {
         "name": "The Molten Caldera",
-        "emoji": "🌋",
+        "emoji": "\ud83c\udf0b",
         "min_rank": "A",
         "level_req": 30,
         "duration_options": [
@@ -725,7 +725,7 @@
     },
     "thunder_crag_coast": {
         "name": "The Thunder-Crag Coast",
-        "emoji": "⛈️",
+        "emoji": "\u26c8\ufe0f",
         "min_rank": "A",
         "level_req": 33,
         "duration_options": [
@@ -806,7 +806,7 @@
     },
     "frostfall_expanse": {
         "name": "The Frostfall Expanse",
-        "emoji": "❄️",
+        "emoji": "\u2744\ufe0f",
         "min_rank": "B",
         "level_req": 25,
         "duration_options": [
@@ -878,7 +878,7 @@
     },
     "void_sanctum": {
         "name": "The Void Sanctum",
-        "emoji": "⚫",
+        "emoji": "\u26ab",
         "min_rank": "S",
         "level_req": 40,
         "duration_options": [
@@ -954,7 +954,7 @@
     },
     "gale_scarred_heights": {
         "name": "Gale-Scarred Heights",
-        "emoji": "🌪️",
+        "emoji": "\ud83c\udf2a\ufe0f",
         "min_rank": "A",
         "level_req": 35,
         "duration_options": [
@@ -1030,7 +1030,7 @@
     },
     "celestial_archipelago": {
         "name": "The Celestial Archipelago",
-        "emoji": "☁️",
+        "emoji": "\u2601\ufe0f",
         "min_rank": "A",
         "level_req": 28,
         "duration_options": [
@@ -1107,7 +1107,7 @@
     },
     "shimmering_wastes": {
         "name": "The Shimmering Wastes",
-        "emoji": "✨",
+        "emoji": "\u2728",
         "min_rank": "A",
         "level_req": 37,
         "duration_options": [
@@ -1179,7 +1179,7 @@
     },
     "guild_arena": {
         "name": "Guild Proving Grounds",
-        "emoji": "🏟️",
+        "emoji": "\ud83c\udfdf\ufe0f",
         "min_rank": "F",
         "level_req": 1,
         "duration_options": [],
@@ -1190,7 +1190,7 @@
     },
     "whispering_archives": {
         "name": "The Whispering Archives",
-        "emoji": "📚",
+        "emoji": "\ud83d\udcda",
         "min_rank": "B",
         "level_req": 26,
         "duration_options": [
@@ -1267,7 +1267,7 @@
     },
     "rust_wastes": {
         "name": "The Rust-Wastes",
-        "emoji": "⚙️",
+        "emoji": "\u2699\ufe0f",
         "min_rank": "E",
         "level_req": 8,
         "duration_options": [
@@ -1342,7 +1342,7 @@
     },
     "abyssal_descent": {
         "name": "The Abyssal Descent",
-        "emoji": "🕳️",
+        "emoji": "\ud83d\udd73\ufe0f",
         "min_rank": "S",
         "level_req": 41,
         "prerequisite_location": "void_sanctum",
@@ -1419,7 +1419,7 @@
     },
     "silent_city_ouros": {
         "name": "The Silent City of Ouros",
-        "emoji": "🕰️",
+        "emoji": "\ud83d\udd70\ufe0f",
         "min_rank": "S",
         "level_req": 42,
         "prerequisite_location": "abyssal_descent",
@@ -1496,7 +1496,7 @@
     },
     "wailing_chasm": {
         "name": "The Wailing Chasm",
-        "emoji": "🕳️",
+        "emoji": "\ud83d\udd73\ufe0f",
         "min_rank": "A",
         "level_req": 35,
         "duration_options": [
