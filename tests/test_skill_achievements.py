@@ -52,7 +52,9 @@ class TestSkillAchievements(unittest.TestCase):
 
     def test_skill_count_achievement_scholar(self):
         """Test awarding 'Scholar' for 4 skills."""
-        self.mock_db.get_all_player_skills.return_value = [{"skill_key": f"s{i}", "skill_level": 1} for i in range(4)]
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": f"s{i}", "skill_level": 1} for i in range(4)
+        ]
         self.mock_db.add_title.side_effect = lambda uid, title: True
 
         msg = self.ach_system.check_skill_achievements(123)
@@ -63,7 +65,9 @@ class TestSkillAchievements(unittest.TestCase):
 
     def test_skill_level_achievement_virtuoso(self):
         """Test awarding 'Virtuoso' for level 10 skill."""
-        self.mock_db.get_all_player_skills.return_value = [{"skill_key": "s1", "skill_level": 10}]
+        self.mock_db.get_all_player_skills.return_value = [
+            {"skill_key": "s1", "skill_level": 10}
+        ]
         self.mock_db.add_title.side_effect = lambda uid, title: True
 
         msg = self.ach_system.check_skill_achievements(123)
@@ -106,7 +110,7 @@ class TestSkillAchievements(unittest.TestCase):
         self.assertIn("Expert", msg)
 
     def test_rogue_class_achievements_assassin(self):
-        """Test awarding 'Assassin' title for learning all Assassin skills."""
+        """Test awarding 'Nightblade' title for learning all Assassin skills."""
         self.mock_db.get_all_player_skills.return_value = [
             {"skill_key": "double_strike", "skill_level": 1},
             {"skill_key": "toxic_blade", "skill_level": 1},
@@ -118,11 +122,11 @@ class TestSkillAchievements(unittest.TestCase):
         msg = self.ach_system.check_skill_achievements(123)
 
         self.assertIsNotNone(msg)
-        self.assertIn("Assassin", msg)
-        self.mock_db.add_title.assert_any_call(123, "Assassin")
+        self.assertIn("Nightblade", msg)
+        self.mock_db.add_title.assert_any_call(123, "Nightblade")
 
     def test_rogue_class_achievements_phantom(self):
-        """Test awarding 'Phantom' title for learning all Phantom skills."""
+        """Test awarding 'Ghost-Walker' title for learning all Phantom skills."""
         self.mock_db.get_all_player_skills.return_value = [
             {"skill_key": "stealth", "skill_level": 1},
             {"skill_key": "shadow_step", "skill_level": 1},
@@ -134,8 +138,8 @@ class TestSkillAchievements(unittest.TestCase):
         msg = self.ach_system.check_skill_achievements(123)
 
         self.assertIsNotNone(msg)
-        self.assertIn("Phantom", msg)
-        self.mock_db.add_title.assert_any_call(123, "Phantom")
+        self.assertIn("Ghost-Walker", msg)
+        self.mock_db.add_title.assert_any_call(123, "Ghost-Walker")
 
 
 if __name__ == "__main__":
