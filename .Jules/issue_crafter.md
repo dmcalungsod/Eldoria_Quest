@@ -125,3 +125,18 @@
 - Guild Halls expansion requires major economy balancing and database integration.
 - Ironhaven region introduces Cold and Altitude survival mechanics which require input from multiple agents, specifically Grimwarden.
 - A minor bug in `test_guild_advisor.py` was caught by Jules during a lint pass and requires a proper mock.
+
+## 2026-03-09
+**Summary:**
+- Scanned recent agent logs (2026-03-09) and the daily log.
+- Identified 3 new issues requiring tracking: 1 new region feature, 1 new mechanic feature, and 1 UI testing request.
+- Created `NEW_ISSUES.md` with detailed descriptions.
+
+**Created Issues:**
+- **[Test] Verify AdventureSetupView for new players** (Source: Mentor)
+- **[Feature] Add thermal insulation gear for Ironhaven** (Source: Grimwarden)
+- **[Feature] Implement The Undergrove Region Mechanics & Content** (Source: Realmwright)
+
+**Notes:**
+- The Undergrove region is a significant addition that requires extensive cross-agent coordination to fully implement all its toxic and fungal mechanics.
+- The Mentor's new onboarding flow needs careful testing by BugHunter to ensure the UI behaves perfectly for new players.

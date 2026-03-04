@@ -18,9 +18,3 @@
 
 **Learning:** When testing background tasks like `discord.ext.tasks.loop`, it's crucial to mock the loop decorator properly to avoid `StopIteration` errors when interacting with test frameworks like `unittest.mock`. Also, `cogs` require complete module mocks for `discord`, `discord.ext`, and `discord.ext.commands` before they can be safely imported without Discord API dependencies in isolated unit tests.
 **Action:** Implemented `tests/test_adventure_loop_regression.py` to cover the `AdventureLoop` scheduler cog. The test verifies that `get_adventures_ending_before` correctly fetches expired sessions based on the current `WorldTime` and successfully passes them to `AdventureResolutionEngine.resolve_sessions_batch` while handling empty states and catching exceptions to prevent crashes. Integrated the new test into `tests/run_all_tests.py`.
-
-### 2026-03-04: Infirmary UI Regression Tests
-- **Area:** Auto-Adventure System / Infirmary
-- **Risk:** High (Death loop, economic exploit)
-- **Changes:** `tests/test_infirmary_regression.py` was created to assert proper logic scaling around beginner free healing via `calculate_heal_cost`, preventing active adventure dispatch when health goes below the 15% threshold via `start_callback` validation, and ensuring emergency extraction penalties only apply when retreating directly from active encounters.
-- **Key Insight:** When testing Discord UI callbacks that contain asynchronous methods like `asyncio.to_thread` or that use `get_player_or_error`, robust mocking of `asyncio.Future` combined with patching `discord` dynamically enables successful CI testing without running Discord's actual networking layer. The new tests correctly run using `PYTHONPATH=. pytest` and are correctly integrated into the master `run_all_tests.py` script.

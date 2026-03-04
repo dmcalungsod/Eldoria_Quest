@@ -71,10 +71,14 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.return_value = True
 
-        msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
+        msg = self.achievements.check_combat_achievements(
+            discord_id, class_name, damage_taken
+        )
 
-        self.mock_db.add_title.assert_any_call(discord_id, "Unseen Death")
-        self.assertIn("**Title Unlocked:** Unseen Death", msg)
+        self.mock_db.add_title.assert_any_call(discord_id, "Without a Trace")
+        self.mock_db.add_title.assert_any_call(discord_id, "Untouchable")
+        self.assertIn("Without a Trace", msg)
+        self.assertIn("Untouchable", msg)
 
     def test_check_combat_achievements_wrong_class(self):
         discord_id = 123
@@ -83,10 +87,13 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.return_value = True
 
-        msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
+        msg = self.achievements.check_combat_achievements(
+            discord_id, class_name, damage_taken
+        )
 
-        self.mock_db.add_title.assert_not_called()
-        self.assertIsNone(msg)
+        self.mock_db.add_title.assert_called_once_with(discord_id, "Untouchable")
+        self.assertIn("**Title Unlocked:** Untouchable", msg)
+        self.assertNotIn("Without a Trace", msg)
 
     def test_check_combat_achievements_took_damage(self):
         discord_id = 123
@@ -95,7 +102,9 @@ class TestAchievementLogic(unittest.TestCase):
 
         self.mock_db.add_title.return_value = True
 
-        msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
+        msg = self.achievements.check_combat_achievements(
+            discord_id, class_name, damage_taken
+        )
 
         self.mock_db.add_title.assert_not_called()
         self.assertIsNone(msg)
