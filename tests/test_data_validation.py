@@ -70,3 +70,8 @@ class TestDataValidator:
         from game_systems.data.equipments import EQUIPMENT_DATA
 
         assert len(EQUIPMENT_DATA) > 0
+
+    def test_skills_integration(self):
+        from game_systems.data.skills_data import SKILLS
+
+        assert len(SKILLS) > 0

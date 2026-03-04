@@ -73,8 +73,8 @@ class TestAchievementLogic(unittest.TestCase):
 
         msg = self.achievements.check_combat_achievements(discord_id, class_name, damage_taken)
 
-        self.mock_db.add_title.assert_any_call(discord_id, "Without a Trace")
-        self.assertIn("**Title Unlocked:** Without a Trace", msg)
+        self.mock_db.add_title.assert_any_call(discord_id, "Unseen Death")
+        self.assertIn("**Title Unlocked:** Unseen Death", msg)
 
     def test_check_combat_achievements_wrong_class(self):
         discord_id = 123

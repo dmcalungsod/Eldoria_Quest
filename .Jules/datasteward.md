@@ -12,3 +12,8 @@
 
 **Learning:** Static data like `FACTIONS` was previously hardcoded in `game_systems/data/factions.py` without schema validation, increasing the risk of inconsistent data entry for future updates.
 **Action:** Extracted faction data to `game_systems/data/factions.json` and implemented a `FACTION_SCHEMA` in `schemas.py`. Python files should act as loaders and validators, keeping data decoupled from logic. Ensure `ranks` keys are cast back to integers during load for backward compatibility.
+
+## 2026-03-03 — Migrated Skills to JSON
+
+**Learning:** Centralizing class skills from Python dictionaries into `skills.json` and adding a formal `SKILL_SCHEMA` ensures skill integrity at startup and prevents typos from breaking the combat engine. Using PEP 562 `__getattr__` allows lazy loading without breaking external imports.
+**Action:** Continue identifying large hardcoded dictionaries (like class stats or descriptions) and extracting them into structured JSON files with schema validation.

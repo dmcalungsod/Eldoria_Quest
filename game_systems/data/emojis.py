@@ -62,6 +62,7 @@ HP = "❤️"
 MP = "💧"
 
 # Misc World
+TIME = "🕰️"
 FOREST = "🌲"
 THICKET = "🍃"
 CAVE = "🍄"
