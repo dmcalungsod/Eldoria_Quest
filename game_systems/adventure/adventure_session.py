@@ -113,8 +113,9 @@ class AdventureSession:
         # Steps past threshold
         excess_steps = steps - 16
 
-        # 5% per hour (4 steps) => 1.25% per step. Double for silent_city_ouros.
-        base_rate = 0.10 if getattr(self, "location_id", None) == "silent_city_ouros" else 0.05
+        # 5% per hour (4 steps) => 1.25% per step. Double for silent_city_ouros and ironhaven (thin air).
+        location_id = getattr(self, "location_id", None)
+        base_rate = 0.10 if location_id in ("silent_city_ouros", "ironhaven") else 0.05
         bonus = (excess_steps / 4.0) * base_rate
 
         # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
@@ -322,6 +323,36 @@ class AdventureSession:
                 if persist:
                     self.db.update_player_vitals_delta(self.discord_id, 0, -(current_mp - new_mp), max_hp, max_mp)
 
+    def _apply_ironhaven_penalties(self, context: dict, persist: bool):
+        """Applies Cold damage if in Ironhaven without thermal protection."""
+        location_id = getattr(self, "location_id", None)
+        if location_id == "ironhaven" and random.random() < 0.40:  # nosec B311
+            # Check for thermal protection
+            has_thermal = context.get("active_boosts", {}).get("thermal_insulation", 0) > 0
+            if has_thermal:
+                return
+
+            has_torch = self.supplies.get("pitch_torch", 0) > 0
+
+            max_hp = context.get("stats_dict", {}).get("HP", context["player_stats"].max_hp)
+            cold_dmg = max(1, int(max_hp * 0.03))
+
+            if has_torch:
+                cold_dmg = max(1, int(cold_dmg * 0.5))
+                msg = f"🏔️ **Biting Cold:** The freezing winds bite, but your torch provides some warmth. You take **{cold_dmg}** HP damage."
+            else:
+                msg = f"🏔️ **Biting Cold:** Without thermal gear, the freezing winds of Ironhaven sap your life! You take **{cold_dmg}** HP damage."
+
+            current_hp = context["vitals"]["current_hp"]
+            if current_hp > 0:
+                new_hp = max(0, current_hp - cold_dmg)
+                context["vitals"]["current_hp"] = new_hp
+                self.logs.append(msg)
+
+                if persist:
+                    max_mp = context.get("stats_dict", {}).get("MP", context["player_stats"].max_mp)
+                    self.db.update_player_vitals_delta(self.discord_id, -cold_dmg, 0, max_hp, max_mp)
+
     def _apply_environmental_effects(self, context: dict, weather: Weather, persist: bool = True):
         """
         Applies non-combat environmental hazards based on weather.
@@ -347,8 +378,11 @@ class AdventureSession:
                 max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
                 self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
 
-        # Wailing Chasm - Sanity Drain (MP Drain)
+        # Wailing Chasm / Ouros - Sanity Drain (MP Drain)
         self._apply_sanity_drain(context, persist)
+
+        # Ironhaven - Cold Survival Penalty
+        self._apply_ironhaven_penalties(context, persist)
 
     def _handle_active_combat(
         self,
