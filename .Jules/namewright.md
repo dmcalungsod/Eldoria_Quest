@@ -204,3 +204,28 @@
 ### 📝 Learnings
 *   "Gale-Lancers" feels more martial and active than simply "Drake-Riders".
 *   Adding "Wind-Scar" and "Iron-Lung" as titles/epithets helps convey the harshness of the environment immediately.
+
+## 2026-03-09 — The Undergrove (Flora & Tools)
+
+**Request:** Assigned by Foreman (via Realmwright's design `.Jules/region_the_undergrove.md`, Issue)
+**Context:** The Undergrove (Rank B). Subterranean jungle, glowing, toxic fungal spores, hyper-aggressive plant life. Alchemists and foragers.
+**Tone:** Toxic, bioluminescent, alien, clinical but hazardous.
+
+### 📜 Generated Names
+
+#### 🌿 Flora & Reagents
+1.  **Lunawort** – A pale, crescent-shaped herb that glows softly in the dark; used in purifying brews.
+2.  **Primordial Ooze** – Viscous, unrefined liquid mana found in the deepest fungal beds.
+3.  **Corpse-Bloom** – A large, beautiful flower that grows exclusively on the decaying bodies of Fungal Hulks.
+4.  **Blight-Root** – A twisted, blackened root that acts as a powerful, albeit dangerous, stimulant.
+5.  **Glow-Cap Spores** – The primary source of the region's eerie illumination; highly toxic if inhaled in large quantities.
+
+#### 🔧 Specialized Alchemist Tools
+1.  **Respirator Mask** -> **Spore-Filter Cowl** or **Alchemist's Rebreather** – Sounds more grounded in dark fantasy than "Respirator".
+2.  **Purifying Brew** -> **Toxin-Siphon Draught** or **Clear-Lung Elixir** – Emphasizes the physical act of removing poison.
+3.  **Harvesting Sickle** -> **Sporesbane Sickle** – A specialized tool designed to cut through hardened fungal stalks without releasing spores.
+4.  **Ooze Extractor** -> **Glass-Marrow Syringe** – A delicate, terrifying tool used to draw Primordial Ooze directly from the source.
+
+### 📝 Learnings
+*   "Spore-Filter Cowl" fits the scavenger/survivalist aesthetic better than a modern-sounding "Respirator Mask".
+*   "Glass-Marrow Syringe" evokes the clinical, almost surgical approach the Alchemists take to this environment.
