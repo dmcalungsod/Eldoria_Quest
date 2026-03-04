@@ -21,7 +21,9 @@ class AutoCombatFormula:
     """
 
     @staticmethod
-    def calculate_player_dps(player_stats, skills=None, stance="balanced", weather_multiplier=1.0) -> float:
+    def calculate_player_dps(
+        player_stats, skills=None, stance="balanced", weather_multiplier=1.0
+    ) -> float:
         """Calculates expected average Damage Per Turn (DPT) for the player."""
         str_val = DamageFormula._get_stat(player_stats, "STR")
         dex_val = DamageFormula._get_stat(player_stats, "DEX")
@@ -41,7 +43,9 @@ class AutoCombatFormula:
             for s in skills:
                 if s.get("power_multiplier"):
                     skill_level = s.get("skill_level", 1)
-                    skill_power = DamageFormula.calculate_skill_attack_power(player_stats, s, skill_level)
+                    skill_power = DamageFormula.calculate_skill_attack_power(
+                        player_stats, s, skill_level
+                    )
                     if skill_power > best_skill_power:
                         best_skill_power = skill_power
 
@@ -129,7 +133,9 @@ class AutoCombatFormula:
             }
         """
         # 1. Power Abstraction
-        player_dps_raw = AutoCombatFormula.calculate_player_dps(player_stats, player_skills, stance, weather_multiplier)
+        player_dps_raw = AutoCombatFormula.calculate_player_dps(
+            player_stats, player_skills, stance, weather_multiplier
+        )
         monster_mitigation = AutoCombatFormula.calculate_monster_mitigation(monster)
 
         # Player net damage per turn
@@ -145,15 +151,14 @@ class AutoCombatFormula:
         elif stance == "defensive":
             stance_vuln = 0.8
 
-        # Monster net damage per turn
-        monster_net_dps = max(
-            1.0,
-            (monster_dps_raw - player_mitigation) * stance_vuln * fatigue_multiplier,
-        )
+        # Base damage clamped to 0
+        base_damage = max(0.0, monster_dps_raw - player_mitigation)
 
-        # Ensure minimum chip damage from monster (5% of its ATK)
+        # Ensure minimum chip damage from monster (5% of its ATK) BEFORE multipliers
         chip_damage = monster.get("ATK", 10) * 0.05
-        monster_net_dps = max(monster_net_dps, chip_damage)
+        monster_net_dps = max(
+            1.0, max(base_damage, chip_damage) * stance_vuln * fatigue_multiplier
+        )
 
         # 2. Deterministic Clash
         monster_hp = monster.get("HP", 1)
