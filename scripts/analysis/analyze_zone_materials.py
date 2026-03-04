@@ -7,6 +7,7 @@ from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.materials import MATERIALS
 from game_systems.data.monsters import MONSTERS
 
+
 def main():
     print("Zone Economy Analysis")
     print("-" * 50)
@@ -48,6 +49,7 @@ def main():
                     drops.append(f"{drop_id}({chance}%:{drop_val}g)")
 
                 print(f"    - {mob_name} (Lvl {mob_lvl}) - {weight} weight - Drops: {', '.join(drops)}")
+
 
 if __name__ == "__main__":
     main()

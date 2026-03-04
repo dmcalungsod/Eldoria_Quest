@@ -8,6 +8,7 @@ from game_systems.data.materials import MATERIALS
 from game_systems.data.monsters import MONSTERS
 from scripts.analysis.economy_utils import calculate_expected_value_stats
 
+
 def main():
     zones = ["shrouded_fen", "clockwork_halls", "celestial_archipelago", "shimmering_wastes", "silent_city_ouros"]
 
@@ -35,7 +36,7 @@ def main():
                 mat_val = MATERIALS.get(mat_id, {}).get("value", 0)
                 prob = weight / total_gather_weight if total_gather_weight > 0 else 0
                 ev_per_gather = prob * mat_val
-                print(f"    - {mat_id}: {prob*100:.1f}% chance, Value {mat_val} -> {ev_per_gather:.1f} EV/gather")
+                print(f"    - {mat_id}: {prob * 100:.1f}% chance, Value {mat_val} -> {ev_per_gather:.1f} EV/gather")
         elif isinstance(gatherables, list):
             total_gather_weight = sum([item[1] for item in gatherables])
             for item in gatherables:
@@ -44,7 +45,7 @@ def main():
                 mat_val = MATERIALS.get(mat_id, {}).get("value", 0)
                 prob = weight / total_gather_weight if total_gather_weight > 0 else 0
                 ev_per_gather = prob * mat_val
-                print(f"    - {mat_id}: {prob*100:.1f}% chance, Value {mat_val} -> {ev_per_gather:.1f} EV/gather")
+                print(f"    - {mat_id}: {prob * 100:.1f}% chance, Value {mat_val} -> {ev_per_gather:.1f} EV/gather")
 
         # Monster Details
         print("  Monster Sources:")
@@ -65,7 +66,10 @@ def main():
             avg_aurum = (aurum_min + aurum_max) / 2
 
             total_mob_ev = avg_aurum + drop_ev
-            print(f"    - {mob_id}: {prob*100:.1f}% chance, Aurum {avg_aurum:.1f}, Drops {drop_ev:.1f} -> {total_mob_ev:.1f} Total EV/kill")
+            print(
+                f"    - {mob_id}: {prob * 100:.1f}% chance, Aurum {avg_aurum:.1f}, Drops {drop_ev:.1f} -> {total_mob_ev:.1f} Total EV/kill"
+            )
+
 
 if __name__ == "__main__":
     main()
