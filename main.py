@@ -57,6 +57,7 @@ def init_db():
         create_tables()
         populate_db()
         logger.info("Database initialization complete.")
+        logger.info("Eldoria Quest Engine v1.2.5 - Stable")
     except Exception as e:
         logger.critical(f"Database initialization failed: {e}", exc_info=True)
         sys.exit(1)

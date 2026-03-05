@@ -19,3 +19,8 @@
 
 **Learning:** When implementing transient combat state effects in the Eldoria Quest engine (like the Silence mechanic, which mirrors the Stun mechanic), it is critical to not only process and return the state from the `CombatEngine`, but to manually propagate that state back into the `player_stats` object in `adventure_session.py`. Because the Discord bot is stateless between turns, failure to explicitly map `self.active_monster["player_silenced"]` into `context["player_stats"].is_silenced` will result in the state immediately dropping on the next turn. Additionally, any new binary flags for state must be manually added to mock player objects in all relevant test files.
 **Action:** Always verify the full lifecycle of a status effect: `Status Applied (Engine) -> Saved (Session/Database) -> Re-Injected (Next Turn Context) -> Enforced (Engine) -> Consumed`.
+
+## 2026-03-04 — Auto-Combat Integration
+
+**Learning:** Auto-adventure combat logic bypasses the turn-by-turn simulation loop in favor of a deterministic formula (`AutoCombatFormula`). New passive mechanics like `kill_heal_percent` and `self_damage_percent` must be translated into raw DPS/mitigation adjustments within this formula to ensure players using auto-adventures still benefit from their class features.
+**Action:** When adding new combat mechanics, always verify if they need an equivalent approximation in `game_systems/combat/auto_combat_formula.py`.

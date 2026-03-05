@@ -16,6 +16,10 @@
             [
                 "slime_gel",
                 40
+            ],
+            [
+                "primordial_ooze",
+                15
             ]
         ],
         "skills": [
@@ -41,6 +45,10 @@
             [
                 "slime_gel",
                 40
+            ],
+            [
+                "primordial_ooze",
+                15
             ]
         ],
         "skills": [
@@ -1880,7 +1888,7 @@
         "id": 116,
         "name": "Void Stalker",
         "level": 41,
-        "tier": "Normal",
+        "tier": "Elite",
         "hp": 2800,
         "atk": 160,
         "def": 40,
@@ -1909,7 +1917,7 @@
         "id": 117,
         "name": "Abyssal Construct",
         "level": 42,
-        "tier": "Normal",
+        "tier": "Elite",
         "hp": 5000,
         "atk": 130,
         "def": 120,
@@ -2571,7 +2579,7 @@
         "id": 141,
         "name": "Arcane Sentinel",
         "level": 28,
-        "tier": "Normal",
+        "tier": "Boss",
         "hp": 1300,
         "atk": 90,
         "def": 60,
@@ -2600,7 +2608,7 @@
         "id": 142,
         "name": "Aether Wisp",
         "level": 28,
-        "tier": "Normal",
+        "tier": "Elite",
         "hp": 800,
         "atk": 110,
         "def": 20,
@@ -2629,7 +2637,7 @@
         "id": 143,
         "name": "Sky-Ray",
         "level": 29,
-        "tier": "Normal",
+        "tier": "Elite",
         "hp": 1500,
         "atk": 100,
         "def": 45,
@@ -3325,5 +3333,110 @@
             "void_slash"
         ],
         "description": "A corrupted delver whose eyes have rotted away, guided only by the Choirmaster's song."
+    },
+    "temporal_wraith": {
+        "id": 168,
+        "name": "Temporal Wraith",
+        "level": 42,
+        "tier": "Elite",
+        "hp": 5000,
+        "atk": 250,
+        "def": 120,
+        "xp": 5000,
+        "drops": [
+            [
+                "chronal_dust",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                50
+            ]
+        ],
+        "skills": [
+            "void_slash",
+            "silence_aura"
+        ],
+        "description": "A ghost stuck between seconds, forever screaming in silence."
+    },
+    "hollowed_sentinel": {
+        "id": 169,
+        "name": "Hollowed Sentinel",
+        "level": 43,
+        "tier": "Elite",
+        "hp": 8000,
+        "atk": 220,
+        "def": 180,
+        "xp": 5500,
+        "drops": [
+            [
+                "perfected_glass",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                60
+            ]
+        ],
+        "skills": [
+            "heavy_blow",
+            "crushing_slam"
+        ],
+        "description": "A massive suit of armor, hollow inside but animated by pure chronal energy."
+    },
+    "abyssal_creeper": {
+        "id": 170,
+        "name": "Abyssal Creeper",
+        "level": 42,
+        "tier": "Normal",
+        "hp": 3000,
+        "atk": 280,
+        "def": 80,
+        "xp": 4000,
+        "drops": [
+            [
+                "void_touched_relic",
+                30
+            ],
+            [
+                "magic_stone_large",
+                100
+            ]
+        ],
+        "skills": [
+            "vicious_bite",
+            "poison_spit"
+        ],
+        "description": "A multi-legged horror that climbs the sheer walls of Ouros."
+    },
+    "echoing_behemoth": {
+        "id": 171,
+        "name": "Echoing Behemoth",
+        "level": 45,
+        "tier": "Boss",
+        "hp": 25000,
+        "atk": 350,
+        "def": 250,
+        "xp": 20000,
+        "drops": [
+            [
+                "ancient_ourosan_coin",
+                100
+            ],
+            [
+                "void_touched_relic",
+                100
+            ],
+            [
+                "magic_stone_flawless",
+                100
+            ]
+        ],
+        "skills": [
+            "thunder_call",
+            "crushing_slam",
+            "regenerate"
+        ],
+        "description": "The silent guardian of the deepest vaults, its steps make no sound."
     }
 }
