@@ -4,6 +4,8 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
+if "discord" not in sys.modules:
+    sys.modules["discord"] = MagicMock()
 
 class TestGuildAdvisor(unittest.TestCase):
     def setUp(self):
