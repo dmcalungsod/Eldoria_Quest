@@ -55,6 +55,8 @@ class AutoCombatFormula:
         else:
             attack_power = basic_attack_power
 
+
+
         # Crit expected value
         crit_chance = 0.03 + (luck_val * 0.002)
         crit_multiplier = 1.75
@@ -175,9 +177,31 @@ class AutoCombatFormula:
         variance = random.uniform(0.9, 1.1)  # nosec B311
         final_damage_taken = int(base_damage_taken * variance)
 
+        # 4. Apply Auto-Combat specific mechanics from skills
+        if player_skills:
+            for skill in player_skills:
+                # Warrior: Bloodlust (Heal on kill)
+                passive_bonus = skill.get("passive_bonus", {})
+                if "kill_heal_percent" in passive_bonus:
+                    # Healing is applied at the end of the combat since it's a kill heal
+                    heal_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * passive_bonus["kill_heal_percent"])
+                    final_damage_taken = max(0, final_damage_taken - heal_amount)
+
+                # Warrior: Reckless Swing (Self damage)
+                # Assume skill is used 25% of the turns
+                if "self_damage_percent" in skill:
+                    # Recoil is applied per use. Uses = turns_to_kill * 0.25
+                    uses = max(1, int(turns_to_kill * 0.25))
+                    # Recoil is based on damage dealt by the skill, but we approximate to % of HP for auto-combat
+                    # if the skill doesn't hit, but for auto-combat, let's use the player's max HP as a safe bet
+                    recoil_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * skill["self_damage_percent"]) * uses
+                    final_damage_taken += recoil_amount
+
+
+
         return {
             "turns_to_kill": int(turns_to_kill),
-            "damage_taken": max(0, final_damage_taken),
+            "damage_taken": max(0, int(final_damage_taken)),
             "player_dps": round(player_net_dps, 2),
             "monster_dps": round(monster_net_dps, 2),
         }
