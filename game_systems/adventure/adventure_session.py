@@ -67,13 +67,19 @@ class AdventureSession:
                 self.logs = []
 
             try:
-                self.loot = json.loads(row_data["loot_collected"]) if row_data["loot_collected"] else {}
+                self.loot = (
+                    json.loads(row_data["loot_collected"])
+                    if row_data["loot_collected"]
+                    else {}
+                )
             except json.JSONDecodeError:
                 self.loot = {}
 
             try:
                 self.active_monster = (
-                    json.loads(row_data["active_monster_json"]) if row_data["active_monster_json"] else None
+                    json.loads(row_data["active_monster_json"])
+                    if row_data["active_monster_json"]
+                    else None
                 )
             except json.JSONDecodeError:
                 self.active_monster = None
@@ -92,12 +98,16 @@ class AdventureSession:
             self.supplies = {}
             self.start_time = 0
 
-    def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
+    def _build_result(
+        self, sequence: list, dead: bool, context: dict | None
+    ) -> dict[str, Any]:
         """Helper to build the standardized result dictionary."""
         return {
             "sequence": sequence,
             "dead": dead,
-            "vitals": (context["vitals"] if context else {"current_hp": 0, "current_mp": 0}),
+            "vitals": (
+                context["vitals"] if context else {"current_hp": 0, "current_mp": 0}
+            ),
             "player_stats": context["player_stats"] if context else None,
             "active_monster": self.active_monster,
         }
@@ -115,9 +125,13 @@ class AdventureSession:
         # Steps past threshold
         excess_steps = steps - 16
 
-        # 5% per hour (4 steps) => 1.25% per step. Double for silent_city_ouros and ironhaven (thin air).
+        # 5% per hour (4 steps) => 1.25% per step. Double for silent_city_ouros, ironhaven (thin air), and the_undergrove (toxins).
         location_id = getattr(self, "location_id", None)
-        base_rate = 0.10 if location_id in ("silent_city_ouros", "ironhaven") else 0.05
+        base_rate = (
+            0.10
+            if location_id in ("silent_city_ouros", "ironhaven", "the_undergrove")
+            else 0.05
+        )
         bonus = (excess_steps / 4.0) * base_rate
 
         # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
@@ -156,7 +170,9 @@ class AdventureSession:
 
         if persist:
             max_hp, max_mp = self._get_max_vitals(context)
-            self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
+            self.db.update_player_vitals_delta(
+                self.discord_id, -damage, 0, max_hp, max_mp
+            )
 
         return damage
 
@@ -164,7 +180,9 @@ class AdventureSession:
     # MAIN STEP LOGIC
     # ======================================================================
 
-    def _fetch_session_context(self, bundle: dict | None = None) -> dict[str, Any] | None:
+    def _fetch_session_context(
+        self, bundle: dict | None = None
+    ) -> dict[str, Any] | None:
         """
         Fetches all necessary data for the adventure step (combat or non-combat).
         Returns None if critical data (vitals) is missing.
@@ -257,14 +275,18 @@ class AdventureSession:
             # Ensure max_hp is at least 1
             if "stats_dict" in context:
                 # Fallback to player_stats.max_hp if key missing
-                max_hp = max(context["stats_dict"].get("HP", context["player_stats"].max_hp), 1)
+                max_hp = max(
+                    context["stats_dict"].get("HP", context["player_stats"].max_hp), 1
+                )
             else:
                 max_hp = max(context["player_stats"].max_hp, 1)
             return (current_hp / max_hp) >= 0.15
         except Exception:
             return False
 
-    def _calculate_weather_damage(self, max_hp: int, weather: Weather) -> tuple[int, str | None]:
+    def _calculate_weather_damage(
+        self, max_hp: int, weather: Weather
+    ) -> tuple[int, str | None]:
         """Calculates damage and returns (damage, message) based on weather."""
         damage = 0
         message = None
@@ -307,7 +329,10 @@ class AdventureSession:
     def _apply_sanity_drain(self, context: dict, persist: bool):
         """Applies MP drain if in the Wailing Chasm or Silent City of Ouros."""
         location_id = getattr(self, "location_id", None)
-        if location_id in ("the_wailing_chasm", "silent_city_ouros") and random.random() < 0.30:  # nosec B311
+        if (
+            location_id in ("the_wailing_chasm", "silent_city_ouros")
+            and random.random() < 0.30
+        ):  # nosec B311
             max_hp = context["stats_dict"].get("HP", context["player_stats"].max_hp)
             max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
             mp_drain = max(1, int(max_mp * 0.02))
@@ -323,20 +348,26 @@ class AdventureSession:
 
                 self.logs.append(msg)
                 if persist:
-                    self.db.update_player_vitals_delta(self.discord_id, 0, -(current_mp - new_mp), max_hp, max_mp)
+                    self.db.update_player_vitals_delta(
+                        self.discord_id, 0, -(current_mp - new_mp), max_hp, max_mp
+                    )
 
     def _apply_ironhaven_penalties(self, context: dict, persist: bool):
         """Applies Cold damage if in Ironhaven without thermal protection."""
         location_id = getattr(self, "location_id", None)
         if location_id == "ironhaven" and random.random() < 0.40:  # nosec B311
             # Check for thermal protection
-            has_thermal = context.get("active_boosts", {}).get("thermal_insulation", 0) > 0
+            has_thermal = (
+                context.get("active_boosts", {}).get("thermal_insulation", 0) > 0
+            )
             if has_thermal:
                 return
 
             has_torch = self.supplies.get("pitch_torch", 0) > 0
 
-            max_hp = context.get("stats_dict", {}).get("HP", context["player_stats"].max_hp)
+            max_hp = context.get("stats_dict", {}).get(
+                "HP", context["player_stats"].max_hp
+            )
             cold_dmg = max(1, int(max_hp * 0.03))
 
             if has_torch:
@@ -352,10 +383,70 @@ class AdventureSession:
                 self.logs.append(msg)
 
                 if persist:
-                    max_mp = context.get("stats_dict", {}).get("MP", context["player_stats"].max_mp)
-                    self.db.update_player_vitals_delta(self.discord_id, -cold_dmg, 0, max_hp, max_mp)
+                    max_mp = context.get("stats_dict", {}).get(
+                        "MP", context["player_stats"].max_mp
+                    )
+                    self.db.update_player_vitals_delta(
+                        self.discord_id, -cold_dmg, 0, max_hp, max_mp
+                    )
 
-    def _apply_environmental_effects(self, context: dict, weather: Weather, persist: bool = True):
+    def _apply_undergrove_penalties(self, context: dict, persist: bool):
+        """Applies Toxin Accumulation if exploring The Undergrove."""
+        location_id = getattr(self, "location_id", None)
+        if location_id == "the_undergrove":
+            # Players continuously build up a 'Toxin' meter while exploring.
+            # Using session tracking or just a periodic chance to simulate accumulation
+            if not hasattr(self, "_toxin_level"):
+                self._toxin_level = 0
+
+            # Increase toxin level each step
+            self._toxin_level += 1
+
+            # Toxin applies damage or penalties periodically
+            if self._toxin_level >= 5 and random.random() < 0.50:  # nosec B311
+                # Check for protection (to mitigate/reset)
+                has_respirator = (
+                    context.get("active_boosts", {}).get("toxin_filtration", 0) > 0
+                )
+                if has_respirator:
+                    self._toxin_level = 0  # Respirator clears it constantly
+                    return
+
+                # Check for purifying brews (consumable mitigation)
+                # Purifying brews will be used automatically to clear toxin if present
+                if self.supplies.get("purifying_brew", 0) > 0:
+                    self.supplies["purifying_brew"] -= 1
+                    self.logs.append(
+                        "🧪 **Toxin Purged:** You drink a Purifying Brew, clearing the dangerous spores from your system."
+                    )
+                    self._toxin_level = 0
+                    return
+
+                max_hp = context.get("stats_dict", {}).get(
+                    "HP", context["player_stats"].max_hp
+                )
+
+                # Toxin accumulation scales with how long you've been poisoned
+                toxin_dmg = max(1, int(max_hp * (0.02 * (self._toxin_level - 4))))
+
+                msg = f"☠️ **Toxin Accumulation:** The glowing spores choke your lungs! You suffer **{toxin_dmg}** poison damage."
+                current_hp = context["vitals"]["current_hp"]
+                if current_hp > 0:
+                    new_hp = max(0, current_hp - toxin_dmg)
+                    context["vitals"]["current_hp"] = new_hp
+                    self.logs.append(msg)
+
+                    if persist:
+                        max_mp = context.get("stats_dict", {}).get(
+                            "MP", context["player_stats"].max_mp
+                        )
+                        self.db.update_player_vitals_delta(
+                            self.discord_id, -toxin_dmg, 0, max_hp, max_mp
+                        )
+
+    def _apply_environmental_effects(
+        self, context: dict, weather: Weather, persist: bool = True
+    ):
         """
         Applies non-combat environmental hazards based on weather.
         Modifies context["vitals"] directly.
@@ -378,13 +469,18 @@ class AdventureSession:
             if persist:
                 # Delta update
                 max_mp = context["stats_dict"].get("MP", context["player_stats"].max_mp)
-                self.db.update_player_vitals_delta(self.discord_id, -damage, 0, max_hp, max_mp)
+                self.db.update_player_vitals_delta(
+                    self.discord_id, -damage, 0, max_hp, max_mp
+                )
 
         # Wailing Chasm / Ouros - Sanity Drain (MP Drain)
         self._apply_sanity_drain(context, persist)
 
         # Ironhaven - Cold Survival Penalty
         self._apply_ironhaven_penalties(context, persist)
+
+        # The Undergrove - Toxin Accumulation Penalty
+        self._apply_undergrove_penalties(context, persist)
 
     def _handle_active_combat(
         self,
@@ -496,7 +592,9 @@ class AdventureSession:
 
         # OPTIMIZATION: Pass pre-fetched level to avoid DB lookup in initiate_combat
         player_level = context["player_row"].get("level", 1)
-        monster, phrase = self.combat.initiate_combat(location, player_level=player_level)
+        monster, phrase = self.combat.initiate_combat(
+            location, player_level=player_level
+        )
 
         if monster:
             # Prepend Weather Flavor to the encounter
@@ -506,9 +604,13 @@ class AdventureSession:
             # --- NIGHT AMBUSH MECHANIC ---
             ambush_chance = 0.20
             # Event Modifier
-            ambush_chance += context.get("active_boosts", {}).get("spectral_ambush_chance", 0.0)
+            ambush_chance += context.get("active_boosts", {}).get(
+                "spectral_ambush_chance", 0.0
+            )
 
-            is_dark = time_phase == TimePhase.NIGHT or self.location_id == "the_wailing_chasm"
+            is_dark = (
+                time_phase == TimePhase.NIGHT or self.location_id == "the_wailing_chasm"
+            )
             has_torch = self.supplies.get("pitch_torch", 0) > 0
 
             # SUPPLY EFFECT: Pitch Torch reduces ambush chance by 50%
@@ -521,12 +623,12 @@ class AdventureSession:
 
             if is_dark and random.random() < ambush_chance:  # nosec B311
                 damage = self._apply_ambush_damage(context, monster, persist)
-                phrase += (
-                    f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
-                )
+                phrase += f"\n⚠️ **AMBUSH!** The {monster['name']} strikes from the shadows! You take **{damage}** damage!"
 
                 if context.get("event_type") == "spectral_tide":
-                    phrase += "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
+                    phrase += (
+                        "\n👻 **Spectral Chill:** The spirits guide the enemy's strike!"
+                    )
 
             # Start new combat
             self.active_monster = monster
@@ -578,7 +680,9 @@ class AdventureSession:
 
         return self._build_result([result["log"]], False, context)
 
-    def _prepare_simulation_context(self, context_bundle: dict | None) -> dict[str, Any] | None:
+    def _prepare_simulation_context(
+        self, context_bundle: dict | None
+    ) -> dict[str, Any] | None:
         if (
             context_bundle
             and "player_stats" in context_bundle
@@ -594,11 +698,17 @@ class AdventureSession:
             return threat_reduction
 
         if self.location_id == "frostfall_expanse":
-            threat_reduction = float(context["active_boosts"].get("frostfall_threat_reduction", 1.0))
+            threat_reduction = float(
+                context["active_boosts"].get("frostfall_threat_reduction", 1.0)
+            )
         elif self.location_id == "the_wailing_chasm":
-            threat_reduction = float(context["active_boosts"].get("wailing_chasm_threat_reduction", 1.0))
+            threat_reduction = float(
+                context["active_boosts"].get("wailing_chasm_threat_reduction", 1.0)
+            )
         elif self.location_id == "silent_city_ouros":
-            threat_reduction = float(context["active_boosts"].get("ouros_threat_reduction", 1.0))
+            threat_reduction = float(
+                context["active_boosts"].get("ouros_threat_reduction", 1.0)
+            )
         return threat_reduction
 
     def _consume_supplies(self):
@@ -612,7 +722,9 @@ class AdventureSession:
                 self.supplies["pitch_torch"] -= 1
                 if self.supplies["pitch_torch"] <= 0:
                     del self.supplies["pitch_torch"]
-                    self.logs.append("🔥 **Your last torch has burned out. The darkness closes in.**")
+                    self.logs.append(
+                        "🔥 **Your last torch has burned out. The darkness closes in.**"
+                    )
 
         # Ration Consumption
         if current_step > 0 and current_step % 4 == 0:
@@ -620,9 +732,13 @@ class AdventureSession:
                 self.supplies["hardtack"] -= 1
                 if self.supplies["hardtack"] <= 0:
                     del self.supplies["hardtack"]
-                    self.logs.append("🍞 **You have run out of rations. Fatigue will build faster.**")
+                    self.logs.append(
+                        "🍞 **You have run out of rations. Fatigue will build faster.**"
+                    )
 
-    def _calculate_regen_threshold(self, context: dict, weather: Weather, time_phase: TimePhase) -> int:
+    def _calculate_regen_threshold(
+        self, context: dict, weather: Weather, time_phase: TimePhase
+    ) -> int:
         """Calculates the dynamic combat threshold based on weather and time."""
         regen_threshold = self.REGEN_CHANCE
 
@@ -665,7 +781,9 @@ class AdventureSession:
             context = self._prepare_simulation_context(context_bundle)
 
             if not context:
-                return self._build_result([["Error: Failed to load player data."]], False, None)
+                return self._build_result(
+                    [["Error: Failed to load player data."]], False, None
+                )
 
             threat_reduction = self._calculate_threat_reduction(context)
 
@@ -696,10 +814,14 @@ class AdventureSession:
                 )
 
             # Dynamic Combat Threshold based on Weather and Time
-            regen_threshold = self._calculate_regen_threshold(context, weather, time_phase)
+            regen_threshold = self._calculate_regen_threshold(
+                context, weather, time_phase
+            )
 
             # --- 2. Trigger New Encounter ---
-            combat_result = self._handle_new_encounter(context, location, regen_threshold, persist, weather, time_phase)
+            combat_result = self._handle_new_encounter(
+                context, location, regen_threshold, persist, weather, time_phase
+            )
             if combat_result:
                 return combat_result
 
@@ -714,7 +836,9 @@ class AdventureSession:
                 None,
             )
 
-    def _attempt_flee(self, context: dict[str, Any], persist: bool = True) -> dict[str, Any]:
+    def _attempt_flee(
+        self, context: dict[str, Any], persist: bool = True
+    ) -> dict[str, Any]:
         """
         Calculates flee chance based on Agility vs Monster Level.
         """
@@ -736,15 +860,21 @@ class AdventureSession:
         if roll <= chance:
             # Success
             self.active_monster = None
-            msg = [f"🏃 **You fled!** (Chance: {chance}%) - You escape into the shadows."]
+            msg = [
+                f"🏃 **You fled!** (Chance: {chance}%) - You escape into the shadows."
+            ]
             self.logs.extend(msg)
             if persist:
                 self.save_state()
             return self._build_result([msg], False, context)
         else:
             # Fail - Trigger a "flee_failed" turn (Player misses turn, Monster attacks)
-            fail_msg = f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
-            return self._process_combat_turn(context, action="flee_failed", prepend_logs=[fail_msg], persist=persist)
+            fail_msg = (
+                f"🚫 **Escape Failed!** (Chance: {chance}%) - The enemy corners you!"
+            )
+            return self._process_combat_turn(
+                context, action="flee_failed", prepend_logs=[fail_msg], persist=persist
+            )
 
     # ======================================================================
     # AUTO COMBAT SEQUENCE
@@ -766,17 +896,28 @@ class AdventureSession:
                 return False
             else:
                 if not background:
-                    sequence.append(["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."])
+                    sequence.append(
+                        ["\n⚠️ **Combat paused:** HP critical. Manual mode engaged."]
+                    )
                 else:
-                    sequence.append(["\n⚠️ **HP Critical! Auto-Retreating to save your life!**"])
+                    sequence.append(
+                        ["\n⚠️ **HP Critical! Auto-Retreating to save your life!**"]
+                    )
                 return True
         return False
 
     def _process_auto_combat_victory(
-        self, result: dict, turn_reports: list, report: dict, sequence: list, context: dict | None = None
+        self,
+        result: dict,
+        turn_reports: list,
+        report: dict,
+        sequence: list,
+        context: dict | None = None,
     ):
         """Processes victory rewards for auto combat."""
-        final_block = [f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(turn_reports)} rounds."]
+        final_block = [
+            f"\n⚔️ **Victory:** Defeated {result['monster_data']['name']} in {len(turn_reports)} rounds."
+        ]
 
         if context and "active_boosts" in context:
             result["active_boosts"] = context["active_boosts"]
@@ -811,13 +952,24 @@ class AdventureSession:
         stance = self.active_monster.get("player_stance", "balanced")
         fatigue_mult = self._calculate_fatigue_multiplier() * threat_reduction
 
-        return context, initial_hp, initial_mp, current_session_exp, fatigue_mult, stance
+        return (
+            context,
+            initial_hp,
+            initial_mp,
+            current_session_exp,
+            fatigue_mult,
+            stance,
+        )
 
     def _apply_turn_results(self, result: dict, context: dict, sequence: list):
         """Updates context vitals and sequence based on the turn result."""
         # Update local vitals for next iteration
-        context["vitals"]["current_hp"] = result.get("hp_current", context["vitals"]["current_hp"])
-        context["vitals"]["current_mp"] = result.get("mp_current", context["vitals"]["current_mp"])
+        context["vitals"]["current_hp"] = result.get(
+            "hp_current", context["vitals"]["current_hp"]
+        )
+        context["vitals"]["current_mp"] = result.get(
+            "mp_current", context["vitals"]["current_mp"]
+        )
 
         # Add narration for this turn
         if result.get("phrases"):
@@ -853,8 +1005,8 @@ class AdventureSession:
         is_dead = False
         player_won = False
 
-        context, initial_hp, initial_mp, current_session_exp, fatigue_mult, stance = self._setup_auto_combat(
-            context, threat_reduction
+        context, initial_hp, initial_mp, current_session_exp, fatigue_mult, stance = (
+            self._setup_auto_combat(context, threat_reduction)
         )
 
         if not context:
@@ -879,7 +1031,9 @@ class AdventureSession:
 
             # Safety: Drop to manual if HP is too low
             max_hp, max_mp = self._get_max_vitals(context)
-            if self._check_auto_potion_during_combat(context, result, max_hp, background, sequence):
+            if self._check_auto_potion_during_combat(
+                context, result, max_hp, background, sequence
+            ):
                 break
 
             should_break, is_dead, player_won = self._check_combat_winner(result)
@@ -893,14 +1047,21 @@ class AdventureSession:
         max_hp, max_mp = self._get_max_vitals(context)
 
         # Auto-Retreat checks
-        if background and not player_won and not is_dead and result["hp_current"] / max_hp < 0.15:
+        if (
+            background
+            and not player_won
+            and not is_dead
+            and result["hp_current"] / max_hp < 0.15
+        ):
             # We broke early due to HP and couldn't potion
             # So next step will be a flee, but we can also just mark it now
             pass
 
         # Final Results Block
         if player_won:
-            self._process_auto_combat_victory(result, turn_reports, report, sequence, context)
+            self._process_auto_combat_victory(
+                result, turn_reports, report, sequence, context
+            )
         elif is_dead:
             sequence.append(["\n💀 **You have been defeated.**"])
 
@@ -912,7 +1073,9 @@ class AdventureSession:
             self.save_state()
 
             # Update vitals only after successful save
-            self.db.update_player_vitals_delta(self.discord_id, delta_hp, delta_mp, max_hp, max_mp)
+            self.db.update_player_vitals_delta(
+                self.discord_id, delta_hp, delta_mp, max_hp, max_mp
+            )
 
         return self._build_result(sequence, is_dead, context)
 
@@ -983,7 +1146,9 @@ class AdventureSession:
         # Let's attach the attribute to the player object in context.
         if context and "player_stats" in context:
             context["player_stats"].is_stunned = is_stunned
-            context["player_stats"].is_silenced = self.active_monster.get("player_silenced", False)
+            context["player_stats"].is_silenced = self.active_monster.get(
+                "player_silenced", False
+            )
 
         # FIX: Pass session XP
         current_session_exp = self.loot.get("exp", 0)
@@ -1023,7 +1188,9 @@ class AdventureSession:
         if prepend_logs:
             turn_logs = prepend_logs + turn_logs
 
-        is_dead, turn_logs = self._handle_combat_turn_outcome(result, report, turn_logs, context)
+        is_dead, turn_logs = self._handle_combat_turn_outcome(
+            result, report, turn_logs, context
+        )
 
         self.logs.extend(turn_logs)
 
@@ -1051,7 +1218,9 @@ class AdventureSession:
                 if s.get("key_id") == "triage":
                     full_skill = SKILLS.get(s.get("key_id"))
                     if full_skill and "passive_bonus" in full_skill:
-                        base_potency = full_skill["passive_bonus"].get("healing_item_potency", 0)
+                        base_potency = full_skill["passive_bonus"].get(
+                            "healing_item_potency", 0
+                        )
                         s_level = s.get("skill_level", 1)
                         if base_potency > 0:
                             scaling_potency = base_potency + (0.02 * (s_level - 1))
@@ -1060,7 +1229,9 @@ class AdventureSession:
             logger.error(f"Error checking passive skills for auto-potion: {e}")
 
         # Add event/global boost
-        healing_multiplier += context.get("active_boosts", {}).get("healing_item_potency", 0.0)
+        healing_multiplier += context.get("active_boosts", {}).get(
+            "healing_item_potency", 0.0
+        )
         return healing_multiplier
 
     def _try_auto_potion(self, context: dict, max_hp: int) -> str | None:
@@ -1121,9 +1292,13 @@ class AdventureSession:
                 steps_completed=getattr(self, "steps_completed", 0),
             )
             if not success:
-                raise RuntimeError("Adventure session state conflict (optimistic lock failed).")
+                raise RuntimeError(
+                    "Adventure session state conflict (optimistic lock failed)."
+                )
             self.version += 1
 
         except Exception as e:
-            logger.error(f"[AdventureSession] Failed to save state for {self.discord_id}: {e}")
+            logger.error(
+                f"[AdventureSession] Failed to save state for {self.discord_id}: {e}"
+            )
             raise e  # Re-raise so simulate_step handles it as a System Error
