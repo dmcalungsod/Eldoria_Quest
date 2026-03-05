@@ -18,6 +18,9 @@ from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class MockDatabaseManager:
+    def get_titles(self, discord_id):
+        return []
+
     def __init__(self):
         self.players = {
             123: {

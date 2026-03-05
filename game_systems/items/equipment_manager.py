@@ -194,6 +194,12 @@ class EquipmentManager:
             # 3. Apply Passive Skill Bonuses
             self._calculate_passive_skill_bonuses(discord_id, stats)
 
+            # 3.5. Apply Title Bonuses (+1 LCK per earned title)
+            titles = self.db.get_titles(discord_id)
+            title_count = len(titles) if titles else 0
+            if title_count > 0:
+                stats.add_bonus_stat("LCK", title_count)
+
             # 4. Save Updates
             self.db.update_player_stats(discord_id, stats.to_dict())
 

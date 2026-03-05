@@ -15,3 +15,8 @@
 
 **Learning:** When evaluating combat feats like "taking 0 damage," the `battle_report` dictionary tracks `damage_taken` properly. It's safer to fetch the player class dynamically via `DatabaseManager.get_player(discord_id)` inside the reward processor than to try extracting it from nested or transient objects. Using a standalone method like `check_combat_achievements` inside `AchievementSystem` keeps `AdventureRewards` clean and focused on dispatching checks.
 **Action:** When implementing new class-specific combat feats, intercept the logic inside `AdventureRewards.process_victory()`, fetch current class data, and delegate the title logic cleanly to the `AchievementSystem`.
+
+## 2026-03-05 — Rogue Expansion Titles
+
+**Learning:** When expanding an existing class or system with new paths, it is important to add new recognition (titles) without removing or overriding existing ones to prevent breaking player progression. "Nightblade" and "Ghost-Walker" had existing relevance, so I simply appended the new "Assassin" and "Phantom" mastery paths so players can receive both. I also confirmed that "Unseen Death" was already handled via the existing "Without a Trace" title to ensure no redundant notifications are introduced.
+**Action:** Always check the current progression and title definitions before adding new ones. If existing titles map loosely to new classes, consider keeping both to respect past efforts while enriching future content.

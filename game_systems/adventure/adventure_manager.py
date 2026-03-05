@@ -403,12 +403,15 @@ class AdventureManager:
                 ach_system = AchievementSystem(self.db)
                 new_title_msg = ach_system.check_exploration_achievements(discord_id)
                 new_duration_msg = ach_system.check_duration_achievements(discord_id, duration_min)
+                new_auto_msg = ach_system.check_auto_adventure_achievements(discord_id)
 
                 msgs = []
                 if new_title_msg:
                     msgs.append(new_title_msg)
                 if new_duration_msg:
                     msgs.append(new_duration_msg)
+                if new_auto_msg:
+                    msgs.append(new_auto_msg)
 
                 if msgs:
                     summary["new_titles"] = "\n".join(msgs)
