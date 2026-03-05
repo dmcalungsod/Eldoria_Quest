@@ -448,8 +448,8 @@ class AdventureManager:
 
         # FIX: Restore HP/MP on level up, otherwise preserve current values
         # Prevents "free healing" exploit by ending adventure without leveling
-        target_mp = level_sys.stats.max_mp if leveled_up else p_row["current_mp"]
-        target_hp = level_sys.stats.max_hp if leveled_up else saved_hp
+        target_mp = max(level_sys.stats.max_mp, p_row["current_mp"]) if leveled_up else p_row["current_mp"]
+        target_hp = max(level_sys.stats.max_hp, saved_hp) if leveled_up else saved_hp
 
         self.db.update_player_mixed(
             session.discord_id,
