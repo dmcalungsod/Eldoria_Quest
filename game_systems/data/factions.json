@@ -307,5 +307,52 @@
             "deepgrove_roots",
             "forgotten_ossuary"
         ]
+    },
+    "spore_gatherers": {
+        "name": "The Spore-Gatherers",
+        "emoji": "🍄",
+        "description": "A loosely organized group of black-market alchemists and reckless foragers who brave The Undergrove.",
+        "ranks": {
+            "1": {
+                "title": "Forager",
+                "reputation_needed": 0,
+                "reward": null
+            },
+            "2": {
+                "title": "Toxin-Taster",
+                "reputation_needed": 500,
+                "reward": {
+                    "type": "item",
+                    "key": "fungal_spores",
+                    "amount": 5
+                }
+            },
+            "3": {
+                "title": "Mycelium Weaver",
+                "reputation_needed": 1500,
+                "reward": {
+                    "type": "item",
+                    "key": "purifying_brew",
+                    "amount": 2
+                }
+            },
+            "4": {
+                "title": "Spore-Lord",
+                "reputation_needed": 3000,
+                "reward": {
+                    "type": "buff",
+                    "key": "toxin_filtration",
+                    "value": 0.1
+                }
+            }
+        },
+        "interests": {
+            "gathering": 1.5,
+            "crafting": 1.2,
+            "combat": 0.8
+        },
+        "favored_locations": [
+            "the_undergrove"
+        ]
     }
 }
