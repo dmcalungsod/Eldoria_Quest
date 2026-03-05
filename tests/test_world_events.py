@@ -73,6 +73,20 @@ class TestWorldEventSystem(unittest.TestCase):
         mods = self.system.get_modifiers()
         self.assertEqual(mods["loot_boost"], 2.0)
 
+    def test_fungal_bloom_event(self):
+        future_time = (datetime.datetime.now() + datetime.timedelta(hours=1)).isoformat()
+        self.mock_db.get_active_world_event.return_value = {
+            "type": "fungal_bloom",
+            "end_time": future_time,
+            "active": 1,
+        }
+        event = self.system.get_current_event()
+        self.assertIsNotNone(event)
+        self.assertEqual(event["type"], "fungal_bloom")
+        self.assertIn("modifiers", event)
+        self.assertEqual(event["modifiers"]["undergrove_threat_reduction"], 0.8)
+        self.assertEqual(event["modifiers"]["undergrove_loot_bonus"], 2.0)
+
 
 if __name__ == "__main__":
     unittest.main()

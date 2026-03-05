@@ -38,6 +38,7 @@ import test_dos_prevention  # New DoS prevention tests
 import test_echoes_of_the_deep_event
 import test_event_cog
 import test_exploration_view_ux  # New UX test
+import test_fungal_bloom_event
 import test_faction_system  # New Faction System tests
 import test_game_systems
 import test_general_cog
@@ -220,6 +221,7 @@ def run_cog_tests():
     suite.addTests(loader.loadTestsFromModule(test_general_cog))
     suite.addTests(loader.loadTestsFromModule(test_echoes_of_the_deep_event))
     suite.addTests(loader.loadTestsFromModule(test_time_quake_event))
+    suite.addTests(loader.loadTestsFromModule(test_fungal_bloom_event))
     suite.addTests(loader.loadTestsFromModule(test_guild_hub_cog))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

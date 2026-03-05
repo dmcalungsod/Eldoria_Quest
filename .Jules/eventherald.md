@@ -11,3 +11,8 @@
 
 **Learning:** When adding location-specific events (e.g., threat reduction or loot bonus for a single zone like Ouros), placing logical checks inside `simulate_step` and `_process_loot_and_quests` effectively ensures those regions offer temporary mechanical incentives that can be safely overridden globally. Testing these hooks thoroughly requires mocking out variables inside `AdventureSession` directly to check passing context variables.
 **Action:** Moving forward, similar location-specific buffs can be structured this way, but they should eventually be migrated into a centralized status effect processor rather than polluting `adventure_session.py` with individual `if location_id == X:` checks.
+
+## 2026-03-05 — The Fungal Bloom
+
+**Learning:** Implementing location-specific event modifiers (like increased loot and threat reduction only in The Undergrove) requires passing specific keys through the `WorldEventSystem.EVENT_CONFIGS` into the active buffs context. Hooking into these requires explicitly grabbing them via `combat_result.get("active_boosts", {}).get("undergrove_loot_bonus", 1.0)` during loot processing, and similarly checking for `undergrove_threat_reduction` during `AdventureSession._calculate_threat_reduction`.
+**Action:** Ensure future event implementations that rely on location context add those custom tags into `EVENT_CONFIGS` properly and then hook them where appropriate in the processing pipeline.
