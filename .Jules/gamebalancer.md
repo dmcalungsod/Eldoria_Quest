@@ -42,3 +42,8 @@
 
 **Learning:** When item values were previously buffed systemically, it created extreme dead zones because certain mid/end-game regions (Shrouded Fen, Clockwork Halls, Void Sanctum) had highly restricted drop rates that didn't scale effectively with the new item values, whereas other zones (Molten Caldera) accidentally maintained their high yields. This meant pushing to new zones strictly penalized players rather than rewarding them.
 **Action:** When item values (`materials.json`) undergo systemic changes, always re-run `analyze_economy.py` to identify newly formed cliffs. Rebalance gatherables and monster weights concurrently to smooth out the Expected Value (EV) progression curve. Re-aligned The Shrouded Fen, The Clockwork Halls, The Void Sanctum, Thunder-Crag Coast, Shimmering Wastes, and Celestial Archipelago to meet scaling EV targets.
+
+## 2026-03-04 — Auto-Adventure Economy Rebalance
+
+**Learning:** EV tuning requires extreme precision after global material sell value updates. `analyze_economy.py` skips EV calculation for monsters not listed in `monsters.json` (like the ones intended for The Silent City of Ouros), making entire end-game locations deceptively poor in Total EV and causing massive progression cliffs between Rank A and Rank S zones.
+**Action:** Always verify that newly introduced locations have their intended monsters explicitly created in the data files before trusting economy analyzer scripts. Rebalanced The Shrouded Fen, The Clockwork Halls, The Celestial Archipelago, and The Void Sanctum, and added missing Ouros monsters to ensure progression is rewarding and fair at higher ranks.
