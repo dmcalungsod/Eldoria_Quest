@@ -140,3 +140,18 @@
 **Notes:**
 - The Undergrove region is a significant addition that requires extensive cross-agent coordination to fully implement all its toxic and fungal mechanics.
 - The Mentor's new onboarding flow needs careful testing by BugHunter to ensure the UI behaves perfectly for new players.
+
+## 2026-03-11
+**Summary:**
+- Scanned recent agent logs (2026-03-11).
+- Identified 1 new issue requiring tracking: a database integration task for Guild Halls.
+- Appended issues to `NEW_ISSUES.md`.
+
+**Created Issues:**
+- **[Feature] Add player_halls database implementation for Building Materials** (Source: Artisan)
+
+**Duplicates Skipped:**
+- The Undergrove region mechanics were already reported and assigned yesterday.
+
+**Notes:**
+- The player_halls integration marks a key step forward for the Guild Halls expansion.
