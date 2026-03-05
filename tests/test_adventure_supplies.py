@@ -70,9 +70,9 @@ class TestAdventureSupplies(unittest.TestCase):
         }
         session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
 
-        # 20 steps (4 over threshold of 16)
-        # Bonus = (4/4) * 0.05 = 0.05. Total 1.05
-        session.steps_completed = 20
+        # 300 steps (60 over threshold of 240)
+        # Bonus = (60/60) * 0.05 = 0.05. Total 1.05
+        session.steps_completed = 300
         mult = session._calculate_fatigue_multiplier()
         self.assertAlmostEqual(mult, 1.05, places=4)
 
@@ -88,9 +88,9 @@ class TestAdventureSupplies(unittest.TestCase):
         }
         session = AdventureSession(self.db, None, None, 12345, row_data=row_data)
 
-        # 20 steps
+        # 300 steps
         # Bonus = 0.05 * 0.8 = 0.04. Total 1.04
-        session.steps_completed = 20
+        session.steps_completed = 300
         mult = session._calculate_fatigue_multiplier()
         self.assertAlmostEqual(mult, 1.04, places=4)
 

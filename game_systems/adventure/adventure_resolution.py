@@ -102,8 +102,8 @@ class AdventureResolutionEngine:
             logger.warning(f"Skipping infinite adventure resolution for {discord_id}")
             return False
 
-        # 15 mins per step
-        total_steps = math.ceil(duration_mins / 15)
+        # 1 min per step
+        total_steps = int(duration_mins)
         # Ensure at least 1 step if duration > 0
         total_steps = max(1, total_steps)
 
