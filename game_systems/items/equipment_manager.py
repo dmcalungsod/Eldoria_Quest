@@ -1,6 +1,8 @@
 """
 game_systems/items/equipment_manager.py
 
+
+.errors
 Handles equipping/unequipping and stat recalculation.
 Hardened: Atomic equipment swaps via MongoDB DatabaseManager methods.
 """
@@ -8,6 +10,7 @@ Hardened: Atomic equipment swaps via MongoDB DatabaseManager methods.
 import logging
 import math
 
+import pymongo
 import pymongo.errors
 
 from database.database_manager import MAX_STACK_EQUIPMENT, DatabaseManager
@@ -186,96 +189,106 @@ class EquipmentManager:
                 stat.bonus = 0
 
             # 2. Apply Equipped Item Bonuses
-            equipped_items = self.db.get_equipped_items(discord_id)
-
-            for item in equipped_items:
-                table = item.get("item_source_table")
-                if table not in self.VALID_TABLES:
-                    continue
-
-                try:
-                    item_id = int(item["item_key"])
-                except ValueError:
-                    logger.warning(f"Skipping invalid item key '{item.get('item_key')}' for user {discord_id}")
-                    continue
-
-                item_data = self.db._col(table).find_one({"id": item_id}, {"_id": 0})
-                if item_data:
-                    # Calculate Quality Scaling
-                    base_rarity = item_data.get("rarity", "Common")
-                    current_rarity = item.get("rarity", base_rarity)
-
-                    base_tier = self.RARITY_TIERS.get(base_rarity, 1)
-                    current_tier = self.RARITY_TIERS.get(current_rarity, 1)
-
-                    multiplier = 1.0
-                    if current_tier > base_tier:
-                        base_mult = self.QUALITY_MULTIPLIERS.get(base_rarity, 1.0)
-                        curr_mult = self.QUALITY_MULTIPLIERS.get(current_rarity, 1.0)
-                        if base_mult > 0:
-                            multiplier = curr_mult / base_mult
-
-                    for col, stat_name in self.STAT_MAP.items():
-                        if col in item_data and item_data[col]:
-                            base_val = item_data[col]
-                            # Apply multiplier and round up
-                            final_val = math.ceil(base_val * multiplier)
-                            stats.add_bonus_stat(stat_name, final_val)
+            self._calculate_equipped_item_bonuses(discord_id, stats)
 
             # 3. Apply Passive Skill Bonuses
-            player_skills = self.db.get_all_player_skills(discord_id)
-
-            for p_skill in player_skills:
-                skill_data = SKILLS.get(p_skill["skill_key"])
-                if skill_data and skill_data.get("type") == "Passive" and "passive_bonus" in skill_data:
-                    level = p_skill["skill_level"]
-
-                    for stat_key, percent in skill_data["passive_bonus"].items():
-                        if stat_key.endswith("_percent"):
-                            stat_name = stat_key.split("_")[0].upper()
-                            current_total = self._get_base_stat(stats, stat_name)
-                            bonus = math.ceil(current_total * (percent * level))
-                            stats.add_bonus_stat(stat_name, bonus)
+            self._calculate_passive_skill_bonuses(discord_id, stats)
 
             # 4. Save Updates
             self.db.update_player_stats(discord_id, stats.to_dict())
 
             # 5. Clamp HP/MP if necessary (Avoid Overflow Exploit)
-            # Fetch current vitals to check if they exceed new max
-            vitals = self.db.get_player_vitals(discord_id)
-            if vitals:
-                current_hp = vitals.get("current_hp", 0)
-                current_mp = vitals.get("current_mp", 0)
-
-                # Calculate Effective Max HP/MP (Stats + Buffs) for Clamping
-                effective_stats = PlayerStats.from_dict(stats.to_dict())
-                active_buffs = self.db.get_active_buffs(discord_id)
-
-                for buff in active_buffs:
-                    stat_name = buff.get("stat", "").upper()
-                    amount = int(buff.get("amount", 0))
-
-                    # Apply to Primary Stats (STR, END, etc.)
-                    # PlayerStats calculates derived HP/MP from these
-                    # Note: We do not handle direct "HP" or "MP" buffs here unless PlayerStats supports it.
-                    # Currently PlayerStats only supports primary stats + DEF in add_bonus_stat.
-                    if stat_name in ["STR", "END", "DEX", "AGI", "MAG", "LCK", "DEF"]:
-                        effective_stats.add_bonus_stat(stat_name, amount)
-
-                new_hp = min(current_hp, effective_stats.max_hp)
-                new_mp = min(current_mp, effective_stats.max_mp)
-
-                if new_hp != current_hp or new_mp != current_mp:
-                    self.db.set_player_vitals(discord_id, new_hp, new_mp)
-                    logger.info(
-                        f"Clamped vitals for {discord_id}: HP {current_hp}->{new_hp}, MP {current_mp}->{new_mp}"
-                    )
+            self._clamp_vitals_to_max(discord_id, stats)
 
             return stats
 
         except Exception as e:
             logger.error(f"Stat calc failed for {discord_id}: {e}", exc_info=True)
             return PlayerStats()
+
+
+    def _calculate_equipped_item_bonuses(self, discord_id: int, stats: PlayerStats):
+        equipped_items = self.db.get_equipped_items(discord_id)
+
+        for item in equipped_items:
+            table = item.get("item_source_table")
+            if table not in self.VALID_TABLES:
+                continue
+
+            try:
+                item_id = int(item["item_key"])
+            except ValueError:
+                logger.warning(f"Skipping invalid item key '{item.get('item_key')}' for user {discord_id}")
+                continue
+
+            item_data = self.db._col(table).find_one({"id": item_id}, {"_id": 0})
+            if item_data:
+                # Calculate Quality Scaling
+                base_rarity = item_data.get("rarity", "Common")
+                current_rarity = item.get("rarity", base_rarity)
+
+                base_tier = self.RARITY_TIERS.get(base_rarity, 1)
+                current_tier = self.RARITY_TIERS.get(current_rarity, 1)
+
+                multiplier = 1.0
+                if current_tier > base_tier:
+                    base_mult = self.QUALITY_MULTIPLIERS.get(base_rarity, 1.0)
+                    curr_mult = self.QUALITY_MULTIPLIERS.get(current_rarity, 1.0)
+                    if base_mult > 0:
+                        multiplier = curr_mult / base_mult
+
+                for col, stat_name in self.STAT_MAP.items():
+                    if col in item_data and item_data[col]:
+                        base_val = item_data[col]
+                        # Apply multiplier and round up
+                        final_val = math.ceil(base_val * multiplier)
+                        stats.add_bonus_stat(stat_name, final_val)
+
+    def _calculate_passive_skill_bonuses(self, discord_id: int, stats: PlayerStats):
+        player_skills = self.db.get_all_player_skills(discord_id)
+
+        for p_skill in player_skills:
+            skill_data = SKILLS.get(p_skill["skill_key"])
+            if skill_data and skill_data.get("type") == "Passive" and "passive_bonus" in skill_data:
+                level = p_skill["skill_level"]
+
+                for stat_key, percent in skill_data["passive_bonus"].items():
+                    if stat_key.endswith("_percent"):
+                        stat_name = stat_key.split("_")[0].upper()
+                        current_total = self._get_base_stat(stats, stat_name)
+                        bonus = math.ceil(current_total * (percent * level))
+                        stats.add_bonus_stat(stat_name, bonus)
+
+    def _clamp_vitals_to_max(self, discord_id: int, stats: PlayerStats):
+        # Fetch current vitals to check if they exceed new max
+        vitals = self.db.get_player_vitals(discord_id)
+        if vitals:
+            current_hp = vitals.get("current_hp", 0)
+            current_mp = vitals.get("current_mp", 0)
+
+            # Calculate Effective Max HP/MP (Stats + Buffs) for Clamping
+            effective_stats = PlayerStats.from_dict(stats.to_dict())
+            active_buffs = self.db.get_active_buffs(discord_id)
+
+            for buff in active_buffs:
+                stat_name = buff.get("stat", "").upper()
+                amount = int(buff.get("amount", 0))
+
+                # Apply to Primary Stats (STR, END, etc.)
+                # PlayerStats calculates derived HP/MP from these
+                # Note: We do not handle direct "HP" or "MP" buffs here unless PlayerStats supports it.
+                # Currently PlayerStats only supports primary stats + DEF in add_bonus_stat.
+                if stat_name in ["STR", "END", "DEX", "AGI", "MAG", "LCK", "DEF"]:
+                    effective_stats.add_bonus_stat(stat_name, amount)
+
+            new_hp = min(current_hp, effective_stats.max_hp)
+            new_mp = min(current_mp, effective_stats.max_mp)
+
+            if new_hp != current_hp or new_mp != current_mp:
+                self.db.set_player_vitals(discord_id, new_hp, new_mp)
+                logger.info(
+                    f"Clamped vitals for {discord_id}: HP {current_hp}->{new_hp}, MP {current_mp}->{new_mp}"
+                )
 
     def equip_item(self, discord_id: int, inventory_db_id: int) -> tuple[bool, str]:
         """
@@ -322,52 +335,18 @@ class EquipmentManager:
             full_item_data = (static_data or {}).copy()
             full_item_data.update(item)
 
-            # 1. Validate Requirements (Level, Rank)
-            can_equip, reason = self.check_requirements(full_item_data, player_data)
-            if not can_equip:
-                return False, f"Cannot equip: {reason}"
+            valid, msg = self._validate_equip_requirements(discord_id, item, full_item_data, player_data)
+            if not valid:
+                return False, msg
 
-            # 2. Validate Class Permissions (Slots)
-            allowed = self._get_player_allowed_slots(discord_id)
-            if item["slot"] not in allowed:
-                return False, f"Your class cannot equip {item['slot']} items."
-
-            # Resolve Slot Conflicts
-            conflicts_msg = ""
-            target_slot = item["slot"]
             equipped_items = self.db.get_equipped_items(discord_id)
+            valid, msg, conflicts_msg = self._resolve_equip_slot_conflicts(discord_id, item, equipped_items)
+            if not valid:
+                return False, msg
 
-            # Accessories: check uniqueness and capacity, no slot clearing
-            if target_slot == "accessory":
-                current_accessories = [i for i in equipped_items if i.get("slot") == "accessory"]
-                for acc in current_accessories:
-                    if acc["item_key"] == item["item_key"]:
-                        return False, "You cannot equip two of the same accessory."
-                if len(current_accessories) >= self.MAX_ACCESSORY_SLOTS:
-                    return (
-                        False,
-                        f"Accessory slots full ({self.MAX_ACCESSORY_SLOTS}/{self.MAX_ACCESSORY_SLOTS}). Unequip one first.",
-                    )
-            else:
-                slots_to_check = self._resolve_conflict_slots(target_slot)
-                for eq_item in equipped_items:
-                    if eq_item.get("slot") in slots_to_check:
-                        try:
-                            self._unequip_logic(discord_id, eq_item["id"])
-                            conflicts_msg += f" (Unequipped {eq_item['item_name']})"
-                        except Exception as e:
-                            logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
-
-            # Equip the new item
-            if item.get("count", 1) > 1:
-                # Split stack safely with compensation
-                if not self.db.split_stack_to_equipped(discord_id, inventory_db_id, item):
-                    return False, "Failed to process equipment split. Please try again."
-            else:
-                try:
-                    self.db.set_item_equipped(inventory_db_id, 1)
-                except pymongo.errors.DuplicateKeyError:
-                    return False, "Equipment slot update conflict."
+            valid, msg = self._execute_equip_db_update(discord_id, inventory_db_id, item)
+            if not valid:
+                return False, msg
 
             # Recalculate stats
             self.recalculate_player_stats(discord_id)
@@ -376,6 +355,62 @@ class EquipmentManager:
         except Exception as e:
             logger.error(f"Equip error: {e}", exc_info=True)
             return False, "An error occurred."
+
+
+    def _validate_equip_requirements(self, discord_id: int, item: dict, full_item_data: dict, player_data: dict) -> tuple[bool, str]:
+        # 1. Validate Requirements (Level, Rank)
+        can_equip, reason = self.check_requirements(full_item_data, player_data)
+        if not can_equip:
+            return False, f"Cannot equip: {reason}"
+
+        # 2. Validate Class Permissions (Slots)
+        allowed = self._get_player_allowed_slots(discord_id)
+        if item["slot"] not in allowed:
+            return False, f"Your class cannot equip {item['slot']} items."
+
+        return True, ""
+
+    def _resolve_equip_slot_conflicts(self, discord_id: int, item: dict, equipped_items: list) -> tuple[bool, str, str]:
+        conflicts_msg = ""
+        target_slot = item["slot"]
+
+        # Accessories: check uniqueness and capacity, no slot clearing
+        if target_slot == "accessory":
+            current_accessories = [i for i in equipped_items if i.get("slot") == "accessory"]
+            for acc in current_accessories:
+                if acc["item_key"] == item["item_key"]:
+                    return False, "You cannot equip two of the same accessory.", conflicts_msg
+            if len(current_accessories) >= self.MAX_ACCESSORY_SLOTS:
+                return (
+                    False,
+                    f"Accessory slots full ({self.MAX_ACCESSORY_SLOTS}/{self.MAX_ACCESSORY_SLOTS}). Unequip one first.",
+                    conflicts_msg
+                )
+        else:
+            slots_to_check = self._resolve_conflict_slots(target_slot)
+            for eq_item in equipped_items:
+                if eq_item.get("slot") in slots_to_check:
+                    try:
+                        self._unequip_logic(discord_id, eq_item["id"])
+                        conflicts_msg += f" (Unequipped {eq_item['item_name']})"
+                    except Exception as e:
+                        logger.error(f"Failed to auto-unequip {eq_item['item_name']}: {e}")
+
+        return True, "", conflicts_msg
+
+    def _execute_equip_db_update(self, discord_id: int, inventory_db_id: int, item: dict) -> tuple[bool, str]:
+        if item.get("count", 1) > 1:
+            # Split stack safely with compensation
+            if not self.db.split_stack_to_equipped(discord_id, inventory_db_id, item):
+                return False, "Failed to process equipment split. Please try again."
+        else:
+            try:
+
+                self.db.set_item_equipped(inventory_db_id, 1)
+            except pymongo.errors.DuplicateKeyError:
+                return False, "Equipment slot update conflict."
+
+        return True, ""
 
     def unequip_item(self, discord_id: int, inventory_db_id: int) -> tuple[bool, str]:
         """Unequips an item safely."""
