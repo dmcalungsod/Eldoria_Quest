@@ -214,5 +214,17 @@
     "name": "Echolocation Helm Recipe",
     "rarity": "Epic",
     "notes": "A scroll detailing how to craft the Echolocation Helm using Abyssal Ore."
+  },
+  "raw_star_metal_block": {
+    "id": "raw_star_metal_block",
+    "name": "Raw Star Metal Block",
+    "rarity": "Epic",
+    "notes": "A dense, incredibly heavy chunk of unrefined Star Metal. It is cold to the touch and slightly glowing."
+  },
+  "vial_of_drake_blood": {
+    "id": "vial_of_drake_blood",
+    "name": "Vial of Drake Blood",
+    "rarity": "Epic",
+    "notes": "A magically sealed vial containing the crackling, lightning-infused blood of a Storm Drake."
   }
 }

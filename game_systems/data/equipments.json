@@ -571,5 +571,31 @@
             "toxin_filtration": 1
         },
         "description": "A heavy mask with charcoal filters. Essential for breathing the toxic air of The Undergrove."
+    },
+    "frost_forged_bulwark": {
+        "name": "Frost-forged Bulwark",
+        "slot": "offhand",
+        "rarity": "Epic",
+        "level_req": 30,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "END": 60,
+            "HP": 100,
+            "thermal_insulation": 1
+        },
+        "description": "A massive shield forged in the Aegis-Heart. It radiates a protective aura."
+    },
+    "storm_chasers_mantle": {
+        "name": "Storm-Chaser's Mantle",
+        "slot": "armor",
+        "rarity": "Epic",
+        "level_req": 30,
+        "rank_restriction": "A",
+        "stats_bonus": {
+            "AGI": 50,
+            "STR": 30,
+            "thermal_insulation": 1
+        },
+        "description": "A cloak worn by the Drake-Riders. It hums with latent lightning and protects against the biting cold."
     }
 }
