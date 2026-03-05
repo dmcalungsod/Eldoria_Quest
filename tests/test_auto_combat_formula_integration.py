@@ -1,0 +1,34 @@
+import pytest
+from game_systems.combat.auto_combat_formula import AutoCombatFormula
+import unittest.mock as mock
+
+class TestAutoCombatFormulaIntegration:
+    def test_kill_heal_percent_integration(self):
+        player_stats = {"STR": 50, "END": 20, "DEF": 10, "AGI": 10, "DEX": 10, "MAG": 10, "LCK": 5, "HP": 1000}
+        monster = {"name": "Test Goblin", "HP": 100, "ATK": 10, "DEF": 5, "tier": "Normal"}
+        player_skills = [{"name": "Bloodlust", "type": "Passive", "passive_bonus": {"kill_heal_percent": 0.05}}]
+        with mock.patch("random.uniform", return_value=1.0):
+            result_baseline = AutoCombatFormula.resolve_clash(player_stats, monster)
+            result_with_heal = AutoCombatFormula.resolve_clash(player_stats, monster, player_skills)
+
+            assert result_with_heal["damage_taken"] == max(0, result_baseline["damage_taken"] - 50)
+
+    def test_self_damage_percent_integration(self):
+        player_stats = {"STR": 50, "END": 20, "DEF": 10, "AGI": 10, "DEX": 10, "MAG": 10, "LCK": 5, "HP": 1000}
+        monster = {"name": "Test Goblin", "HP": 1000, "ATK": 10, "DEF": 5, "tier": "Normal"}
+        player_skills = [{"name": "Reckless Swing", "self_damage_percent": 0.1, "power_multiplier": 1.5}]
+        with mock.patch("random.uniform", return_value=1.0):
+            result_baseline = AutoCombatFormula.resolve_clash(player_stats, monster)
+            result_with_recoil = AutoCombatFormula.resolve_clash(player_stats, monster, player_skills)
+
+            turns_baseline = result_baseline["turns_to_kill"]
+            turns_recoil = result_with_recoil["turns_to_kill"]
+
+            assert turns_recoil <= turns_baseline
+            recoil_uses = max(1, int(turns_recoil * 0.25))
+            expected_recoil_damage = recoil_uses * 100
+
+            monster_dps = result_with_recoil["monster_dps"]
+            base_damage_taken = int(turns_recoil * monster_dps)
+
+            assert result_with_recoil["damage_taken"] == base_damage_taken + expected_recoil_damage
