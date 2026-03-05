@@ -12,3 +12,7 @@
 
 **Learning:** It is crucial to ensure variables derived from system state like `time_phase` and `weather` can trickle down appropriately through object and event handling pipelines (`AdventureSession` -> `EventHandler` -> `ExplorationEvents`) for a fully immersive implementation of condition-based events.
 **Action:** Keep these context variables easily accessible from lower-level functions so that individual classes or utility functions can cleanly leverage conditions without making multiple repeated system time calls and violating atomic rules.
+## 2026-03-12 — Weather added to new locations
+
+**Learning:** When new adventure locations like The Wailing Chasm and The Silent City of Ouros are added to `adventure_locations.json`, they must also be registered in `LOCATION_WEATHER_WEIGHTS` inside `game_systems/core/world_time.py` with custom weather distributions, otherwise they default to generic weather rules.
+**Action:** Always check for newly added locations in the location JSON or recent Foreman plans to ensure they are properly integrated into the dynamic weather system.
