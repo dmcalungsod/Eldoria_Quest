@@ -224,8 +224,21 @@ class AdventureEmbeds:
             color=color,
         )
 
+        # Calculate expected steps taken based on time elapsed (1 step per minute)
+        start_time = datetime.datetime.fromisoformat(session["start_time"])
+        elapsed = now - start_time
+        elapsed_minutes = max(0, int(elapsed.total_seconds() / 60))
+
+        # Cap elapsed steps to duration limit if bounded
+        duration_mins = session.get("duration_minutes", 60)
+        if duration_mins > 0:
+            elapsed_minutes = min(elapsed_minutes, duration_mins)
+
+        # The DB steps_completed might only update when resolving. Show expected progress.
+        display_steps = max(session.get('steps_completed', 0), elapsed_minutes)
+
         embed.add_field(name="⏳ Time Remaining", value=f"`{remaining_str}`", inline=True)
-        embed.add_field(name="👣 Steps Taken", value=f"`{session.get('steps_completed', 0)}`", inline=True)
+        embed.add_field(name="👣 Steps Taken", value=f"`{display_steps}`", inline=True)
 
         # Player Vitals & Kills
         # The session should have these in context if updated during simulation, but since we are fetching just the session
