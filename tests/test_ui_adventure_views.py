@@ -48,9 +48,24 @@ class MockView:
 
 
 # Mock discord module
+class MockEmbed:
+    def __init__(self, **kwargs):
+        self.title = kwargs.get("title")
+        self.description = kwargs.get("description")
+        self.color = kwargs.get("color")
+        self.fields = []
+
+    def add_field(self, name, value, inline=False):
+        field = MagicMock()
+        field.name = name
+        field.value = value
+        field.inline = inline
+        self.fields.append(field)
+
 mock_discord = MagicMock()
 mock_discord.ButtonStyle = MagicMock()
 mock_discord.Color = MagicMock()
+mock_discord.Embed = MockEmbed
 mock_discord.ui.View = MockView
 mock_discord.ui.Button = MockButton
 mock_discord.ui.Select = MockSelect
@@ -253,3 +268,78 @@ class TestAdventureSetupView(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class TestAdventureMenuView(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.mock_db = MagicMock()
+        self.mock_manager = MagicMock()
+        self.mock_user = MagicMock()
+        self.mock_user.id = 12345
+        self.mock_interaction = AsyncMock()
+        self.mock_interaction.user = self.mock_user
+        self.mock_interaction.client = MagicMock()
+        self.mock_interaction.response = AsyncMock()
+        self.mock_interaction.edit_original_response = AsyncMock()
+        self.mock_interaction.followup = AsyncMock()
+
+        # Mock cog manager
+        mock_cog = MagicMock()
+        mock_cog.manager = self.mock_manager
+        self.mock_interaction.client.get_cog.return_value = mock_cog
+
+    @patch("game_systems.character.ui.adventure_menu.AdventureSetupView")
+    async def test_start_adventure_callback_new_player(self, MockSetupView):
+        """Test start_adventure_callback for a new player with 0 expeditions."""
+        from game_systems.character.ui.adventure_menu import AdventureView
+
+        # Setup mocks for parallel DB fetch
+        self.mock_db.get_guild_member_data.return_value = {"rank": "F"}
+        self.mock_db.get_player.return_value = {"level": 1}
+        self.mock_db.get_inventory_items.return_value = []
+        self.mock_db.calculate_inventory_limit.return_value = 20
+        self.mock_db.get_inventory_slot_count.return_value = 5
+
+        # This is the key mock: return 0 expeditions
+        self.mock_db.get_exploration_stats.return_value = {
+            "unique_locations": [],
+            "total_expeditions": 0
+        }
+
+        # Ensure no active session
+        self.mock_manager.get_active_session.return_value = None
+
+        view = AdventureView(self.mock_db, self.mock_user, active_session=False)
+
+        await view.start_adventure_callback(self.mock_interaction)
+
+        # Ensure interaction was deferred
+        self.mock_interaction.response.defer.assert_called_once()
+
+        # Ensure edit_original_response was called with an embed and view
+        self.mock_interaction.edit_original_response.assert_called_once()
+        args, kwargs = self.mock_interaction.edit_original_response.call_args
+
+        embed = kwargs.get("embed")
+        self.assertIsNotNone(embed)
+
+        # In a test suite where discord is heavily mocked globally,
+        # embed.add_field might be a MagicMock instead of our custom class method.
+        # Check if add_field was called.
+        if hasattr(embed.add_field, 'call_args_list') and embed.add_field.call_args_list:
+            # It's a MagicMock, let's verify the calls
+            mentor_call = None
+            for call in embed.add_field.call_args_list:
+                _, call_kwargs = call
+                if "Mentor's Advice" in call_kwargs.get("name", ""):
+                    mentor_call = call_kwargs
+                    break
+            self.assertIsNotNone(mentor_call, "Mentor's Advice field was not added.")
+            self.assertIn("The Whispering Forest", mentor_call.get("value", ""))
+            self.assertIn("30 Minutes", mentor_call.get("value", ""))
+        else:
+            # It might be our custom MockEmbed
+            fields = getattr(embed, "fields", [])
+            mentor_field = next((f for f in fields if getattr(f, "name", "") and "Mentor's Advice" in f.name), None)
+            self.assertIsNotNone(mentor_field, "Mentor's Advice field was not found in the embed for new player.")
+            self.assertIn("The Whispering Forest", mentor_field.value)
+            self.assertIn("30 Minutes", mentor_field.value)
