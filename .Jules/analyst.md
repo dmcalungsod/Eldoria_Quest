@@ -104,3 +104,12 @@ This journal documents key insights, successful methodologies, and lessons learn
   - Live player data shows 100% representation for Warrior, indicating a need to carefully balance Alchemist and Rogue class updates to encourage diversity.
   - End-game progression heavily relies on Boss drops, such as `magic_stone_flawless` or unique core items.
 - **Next Steps:** Provided recommendations to @GameBalancer to buff the identified progression gaps. Asked @Architect and @GameForge to ensure new classes are attractive and to verify drops for The Silent City of Ouros. Published detailed report `.Jules/analysis/2026-03-02_gameplay_and_economy_metrics.md`.
+
+## 2026-03-05: The Silent City of Ouros Economy Investigation
+- **Focus:** Investigated the dramatically depressed Expected Value (EV) of The Silent City of Ouros (Task 2.2f)
+- **Methodology:** Ran a script `scripts/analysis/find_missing_location_monsters.py` to identify missing entity references, discovering that 3 out of 4 designated monsters for the zone were not implemented. Created `scripts/analysis/calculate_silent_city_ev.py` to mock these monsters and calculate the theoretical EV of the location.
+- **Findings:**
+  - The monsters `temporal_wraith`, `hollowed_sentinel`, and `abyssal_creeper` are entirely absent from `monsters.json`.
+  - Because of these absent entities, their combat encounters resulted in 0 EV drops during economy simulation, dropping the zone's EV to 1660.4 Aurum/Hr (compared to Void Sanctum's 2599.3).
+  - Injecting mock implementations for these missing monsters (dropping `chronal_dust`, `perfected_glass`, `ancient_ourosan_coin`, and `magic_stone_flawless`) boosted the theoretical EV of the zone to ~2771 Aurum/Hr, confirming the missing entities as the root cause of the broken progression curve.
+- **Next Steps:** Provided recommendations to @GameForge to implement the missing monsters and assigned them high-value drops. Asked @GameBalancer to confirm EV balances once complete. Published detailed report `.Jules/analysis/2026-03-05_silent_city_economy.md`.
