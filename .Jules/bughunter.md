@@ -30,7 +30,3 @@
 
 **Learning:** When using nested `__getitem__` calls in `DatabaseManager._col`, assertions on mock objects must mimic the exact chain of `__getitem__` calls made by the code under test (e.g., `self.mock_client().__getitem__('EQ_Game').__getitem__('player_codex')`) to ensure the correct mocked collection is targeted for assertions.
 **Action:** Updated test assertions in `tests/test_codex_unlocks.py` to fetch the correctly nested mock object before asserting `update_one` calls, fixing the pipeline.
-## 2026-03-11 — Fix Codex Unlocks Test Mock Assertions
-
-**Learning:** When using nested `__getitem__` calls in `DatabaseManager._col`, assertions on mock objects must mimic the exact chain of `__getitem__` calls made by the code under test (e.g., `self.mock_client.__getitem__(self.db._db_name).__getitem__('player_codex')`) to ensure the correct mocked collection is targeted for assertions. `self.mock_db` alone is not enough, as `DatabaseManager` accesses the database name first via the client before the collection name.
-**Action:** Updated test assertions in `tests/test_codex_unlocks.py` to fetch the correctly nested mock object before asserting `update_one` calls, fixing the pipeline and resolving Codex Tests failures.

@@ -180,13 +180,6 @@ class AutoCombatFormula:
         # 4. Apply Auto-Combat specific mechanics from skills
         if player_skills:
             for skill in player_skills:
-                # Rogue: Shadow Step (next_hit_crit)
-                if "buff" in skill and skill["buff"].get("next_hit_crit"):
-                    final_damage_taken = max(0, final_damage_taken - int(final_damage_taken * 0.1)) # Small reduction in damage taken due to guaranteed crits ending fights faster
-
-                # Rogue: Venomous Strike (conditional_multiplier)
-                if "conditional_multiplier" in skill:
-                    final_damage_taken = max(0, final_damage_taken - int(final_damage_taken * 0.15)) # Represents higher burst output reducing monster turns
                 # Warrior: Bloodlust (Heal on kill)
                 passive_bonus = skill.get("passive_bonus", {})
                 if "kill_heal_percent" in passive_bonus:
