@@ -5,8 +5,9 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from game_systems.data.adventure_locations import LOCATIONS
-from scripts.analysis.economy_utils import calculate_expected_value_stats
 from game_systems.data.monsters import MONSTERS
+from scripts.analysis.economy_utils import calculate_expected_value_stats
+
 
 def main():
     # temporarily mock the missing monsters so we can see EV

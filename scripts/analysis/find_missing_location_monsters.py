@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 
@@ -7,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 
 from game_systems.data.adventure_locations import LOCATIONS
 from game_systems.data.monsters import MONSTERS
+
 
 def main():
     missing_monsters = []

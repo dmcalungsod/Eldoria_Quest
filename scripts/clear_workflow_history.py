@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 from dotenv import load_dotenv
@@ -21,38 +22,47 @@ headers = {
 
 
 def delete_all_runs():
-    print(f"Fetching workflow runs for {REPO_OWNER}/{REPO_NAME}...")
+    total_deleted = 0
 
-    # Get all workflow runs
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs"
-    response = requests.get(url, headers=headers)
+    while True:
+        print(f"Fetching up to 100 workflow runs for {REPO_OWNER}/{REPO_NAME}...")
 
-    if response.status_code != 200:
-        print(f"Error fetching runs: {response.json()}")
-        return
+        url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs?per_page=100"
+        response = requests.get(url, headers=headers)
 
-    runs = response.json().get("workflow_runs", [])
+        if response.status_code != 200:
+            print(f"Error fetching runs: {response.json()}")
+            break
 
-    if not runs:
-        print("No workflow runs found! Your Actions history is already perfectly clean.")
-        return
+        all_runs = response.json().get("workflow_runs", [])
 
-    print(f"Found {len(runs)} workflow runs. Deleting them now...")
+        if not all_runs:
+            print("No more workflow runs found! Your Actions history is perfectly clean.")
+            break
 
-    deleted_count = 0
-    for run in runs:
-        run_id = run["id"]
-        delete_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs/{run_id}"
+        print(f"Found a batch of {len(all_runs)} workflow runs. Deleting them concurrently...")
 
-        del_response = requests.delete(delete_url, headers=headers)
+        def delete_run(run_id):
+            delete_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs/{run_id}"
+            del_response = requests.delete(delete_url, headers=headers)
+            if del_response.status_code == 204:
+                return True
+            else:
+                print(f"Failed to delete run ID: {run_id} - {del_response.status_code} - {del_response.text}")
+                return False
 
-        if del_response.status_code == 204:
-            print(f"Successfully deleted run ID: {run_id}")
-            deleted_count += 1
-        else:
-            print(f"Failed to delete run ID: {run_id} - {del_response.json()}")
+        batch_deleted = 0
+        # Use max_workers=10 to avoid hitting GitHub API secondary rate limits
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(delete_run, run["id"]) for run in all_runs]
+            for future in as_completed(futures):
+                if future.result():
+                    batch_deleted += 1
 
-    print(f"\nDone! Successfully wiped {deleted_count} workflow runs.")
+        total_deleted += batch_deleted
+        print(f"Batch complete. Deleted {batch_deleted} runs in this batch.")
+
+    print(f"\nDone! Successfully wiped a total of {total_deleted} workflow runs.")
 
 
 if __name__ == "__main__":
