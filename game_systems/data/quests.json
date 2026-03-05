@@ -1661,5 +1661,92 @@
       "item": "Hymnal of the Void",
       "title": "Discordant Hero"
     }
+  },
+  {
+    "id": 82,
+    "title": "The Broken Anvil",
+    "tier": "A",
+    "quest_giver": "Magni the Anvil",
+    "location": "The Deep Forges",
+    "summary": "Secure rare Star Metal and Drake Blood to repair the Aegis-Heart.",
+    "description": "Magni the Anvil needs a replacement block of raw, super-cooled Star Metal, which can only be found deep within the Howling Peaks, guarded by Frost Gargoyles. But simply bringing the ore isn't enough; it must be quenched in the blood of a Storm Drake to temper it properly for the Aegis-Heart.",
+    "objectives": {
+      "defeat": {
+        "Frost Gargoyle": 3,
+        "Storm Drake": 1
+      },
+      "collect": {
+        "Raw Star Metal Block": 1,
+        "Vial of Drake Blood": 1
+      }
+    },
+    "flavor_text": {
+      "defeat:Frost Gargoyle": "The gargoyle shatters into jagged ice and stone upon defeat.",
+      "defeat:Storm Drake": "The massive drake falls, its lightning fading into the snow.",
+      "collect:Raw Star Metal Block": "The ore is impossibly heavy and radiates a biting cold.",
+      "collect:Vial of Drake Blood": "The blood crackles with residual storm magic in the vial."
+    },
+    "rewards": {
+      "exp": 8500,
+      "aurum": 3000
+    }
+  },
+  {
+    "id": 83,
+    "title": "The Broken Anvil: The Forge",
+    "tier": "A",
+    "quest_giver": "Magni the Anvil",
+    "location": "The Deep Forges",
+    "summary": "Give the Star Metal to Magni to repair the forge. (Choice A)",
+    "description": "General Rask demands the Star Metal for the Aviary Towers, but Magni insists the shields must hold. You choose to give the materials to Magni.",
+    "prerequisites": [
+      82
+    ],
+    "exclusive_group": "broken_anvil_choice",
+    "objectives": {
+      "deliver": {
+        "Raw Star Metal Block": 1,
+        "Vial of Drake Blood": 1
+      }
+    },
+    "flavor_text": {
+      "deliver:Raw Star Metal Block": "Magni snatches the ore, his prosthetic arm whirring as he hurls it into the Aegis-Heart.",
+      "deliver:Vial of Drake Blood": "The drake blood quenches the metal. The forge roars back to life, blazing with a blinding, blue-white intensity."
+    },
+    "rewards": {
+      "exp": 2000,
+      "aurum": 500,
+      "item": "Frost-forged Bulwark",
+      "title": "The Anvil's Spark"
+    }
+  },
+  {
+    "id": 84,
+    "title": "The Broken Anvil: The Sky",
+    "tier": "A",
+    "quest_giver": "General Rask",
+    "location": "The Aviary Towers",
+    "summary": "Give the Star Metal to General Rask for the Drakes. (Choice B)",
+    "description": "Magni demands the Star Metal for his forge, but General Rask insists the Aviary must be reinforced to control the skies. You choose to give the materials to General Rask.",
+    "prerequisites": [
+      82
+    ],
+    "exclusive_group": "broken_anvil_choice",
+    "objectives": {
+      "deliver": {
+        "Raw Star Metal Block": 1,
+        "Vial of Drake Blood": 1
+      }
+    },
+    "flavor_text": {
+      "deliver:Raw Star Metal Block": "Rask nods grimly and takes the supplies, gesturing for his runners.",
+      "deliver:Vial of Drake Blood": "The blood will strengthen the drake harnesses. The skies will remain ours."
+    },
+    "rewards": {
+      "exp": 2000,
+      "aurum": 500,
+      "item": "Storm-Chaser's Mantle",
+      "title": "Sky Warden"
+    }
   }
 ]

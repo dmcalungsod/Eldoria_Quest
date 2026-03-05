@@ -29,3 +29,4 @@
 *   **Meaningless choices.**
 *   **Silly rewards** that break immersion.
 *   **The Pathfinder's Toll:** An introductory quest designed for the TimeWeaver auto-adventure overhaul. It teaches players about rationing, fatigue, and the inherent risks of offline expeditions without relying on manual combat.
+*   **The Broken Anvil:** A high-stakes, multi-part collection quest for the Ironhaven region that forces players to choose between repairing a vital forge or reinforcing anti-air defenses, highlighting the grim triage of survival against the Void.
