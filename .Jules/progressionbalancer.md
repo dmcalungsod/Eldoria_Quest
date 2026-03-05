@@ -40,3 +40,8 @@
 
 **Learning:** The auto-adventure system (TimeWeaver) introduced a massive new core loop, but it was not integrated into rank progression. This meant players could engage exclusively with the new system but still be gatekept by manual quest completion or kill requirements they weren't organically achieving.
 **Action:** Integrated `total_expeditions` as a core requirement for all ranks (F: 2 -> SS: 50) in `rank_system.py` using data from `get_exploration_stats`. This formally links the new auto-adventure loop to guild advancement.
+
+## 2026-03-11 — Continuing Auto-Adventure Integration into Ranks
+
+**Learning:** While `total_expeditions` integrated part of Auto-Adventure progress into ranks, it allowed players to circumvent the difficulty intended by time gating. Expeditions can be short, allowing players to meet the total expeditions metric without committing to the extended duration necessary to match intended progression pace.
+**Action:** Added `total_adventure_minutes` as a requirement for all ranks (F: 60 minutes -> SS: 19,200 minutes). This forces a cumulative time investment from auto-adventuring, aligning its advancement with the system's "grim survival" philosophy.
