@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 from dotenv import load_dotenv
@@ -20,9 +21,6 @@ headers = {
 }
 
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-
 def delete_all_runs():
     total_deleted = 0
 
@@ -39,7 +37,7 @@ def delete_all_runs():
         all_runs = response.json().get("workflow_runs", [])
 
         if not all_runs:
-            print(f"No more workflow runs found! Your Actions history is perfectly clean.")
+            print("No more workflow runs found! Your Actions history is perfectly clean.")
             break
 
         print(f"Found a batch of {len(all_runs)} workflow runs. Deleting them concurrently...")
