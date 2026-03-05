@@ -23,7 +23,7 @@ class CombatEffects:
             for debuff in monster["debuffs"]:
                 if debuff.get("type") == "stat_mod":
                     # Apply percentage modifiers
-                    for stat in ["ATK", "DEF", "AGI", "DEX"]:
+                    for stat in ["ATK", "DEF", "AGI", "DEX", "END"]:
                         key = f"{stat}_percent"
                         if key in debuff:
                             mod = float(debuff[key])
@@ -120,7 +120,7 @@ class CombatEffects:
 
         # Check for Stat Modifiers
         stat_mods = {}
-        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent", "accuracy_percent"]:
+        for key in ["ATK_percent", "DEF_percent", "AGI_percent", "DEX_percent", "END_percent", "accuracy_percent"]:
             if key in debuff_data:
                 stat_mods[key] = debuff_data[key]
 
