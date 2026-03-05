@@ -57,8 +57,8 @@ def test_locations_balance():
     fen = LOCATIONS.get("shrouded_fen")
     assert fen, "Shrouded Fen not found"
     gather = dict(fen["gatherables"])
-    assert gather.get("magic_stone_medium") == 100, (
-        f"Shrouded Fen magic_stone_medium expected 100, got {gather.get('magic_stone_medium')}"
+    assert gather.get("magic_stone_medium") == 120, (
+        f"Shrouded Fen magic_stone_medium expected 120, got {gather.get('magic_stone_medium')}"
     )
     assert gather.get("ancient_wood") == 60, f"Shrouded Fen ancient_wood expected 60, got {gather.get('ancient_wood')}"
 
