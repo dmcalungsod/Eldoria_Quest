@@ -2895,6 +2895,49 @@ class DatabaseManager:
         self._world_event_cache_time = 0.0  # Invalidate cache
 
     # ============================================================
+    # GUILD HALLS
+    # ============================================================
+
+    def get_player_hall(self, discord_id: int) -> dict | None:
+        """Fetches the player's hall data. Returns None if the player does not have a hall deed."""
+        return self._col("player_halls").find_one(
+            {"discord_id": discord_id}, {"_id": 0}
+        )
+
+    def create_player_hall(self, discord_id: int):
+        """Creates the initial hall document when the deed is purchased."""
+        self._col("player_halls").update_one(
+            {"discord_id": discord_id},
+            {
+                "$setOnInsert": {
+                    "discord_id": discord_id,
+                    "hearth_level": 0,
+                    "infirmary_level": 0,
+                    "apothecary_level": 0,
+                    "armory_level": 0,
+                    "trophy_room_level": 0,
+                    "vault_level": 0,
+                    "trophies": [],
+                }
+            },
+            upsert=True,
+        )
+
+    def update_hall_room(self, discord_id: int, room_name: str, new_level: int) -> bool:
+        """Updates the level of a specific room."""
+        result = self._col("player_halls").update_one(
+            {"discord_id": discord_id}, {"$set": {f"{room_name}_level": new_level}}
+        )
+        return result.modified_count > 0
+
+    def add_hall_trophy(self, discord_id: int, trophy_key: str) -> bool:
+        """Adds a crafted trophy to the hall's display."""
+        result = self._col("player_halls").update_one(
+            {"discord_id": discord_id}, {"$addToSet": {"trophies": trophy_key}}
+        )
+        return result.modified_count > 0
+
+    # ============================================================
     # EQUIPMENT SETS
     # ============================================================
 
