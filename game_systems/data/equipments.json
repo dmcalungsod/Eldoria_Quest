@@ -559,5 +559,17 @@
             "thermal_insulation": 1
         },
         "description": "A robe woven from threads soaked in liquid magma. Radiates a comforting, constant heat."
+    },
+    "mask_respirator": {
+        "name": "Respirator Mask",
+        "slot": "accessory",
+        "rarity": "Rare",
+        "level_req": 25,
+        "rank_restriction": "B",
+        "stats_bonus": {
+            "END": 15,
+            "toxin_filtration": 1
+        },
+        "description": "A heavy mask with charcoal filters. Essential for breathing the toxic air of The Undergrove."
     }
 }
