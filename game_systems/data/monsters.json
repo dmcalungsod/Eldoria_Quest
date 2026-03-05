@@ -3325,5 +3325,60 @@
             "void_slash"
         ],
         "description": "A corrupted delver whose eyes have rotted away, guided only by the Choirmaster's song."
+    },
+    "temporal_wraith": {
+        "id": 168,
+        "name": "Temporal Wraith",
+        "level": 42,
+        "tier": "Elite",
+        "hp": 4500,
+        "atk": 150,
+        "def": 40,
+        "xp": 6000,
+        "drops": [
+            [
+                "chronal_dust",
+                60
+            ],
+            [
+                "shadow_essence",
+                25
+            ]
+        ],
+        "skills": [
+            "void_slash",
+            "shadow_step"
+        ],
+        "description": "An entity trapped in a time loop, eternally seeking an exit from the Silent City."
+    },
+    "hollowed_sentinel": {
+        "id": 169,
+        "name": "Hollowed Sentinel",
+        "level": 43,
+        "tier": "Boss",
+        "hp": 15000,
+        "atk": 180,
+        "def": 120,
+        "xp": 25000,
+        "drops": [
+            [
+                "ancient_ourosan_coin",
+                100
+            ],
+            [
+                "perfected_glass",
+                80
+            ],
+            [
+                "chronal_dust",
+                50
+            ]
+        ],
+        "skills": [
+            "shield_bash",
+            "unstoppable_force",
+            "whirlwind"
+        ],
+        "description": "A clockwork automaton whose internal ticking is the only sound it makes; a terrifyingly silent guardian."
     }
 }
