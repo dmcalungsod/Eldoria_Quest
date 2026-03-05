@@ -41,7 +41,13 @@ def load_materials():
             logger.error(f"Validation Error: {err}")
         logger.warning("Loaded material data contains schema errors.")
 
+    # Ensure economy balance: materials have base values
     validated_materials = data
+    for mat_id, mat_info in validated_materials.items():
+        if "value" in mat_info:
+            # Boost material sell values by 10% for better economy flow
+            mat_info["value"] = int(mat_info["value"] * 1.1)
+
     logger.info(f"Loaded {len(validated_materials)} materials from {data_path.name}")
     return validated_materials
 

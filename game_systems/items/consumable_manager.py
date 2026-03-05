@@ -129,6 +129,46 @@ class ConsumableManager:
 
         return item_used, buffs_to_apply
 
+
+    def _can_use_consumable_effects(self, item_used: bool, effect: dict) -> tuple[bool, str]:
+        if not item_used:
+            if "heal" in effect and "mana" in effect:
+                return False, "You are already at full health and mana."
+            elif "heal" in effect:
+                return False, "You are already at full health."
+            elif "mana" in effect:
+                return False, "You are already at full mana."
+            else:
+                return False, "This item has no usable effect right now."
+        return True, ""
+
+    def _execute_consumable_db_updates(self, discord_id: int, inventory_db_id: int, current_hp: int, current_mp: int, buffs_to_apply: list, item: dict, item_data: dict, message_lines: list) -> tuple[bool, str]:
+        if not self.db.consume_item_atomic(inventory_db_id, 1):
+            return False, "Item no longer available."
+
+        try:
+            self.db.set_player_vitals(discord_id, current_hp, current_mp)
+
+            if buffs_to_apply:
+                bulk_list = [
+                    {
+                        "buff_id": item["item_key"],
+                        "name": item_data["name"],
+                        "stat": b["key"],
+                        "amount": b["val"],
+                        "duration_s": b["duration"],
+                    }
+                    for b in buffs_to_apply
+                ]
+                self.db.add_active_buffs_bulk(discord_id, bulk_list)
+
+            return True, " ".join(message_lines)
+
+        except Exception as e:
+            logger.error(f"Item use error for {discord_id} (Refunding): {e}", exc_info=True)
+            self.db.increment_inventory_count(inventory_db_id, 1)
+            raise e
+
     def use_item(self, discord_id: int, inventory_db_id: int) -> tuple[bool, str]:
         """
         Uses a consumable item from the inventory.
@@ -164,41 +204,11 @@ class ConsumableManager:
             buffs_used, buffs_to_apply = self._process_buffs(discord_id, item_data, effect, message_lines)
             item_used = item_used or buffs_used
 
-            if not item_used:
-                if "heal" in effect and "mana" in effect:
-                    return False, "You are already at full health and mana."
-                elif "heal" in effect:
-                    return False, "You are already at full health."
-                elif "mana" in effect:
-                    return False, "You are already at full mana."
-                else:
-                    return False, "This item has no usable effect right now."
+            valid, msg = self._can_use_consumable_effects(item_used, effect)
+            if not valid:
+                return False, msg
 
-            if not self.db.consume_item_atomic(inventory_db_id, 1):
-                return False, "Item no longer available."
-
-            try:
-                self.db.set_player_vitals(discord_id, current_hp, current_mp)
-
-                if buffs_to_apply:
-                    bulk_list = [
-                        {
-                            "buff_id": item["item_key"],
-                            "name": item_data["name"],
-                            "stat": b["key"],
-                            "amount": b["val"],
-                            "duration_s": b["duration"],
-                        }
-                        for b in buffs_to_apply
-                    ]
-                    self.db.add_active_buffs_bulk(discord_id, bulk_list)
-
-                return True, " ".join(message_lines)
-
-            except Exception as e:
-                logger.error(f"Item use error for {discord_id} (Refunding): {e}", exc_info=True)
-                self.db.increment_inventory_count(inventory_db_id, 1)
-                raise e
+            return self._execute_consumable_db_updates(discord_id, inventory_db_id, current_hp, current_mp, buffs_to_apply, item, item_data, message_lines)
 
         except Exception as e:
             logger.error(f"Item use error for {discord_id}: {e}", exc_info=True)
