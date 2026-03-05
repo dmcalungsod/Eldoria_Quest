@@ -64,14 +64,16 @@ class TestAdventureStatusEmbed(unittest.TestCase):
         assert len(calls) >= 3
 
         # Check call arguments
-        # Call 1: Time Remaining
+        # Call 1: Expedition Progress (Time/Steps combined)
         args, kwargs = calls[0]
-        assert "Time Remaining" in kwargs["name"]
-
-        # Call 2: Steps
-        args, kwargs = calls[1]
-        assert "Steps Taken" in kwargs["name"]
+        assert "Expedition Progress" in kwargs["name"]
         assert "15" in kwargs["value"]
+
+        # Call 2: Adventure Log
+        args, kwargs = calls[1]
+        assert "Adventure Log" in kwargs["name"]
+        assert "100" in kwargs["value"] # exp
+        assert "50" in kwargs["value"]  # aurum
 
         # Call 3: Loot
         args, kwargs = calls[2]
