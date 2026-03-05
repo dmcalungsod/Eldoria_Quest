@@ -711,6 +711,10 @@ class AdventureSession:
             threat_reduction = float(
                 context["active_boosts"].get("ouros_threat_reduction", 1.0)
             )
+        elif self.location_id == "the_undergrove":
+            threat_reduction = float(
+                context["active_boosts"].get("undergrove_threat_reduction", 1.0)
+            )
         return threat_reduction
 
     def _consume_supplies(self):

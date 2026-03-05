@@ -28,6 +28,7 @@ class WorldEventSystem:
     ECHOES_OF_THE_DEEP = "echoes_of_the_deep"
     TIME_QUAKE = "time_quake"
     BUILDERS_BOON = "builders_boon"
+    FUNGAL_BLOOM = "fungal_bloom"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -130,6 +131,16 @@ class WorldEventSystem:
                 "exp_boost": 1.1,
                 "ouros_threat_reduction": 0.8,
                 "ouros_loot_bonus": 2.0,
+            },
+        },
+        FUNGAL_BLOOM: {
+            "name": "The Fungal Bloom",
+            "description": "Bioluminescent spores cascade through the subterranean depths. Toxin accumulation is slowed, and monstrous flora drop unprecedented bounties.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.1,
+                "undergrove_threat_reduction": 0.8,
+                "undergrove_loot_bonus": 2.0,
             },
         },
     }
