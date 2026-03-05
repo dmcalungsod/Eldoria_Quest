@@ -55,6 +55,18 @@ class TestUIHelpers(unittest.TestCase):
         bar = make_progress_bar(5, 10, length=10, empty_char="-", filled_char="#")
         self.assertEqual(bar, "#####-----")
 
+        # Test 0%
+        bar_0 = make_progress_bar(0, 10, length=10, empty_char="-", filled_char="#")
+        self.assertEqual(bar_0, "----------")
+
+        # Test 100%
+        bar_100 = make_progress_bar(10, 10, length=10, empty_char="-", filled_char="#")
+        self.assertEqual(bar_100, "##########")
+
+        # Test over 100%
+        bar_over = make_progress_bar(15, 10, length=10, empty_char="-", filled_char="#")
+        self.assertEqual(bar_over, "##########")
+
     def test_inventory_embed_categorization(self):
         """Test that inventory embed categorizes equipped items."""
         items = [

@@ -237,34 +237,47 @@ class AdventureEmbeds:
         # The DB steps_completed might only update when resolving. Show expected progress.
         display_steps = max(session.get('steps_completed', 0), elapsed_minutes)
 
-        embed.add_field(name="⏳ Time Remaining", value=f"`{remaining_str}`", inline=True)
-        embed.add_field(name="👣 Steps Taken", value=f"`{display_steps}`", inline=True)
+        # Progress Bars
+        time_bar = make_progress_bar(elapsed_minutes, duration_mins, length=10)
+        steps_bar = make_progress_bar(display_steps, duration_mins, length=10)
 
-        # Player Vitals & Kills
-        # The session should have these in context if updated during simulation, but since we are fetching just the session
-        # we might need to rely on the main stats. If they aren't available, we skip.
+        embed.add_field(
+            name="⏳ Expedition Progress",
+            value=(
+                f"**Time:** `{time_bar}` {remaining_str} remaining\n"
+                f"**Steps:** `{steps_bar}` {display_steps}/{duration_mins}"
+            ),
+            inline=False
+        )
+
+        # Player Vitals
         if "vitals" in session and session["vitals"]:
             hp = session["vitals"].get("current_hp", 0)
             mp = session["vitals"].get("current_mp", 0)
             embed.add_field(name="❤️ Vitals", value=f"**HP:** {hp} | **MP:** {mp}", inline=True)
 
+        # Parses Kills, Exp, Aurum, and Loot
+        kills = 0
         try:
             logs_raw = session.get("logs", "[]")
             logs = json.loads(logs_raw) if isinstance(logs_raw, str) else logs_raw
-            # Count kills by searching logs
-            kills = 0
             for log in logs:
-                if "Defeated" in log or "Victory" in log or "slain" in log:
+                log_lower = log.lower()
+                if "defeated" in log_lower or "victory" in log_lower or "slain" in log_lower:
                     kills += 1
-            if kills > 0:
-                embed.add_field(name="⚔️ Kills", value=f"`{kills}` Monsters Defeated", inline=True)
         except Exception:
             pass
 
-        # Loot Details
+        exp_earned = 0
+        aurum_earned = 0
+        loot_text = "None yet."
+
         try:
             loot_raw = session.get("loot_collected", "{}")
             loot = json.loads(loot_raw) if isinstance(loot_raw, str) else loot_raw
+
+            exp_earned = loot.get("exp", 0)
+            aurum_earned = loot.get("aurum", 0)
 
             loot_details = []
             item_count = 0
@@ -273,7 +286,6 @@ class AdventureEmbeds:
                     continue
                 if item_count < 5:
                     from game_systems.data.materials import MATERIALS
-
                     mat = MATERIALS.get(item_key)
                     name = mat["name"] if mat else item_key.replace("_", " ").title()
                     loot_details.append(f"• {name}: {count}")
@@ -282,11 +294,23 @@ class AdventureEmbeds:
             if item_count > 5:
                 loot_details.append(f"...and {item_count - 5} more types")
 
-            loot_text = "\n".join(loot_details) if loot_details else "None yet."
-            embed.add_field(name="🎒 Loot Gathered", value=loot_text, inline=True)
-
+            if loot_details:
+                loot_text = "\n".join(loot_details)
         except Exception as e:
-            embed.add_field(name="🎒 Loot Gathered", value="Data Error", inline=True)
+            loot_text = "Data Error"
+
+        # Adventure Summary
+        embed.add_field(
+            name="📊 Adventure Log",
+            value=(
+                f"⚔️ **Monsters Slain:** {kills}\n"
+                f"✨ **Experience:** +{exp_earned}\n"
+                f"🪙 **Aurum:** +{aurum_earned}"
+            ),
+            inline=True
+        )
+
+        embed.add_field(name="🎒 Loot Gathered", value=loot_text, inline=True)
 
         # Recent Events
         try:

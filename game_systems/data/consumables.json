@@ -238,5 +238,13 @@
         "effect": {"STR": 8, "duration_s": 180},
         "rarity": "Epic",
         "description": "Brewed with essence of magma. Burns going down, but grants immense strength."
+    },
+    "purifying_brew": {
+        "id": "purifying_brew",
+        "name": "Purifying Brew",
+        "type": "supply",
+        "effect": {"clear_toxin": true},
+        "rarity": "Uncommon",
+        "description": "A bitter tea brewed from rare moss that flushes dangerous spores from the lungs."
     }
 }
