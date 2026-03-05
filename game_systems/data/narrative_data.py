@@ -101,6 +101,11 @@ MISSION_FLAVOR_TEXT = {
         "You wipe unnervingly clean dust from your armor. The preserved city slumbers on, undisturbed by your passing.",
         "The air grows warm and chaotic once more. You have escaped the cold, beautiful stasis of Ouros.",
         "You glance back, half-expecting the statues to follow. They don't. The city remains a perfectly frozen nightmare.",
+        "The crushing weight of absolute silence lifts from your chest. You gasp for the chaotic, noisy air of the surface.",
+        "You leave the pristine streets behind. Your reflection in the spotless glass seems to linger a second too long.",
+        "The temporal stillness releases its grip. You are no longer trapped between the ticks of a dead clock.",
+        "You step away from the motionless fountains and petrified trees. The unnerving perfection of Ouros stays below, waiting in the dark.",
+        "Your ears ring as ambient sound rushes back in. The silence of the ancient chronomancers almost claimed your sanity.",
     ],
     "wailing_chasm": [
         "The crushing silence of the abyss recedes, replaced by the chaotic, comforting sounds of the surface.",
