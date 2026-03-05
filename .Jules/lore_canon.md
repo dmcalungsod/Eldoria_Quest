@@ -66,14 +66,16 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 10. **The Forgotten Ossuary (Rank B):** A silent labyrinth of bone and shadow. The air is cold and smells of ancient dust.
 11. **The Celestial Archipelago (Rank B):** Ancient ruins held aloft by failing magic. The air is thin, and gravity is a suggestion.
 12. **The Whispering Archives (Rank B):** A grand library buried beneath the surface, where forbidden magic and restless spirits roam.
-13. **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
-14. **The Frostfall Expanse (Rank A):** A frozen wasteland where the wind cuts like a knife and only the strong survive.
-15. **Gale-Scarred Heights (Rank A):** High peaks where the wind howls like a living thing. Only the sure-footed survive.
-16. **The Shimmering Wastes (Rank A):** A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.
-17. **The Thunder-Crag Coast (Rank A):** A storm-battered shoreline teeming with elemental fury and high-value materials like storm essence.
-18. **The Wailing Chasm (Rank A):** A pitch-black subterranean abyss where echoes of The Sundering are physically trapped. Home to the madness of the Deep Delvers and the corrupted Blind Choir.
-19. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
-20. **The Silent City of Ouros (Rank S):** An eerie, perfectly preserved ancient metropolis swallowed whole by the earth during The Sundering, trapped in a silent stasis by temporal anomalies.
+13. **The Undergrove (Rank B):** A massive, subterranean jungle of mutated, bioluminescent flora created when ancient forests were swallowed during The Sundering.
+14. **The Molten Caldera (Rank A):** A volcanic region of fire and ash. High danger, high reward.
+15. **The Frostfall Expanse (Rank A):** A frozen wasteland where the wind cuts like a knife and only the strong survive.
+16. **Gale-Scarred Heights (Rank A):** High peaks where the wind howls like a living thing. Only the sure-footed survive.
+17. **The Shimmering Wastes (Rank A):** A blinding desert of fused glass. Mirages dance on the horizon, and the heat is lethal.
+18. **The Thunder-Crag Coast (Rank A):** A storm-battered shoreline teeming with elemental fury and high-value materials like storm essence.
+19. **The Wailing Chasm (Rank A):** A pitch-black subterranean abyss where echoes of The Sundering are physically trapped. Home to the madness of the Deep Delvers and the corrupted Blind Choir.
+20. **Ironhaven (Rank A):** A militant, fortified mountain city carved into Mount Kaelen by the Iron Vanguard to fend off aerial Void horrors.
+21. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
+22. **The Silent City of Ouros (Rank S):** An eerie, perfectly preserved ancient metropolis swallowed whole by the earth during The Sundering, trapped in a silent stasis by temporal anomalies.
 
 ---
 
