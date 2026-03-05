@@ -403,6 +403,47 @@ class CombatTutorialView(View):
                 else:
                     weapon_msg = f"\n⚔️ **Bonus:** Received **{name}**! (Check Inventory)"
 
+        # Extra items for Alchemist (Class 6)
+        if class_id == 6:
+            extra_items = [
+                ("gen_mediumarmor_002", "Apothecary's Leathers", "equipment", "Common", 1, "medium_armor", "equipment"),
+                ("gen_accessory_002", "Bandolier of Vials", "equipment", "Common", 1, "accessory", "equipment"),
+                ("phial_of_vitriol", "Phial of Vitriol", "consumable", "Common", 2, None, "consumables"),
+                ("bitter_panacea", "Bitter Panacea", "consumable", "Common", 1, None, "consumables")
+            ]
+
+            for item_key, item_name, item_type, rarity, count, slot, source in extra_items:
+                try:
+                    # Add to inventory
+                    if slot:
+                        await asyncio.to_thread(
+                            self.db.add_inventory_item,
+                            self.user.id, item_key, item_name, item_type, rarity, count, slot, source
+                        )
+                    else:
+                        await asyncio.to_thread(
+                            self.db.add_inventory_item,
+                            self.user.id, item_key, item_name, item_type, rarity, count
+                        )
+
+                    if item_type == "equipment" and slot:
+                        extra_item = await asyncio.to_thread(
+                            self.db.find_stackable_item,
+                            self.user.id, item_key, rarity, slot, source, equipped=0
+                        )
+                        if extra_item:
+                            equip_mgr = EquipmentManager(self.db)
+                            ok, _ = await asyncio.to_thread(equip_mgr.equip_item, self.user.id, extra_item["id"])
+                            if ok:
+                                weapon_msg += f"\n🧪 **Bonus:** Received and equipped **{item_name}**!"
+                            else:
+                                weapon_msg += f"\n🧪 **Bonus:** Received **{item_name}**! (Check Inventory)"
+                    else:
+                        weapon_msg += f"\n🧪 **Bonus:** Received {count}x **{item_name}**!"
+
+                except Exception as e:
+                    logger.error(f"Failed to grant extra alchemist item {item_name}: {e}")
+
         await interaction.followup.send(
             f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}",
             ephemeral=True,

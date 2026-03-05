@@ -24,7 +24,7 @@ class ExplorationEvents:
     def __init__(self, db: Any):
         self.db = db
 
-    def handle_event(self, event_key: str, context: dict[str, Any]) -> dict[str, Any]:
+    def handle_event(self, event_key: str, context: dict[str, Any], weather=None, time_phase=None) -> dict[str, Any]:
         """
         Dispatches to specific event handlers based on key.
         """
@@ -34,9 +34,9 @@ class ExplorationEvents:
             elif event_key == "hidden_stash":
                 return self._handle_hidden_stash(context)
             elif event_key == "ancient_shrine":
-                return self._handle_ancient_shrine(context)
+                return self._handle_ancient_shrine(context, time_phase)
             elif event_key == "trap_pit":
-                return self._handle_trap(context)
+                return self._handle_trap(context, weather)
 
             # Fallback
             return {"log": [], "vitals": context["vitals"], "loot": {}, "dead": False}
@@ -80,13 +80,13 @@ class ExplorationEvents:
     def _handle_hidden_stash(self, context: dict[str, Any]) -> dict[str, Any]:
         # Aurum or Material
         loot = {}
-        log = [AdventureEvents.special_event_flavor("hidden_stash")]
+        flavor = AdventureEvents.special_event_flavor("hidden_stash")
 
         if random.random() < 0.6:
             # Aurum
             amount = random.randint(50, 200)
             loot["aurum"] = amount
-            log.append(f"{E.AURUM} Found **{amount} Aurum**.")
+            log = [flavor, f"{E.AURUM} Found **{amount} Aurum**."]
         else:
             # Material - Pick a Rare material
             rare_mats = [k for k, v in MATERIALS.items() if v.get("rarity") == "Rare"]
@@ -94,28 +94,50 @@ class ExplorationEvents:
                 item_key = random.choice(rare_mats)
                 mat_name = MATERIALS[item_key]["name"]
                 loot[item_key] = 1
-                log.append(f"{E.LOOT} Found **{mat_name}**!")
+                log = [flavor, f"{E.LOOT} Found **{mat_name}**!"]
+            else:
+                 log = [flavor, "It was empty!"]
 
         return {"log": log, "vitals": context["vitals"], "loot": loot, "dead": False}
 
-    def _handle_ancient_shrine(self, context: dict[str, Any]) -> dict[str, Any]:
+    def _handle_ancient_shrine(self, context: dict[str, Any], time_phase) -> dict[str, Any]:
         # Grant XP
         amount = random.randint(100, 300)
+
+        # Dynamic Time Element: Nighttime grants extra XP
+        from game_systems.core.world_time import TimePhase
+        if time_phase == TimePhase.NIGHT:
+            amount = int(amount * 1.5)
+            flavor = "🌙 " + AdventureEvents.special_event_flavor("ancient_shrine") + " The starlight amplifies its power."
+        else:
+            flavor = AdventureEvents.special_event_flavor("ancient_shrine")
+
         loot = {"exp": amount}
 
         log = [
-            AdventureEvents.special_event_flavor("ancient_shrine"),
+            flavor,
             f"{E.EXP} You gain **{amount} XP** from the ancient knowledge.",
         ]
 
         return {"log": log, "vitals": context["vitals"], "loot": loot, "dead": False}
 
-    def _handle_trap(self, context: dict[str, Any]) -> dict[str, Any]:
+    def _handle_trap(self, context: dict[str, Any], weather) -> dict[str, Any]:
         stats = context["player_stats"]
         vitals = context["vitals"]
 
         # Damage 10-25% of Max HP
         damage_percent = random.uniform(0.10, 0.25)
+
+        # Dynamic Weather Element: Rain/Storms make traps deadlier (slippery)
+        from game_systems.core.world_time import Weather
+        weather_log = ""
+        if weather in [Weather.RAIN, Weather.STORM]:
+            damage_percent += 0.10
+            weather_log = "🌧️ The wet ground makes it impossible to find your footing! "
+        elif weather in [Weather.FOG, Weather.BLIZZARD, Weather.SANDSTORM]:
+            damage_percent += 0.05
+            weather_log = "🌫️ Poor visibility completely obscured the danger! "
+
         damage = int(stats.max_hp * damage_percent)
         damage = max(1, damage)
 
@@ -135,7 +157,7 @@ class ExplorationEvents:
 
         vitals["current_hp"] = new_hp
 
-        flavor = AdventureEvents.special_event_flavor("trap_pit")
+        flavor = weather_log + AdventureEvents.special_event_flavor("trap_pit")
         if mitigated:
             flavor += f"\n{E.DODGE} You reacted quickly, reducing the impact!"
 
