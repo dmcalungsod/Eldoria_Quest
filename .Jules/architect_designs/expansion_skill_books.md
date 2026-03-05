@@ -50,7 +50,7 @@ The Alchemist needs ways to manage resources better and burst down threats to co
 **1. Blueprint: Exothermic Reaction**
 *   **Teaches:** `flash_fire` (Active AoE)
 *   **Description:** "A rapid deployment of ignition powder, dealing low damage but applying a severe burn."
-*   **Mechanics:** AoE attack (0.5x Power), applies Burn (5% Max HP/turn) for 3 turns. Costs 12 MP.
+*   **Mechanics:** AoE attack (0.5x Power), applies Burn (5% Max HP/turn, capped vs Bosses) for 3 turns. Costs 12 MP.
 *   **Target Drop:** Ignis, Lord of Cinders (Boss - Molten Caldera).
 
 **2. Notes on Cellular Regeneration**
