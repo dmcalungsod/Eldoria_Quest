@@ -481,6 +481,50 @@ class EquipmentManager:
         self.db.delete_equipment_set(discord_id, name)
         return True, f"Loadout '{name}' deleted."
 
+    def _equip_loadout_item(self, discord_id: int, slot_key: str, target_data: dict) -> tuple[bool, str]:
+        """Equips a single item from a loadout."""
+        target_key = target_data["item_key"]
+        target_rarity = target_data["rarity"]
+
+        target_slot = target_data.get("slot")
+        if not target_slot:
+            if "accessory" in slot_key:
+                target_slot = "accessory"
+            else:
+                target_slot = slot_key
+
+        match = self.db._col("inventory").find_one(
+            {
+                "discord_id": discord_id,
+                "item_key": target_key,
+                "rarity": target_rarity,
+                "slot": target_slot,
+                "equipped": 0,
+            }
+        )
+
+        if match:
+            ok, msg = self.equip_item(discord_id, match["id"])
+            if ok:
+                return True, ""
+            else:
+                return False, f"{target_data['item_name']} (Error: {msg})"
+
+        equipped_count = self.db._col("inventory").count_documents(
+            {
+                "discord_id": discord_id,
+                "item_key": target_key,
+                "rarity": target_rarity,
+                "slot": target_slot,
+                "equipped": 1,
+            }
+        )
+
+        if hasattr(equipped_count, "__call__") or (isinstance(equipped_count, int) and equipped_count > 0):
+            return True, ""
+
+        return False, target_data["item_name"]
+
     def equip_loadout(self, discord_id: int, name: str) -> tuple[bool, str]:
         """
         Attempts to equip a saved loadout.
@@ -497,95 +541,12 @@ class EquipmentManager:
         success_count = 0
         missing_items = []
 
-        current_equipped = {item["slot"]: item for item in self.db.get_equipped_items(discord_id)}
-
         for slot_key, target_data in items_to_equip.items():
-            target_key = target_data["item_key"]
-            target_rarity = target_data["rarity"]
-
-            # Determine actual slot to search (handle suffixes)
-            # Use preserved 'slot' if available, otherwise strip suffix if accessory
-            target_slot = target_data.get("slot")
-            if not target_slot:
-                if "accessory" in slot_key:
-                    target_slot = "accessory"
-                else:
-                    target_slot = slot_key
-
-            # Check if already equipped
-            # Note: For accessories, we just check if *any* equipped item matches this key+rarity+slot
-            # This is a bit simplified; strictly we might want to ensure *enough* are equipped.
-            # But iterating through the loadout means we check for *each* required item.
-
-            # We can't use simple dictionary lookup for duplicate slots like accessory
-            # So we iterate current_equipped values.
-            for eq_item in current_equipped.values():
-                if (
-                    eq_item["slot"] == target_slot
-                    and eq_item["item_key"] == target_key
-                    and eq_item["rarity"] == target_rarity
-                ):
-                    # Found a match. To prevent counting same item for multiple loadout entries,
-                    # we should track used IDs?
-                    # But for now, simple check is okay, loadout equipping is best-effort.
-                    # Actually, if loadout has 2 rings, and we have 1 ring equipped,
-                    # both iterations will find "already equipped".
-                    # So we skip equipping the second ring. BAD.
-
-                    # Fix: We should check if we need to equip MORE.
-                    # But equip_item() handles "already equipped" check internally via "equipped": 1 status.
-                    # So maybe we should just ALWAYS try to equip from inventory?
-                    # If it's already equipped, it won't be in inventory with equipped=0.
-                    pass
-
-            # Better approach: Search inventory for UN-EQUIPPED item.
-            # If found, equip it.
-            # If NOT found, verify if it's already equipped.
-
-            match = self.db._col("inventory").find_one(
-                {
-                    "discord_id": discord_id,
-                    "item_key": target_key,
-                    "rarity": target_rarity,
-                    "slot": target_slot,
-                    "equipped": 0,
-                }
-            )
-
-            if match:
-                ok, msg = self.equip_item(discord_id, match["id"])
-                if ok:
-                    success_count += 1
-                else:
-                    missing_items.append(f"{target_data['item_name']} (Error: {msg})")
+            success, msg = self._equip_loadout_item(discord_id, slot_key, target_data)
+            if success:
+                success_count += 1
             else:
-                # Not found in unequipped inventory. Check if already equipped.
-                # We need to find *how many* of this item are currently equipped vs how many needed?
-                # This gets complex.
-                # Simple check: Is at least ONE matching item equipped?
-                # If loadout has 2 identical rings, and we have 1 equipped and 0 in inventory...
-                # We report missing.
-
-                # Check actual count in inventory (equipped=1)
-                equipped_count = self.db._col("inventory").count_documents(
-                    {
-                        "discord_id": discord_id,
-                        "item_key": target_key,
-                        "rarity": target_rarity,
-                        "slot": target_slot,
-                        "equipped": 1,
-                    }
-                )
-
-                # We can't easily know if this specific iteration of the loop corresponds to
-                # the 1st or 2nd ring without tracking.
-                # But since we just want to report success/fail...
-                if hasattr(equipped_count, "__call__") or (isinstance(equipped_count, int) and equipped_count > 0):
-                    # Assume success if at least one is equipped.
-                    # This might be slightly inaccurate for duplicates but acceptable.
-                    success_count += 1
-                else:
-                    missing_items.append(target_data["item_name"])
+                missing_items.append(msg)
 
         msg = f"Equipped {success_count} items."
         if missing_items:

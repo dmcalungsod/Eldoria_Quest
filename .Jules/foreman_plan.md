@@ -151,10 +151,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @Palette
     - **Details:** `event_cog.py`, `tournament_cog.py`, `faction_cog.py`, `general_cog.py`, `developer_cog.py`, `adventure_menu.py`, `setup_view.py`, `components.py`, `handbook_view.py`.
     - **Due:** 2026-03-10
-- [x] **Task 5.10:** Refactor high cyclomatic complexity functions & clean dead code.
+- [ ] **Task 5.10:** Refactor high cyclomatic complexity functions & clean dead code.
     - **Agent:** @SystemSmith
     - **Details:** `combat_engine.py`, `consumable_manager.py`, `adventure_session.py`, `equipment_manager.py`.
-    - **Status:** **Completed**
     - **Due:** 2026-03-10
 - [x] **Task 5.11:** Improve test coverage for Discord cogs.
     - **Agent:** @BugHunter
@@ -200,9 +199,8 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task R.2:** Implement Rogue Skills (`Shadow Step`, `Venomous Strike`, etc.).
     - **Agent:** @GameForge
     - **Due:** 2026-03-10
-- [x] **Task R.3:** Create Rogue Achievements.
+- [ ] **Task R.3:** Create Rogue Achievements.
     - **Agent:** @ChronicleKeeper
-    - **Status:** **Completed**
     - **Due:** 2026-03-10
 
 ### The Guild Halls Expansion (New)
@@ -214,9 +212,8 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task GH.2:** Tune exponential material costs for room upgrades.
     - **Agent:** @GameBalancer
     - **Due:** 2026-03-12
-- [x] **Task GH.3:** Implement "Building Materials" and Boss Trophies.
-    - **Agent:** @GameForge / @Artisan
-    - **Status:** **Completed**
+- [ ] **Task GH.3:** Implement "Building Materials" and Boss Trophies.
+    - **Agent:** @GameForge
     - **Due:** 2026-03-12
 - [ ] **Task GH.4:** Design interactive Guild Hall management View (One UI).
     - **Agent:** @Palette
@@ -238,17 +235,10 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @StoryWeaver
     - **Due:** 2026-03-14
 
-### Undergrove & Broken Anvil (New)
-- [ ] **Task UB.1:** Implement missing Undergrove monsters (`fungal_hulk`, `spore_stalker`).
-    - **Agent:** @GameForge
-- [ ] **Task UB.2:** Fix unobtainable quest items for "The Broken Anvil" (`raw_star_metal_block`).
-    - **Agent:** @GameForge
-
 
 ---
 
 ## 📝 Activity Log
-- **2026-03-11 (Update):** Added Tasks UB.1 and UB.2. Noted GH.3 and R.3 are Complete.
 - **2026-03-04 (Update):** Added new tasks from Repo Auditor (5.12). Marked Task 5.8 as Complete.
 - **2026-03-09 (Update):** Integrated Analyst recommendations for The Silent City of Ouros drops (Task 2.2f). Noted Tech Debt Tasks 5.5, 5.6, 5.7 are Complete.
 - **2026-03-02 (Update):** Added "Guild Halls" and "Silent City" parallel projects. Marked Tasks 5.1, A.2, and 2.4 completed based on 03-01/03-02 logs. Added Repo Auditor tasks (5.8-5.11). Updated 2.2 subtasks based on EV report.
