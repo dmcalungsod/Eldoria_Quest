@@ -650,6 +650,7 @@ class AdventureSession:
         location: dict,
         weather: Weather,
         persist: bool,
+        time_phase: TimePhase = None,
     ) -> dict[str, Any]:
         """Resolves a non-combat exploration event."""
         location_name = location.get("name")
@@ -662,6 +663,7 @@ class AdventureSession:
             weather=weather,
             event_type=context.get("event_type"),
             supplies=self.supplies,
+            time_phase=time_phase,
         )
         self.logs.extend(result["log"])
 
@@ -826,7 +828,7 @@ class AdventureSession:
                 return combat_result
 
             # --- 3. Non-Combat Event ---
-            return self._handle_exploration_event(context, location, weather, persist)
+            return self._handle_exploration_event(context, location, weather, persist, time_phase=time_phase)
 
         except Exception as e:
             logger.error(f"Simulation error for {self.discord_id}: {e}", exc_info=True)
