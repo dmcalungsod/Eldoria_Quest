@@ -47,7 +47,7 @@ def load_materials():
         if "value" in mat_info:
             # Boost material sell values by 10% for better economy flow
             mat_info["value"] = int(mat_info["value"] * 1.1)
-            
+
     logger.info(f"Loaded {len(validated_materials)} materials from {data_path.name}")
     return validated_materials
 

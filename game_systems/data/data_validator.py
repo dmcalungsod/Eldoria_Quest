@@ -52,7 +52,11 @@ class DataValidator:
         expected_type = schema.get("type")
         if expected_type:
             if not isinstance(data, expected_type):
-                return [f"{path}: Expected type {expected_type.__name__}, got {type(data).__name__}"]
+                if isinstance(expected_type, tuple):
+                    expected_names = " or ".join(t.__name__ for t in expected_type)
+                else:
+                    expected_names = expected_type.__name__
+                return [f"{path}: Expected type {expected_names}, got {type(data).__name__}"]
         return []
 
     @staticmethod
