@@ -204,27 +204,3 @@
 ### 📝 Learnings
 *   "Gale-Lancers" feels more martial and active than simply "Drake-Riders".
 *   Adding "Wind-Scar" and "Iron-Lung" as titles/epithets helps convey the harshness of the environment immediately.
-
-## 2026-03-12 — The Undergrove (Flora and Tools)
-
-**Request:** Proactive / Assigned by Foreman (via Realmwright's design `.Jules/region_the_undergrove.md`, NEW_ISSUES.md)
-**Context:** The Undergrove (Rank B). Subterranean jungle, bioluminescent, toxic fungal spores, alien flora, black-market alchemists.
-**Tone:** Toxic, alien, clinical, hazardous, suffocating.
-
-### 📜 Generated Names
-
-#### 🌿 Flora & Reagents
-1.  **Corpse-Bloom** (Instead of generic Fungal Spores) – A flower that roots in bone and emits a sweet, suffocating dust.
-2.  **Gloom-Root** – A pale, fibrous root that thrives in complete darkness, used to stabilize volatile mixtures.
-3.  **Blight-Weed** – A creeping vine that slowly chokes out other life, its sap is highly caustic.
-4.  **Lumina Sap** (Instead of generic Bioluminescent Sap) – The glowing lifeblood of the giant subterranean flora, beautiful but toxic to the touch.
-
-#### 🔧 Specialized Alchemist Tools
-1.  **Miasma Extractor** – A heavy, brass syringe designed to pull raw toxins from infected flora without bursting spore sacs.
-2.  **Spore-Filter Crucible** – A sealed boiling flask with charcoal filters, used to distill safe reagents from toxic materials.
-3.  **Toxin Gauge** – A delicate glass vial filled with a reactive liquid that changes color in the presence of lethal spore concentrations.
-4.  **Vitriol Burner** – A specialized portable heat source used to instantly incinerate contaminated tools or samples in the field.
-
-### 📝 Learnings
-*   Renaming generic items like "Fungal Spores" to "Corpse-Bloom" adds immediate environmental storytelling and emphasizes the grim survival tone.
-*   The tools sound heavy, sealed, and practical, reinforcing that surviving The Undergrove requires serious, specialized equipment, not just basic fantasy alchemy sets.

@@ -102,16 +102,6 @@ LOCATION_WEATHER_WEIGHTS = {
         (Weather.RAIN, 30),
         (Weather.FOG, 30),
     ],
-    "the_wailing_chasm": [
-        (Weather.MIASMA, 50),
-        (Weather.FOG, 30),
-        (Weather.CLEAR, 20),
-    ],
-    "silent_city_ouros": [
-        (Weather.CLEAR, 60),
-        (Weather.FOG, 30),
-        (Weather.ASH, 10),
-    ],
 }
 
 # Multipliers applied to base weights depending on season
