@@ -28,7 +28,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
         self.mock_bot = MagicMock()
 
         # Patch InventoryManager since it's instantiated in AdventureManager.__init__
-        with patch("game_systems.adventure.adventure_manager.InventoryManager") as MockInventoryManager:
+        with patch(
+            "game_systems.adventure.adventure_manager.InventoryManager"
+        ) as MockInventoryManager:
             self.manager = AdventureManager(self.mock_db, self.mock_bot)
             self.mock_inventory_manager = MockInventoryManager.return_value
             self.manager.inventory_manager = self.mock_inventory_manager
@@ -104,7 +106,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
         mock_world_time.now.return_value.isoformat.return_value = "2023-01-01T00:00:00"
 
         # Call start_adventure
-        success = self.manager.start_adventure(self.discord_id, "forest_outskirts", duration_minutes=60, supplies={})
+        success = self.manager.start_adventure(
+            self.discord_id, "forest_outskirts", duration_minutes=60, supplies={}
+        )
 
         self.assertTrue(success, "Failed to start adventure")
         self.mock_db.insert_adventure_session.assert_called_once()
@@ -132,21 +136,27 @@ class TestAutoAdventureRegression(unittest.TestCase):
         }
 
         # Mock AdventureSession behavior within Engine
-        with patch("game_systems.adventure.adventure_resolution.AdventureSession") as MockSession:
+        with patch(
+            "game_systems.adventure.adventure_resolution.AdventureSession"
+        ) as MockSession:
             mock_session_instance = MockSession.return_value
             mock_session_instance.steps_completed = 0
             mock_session_instance.simulate_step.return_value = {
                 "dead": False,
                 "vitals": {"current_hp": 90, "current_mp": 90},
             }
-            mock_session_instance._fetch_session_context.return_value = self.mock_context_bundle
+            mock_session_instance._fetch_session_context.return_value = (
+                self.mock_context_bundle
+            )
 
             # Run Resolution
             self.engine.resolve_session(session_doc)
 
             # Verify 4 steps for 60 mins (15 min/step)
             self.assertEqual(mock_session_instance.simulate_step.call_count, 4)
-            self.mock_db.update_adventure_status.assert_called_with(self.discord_id, "completed")
+            self.mock_db.update_adventure_status.assert_called_with(
+                self.discord_id, "completed"
+            )
 
         # --- 3. End Adventure (Claim Rewards) ---
 
@@ -207,7 +217,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "active_monster_json": None,
             "supplies": {},
         }
-        session = AdventureSession(self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data)
+        session = AdventureSession(
+            self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data
+        )
 
         # 1. Base Case: < 16 steps (4 hours)
         session.steps_completed = 10
@@ -232,6 +244,13 @@ class TestAutoAdventureRegression(unittest.TestCase):
         session.steps_completed = 20
         # Expected Bonus = 0.05 * 0.8 = 0.04. Total = 1.04
         self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.04)
+
+        # 6. Double Penalty Region (The Undergrove)
+        session.location_id = "the_undergrove"
+        session.supplies = {}
+        session.steps_completed = 20
+        # Excess = 4. Base rate = 0.10. Bonus = (4/4)*0.10 = 0.10. Total = 1.10
+        self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.10)
 
     @patch(
         "game_systems.adventure.adventure_manager.LOCATIONS",
@@ -263,7 +282,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
         )
 
         self.assertTrue(success)
-        self.mock_db.remove_inventory_item.assert_called_with(self.discord_id, "pitch_torch", 1)
+        self.mock_db.remove_inventory_item.assert_called_with(
+            self.discord_id, "pitch_torch", 1
+        )
 
         # --- 2. Supply Effect Logic (Ambush Reduction) ---
         # Pitch Torch should reduce ambush chance by 50%
@@ -344,7 +365,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
             # Fix: Reset active_monster before the second call.
 
             # Mock Time (Night)
-            with patch("game_systems.adventure.adventure_session.WorldTime") as MockTime:
+            with patch(
+                "game_systems.adventure.adventure_session.WorldTime"
+            ) as MockTime:
                 MockTime.get_current_weather.return_value = Weather.CLEAR
                 MockTime.get_current_phase.return_value = TimePhase.NIGHT
                 MockTime.get_weather_flavor.return_value = "Clear Night"
@@ -353,7 +376,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
                 # 1. regen_threshold check (fail regen -> combat) -> return 100
                 # 2. ambush chance check -> return 0.15 (15%)
 
-                with patch("random.randint", return_value=100):  # Force combat encounter check to pass
+                with patch(
+                    "random.randint", return_value=100
+                ):  # Force combat encounter check to pass
                     with patch("random.random", return_value=0.15):  # Ambush roll
                         with patch.object(
                             session,
@@ -445,7 +470,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
             "loot_collected": "{}",
             "active_monster_json": None,
         }
-        session = AdventureSession(self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data)
+        session = AdventureSession(
+            self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data
+        )
         session.loot = {"exp": 1000, "aurum": 500, "wood": 10}
         session.supplies = {"pitch_torch": 2}
 
@@ -494,7 +521,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
         # Player is level 5 (from setUp)
 
         # Try to start in High Level Zone (Req 50)
-        success = self.manager.start_adventure(self.discord_id, "high_level_zone", duration_minutes=60)
+        success = self.manager.start_adventure(
+            self.discord_id, "high_level_zone", duration_minutes=60
+        )
 
         # Currently, start_adventure ONLY checks if location exists, not level req.
         # Level reqs are checked in UI (SetupView).
@@ -552,7 +581,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
 
             # B. Check Ambush (Pitch Torch Effect)
             # Mock RNG for Ambush
-            with patch("game_systems.adventure.adventure_session.WorldTime") as MockTime:
+            with patch(
+                "game_systems.adventure.adventure_session.WorldTime"
+            ) as MockTime:
                 MockTime.get_current_weather.return_value = Weather.CLEAR
                 MockTime.get_current_phase.return_value = TimePhase.NIGHT
                 MockTime.get_weather_flavor.return_value = "Clear Night"
@@ -572,7 +603,9 @@ class TestAutoAdventureRegression(unittest.TestCase):
                             "_fetch_session_context",
                             return_value=self.mock_context_bundle,
                         ):
-                            session.steps_completed = 1  # Avoid consuming torch instantly
+                            session.steps_completed = (
+                                1  # Avoid consuming torch instantly
+                            )
                             result = session.simulate_step()
                             logs = "".join([str(x) for x in result["sequence"][0]])
                             self.assertNotIn("AMBUSH!", logs)
@@ -601,3 +634,55 @@ class TestAutoAdventureRegression(unittest.TestCase):
         self.assertIn("Emergency Extraction", summary["penalty_logs"][0])
         # Loot should be empty
         self.assertEqual(len(summary["loot"]), 0)
+
+    def test_undergrove_toxin_mechanic(self):
+        """
+        Regression Test: The Undergrove Toxin Mechanic
+        - Verify toxin level increments and deals damage
+        - Verify Respirator Masks mitigate it
+        - Verify Purifying Brews clear it
+        """
+        row_data = {
+            "location_id": "the_undergrove",
+            "active": 1,
+            "logs": "[]",
+            "loot_collected": "{}",
+            "active_monster_json": None,
+            "supplies": {},
+        }
+        session = AdventureSession(
+            self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data
+        )
+
+        # Base case
+        context = {
+            "vitals": {"current_hp": 100, "current_mp": 50},
+            "stats_dict": {"HP": 100, "MP": 50},
+            "player_stats": MagicMock(max_hp=100, max_mp=50),
+            "active_boosts": {},
+        }
+
+        # Force toxin level high enough
+        session._toxin_level = 5
+
+        # Mock random to always trigger
+        with patch("random.random", return_value=0.1):
+            session._apply_undergrove_penalties(context, persist=False)
+
+            # Toxin dmg = max(1, 100 * (0.02 * (6 - 4))) = 100 * 0.04 = 4
+            self.assertEqual(context["vitals"]["current_hp"], 96)
+            self.assertEqual(session._toxin_level, 6)
+            self.assertIn("Toxin Accumulation", session.logs[-1])
+
+            # Now test Purifying Brew clears it
+            session.supplies["purifying_brew"] = 1
+            session._apply_undergrove_penalties(context, persist=False)
+            self.assertEqual(session._toxin_level, 0)
+            self.assertEqual(session.supplies["purifying_brew"], 0)
+            self.assertIn("Toxin Purged", session.logs[-1])
+
+            # Now test Respirator prevents it
+            session._toxin_level = 5
+            context["active_boosts"]["toxin_filtration"] = 1
+            session._apply_undergrove_penalties(context, persist=False)
+            self.assertEqual(session._toxin_level, 0)

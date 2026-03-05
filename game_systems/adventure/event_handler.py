@@ -41,6 +41,7 @@ class EventHandler:
         weather: Weather = Weather.CLEAR,
         event_type: str | None = None,
         supplies: dict[str, int] | None = None,
+        time_phase=None,
     ) -> dict[str, Any]:
         """Decides between Regen or Quest Event."""
         try:
@@ -53,7 +54,7 @@ class EventHandler:
                     # 15% chance to trigger a special event if available
                     if special_events and random.random() < 0.15:
                         event_key = random.choice(special_events)
-                        result = self.exploration.handle_event(event_key, context)
+                        result = self.exploration.handle_event(event_key, context, weather, time_phase)
                         # Prepend newline to first log for formatting
                         if result["log"]:
                             result["log"][0] = f"\n{result['log'][0]}"

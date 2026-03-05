@@ -7,3 +7,8 @@
 
 **Learning:** Dynamic systems (like Weather) feel most impactful when they alter core mechanics (damage types, turn events) rather than just passive encounter rates. Hooking directly into `CombatEngine` allows for emergent gameplay (e.g., avoiding Fire skills in Rain).
 **Action:** When designing future systems (e.g., Seasons), prioritize deep integration into `CombatEngine` or `DamageFormula` over simple probability adjustments.
+
+## 2026-03-04 — Dynamic Time/Weather Events
+
+**Learning:** It is crucial to ensure variables derived from system state like `time_phase` and `weather` can trickle down appropriately through object and event handling pipelines (`AdventureSession` -> `EventHandler` -> `ExplorationEvents`) for a fully immersive implementation of condition-based events.
+**Action:** Keep these context variables easily accessible from lower-level functions so that individual classes or utility functions can cleanly leverage conditions without making multiple repeated system time calls and violating atomic rules.
