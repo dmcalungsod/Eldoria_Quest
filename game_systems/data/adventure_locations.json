@@ -1,7 +1,7 @@
 {
     "forest_outskirts": {
         "name": "Willowcreek Outskirts",
-        "emoji": "\ud83c\udf32",
+        "emoji": "🌲",
         "min_rank": "F",
         "level_req": 1,
         "duration_options": [
@@ -60,7 +60,7 @@
     },
     "whispering_thicket": {
         "name": "Whispering Thicket",
-        "emoji": "\ud83c\udf43",
+        "emoji": "🍃",
         "min_rank": "E",
         "level_req": 5,
         "duration_options": [
@@ -132,7 +132,7 @@
     },
     "deepgrove_roots": {
         "name": "Deepgrove Roots",
-        "emoji": "\ud83c\udf44",
+        "emoji": "🍄",
         "min_rank": "D",
         "level_req": 10,
         "duration_options": [
@@ -199,7 +199,7 @@
     },
     "the_ashlands": {
         "name": "The Ashlands",
-        "emoji": "\ud83c\udf0b",
+        "emoji": "🌋",
         "min_rank": "D",
         "level_req": 12,
         "duration_options": [
@@ -279,7 +279,7 @@
     },
     "shrouded_fen": {
         "name": "The Shrouded Fen",
-        "emoji": "\ud83c\udf2b\ufe0f",
+        "emoji": "🌫️",
         "min_rank": "C",
         "level_req": 15,
         "duration_options": [
@@ -360,7 +360,7 @@
     },
     "sunken_grotto": {
         "name": "The Sunken Grotto",
-        "emoji": "\ud83c\udf0a",
+        "emoji": "🌊",
         "min_rank": "C",
         "level_req": 18,
         "duration_options": [
@@ -436,7 +436,7 @@
     },
     "crystal_caverns": {
         "name": "The Crystal Caverns",
-        "emoji": "\ud83d\udc8e",
+        "emoji": "💎",
         "min_rank": "B",
         "level_req": 20,
         "duration_options": [
@@ -508,7 +508,7 @@
     },
     "clockwork_halls": {
         "name": "The Clockwork Halls",
-        "emoji": "\u2699\ufe0f",
+        "emoji": "⚙️",
         "min_rank": "B",
         "level_req": 22,
         "duration_options": [
@@ -584,7 +584,7 @@
     },
     "forgotten_ossuary": {
         "name": "The Forgotten Ossuary",
-        "emoji": "\ud83d\udc80",
+        "emoji": "💀",
         "min_rank": "B",
         "level_req": 24,
         "duration_options": [
@@ -657,7 +657,7 @@
     },
     "molten_caldera": {
         "name": "The Molten Caldera",
-        "emoji": "\ud83c\udf0b",
+        "emoji": "🌋",
         "min_rank": "A",
         "level_req": 30,
         "duration_options": [
@@ -733,7 +733,7 @@
     },
     "thunder_crag_coast": {
         "name": "The Thunder-Crag Coast",
-        "emoji": "\u26c8\ufe0f",
+        "emoji": "⛈️",
         "min_rank": "A",
         "level_req": 33,
         "duration_options": [
@@ -814,7 +814,7 @@
     },
     "frostfall_expanse": {
         "name": "The Frostfall Expanse",
-        "emoji": "\u2744\ufe0f",
+        "emoji": "❄️",
         "min_rank": "B",
         "level_req": 25,
         "duration_options": [
@@ -886,7 +886,7 @@
     },
     "void_sanctum": {
         "name": "The Void Sanctum",
-        "emoji": "\u26ab",
+        "emoji": "⚫",
         "min_rank": "S",
         "level_req": 40,
         "duration_options": [
@@ -962,7 +962,7 @@
     },
     "gale_scarred_heights": {
         "name": "Gale-Scarred Heights",
-        "emoji": "\ud83c\udf2a\ufe0f",
+        "emoji": "🌪️",
         "min_rank": "A",
         "level_req": 35,
         "duration_options": [
@@ -1038,7 +1038,7 @@
     },
     "celestial_archipelago": {
         "name": "The Celestial Archipelago",
-        "emoji": "\u2601\ufe0f",
+        "emoji": "☁️",
         "min_rank": "A",
         "level_req": 28,
         "duration_options": [
@@ -1115,7 +1115,7 @@
     },
     "shimmering_wastes": {
         "name": "The Shimmering Wastes",
-        "emoji": "\u2728",
+        "emoji": "✨",
         "min_rank": "A",
         "level_req": 37,
         "duration_options": [
@@ -1187,7 +1187,7 @@
     },
     "guild_arena": {
         "name": "Guild Proving Grounds",
-        "emoji": "\ud83c\udfdf\ufe0f",
+        "emoji": "🏟️",
         "min_rank": "F",
         "level_req": 1,
         "duration_options": [],
@@ -1198,7 +1198,7 @@
     },
     "whispering_archives": {
         "name": "The Whispering Archives",
-        "emoji": "\ud83d\udcda",
+        "emoji": "📚",
         "min_rank": "B",
         "level_req": 26,
         "duration_options": [
@@ -1275,7 +1275,7 @@
     },
     "rust_wastes": {
         "name": "The Rust-Wastes",
-        "emoji": "\u2699\ufe0f",
+        "emoji": "⚙️",
         "min_rank": "E",
         "level_req": 8,
         "duration_options": [
@@ -1350,7 +1350,7 @@
     },
     "abyssal_descent": {
         "name": "The Abyssal Descent",
-        "emoji": "\ud83d\udd73\ufe0f",
+        "emoji": "🕳️",
         "min_rank": "S",
         "level_req": 41,
         "prerequisite_location": "void_sanctum",
@@ -1427,7 +1427,7 @@
     },
     "silent_city_ouros": {
         "name": "The Silent City of Ouros",
-        "emoji": "\ud83d\udd70\ufe0f",
+        "emoji": "🕰️",
         "min_rank": "S",
         "level_req": 42,
         "prerequisite_location": "abyssal_descent",
@@ -1504,7 +1504,7 @@
     },
     "wailing_chasm": {
         "name": "The Wailing Chasm",
-        "emoji": "\ud83d\udd73\ufe0f",
+        "emoji": "🕳️",
         "min_rank": "A",
         "level_req": 35,
         "duration_options": [
@@ -1560,5 +1560,71 @@
         ],
         "floor_depth": 36,
         "danger_level": 7
+    },
+    "the_undergrove": {
+        "name": "The Undergrove",
+        "emoji": "🍄",
+        "min_rank": "B",
+        "level_req": 25,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "fungal_hulk",
+                30
+            ],
+            [
+                "spore_stalker",
+                40
+            ],
+            [
+                "bioluminescent_myriapod",
+                30
+            ]
+        ],
+        "night_monsters": [
+            [
+                "fungal_hulk",
+                50
+            ],
+            [
+                "bioluminescent_myriapod",
+                50
+            ]
+        ],
+        "description": "A massive, subterranean jungle illuminated by eerie bioluminescence and toxic fungal spores. Beautiful, but deeply hazardous.",
+        "gatherables": [
+            [
+                "primordial_ooze",
+                30
+            ],
+            [
+                "lunawort",
+                30
+            ],
+            [
+                "fungal_spores",
+                50
+            ],
+            [
+                "bioluminescent_sap",
+                40
+            ],
+            [
+                "magic_stone_medium",
+                100
+            ]
+        ],
+        "special_events": [
+            "trap_pit",
+            "safe_room",
+            "hidden_stash"
+        ],
+        "floor_depth": 25,
+        "danger_level": 5
     }
 }
