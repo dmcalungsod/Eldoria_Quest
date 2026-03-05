@@ -17,6 +17,7 @@ class RankSystem:
                 "quests_completed": 3,
                 "normal_kills": 50,
                 "total_expeditions": 2,
+                "total_adventure_minutes": 60,
             },
         },
         "E": {
@@ -27,6 +28,7 @@ class RankSystem:
                 "normal_kills": 150,
                 "elite_kills": 5,
                 "total_expeditions": 5,
+                "total_adventure_minutes": 300,
             },
         },
         "D": {
@@ -38,6 +40,7 @@ class RankSystem:
                 "elite_kills": 20,
                 "boss_kills": 1,
                 "total_expeditions": 10,
+                "total_adventure_minutes": 600,
             },
         },
         "C": {
@@ -49,6 +52,7 @@ class RankSystem:
                 "elite_kills": 50,
                 "boss_kills": 2,
                 "total_expeditions": 15,
+                "total_adventure_minutes": 1200,
             },
         },
         "B": {
@@ -60,6 +64,7 @@ class RankSystem:
                 "boss_kills": 4,
                 "elite_kills": 65,
                 "total_expeditions": 20,
+                "total_adventure_minutes": 2400,
             },
         },
         "A": {
@@ -71,6 +76,7 @@ class RankSystem:
                 "boss_kills": 6,
                 "elite_kills": 80,
                 "total_expeditions": 30,
+                "total_adventure_minutes": 4800,
             },
         },
         "S": {
@@ -82,6 +88,7 @@ class RankSystem:
                 "boss_kills": 10,
                 "elite_kills": 120,
                 "total_expeditions": 40,
+                "total_adventure_minutes": 9600,
             },
         },
         "SS": {
@@ -93,6 +100,7 @@ class RankSystem:
                 "boss_kills": 20,
                 "elite_kills": 200,
                 "total_expeditions": 50,
+                "total_adventure_minutes": 19200,
             },
         },
         "SSS": {"title": "Mythic", "next_rank": None, "requirements": {}},
@@ -109,6 +117,9 @@ class RankSystem:
         player_data = dict(row)
         exploration = self.db.get_exploration_stats(discord_id) or {}
         player_data["total_expeditions"] = exploration.get("total_expeditions", 0)
+        player_data["total_adventure_minutes"] = exploration.get(
+            "total_adventure_minutes", 0
+        )
 
         return player_data
 
