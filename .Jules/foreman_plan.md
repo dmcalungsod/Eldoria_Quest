@@ -158,8 +158,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task 5.11:** Improve test coverage for Discord cogs.
     - **Agent:** @BugHunter
     - **Due:** 2026-03-10
-- [ ] **Task 5.12:** Upgrade `pip` in test environment to fix Critical CVE.
+- [x] **Task 5.12:** Upgrade `pip` in test environment to fix Critical CVE.
     - **Agent:** @Sentinel
+    - **Status:** **Completed**
     - **Due:** 2026-03-10
 
 ---
