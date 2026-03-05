@@ -124,9 +124,6 @@ def create_tables(db=None):
         "player_codex": [
             ([("user_id", ASCENDING)], True, None),
         ],
-        "player_halls": [
-            ([("discord_id", ASCENDING)], True, None),
-        ],
     }
 
     for col_name, indexes in INDEX_DEFINITIONS.items():
