@@ -538,5 +538,29 @@
         "description": "A dark, twisting artifact humming with abyssal energy.",
         "rarity": "Epic",
         "value": 300
+    },
+    "refined_stone": {
+        "name": "Refined Stone",
+        "description": "A perfectly cut block of stone, ready for construction.",
+        "rarity": "Common",
+        "value": 25
+    },
+    "treated_lumber": {
+        "name": "Treated Lumber",
+        "description": "Hardwood planks that have been treated to resist rot and fire.",
+        "rarity": "Common",
+        "value": 30
+    },
+    "stuffed_feral_stag_head": {
+        "name": "Stuffed Feral Stag Head",
+        "description": "A taxidermy trophy of a mighty Feral Stag. A testament to a hunter's prowess.",
+        "rarity": "Rare",
+        "value": 500
+    },
+    "void_wraith_core_pedestal": {
+        "name": "Void Wraith Core Pedestal",
+        "description": "A dark, humming pedestal holding the trapped essence of a Void Wraith.",
+        "rarity": "Epic",
+        "value": 2000
     }
 }

@@ -28,3 +28,9 @@
 - **Design Pattern:** A toxic, bioluminescent underground jungle. Focuses on environmental hazards (Toxin accumulation) and provides a rich source for Alchemical reagents (Lunawort, Primordial Ooze).
 - **Thematic Consistency:** Explores the ecological impact of The Sundering on Eldoria's subterranean spaces, creating a hyper-aggressive, mutated ecosystem.
 - **Coordination:** Will require cross-agent coordination for new mechanics (Toxin meter, Respirator gear) and integrating the new alchemical materials and fungal enemies.
+
+## 2026-03-05: Frostmire
+- Designed a new permafrost swamp region: Frostmire.
+- **Design Pattern:** A desolate, frozen environment with cold survival mechanics, building upon the `thermal_insulation` concept introduced in Ironhaven, paired with treacherous terrain (Thin Ice).
+- **Thematic Consistency:** An area frozen over by a magical backlash during The Sundering, freezing ancient life and magic in time, introducing an environment where the harshness is preserved rather than actively mutating.
+- **Coordination:** Will require cross-agent coordination for integrating the Cold mechanics and the specific 'Thin Ice' random events, along with introducing new ice-themed monsters and gatherables.

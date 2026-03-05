@@ -262,7 +262,8 @@ class AdventureEmbeds:
             logs_raw = session.get("logs", "[]")
             logs = json.loads(logs_raw) if isinstance(logs_raw, str) else logs_raw
             for log in logs:
-                if "Defeated" in log or "Victory" in log or "slain" in log:
+                log_lower = log.lower()
+                if "defeated" in log_lower or "victory" in log_lower or "slain" in log_lower:
                     kills += 1
         except Exception:
             pass
