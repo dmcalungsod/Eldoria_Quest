@@ -1,0 +1,138 @@
+./game_systems/character/ui/settings_view.py:54:            await interaction.response.send_message("This menu does not belong to you.", ephemeral=True)
+./game_systems/character/ui/settings_view.py:108:            await interaction.response.send_message("This menu does not belong to you.", ephemeral=True)
+./game_systems/character/ui/inventory_view.py:219:            await interaction.response.send_message("Not your inventory.", ephemeral=True)
+./game_systems/character/ui/abilities_view.py:70:            await interaction.response.send_message("This is not your profile.", ephemeral=True)
+./game_systems/character/ui/adventure_menu.py:92:        await interaction.response.send_message(embed=embed, ephemeral=True)
+./game_systems/character/ui/adventure_menu.py:99:            await interaction.response.send_message("This is not your session.", ephemeral=True)
+./game_systems/character/ui/adventure_menu.py:116:            await interaction.response.send_message(
+./game_systems/character/ui/profile_view.py:102:            await interaction.response.send_message("This profile does not belong to you.", ephemeral=True)
+./game_systems/character/ui/loadout_view.py:56:            await interaction.response.send_message("Not your confirmation.", ephemeral=True)
+./game_systems/character/ui/loadout_view.py:70:            await interaction.response.send_message("Not your confirmation.", ephemeral=True)
+./game_systems/character/ui/loadout_view.py:145:            await interaction.response.send_message("Not your menu.", ephemeral=True)
+./game_systems/character/ui/loadout_view.py:158:            await interaction.response.send_message("Not your menu.", ephemeral=True)
+./game_systems/character/ui/loadout_view.py:181:            await interaction.response.send_message("Not your menu.", ephemeral=True)
+./game_systems/character/ui/loadout_view.py:190:            await interaction.response.send_message("Not your menu.", ephemeral=True)
+./game_systems/adventure/ui/exploration_view.py:239:            await interaction.response.send_message("Not your session.", ephemeral=True)
+./game_systems/adventure/ui/exploration_view.py:272:            await interaction.response.send_message("Please wait...", ephemeral=True)
+./game_systems/adventure/ui/exploration_view.py:278:            await interaction.response.send_message("Invalid action data.", ephemeral=True)
+./game_systems/adventure/ui/exploration_view.py:364:            await interaction.response.send_message("Please wait...", ephemeral=True)
+./game_systems/adventure/ui/exploration_view.py:390:            await interaction.response.send_message("Please wait...", ephemeral=True)
+./game_systems/adventure/ui/exploration_view.py:432:            await interaction.response.send_message("Please wait...", ephemeral=True)
+./game_systems/adventure/ui/setup_view.py:214:            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+./game_systems/adventure/ui/setup_view.py:233:            await interaction.response.send_message(
+./game_systems/adventure/ui/setup_view.py:269:                await interaction.response.send_message(
+./game_systems/adventure/ui/status_view.py:59:            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+./game_systems/guild_system/ui/components.py:75:            await interaction.response.send_message(
+./game_systems/guild_system/ui/exchange_view.py:58:            await interaction.response.send_message("This exchange is not for you.", ephemeral=True)
+./game_systems/help_system/handbook_view.py:56:            await interaction.response.send_message("This handbook belongs to another.", ephemeral=True)
+./game_systems/help_system/handbook_view.py:70:            await interaction.response.send_message("Page torn out.", ephemeral=True)
+./game_systems/crafting/ui/crafting_view.py:55:            await interaction.response.send_message("This workbench is occupied.", ephemeral=True)
+./game_systems/crafting/ui/experiment_view.py:39:            await interaction.response.send_message("This workbench is occupied.", ephemeral=True)
+./.Jules/audit_report_2026-03-04.md:18:- **Issue**: ONE UI Policy Violations (`send_message` used instead of edits or properly scoped ephemeral messages for non-initial responses).
+./.Jules/audit_report_2026-03-04.md:22:  **Recommendation**: Refactor these specific `send_message` calls to `edit_original_response` if they are updating a view, or ensure they use `ephemeral=True` if they are initial slash command responses that must be sent.
+./.Jules/audit_report_2026-03-04.md:65:- **Process**: Create a specific lint rule or test to enforce the ONE UI Policy (e.g., failing tests if `send_message` is used without `ephemeral=True` in specific contexts).
+./.Jules/repo_auditor.md:9:1.  **Grep vs. Static Analysis**: Manual `grep` patterns (`send_message`, `print(`) were faster and more targeted for policy violations (ONE UI) than generic linters.
+./.Jules/repo_auditor.md:15:-   Add a custom `ruff` plugin or pre-commit hook to strictly enforce "ONE UI" (forbid `send_message` unless `ephemeral=True`).
+./.Jules/repo_auditor.md:27:2.  **ONE UI Enforcement**: Grep confirmed widespread use of `interaction.response.send_message` in Cogs (`faction`, `tournament`, `event`, `onboarding`). This requires a targeted refactor campaign.
+./.Jules/repo_auditor.md:38:- **Effectiveness:** Automated tools were highly effective at identifying style, security, dead code, and complexity issues. `safety` was deprecated but `bandit` caught Python-specific security concerns. Manual grep was effective for ONE UI policy violations (`send_message`).
+./.Jules/repo_auditor.md:39:- **Recurring Issues:** High cyclomatic complexity in UI components (e.g., `ShopView`, `QuestBoardView`). Consistent use of `send_message` in UI logic which violates the ONE UI pattern.
+./.Jules/repo_auditor.md:50:- Manual grep for "send_message" in `cogs/` is still the most reliable way to find ONE UI Policy violations, as automated linters don't understand the semantic difference between `send_message` and `edit_original_response`.
+./.Jules/repo_auditor.md:56:- **Recurring Patterns**: ONE UI Policy violations are still frequent in the `cogs/` directory. The use of `send_message` without `ephemeral=True` for non-initial responses is a common anti-pattern here.
+./.Jules/repo_auditor.md:58:  - Implement a custom lint rule or pre-commit regex to catch `send_message` uses that don't pass `ephemeral=True` or aren't preceded by `edit_original_response`.
+./.Jules/repo_auditor.md:72:- **Manual Checks**: Discovered multiple instances of `send_message` breaking the ONE UI policy (assigning to `@Palette`).
+./.Jules/repo_auditor.md:83:- **Recurring Patterns**: ONE UI Policy violations (`interaction.response.send_message`) remain widespread across UI views and Cogs, confirming previous audit findings. Manual `grep` remains the most reliable method for detecting these.
+./.Jules/audit_report_2026-02-23.md:40:  **Recommendation**: Verify `send_message` usage. Ensure all state updates edit the original interaction response where possible.
+./.Jules/audit_report_2026-02-27.md:20:  - `cogs/tournament_cog.py:97, 106` (`await interaction.response.send_message(embed=embed)`)
+./.Jules/audit_report_2026-02-27.md:87:1. **Enforce ONE UI**: Add a pre-commit hook or linter rule to flag `interaction.response.send_message` without `ephemeral=True`.
+./.Jules/audit_report_2026-02-26.md:26:  **Recommendation**: Replace `await interaction.response.send_message(...)` with `await interaction.edit_original_response(...)` where appropriate, or use `ephemeral=True` for transient feedback.
+./.Jules/audit_report_2026-02-26.md:81:1.  **Enforce ONE UI**: Add a pre-commit hook or linter rule to flag `send_message` usage in `cogs/` to prevent regression.
+./.Jules/audit_report_2026-02-28.md:8:Comprehensive codebase audit completed. Key findings include a critical pip vulnerability in the test environment, a medium security risk with `urlopen`, several instances of unused variables (dead code), UI policy violations (using `send_message` improperly), and high complexity in some methods. Test coverage is 73% across core components.
+./.Jules/audit_report_2026-02-28.md:18:- **Issue**: ONE UI Policy Violations (`send_message` used instead of edits/ephemeral properly)
+./.Jules/audit_report_2026-03-02.md:14:- **Issue**: ONE UI Policy Violations (`send_message` used instead of `edit_original_response` or `ephemeral=True` for non-initial responses)
+./.Jules/audit_report_2026-03-01.md:18:- **Issue**: ONE UI Policy Violations (`send_message` used instead of proper ephemeral/edits, non-initial responses)
+./.Jules/audit_report_2026-03-03.md:39:- **ONE UI Policy**: Multiple instances of `send_message` rather than `edit_original_response` were found in `cogs/faction_cog.py`, `cogs/general_cog.py`, `cogs/quest_hub_cog.py`, and `cogs/tournament_cog.py`.
+./tests/test_ui_adventure_views.py:196:        self.mock_interaction.response.send_message.assert_called_once()
+./tests/test_ui_adventure_views.py:197:        args, kwargs = self.mock_interaction.response.send_message.call_args
+./tests/test_ui_callbacks.py:56:        self.mock_interaction.response.send_message = AsyncMock()
+./tests/test_ui_callbacks.py:74:        self.mock_interaction.response.send_message.assert_not_called()
+./tests/test_ui_callbacks.py:85:        self.mock_interaction.response.send_message.assert_called_with("Character record not found.", ephemeral=True)
+./tests/test_general_cog.py:73:        self.interaction.response.send_message.assert_called_once()
+./tests/test_general_cog.py:74:        call_args = self.interaction.response.send_message.call_args[1]
+./tests/test_general_cog.py:88:        self.interaction.response.send_message.side_effect = [Exception("Send Error"), None]
+./tests/test_general_cog.py:98:        # Cause an exception before send_message
+./tests/test_general_cog.py:106:        self.interaction.response.send_message.assert_called_once_with(
+./tests/test_general_cog.py:114:        self.interaction.response.send_message.assert_called_once()
+./tests/test_general_cog.py:115:        call_args = self.interaction.response.send_message.call_args[1]
+./tests/test_general_cog.py:131:        self.interaction.response.send_message.side_effect = [Exception("Embed Error"), None]
+./tests/test_event_cog.py:121:        interaction.response.send_message.assert_called_once()
+./tests/test_event_cog.py:122:        kwargs = interaction.response.send_message.call_args.kwargs
+./tests/test_event_cog.py:139:        interaction.response.send_message.assert_called_once()
+./tests/test_event_cog.py:140:        kwargs = interaction.response.send_message.call_args.kwargs
+./tests/test_event_cog.py:153:        interaction.response.send_message.assert_called_once()
+./tests/test_event_cog.py:154:        self.assertIn("Started Event", interaction.response.send_message.call_args[0][0])
+./tests/test_event_cog.py:162:        interaction.response.send_message.assert_called_once()
+./tests/test_event_cog.py:163:        self.assertIn("Invalid type", interaction.response.send_message.call_args[0][0])
+./tests/test_event_cog.py:171:        interaction.response.send_message.assert_called_once()
+./tests/test_ui_validation.py:61:        self.interaction.response.send_message.assert_not_called()
+./tests/test_ui_validation.py:68:        self.interaction.response.send_message = AsyncMock()
+./tests/test_ui_validation.py:73:        self.interaction.response.send_message.assert_called_with("Character record not found.", ephemeral=True)
+./tests/test_ui_validation.py:85:        self.interaction.response.send_message.assert_not_called()
+./tests/test_ui_validation.py:92:        self.interaction.response.send_message = AsyncMock()
+./tests/test_ui_validation.py:97:        self.interaction.response.send_message.assert_called_with("Custom Error", ephemeral=True)
+./tests/test_security_developer.py:131:        interaction.response.send_message = AsyncMock()
+./tests/test_security_developer.py:139:        interaction.response.send_message.assert_awaited_with("⛔ You are not the bot owner.", ephemeral=True)
+./tests/test_ui_quest_views.py:100:        self.mock_interaction.response.send_message.assert_called_with("This is not your adventure.", ephemeral=True)
+./tests/test_tournament_cog.py:138:        interaction.response.send_message.assert_called_once()
+./tests/test_tournament_cog.py:139:        args, kwargs = interaction.response.send_message.call_args
+./tests/test_tournament_cog.py:153:        interaction.response.send_message.assert_called_once()
+./tests/test_tournament_cog.py:154:        args, kwargs = interaction.response.send_message.call_args
+./tests/test_tournament_cog.py:166:        interaction.response.send_message.assert_called_once()
+./tests/test_tournament_cog.py:167:        args = interaction.response.send_message.call_args[0]
+./tests/test_tournament_cog.py:178:        interaction.response.send_message.assert_called_once()
+./tests/test_tournament_cog.py:179:        args, kwargs = interaction.response.send_message.call_args
+./tests/test_tournament_cog.py:195:        interaction.response.send_message.assert_called_once()
+./tests/test_tournament_cog.py:196:        self.assertIn("Started Tournament #101", interaction.response.send_message.call_args[0][0])
+./tests/test_tournament_cog.py:205:        interaction.response.send_message.assert_called_once()
+./tests/test_tournament_cog.py:206:        self.assertIn("Invalid type", interaction.response.send_message.call_args[0][0])
+./tests/test_tournament_cog.py:215:        interaction.response.send_message.assert_called_once()
+./tests/test_ui_rank_view.py:142:        self.mock_interaction.response.send_message = AsyncMock()
+./tests/test_adventure_race.py:116:                await interaction.response.send_message("Please wait...", ephemeral=True)
+./tests/test_developer_cog.py:107:        interaction.response.send_message.assert_called_once()
+./tests/test_developer_cog.py:108:        self.assertIn("not the bot owner", interaction.response.send_message.call_args[0][0])
+./tests/test_developer_cog.py:157:        interaction.response.send_message.assert_called_once()
+./tests/test_dos_prevention.py:162:            interaction.response.send_message.assert_called_with("Invalid action data.", ephemeral=True)
+./cogs/faction_cog.py:52:        await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/faction_cog.py:59:        await interaction.response.send_message(msg, ephemeral=True)
+./cogs/faction_cog.py:67:            await interaction.response.send_message(
+./cogs/faction_cog.py:104:        await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/faction_cog.py:114:        await interaction.response.send_message(msg, ephemeral=True)
+./cogs/general_cog.py:36:            await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/general_cog.py:41:            await interaction.response.send_message("Error calculating latency.", ephemeral=True)
+./cogs/general_cog.py:76:            await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/general_cog.py:81:            await interaction.response.send_message("Error accessing the Guild Handbook.", ephemeral=True)
+./cogs/utils/ui_helpers.py:158:            await interaction.response.send_message(content, ephemeral=True)
+./cogs/utils/ui_helpers.py:180:            await interaction.response.send_message(content, ephemeral=True)
+./cogs/utils/ui_helpers.py:338:            await interaction.response.send_message("Error loading profile.", ephemeral=True)
+./cogs/quest_hub_cog.py:69:            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+./cogs/quest_hub_cog.py:146:            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+./cogs/quest_hub_cog.py:303:            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+./cogs/quest_hub_cog.py:442:            await interaction.response.send_message("This is not your adventure.", ephemeral=True)
+./cogs/tournament_cog.py:107:            await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/tournament_cog.py:127:        await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/tournament_cog.py:138:            await interaction.response.send_message(f"{E.WARNING} No tournament is currently active.", ephemeral=True)
+./cogs/tournament_cog.py:161:        await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/tournament_cog.py:178:            await interaction.response.send_message(
+./cogs/tournament_cog.py:197:        await interaction.response.send_message(f"{E.CHECK} Started Tournament #{t_id}: {event_type}", ephemeral=True)
+./cogs/tournament_cog.py:207:        await interaction.response.send_message(f"{E.CHECK} Tournament ended manually.\n\n{result}", ephemeral=True)
+./cogs/developer_cog.py:42:            await interaction.response.send_message("Access Denied.", ephemeral=True)
+./cogs/developer_cog.py:186:            await interaction.response.send_message("⛔ You are not the bot owner.", ephemeral=True)
+./cogs/developer_cog.py:207:            await interaction.response.send_message(
+./cogs/skill_trainer_cog.py:78:            await interaction.response.send_message("This session is not yours.", ephemeral=True)
+./cogs/event_cog.py:140:            await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/event_cog.py:165:        await interaction.response.send_message(embed=embed, ephemeral=True)
+./cogs/event_cog.py:180:            await interaction.response.send_message(
+./cogs/event_cog.py:190:            await interaction.response.send_message(
+./cogs/event_cog.py:201:            await interaction.response.send_message(f"{E.ERROR} Failed to start event.", ephemeral=True)
+./cogs/event_cog.py:211:        await interaction.response.send_message(f"{E.CHECK} Event ended manually.", ephemeral=True)
+./cogs/onboarding_cog.py:109:            await interaction.response.send_message("Class data error.", ephemeral=True)
+./cogs/onboarding_cog.py:474:            await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
