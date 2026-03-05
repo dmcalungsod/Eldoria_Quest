@@ -204,6 +204,11 @@ class AdventureRewards:
             ouros_bonus = combat_result.get("active_boosts", {}).get("ouros_loot_bonus", 1.0)
             loot_boost *= float(ouros_bonus)
 
+        # EVENT HOOK: Undergrove Loot Bonus
+        if location_id == "the_undergrove":
+            undergrove_bonus = combat_result.get("active_boosts", {}).get("undergrove_loot_bonus", 1.0)
+            loot_boost *= float(undergrove_bonus)
+
         # Check for World Event: Elemental Surge or Spectral Tide
         try:
             active_event = self.db.get_active_world_event()
