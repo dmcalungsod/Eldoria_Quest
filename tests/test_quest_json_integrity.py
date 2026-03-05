@@ -63,6 +63,14 @@ class TestQuestJsonIntegrity(unittest.TestCase):
                             found = True
                             break
 
+                if not found:
+                    # Check Equipments
+                    from game_systems.data.equipments import EQUIPMENT_DATA
+                    for eq in EQUIPMENT_DATA.values():
+                        if eq["name"] == item_name:
+                            found = True
+                            break
+
                 self.assertTrue(found, f"Quest {quest['id']} rewards unknown item: '{item_name}'")
 
     def test_frozen_echo_chain(self):
