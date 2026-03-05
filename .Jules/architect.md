@@ -181,3 +181,23 @@ Major Content Expansion: Guild Halls (Player Housing & Shared Resources).
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/expansion_guild_halls.md`
+
+## 2026-03-10 — Expansion Blueprint: The Lost Tomes (Skill Books)
+
+**Design Choice:**
+Major Content Expansion/System: The Lost Tomes (Consumable Skill Books).
+
+**Reasoning:**
+- **Progression:** The game needs horizontal progression for players who reach max level or complete all base skill trees.
+- **Engagement:** High-level bosses needed better chase items besides just `magic_stone_flawless` or stat sticks.
+- **Class Parity:** Specifically addresses Foreman's assignment to ensure Alchemist and Rogue are competitive with the 100% popularity Warrior class, without issuing direct nerfs to the Warrior.
+
+**Theme Alignment:**
+- "Grim Survival": Recovering forbidden/lost knowledge from dangerous beasts fits the post-Sundering world perfectly.
+
+**Integration Notes:**
+- **CombatEngine/Items:** Requires updates to `ConsumableManager` to handle skill unlocks and `CombatEngine` to support the new conditional passives.
+- **Economy:** Must ensure these books are either untradeable or heavily weighted so as not to break zone EV.
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/expansion_skill_books.md`
