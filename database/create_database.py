@@ -121,6 +121,9 @@ def create_tables(db=None):
             ([("active", ASCENDING)], False, None),
             ([("end_time", ASCENDING)], False, None),
         ],
+        "player_codex": [
+            ([("user_id", ASCENDING)], True, None),
+        ],
     }
 
     for col_name, indexes in INDEX_DEFINITIONS.items():
