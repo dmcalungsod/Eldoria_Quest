@@ -20,3 +20,7 @@
 **Learning:** When implementing the "Toxin Accumulation" mechanic for The Undergrove, the persistent state needed to track accumulation over the course of the background adventure simulation without writing to the database on every tick. The `AdventureSession` instance persists over the course of the simulation loop for auto-adventures, making it an ideal place to store temporary mechanical state (like `_toxin_level`) safely. Additionally, incorporating `the_undergrove` into the double-fatigue multiplier list effectively communicates the physical tax of exploring such a hostile environment.
 
 **Action:** Leveraged instance attributes on `AdventureSession` to track Toxin accumulation across the simulation. Implemented `_apply_undergrove_penalties` which periodically checks for `toxin_filtration` active boosts or consumes `purifying_brew` supplies to clear the toxin, dealing scaling poison damage otherwise. Integrated `the_undergrove` into `_calculate_fatigue_multiplier` to stack realism pressure on longer expeditions.
+## 2026-03-12 — Environmental Logic for The Howling Peaks
+
+**Learning:** When adding new quest locations, we must ensure they have a realistic ecosystem. A location only containing elite quest targets feels artificial.
+**Action:** Always ensure new areas contain lower-tier, environmentally appropriate mobs (e.g., adding Frost Wolves to the Howling Peaks alongside the Frost Gargoyles and Storm Drakes).
