@@ -109,6 +109,19 @@ class TestAchievementLogic(unittest.TestCase):
         self.mock_db.add_title.assert_not_called()
         self.assertIsNone(msg)
 
+    def test_check_auto_adventure_achievements_success(self):
+        discord_id = 123
+        self.mock_db.get_exploration_stats.return_value = {"total_adventure_minutes": 5500}
+        self.mock_db.add_title.return_value = True
+
+        msg = self.achievements.check_auto_adventure_achievements(discord_id)
+
+        self.mock_db.add_title.assert_any_call(discord_id, "Wanderer")
+        self.mock_db.add_title.assert_any_call(discord_id, "Explorer")
+        self.assertIn("Wanderer", msg)
+        self.assertIn("Explorer", msg)
+        self.assertNotIn("Vagabond", msg)
+
 
 if __name__ == "__main__":
     unittest.main()

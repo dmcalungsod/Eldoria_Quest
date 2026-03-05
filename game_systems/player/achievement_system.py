@@ -113,6 +113,12 @@ DURATION_MILESTONES = {
     480: ("Marathoner", "Completed an adventure lasting at least 8 hours."),
 }
 
+AUTO_ADVENTURE_MILESTONES = {
+    1000: ("Wanderer", "Spent 1000 total minutes in auto-adventures."),
+    5000: ("Explorer", "Spent 5000 total minutes in auto-adventures."),
+    10000: ("Vagabond", "Spent 10000 total minutes in auto-adventures."),
+}
+
 CRAFTING_MILESTONES = {
     5: ("Apprentice Smith", "Reached Crafting Level 5."),
     10: ("Journeyman Crafter", "Reached Crafting Level 10."),
@@ -123,6 +129,8 @@ CRAFTING_MILESTONES = {
 CLASS_MASTERY_MILESTONES = {
     "Nightblade": {"double_strike", "toxic_blade", "venomous_strike", "death_blossom"},
     "Ghost-Walker": {"stealth", "shadow_step", "flash_powder"},
+    "Assassin": {"double_strike", "toxic_blade", "venomous_strike", "death_blossom"},
+    "Phantom": {"stealth", "shadow_step", "flash_powder"},
 }
 
 
@@ -324,6 +332,24 @@ class AchievementSystem:
 
         except Exception as e:
             logger.error(f"Error checking duration achievements for {discord_id}: {e}")
+            return None
+
+    def check_auto_adventure_achievements(self, discord_id: int) -> str | None:
+        """
+        Checks if the player has reached a total auto-adventure duration milestone.
+        Returns a success message if a new title is awarded, else None.
+        """
+        try:
+            stats = self.db.get_exploration_stats(discord_id)
+            total_minutes = stats.get("total_adventure_minutes", 0)
+
+            newly_awarded = self._check_milestones(
+                discord_id, AUTO_ADVENTURE_MILESTONES, total_minutes
+            )
+            return self._format_title_message(newly_awarded)
+
+        except Exception as e:
+            logger.error(f"Error checking auto-adventure achievements for {discord_id}: {e}")
             return None
 
     def check_crafting_achievements(self, discord_id: int) -> str | None:
