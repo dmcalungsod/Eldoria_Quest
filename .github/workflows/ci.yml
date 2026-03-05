@@ -36,7 +36,7 @@ jobs:
           
       - name: Install Tools
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install "pip==26.0.1"
           pip install ruff bandit pip-audit
           
       - name: Ruff Auto-Fix & Format
@@ -70,7 +70,7 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install "pip==26.0.1"
           pip install -r requirements.txt
           pip install pytest pytest-cov
           
