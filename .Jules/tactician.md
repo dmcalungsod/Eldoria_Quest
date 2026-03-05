@@ -24,7 +24,3 @@
 
 **Learning:** Auto-adventure combat logic bypasses the turn-by-turn simulation loop in favor of a deterministic formula (`AutoCombatFormula`). New passive mechanics like `kill_heal_percent` and `self_damage_percent` must be translated into raw DPS/mitigation adjustments within this formula to ensure players using auto-adventures still benefit from their class features.
 **Action:** When adding new combat mechanics, always verify if they need an equivalent approximation in `game_systems/combat/auto_combat_formula.py`.
-## 2026-03-05 — Rogue Auto-Combat Mechanics
-
-**Learning:** Auto-combat abstractions (`auto_combat_formula.py`) bypass the complex turn-by-turn simulation loop entirely to save processing power. As a result, specific skill mechanics like `next_hit_crit` and `conditional_multiplier` must be explicitly modeled by modifying the expected `final_damage_taken` rather than trying to simulate the exact hit/crit mechanics inside the formula.
-**Action:** When implementing future class mechanics (like Warrior's recoil or lifesteal) for auto-adventure, directly modify the `final_damage_taken` or `player_dps` values rather than trying to recreate turn-based logic.
