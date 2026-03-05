@@ -152,8 +152,8 @@ class TestAutoAdventureRegression(unittest.TestCase):
             # Run Resolution
             self.engine.resolve_session(session_doc)
 
-            # Verify 4 steps for 60 mins (15 min/step)
-            self.assertEqual(mock_session_instance.simulate_step.call_count, 4)
+            # Verify 60 steps for 60 mins (1 min/step)
+            self.assertEqual(mock_session_instance.simulate_step.call_count, 60)
             self.mock_db.update_adventure_status.assert_called_with(
                 self.discord_id, "completed"
             )
@@ -221,35 +221,35 @@ class TestAutoAdventureRegression(unittest.TestCase):
             self.mock_db, MagicMock(), MagicMock(), self.discord_id, row_data=row_data
         )
 
-        # 1. Base Case: < 16 steps (4 hours)
-        session.steps_completed = 10
+        # 1. Base Case: < 240 steps (4 hours)
+        session.steps_completed = 100
         self.assertEqual(session._calculate_fatigue_multiplier(), 1.0)
 
-        # 2. Threshold Case: 16 steps
-        session.steps_completed = 16
+        # 2. Threshold Case: 240 steps
+        session.steps_completed = 240
         self.assertEqual(session._calculate_fatigue_multiplier(), 1.0)
 
-        # 3. Scaling Case: 20 steps (5 hours)
-        # Excess = 4. Bonus = (4/4)*0.05 = 0.05. Total = 1.05
-        session.steps_completed = 20
+        # 3. Scaling Case: 300 steps (5 hours)
+        # Excess = 60. Bonus = (60/60)*0.05 = 0.05. Total = 1.05
+        session.steps_completed = 300
         self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.05)
 
-        # 4. Heavy Scaling Case: 32 steps (8 hours)
-        # Excess = 16. Bonus = (16/4)*0.05 = 0.20. Total = 1.20
-        session.steps_completed = 32
+        # 4. Heavy Scaling Case: 480 steps (8 hours)
+        # Excess = 240. Bonus = (240/60)*0.05 = 0.20. Total = 1.20
+        session.steps_completed = 480
         self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.20)
 
         # 5. Supply Effect: Hardtack
         session.supplies = {"hardtack": 1}
-        session.steps_completed = 20
+        session.steps_completed = 300
         # Expected Bonus = 0.05 * 0.8 = 0.04. Total = 1.04
         self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.04)
 
         # 6. Double Penalty Region (The Undergrove)
         session.location_id = "the_undergrove"
         session.supplies = {}
-        session.steps_completed = 20
-        # Excess = 4. Base rate = 0.10. Bonus = (4/4)*0.10 = 0.10. Total = 1.10
+        session.steps_completed = 300
+        # Excess = 60. Base rate = 0.10. Bonus = (60/60)*0.10 = 0.10. Total = 1.10
         self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.10)
 
     @patch(
@@ -574,8 +574,8 @@ class TestAutoAdventureRegression(unittest.TestCase):
             )
 
             # A. Check Fatigue (Hardtack Effect)
-            # 20 steps (4 excess). Base Bonus 0.05.
-            session.steps_completed = 20
+            # 300 steps (60 excess). Base Bonus 0.05.
+            session.steps_completed = 300
             # Hardtack reduces by 20% -> 0.04
             self.assertAlmostEqual(session._calculate_fatigue_multiplier(), 1.04)
 
