@@ -1,6 +1,7 @@
-import pytest
-from game_systems.combat.auto_combat_formula import AutoCombatFormula
 import unittest.mock as mock
+
+from game_systems.combat.auto_combat_formula import AutoCombatFormula
+
 
 class TestAutoCombatFormulaIntegration:
     def test_kill_heal_percent_integration(self):
