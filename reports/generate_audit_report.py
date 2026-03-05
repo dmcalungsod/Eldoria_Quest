@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 
 # Parse Bandit
-with open("reports/bandit.txt", "r") as f:
+with open("reports/bandit.txt") as f:
     bandit_data = f.read()
 
 bandit_issues = []
@@ -26,7 +26,7 @@ for block in bandit_data.split("------------------------------------------------
             })
 
 # Parse Vulture (dead code)
-with open("reports/vulture.txt", "r") as f:
+with open("reports/vulture.txt") as f:
     vulture_data = f.read().splitlines()
 
 vulture_issues = []
@@ -35,7 +35,7 @@ for line in vulture_data:
         vulture_issues.append({"location": line.split(":")[0], "issue": line})
 
 # Parse Complexity
-with open("reports/complexity.txt", "r") as f:
+with open("reports/complexity.txt") as f:
     complexity_data = f.read().splitlines()
 
 complexity_issues = []
@@ -46,7 +46,7 @@ for line in complexity_data:
             complexity_issues.append({"issue": f"High Complexity ({parts[1].strip()})", "location": parts[0].strip()})
 
 # Parse Safety
-with open("reports/safety.json", "r") as f:
+with open("reports/safety.json") as f:
     try:
         safety_data = json.load(f)
         safety_issues = safety_data.get("vulnerabilities", [])
@@ -54,12 +54,12 @@ with open("reports/safety.json", "r") as f:
         safety_issues = []
 
 # ONE UI Policy violations
-with open("reports/send_message.txt", "r") as f:
+with open("reports/send_message.txt") as f:
     send_message_data = f.read().splitlines()
 
 ui_violations = []
 for line in send_message_data:
-    if "send_message" in line and not "reports/" in line:
+    if "send_message" in line and "reports/" not in line:
          ui_violations.append(line)
 
 report = f"""# 🔍 Eldoria Quest Codebase Audit — {datetime.now().strftime('%Y-%m-%d')}
@@ -82,9 +82,9 @@ for issue in bandit_issues:
     if issue["severity"] == "High":
         report += f"- **Issue**: Security Warning {issue['issue']}\n"
         report += f"  **Location**: `{issue['location']}`\n"
-        report += f"  **Risk**: Potential vulnerability.\n"
-        report += f"  **Suggested Agent**: Sentinel\n"
-        report += f"  **Recommendation**: Review and mitigate.\n\n"
+        report += "  **Risk**: Potential vulnerability.\n"
+        report += "  **Suggested Agent**: Sentinel\n"
+        report += "  **Recommendation**: Review and mitigate.\n\n"
 
 report += "## 🔸 Medium Priority Issues\n\n"
 
@@ -92,22 +92,22 @@ for issue in bandit_issues:
     if issue["severity"] in ["Medium", "Low"]:
         report += f"- **Issue**: Security Warning {issue['issue']}\n"
         report += f"  **Location**: `{issue['location']}`\n"
-        report += f"  **Risk**: Low to medium security risk.\n"
-        report += f"  **Suggested Agent**: Sentinel\n"
-        report += f"  **Recommendation**: Review and mitigate if necessary.\n\n"
+        report += "  **Risk**: Low to medium security risk.\n"
+        report += "  **Suggested Agent**: Sentinel\n"
+        report += "  **Recommendation**: Review and mitigate if necessary.\n\n"
 
-report += f"- **Issue**: High Cyclomatic Complexity (> 10)\n"
+report += "- **Issue**: High Cyclomatic Complexity (> 10)\n"
 report += f"  **Location**: Multiple files ({len(complexity_issues)} instances)\n"
-report += f"  **Risk**: Difficult to maintain and test.\n"
-report += f"  **Suggested Agent**: SystemSmith\n"
-report += f"  **Recommendation**: Refactor functions to reduce complexity. Focus on DatabaseManager, CombatEngine, and AdventureSession.\n\n"
+report += "  **Risk**: Difficult to maintain and test.\n"
+report += "  **Suggested Agent**: SystemSmith\n"
+report += "  **Recommendation**: Refactor functions to reduce complexity. Focus on DatabaseManager, CombatEngine, and AdventureSession.\n\n"
 
 report += "## 🔹 ONE UI Policy Violations\n\n"
-report += f"- **Issue**: `send_message` used instead of editing existing messages.\n"
+report += "- **Issue**: `send_message` used instead of editing existing messages.\n"
 report += f"  **Location**: Multiple files ({len(ui_violations)} instances, mainly in `ui/` directories)\n"
-report += f"  **Risk**: Breaks immersion and creates UI clutter.\n"
-report += f"  **Suggested Agent**: Palette\n"
-report += f"  **Recommendation**: Replace `send_message` with `edit_original_response` or appropriate state updates.\n\n"
+report += "  **Risk**: Breaks immersion and creates UI clutter.\n"
+report += "  **Suggested Agent**: Palette\n"
+report += "  **Recommendation**: Replace `send_message` with `edit_original_response` or appropriate state updates.\n\n"
 
 
 report += "## 📦 Dependency Issues\n\n"
@@ -119,10 +119,10 @@ else:
     report += "- No known vulnerabilities found in dependencies.\n"
 
 report += "\n## 📚 Documentation & Dead Code\n\n"
-report += f"- **Issue**: Potentially dead code detected.\n"
+report += "- **Issue**: Potentially dead code detected.\n"
 report += f"  **Location**: Multiple files ({len(vulture_issues)} instances)\n"
-report += f"  **Suggested Agent**: SystemSmith\n"
-report += f"  **Recommendation**: Review and remove unused code to improve maintainability.\n"
+report += "  **Suggested Agent**: SystemSmith\n"
+report += "  **Recommendation**: Review and remove unused code to improve maintainability.\n"
 
 report += """
 ## 🧪 Test Coverage Gaps
