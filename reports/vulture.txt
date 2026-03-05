@@ -1,3 +1,4 @@
+scripts/clear_workflow_history.py:65: unreachable code after 'while' (100% confidence)
 tests/test_accessory_slots.py:217: unused variable 'projection' (100% confidence)
 tests/test_adventure_retreat_exploit.py:25: unused variable 'mock_faction' (100% confidence)
 tests/test_equipment_robustness.py:29: unused variable 'projection' (100% confidence)
