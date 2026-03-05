@@ -1626,5 +1626,44 @@
         ],
         "floor_depth": 25,
         "danger_level": 5
+    },
+    "howling_peaks": {
+        "name": "The Howling Peaks",
+        "emoji": "🏔️",
+        "min_rank": "A",
+        "level_req": 30,
+        "duration_options": [
+            60,
+            120,
+            240,
+            480
+        ],
+        "monsters": [
+            [
+                "frost_gargoyle",
+                60
+            ],
+            [
+                "storm_drake",
+                10
+            ],
+            [
+                "monster_111",
+                30
+            ]
+        ],
+        "bosses": [
+            "storm_drake"
+        ],
+        "materials": [
+            "raw_star_metal_block",
+            "dragon_scale",
+            "refined_stone"
+        ],
+        "quest_items": [
+            "vial_of_drake_blood"
+        ],
+        "floor_depth": 50,
+        "danger_level": 8
     }
 }
