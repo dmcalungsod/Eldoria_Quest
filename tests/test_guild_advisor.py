@@ -16,6 +16,7 @@ class TestGuildAdvisor(unittest.TestCase):
         sys.modules["pymongo"] = mock_pymongo
         sys.modules["pymongo.errors"] = mock_pymongo.errors
         sys.modules["pymongo.MongoClient"] = MagicMock()
+        sys.modules["discord"] = MagicMock()
 
         # Add repo root to path if not present
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
