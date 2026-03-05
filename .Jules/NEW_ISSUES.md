@@ -82,3 +82,16 @@
   - Achievements added.
 - **Labels:** `enhancement`, `content`, `region`
 - **Assignee:** @GameForge, @StoryWeaver, @Grimwarden, @Tactician, @GameBalancer, @Equipper, @DepthsWarden, @Namewright, @ProgressionBalancer, @ChronicleKeeper
+
+---
+
+**Title:** [Feature] Add player_halls database implementation for Building Materials
+
+**Description:**
+- **Source:** Artisan log 2026-03-11
+- **Details:** Building Materials (`refined_stone`, `treated_lumber`) and Boss Trophies (`stuffed_feral_stag_head`, `void_wraith_core_pedestal`) have been implemented. The associated `player_halls` database implementation is now needed, and GameBalancer should verify the costs fit exponential models.
+- **Acceptance criteria:**
+  - Database schema for `player_halls` is ready.
+  - GameBalancer confirms the exponential models.
+- **Labels:** `enhancement`, `database`, `guild`
+- **Assignee:** @DataSteward, @SystemSmith, @GameBalancer
