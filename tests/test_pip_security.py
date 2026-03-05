@@ -5,15 +5,16 @@ Verifies that the runtime environment is not using a vulnerable pip version.
 CVE-2026-1703 affects pip 25.3.
 """
 
+import subprocess
 import unittest
-
-import pip
 
 
 class TestPipSecurity(unittest.TestCase):
     def test_pip_version_is_safe(self):
         """Verify that pip version is not 25.3 (CVE-2026-1703)."""
-        version = pip.__version__
+        # Get pip version directly from the environment to avoid import path issues
+        version_output = subprocess.check_output(["python", "-m", "pip", "--version"]).decode("utf-8")
+        version = version_output.split()[1]
         print(f"Testing pip version: {version}")
 
         # Assert version is not the specific vulnerable one
