@@ -22,7 +22,7 @@ class TestAdventureFatigue:
     def test_calculate_fatigue_multiplier(self):
         """
         Verify that _calculate_fatigue_multiplier returns correct values.
-        Logic: > 16 steps -> +5% per 4 steps.
+        Logic: > 240 steps -> +5% per 60 steps.
         """
         # We can mock AdventureSession to test just this method
         session = MagicMock(spec=AdventureSession)
@@ -35,24 +35,24 @@ class TestAdventureFatigue:
         # Mock supplies (new requirement)
         session.supplies = {}
 
-        # Case 1: Under threshold (1 hour = 4 steps)
-        session.steps_completed = 4
+        # Case 1: Under threshold (1 hour = 60 steps)
+        session.steps_completed = 60
         assert session._calculate_fatigue_multiplier() == 1.0
 
-        # Case 2: At threshold (4 hours = 16 steps)
-        session.steps_completed = 16
+        # Case 2: At threshold (4 hours = 240 steps)
+        session.steps_completed = 240
         assert session._calculate_fatigue_multiplier() == 1.0
 
-        # Case 3: 5 hours (20 steps) -> +5%
-        session.steps_completed = 20
+        # Case 3: 5 hours (300 steps) -> +5%
+        session.steps_completed = 300
         assert session._calculate_fatigue_multiplier() == 1.05
 
-        # Case 4: 8 hours (32 steps) -> (16/4)*0.05 = 0.20 -> 1.20
-        session.steps_completed = 32
+        # Case 4: 8 hours (480 steps) -> (240/60)*0.05 = 0.20 -> 1.20
+        session.steps_completed = 480
         assert session._calculate_fatigue_multiplier() == 1.20
 
-        # Case 5: 24 hours (96 steps) -> (80/4)*0.05 = 1.00 -> 2.00
-        session.steps_completed = 96
+        # Case 5: 24 hours (1440 steps) -> (1200/60)*0.05 = 1.00 -> 2.00
+        session.steps_completed = 1440
         assert session._calculate_fatigue_multiplier() == 2.00
 
     @patch("game_systems.combat.combat_engine.DamageFormula")

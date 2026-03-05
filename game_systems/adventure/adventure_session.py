@@ -115,24 +115,24 @@ class AdventureSession:
     def _calculate_fatigue_multiplier(self) -> float:
         """
         Calculates monster damage multiplier based on session duration.
-        Logic: > 4 hours (16 steps) -> +5% damage per hour (4 steps).
+        Logic: > 4 hours (240 steps) -> +5% damage per hour (60 steps).
         For silent_city_ouros: sensory deprivation doubles the fatigue buildup (+10% per hour).
         """
         steps = getattr(self, "steps_completed", 0)
-        if steps <= 16:
+        if steps <= 240:
             return 1.0
 
         # Steps past threshold
-        excess_steps = steps - 16
+        excess_steps = steps - 240
 
-        # 5% per hour (4 steps) => 1.25% per step. Double for silent_city_ouros, ironhaven (thin air), and the_undergrove (toxins).
+        # 5% per hour (60 steps) => ~0.083% per step. Double for silent_city_ouros, ironhaven (thin air), and the_undergrove (toxins).
         location_id = getattr(self, "location_id", None)
         base_rate = (
             0.10
             if location_id in ("silent_city_ouros", "ironhaven", "the_undergrove")
             else 0.05
         )
-        bonus = (excess_steps / 4.0) * base_rate
+        bonus = (excess_steps / 60.0) * base_rate
 
         # SUPPLY EFFECT: Hardtack reduces fatigue buildup by 20%
         if self.supplies.get("hardtack", 0) > 0:
@@ -722,7 +722,7 @@ class AdventureSession:
         current_step = getattr(self, "steps_completed", 0)
 
         # Torch Consumption
-        torch_rate = 2 if self.location_id == "the_wailing_chasm" else 4
+        torch_rate = 30 if self.location_id == "the_wailing_chasm" else 60
         if current_step > 0 and current_step % torch_rate == 0:
             if self.supplies.get("pitch_torch", 0) > 0:
                 self.supplies["pitch_torch"] -= 1
@@ -733,7 +733,7 @@ class AdventureSession:
                     )
 
         # Ration Consumption
-        if current_step > 0 and current_step % 4 == 0:
+        if current_step > 0 and current_step % 60 == 0:
             if self.supplies.get("hardtack", 0) > 0:
                 self.supplies["hardtack"] -= 1
                 if self.supplies["hardtack"] <= 0:

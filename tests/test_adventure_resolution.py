@@ -43,7 +43,7 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
 
     session_doc = {
         "discord_id": 123,
-        "duration_minutes": 30,  # 2 steps
+        "duration_minutes": 30,  # 30 steps
         "steps_completed": 0,
     }
 
@@ -54,8 +54,8 @@ def test_resolution_success(mock_mgr, mock_inv, mock_quest, mock_session_cls, mo
     assert result is True
     # Should create session
     mock_session_cls.assert_called_once()
-    # Should simulate 2 steps (30 / 15)
-    assert mock_session.simulate_step.call_count == 2
+    # Should simulate 30 steps
+    assert mock_session.simulate_step.call_count == 30
 
     # Should be called with the parsed context (return value of _fetch_session_context)
     # The engine now calls _fetch_session_context ONCE and passes the result
@@ -140,7 +140,7 @@ def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_b
 
     session_doc = {
         "discord_id": 123,
-        "duration_minutes": 60,  # 4 steps total
+        "duration_minutes": 60,  # 60 steps total
         "steps_completed": 2,
     }
 
@@ -148,8 +148,8 @@ def test_resume_session(mock_mgr, mock_inv, mock_quest, mock_session_cls, mock_b
     engine.resolve_session(session_doc)
 
     # Verify
-    # Should simulate remaining 2 steps
-    assert mock_session.simulate_step.call_count == 2
+    # Should simulate remaining 58 steps
+    assert mock_session.simulate_step.call_count == 58
     mock_db.update_adventure_status.assert_called_with(123, "completed")
 
 
@@ -194,7 +194,7 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
 
     session_doc = {
         "discord_id": 123,
-        "duration_minutes": 30,  # 2 steps
+        "duration_minutes": 30,  # 30 steps
         "steps_completed": 0,
     }
 
@@ -202,14 +202,12 @@ def test_resolution_state_persistence(mock_mgr, mock_inv, mock_quest, mock_sessi
     engine.resolve_session(session_doc)
 
     # Verify calls
-    assert mock_session.simulate_step.call_count == 2
+    assert mock_session.simulate_step.call_count == 30
 
     # Check that the final call received the updated HP
-    # Step 1: 100 -> 90. Context updated to 90.
-    # Step 2: 90 -> 80. Context updated to 80.
     calls = mock_session.simulate_step.call_args_list
     final_bundle = calls[-1].kwargs["context_bundle"]
 
     # The bundle object is mutated in place, so we check its final state
     # Engine updates context["vitals"]["current_hp"]
-    assert final_bundle["vitals"]["current_hp"] == 80
+    assert final_bundle["vitals"]["current_hp"] == -200
