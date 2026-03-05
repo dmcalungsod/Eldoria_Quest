@@ -33,3 +33,31 @@ class TestAutoCombatFormulaIntegration:
             base_damage_taken = int(turns_recoil * monster_dps)
 
             assert result_with_recoil["damage_taken"] == base_damage_taken + expected_recoil_damage
+
+    def test_next_hit_crit_integration(self):
+        player_stats = {"STR": 50, "END": 20, "DEF": 10, "AGI": 10, "DEX": 10, "MAG": 10, "LCK": 5, "HP": 1000}
+        monster = {"name": "Dummy", "HP": 1000, "ATK": 20, "DEF": 5}
+
+        # Test baseline
+        res_baseline = AutoCombatFormula.resolve_clash(player_stats, monster, player_skills=[])
+
+        # Test with next_hit_crit
+        skills_crit = [{"key_id": "shadow_step", "buff": {"next_hit_crit": 1}}]
+        res_crit = AutoCombatFormula.resolve_clash(player_stats, monster, player_skills=skills_crit)
+
+        # The damage taken should be reduced by 10%
+        assert res_crit["damage_taken"] < res_baseline["damage_taken"]
+
+    def test_conditional_multiplier_integration(self):
+        player_stats = {"STR": 50, "END": 20, "DEF": 10, "AGI": 10, "DEX": 10, "MAG": 10, "LCK": 5, "HP": 1000}
+        monster = {"name": "Dummy", "HP": 1000, "ATK": 20, "DEF": 5}
+
+        # Test baseline
+        res_baseline = AutoCombatFormula.resolve_clash(player_stats, monster, player_skills=[])
+
+        # Test with conditional_multiplier
+        skills_cond = [{"key_id": "venomous_strike", "conditional_multiplier": {"condition": "target_poisoned", "multiplier": 2.0}}]
+        res_cond = AutoCombatFormula.resolve_clash(player_stats, monster, player_skills=skills_cond)
+
+        # The damage taken should be reduced by 15%
+        assert res_cond["damage_taken"] < res_baseline["damage_taken"]
