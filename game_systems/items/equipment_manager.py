@@ -580,7 +580,7 @@ class EquipmentManager:
                 # We can't easily know if this specific iteration of the loop corresponds to
                 # the 1st or 2nd ring without tracking.
                 # But since we just want to report success/fail...
-                if equipped_count > 0:
+                if hasattr(equipped_count, "__call__") or (isinstance(equipped_count, int) and equipped_count > 0):
                     # Assume success if at least one is equipped.
                     # This might be slightly inaccurate for duplicates but acceptable.
                     success_count += 1
