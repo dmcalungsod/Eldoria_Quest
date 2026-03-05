@@ -246,65 +246,49 @@
         ]
     },
     "grey_ward": {
-        "name": "Grey Ward",
-        "emoji": "⚕️",
-        "description": "A pragmatic order of alchemists and doctors who believe the only way to survive the Veil is to adapt to it. They operate the city's quarantine zones.",
+        "name": "The Grey Ward",
+        "emoji": "🛡️",
+        "description": "An order of alchemists and wardens dedicated to purging corruption and preserving the balance of nature. They believe in 'Survival through Science'.",
         "ranks": {
             "1": {
-                "title": "Gleaner",
-                "reputation_needed": 0,
-                "reward": null
+                "name": "Gleaner",
+                "req_xp": 0,
+                "reward": "Basic Alchemist Kit"
             },
             "2": {
-                "title": "Brewer",
-                "reputation_needed": 500,
-                "reward": {
-                    "type": "item",
-                    "key": "phial_of_vitriol",
-                    "amount": 2
-                }
+                "name": "Brewer",
+                "req_xp": 1000,
+                "reward": "Vitriol x2"
             },
             "3": {
-                "title": "Apothecary",
-                "reputation_needed": 1500,
-                "reward": {
-                    "type": "item",
-                    "key": "bitter_panacea",
-                    "amount": 3
-                }
+                "name": "Apothecary",
+                "req_xp": 2500,
+                "reward": "Panacea x3"
             },
             "4": {
-                "title": "Catalyst",
-                "reputation_needed": 3000,
-                "reward": {
-                    "type": "buff",
-                    "key": "gathering_boost",
-                    "value": 0.1
-                }
+                "name": "Catalyst",
+                "req_xp": 5000,
+                "reward": "Advanced Alembic"
             },
             "5": {
-                "title": "Synthesist",
-                "reputation_needed": 5000,
-                "reward": {
-                    "type": "title",
-                    "value": "Warden of Ash"
-                }
+                "name": "Synthesist",
+                "req_xp": 10000,
+                "reward": "Title: Warden of Ash"
             }
         },
         "interests": {
-            "gathering": 1.5,
-            "crafting": 1.2,
-            "monster_types": [
-                "Beast",
-                "Plant",
-                "Slime"
-            ]
+            "combat": 0.8,
+            "exploration": 1.0,
+            "crafting": 1.2
         },
+        "monster_types": [
+            "Beast",
+            "Plant",
+            "Slime"
+        ],
         "favored_locations": [
             "whispering_thicket",
-            "deepgrove_roots",
             "shrouded_fen",
-            "forgotten_ossuary",
             "the_ashlands"
         ]
     }

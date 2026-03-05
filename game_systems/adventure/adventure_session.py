@@ -80,6 +80,7 @@ class AdventureSession:
 
             # Load Supplies
             self.supplies = row_data.get("supplies", {})
+            self.start_time = row_data.get("start_time", 0)
         else:
             self.active = False
             self.active_monster = None
@@ -89,6 +90,7 @@ class AdventureSession:
             self.steps_completed = 0
             self.version = 1
             self.supplies = {}
+            self.start_time = 0
 
     def _build_result(self, sequence: list, dead: bool, context: dict | None) -> dict[str, Any]:
         """Helper to build the standardized result dictionary."""

@@ -117,6 +117,10 @@
             [
                 "magic_stone_small",
                 20
+            ],
+            [
+                "lunawort",
+                10
             ]
         ],
         "special_events": [
@@ -259,6 +263,10 @@
             [
                 "magic_stone_medium",
                 10
+            ],
+            [
+                "brimstone",
+                15
             ]
         ],
         "special_events": [

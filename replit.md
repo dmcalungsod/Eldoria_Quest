@@ -54,3 +54,11 @@ logs/                 # Runtime logs (auto-created)
 
 ## Known Fixes Applied
 - Fixed `tournament_system.py`: `type=` → `tournament_type=` keyword argument to match `DatabaseManager.create_tournament()` signature
+- Updated `Grey Ward` faction in `factions.json` with finalized design (Gleaner, Brewer, Apothecary, Catalyst, Synthesist ranks).
+- Added new Alchemist materials (`primordial_ooze`, `brimstone`, `lunawort`) to `materials.json`.
+- Integrated new materials into `adventure_locations.json` and `monsters.json` loot tables.
+- Implemented base logic for `start_time` in `AdventureSession` to support future fatigue system.
+- Balanced economy by increasing material sell values by 10% during data loading.
+- Refactored `Grey Ward` faction and added Alchemist materials/loot integration.
+- Optimized `AdventureSession` and `CombatEngine` data structures for future features.
+- Applied versioning to `main.py` for engine stability tracking.

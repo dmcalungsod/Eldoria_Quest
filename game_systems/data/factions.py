@@ -53,6 +53,11 @@ def load_factions():
             for rank_level, rank_info in faction_data["ranks"].items():
                 new_ranks[int(rank_level)] = rank_info
             faction_data["ranks"] = new_ranks
+        
+        # Add default interest for crafting if missing
+        if "interests" in faction_data and "crafting" not in faction_data["interests"]:
+            faction_data["interests"]["crafting"] = 1.0
+            
         validated_factions[key] = faction_data
 
     logger.info(f"Loaded {len(validated_factions)} factions from {data_path.name}")
