@@ -17,8 +17,8 @@
         "account": "",
         "local_database_path": null,
         "safety_version": "3.7.0",
-        "timestamp": "2026-03-04 03:10:35",
-        "packages_found": 62,
+        "timestamp": "2026-03-05 03:02:16",
+        "packages_found": 54,
         "vulnerabilities_found": 0,
         "vulnerabilities_ignored": 0,
         "remediations_recommended": 0,
@@ -37,10 +37,10 @@
             "safety_command": "check"
         },
         "git": {
-            "branch": "jules-8633360683164731123-676d3add",
+            "branch": "jules-14814951085888360152-51435e5d",
             "tag": "",
-            "commit": "82dd33887d4efb9093f0f25507ae189b7b96625b",
-            "dirty": "False",
+            "commit": "7b78e7e06c45f5d9245d7276318f4ab56f8c9f49",
+            "dirty": "True",
             "origin": "https://github.com/dmcalungsod/Eldoria_Quest"
         },
         "project": null,
@@ -137,6 +137,21 @@
                     "specifier": "==6.0.3",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pyyaml-6.0.3.dist-info"
+                }
+            ]
+        },
+        "vulture": {
+            "name": "vulture",
+            "version": "2.15",
+            "requirements": [
+                {
+                    "raw": "vulture==2.15",
+                    "extras": [],
+                    "marker": null,
+                    "name": "vulture",
+                    "specifier": "==2.15",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/vulture-2.15.dist-info"
                 }
             ]
         },
@@ -380,21 +395,6 @@
                 }
             ]
         },
-        "pytest-cov": {
-            "name": "pytest-cov",
-            "version": "7.0.0",
-            "requirements": [
-                {
-                    "raw": "pytest-cov==7.0.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pytest-cov",
-                    "specifier": "==7.0.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pytest_cov-7.0.0.dist-info"
-                }
-            ]
-        },
         "six": {
             "name": "six",
             "version": "1.17.0",
@@ -422,21 +422,6 @@
                     "specifier": "==3.11",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/idna-3.11.dist-info"
-                }
-            ]
-        },
-        "pyflakes": {
-            "name": "pyflakes",
-            "version": "3.4.0",
-            "requirements": [
-                {
-                    "raw": "pyflakes==3.4.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pyflakes",
-                    "specifier": "==3.4.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pyflakes-3.4.0.dist-info"
                 }
             ]
         },
@@ -545,6 +530,21 @@
                 }
             ]
         },
+        "ruff": {
+            "name": "ruff",
+            "version": "0.15.4",
+            "requirements": [
+                {
+                    "raw": "ruff==0.15.4",
+                    "extras": [],
+                    "marker": null,
+                    "name": "ruff",
+                    "specifier": "==0.15.4",
+                    "url": null,
+                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/ruff-0.15.4.dist-info"
+                }
+            ]
+        },
         "requests": {
             "name": "requests",
             "version": "2.32.5",
@@ -590,21 +590,6 @@
                 }
             ]
         },
-        "vulture": {
-            "name": "vulture",
-            "version": "2.14",
-            "requirements": [
-                {
-                    "raw": "vulture==2.14",
-                    "extras": [],
-                    "marker": null,
-                    "name": "vulture",
-                    "specifier": "==2.14",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/vulture-2.14.dist-info"
-                }
-            ]
-        },
         "typer": {
             "name": "typer",
             "version": "0.24.1",
@@ -617,21 +602,6 @@
                     "specifier": "==0.24.1",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/typer-0.24.1.dist-info"
-                }
-            ]
-        },
-        "pluggy": {
-            "name": "pluggy",
-            "version": "1.6.0",
-            "requirements": [
-                {
-                    "raw": "pluggy==1.6.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pluggy",
-                    "specifier": "==1.6.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pluggy-1.6.0.dist-info"
                 }
             ]
         },
@@ -662,36 +632,6 @@
                     "specifier": "==1.0.9",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/httpcore-1.0.9.dist-info"
-                }
-            ]
-        },
-        "mccabe": {
-            "name": "mccabe",
-            "version": "0.7.0",
-            "requirements": [
-                {
-                    "raw": "mccabe==0.7.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "mccabe",
-                    "specifier": "==0.7.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/mccabe-0.7.0.dist-info"
-                }
-            ]
-        },
-        "coverage": {
-            "name": "coverage",
-            "version": "7.13.4",
-            "requirements": [
-                {
-                    "raw": "coverage==7.13.4",
-                    "extras": [],
-                    "marker": null,
-                    "name": "coverage",
-                    "specifier": "==7.13.4",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/coverage-7.13.4.dist-info"
                 }
             ]
         },
@@ -737,21 +677,6 @@
                     "specifier": "==0.14.0",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/tomlkit-0.14.0.dist-info"
-                }
-            ]
-        },
-        "iniconfig": {
-            "name": "iniconfig",
-            "version": "2.3.0",
-            "requirements": [
-                {
-                    "raw": "iniconfig==2.3.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "iniconfig",
-                    "specifier": "==2.3.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/iniconfig-2.3.0.dist-info"
                 }
             ]
         },
@@ -845,21 +770,6 @@
                 }
             ]
         },
-        "pycodestyle": {
-            "name": "pycodestyle",
-            "version": "2.14.0",
-            "requirements": [
-                {
-                    "raw": "pycodestyle==2.14.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pycodestyle",
-                    "specifier": "==2.14.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pycodestyle-2.14.0.dist-info"
-                }
-            ]
-        },
         "stevedore": {
             "name": "stevedore",
             "version": "5.7.0",
@@ -887,21 +797,6 @@
                     "specifier": "==3.4.4",
                     "url": null,
                     "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/charset_normalizer-3.4.4.dist-info"
-                }
-            ]
-        },
-        "flake8": {
-            "name": "flake8",
-            "version": "7.3.0",
-            "requirements": [
-                {
-                    "raw": "flake8==7.3.0",
-                    "extras": [],
-                    "marker": null,
-                    "name": "flake8",
-                    "specifier": "==7.3.0",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/flake8-7.3.0.dist-info"
                 }
             ]
         },
@@ -950,21 +845,6 @@
                 }
             ]
         },
-        "pytest": {
-            "name": "pytest",
-            "version": "9.0.2",
-            "requirements": [
-                {
-                    "raw": "pytest==9.0.2",
-                    "extras": [],
-                    "marker": null,
-                    "name": "pytest",
-                    "specifier": "==9.0.2",
-                    "url": null,
-                    "found": "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pytest-9.0.2.dist-info"
-                }
-            ]
-        },
         "pydantic": {
             "name": "pydantic",
             "version": "2.12.5",
@@ -992,3 +872,15 @@
         "remediations_skipped": {}
     }
 }
+
+
++===========================================================================================================================================================================================+
+
+
+DEPRECATED: this command (`check`) has been DEPRECATED, and will be unsupported beyond 01 June 2024.
+
+
+We highly encourage switching to the new `scan` command which is easier to use, more powerful, and can be set up to mimic the deprecated command if required.
+
+
++===========================================================================================================================================================================================+

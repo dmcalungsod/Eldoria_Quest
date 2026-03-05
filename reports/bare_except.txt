@@ -1,0 +1,2 @@
+./.Jules/audit_report_2026-02-22.md:51:- **Clean Code**: No `TODO`, `FIXME`, or `XXX` comments found in source code (only in git hooks). No bare `except:` clauses found.
+./.Jules/audit_report_2026-03-03.md:40:- **Error Handling**: A few bare `except:` clauses were found (or at least could be present given the size). None matched immediately.
