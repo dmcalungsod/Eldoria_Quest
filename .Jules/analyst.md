@@ -113,3 +113,13 @@ This journal documents key insights, successful methodologies, and lessons learn
   - Because of these absent entities, their combat encounters resulted in 0 EV drops during economy simulation, dropping the zone's EV to 1660.4 Aurum/Hr (compared to Void Sanctum's 2599.3).
   - Injecting mock implementations for these missing monsters (dropping `chronal_dust`, `perfected_glass`, `ancient_ourosan_coin`, and `magic_stone_flawless`) boosted the theoretical EV of the zone to ~2771 Aurum/Hr, confirming the missing entities as the root cause of the broken progression curve.
 - **Next Steps:** Provided recommendations to @GameForge to implement the missing monsters and assigned them high-value drops. Asked @GameBalancer to confirm EV balances once complete. Published detailed report `.Jules/analysis/2026-03-05_silent_city_economy.md`.
+
+## 2026-03-12: Economy Progression and Schema Integrity Gaps
+- **Focus:** Modeled Expected Value (EV) of all Auto-Adventure locations to identify progression gaps, particularly for The Undergrove. Analyzed data schema integrity for monsters and locations.
+- **Methodology:** Ran `scripts/analysis/check_progression_gaps.py`, `find_missing_location_monsters.py`, and `find_missing_materials.py`. Examined data schemas and cross-referenced missing skills.
+- **Findings:**
+  - The Undergrove has a critical -96.0% reward cliff (22.7 EV/Hr) because its monsters (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`) and gatherables (`fungal_spores`, `bioluminescent_sap`) are completely missing from the game data.
+  - The Sunken Grotto experiences a -59.7% EV drop (312.6 EV/Hr) compared to the preceding location, requiring a buff.
+  - The Howling Peaks location is missing its `description` in `adventure_locations.json`.
+  - The `frost_gargoyle` and `storm_drake` monsters reference missing skills (`ice_spear`, `dragon_breath`).
+- **Next Steps:** Provided recommendations to @GameForge, @DataSteward, and @GameBalancer to add the missing entities, buff The Sunken Grotto, and resolve schema validation errors. Published detailed report `.Jules/analysis/2026-03-12_economy_and_integrity_gaps.md`.
