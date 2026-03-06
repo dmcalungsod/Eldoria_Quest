@@ -39,11 +39,15 @@ STAT_UP_MESSAGES = {
 
 STAT_EXP_GAINS = {
     "str_exp": lambda br: br.get("str_hits", 0) * 0.5,
-    "dex_exp": lambda br: (br.get("dex_hits", 0) * 0.5) + (br.get("player_crit", 0) * 2.0),
+    "dex_exp": lambda br: (br.get("dex_hits", 0) * 0.5)
+    + (br.get("player_crit", 0) * 2.0),
     "agi_exp": lambda br: br.get("player_dodge", 0) * 1.5,
-    "end_exp": lambda br: (br.get("hits_taken", 0) * 1.0) + (br.get("damage_taken", 0) * 0.1),
+    "end_exp": lambda br: (br.get("hits_taken", 0) * 1.0)
+    + (br.get("damage_taken", 0) * 0.1),
     "mag_exp": lambda br: br.get("mag_hits", 0) * 1.0,
-    "lck_exp": lambda br: 0.5 + (br.get("player_crit", 0) * 0.5) + (br.get("player_dodge", 0) * 0.5),
+    "lck_exp": lambda br: 0.5
+    + (br.get("player_crit", 0) * 0.5)
+    + (br.get("player_dodge", 0) * 0.5),
 }
 
 
@@ -77,9 +81,13 @@ class AdventureRewards:
             promo_rank = monster_data.get("promotion_target")
 
             if promo_rank:
-                success, msg = self.rank_system.finalize_promotion(self.discord_id, promo_rank)
+                success, msg = self.rank_system.finalize_promotion(
+                    self.discord_id, promo_rank
+                )
                 if success:
-                    logs.append(f"\n{E.MEDAL} **PROMOTION SUCCESSFUL!**\nYou are now **Rank {promo_rank}**.")
+                    logs.append(
+                        f"\n{E.MEDAL} **PROMOTION SUCCESSFUL!**\nYou are now **Rank {promo_rank}**."
+                    )
 
             # 2. Loot & Quests
             actual_drops = self._process_loot_and_quests(
@@ -115,24 +123,32 @@ class AdventureRewards:
                 # Event: Spectral Tide
                 ectoplasm_count = actual_drops.count("ectoplasm")
                 if ectoplasm_count > 0:
-                    tournament.record_action(self.discord_id, "spectral_tide", ectoplasm_count)
+                    tournament.record_action(
+                        self.discord_id, "spectral_tide", ectoplasm_count
+                    )
 
                 # Event: Elemental Harvest
                 mote_count = actual_drops.count("elemental_mote")
                 if mote_count > 0:
-                    tournament.record_action(self.discord_id, "elemental_harvest", mote_count)
+                    tournament.record_action(
+                        self.discord_id, "elemental_harvest", mote_count
+                    )
 
             except Exception as e:
                 logger.error(f"Tournament hook error: {e}")
             # -----------------------
 
             # 6. Achievements
-            ach_msg = self.achievement_system.check_kill_achievements(self.discord_id, tier)
+            ach_msg = self.achievement_system.check_kill_achievements(
+                self.discord_id, tier
+            )
             if ach_msg:
                 logs.append(f"\n{ach_msg}")
 
             # Check Group Achievements
-            group_ach_msg = self.achievement_system.check_group_achievements(self.discord_id, monster_name)
+            group_ach_msg = self.achievement_system.check_group_achievements(
+                self.discord_id, monster_name
+            )
             if group_ach_msg:
                 logs.append(f"\n{group_ach_msg}")
 
@@ -156,7 +172,9 @@ class AdventureRewards:
                 logs.append("\n" + "\n".join(faction_logs))
 
         except Exception as e:
-            logger.error(f"Reward processing failed for {self.discord_id}: {e}", exc_info=True)
+            logger.error(
+                f"Reward processing failed for {self.discord_id}: {e}", exc_info=True
+            )
             logs.append(f"\n{E.ERROR} *An error occurred processing some rewards.*")
 
         return logs
@@ -191,23 +209,38 @@ class AdventureRewards:
 
         # EVENT HOOK: Frostfall Loot Bonus
         if location_id == "frostfall_expanse":
-            frostfall_bonus = combat_result.get("active_boosts", {}).get("frostfall_loot_bonus", 1.0)
+            frostfall_bonus = combat_result.get("active_boosts", {}).get(
+                "frostfall_loot_bonus", 1.0
+            )
             loot_boost *= float(frostfall_bonus)
 
         # EVENT HOOK: Wailing Chasm Loot Bonus
         if location_id == "the_wailing_chasm":
-            wailing_chasm_bonus = combat_result.get("active_boosts", {}).get("wailing_chasm_loot_bonus", 1.0)
+            wailing_chasm_bonus = combat_result.get("active_boosts", {}).get(
+                "wailing_chasm_loot_bonus", 1.0
+            )
             loot_boost *= float(wailing_chasm_bonus)
 
         # EVENT HOOK: Ouros Loot Bonus
         if location_id == "silent_city_ouros":
-            ouros_bonus = combat_result.get("active_boosts", {}).get("ouros_loot_bonus", 1.0)
+            ouros_bonus = combat_result.get("active_boosts", {}).get(
+                "ouros_loot_bonus", 1.0
+            )
             loot_boost *= float(ouros_bonus)
 
         # EVENT HOOK: Undergrove Loot Bonus
         if location_id == "the_undergrove":
-            undergrove_bonus = combat_result.get("active_boosts", {}).get("undergrove_loot_bonus", 1.0)
+            undergrove_bonus = combat_result.get("active_boosts", {}).get(
+                "undergrove_loot_bonus", 1.0
+            )
             loot_boost *= float(undergrove_bonus)
+
+        # EVENT HOOK: Frostmire Loot Bonus
+        if location_id == "frostmire":
+            frostmire_bonus = combat_result.get("active_boosts", {}).get(
+                "frostmire_loot_bonus", 1.0
+            )
+            loot_boost *= float(frostmire_bonus)
 
         # Check for World Event: Elemental Surge or Spectral Tide
         try:
@@ -218,7 +251,9 @@ class AdventureRewards:
                     # 30% chance to drop 1-3 Elemental Motes
                     if random.random() < 0.3:  # nosec B311
                         mote_count = random.randint(1, 3)  # nosec B311
-                        self._add_loot_to_session(session_loot, "elemental_mote", mote_count)
+                        self._add_loot_to_session(
+                            session_loot, "elemental_mote", mote_count
+                        )
 
                         mote_info = MATERIALS.get("elemental_mote", {})
                         loot_bundle[
@@ -254,7 +289,9 @@ class AdventureRewards:
             logger.error(f"Event loot error: {e}")
 
         # Material Drops (via Centralized Calculator)
-        rolled_drops = LootCalculator.roll_drops(combat_result.get("drops", []), stats.luck, loot_boost)
+        rolled_drops = LootCalculator.roll_drops(
+            combat_result.get("drops", []), stats.luck, loot_boost
+        )
 
         for drop_key in rolled_drops:
             self._add_loot_to_session(session_loot, drop_key, 1)
@@ -280,7 +317,9 @@ class AdventureRewards:
             if success:
                 loot_bundle[(item["name"], item["rarity"])] += 1
             else:
-                logs.append(f"\n{E.ERROR} **Inventory Full!** Left **{item['name']}** behind.")
+                logs.append(
+                    f"\n{E.ERROR} **Inventory Full!** Left **{item['name']}** behind."
+                )
 
             # Assuming equipment doesn't trigger "collect" quests for now, or if it does, it's not handled here.
             # Usually collect quests are for materials.
@@ -299,7 +338,9 @@ class AdventureRewards:
             "Legendary": 4,
             "Mythical": 5,
         }
-        sorted_loot = sorted(loot_bundle.items(), key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1]))
+        sorted_loot = sorted(
+            loot_bundle.items(), key=lambda x: (rarity_order.get(x[0][1], 0), x[0][1])
+        )
 
         for (name, rarity), count in sorted_loot:
             qty = f" (x{count})" if count > 1 else ""
@@ -311,7 +352,9 @@ class AdventureRewards:
 
         # Quest Updates
         # FIX: Pass only actual drops, not potential drops
-        self._update_quests(quest_system, combat_result["monster_data"]["name"], actual_drops, logs)
+        self._update_quests(
+            quest_system, combat_result["monster_data"]["name"], actual_drops, logs
+        )
 
         return actual_drops
 
@@ -330,7 +373,9 @@ class AdventureRewards:
 
             # Defeat check
             if "defeat" in objs and monster_name in objs["defeat"]:
-                quest_system.update_progress(self.discord_id, q["id"], "defeat", monster_name)
+                quest_system.update_progress(
+                    self.discord_id, q["id"], "defeat", monster_name
+                )
                 progress_made = True
 
                 # Check for flavor text
@@ -342,7 +387,9 @@ class AdventureRewards:
             if "collect" in objs:
                 for dk, count in drop_counts.items():
                     if dk in objs["collect"]:
-                        quest_system.update_progress(self.discord_id, q["id"], "collect", dk, amount=count)
+                        quest_system.update_progress(
+                            self.discord_id, q["id"], "collect", dk, amount=count
+                        )
                         progress_made = True
 
                         # Check for flavor text (avoid spamming if multiple drop)
@@ -355,7 +402,9 @@ class AdventureRewards:
             if "examine" in objs:
                 for dk, count in drop_counts.items():
                     if dk in objs["examine"]:
-                        quest_system.update_progress(self.discord_id, q["id"], "examine", dk, amount=count)
+                        quest_system.update_progress(
+                            self.discord_id, q["id"], "examine", dk, amount=count
+                        )
                         progress_made = True
 
                         key = f"examine:{dk}"
@@ -461,7 +510,9 @@ class AdventureRewards:
                     break
 
                 attempts += 1
-                logger.warning(f"Stat XP race condition for {self.discord_id}. Retrying ({attempts}/3)...")
+                logger.warning(
+                    f"Stat XP race condition for {self.discord_id}. Retrying ({attempts}/3)..."
+                )
 
         except Exception as e:
             logger.error(f"Stat XP error: {e}")
@@ -493,7 +544,9 @@ class AdventureRewards:
                     lvl += levels
                     msgs.append(f"{E.LEVEL_UP} **{name}** reached **Level {lvl}**!")
 
-                self.db.update_player_skill(self.discord_id, s_key, skill_level=lvl, skill_exp=new_exp)
+                self.db.update_player_skill(
+                    self.discord_id, s_key, skill_level=lvl, skill_exp=new_exp
+                )
 
             if msgs:
                 logs.append("\n" + "\n".join(msgs))
