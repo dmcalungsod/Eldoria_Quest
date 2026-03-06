@@ -56,16 +56,17 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Subtask 2.2c (Expanded):** Buff "The Void Sanctum" & "Clockwork Halls" (End-game incentives. Clockwork Halls EV target > ~900 Aurum per 30m). **[ ] Reopened**
     - **Subtask 2.2d:** Tune "Thunder-Crag Coast" & "Shimmering Wastes" (Must scale past Molten Caldera's high EV 1500.50). **[ ] Reopened**
     - **Subtask 2.2e (New):** Address "Celestial Archipelago" EV (EV 624.25 < Rank B). Raise to > 1300 Aurum. **[ ] Unstarted**
-- [ ] **Task 2.2f (New):** Address "The Silent City of Ouros" drops (EV 307.0 < Rank S). Raise significantly to be competitive with The Void Sanctum (915.8 EV/Hr). **[ ] Unstarted**
-    - **Due:** 2026-03-08
+- [ ] **Task 2.2f:** Address "The Silent City of Ouros" drops (EV 307.0 < Rank S). Raise significantly to be competitive with The Void Sanctum (915.8 EV/Hr). Includes adding missing monsters (`temporal_wraith`, `hollowed_sentinel`, `abyssal_creeper`) per Analyst report.
+    - **Agent:** @GameForge, @GameBalancer
+    - **Due:** 2026-03-15
 - [x] **Task 2.3:** Implement Fatigue System (>4h risk increase).
     - **Agent:** @GameBalancer / @SystemSmith
     - **Details:** Modify `AdventureSession` to increase monster damage scaling for long durations.
     - **Status:** **Completed** (Verified `_calculate_fatigue_multiplier` in `adventure_session.py`).
 - [x] **Task 2.4:** Resolve Rank Logic Conflict (Frostfall vs Archipelago).
-    - **Agent:** @GameBalancer / @GameForge
-    - **Details:** Resolve Level 25/28 vs Rank A/B inconsistency.
-    - **Status:** **Completed** (Confirmed by Analyst EV Model)
+    - **Agent:** @ProgressionBalancer
+    - **Details:** Changed `min_rank` from "A" to "B" for `celestial_archipelago`.
+    - **Status:** **Completed**
 
 ### Phase 3: Integration & Polish
 **Focus:** Flavor, depth, and safety nets.
@@ -100,8 +101,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @Equipper
 - [ ] **Issue #4:** [Test] Auto-Adventure: Stress Test Scheduler
     - **Agent:** @BugHunter
-- [ ] **Issue #5:** [Test] Auto-Adventure: Exploit Verification
+- [x] **Issue #5:** [Test] Auto-Adventure: Exploit Verification
     - **Agent:** @BugHunter
+    - **Status:** **Completed** (Regression Hunter added test to suite)
 - [ ] **Issue #6:** [Feature] The Eldoria Codex System
     - **Agent:** @CodexKeeper
 - [ ] **Issue #7:** [Feature] Alchemist Class Implementation
@@ -151,10 +153,10 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Agent:** @Palette
     - **Details:** `event_cog.py`, `tournament_cog.py`, `faction_cog.py`, `general_cog.py`, `developer_cog.py`, `adventure_menu.py`, `setup_view.py`, `components.py`, `handbook_view.py`.
     - **Due:** 2026-03-10
-- [ ] **Task 5.10:** Refactor high cyclomatic complexity functions & clean dead code.
+- [x] **Task 5.10:** Refactor high cyclomatic complexity functions & clean dead code.
     - **Agent:** @SystemSmith
     - **Details:** `combat_engine.py`, `consumable_manager.py`, `adventure_session.py`, `equipment_manager.py`.
-    - **Due:** 2026-03-10
+    - **Status:** **Completed**
 - [x] **Task 5.11:** Improve test coverage for Discord cogs.
     - **Agent:** @BugHunter
     - **Due:** 2026-03-10
@@ -212,9 +214,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task GH.2:** Tune exponential material costs for room upgrades.
     - **Agent:** @GameBalancer
     - **Due:** 2026-03-12
-- [ ] **Task GH.3:** Implement "Building Materials" and Boss Trophies.
-    - **Agent:** @GameForge
-    - **Due:** 2026-03-12
+- [x] **Task GH.3:** Implement "Building Materials" and Boss Trophies.
+    - **Agent:** @Artisan
+    - **Status:** **Completed**
 - [ ] **Task GH.4:** Design interactive Guild Hall management View (One UI).
     - **Agent:** @Palette
     - **Due:** 2026-03-12
@@ -225,7 +227,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task SC.1:** Connect Ouros beneath the Void Sanctum.
     - **Agent:** @DepthsWarden
     - **Due:** 2026-03-14
-- [ ] **Task SC.2:** Create Temporal Wraiths, Hollowed Sentinels, and Chronal Dust.
+- [ ] **Task SC.2:** Create Temporal Wraiths, Hollowed Sentinels, Abyssal Creepers, and Chronal Dust. (Critical per Analyst report).
     - **Agent:** @GameForge
     - **Due:** 2026-03-14
 - [ ] **Task SC.3:** Design the absolute silence mechanic.
@@ -238,7 +240,77 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 
 ---
 
+### The Sunken Grotto (New)
+**Design:** `.Jules/region_the_sunken_grotto.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task SG.1:** Add "The Sunken Grotto" to adventure locations with Oxygen Management & Current mechanics.
+    - **Agent:** @GameForge / @Grimwarden
+    - **Due:** 2026-03-16
+- [ ] **Task SG.2:** Implement aquatic monsters and resource drops.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-16
+- [ ] **Task SG.3:** Write flavor text for The Sunken Grotto.
+    - **Agent:** @StoryWeaver
+    - **Due:** 2026-03-16
+- [ ] **Task SG.4:** Add Abyssal Rebreather equipment.
+    - **Agent:** @Equipper
+    - **Due:** 2026-03-16
+- [ ] **Task SG.5:** Balance oxygen drain and economy.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task SG.6:** Provide names for new entities.
+    - **Agent:** @Namewright
+    - **Due:** 2026-03-16
+- [ ] **Task SG.7:** Design aquatic combat mechanics.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-16
+- [ ] **Task SG.8:** Add achievements for region.
+    - **Agent:** @ChronicleKeeper
+    - **Due:** 2026-03-16
+### Auto-Adventure Overhaul - Skill Tree Integrations (New)
+**Design:** `.Jules/architect_designs/expansion_auto_adventure_overhaul.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task AA.1:** Implement translation of new mechanics into `AutoCombatFormula.resolve_clash`.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-16
+- [ ] **Task AA.2:** Add new paths to classes and specific skills.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-16
+
+### The Lost Tomes - Skill Books (New)
+**Design:** `.Jules/architect_designs/expansion_skill_books.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task LT.1:** Add Skill Books to `consumables.json` and `skills.json` and drop tables.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-15
+- [ ] **Task LT.2:** Implement mechanic requirements in engine.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-15
+- [ ] **Task LT.3:** Ensure economy balance.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task LT.4:** Add Forbidden Knowledge achievements.
+    - **Agent:** @ChronicleKeeper
+    - **Due:** 2026-03-16
+
+### The Broken Anvil Questline (New)
+**Design:** `.Jules/quest_the_broken_anvil.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task BA.1:** Implement `Raw Star Metal Block` and `Vial of Drake Blood` drops.
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-16
+- [ ] **Task BA.2:** Review and implement dialogue.
+    - **Agent:** @StoryWeaver
+    - **Due:** 2026-03-16
+- [ ] **Task BA.3:** Ensure Storm Drakes and Frost Gargoyles are present in Howling Peaks.
+    - **Agent:** @Grimwarden
+    - **Due:** 2026-03-16
+- [ ] **Task BA.4:** Add achievement for questline.
+    - **Agent:** @ChronicleKeeper
+    - **Due:** 2026-03-16
+
 ## 📝 Activity Log
+- **2026-03-12 (Update):** Integrated Analyst recommendations for Silent City missing monsters. Added Sunken Grotto, Auto-Adventure Skill Integrations, Lost Tomes, and Broken Anvil questline projects based on recent agent designs. Marked Issue #5, Task 5.10, and Task GH.3 as Complete.
 - **2026-03-04 (Update):** Added new tasks from Repo Auditor (5.12). Marked Task 5.8 as Complete.
 - **2026-03-09 (Update):** Integrated Analyst recommendations for The Silent City of Ouros drops (Task 2.2f). Noted Tech Debt Tasks 5.5, 5.6, 5.7 are Complete.
 - **2026-03-02 (Update):** Added "Guild Halls" and "Silent City" parallel projects. Marked Tasks 5.1, A.2, and 2.4 completed based on 03-01/03-02 logs. Added Repo Auditor tasks (5.8-5.11). Updated 2.2 subtasks based on EV report.
