@@ -12,3 +12,7 @@
 
 **Learning:** It is crucial to ensure variables derived from system state like `time_phase` and `weather` can trickle down appropriately through object and event handling pipelines (`AdventureSession` -> `EventHandler` -> `ExplorationEvents`) for a fully immersive implementation of condition-based events.
 **Action:** Keep these context variables easily accessible from lower-level functions so that individual classes or utility functions can cleanly leverage conditions without making multiple repeated system time calls and violating atomic rules.
+
+## 2026-03-12 — Weather Location Weights
+**Learning:** Adding new adventure locations without updating their specific `LOCATION_WEATHER_WEIGHTS` in `game_systems/core/world_time.py` causes them to fall back to generic clear/rain combinations, limiting regional immersion and failing to meet dynamic weather expectations.
+**Action:** When adding or verifying locations, ensure explicit entries exist in `world_time.py` for weather weighting.

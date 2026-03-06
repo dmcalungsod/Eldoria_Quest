@@ -108,6 +108,46 @@ LOCATION_WEATHER_WEIGHTS = {
         (Weather.RAIN, 30),
         (Weather.FOG, 30),
     ],
+    "forest_outskirts": [
+        (Weather.CLEAR, 70),
+        (Weather.RAIN, 20),
+        (Weather.FOG, 10),
+    ],
+    "guild_arena": [
+        (Weather.CLEAR, 100),
+    ],
+    "whispering_archives": [
+        (Weather.CLEAR, 100),
+    ],
+    "thunder_crag_coast": [
+        (Weather.STORM, 50),
+        (Weather.GALE, 30),
+        (Weather.RAIN, 20),
+    ],
+    "rust_wastes": [
+        (Weather.ASH, 40),
+        (Weather.MIASMA, 30),
+        (Weather.CLEAR, 30),
+    ],
+    "abyssal_descent": [
+        (Weather.MIASMA, 50),
+        (Weather.FOG, 50),
+    ],
+    "silent_city_ouros": [
+        (Weather.FOG, 70),
+        (Weather.CLEAR, 20),
+        (Weather.MIASMA, 10),
+    ],
+    "wailing_chasm": [
+        (Weather.MIASMA, 50),
+        (Weather.FOG, 30),
+        (Weather.CLEAR, 20),
+    ],
+    "the_undergrove": [
+        (Weather.MIASMA, 40),
+        (Weather.FOG, 40),
+        (Weather.RAIN, 20),
+    ],
 }
 
 # Multipliers applied to base weights depending on season
