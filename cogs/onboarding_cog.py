@@ -444,8 +444,14 @@ class CombatTutorialView(View):
                 except Exception as e:
                     logger.error(f"Failed to grant extra alchemist item {item_name}: {e}")
 
+        next_steps = (
+            "\n\n**Next Steps:**\n"
+            "Open your `/profile` to review your new gear, then click **🗺️ Expeditions** "
+            "in the Guild Lobby to start your first time-based adventure."
+        )
+
         await interaction.followup.send(
-            f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}",
+            f"🎁 **Tutorial Rewards:**\n• 3x Minor Health Potion{weapon_msg}{next_steps}",
             ephemeral=True,
         )
 
