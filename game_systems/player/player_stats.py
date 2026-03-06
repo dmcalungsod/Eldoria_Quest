@@ -146,7 +146,7 @@ class PlayerStats:
         Calculates total inventory slots based on STR and DEX.
         Formula: Base(10) + floor(STR * 0.5) + floor(DEX * 0.25).
         """
-        if self._cached_max_slots is None:
+        if getattr(self, "_cached_max_slots", None) is None:
             base_slots = self.INVENTORY_BASE
             str_bonus = math.floor(self.strength * self.INVENTORY_STR_MOD)
             dex_bonus = math.floor(self.dexterity * self.INVENTORY_DEX_MOD)
