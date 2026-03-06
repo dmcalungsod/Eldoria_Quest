@@ -1669,7 +1669,7 @@
     "quest_giver": "Magni the Anvil",
     "location": "The Deep Forges",
     "summary": "Secure rare Star Metal and Drake Blood to repair the Aegis-Heart.",
-    "description": "Magni the Anvil needs a replacement block of raw, super-cooled Star Metal, which can only be found deep within the Howling Peaks, guarded by Frost Gargoyles. But simply bringing the ore isn't enough; it must be quenched in the blood of a Storm Drake to temper it properly for the Aegis-Heart.",
+    "description": "*The heat of the Deep Forges is oppressive, but Magni the Anvil stands before the massive, sputtering Aegis-Heart forge without sweating. He strikes a cracked, glowing anvil, then throws his hammer down in disgust.* 'Useless! The Frost-forged steel is giving out. The Aegis-Heart is dying, and if it dies, the Vanguard's shields will shatter in the next assault.' When asked what he needs, Magni grimaces. 'A miracle. Or a block of raw Star Metal from the highest ridges of the Howling Peaks. But don't just bring me the rock. It's too brittle on its own. It needs to be quenched in the blood of a Storm Drake to bind the magic.'",
     "objectives": {
       "defeat": {
         "Frost Gargoyle": 3,
@@ -1698,7 +1698,7 @@
     "quest_giver": "Magni the Anvil",
     "location": "The Deep Forges",
     "summary": "Give the Star Metal to Magni to repair the forge. (Choice A)",
-    "description": "General Rask demands the Star Metal for the Aviary Towers, but Magni insists the shields must hold. You choose to give the materials to Magni.",
+    "description": "*As you approach Magni with the heavy Star Metal and the vial of crackling Drake Blood, General Rask of the Iron Vanguard intercepts you.* 'Hold, adventurer. Magni wants that metal to save his precious forge. But the Aviary Towers are taking heavy damage. We need that Star Metal to reinforce the roosts, or the Drake-Riders won't be able to launch. The skies will fall.' Magni storms over. 'The shields come first, Rask! If the ground falls, your birds won't have anywhere to land!' You choose to give the materials to Magni. 'The forge is the heart of this city. Take it, Magni.'",
     "prerequisites": [
       82
     ],
@@ -1711,7 +1711,7 @@
     },
     "flavor_text": {
       "deliver:Raw Star Metal Block": "Magni snatches the ore, his prosthetic arm whirring as he hurls it into the Aegis-Heart.",
-      "deliver:Vial of Drake Blood": "The drake blood quenches the metal. The forge roars back to life, blazing with a blinding, blue-white intensity."
+      "deliver:Vial of Drake Blood": "The drake blood quenches the metal. The forge roars back to life, blazing with a blinding, blue-white intensity. 'Good choice,' Magni grunts. 'The Vanguard's shields will hold against the Void. You've got the soul of a smith, adventurer. Keep this. It's a prototype from the new batch.'"
     },
     "rewards": {
       "exp": 2000,
@@ -1727,7 +1727,7 @@
     "quest_giver": "General Rask",
     "location": "The Aviary Towers",
     "summary": "Give the Star Metal to General Rask for the Drakes. (Choice B)",
-    "description": "Magni demands the Star Metal for his forge, but General Rask insists the Aviary must be reinforced to control the skies. You choose to give the materials to General Rask.",
+    "description": "*As you approach Magni with the heavy Star Metal and the vial of crackling Drake Blood, General Rask of the Iron Vanguard intercepts you.* 'Hold, adventurer. Magni wants that metal to save his precious forge. But the Aviary Towers are taking heavy damage. We need that Star Metal to reinforce the roosts, or the Drake-Riders won't be able to launch. The skies will fall.' Magni storms over. 'The shields come first, Rask! If the ground falls, your birds won't have anywhere to land!' You choose to give the materials to General Rask. 'Control the skies, control the battle. Use it for the Aviary, General.'",
     "prerequisites": [
       82
     ],
@@ -1739,8 +1739,8 @@
       }
     },
     "flavor_text": {
-      "deliver:Raw Star Metal Block": "Rask nods grimly and takes the supplies, gesturing for his runners.",
-      "deliver:Vial of Drake Blood": "The blood will strengthen the drake harnesses. The skies will remain ours."
+      "deliver:Raw Star Metal Block": "Rask nods grimly and takes the supplies, gesturing for his runners to take them to the Aviary.",
+      "deliver:Vial of Drake Blood": "The blood will strengthen the drake harnesses. 'A tactical mind,' Rask says. 'The skies will remain ours. The Forge-Masters will just have to make do. You've earned the Vanguard's respect.'"
     },
     "rewards": {
       "exp": 2000,
