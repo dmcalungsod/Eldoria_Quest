@@ -76,6 +76,7 @@ They are not chosen heroes or glorious knights. They are **laborers** of the dan
 20. **Ironhaven (Rank A):** A militant, fortified mountain city carved into Mount Kaelen by the Iron Vanguard to fend off aerial Void horrors.
 21. **The Void Sanctum (Rank S):** The edge of reality itself. A place where the Veil is almost non-existent.
 22. **The Silent City of Ouros (Rank S):** An eerie, perfectly preserved ancient metropolis swallowed whole by the earth during The Sundering, trapped in a silent stasis by temporal anomalies.
+23. **The Howling Peaks (Rank A):** A frozen, storm-battered mountain range. Its biting cold brings stone guardians like Frost Gargoyles to life.
 
 ---
 
