@@ -220,6 +220,11 @@ class AdventureSetupView(View):
 
     def _update_start_button(self):
         if self.selected_location and self.selected_duration:
+            if self.capacity:
+                current_slots, max_slots = self.capacity
+                if current_slots >= max_slots:
+                    self.start_btn.disabled = True
+                    return
             self.start_btn.disabled = False
         else:
             self.start_btn.disabled = True

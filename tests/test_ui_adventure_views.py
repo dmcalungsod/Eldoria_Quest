@@ -343,3 +343,49 @@ class TestAdventureMenuView(unittest.IsolatedAsyncioTestCase):
             self.assertIsNotNone(mentor_field, "Mentor's Advice field was not found in the embed for new player.")
             self.assertIn("The Whispering Forest", mentor_field.value)
             self.assertIn("30 Minutes", mentor_field.value)
+
+    def test_start_disabled_when_capacity_full(self):
+        """Test that the start button is disabled when inventory is full."""
+        from game_systems.adventure.ui.setup_view import AdventureSetupView
+        from unittest.mock import MagicMock
+
+        # Setup view with full capacity (20/20)
+        view = AdventureSetupView(
+            MagicMock(),
+            MagicMock(),
+            MagicMock(),
+            player_rank="D",
+            player_level=10,
+            supplies=[],
+            capacity=(20, 20),
+            visited_locations=["forest_outskirts"]
+        )
+
+        # Simulate selecting location and duration
+        view.selected_location = "forest_outskirts"
+        view.selected_duration = 30
+
+        # Call update
+        view._update_start_button()
+
+        # Verify button is disabled
+        self.assertTrue(view.start_btn.disabled, "Start button should be disabled when inventory is full")
+
+        # Setup view with available capacity (19/20)
+        view2 = AdventureSetupView(
+            MagicMock(),
+            MagicMock(),
+            MagicMock(),
+            player_rank="D",
+            player_level=10,
+            supplies=[],
+            capacity=(19, 20),
+            visited_locations=["forest_outskirts"]
+        )
+
+        view2.selected_location = "forest_outskirts"
+        view2.selected_duration = 30
+        view2._update_start_button()
+
+        # Verify button is enabled
+        self.assertFalse(view2.start_btn.disabled, "Start button should be enabled when inventory has space")

@@ -34,3 +34,9 @@
 - **Design Pattern:** A desolate, frozen environment with cold survival mechanics, building upon the `thermal_insulation` concept introduced in Ironhaven, paired with treacherous terrain (Thin Ice).
 - **Thematic Consistency:** An area frozen over by a magical backlash during The Sundering, freezing ancient life and magic in time, introducing an environment where the harshness is preserved rather than actively mutating.
 - **Coordination:** Will require cross-agent coordination for integrating the Cold mechanics and the specific 'Thin Ice' random events, along with introducing new ice-themed monsters and gatherables.
+
+## 2026-03-12: The Sunken Grotto
+- Designed a new Rank A (Level 30+) coastal ruins region: The Sunken Grotto.
+- **Design Pattern:** A submerged, claustrophobic environment that introduces "Oxygen Management" and "Current" mechanics, adding spatial pressure and resource constraints.
+- **Thematic Consistency:** Reflects the widespread geographical devastation of The Sundering by sinking an entire ancient Eldorian outpost, now teeming with Veil-corrupted aquatic life.
+- **Coordination:** Will require cross-agent coordination to implement Oxygen mechanics, specific `Abyssal Rebreather` gear, and aquatic combat adjustments.
