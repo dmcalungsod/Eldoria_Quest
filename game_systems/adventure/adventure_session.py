@@ -715,6 +715,10 @@ class AdventureSession:
             threat_reduction = float(
                 context["active_boosts"].get("undergrove_threat_reduction", 1.0)
             )
+        elif self.location_id == "frostmire":
+            threat_reduction = float(
+                context["active_boosts"].get("frostmire_threat_reduction", 1.0)
+            )
         return threat_reduction
 
     def _consume_supplies(self):
@@ -832,7 +836,9 @@ class AdventureSession:
                 return combat_result
 
             # --- 3. Non-Combat Event ---
-            return self._handle_exploration_event(context, location, weather, persist, time_phase=time_phase)
+            return self._handle_exploration_event(
+                context, location, weather, persist, time_phase=time_phase
+            )
 
         except Exception as e:
             logger.error(f"Simulation error for {self.discord_id}: {e}", exc_info=True)

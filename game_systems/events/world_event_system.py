@@ -29,6 +29,7 @@ class WorldEventSystem:
     TIME_QUAKE = "time_quake"
     BUILDERS_BOON = "builders_boon"
     FUNGAL_BLOOM = "fungal_bloom"
+    PERMAFROST_THAW = "permafrost_thaw"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -143,6 +144,16 @@ class WorldEventSystem:
                 "undergrove_loot_bonus": 2.0,
             },
         },
+        PERMAFROST_THAW: {
+            "name": "The Permafrost Thaw",
+            "description": "A rare warming trend touches the frozen wastes. The biting cold lessens, revealing ancient relics long trapped beneath the ice.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.1,
+                "frostmire_threat_reduction": 0.8,
+                "frostmire_loot_bonus": 2.0,
+            },
+        },
     }
 
     def __init__(self, db: DatabaseManager):
@@ -186,7 +197,9 @@ class WorldEventSystem:
         start_time = WorldTime.now()
         end_time = start_time + datetime.timedelta(hours=duration_hours)
 
-        self.db.set_active_world_event(event_type, start_time.isoformat(), end_time.isoformat())
+        self.db.set_active_world_event(
+            event_type, start_time.isoformat(), end_time.isoformat()
+        )
         logger.info(f"Started World Event: {event_type} for {duration_hours}h")
         return True
 

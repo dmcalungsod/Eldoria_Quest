@@ -16,3 +16,8 @@
 
 **Learning:** Implementing location-specific event modifiers (like increased loot and threat reduction only in The Undergrove) requires passing specific keys through the `WorldEventSystem.EVENT_CONFIGS` into the active buffs context. Hooking into these requires explicitly grabbing them via `combat_result.get("active_boosts", {}).get("undergrove_loot_bonus", 1.0)` during loot processing, and similarly checking for `undergrove_threat_reduction` during `AdventureSession._calculate_threat_reduction`.
 **Action:** Ensure future event implementations that rely on location context add those custom tags into `EVENT_CONFIGS` properly and then hook them where appropriate in the processing pipeline.
+
+## 2026-03-05 — The Permafrost Thaw
+
+**Learning:** Implementing location-specific events tied to new regions (like The Permafrost Thaw for Frostmire) follows the established pattern of hooking `loot_boost` and `threat_reduction` through `_process_loot_and_quests` and `simulate_step`.
+**Action:** Always test newly created event modifications thoroughly by mocking context properly. Ensure new test files are wired correctly into `run_all_tests.py` using `unittest` loader methods.
