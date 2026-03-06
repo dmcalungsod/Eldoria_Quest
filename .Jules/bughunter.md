@@ -34,3 +34,8 @@
 
 **Learning:** When using nested `__getitem__` calls in `DatabaseManager._col`, assertions on mock objects must mimic the exact chain of `__getitem__` calls made by the code under test (e.g., `self.mock_client.__getitem__(self.db._db_name).__getitem__('player_codex')`) to ensure the correct mocked collection is targeted for assertions. `self.mock_db` alone is not enough, as `DatabaseManager` accesses the database name first via the client before the collection name.
 **Action:** Updated test assertions in `tests/test_codex_unlocks.py` to fetch the correctly nested mock object before asserting `update_one` calls, fixing the pipeline and resolving Codex Tests failures.
+## 2026-03-12 — Added Guild Advisor Checklist Tests
+
+**Learning:** When writing tests that use discord modules it's essential to not just stub the module `discord` but also specific properties and classes used (e.g., `discord.Embed`, `discord.Color`) properly with robust mocking implementations (e.g., mock classes). Also, when changing test imports inside test suites like `tests/run_all_tests.py`, verify not just that individual tests run properly but also that the `run_all_tests.py` comprehensive test suite passes fully to prevent regression `ImportError` bugs.
+
+**Action:** Before running tests always double check what dependencies need to be specifically patched and ensure `PYTHONPATH=. python tests/run_all_tests.py` finishes flawlessly after any refactoring.

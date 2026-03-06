@@ -28,7 +28,7 @@ import test_adventure_session_concurrency  # New session concurrency test
 import test_auto_adventure_regression
 import test_auto_combat_formula
 import test_character_cog
-import test_codex_unlocks
+import test_codex_unlocks as test_codex_unlocks
 import test_combat_actions  # New Combat Actions test
 import test_crafting_expanded  # Expanded crafting tests
 import test_crafting_ui  # New Crafting UI tests
