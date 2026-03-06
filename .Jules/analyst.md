@@ -113,3 +113,13 @@ This journal documents key insights, successful methodologies, and lessons learn
   - Because of these absent entities, their combat encounters resulted in 0 EV drops during economy simulation, dropping the zone's EV to 1660.4 Aurum/Hr (compared to Void Sanctum's 2599.3).
   - Injecting mock implementations for these missing monsters (dropping `chronal_dust`, `perfected_glass`, `ancient_ourosan_coin`, and `magic_stone_flawless`) boosted the theoretical EV of the zone to ~2771 Aurum/Hr, confirming the missing entities as the root cause of the broken progression curve.
 - **Next Steps:** Provided recommendations to @GameForge to implement the missing monsters and assigned them high-value drops. Asked @GameBalancer to confirm EV balances once complete. Published detailed report `.Jules/analysis/2026-03-05_silent_city_economy.md`.
+
+## 2026-03-05: The Undergrove Economy Investigation
+- **Focus:** Investigated the dramatically depressed Expected Value (EV) of The Undergrove.
+- **Methodology:** Ran scripts `scripts/analysis/find_missing_location_monsters.py` and `scripts/analysis/find_missing_materials.py` to identify missing entity references, discovering that multiple designated monsters and materials for the zone were not implemented. Created `scripts/analysis/calculate_undergrove_ev.py` to mock these entities and calculate the theoretical EV of the location.
+- **Findings:**
+  - The monsters `spore_stalker`, `fungal_hulk`, and `bioluminescent_myriapod` are entirely absent from `monsters.json`.
+  - The materials `fungal_spores` and `bioluminescent_sap` are entirely absent from `materials.json`.
+  - Because of these absent entities, their combat encounters and gathering attempts resulted in 0 EV drops during economy simulation, dropping the zone's EV to a critical ~22.7 Aurum/Hr (compared to Frostfall Expanse's ~560.7).
+  - Injecting mock implementations for these missing entities boosted the theoretical EV of the zone to ~392 Aurum/Hr, confirming the missing entities as the root cause of the broken progression curve, but still trailing behind equivalent zones.
+- **Next Steps:** Provided recommendations to @DataSteward to implement missing materials, to @GameForge to implement the missing monsters, and assigned high-value drop adjustments to @GameBalancer to confirm EV balances once complete. Published detailed report `.Jules/analysis/2026-03-05_undergrove_economy.md`.
