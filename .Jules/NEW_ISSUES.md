@@ -95,3 +95,33 @@
   - GameBalancer confirms the exponential models.
 - **Labels:** `enhancement`, `database`, `guild`
 - **Assignee:** @DataSteward, @SystemSmith, @GameBalancer
+
+---
+
+**Title:** [Feature] Implement Auto-Adventure Overhaul (Skill Tree Integrations)
+
+**Description:**
+- **Source:** Architect log 2026-03-12
+- **Details:** Ensure class abilities work in time-based expeditions. The blueprints describe new paths/skills (Paladin for Cleric, Elementalist for Mage, Beastmaster for Ranger) and how their abilities translate into the deterministic combat formula.
+- **Acceptance criteria:**
+  - New paths added to `classes.json`.
+  - Specific skills added to `skills_data.py`.
+  - Mechanics (e.g., `aura_of_vitality`, time reduction for `meteor_swarm`) translated into `AutoCombatFormula.resolve_clash`.
+- **Labels:** `enhancement`, `content`, `skills`, `auto-adventure`
+- **Assignee:** @Tactician, @GameForge
+
+---
+
+**Title:** [Feature] Implement The Sunken Grotto Region Mechanics & Content
+
+**Description:**
+- **Source:** Realmwright log 2026-03-12
+- **Details:** Add a new Rank A coastal/submerged region: The Sunken Grotto. Introduces 'Oxygen Management' and 'Current' mechanics, as well as an `Abyssal Rebreather` to survive.
+- **Acceptance criteria:**
+  - Monsters and resources added.
+  - Oxygen Management and Current mechanics implemented.
+  - Flavor text added.
+  - Location names and achievements added.
+  - Aquatic combat mechanics balanced.
+- **Labels:** `enhancement`, `content`, `region`
+- **Assignee:** @GameForge, @Equipper, @Grimwarden, @StoryWeaver, @GameBalancer, @Namewright, @Tactician, @ChronicleKeeper

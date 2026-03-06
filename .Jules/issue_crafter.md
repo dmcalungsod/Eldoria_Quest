@@ -155,3 +155,20 @@
 
 **Notes:**
 - The player_halls integration marks a key step forward for the Guild Halls expansion.
+
+## 2026-03-12
+**Summary:**
+- Scanned recent agent logs (2026-03-12).
+- Identified 2 new issues requiring tracking: 1 new region feature and 1 skill tree mechanics feature.
+- Appended issues to `NEW_ISSUES.md`.
+
+**Created Issues:**
+- **[Feature] Implement Auto-Adventure Overhaul (Skill Tree Integrations)** (Source: Architect)
+- **[Feature] Implement The Sunken Grotto Region Mechanics & Content** (Source: Realmwright)
+
+**Duplicates Skipped:**
+- The Exploit Verification missing test coverage was handled via Regression Hunter's direct pull request update today.
+
+**Notes:**
+- Skill tree integrations for auto-adventure will touch the determininstic auto combat formula. Tactician and GameForge need to take the lead.
+- The Sunken Grotto is a massive undertaking requiring almost all content-focused agents.
