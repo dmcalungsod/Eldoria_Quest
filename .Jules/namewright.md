@@ -204,3 +204,35 @@
 ### 📝 Learnings
 *   "Gale-Lancers" feels more martial and active than simply "Drake-Riders".
 *   Adding "Wind-Scar" and "Iron-Lung" as titles/epithets helps convey the harshness of the environment immediately.
+
+## 2026-03-12 — The Sunken Grotto (Expansion)
+
+**Request:** Assigned by Foreman (via Realmwright's design `.Jules/region_the_sunken_grotto.md`, Task SG.6)
+**Context:** The Sunken Grotto (Rank A, Level 30+). Flooded coastal ruins, unnatural fog, oppressive, damp, claustrophobic, deep salvage.
+**Tone:** Oppressive, watery, desperate, ancient ruin, survival.
+
+### 📜 Generated Names
+
+#### 👥 NPCs (Deep Salvagers)
+1.  **Captain "Iron-Lung" Thade** – Leader of the Salvagers, known for diving deeper than anyone without magic.
+2.  **Kaelen the Drowned** – A veteran who survived a near-fatal drowning and now speaks in watery rasps.
+3.  **Elara "Riptide"** – A scavenger who specializes in navigating the treacherous underwater currents.
+4.  **Old Man Barnaby** – A senile former explorer who constantly babbles about the Leviathan.
+
+#### 📍 Locations (Sub-Zones / Alternatives)
+1.  **The Drowned Courtyard** -> **The Flooded Atrium** (Feels more architectural and ruined)
+2.  **The Whispering Caverns** -> **The Murmuring Depths** (More evocative of underwater sound)
+3.  **The Abyssal Vaults** -> **The Sunken Reliquary** (Implies ancient treasure and religion)
+4.  **Tide-Stalker's Reef** – A specific hazard zone where the predators nest.
+5.  **The Coral Catacombs** – A burial site now overtaken by marine life.
+
+#### 🏆 Achievements
+1.  **Breathless** – Survive a close call with drowning (Oxygen < 5%).
+2.  **Abyssal Plunderer** – Loot the deepest vault in The Sunken Grotto.
+3.  **Leviathan's Bane** – Defeat The Leviathan's Shadow.
+4.  **Current Rider** – Navigate the strongest underwater currents without taking damage.
+
+### 📝 Learnings
+*   Renaming "The Whispering Caverns" to "The Murmuring Depths" better captures the muted, distorted sounds of an underwater environment.
+*   "The Sunken Reliquary" sounds much more like a lost cultural site than "The Abyssal Vaults".
+*   NPC names like "Iron-Lung" and "The Drowned" immediately ground the characters in the harsh reality of their environment.
