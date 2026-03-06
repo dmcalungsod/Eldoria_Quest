@@ -28,7 +28,7 @@ def delete_all_runs():
         print(f"Fetching up to 100 workflow runs for {REPO_OWNER}/{REPO_NAME}...")
 
         url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs?per_page=100"
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=10)
 
         if response.status_code != 200:
             print(f"Error fetching runs: {response.json()}")
@@ -44,7 +44,7 @@ def delete_all_runs():
 
         def delete_run(run_id):
             delete_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs/{run_id}"
-            del_response = requests.delete(delete_url, headers=headers)
+            del_response = requests.delete(delete_url, headers=headers, timeout=10)
             if del_response.status_code == 204:
                 return True
             else:
