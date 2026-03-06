@@ -7,6 +7,23 @@ from unittest.mock import MagicMock, patch
 if "discord" not in sys.modules:
     sys.modules["discord"] = MagicMock()
 
+
+class MockField:
+    def __init__(self, name, value, inline):
+        self.name = name
+        self.value = value
+        self.inline = inline
+
+class MockEmbed:
+    def __init__(self, title=None, description=None, color=None):
+        self.title = title
+        self.description = description
+        self.color = color
+        self.fields = []
+
+    def add_field(self, name, value, inline):
+        self.fields.append(MockField(name, value, inline))
+
 class TestGuildAdvisor(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules to mock dependencies BEFORE importing the unit under test
@@ -19,6 +36,11 @@ class TestGuildAdvisor(unittest.TestCase):
         sys.modules["pymongo.errors"] = mock_pymongo.errors
         sys.modules["pymongo.MongoClient"] = MagicMock()
         sys.modules["discord"] = MagicMock()
+
+        # Crucial for test_checklist_embed
+        sys.modules["discord"].Embed = MockEmbed
+        sys.modules["discord"].Color.blue.return_value = "blue"
+        sys.modules["discord"].Color.gold.return_value = "gold"
 
         # Add repo root to path if not present
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -97,6 +119,62 @@ class TestGuildAdvisor(unittest.TestCase):
         advice = self.advisor.get_advice()
         self.assertIsInstance(advice, str)
         self.assertTrue(len(advice) > 10)
+
+
+
+    def test_checklist_embed_all_pending(self):
+        """Test checklist embed when all criteria are pending."""
+        self.mock_db.get_equipped_items.return_value = []
+        self.mock_db.get_guild_member_data.return_value = {"quests_completed": 0}
+        self.mock_db.get_player_quests_joined.return_value = []
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 0}
+
+        embed = self.advisor.get_checklist_embed()
+
+        self.assertEqual(embed.title, "📜 New Recruit Checklist")
+        self.assertEqual(embed.color, sys.modules["discord"].Color.blue())
+
+        fields = embed.fields
+        self.assertEqual(len(fields), 4)
+
+        self.assertEqual(fields[0].name, "1. Registration")
+        self.assertIn("✅", fields[0].value)
+
+        self.assertEqual(fields[1].name, "2. Gear Up")
+        self.assertIn("❌", fields[1].value)
+
+        self.assertEqual(fields[2].name, "3. First Contract")
+        self.assertIn("❌", fields[2].value)
+
+        self.assertEqual(fields[3].name, "4. First Expedition")
+        self.assertIn("❌", fields[3].value)
+
+    def test_checklist_embed_completed_initiation(self):
+        """Test checklist embed when all criteria are met and player graduates."""
+        self.mock_db.get_equipped_items.return_value = [{"slot": "sword"}]
+        self.mock_db.get_guild_member_data.return_value = {"quests_completed": 1}
+        self.mock_db.get_player_quests_joined.return_value = []
+        self.mock_db.get_exploration_stats.return_value = {"total_expeditions": 1}
+
+        embed = self.advisor.get_checklist_embed()
+
+        self.assertEqual(embed.color, sys.modules["discord"].Color.gold())
+        self.assertIn("INITIATION COMPLETE", embed.description)
+
+        fields = embed.fields
+        self.assertEqual(len(fields), 4)
+
+        self.assertEqual(fields[0].name, "1. Registration")
+        self.assertIn("✅", fields[0].value)
+
+        self.assertEqual(fields[1].name, "2. Gear Up")
+        self.assertIn("✅", fields[1].value)
+
+        self.assertEqual(fields[2].name, "3. First Contract")
+        self.assertIn("✅", fields[2].value)
+
+        self.assertEqual(fields[3].name, "4. First Expedition")
+        self.assertIn("✅", fields[3].value)
 
 
 if __name__ == "__main__":
