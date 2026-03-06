@@ -120,8 +120,8 @@ class TestGeneralCog(unittest.IsolatedAsyncioTestCase):
         self.assertTrue("The pages are worn" in embed.description)
         self.assertTrue(call_args.get("ephemeral") is True)
 
-        # Check that add_field was called 4 times
-        self.assertEqual(len(embed.fields), 4)
+        # Check that add_field was called 5 times
+        self.assertEqual(len(embed.fields), 5)
         self.assertEqual(embed.footer["text"], "May your light hold against the darkness.")
 
     @patch("cogs.general_cog.logger.error")

@@ -57,8 +57,13 @@ class GeneralCog(commands.Cog):
                 inline=False,
             )
             embed.add_field(
+                name="⚔️ Guild Classes",
+                value="Warriors hold the line, Mages shape the Veil, Rogues strike from the shadows, Clerics mend shattered flesh, Rangers track unseen horrors, and Alchemists turn the environment against the enemy.",
+                inline=False,
+            )
+            embed.add_field(
                 name="🗺️ Expeditions",
-                value="Time-based exploration. Select a destination and duration, then wait for your return. The wilds do not sleep, nor should your guard drop.",
+                value="Time-based exploration is your core duty. Select a destination and duration, then wait for your return. The wilds do not sleep—prepare your supplies carefully, or the darkness will claim you.",
                 inline=False,
             )
             embed.add_field(
