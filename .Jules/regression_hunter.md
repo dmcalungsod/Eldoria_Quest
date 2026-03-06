@@ -24,3 +24,7 @@
   - **Test Pollution:** When multiple UI test files globally mock `discord` objects (like `discord.Embed`) in varying ways (e.g., as `MagicMock` vs custom struct classes), standard discovery tools like `pytest` run them sequentially in the same process, causing massive test pollution and false-negative failures. Solved by injecting fallback inspection mechanisms into the test assertions directly (`hasattr(embed.add_field, 'call_args_list')`) rather than relying on assumed mock object structures.
   - **Module Mocks:** Always isolate module mocks using `patch.dict(sys.modules)` within `setUp` or test methods rather than at the root file level to prevent cross-contamination.
   - **Performance Assertions:** Translated a manual stress testing script (`stress_adventure_realistic.py`) into an automated `unittest.TestCase` regression test. This guarantees that engine refactors won't silently degrade the throughput required for the Auto-Adventure background loop (10,000 sessions/minute).
+
+## 2026-03-12 — Auto-Adventure Regression Testing & Exploit Verification
+**Action:** Discovered the existing `tests/test_adventure_retreat_exploit.py` was disconnected. Imported it into `tests/run_all_tests.py` and added it to the `run_adventure_tests` test suite to ensure that local regression testing actually runs it. This closes "Issue #5: [Test] Auto-Adventure: Exploit Verification".
+**Coverage:** Covers `game_systems/adventure/adventure_manager.py` retreat penalty logic.
