@@ -45,3 +45,8 @@
 
 **Learning:** While `total_expeditions` integrated part of Auto-Adventure progress into ranks, it allowed players to circumvent the difficulty intended by time gating. Expeditions can be short, allowing players to meet the total expeditions metric without committing to the extended duration necessary to match intended progression pace.
 **Action:** Added `total_adventure_minutes` as a requirement for all ranks (F: 60 minutes -> SS: 19,200 minutes). This forces a cumulative time investment from auto-adventuring, aligning its advancement with the system's "grim survival" philosophy.
+
+## 2026-03-12 — Rank B Level Requirements Conflict
+
+**Learning:** The Celestial Archipelago had an incorrect `min_rank` requirement of "A" while its `level_req` was 28. Since Rank A generally corresponds to Level 30+ content (e.g., Molten Caldera), this created a logic conflict that locked level 28 Rank B players out of appropriate content.
+**Action:** Changed `min_rank` from "A" to "B" for `celestial_archipelago` in `game_systems/data/adventure_locations.json` to smooth the progression curve between Rank B and Rank A.
