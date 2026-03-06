@@ -197,6 +197,16 @@ class AutoCombatFormula:
                     recoil_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * skill["self_damage_percent"]) * uses
                     final_damage_taken += recoil_amount
 
+                # Rogue: next_hit_crit burst damage abstraction
+                if "next_hit_crit" in skill.get("buff", {}):
+                    # Abstract the impact of guaranteed crits by reducing expected incoming damage
+                    final_damage_taken = int(final_damage_taken * 0.90)
+
+                # Rogue: conditional_multiplier burst damage abstraction
+                if "conditional_multiplier" in skill:
+                    # Abstract the impact of conditional multipliers (like venomous strike)
+                    final_damage_taken = int(final_damage_taken * 0.85)
+
 
 
         return {
