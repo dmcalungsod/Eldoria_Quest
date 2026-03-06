@@ -30,3 +30,9 @@
 *   **Silly rewards** that break immersion.
 *   **The Pathfinder's Toll:** An introductory quest designed for the TimeWeaver auto-adventure overhaul. It teaches players about rationing, fatigue, and the inherent risks of offline expeditions without relying on manual combat.
 *   **The Broken Anvil:** A high-stakes, multi-part collection quest for the Ironhaven region that forces players to choose between repairing a vital forge or reinforcing anti-air defenses, highlighting the grim triage of survival against the Void.
+
+## 2026-03-06 — The Whispering Archives Design
+
+*   **Focus:** Designed "The Whispering Archives" quest to serve as the narrative gateway to the new "Silent City of Ouros" expansion, in coordination with Foreman's plan and DepthsWarden's recent addition of "The Void Seekers" faction.
+*   **Design Rationale:** I needed to introduce the core mechanics and theme of Ouros (temporal anomalies, absolute silence, preserved perfection) before the player fully enters the region. The quest gives players a choice to side with the traditional Guild (Archivist Valen) or the newly introduced Void Seekers, explicitly hooking into DepthsWarden's new faction to give it immediate narrative weight.
+*   **Key Mechanic:** Introduced the concept of the "Chronal Anchor" during the climax fight to prepare players for the unique, non-standard combat encounters they will face inside Ouros.
