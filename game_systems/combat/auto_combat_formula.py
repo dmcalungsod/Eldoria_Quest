@@ -55,8 +55,6 @@ class AutoCombatFormula:
         else:
             attack_power = basic_attack_power
 
-
-
         # Crit expected value
         crit_chance = 0.03 + (luck_val * 0.002)
         crit_multiplier = 1.75
@@ -180,11 +178,30 @@ class AutoCombatFormula:
         # 4. Apply Auto-Combat specific mechanics from skills
         if player_skills:
             for skill in player_skills:
+                # Rogue: Shadow Step (next_hit_crit)
+                if skill.get("buff", {}).get("next_hit_crit"):
+                    uses = max(1, int(turns_to_kill * 0.25))
+                    saved_damage = int(uses * monster_net_dps)
+                    final_damage_taken = max(0, final_damage_taken - saved_damage)
+
+                # Rogue: Venomous Strike (conditional_multiplier)
+                if "conditional_multiplier" in skill:
+                    uses = max(1, int(turns_to_kill * 0.25))
+                    saved_damage = int(uses * monster_net_dps * 1.5)
+                    final_damage_taken = max(0, final_damage_taken - saved_damage)
+
                 # Warrior: Bloodlust (Heal on kill)
                 passive_bonus = skill.get("passive_bonus", {})
                 if "kill_heal_percent" in passive_bonus:
                     # Healing is applied at the end of the combat since it's a kill heal
-                    heal_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * passive_bonus["kill_heal_percent"])
+                    heal_amount = int(
+                        (
+                            player_stats.get("HP", 100)
+                            if isinstance(player_stats, dict)
+                            else getattr(player_stats, "max_hp", 100)
+                        )
+                        * passive_bonus["kill_heal_percent"]
+                    )
                     final_damage_taken = max(0, final_damage_taken - heal_amount)
 
                 # Warrior: Reckless Swing (Self damage)
@@ -194,10 +211,18 @@ class AutoCombatFormula:
                     uses = max(1, int(turns_to_kill * 0.25))
                     # Recoil is based on damage dealt by the skill, but we approximate to % of HP for auto-combat
                     # if the skill doesn't hit, but for auto-combat, let's use the player's max HP as a safe bet
-                    recoil_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * skill["self_damage_percent"]) * uses
+                    recoil_amount = (
+                        int(
+                            (
+                                player_stats.get("HP", 100)
+                                if isinstance(player_stats, dict)
+                                else getattr(player_stats, "max_hp", 100)
+                            )
+                            * skill["self_damage_percent"]
+                        )
+                        * uses
+                    )
                     final_damage_taken += recoil_amount
-
-
 
         return {
             "turns_to_kill": int(turns_to_kill),
