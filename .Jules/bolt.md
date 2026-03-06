@@ -26,3 +26,7 @@
 ## 2026-03-01 - [Auto-Adventure Scheduler N+1 Query Fix]
 **Learning:** `AdventureResolutionEngine.resolve_sessions_batch` fetched combat context bundles inside a loop calling `get_combat_context_bundle` for each `discord_id`, resulting in an N+1 query problem that slowed down the auto-adventure scheduler.
 **Action:** Introduced `get_combat_context_bundles_batch` using MongoDB's `$in` operator to fetch all context bundles in a single query. `resolve_sessions_batch` now parses and maps these bundles, passing them efficiently into `resolve_session`.
+
+## 2026-03-11 - [Removed Leftover Debug Logs from Production]
+**Learning:** Hardcoded `print()` statements left in data generation or initialization scripts (like `class_equipments.py`) cause unnecessary console spam and I/O overhead on server startup or reload. Using the standard `logging` library instead allows these messages to be filtered out gracefully based on environment levels (e.g., hiding debug output in production).
+**Action:** Always replace `print()` statements with `logging.debug()` or `logging.info()` to ensure robust log management, minimizing overhead and keeping logs clean.
