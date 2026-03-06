@@ -68,6 +68,12 @@ LOCATION_WEATHER_WEIGHTS = {
         (Weather.CLEAR, 20),
         (Weather.FOG, 10),
     ],
+    "howling_peaks": [
+        (Weather.SNOW, 30),
+        (Weather.BLIZZARD, 40),
+        (Weather.GALE, 20),
+        (Weather.CLEAR, 10),
+    ],
     "shimmering_wastes": [
         (Weather.CLEAR, 50),
         (Weather.SANDSTORM, 40),

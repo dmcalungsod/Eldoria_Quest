@@ -24,3 +24,7 @@
 
 **Learning:** When adding new quest locations, we must ensure they have a realistic ecosystem. A location only containing elite quest targets feels artificial.
 **Action:** Always ensure new areas contain lower-tier, environmentally appropriate mobs (e.g., adding Frost Wolves to the Howling Peaks alongside the Frost Gargoyles and Storm Drakes).
+## 2026-03-12 — Environmental Logic for The Howling Peaks (Weather Expansion)
+
+**Learning:** When a new adventure location is created, it defaults to standard weather weights if not explicitly defined. For locations with distinct environmental characteristics (like Howling Peaks), defaulting to "Clear" or "Rain" breaks immersion and the established realism mechanics.
+**Action:** Always add explicit weather probability weights to `LOCATION_WEATHER_WEIGHTS` in `game_systems/core/world_time.py` for newly introduced environments to ensure atmospheric consistency.
