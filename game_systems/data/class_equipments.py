@@ -7,7 +7,10 @@ classes, rarities, and slots, balanced for the 999-stat system.
 Total items generated: 5 Classes * 6 Rarities * 10 Slots = 300 items.
 """
 
+import logging
 from math import ceil
+
+logger = logging.getLogger(__name__)
 
 CLASSES = ["Warrior", "Mage", "Rogue", "Cleric", "Ranger", "Alchemist"]
 
@@ -162,7 +165,7 @@ STAT_BUDGETS = {
 CLASS_EQUIPMENTS = {}
 eid = 1  # Use a simple counter for the unique key
 
-print("--- Generating Class Equipment Catalog (300 items) ---")
+logger.debug("--- Generating Class Equipment Catalog (300 items) ---")
 
 for class_name in CLASSES:
     class_id = CLASSES.index(class_name) + 1
@@ -180,7 +183,7 @@ for class_name in CLASSES:
             # Get the stat distribution for this slot
             budget = STAT_BUDGETS.get(slot)
             if not budget:
-                print(f"WARNING: No stat budget found for slot '{slot}'. Skipping.")
+                logger.warning(f"No stat budget found for slot '{slot}'. Skipping.")
                 continue
 
             # Generate the item name
@@ -225,7 +228,7 @@ for class_name in CLASSES:
 
             eid += 1
 
-print(f"--- Generated {len(CLASS_EQUIPMENTS)} class-specific items. ---")
+logger.debug(f"--- Generated {len(CLASS_EQUIPMENTS)} class-specific items. ---")
 
 # We no longer need to export CLASS_SETS
 __all__ = ["CLASS_EQUIPMENTS"]
