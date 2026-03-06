@@ -65,3 +65,12 @@
 
 **Learning:** The Void Sanctum and Silent City of Ouros lacked a transitional zone. Floor 41 was created to connect them properly per Foreman's plan.
 **Action:** Add intermediate zones when major thematic changes occur between deep floors.
+
+## 2026-03-06 — The Void Seekers Faction
+
+**Learning:** Endgame players exploring The Void Sanctum, Abyssal Descent, and The Silent City of Ouros lacked a dedicated faction providing long-term horizontal progression and identity tied to the deep dungeon's narrative themes.
+**Action:** Implemented "The Void Seekers" faction.
+- **Theme:** Explorers driven by the silence and mysteries of the Void.
+- **Progression:** Ranks from Initiate to Void Walker.
+- **Rewards:** Utility and rare materials (`null_stone`, `chronal_dust`) and the exclusive "Void Walker" title.
+- **Integration:** Favored locations include `void_sanctum`, `abyssal_descent`, and `silent_city_ouros`, encouraging exploration of the deepest, most dangerous zones.

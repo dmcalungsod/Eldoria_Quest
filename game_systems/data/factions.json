@@ -354,5 +354,56 @@
         "favored_locations": [
             "the_undergrove"
         ]
+    },
+    "void_seekers": {
+        "name": "The Void Seekers",
+        "emoji": "🌌",
+        "description": "Explorers driven by the silence and the mysteries of the Void.",
+        "ranks": {
+            "1": {
+                "title": "Initiate",
+                "reputation_needed": 0,
+                "reward": null
+            },
+            "2": {
+                "title": "Observer",
+                "reputation_needed": 1000,
+                "reward": {
+                    "type": "item",
+                    "key": "null_stone",
+                    "amount": 2
+                }
+            },
+            "3": {
+                "title": "Silent Strider",
+                "reputation_needed": 3000,
+                "reward": {
+                    "type": "item",
+                    "key": "chronal_dust",
+                    "amount": 3
+                }
+            },
+            "4": {
+                "title": "Void Walker",
+                "reputation_needed": 6000,
+                "reward": {
+                    "type": "title",
+                    "value": "Void Walker"
+                }
+            }
+        },
+        "interests": {
+            "exploration": 2.0,
+            "boss_kills": 1.5,
+            "monster_types": [
+                "Demon",
+                "Undead"
+            ]
+        },
+        "favored_locations": [
+            "void_sanctum",
+            "abyssal_descent",
+            "silent_city_ouros"
+        ]
     }
 }
