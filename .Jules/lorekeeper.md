@@ -78,3 +78,18 @@ Reviewed the recently designed regions by Realmwright: **Ironhaven** and **The U
 
 **Next Steps:**
 - Monitor the addition of new monsters, items, and quests for these regions to ensure consistent flavor text.
+
+## 2026-03-12 — Verifying the Deep Expansions
+
+**Learning:**
+Reviewed Foreman's active tasks and the recent lore additions by Realmwright and StoryWeaver.
+- **The Sunken Grotto:** Already established in `lore_canon.md` (Rank C). Its aquatic mechanics fit the survival focus.
+- **The Blind Choir's Requiem:** Perfectly matches the grim lore of The Wailing Chasm. The newly added monsters ("Choirmaster", "Blind Choir Zealot") in `monsters.json` have descriptions that align with the narrative.
+- **The Broken Anvil:** A compelling questline focusing on the Iron Vanguard's forge. It introduces "Frost Gargoyles" and "Storm Drakes" from the "Howling Peaks". However, "Howling Peaks" was missing from the world canon.
+
+**Action:**
+1. Added **The Howling Peaks (Rank A)** to `.Jules/lore_canon.md` as a frozen mountain range harboring Frost Gargoyles.
+2. Verified that the new monster descriptions and quest dialogues adhere to the "grim but hopeful" and "material" tone guidelines.
+
+**Next Steps:**
+- Await directives from Foreman before integrating this new lore into the Codex or other player-facing UI systems.
