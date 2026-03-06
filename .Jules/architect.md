@@ -201,3 +201,22 @@ Major Content Expansion/System: The Lost Tomes (Consumable Skill Books).
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/expansion_skill_books.md`
+
+## 2026-03-12 — Expansion Blueprint: Auto-Adventure Overhaul (Skill Tree Integrations)
+
+**Design Choice:**
+Skill Tree Blueprints for the auto-adventure overhaul.
+
+**Reasoning:**
+- **Foreman Assignment:** Created skill tree blueprints for the auto-adventure overhaul to ensure class abilities work in time-based expeditions.
+- **System Parity:** The deterministic combat formula currently lacks nuance for many class skills, especially utility or AoE effects.
+
+**Key Mechanics:**
+- **Translation:** Turn-based mechanics are translated into time-saving (AoE) or damage-reducing (Stun/Shields) passives for the background simulation.
+- **New Archetypes:** Designed the Paladin (Cleric), Elementalist (Mage), and Beastmaster (Ranger) paths to flesh out the missing archetypes and provide concrete examples of the new deterministic scaling.
+
+**Integration Notes:**
+- **CombatEngine:** `AutoCombatFormula.resolve_clash` needs hooks for `aura_of_vitality` (healing between encounters) and `meteor_swarm` (reducing encounter time).
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/expansion_auto_adventure_overhaul.md`
