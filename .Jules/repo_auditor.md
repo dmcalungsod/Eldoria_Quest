@@ -96,3 +96,9 @@
 - `vulture` successfully identified dead code in test files and scripts.
 - Manual regex searches effectively flagged multiple potential "ONE UI" violations where `send_message` / `followup.send` are used across various views (`inventory_view.py`, `adventure_menu.py`, etc.).
 - Recommendation: Add a `pre-commit` hook for `vulture` and `radon` to prevent dead code and overly complex functions from being committed in the first place.
+
+## 2026-03-13 Audit Learnings
+- **Tooling Effectiveness:** `flake8` is extremely chatty, mostly reporting line length violations and module level import issues. `radon` effectively highlighted complex functions for refactoring. The `safety` tool has deprecated the `check` command, and using `scan` instead may require further configuration or authentication.
+- **Patterns:** The ONE UI policy is actively being violated in several views (e.g. `send_message` and `followup.send`), which will create messy discord chats.
+- **Process Improvements:** Introducing `black` or `ruff` to the CI pipeline or pre-commit hooks could instantly eliminate the bulk of the `flake8` warnings and keep the code style consistent.
+- **Limitations:** Limited security scanning effectiveness, as `bandit` only flagged low severity confidence issues. No actual secrets were found, which is positive.
