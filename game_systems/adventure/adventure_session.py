@@ -129,7 +129,7 @@ class AdventureSession:
         location_id = getattr(self, "location_id", None)
         base_rate = (
             0.10
-            if location_id in ("silent_city_ouros", "ironhaven", "the_undergrove")
+            if location_id in ("silent_city_ouros", "ironhaven", "the_undergrove", "sunken_grotto")
             else 0.05
         )
         bonus = (excess_steps / 60.0) * base_rate
@@ -444,6 +444,56 @@ class AdventureSession:
                             self.discord_id, -toxin_dmg, 0, max_hp, max_mp
                         )
 
+    def _apply_sunken_grotto_penalties(self, context: dict, persist: bool):
+        """Applies Oxygen Depletion and Currents if exploring The Sunken Grotto."""
+        location_id = getattr(self, "location_id", None)
+        if location_id == "sunken_grotto":
+            import random
+
+            # Current Mechanic: Sweeps player into new areas, adding fatigue/time
+            if random.random() < 0.15:  # nosec B311
+                current_steps = getattr(self, "steps_completed", 0)
+                self.steps_completed = current_steps + 2
+                self.logs.append("🌊 **Strong Current:** A powerful underwater current sweeps you off course, exhausting you.")
+
+            # Oxygen Management
+            if not hasattr(self, "_oxygen_depletion"):
+                self._oxygen_depletion = 0
+
+            self._oxygen_depletion += 1
+
+            if self._oxygen_depletion >= 5 and random.random() < 0.50:  # nosec B311
+                # Need air
+
+                # Check for Air Bladder
+                if self.supplies.get("air_bladder", 0) > 0:
+                    self.supplies["air_bladder"] -= 1
+                    self.logs.append("🫧 **Breath of Air:** You consume an Air Bladder to replenish your oxygen.")
+                    self._oxygen_depletion = 0
+                    return
+
+                # Take drowning damage
+                max_hp = context.get("stats_dict", {}).get(
+                    "HP", context["player_stats"].max_hp
+                )
+
+                drowning_dmg = max(1, int(max_hp * (0.05 * (self._oxygen_depletion - 3))))
+                msg = f"🫁 **Drowning:** You are running out of air! You suffer **{drowning_dmg}** damage."
+
+                current_hp = context["vitals"]["current_hp"]
+                if current_hp > 0:
+                    new_hp = max(0, current_hp - drowning_dmg)
+                    context["vitals"]["current_hp"] = new_hp
+                    self.logs.append(msg)
+
+                    if persist:
+                        max_mp = context.get("stats_dict", {}).get(
+                            "MP", context["player_stats"].max_mp
+                        )
+                        self.db.update_player_vitals_delta(
+                            self.discord_id, -drowning_dmg, 0, max_hp, max_mp
+                        )
+
     def _apply_environmental_effects(
         self, context: dict, weather: Weather, persist: bool = True
     ):
@@ -481,6 +531,9 @@ class AdventureSession:
 
         # The Undergrove - Toxin Accumulation Penalty
         self._apply_undergrove_penalties(context, persist)
+
+        # The Sunken Grotto - Oxygen and Currents
+        self._apply_sunken_grotto_penalties(context, persist)
 
     def _handle_active_combat(
         self,
@@ -719,7 +772,7 @@ class AdventureSession:
             threat_reduction = float(
                 context["active_boosts"].get("frostmire_threat_reduction", 1.0)
             )
-        elif self.location_id == "the_sunken_grotto":
+        elif self.location_id == "sunken_grotto":
             threat_reduction = float(
                 context["active_boosts"].get("sunken_grotto_threat_reduction", 1.0)
             )

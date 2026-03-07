@@ -243,7 +243,7 @@ class AdventureRewards:
             loot_boost *= float(frostmire_bonus)
 
         # EVENT HOOK: Sunken Grotto Loot Bonus
-        if location_id == "the_sunken_grotto":
+        if location_id == "sunken_grotto":
             sunken_grotto_bonus = combat_result.get("active_boosts", {}).get(
                 "sunken_grotto_loot_bonus", 1.0
             )
