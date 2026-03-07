@@ -5,9 +5,12 @@ Core Stats Module for Eldoria Quest
 Hardened: Tiered scaling logic and robust serialization.
 """
 
+import logging
 import math
 from dataclasses import dataclass
 from typing import Any
+
+logger = logging.getLogger("eldoria.stats")
 
 
 # --- NEW HELPER FUNCTION (Used by Combat) ---
@@ -150,7 +153,13 @@ class PlayerStats:
             base_slots = self.INVENTORY_BASE
             str_bonus = math.floor(self.strength * self.INVENTORY_STR_MOD)
             dex_bonus = math.floor(self.dexterity * self.INVENTORY_DEX_MOD)
-            self._cached_max_slots = max(base_slots, base_slots + str_bonus + dex_bonus)
+            total_slots = max(base_slots, base_slots + str_bonus + dex_bonus)
+
+            logger.debug(
+                f"Recalculating inventory capacity: "
+                f"Base={base_slots}, STR Bonus=+{str_bonus}, DEX Bonus=+{dex_bonus} -> Total={total_slots}"
+            )
+            self._cached_max_slots = total_slots
         return self._cached_max_slots
 
     # --- Stat modification ---
