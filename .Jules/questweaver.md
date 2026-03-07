@@ -36,3 +36,9 @@
 *   **Focus:** Designed "The Whispering Archives" quest to serve as the narrative gateway to the new "Silent City of Ouros" expansion, in coordination with Foreman's plan and DepthsWarden's recent addition of "The Void Seekers" faction.
 *   **Design Rationale:** I needed to introduce the core mechanics and theme of Ouros (temporal anomalies, absolute silence, preserved perfection) before the player fully enters the region. The quest gives players a choice to side with the traditional Guild (Archivist Valen) or the newly introduced Void Seekers, explicitly hooking into DepthsWarden's new faction to give it immediate narrative weight.
 *   **Key Mechanic:** Introduced the concept of the "Chronal Anchor" during the climax fight to prepare players for the unique, non-standard combat encounters they will face inside Ouros.
+
+## 2026-03-13 — The Drowned Salvage Design
+
+*   **Focus:** Designed "The Drowned Salvage" quest as part of the new "The Sunken Grotto" expansion (Foreman's assignment SG.3 integration).
+*   **Design Rationale:** I needed to introduce a compelling narrative involving the local "Deep Salvagers" faction and the oppressive Oxygen Management and Current mechanics. The quest creates a moral dilemma balancing immediate wealth (Vane's bribe) against long-term strategic advantage for the Guild (navigational charts), highlighting the harsh realities of survival.
+*   **Key Mechanic:** Integrated the oxygen tension into the hunt for the Coral-Bound Goliath, reinforcing the grim survival theme of Eldoria Quest.
