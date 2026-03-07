@@ -252,7 +252,8 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task SG.3:** Write flavor text for The Sunken Grotto.
     - **Agent:** @StoryWeaver
     - **Due:** 2026-03-16
-- [ ] **Task SG.4:** Add Abyssal Rebreather equipment.
+- [x] **Task SG.4:** Add Abyssal Rebreather equipment.
+    - **Status:** **Completed**
     - **Agent:** @Equipper
     - **Due:** 2026-03-16
 - [ ] **Task SG.5:** Balance oxygen drain and economy.
