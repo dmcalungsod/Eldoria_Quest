@@ -30,6 +30,7 @@ class WorldEventSystem:
     BUILDERS_BOON = "builders_boon"
     FUNGAL_BLOOM = "fungal_bloom"
     PERMAFROST_THAW = "permafrost_thaw"
+    ABYSSAL_TIDE = "abyssal_tide"
 
     # Event Configurations
     EVENT_CONFIGS = {
@@ -152,6 +153,16 @@ class WorldEventSystem:
                 "exp_boost": 1.1,
                 "frostmire_threat_reduction": 0.8,
                 "frostmire_loot_bonus": 2.0,
+            },
+        },
+        ABYSSAL_TIDE: {
+            "name": "The Abyssal Tide",
+            "description": "Unnatural currents pull treasures from the deep. The Sunken Grotto is less treacherous and overflowing with lost riches.",
+            "modifiers": {
+                "loot_boost": 1.25,
+                "exp_boost": 1.1,
+                "sunken_grotto_threat_reduction": 0.8,
+                "sunken_grotto_loot_bonus": 2.0,
             },
         },
     }

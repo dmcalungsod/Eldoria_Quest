@@ -21,3 +21,7 @@
 
 **Learning:** Implementing location-specific events tied to new regions (like The Permafrost Thaw for Frostmire) follows the established pattern of hooking `loot_boost` and `threat_reduction` through `_process_loot_and_quests` and `simulate_step`.
 **Action:** Always test newly created event modifications thoroughly by mocking context properly. Ensure new test files are wired correctly into `run_all_tests.py` using `unittest` loader methods.
+## 2026-03-13 — The Abyssal Tide
+
+**Learning:** Implementing location-specific events tied to new regions (like The Abyssal Tide for The Sunken Grotto) continues to follow the established pattern of hooking `loot_boost` and `threat_reduction` through `AdventureRewards._process_loot_and_quests` and `AdventureSession.simulate_step`.
+**Action:** Always test newly created event modifications properly to ensure the location IDs align exactly with those in `adventure_locations.json` and that modifiers stack correctly with other events if any exist.
