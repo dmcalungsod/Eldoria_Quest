@@ -5,3 +5,5 @@
 - Added thermal insulation equipment (Frost-Warden Cloak, Forge-Guard Carapace, Ember-Weave Robe) to equipments.json for Ironhaven survival mechanics.
 
 - 2026-03-10: Explored the codebase for the "The Undergrove Region Mechanics & Content" task. Added the "Respirator Mask" and "Purifying Brew" to `equipments.json` and `consumables.json` respectively.
+
+- 2026-03-13: Explored codebase for Task SG.4 (The Sunken Grotto mechanics). Added the "Abyssal Rebreather" accessory to `equipments.json` allowing for deep sea breathing, as well as the "Air Bladder" supply item to `consumables.json` to refill oxygen. Implemented crafting recipe `craft_abyssal_rebreather`. Marked Task SG.4 as Complete.
