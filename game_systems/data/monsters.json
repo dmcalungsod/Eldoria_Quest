@@ -2042,11 +2042,15 @@
         "drops": [
             [
                 "coral_fragment",
-                60
+                80
             ],
             [
                 "magic_stone_medium",
-                20
+                100
+            ],
+            [
+                "magic_stone_large",
+                30
             ]
         ],
         "skills": [
@@ -2067,11 +2071,15 @@
         "drops": [
             [
                 "bioluminescent_scale",
-                40
+                100
             ],
             [
-                "magic_stone_small",
-                50
+                "magic_stone_medium",
+                100
+            ],
+            [
+                "pearl",
+                30
             ]
         ],
         "skills": [
@@ -2092,15 +2100,15 @@
         "drops": [
             [
                 "siren_voice_box",
-                25
+                80
             ],
             [
                 "pearl",
-                10
+                100
             ],
             [
                 "magic_stone_medium",
-                30
+                100
             ]
         ],
         "skills": [
@@ -2121,11 +2129,19 @@
         "drops": [
             [
                 "coral_fragment",
-                50
+                100
             ],
             [
                 "bioluminescent_scale",
-                40
+                100
+            ],
+            [
+                "magic_stone_large",
+                80
+            ],
+            [
+                "pearl",
+                80
             ]
         ],
         "skills": [
@@ -2150,11 +2166,11 @@
             ],
             [
                 "magic_stone_large",
-                50
+                80
             ],
             [
                 "siren_voice_box",
-                50
+                80
             ]
         ],
         "skills": [
