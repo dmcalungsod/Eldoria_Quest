@@ -9,7 +9,31 @@
             }
         }
     },
-    "items": {},
-    "locations": {},
-    "factions": {}
+    "items": {
+        "item_001": {
+            "lore_extended": "A standard potion used by novice adventurers.",
+            "unlock_thresholds": {
+                "basic": 1,
+                "lore": 50
+            }
+        }
+    },
+    "locations": {
+        "location_001": {
+            "lore_extended": "A calm, serene forest that is home to many wild beasts.",
+            "unlock_thresholds": {
+                "basic": 1,
+                "lore": 50
+            }
+        }
+    },
+    "factions": {
+        "faction_001": {
+            "lore_extended": "A mysterious group that operates from the shadows.",
+            "unlock_thresholds": {
+                "basic": 1,
+                "lore": 50
+            }
+        }
+    }
 }
