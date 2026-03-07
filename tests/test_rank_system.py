@@ -162,7 +162,7 @@ class TestRankSystem(unittest.TestCase):
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
     def test_rank_a_requirements(self):
-        # Rank A -> S requires 50 quests, 800 normal kills, 80 elite kills, 6 boss kills
+        # Rank A -> S requires 50 quests, 800 normal kills, 95 elite kills, 6 boss kills
         self.mock_db.get_exploration_stats.return_value = {
             "total_expeditions": 30,
             "total_adventure_minutes": 4800,
@@ -173,7 +173,7 @@ class TestRankSystem(unittest.TestCase):
             "rank": "A",
             "quests_completed": 50,
             "normal_kills": 800,
-            "elite_kills": 80,
+            "elite_kills": 95,
             "boss_kills": 5,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
@@ -183,13 +183,13 @@ class TestRankSystem(unittest.TestCase):
             "rank": "A",
             "quests_completed": 50,
             "normal_kills": 800,
-            "elite_kills": 80,
+            "elite_kills": 95,
             "boss_kills": 6,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
     def test_rank_s_requirements(self):
-        # Rank S -> SS requires 60 quests, 1000 normal kills, 120 elite kills, 10 boss kills
+        # Rank S -> SS requires 60 quests, 1000 normal kills, 135 elite kills, 10 boss kills
         self.mock_db.get_exploration_stats.return_value = {
             "total_expeditions": 40,
             "total_adventure_minutes": 9600,
@@ -200,7 +200,7 @@ class TestRankSystem(unittest.TestCase):
             "rank": "S",
             "quests_completed": 60,
             "normal_kills": 1000,
-            "elite_kills": 120,
+            "elite_kills": 135,
             "boss_kills": 9,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
@@ -210,13 +210,13 @@ class TestRankSystem(unittest.TestCase):
             "rank": "S",
             "quests_completed": 60,
             "normal_kills": 1000,
-            "elite_kills": 120,
+            "elite_kills": 135,
             "boss_kills": 10,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
 
     def test_rank_ss_requirements(self):
-        # Rank SS -> SSS requires 65 quests, 1500 normal kills, 200 elite kills, 20 boss kills
+        # Rank SS -> SSS requires 65 quests, 1500 normal kills, 185 elite kills, 20 boss kills
         self.mock_db.get_exploration_stats.return_value = {
             "total_expeditions": 50,
             "total_adventure_minutes": 19200,
@@ -227,7 +227,7 @@ class TestRankSystem(unittest.TestCase):
             "rank": "SS",
             "quests_completed": 65,
             "normal_kills": 1500,
-            "elite_kills": 200,
+            "elite_kills": 185,
             "boss_kills": 19,
         }
         self.assertFalse(self.rank_system.check_promotion_eligibility(123))
@@ -237,7 +237,7 @@ class TestRankSystem(unittest.TestCase):
             "rank": "SS",
             "quests_completed": 65,
             "normal_kills": 1500,
-            "elite_kills": 200,
+            "elite_kills": 185,
             "boss_kills": 20,
         }
         self.assertTrue(self.rank_system.check_promotion_eligibility(123))
