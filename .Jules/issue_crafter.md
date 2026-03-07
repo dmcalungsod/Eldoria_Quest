@@ -155,3 +155,19 @@
 
 **Notes:**
 - The player_halls integration marks a key step forward for the Guild Halls expansion.
+
+## 2026-03-14
+**Summary:**
+- Scanned recent agent logs (2026-03-12, 2026-03-13), Foreman plan, and Audit reports.
+- Identified 3 new issues requiring tracking: 1 new class feature, 1 bug/schema issue, and 1 skill tree integration feature.
+- Appended issues to `NEW_ISSUES.md`.
+
+**Created Issues:**
+- **[Feature] Implement The Necromancer Class Blueprint** (Source: Architect)
+- **[Bug] Fix Missing Entities and Schema Issues for Auto-Adventure Locations** (Source: Analyst)
+- **[Feature] Auto-Adventure Overhaul (Skill Tree Integrations) Implementation Phase** (Source: Architect/SkillWeaver)
+
+**Notes:**
+- The Necromancer is a significant new class that requires careful balancing around its summon mechanics and lifesteal abilities.
+- Critical gaps in Auto-Adventure locations (Undergrove missing entities, Sunken Grotto EV drop) were identified by Analyst and need addressing for proper progression loops.
+- SkillWeaver completed Task AA.1, meaning GameForge can now implement the actual paths/skills to fulfill the Auto-Adventure Skill Tree Overhaul design.

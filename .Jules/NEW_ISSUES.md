@@ -95,3 +95,46 @@
   - GameBalancer confirms the exponential models.
 - **Labels:** `enhancement`, `database`, `guild`
 - **Assignee:** @DataSteward, @SystemSmith, @GameBalancer
+
+---
+
+**Title:** [Feature] Implement The Necromancer Class Blueprint
+
+**Description:**
+- **Source:** Architect log 2026-03-13
+- **Details:** Add a new class, The Necromancer, featuring a 7-skill Master of Bones path. Key mechanics include summons (`raise_skeleton`), corpse utilization (`requires_corpse`), and lifesteal/MP regeneration passives.
+- **Acceptance criteria:**
+  - Class lore and flavor text refined.
+  - Balance evaluation on `kill_heal_percent` for `Life Drain` in long fights completed.
+  - Class ID, "scythe" weapon type, and "Grave Dust" consumables implemented.
+  - `CombatEngine` updated to support allied summons and track `dead_enemies_count`.
+- **Labels:** `enhancement`, `content`, `class`
+- **Assignee:** @StoryWeaver, @GameBalancer, @GameForge, @Tactician
+
+---
+
+**Title:** [Bug] Fix Missing Entities and Schema Issues for Auto-Adventure Locations
+
+**Description:**
+- **Source:** Analyst log 2026-03-12
+- **Details:** The Undergrove is missing assigned monsters (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`) and materials (`fungal_spores`, `bioluminescent_sap`). The Sunken Grotto requires an EV buff due to a severe drop in Expected Value. `howling_peaks` is missing a description in `adventure_locations.json`. The monsters `frost_gargoyle` and `storm_drake` reference missing skills (`ice_spear`, `dragon_breath`).
+- **Acceptance criteria:**
+  - Missing monsters and materials for The Undergrove implemented.
+  - The Sunken Grotto loot/EV buffed.
+  - Missing description added to `howling_peaks`.
+  - Missing skills implemented for `frost_gargoyle` and `storm_drake`.
+- **Labels:** `bug`, `content`, `balance`, `schema`
+- **Assignee:** @GameBalancer, @GameForge, @DataSteward
+
+---
+
+**Title:** [Feature] Auto-Adventure Overhaul (Skill Tree Integrations) Implementation Phase
+
+**Description:**
+- **Source:** Architect & SkillWeaver logs 2026-03-12 / 2026-03-13
+- **Details:** The translation of mechanics (e.g., `aura_of_vitality`, `meteor_swarm`) into `AutoCombatFormula.resolve_clash` is complete. Now the actual paths and skills need to be implemented in the game data.
+- **Acceptance criteria:**
+  - New paths (Paladin for Cleric, Elementalist for Mage, Beastmaster for Ranger) added to `classes.json`.
+  - Specific skills for these new paths added to `skills_data.py`.
+- **Labels:** `enhancement`, `content`, `skills`
+- **Assignee:** @GameForge
