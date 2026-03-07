@@ -50,7 +50,11 @@ class AdventureManager:
         # --- REGRESSION FIX: Enforce Level Requirements ---
         location_data = LOCATIONS[location_id]
         level_req = location_data.get("level_req", 1)
-        player_level = self.db.get_player_field(discord_id, "level") or 1
+        player_level_raw = self.db.get_player_field(discord_id, "level")
+        try:
+            player_level = int(player_level_raw)
+        except (TypeError, ValueError):
+            player_level = 1
 
         if player_level < level_req:
             logger.warning(f"Player {discord_id} (Level {player_level}) attempted to start adventure in {location_id} (Req {level_req})")
