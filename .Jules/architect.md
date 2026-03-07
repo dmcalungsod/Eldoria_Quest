@@ -220,3 +220,26 @@ Skill Tree Blueprints for the auto-adventure overhaul.
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/expansion_auto_adventure_overhaul.md`
+
+## 2026-03-13 — Class Expansion Blueprint: Necromancer
+
+**Design Choice:**
+New Class Design: The Necromancer.
+
+**Reasoning:**
+- **Foreman Assignment:** While not explicitly assigned in `.Jules/foreman_plan.md` right now, designing new classes for major expansions was a listed favorite activity. I've designed this new class as a unique magical alternative to the Mage and Cleric.
+- **Identity:** Introduces a summoner/attrition playstyle to the game. Focuses on manipulating life force and utilizing dead enemies.
+- **Theme:** Directly supports the "Grim Survival" pillar—viewing death not as an end, but as a resource.
+
+**Key Mechanics:**
+- **Summons:** Added mechanics for raising temporary minions (`skeleton`, `undead_horde`) to absorb hits.
+- **Corpse Utilization:** Introduced `requires_corpse` mechanic for AoE damage (Corpse Explosion).
+- **Sustain:** Blends self-healing (`kill_heal_percent`) and MP regeneration on kill.
+
+**Integration Notes:**
+- **Tactician:** Needs to update `CombatEngine` to support allied summoned entities, track `dead_enemies_count` for corpse-based skills, and add hooks for passive debuffs/on-kill effects.
+- **GameForge:** Requires adding Class ID 7, 7 new skills, a new "scythe" weapon type, and "Grave Dust" consumables.
+- **Auto-Adventure Translation:** Summons should translate into flat HP buffers in the deterministic formula.
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/class_necromancer.md`
