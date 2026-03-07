@@ -40,3 +40,9 @@
 - **Design Pattern:** A submerged, claustrophobic environment that introduces "Oxygen Management" and "Current" mechanics, adding spatial pressure and resource constraints.
 - **Thematic Consistency:** Reflects the widespread geographical devastation of The Sundering by sinking an entire ancient Eldorian outpost, now teeming with Veil-corrupted aquatic life.
 - **Coordination:** Will require cross-agent coordination to implement Oxygen mechanics, specific `Abyssal Rebreather` gear, and aquatic combat adjustments.
+
+## 2026-03-13: The Crimson Citadel
+- Designed a new Rank S (Level 45+) high-danger zone: The Crimson Citadel.
+- **Design Pattern:** A corrupted fortress introducing environmental hazards like "Veil Bleed" (Sanity/HP drain) requiring specific protective gear (`ward_of_astraeon`) to navigate safely. The area also features "Spatial Shifts" that can disorient players.
+- **Thematic Consistency:** Deeply ties into the lore of the first Vanguard's failed expedition and the true nature of The Sundering. Uses raw Aether (Blood) as a central thematic and resource element.
+- **Coordination:** Will require cross-agent coordination for new mechanics (Veil Bleed, Spatial Shifts) and integrating the new high-tier materials and corrupted Vanguard enemies.
