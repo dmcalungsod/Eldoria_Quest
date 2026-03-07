@@ -287,6 +287,9 @@ async def back_to_profile_callback(interaction: discord.Interaction, is_new_mess
                     "dagger",
                     "bow",
                     "greatsword",
+                    "tome",
+                    "orb",
+                    "offhand_dagger",
                 }
                 has_weapon = any(item.get("slot") in weapon_slots for item in equipped_items)
 
