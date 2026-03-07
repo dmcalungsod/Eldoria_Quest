@@ -26,3 +26,8 @@
 **Vulnerability:** Medium-severity B310 (audit url open for permitted schemes). `urllib.request.urlopen` can open `file://` or custom schemes if the URL is not strictly validated, leading to potential Server-Side Request Forgery (SSRF) or local file read. The previous validation used `startswith(("http://", "https://"))`, which doesn't actually parse the URL and could be bypassed (e.g., `http://../local/file` or spaces).
 **Learning:** Even internal scripts (like `scripts/chronicler/post_update.py`) fetching webhooks must rigorously validate the protocol scheme using a true URL parser rather than string manipulation.
 **Prevention:** Always use `urllib.parse.urlparse(url).scheme` to strictly check against allowed protocols (`http`, `https`) before passing the URL to `urllib.request.urlopen` or `requests.get`.
+## 2026-03-13 — Swallowed Exceptions in UI Parsing (Bandit B110)
+
+**Vulnerability:** A `try-except pass` block was used when parsing `logs` from the `session` object within the `build_summary_embed` function in `game_systems/adventure/ui/adventure_embeds.py`. This effectively swallows any parsing errors, leading to silent failures that hinder observability and debugging (Bandit B110).
+**Learning:** Silently catching exceptions (e.g., `except Exception: pass`) violates security and observability policies. Even if an error in a UI embed is non-critical, it must be logged to prevent blind spots in the application's behavior.
+**Prevention:** Always log exceptions properly using the module's instantiated logger (e.g., `logger.warning("Failed to parse logs for kills: %s", e, exc_info=True)`) rather than using `pass`.
