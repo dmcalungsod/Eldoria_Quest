@@ -50,3 +50,8 @@
 
 **Learning:** The Celestial Archipelago had an incorrect `min_rank` requirement of "A" while its `level_req` was 28. Since Rank A generally corresponds to Level 30+ content (e.g., Molten Caldera), this created a logic conflict that locked level 28 Rank B players out of appropriate content.
 **Action:** Changed `min_rank` from "A" to "B" for `celestial_archipelago` in `game_systems/data/adventure_locations.json` to smooth the progression curve between Rank B and Rank A.
+
+## 2026-03-07 — Elite Kill Progression Smoothing
+
+**Learning:** The difficulty curve for Elite Kills was misaligned. The gap between Rank D and C required 30 elite kills, but the subsequent ranks (C->B and B->A) only required 15 each. This created a significant mid-game progression bottleneck and a flattened late-game curve.
+**Action:** Smoothed the elite kills curve across all ranks. Adjusted C (to 40), A (to 95), S (to 135), and SS (to 185) to create a steady, progressive increase in effort (delta gaps of 15, 20, 25, 30, 40, 50).
