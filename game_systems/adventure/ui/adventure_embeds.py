@@ -265,8 +265,8 @@ class AdventureEmbeds:
                 log_lower = log.lower()
                 if "defeated" in log_lower or "victory" in log_lower or "slain" in log_lower:
                     kills += 1
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to parse logs for kills: {e}", exc_info=True)
 
         exp_earned = 0
         aurum_earned = 0
