@@ -47,6 +47,15 @@ class AdventureManager:
             logger.warning(f"Invalid location_id attempted: {location_id} by {discord_id}")
             return False
 
+        # --- REGRESSION FIX: Enforce Level Requirements ---
+        location_data = LOCATIONS[location_id]
+        level_req = location_data.get("level_req", 1)
+        player_level = self.db.get_player_field(discord_id, "level") or 1
+
+        if player_level < level_req:
+            logger.warning(f"Player {discord_id} (Level {player_level}) attempted to start adventure in {location_id} (Req {level_req})")
+            return False
+
         # Max duration: 1 year (approx 525,600 minutes) to prevent overflow
         if duration_minutes != -1 and not (0 < duration_minutes <= 525600):
             logger.warning(f"Invalid adventure duration: {duration_minutes} by {discord_id}")
