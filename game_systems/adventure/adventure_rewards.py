@@ -242,6 +242,13 @@ class AdventureRewards:
             )
             loot_boost *= float(frostmire_bonus)
 
+        # EVENT HOOK: Sunken Grotto Loot Bonus
+        if location_id == "the_sunken_grotto":
+            sunken_grotto_bonus = combat_result.get("active_boosts", {}).get(
+                "sunken_grotto_loot_bonus", 1.0
+            )
+            loot_boost *= float(sunken_grotto_bonus)
+
         # Check for World Event: Elemental Surge or Spectral Tide
         try:
             active_event = self.db.get_active_world_event()

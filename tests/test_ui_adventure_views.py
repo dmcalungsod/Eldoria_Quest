@@ -346,8 +346,9 @@ class TestAdventureMenuView(unittest.IsolatedAsyncioTestCase):
 
     def test_start_disabled_when_capacity_full(self):
         """Test that the start button is disabled when inventory is full."""
-        from game_systems.adventure.ui.setup_view import AdventureSetupView
         from unittest.mock import MagicMock
+
+        from game_systems.adventure.ui.setup_view import AdventureSetupView
 
         # Setup view with full capacity (20/20)
         view = AdventureSetupView(

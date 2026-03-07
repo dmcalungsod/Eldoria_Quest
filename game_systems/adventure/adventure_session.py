@@ -719,6 +719,10 @@ class AdventureSession:
             threat_reduction = float(
                 context["active_boosts"].get("frostmire_threat_reduction", 1.0)
             )
+        elif self.location_id == "the_sunken_grotto":
+            threat_reduction = float(
+                context["active_boosts"].get("sunken_grotto_threat_reduction", 1.0)
+            )
         return threat_reduction
 
     def _consume_supplies(self):
