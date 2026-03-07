@@ -1,5 +1,7 @@
 import unittest
+
 from game_systems.data.adventure_locations import load_locations
+
 
 class TestDepthswardenUndergrove(unittest.TestCase):
     def test_undergrove_exists(self):

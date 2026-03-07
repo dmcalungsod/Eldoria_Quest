@@ -1,14 +1,13 @@
-import unittest
-from unittest.mock import MagicMock
 import sys
+import unittest
 import unittest.mock
+from unittest.mock import MagicMock
 
 # Mock pymongo before any imports
 sys.modules['pymongo'] = MagicMock()
 sys.modules['pymongo.errors'] = MagicMock()
 
 from game_systems.adventure.adventure_rewards import AdventureRewards
-
 from game_systems.adventure.adventure_session import AdventureSession
 from game_systems.events.world_event_system import WorldEventSystem
 

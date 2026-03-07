@@ -40,7 +40,6 @@ class TestAbyssalTideEvent(unittest.TestCase):
                 "sunken_grotto_threat_reduction": 0.9,
             },
             "event_type": WorldEventSystem.ABYSSAL_TIDE,
-            "event_type": WorldEventSystem.ABYSSAL_TIDE,
         }
 
         # Mock the context fetcher so we can directly pass our context
@@ -98,7 +97,6 @@ class TestAbyssalTideEvent(unittest.TestCase):
         """Test that the 50% loot bonus is passed to the LootCalculator in the Sunken Grotto."""
         mock_loot_calc.roll_drops.return_value = ["test_item"]
         self.db_mock.get_player_stats_json.return_value = {"LUCK": {"base": 10}}
-        self.db_mock.get_active_world_event.return_value = {"type": WorldEventSystem.ABYSSAL_TIDE}
         self.db_mock.get_active_world_event.return_value = {"type": WorldEventSystem.ABYSSAL_TIDE}
 
         combat_result = {

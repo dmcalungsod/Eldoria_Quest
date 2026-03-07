@@ -19,6 +19,7 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
+import test_abyssal_tide_event
 import test_adventure_embeds  # New Embed test
 import test_adventure_loop_regression
 import test_adventure_race  # New race condition test
@@ -39,16 +40,15 @@ import test_dos_prevention  # New DoS prevention tests
 import test_echoes_of_the_deep_event
 import test_event_cog
 import test_exploration_view_ux  # New UX test
-import test_fungal_bloom_event
-import test_permafrost_thaw_event
-import test_abyssal_tide_event
 import test_faction_system  # New Faction System tests
+import test_fungal_bloom_event
 import test_game_systems
 import test_general_cog
 import test_guild_hub_cog
 import test_item_manager
 import test_monster_actions
 import test_onboarding_ux  # New Onboarding UX test
+import test_permafrost_thaw_event
 import test_populate_database
 import test_quest_security  # New security test
 import test_quest_update_efficiency  # Optimization test
