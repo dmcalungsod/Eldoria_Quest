@@ -143,7 +143,21 @@ class AutoCombatFormula:
         # Player net damage per turn
         player_net_dps = max(1.0, player_dps_raw - monster_mitigation)
 
+        # Beastmaster: Pack Tactics (10% damage increase against single targets/bosses)
+        if player_skills and monster.get("tier") == "Boss":
+            for skill in player_skills:
+                if skill.get("key_id") == "pack_tactics":
+                    player_net_dps *= 1.10
+                    break
+
         monster_dps_raw = AutoCombatFormula.calculate_monster_dps(monster, player_stats)
+
+        # Paladin: Divine Shield (10% reduction in base monster damage)
+        if player_skills:
+            for skill in player_skills:
+                if skill.get("key_id") == "divine_shield":
+                    monster_dps_raw *= 0.90
+                    break
         player_mitigation = AutoCombatFormula.calculate_player_mitigation(player_stats)
 
         # Stance vulnerability
@@ -169,6 +183,13 @@ class AutoCombatFormula:
 
         # Cap turns at 15 to prevent infinite auto-loops in extreme defense scenarios
         turns_to_kill = min(15, turns_to_kill)
+
+        # Elementalist: Meteor Swarm (15% reduction in time to kill for non-elite encounters)
+        if player_skills and monster.get("tier", "Normal") in ["Normal", "Minion"]:
+            for skill in player_skills:
+                if skill.get("key_id") == "meteor_swarm":
+                    turns_to_kill = max(1, math.ceil(turns_to_kill * 0.85))
+                    break
 
         # Base damage taken over the combat duration
         base_damage_taken = turns_to_kill * monster_net_dps
@@ -206,6 +227,24 @@ class AutoCombatFormula:
                 if "conditional_multiplier" in skill:
                     # Abstract the impact of conditional multipliers (like venomous strike)
                     final_damage_taken = int(final_damage_taken * 0.85)
+
+                # Paladin: Aura of Vitality (heal 2% max HP between encounters)
+                if skill.get("key_id") == "aura_of_vitality":
+                    heal_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * 0.02)
+                    final_damage_taken = max(0, final_damage_taken - heal_amount)
+
+                # Beastmaster: Summon Companion (+20% to total HP pool during clash, effectively a damage buffer)
+                if skill.get("key_id") == "summon_companion":
+                    buffer_amount = int((player_stats.get("HP", 100) if isinstance(player_stats, dict) else getattr(player_stats, "max_hp", 100)) * 0.20)
+                    final_damage_taken = max(0, final_damage_taken - buffer_amount)
+
+                # Mage: Mana Shield (Acts as a secondary HP bar)
+                if skill.get("key_id") == "mana_shield":
+                    max_mp = player_stats.get("MP", 50) if isinstance(player_stats, dict) else getattr(player_stats, "max_mp", 50)
+                    # Use up to 50% of max MP to absorb damage 1:1
+                    absorb = min(final_damage_taken, int(max_mp * 0.5))
+                    final_damage_taken -= absorb
+
 
 
 
