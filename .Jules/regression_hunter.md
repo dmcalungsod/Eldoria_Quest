@@ -28,3 +28,7 @@
 ## 2026-03-12 — Auto-Adventure Regression Testing & Exploit Verification
 **Action:** Discovered the existing `tests/test_adventure_retreat_exploit.py` was disconnected. Imported it into `tests/run_all_tests.py` and added it to the `run_adventure_tests` test suite to ensure that local regression testing actually runs it. This closes "Issue #5: [Test] Auto-Adventure: Exploit Verification".
 **Coverage:** Covers `game_systems/adventure/adventure_manager.py` retreat penalty logic.
+
+## 2026-03-14 — Auto-Adventure Requirements Regression Test
+**Learning:** During the auto-adventure overhaul, level requirement validation was correctly handled on the UI layer (`AdventureSetupView`) but lacked explicit server-side enforcement within `AdventureManager.start_adventure`, opening up an unintended bypass vulnerability.
+**Action:** Implemented level requirement checking explicitly within `start_adventure` based on `LOCATIONS` configurations. Updated `tests/test_auto_adventure_regression.py` to enable the `test_start_adventure_requirements` regression test, guaranteeing this implicit security logic prevents underleveled players from exploiting high-tier zones without UI.
