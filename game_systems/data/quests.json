@@ -1046,6 +1046,9 @@
       "exp": 1300,
       "aurum": 420,
       "item": "Glade Salve Vial"
+    },
+    "flavor_text": {
+      "defeat:Coral Golem": "The golem crumbles, returning its sharp coral to the sea floor."
     }
   },
   {
@@ -1064,6 +1067,9 @@
     "rewards": {
       "exp": 1250,
       "aurum": 400
+    },
+    "flavor_text": {
+      "defeat:Abyssal Eel": "The eel's bioluminescence flickers and dies as it stops thrashing."
     }
   },
   {
@@ -1083,6 +1089,9 @@
       "exp": 1350,
       "aurum": 450,
       "item": "Lunaris Tonic"
+    },
+    "flavor_text": {
+      "defeat:Tide Siren": "The haunting melody ends abruptly, leaving only the oppressive silence of the deep."
     }
   },
   {
@@ -1102,6 +1111,9 @@
       "exp": 1400,
       "aurum": 500,
       "item": "Wardkeeper's Vial"
+    },
+    "flavor_text": {
+      "defeat:Deep Crawler": "The massive shell cracks under pressure, yielding its armored plates."
     }
   },
   {
@@ -1121,6 +1133,9 @@
       "exp": 3000,
       "aurum": 1500,
       "item": "Magic Stone (Large)"
+    },
+    "flavor_text": {
+      "defeat:Leviathan": "The great beast sinks slowly into the abyss. The crushing depths are quiet once more."
     }
   },
   {
