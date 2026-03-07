@@ -74,3 +74,12 @@
 - **Progression:** Ranks from Initiate to Void Walker.
 - **Rewards:** Utility and rare materials (`null_stone`, `chronal_dust`) and the exclusive "Void Walker" title.
 - **Integration:** Favored locations include `void_sanctum`, `abyssal_descent`, and `silent_city_ouros`, encouraging exploration of the deepest, most dangerous zones.
+
+## 2026-03-12 — The Deep Salvagers Faction
+
+**Learning:** Players exploring The Sunken Grotto needed a dedicated faction to provide long-term horizontal progression and narrative context regarding the desperate scavengers of the submerged ruins.
+**Action:** Implemented "The Deep Salvagers" faction.
+- **Theme:** Desperate and ruthless scavengers pillaging the sunken ruins.
+- **Progression:** Ranks from Scavenger to Abyssal Plunderer.
+- **Rewards:** Utility items (`pearl`, `air_bladder`), gathering boosts, and the exclusive "Lord of the Depths" title.
+- **Integration:** Favored locations include `sunken_grotto`, encouraging exploration of the Rank A underwater zone.

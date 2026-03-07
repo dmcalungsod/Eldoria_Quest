@@ -405,5 +405,64 @@
             "abyssal_descent",
             "silent_city_ouros"
         ]
+    },
+    "deep_salvagers": {
+        "name": "The Deep Salvagers",
+        "emoji": "⚓",
+        "description": "A desperate and ruthless group of scavengers who use crude diving bells to pillage the upper levels of The Sunken Grotto.",
+        "ranks": {
+            "1": {
+                "title": "Scavenger",
+                "reputation_needed": 0,
+                "reward": null
+            },
+            "2": {
+                "title": "Diver",
+                "reputation_needed": 500,
+                "reward": {
+                    "type": "item",
+                    "key": "pearl",
+                    "amount": 3
+                }
+            },
+            "3": {
+                "title": "Reef Walker",
+                "reputation_needed": 1500,
+                "reward": {
+                    "type": "item",
+                    "key": "air_bladder",
+                    "amount": 2
+                }
+            },
+            "4": {
+                "title": "Tide Master",
+                "reputation_needed": 3000,
+                "reward": {
+                    "type": "buff",
+                    "key": "gathering_boost",
+                    "value": 0.1
+                }
+            },
+            "5": {
+                "title": "Abyssal Plunderer",
+                "reputation_needed": 5000,
+                "reward": {
+                    "type": "title",
+                    "value": "Lord of the Depths"
+                }
+            }
+        },
+        "interests": {
+            "exploration": 2.0,
+            "gathering": 1.5,
+            "boss_kills": 1.2,
+            "monster_types": [
+                "Beast",
+                "Demon"
+            ]
+        },
+        "favored_locations": [
+            "sunken_grotto"
+        ]
     }
 }
