@@ -23,6 +23,7 @@ import test_abyssal_tide_event
 import test_adventure_embeds  # New Embed test
 import test_adventure_loop_regression
 import test_adventure_race  # New race condition test
+import test_guild_advisor
 import test_adventure_retreat_exploit
 import test_adventure_rewards  # Adventure Rewards regression test
 import test_adventure_scheduler_stress
@@ -231,6 +232,7 @@ def run_cog_tests():
     suite.addTests(loader.loadTestsFromModule(test_permafrost_thaw_event))
     suite.addTests(loader.loadTestsFromModule(test_abyssal_tide_event))
     suite.addTests(loader.loadTestsFromModule(test_guild_hub_cog))
+    suite.addTests(loader.loadTestsFromModule(test_guild_advisor))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
