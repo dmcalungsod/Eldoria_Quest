@@ -28,3 +28,7 @@
 ## 2026-03-12 — Auto-Adventure Regression Testing & Exploit Verification
 **Action:** Discovered the existing `tests/test_adventure_retreat_exploit.py` was disconnected. Imported it into `tests/run_all_tests.py` and added it to the `run_adventure_tests` test suite to ensure that local regression testing actually runs it. This closes "Issue #5: [Test] Auto-Adventure: Exploit Verification".
 **Coverage:** Covers `game_systems/adventure/adventure_manager.py` retreat penalty logic.
+
+## 2026-03-15 - Resolving Missing Discord Mock & Fixing Skill Data
+**Action:** Resolved Issue #31 by integrating `test_guild_advisor.py` into `tests/run_all_tests.py` within the `run_cog_tests` suite.
+**Learning:** During integration, discovered that `test_guild_advisor.py` had a root-level `sys.modules["discord"] = MagicMock()` mock which violated our test isolation patterns and caused pollution. It was safely removed since the `setUp` method already handled the required module isolation via `patch.dict(sys.modules)`. Also fixed underlying schema validation failures for the `ice_spear` and `dragon_breath` skills in `game_systems/data/skills.json` that were causing the test suite to fail when loading skills.
