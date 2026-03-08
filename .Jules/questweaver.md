@@ -36,3 +36,9 @@
 *   **Focus:** Designed "The Whispering Archives" quest to serve as the narrative gateway to the new "Silent City of Ouros" expansion, in coordination with Foreman's plan and DepthsWarden's recent addition of "The Void Seekers" faction.
 *   **Design Rationale:** I needed to introduce the core mechanics and theme of Ouros (temporal anomalies, absolute silence, preserved perfection) before the player fully enters the region. The quest gives players a choice to side with the traditional Guild (Archivist Valen) or the newly introduced Void Seekers, explicitly hooking into DepthsWarden's new faction to give it immediate narrative weight.
 *   **Key Mechanic:** Introduced the concept of the "Chronal Anchor" during the climax fight to prepare players for the unique, non-standard combat encounters they will face inside Ouros.
+
+## 2026-03-15 — The Drowned Reliquary Design
+
+*   **Focus:** Designed "The Drowned Reliquary" quest to serve as a deep exploration and moral choice quest for the new "The Sunken Grotto" expansion, coordinating with Foreman's overarching world expansion and Realmwright's design.
+*   **Design Rationale:** I needed to introduce the "Deep Salvagers" faction dynamically and tie them to the treacherous environment of the Sunken Grotto. The quest forces players to balance greed (taking the Pearl for wealth and Salvager rep) against safety (leaving the Pearl to prevent Void seeping).
+*   **Key Mechanic:** Explored the idea of a quest choice fundamentally altering the zone's ecosystem slightly (e.g., Choice A increasing Void spawns), though this will require GameBalancer/Tactician approval.
