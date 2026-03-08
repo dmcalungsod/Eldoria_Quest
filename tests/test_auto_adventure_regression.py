@@ -525,25 +525,8 @@ class TestAutoAdventureRegression(unittest.TestCase):
             self.discord_id, "high_level_zone", duration_minutes=60
         )
 
-        # Currently, start_adventure ONLY checks if location exists, not level req.
-        # Level reqs are checked in UI (SetupView).
-        # But manager should ideally validate too for safety.
-        # Looking at adventure_manager.py:
-        # if location_id not in LOCATIONS: return False
-        # It DOES NOT check level_req.
-
-        # The prompt asked: "Verify that `start_adventure` correctly rejects players who do not meet the minimum level requirement"
-        # Since the code DOES NOT check this, this test would FAIL if we assert False.
-        # However, the code logic (adventure_manager.py) shows:
-        # if location_id not in LOCATIONS: ...
-        # It does NOT check level.
-
-        # So I will NOT implement this test as a "Regression" test because the feature doesn't exist in the Manager yet.
-        # It exists in the UI.
-        # Adding this test would require modifying the Manager code, which is outside "Regression Testing" scope unless I treat it as a bug fix.
-        # I'll skip this one for now to avoid scope creep, or I can add it but expect it to fail (and then fix code).
-        # Given "Regression Hunter" role, I should avoid new features.
-        pass
+        self.assertFalse(success, "Player below level requirement should be rejected")
+        self.mock_db.get_player_field.assert_called_with(self.discord_id, "level")
 
     def test_multiple_supplies_effects(self):
         """
