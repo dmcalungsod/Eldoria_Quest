@@ -102,3 +102,12 @@
 - **Patterns:** The ONE UI policy is actively being violated in several views (e.g. `send_message` and `followup.send`), which will create messy discord chats.
 - **Process Improvements:** Introducing `black` or `ruff` to the CI pipeline or pre-commit hooks could instantly eliminate the bulk of the `flake8` warnings and keep the code style consistent.
 - **Limitations:** Limited security scanning effectiveness, as `bandit` only flagged low severity confidence issues. No actual secrets were found, which is positive.
+
+## 2026-03-08: Comprehensive Codebase Inspection
+- **Tools Used**: `flake8`, `bandit`, `vulture`, `radon`
+- **Effectiveness**: `radon` highlighted critical complexity in core systems (`auto_combat_formula.py`, `adventure_resolution.py`). `flake8` identified numerous style/formatting issues (`E501`, `E701`). `bandit` flagged potential subprocess vulnerabilities in `scripts/`.
+- **Patterns**: High cyclomatic complexity in resolution engines and UI components. Inconsistent use of UI response methods (`send_message` vs `edit_original_response`).
+- **Suggestions**:
+  - Refactor large, monolithic functions in `game_systems/combat/` and `game_systems/adventure/`.
+  - Add pre-commit hooks to enforce formatting (e.g., `black`, `isort`) and basic static analysis (`flake8`, `bandit`).
+- **Limitations**: Incomplete `safety` parsing during initial scan due to output format; requires dedicated run next cycle.
