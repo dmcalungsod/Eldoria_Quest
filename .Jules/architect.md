@@ -243,3 +243,24 @@ New Class Design: The Necromancer.
 
 **Deliverable:**
 Detailed Design Document: `.Jules/architect_designs/class_necromancer.md`
+
+## 2026-03-15 — Expansion Blueprint: Companion System
+
+**Design Choice:**
+Major Content Expansion: Companion System (Taming and Upkeep).
+
+**Reasoning:**
+- **Economy:** We need more permanent sinks for low-tier materials (`feral_meat`, `wild_herbs`) to keep them relevant in the late game. A constant "Beast Feed" requirement solves this.
+- **Engagement:** Fulfills the "Taming" archetype that players often request in RPGs, but adapted for Eldoria's grim setting.
+- **Auto-Adventure Integration:** Fits perfectly into the new time-based auto-adventures, where a companion can act as a stat block modifier (e.g., Scout lowers encounter rate).
+
+**Theme Alignment:**
+- "Grim Survival": Companions are not pets; they are tools of survival. If you don't feed them, they turn on you or leave. The taming process requires weakening a beast, emphasizing dominance rather than friendship.
+
+**Integration Notes:**
+- **Database:** Requires a `player_companions` collection.
+- **CombatEngine/Auto-Adventure:** Companions need to be integrated into `CombatEngine` to absorb hits or deal extra damage, and into `AutoCombatFormula` to affect session outcomes.
+- **Economy:** GameBalancer must tune the upkeep costs so it's a persistent drain but not debilitating.
+
+**Deliverable:**
+Detailed Design Document: `.Jules/architect_designs/expansion_companion_system.md`

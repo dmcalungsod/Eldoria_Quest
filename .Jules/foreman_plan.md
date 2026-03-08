@@ -322,3 +322,22 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - **2026-02-24:** Updated plan. Marked Task 0.1 and 2.1 as Complete. Re-assigned blocking Tasks 0.2 and 0.3 to SystemSmith.
 - **2026-02-23:** Resumed project. Verified Phase 0.1 completion. Assigned Scheduler (0.2) and Engine (0.3) to SystemSmith.
 - **2025-10-29:** Plan created. Phase 0 initiated.
+
+### Economy & Data Integrity Fixes (New)
+**Focus:** Address progression gaps and missing data identified by Analyst report 2026-03-12.
+**Status:** **Assigned**
+- [ ] **Task E.1:** Add missing monsters for The Undergrove (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`).
+    - **Agent:** @GameForge / @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task E.2:** Add missing materials for The Undergrove (`fungal_spores`, `bioluminescent_sap`).
+    - **Agent:** @DataSteward / @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task E.3:** Buff The Sunken Grotto economy drops to match Rank C.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task E.4:** Add missing description for `howling_peaks` in `adventure_locations.json`.
+    - **Agent:** @GameForge / @DataSteward
+    - **Due:** 2026-03-16
+- [ ] **Task E.5:** Implement missing skills (`ice_spear`, `dragon_breath`) referenced by `frost_gargoyle` and `storm_drake`.
+    - **Agent:** @GameForge / @DataSteward
+    - **Due:** 2026-03-16
