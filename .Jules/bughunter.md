@@ -39,3 +39,8 @@
 **Learning:** When writing tests that use discord modules it's essential to not just stub the module `discord` but also specific properties and classes used (e.g., `discord.Embed`, `discord.Color`) properly with robust mocking implementations (e.g., mock classes). Also, when changing test imports inside test suites like `tests/run_all_tests.py`, verify not just that individual tests run properly but also that the `run_all_tests.py` comprehensive test suite passes fully to prevent regression `ImportError` bugs.
 
 **Action:** Before running tests always double check what dependencies need to be specifically patched and ensure `PYTHONPATH=. python tests/run_all_tests.py` finishes flawlessly after any refactoring.
+
+## 2026-03-08 — [Test] Auto-Adventure: Stress Test Scheduler
+
+**Learning:** Stress testing the scheduler logic using `tests/stress_adventure_realistic.py` required converting it into a proper `unittest` structure to be integrated into `run_all_tests.py` and run properly in CI.
+**Action:** Always wrap manual load/stress scripts into automated test cases with realistic lower bounds (e.g., asserting `throughput >= 167`) to catch regressions in processing efficiency before they hit production.
