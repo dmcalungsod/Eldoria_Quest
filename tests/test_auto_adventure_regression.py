@@ -635,6 +635,45 @@ class TestAutoAdventureRegression(unittest.TestCase):
         # Loot should be empty
         self.assertEqual(len(summary["loot"]), 0)
 
+
+    def test_sunken_grotto_oxygen_mechanic(self):
+        """Test that oxygen depletion is handled correctly."""
+        from game_systems.adventure.adventure_session import AdventureSession
+        from unittest.mock import MagicMock
+
+        session = AdventureSession("dummy", MagicMock(), MagicMock(), 123)
+        session.location_id = "sunken_grotto"
+
+        context = {
+            "vitals": {"current_hp": 1000},
+            "stats_dict": {"HP": 1000, "MP": 100},
+            "active_boosts": {},
+            "player_stats": MagicMock(max_hp=1000, max_mp=100)
+        }
+
+        with patch('random.random', return_value=0.0): # Force checks to pass probability
+            # Should deplete oxygen
+            session._apply_sunken_grotto_penalties(context, persist=False)
+            self.assertEqual(session._oxygen_depletion, 1)
+
+            # Hit threshold, take damage
+            session._oxygen_depletion = 5
+            session._apply_sunken_grotto_penalties(context, persist=False)
+            self.assertTrue(context["vitals"]["current_hp"] < 1000)
+
+            # Use air_bladder to clear oxygen depletion
+            session._oxygen_depletion = 5
+            session.supplies["air_bladder"] = 1
+            session._apply_sunken_grotto_penalties(context, persist=False)
+            self.assertEqual(session._oxygen_depletion, 0)
+            self.assertEqual(session.supplies["air_bladder"], 0)
+
+            # Has rebreather
+            session._oxygen_depletion = 5
+            context["active_boosts"]["oxygen_efficiency"] = 1
+            session._apply_sunken_grotto_penalties(context, persist=False)
+            self.assertEqual(session._oxygen_depletion, 0)
+
     def test_undergrove_toxin_mechanic(self):
         """
         Regression Test: The Undergrove Toxin Mechanic
