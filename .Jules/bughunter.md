@@ -43,3 +43,8 @@
 
 **Learning:** When using mock setups in tests (e.g. `test_codex_unlocks.py`), asserting on deeply chained `__getitem__` mock objects like `self.mock_client.__getitem__(self.db._db_name).__getitem__("player_codex")` can fail because the test runner interprets the reference differently than the system under test (`DatabaseManager`), leading to assertion mismatches (`Expected call not found`).
 **Action:** Always retrieve the mock object for assertion using the same internal method the system uses. In this case, `self.db._col("player_codex")` correctly returns the patched Mock object that the `update_one` and `find_one` calls were actually made against.
+
+## 2026-03-08 — [Test] Auto-Adventure: Stress Test Scheduler
+
+**Learning:** Stress testing the scheduler logic using `tests/stress_adventure_realistic.py` required converting it into a proper `unittest` structure to be integrated into `run_all_tests.py` and run properly in CI.
+**Action:** Always wrap manual load/stress scripts into automated test cases with realistic lower bounds (e.g., asserting `throughput >= 167`) to catch regressions in processing efficiency before they hit production.

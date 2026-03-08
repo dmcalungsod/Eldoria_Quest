@@ -155,3 +155,18 @@
 
 **Notes:**
 - The player_halls integration marks a key step forward for the Guild Halls expansion.
+
+## 2026-03-14
+**Summary:**
+- Scanned recent agent logs (2026-03-14).
+- Identified 3 new issues requiring tracking: progression gaps and data integrity errors identified by Analyst.
+- Appended issues to `NEW_ISSUES.md`.
+
+**Created Issues:**
+- **[Balance] Progression Gaps identified in several locations** (Source: Analyst)
+- **[Bug] Missing description for howling_peaks** (Source: Analyst)
+- **[Bug] Missing skills for frost_gargoyle and storm_drake** (Source: Analyst)
+
+**Notes:**
+- Analyst flagged significant progression EV drops in The Crystal Caverns, The Forgotten Ossuary, The Molten Caldera, and Gale-Scarred Heights that require GameBalancer's attention.
+- Critical data integrity issues with missing descriptions and skills remain and block full implementation of the region/quests.
