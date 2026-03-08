@@ -25,6 +25,7 @@ import test_adventure_loop_regression
 import test_adventure_race  # New race condition test
 import test_adventure_retreat_exploit
 import test_adventure_rewards  # Adventure Rewards regression test
+import test_adventure_scheduler_stress
 import test_adventure_session_concurrency  # New session concurrency test
 import test_auto_adventure_regression
 import test_auto_combat_formula
@@ -101,6 +102,7 @@ def run_adventure_tests():
     suite.addTests(loader.loadTestsFromModule(test_auto_adventure_regression))
     suite.addTests(loader.loadTestsFromModule(test_adventure_loop_regression))
     suite.addTests(loader.loadTestsFromModule(test_auto_combat_formula))
+    suite.addTests(loader.loadTestsFromModule(test_adventure_scheduler_stress))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()
