@@ -465,6 +465,12 @@ class AdventureSession:
             if self._oxygen_depletion >= 5 and random.random() < 0.50:  # nosec B311
                 # Need air
 
+                # Check for Abyssal Rebreather
+                has_rebreather = context.get("active_boosts", {}).get("oxygen_efficiency", 0) > 0
+                if has_rebreather:
+                    self._oxygen_depletion = 0
+                    return
+
                 # Check for Air Bladder
                 if self.supplies.get("air_bladder", 0) > 0:
                     self.supplies["air_bladder"] -= 1
