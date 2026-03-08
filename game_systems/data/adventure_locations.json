@@ -412,19 +412,27 @@
         "gatherables": [
             [
                 "coral_fragment",
-                40
+                100
             ],
             [
                 "pearl",
-                30
+                80
             ],
             [
                 "magic_stone_medium",
-                20
+                100
             ],
             [
                 "bioluminescent_scale",
-                10
+                100
+            ],
+            [
+                "magic_stone_large",
+                30
+            ],
+            [
+                "abyssal_pearl",
+                5
             ]
         ],
         "special_events": [
@@ -1664,6 +1672,7 @@
             "vial_of_drake_blood"
         ],
         "floor_depth": 50,
-        "danger_level": 8
+        "danger_level": 8,
+        "description": "A frozen, storm-battered mountain range where stone guardians like Frost Gargoyles reside."
     }
 }
