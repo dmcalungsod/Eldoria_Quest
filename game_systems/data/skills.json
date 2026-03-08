@@ -486,5 +486,41 @@
         "upgrade_cost": 800,
         "scaling_stat": "MAG",
         "scaling_factor": 1.0
+    },
+    "ice_spear": {
+        "name": "Ice Spear",
+        "type": "magic",
+        "target": "enemy",
+        "power": 160,
+        "mana_cost": 45,
+        "cooldown": 3,
+        "description": "Conjures a sharp spear of ice that pierces the enemy, dealing heavy magic damage.",
+        "effects": [
+            {
+                "type": "status",
+                "target": "enemy",
+                "name": "frostbite",
+                "chance": 0.3,
+                "duration": 2
+            }
+        ]
+    },
+    "dragon_breath": {
+        "name": "Dragon Breath",
+        "type": "magic",
+        "target": "all_enemies",
+        "power": 200,
+        "mana_cost": 80,
+        "cooldown": 5,
+        "description": "Exhales a torrent of raw elemental energy that damages all enemies.",
+        "effects": [
+            {
+                "type": "status",
+                "target": "all_enemies",
+                "name": "burn",
+                "chance": 0.5,
+                "duration": 3
+            }
+        ]
     }
 }
