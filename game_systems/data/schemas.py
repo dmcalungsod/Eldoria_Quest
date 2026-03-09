@@ -251,7 +251,17 @@ CODEX_SCHEMA = {
         "keys_schema": {"type": str},
         "values_schema": {
             "type": dict,
-            "schema": {"lore_extended": {"type": str, "required": True}},
+            "schema": {
+                "lore_extended": {"type": str, "required": True},
+                "unlock_thresholds": {
+                    "type": dict,
+                    "required": True,
+                    "schema": {
+                        "basic": {"type": int, "required": True},
+                        "lore": {"type": int, "required": True},
+                    },
+                },
+            },
         },
     },
     "locations": {
@@ -259,7 +269,17 @@ CODEX_SCHEMA = {
         "keys_schema": {"type": str},
         "values_schema": {
             "type": dict,
-            "schema": {"lore_extended": {"type": str, "required": True}},
+            "schema": {
+                "lore_extended": {"type": str, "required": True},
+                "unlock_thresholds": {
+                    "type": dict,
+                    "required": True,
+                    "schema": {
+                        "basic": {"type": int, "required": True},
+                        "lore": {"type": int, "required": True},
+                    },
+                },
+            },
         },
     },
     "factions": {
@@ -267,7 +287,17 @@ CODEX_SCHEMA = {
         "keys_schema": {"type": str},
         "values_schema": {
             "type": dict,
-            "schema": {"lore_extended": {"type": str, "required": True}},
+            "schema": {
+                "lore_extended": {"type": str, "required": True},
+                "unlock_thresholds": {
+                    "type": dict,
+                    "required": True,
+                    "schema": {
+                        "basic": {"type": int, "required": True},
+                        "lore": {"type": int, "required": True},
+                    },
+                },
+            },
         },
     },
 }
