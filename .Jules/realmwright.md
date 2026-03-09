@@ -40,3 +40,9 @@
 - **Design Pattern:** A submerged, claustrophobic environment that introduces "Oxygen Management" and "Current" mechanics, adding spatial pressure and resource constraints.
 - **Thematic Consistency:** Reflects the widespread geographical devastation of The Sundering by sinking an entire ancient Eldorian outpost, now teeming with Veil-corrupted aquatic life.
 - **Coordination:** Will require cross-agent coordination to implement Oxygen mechanics, specific `Abyssal Rebreather` gear, and aquatic combat adjustments.
+
+## 2026-03-14: Gallowsgate
+- Designed a new Rank A (Level 35+) frontier village: Gallowsgate.
+- **Design Pattern:** A hub designed specifically for outcasts and the new Alchemist/Necromancer classes, providing a thematic way to acquire rare dark magic components via an inflated black market economy.
+- **Thematic Consistency:** Builds on the lore of The Sundering by showcasing the societal fallout—those who flee Astraeon's rigid laws. Teeters on the edge of the Wailing Chasm.
+- **Coordination:** Will require cross-agent coordination to implement new hub UI (Palette), black market economy (GameBalancer), and "Abyssal Winds" survival mechanic (Grimwarden).
