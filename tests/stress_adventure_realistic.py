@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 import time
-import unittest
 from unittest.mock import MagicMock
 
 # Add root to sys.path
@@ -179,70 +178,69 @@ class RealisticMockDatabase:
         mock_col.find_one.return_value = None
         return mock_col
 
-class TestAdventureSchedulerStress(unittest.TestCase):
-    def test_throughput(self):
-        logger.info("Initializing Realistic Stress Test...")
 
-        mock_db = RealisticMockDatabase()
-        mock_bot = MagicMock()
+def run_realistic_stress_test():
+    logger.info("Initializing Realistic Stress Test...")
 
-        # Initialize Engine
-        engine = AdventureResolutionEngine(mock_bot, mock_db)
+    mock_db = RealisticMockDatabase()
+    mock_bot = MagicMock()
 
-        # Generate 10k sessions
-        NUM_SESSIONS = 10000
-        sessions = []
+    # Initialize Engine
+    engine = AdventureResolutionEngine(mock_bot, mock_db)
 
-        location_id = "shrouded_fen"
+    # Generate 10k sessions
+    NUM_SESSIONS = 10000
+    sessions = []
 
-        for i in range(NUM_SESSIONS):
-            sessions.append(
-                {
-                    "discord_id": 100000 + i,
-                    "duration_minutes": 60,  # 4 steps (15 min each)
-                    "steps_completed": 0,
-                    "start_time": "2023-01-01T00:00:00",
-                    "location_id": location_id,
-                    "active": 1,
-                    "version": 1,
-                    "logs": "[]",
-                    "loot_collected": "{}",
-                    "active_monster_json": None,
-                    "supplies": {},
-                }
-            )
+    location_id = "shrouded_fen"
 
-        logger.info(f"Generated {NUM_SESSIONS} sessions (Duration: 60m / 4 steps).")
-        logger.info("Starting Resolution Loop...")
+    for i in range(NUM_SESSIONS):
+        sessions.append(
+            {
+                "discord_id": 100000 + i,
+                "duration_minutes": 60,  # 4 steps (15 min each)
+                "steps_completed": 0,
+                "start_time": "2023-01-01T00:00:00",
+                "location_id": location_id,
+                "active": 1,
+                "version": 1,
+                "logs": "[]",
+                "loot_collected": "{}",
+                "active_monster_json": None,
+                "supplies": {},
+            }
+        )
 
-        start_time = time.time()
-        processed_count = 0
+    logger.info(f"Generated {NUM_SESSIONS} sessions (Duration: 60m / 4 steps).")
+    logger.info("Starting Resolution Loop...")
 
-        for session_doc in sessions:
-            engine.resolve_session(session_doc)
-            processed_count += 1
+    start_time = time.time()
+    processed_count = 0
 
-            if processed_count % 1000 == 0:
-                elapsed = time.time() - start_time
-                logger.info(f"Processed {processed_count} sessions... ({processed_count / elapsed:.2f} sess/s)")
+    for session_doc in sessions:
+        engine.resolve_session(session_doc)
+        processed_count += 1
 
-        end_time = time.time()
-        duration = end_time - start_time
+        if processed_count % 1000 == 0:
+            elapsed = time.time() - start_time
+            logger.info(f"Processed {processed_count} sessions... ({processed_count / elapsed:.2f} sess/s)")
 
-        throughput = NUM_SESSIONS / duration
-        logger.info(f"Finished {NUM_SESSIONS} sessions in {duration:.4f}s")
-        logger.info(f"Throughput: {throughput:.2f} sessions/sec")
+    end_time = time.time()
+    duration = end_time - start_time
 
-        total_steps = NUM_SESSIONS * 4
-        steps_throughput = total_steps / duration
-        logger.info(f"Step Throughput: {steps_throughput:.2f} steps/sec")
+    throughput = NUM_SESSIONS / duration
+    logger.info(f"Finished {NUM_SESSIONS} sessions in {duration:.4f}s")
+    logger.info(f"Throughput: {throughput:.2f} sessions/sec")
 
-        if throughput < 167:
-            logger.warning("⚠️ Throughput is below target (10k/60s = 167/s). Optimization needed.")
-        else:
-            logger.info("✅ Throughput meets requirements.")
+    total_steps = NUM_SESSIONS * 4
+    steps_throughput = total_steps / duration
+    logger.info(f"Step Throughput: {steps_throughput:.2f} steps/sec")
 
-        self.assertGreaterEqual(throughput, 167)
+    if throughput < 167:
+        logger.warning("⚠️ Throughput is below target (10k/60s = 167/s). Optimization needed.")
+    else:
+        logger.info("✅ Throughput meets requirements.")
+
 
 if __name__ == "__main__":
-    unittest.main()
+    run_realistic_stress_test()

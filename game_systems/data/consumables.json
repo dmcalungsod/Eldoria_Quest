@@ -57,7 +57,7 @@
             "cure_poison": true
         },
         "rarity": "Common",
-        "description": "A paste brewed from moss and nettle—pulls sting from the blood."
+        "description": "A paste brewed from moss and nettle\u2014pulls sting from the blood."
     },
     "stamina_tonic": {
         "id": "stamina_tonic",
@@ -101,7 +101,7 @@
             "stamina": 25
         },
         "rarity": "Common",
-        "description": "Dried meat and bread—plain, comforting, sustaining."
+        "description": "Dried meat and bread\u2014plain, comforting, sustaining."
     },
     "campfire_stew": {
         "id": "campfire_stew",
@@ -334,9 +334,9 @@
         "name": "Air Bladder",
         "type": "supply",
         "effect": {
-            "oxygen": true
+            "oxygen_replenish": 100
         },
         "rarity": "Uncommon",
-        "description": "An inflated, buoyant organ salvaged from deep-sea creatures. Squeezing it releases a precious breath of fresh air."
+        "description": "A sealed, reinforced bladder holding compressed air. Provides a crucial refill of oxygen while submerged."
     }
 }

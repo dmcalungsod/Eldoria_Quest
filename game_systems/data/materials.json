@@ -562,17 +562,5 @@
         "description": "A dark, humming pedestal holding the trapped essence of a Void Wraith.",
         "rarity": "Epic",
         "value": 2000
-    },
-    "fungal_spores": {
-        "name": "Fungal Spores",
-        "description": "Spores harvested from the Fungal Hulk, carrying the strange ecology of The Undergrove.",
-        "rarity": "Common",
-        "value": 25
-    },
-    "bioluminescent_sap": {
-        "name": "Bioluminescent Sap",
-        "description": "Glowing sap collected from flora and fauna of The Undergrove, pulsating with dim light.",
-        "rarity": "Uncommon",
-        "value": 50
     }
 }

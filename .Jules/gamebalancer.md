@@ -47,8 +47,3 @@
 
 **Learning:** EV tuning requires extreme precision after global material sell value updates. `analyze_economy.py` skips EV calculation for monsters not listed in `monsters.json` (like the ones intended for The Silent City of Ouros), making entire end-game locations deceptively poor in Total EV and causing massive progression cliffs between Rank A and Rank S zones.
 **Action:** Always verify that newly introduced locations have their intended monsters explicitly created in the data files before trusting economy analyzer scripts. Rebalanced The Shrouded Fen, The Clockwork Halls, The Celestial Archipelago, and The Void Sanctum, and added missing Ouros monsters to ensure progression is rewarding and fair at higher ranks.
-
-## 2026-03-13 — The Sunken Grotto Economy Rebalance
-
-**Learning:** Analyst report showed The Sunken Grotto (Rank C, Level 18) underperforming severely (Total EV 312.6/hr) compared to The Shrouded Fen (Rank C, Level 15, Total EV 775.4/hr). This created an economy cliff early in mid-game progression.
-**Action:** Increased monster drop rates for `coral_fragment`, `bioluminescent_scale`, `pearl`, `siren_voice_box` and added `magic_stone_large` and `abyssal_pearl` to Elite and Boss drops. Adjusted gatherables in `adventure_locations.json` to be more rewarding. Total EV for The Sunken Grotto increased to ~731.2/hr, putting it in line with Rank C expectations.
