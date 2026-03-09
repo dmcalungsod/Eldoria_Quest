@@ -2042,15 +2042,11 @@
         "drops": [
             [
                 "coral_fragment",
-                80
+                60
             ],
             [
                 "magic_stone_medium",
-                100
-            ],
-            [
-                "magic_stone_large",
-                30
+                20
             ]
         ],
         "skills": [
@@ -2071,15 +2067,11 @@
         "drops": [
             [
                 "bioluminescent_scale",
-                100
+                40
             ],
             [
-                "magic_stone_medium",
-                100
-            ],
-            [
-                "pearl",
-                30
+                "magic_stone_small",
+                50
             ]
         ],
         "skills": [
@@ -2100,15 +2092,15 @@
         "drops": [
             [
                 "siren_voice_box",
-                80
+                25
             ],
             [
                 "pearl",
-                100
+                10
             ],
             [
                 "magic_stone_medium",
-                100
+                30
             ]
         ],
         "skills": [
@@ -2129,19 +2121,11 @@
         "drops": [
             [
                 "coral_fragment",
-                100
+                50
             ],
             [
                 "bioluminescent_scale",
-                100
-            ],
-            [
-                "magic_stone_large",
-                80
-            ],
-            [
-                "pearl",
-                80
+                40
             ]
         ],
         "skills": [
@@ -2166,11 +2150,11 @@
             ],
             [
                 "magic_stone_large",
-                80
+                50
             ],
             [
                 "siren_voice_box",
-                80
+                50
             ]
         ],
         "skills": [
@@ -3513,87 +3497,5 @@
             "whirlwind"
         ],
         "description": "A massive beast of the Howling Peaks, its scales crackling with lightning."
-    },
-    "fungal_hulk": {
-        "id": 174,
-        "name": "Fungal Hulk",
-        "level": 30,
-        "tier": "Boss",
-        "hp": 6500,
-        "atk": 200,
-        "def": 180,
-        "xp": 3000,
-        "drops": [
-            [
-                "fungal_spores",
-                100
-            ],
-            [
-                "magic_stone_flawless",
-                30
-            ],
-            [
-                "refined_wood",
-                50
-            ]
-        ],
-        "skills": [
-            "crushing_slam"
-        ],
-        "description": "A massive amalgamation of rot and muscle, ruling the deepest parts of the Undergrove."
-    },
-    "spore_stalker": {
-        "id": 175,
-        "name": "Spore Stalker",
-        "level": 28,
-        "tier": "Elite",
-        "hp": 2800,
-        "atk": 160,
-        "def": 120,
-        "xp": 1000,
-        "drops": [
-            [
-                "fungal_spores",
-                50
-            ],
-            [
-                "magic_stone_polished",
-                20
-            ],
-            [
-                "refined_wood",
-                30
-            ]
-        ],
-        "skills": [
-            "venomous_bite"
-        ],
-        "description": "A stealthy predator that blends in perfectly with the giant mushrooms of the Undergrove."
-    },
-    "bioluminescent_myriapod": {
-        "id": 176,
-        "name": "Bioluminescent Myriapod",
-        "level": 26,
-        "tier": "Normal",
-        "hp": 1200,
-        "atk": 140,
-        "def": 100,
-        "xp": 500,
-        "drops": [
-            [
-                "bioluminescent_sap",
-                60
-            ],
-            [
-                "magic_stone_fragment",
-                80
-            ],
-            [
-                "hardwood",
-                50
-            ]
-        ],
-        "skills": [],
-        "description": "A massive glowing centipede that scavenges the forest floor."
     }
 }
