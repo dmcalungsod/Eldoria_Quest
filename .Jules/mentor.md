@@ -12,8 +12,3 @@
 
 **Learning:** When introducing new classes, their starting equipment must be explicitly added to the `CombatTutorialView.complete_callback` in `cogs/onboarding_cog.py` to ensure they receive their class-specific items immediately after finishing the onboarding combat tutorial, rather than entering the game unequipped.
 **Action:** Added explicit logic to grant and attempt to auto-equip the Alchemist's extra starting items (Apothecary's Leathers, Bandolier of Vials, Potions, and Antidotes) when `class_id == 6` completes the tutorial.
-
-## 2026-03-13 — [Mentor: Weapon Slot Hardcoding Fix]
-
-**Learning:** The "Mentor's Advice" progressive onboarding feature in `/profile` explicitly instructs new players (Rank F/E) to equip their starter weapon if `has_weapon` is false. However, the `weapon_slots` dictionary used for this check incorrectly hardcoded only basic weapons (`sword`, `mace`, etc.) and omitted valid class weapons like `tome`, `orb`, and `offhand_dagger`. If a new Mage equipped an `orb` or `tome`, the UI still instructed them to equip a weapon, trapping them in the first tutorial step and ruining the onboarding experience.
-**Action:** In `cogs/utils/ui_helpers.py`, updated the `weapon_slots` set to explicitly include all valid weapon slots found in `game_systems/data/class_equipments.py` (`tome`, `orb`, `offhand_dagger`). This ensures the onboarding progression accurately recognizes when a player of any class has armed themselves and moves them along to the next step.

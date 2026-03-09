@@ -4,6 +4,9 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
+if "discord" not in sys.modules:
+    sys.modules["discord"] = MagicMock()
+
 
 class MockField:
     def __init__(self, name, value, inline):

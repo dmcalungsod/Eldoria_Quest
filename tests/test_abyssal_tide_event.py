@@ -28,7 +28,7 @@ class TestAbyssalTideEvent(unittest.TestCase):
         """Test that the threat reduction multiplier is applied during the event in the Sunken Grotto."""
         # Setup location
         mock_locations.get.return_value = {"name": "The Sunken Grotto"}
-        self.session.location_id = "sunken_grotto"
+        self.session.location_id = "the_sunken_grotto"
         self.session.active_monster = None
 
         # Setup context with the event active
@@ -116,7 +116,7 @@ class TestAbyssalTideEvent(unittest.TestCase):
             inventory_manager=self.inventory_manager_mock,
             session_loot={},
             logs=[],
-            location_id="sunken_grotto",
+            location_id="the_sunken_grotto",
         )
 
         mock_loot_calc.roll_drops.assert_called_once()
