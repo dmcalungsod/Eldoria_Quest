@@ -56,6 +56,7 @@ import test_scavenge_mechanic  # Scavenge & Surge tests
 import test_security  # General security test
 import test_shop_ux_enhancement  # New Shop UX test
 import test_stack_limits  # New Stack Limits tests
+import test_stress_adventure_realistic
 import test_time_quake_event
 import test_tournament_cog
 import test_tournament_system  # New Tournament System tests
@@ -272,6 +273,18 @@ def run_stack_limit_tests():
     return result.wasSuccessful()
 
 
+def run_stress_tests():
+    """Runs the stress tests for concurrent adventure sessions."""
+    print("\n" + "-" * 70)
+    print("RUNNING STRESS TESTS (Unit)")
+    print("-" * 70)
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_stress_adventure_realistic)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    return result.wasSuccessful()
+
+
 def main():
     """Run all test suites."""
     print("\n" + "=" * 70)
@@ -290,6 +303,7 @@ def main():
     print("  • Crafting System Expansion (New)")
     print("  • UX Tests (New)")
     print("  • Adventure Race Conditions (New)")
+    print("  • Stress Tests (New)")
     print("\n")
 
     db_available = check_mongodb_connection()
@@ -338,6 +352,10 @@ def main():
     codex_passed = run_codex_tests()
     all_passed = all_passed and codex_passed
     all_passed = all_passed and stack_passed
+
+    # 7.5.5 Stress Tests
+    stress_passed = run_stress_tests()
+    all_passed = all_passed and stress_passed
 
     # 7.6. Cog Tests
     cogs_passed = run_cog_tests()
@@ -389,6 +407,7 @@ def main():
     print(f"Combat Action Tests: {'✓ PASSED' if combat_actions_passed else '✗ FAILED'}")
     print(f"Tournament System Tests: {'✓ PASSED' if tournament_passed else '✗ FAILED'}")
     print(f"Stack Limit Tests: {'✓ PASSED' if stack_passed else '✗ FAILED'}")
+    print(f"Stress Tests: {'✓ PASSED' if stress_passed else '✗ FAILED'}")
     print(f"Codex Tests: {'✓ PASSED' if codex_passed else '✗ FAILED'}")
     print(f"Cog Tests: {'✓ PASSED' if cogs_passed else '✗ FAILED'}")
     print(f"Manager Tests: {'✓ PASSED' if managers_passed else '✗ FAILED'}")
