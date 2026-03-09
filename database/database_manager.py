@@ -2935,3 +2935,85 @@ class DatabaseManager:
     def delete_equipment_set(self, discord_id: int, name: str):
         """Deletes a specific equipment set."""
         self._col("equipment_sets").delete_one({"discord_id": discord_id, "name": name})
+
+    # --------------------------------------------------------------------------
+    # GUILD HALLS SYSTEM
+    # --------------------------------------------------------------------------
+
+    def get_player_hall(self, discord_id: int) -> dict:
+        """
+        Retrieves a player's guild hall data, returning a default empty hall if none exists.
+        """
+        hall = self._col("player_halls").find_one({"discord_id": discord_id})
+        if not hall:
+            hall = {
+                "discord_id": discord_id,
+                "the_hearth_level": 0,
+                "infirmary_level": 0,
+                "apothecary_level": 0,
+                "armory_level": 0,
+                "trophies": [],
+                "vault_displays": [],
+            }
+        return hall
+
+    def create_player_hall(self, discord_id: int) -> dict:
+        """
+        Creates a new default guild hall for the player.
+        """
+        hall = {
+            "discord_id": discord_id,
+            "the_hearth_level": 1,
+            "infirmary_level": 0,
+            "apothecary_level": 0,
+            "armory_level": 0,
+            "trophies": [],
+            "vault_displays": [],
+        }
+        self._col("player_halls").update_one(
+            {"discord_id": discord_id}, {"$set": hall}, upsert=True
+        )
+        return hall
+
+    def update_player_hall_room(self, discord_id: int, room_key: str, level: int) -> bool:
+        """
+        Updates the level of a specific room in the player's guild hall.
+        """
+        result = self._col("player_halls").update_one(
+            {"discord_id": discord_id},
+            {
+                "$set": {f"{room_key}_level": level},
+                "$setOnInsert": {
+                    "discord_id": discord_id,
+                    "the_hearth_level": 0,
+                    "infirmary_level": 0,
+                    "apothecary_level": 0,
+                    "armory_level": 0,
+                    "trophies": [],
+                    "vault_displays": [],
+                }
+            },
+            upsert=True
+        )
+        return result.modified_count > 0 or result.upserted_id is not None
+
+    def add_player_hall_trophy(self, discord_id: int, trophy: str) -> bool:
+        """
+        Adds a new trophy to the player's guild hall trophy room.
+        """
+        result = self._col("player_halls").update_one(
+            {"discord_id": discord_id},
+            {
+                "$addToSet": {"trophies": trophy},
+                "$setOnInsert": {
+                    "discord_id": discord_id,
+                    "the_hearth_level": 0,
+                    "infirmary_level": 0,
+                    "apothecary_level": 0,
+                    "armory_level": 0,
+                    "vault_displays": [],
+                }
+            },
+            upsert=True
+        )
+        return result.modified_count > 0 or result.upserted_id is not None
