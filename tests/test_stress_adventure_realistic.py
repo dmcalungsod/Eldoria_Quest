@@ -3,23 +3,15 @@ import logging
 import os
 import sys
 import time
-from unittest.mock import MagicMock
+import unittest
+from unittest.mock import MagicMock, patch
 
-# Add root to sys.path
-sys.path.append(os.getcwd())
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger("stress_test_realistic")
-
-# --- MOCK MODULES ---
-sys.modules["discord"] = MagicMock()
-sys.modules["pymongo"] = MagicMock()
-sys.modules["pymongo.errors"] = MagicMock()
-
-# Now we can import game systems safely
-from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
-
+# --- MOCK MODULES AT MODULE LEVEL FOR DISCOVERY ---
+# These are necessary if game_systems are imported at the top level
+# of other modules, but it's cleaner to mock in setUp if possible.
+# However, due to how adventure_resolution might import things,
+# we may need some global mocks. We'll try to do it in setUp first,
+# but if that fails, we'll put them here.
 
 class RealisticMockDatabase:
     def __init__(self):
@@ -179,68 +171,79 @@ class RealisticMockDatabase:
         return mock_col
 
 
-def run_realistic_stress_test():
-    logger.info("Initializing Realistic Stress Test...")
-
-    mock_db = RealisticMockDatabase()
-    mock_bot = MagicMock()
-
-    # Initialize Engine
-    engine = AdventureResolutionEngine(mock_bot, mock_db)
-
-    # Generate 10k sessions
-    NUM_SESSIONS = 10000
-    sessions = []
-
-    location_id = "shrouded_fen"
-
-    for i in range(NUM_SESSIONS):
-        sessions.append(
+class TestStressAdventureRealistic(unittest.TestCase):
+    def setUp(self):
+        # We need to mock discord and pymongo in sys.modules *before* importing game_systems
+        # However, because tests are run in a suite, other tests might have already imported them.
+        # So we patch sys.modules but carefully.
+        self.module_patcher = patch.dict(
+            "sys.modules",
             {
-                "discord_id": 100000 + i,
-                "duration_minutes": 60,  # 4 steps (15 min each)
-                "steps_completed": 0,
-                "start_time": "2023-01-01T00:00:00",
-                "location_id": location_id,
-                "active": 1,
-                "version": 1,
-                "logs": "[]",
-                "loot_collected": "{}",
-                "active_monster_json": None,
-                "supplies": {},
-            }
+                "discord": MagicMock(),
+                "pymongo": MagicMock(),
+                "pymongo.errors": MagicMock(),
+            },
         )
+        self.module_patcher.start()
 
-    logger.info(f"Generated {NUM_SESSIONS} sessions (Duration: 60m / 4 steps).")
-    logger.info("Starting Resolution Loop...")
+        # Now import the actual engine
+        from game_systems.adventure.adventure_resolution import AdventureResolutionEngine
+        self.AdventureResolutionEngine = AdventureResolutionEngine
 
-    start_time = time.time()
-    processed_count = 0
+        # Configure logging to suppress noisy output during the stress test
+        self.logger = logging.getLogger("stress_test_realistic")
+        self.logger.setLevel(logging.WARNING)
 
-    for session_doc in sessions:
-        engine.resolve_session(session_doc)
-        processed_count += 1
+    def tearDown(self):
+        self.module_patcher.stop()
 
-        if processed_count % 1000 == 0:
-            elapsed = time.time() - start_time
-            logger.info(f"Processed {processed_count} sessions... ({processed_count / elapsed:.2f} sess/s)")
+    def test_realistic_stress(self):
+        """Stress test the Adventure Resolution Engine with 10k realistic sessions."""
+        mock_db = RealisticMockDatabase()
+        mock_bot = MagicMock()
 
-    end_time = time.time()
-    duration = end_time - start_time
+        # Initialize Engine
+        engine = self.AdventureResolutionEngine(mock_bot, mock_db)
 
-    throughput = NUM_SESSIONS / duration
-    logger.info(f"Finished {NUM_SESSIONS} sessions in {duration:.4f}s")
-    logger.info(f"Throughput: {throughput:.2f} sessions/sec")
+        # Generate 10k sessions
+        NUM_SESSIONS = 10000
+        sessions = []
+        location_id = "shrouded_fen"
 
-    total_steps = NUM_SESSIONS * 4
-    steps_throughput = total_steps / duration
-    logger.info(f"Step Throughput: {steps_throughput:.2f} steps/sec")
+        for i in range(NUM_SESSIONS):
+            sessions.append(
+                {
+                    "discord_id": 100000 + i,
+                    "duration_minutes": 60,  # 4 steps (15 min each)
+                    "steps_completed": 0,
+                    "start_time": "2023-01-01T00:00:00",
+                    "location_id": location_id,
+                    "active": 1,
+                    "version": 1,
+                    "logs": "[]",
+                    "loot_collected": "{}",
+                    "active_monster_json": None,
+                    "supplies": {},
+                }
+            )
 
-    if throughput < 167:
-        logger.warning("⚠️ Throughput is below target (10k/60s = 167/s). Optimization needed.")
-    else:
-        logger.info("✅ Throughput meets requirements.")
+        start_time = time.time()
 
+        for session_doc in sessions:
+            engine.resolve_session(session_doc)
 
-if __name__ == "__main__":
-    run_realistic_stress_test()
+        end_time = time.time()
+        duration = end_time - start_time
+
+        throughput = NUM_SESSIONS / duration
+
+        print(f"\n[Stress Test] Processed {NUM_SESSIONS} sessions in {duration:.4f}s")
+        print(f"[Stress Test] Throughput: {throughput:.2f} sessions/sec")
+
+        # We assert that the throughput is greater than or equal to 167
+        # as specified in the original manual test script (10k/60s)
+        self.assertGreaterEqual(
+            throughput,
+            167,
+            f"Throughput {throughput:.2f} is below target 167 sessions/sec"
+        )
