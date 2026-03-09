@@ -55,3 +55,8 @@
 
 **Learning:** The difficulty curve for Elite Kills was misaligned. The gap between Rank D and C required 30 elite kills, but the subsequent ranks (C->B and B->A) only required 15 each. This created a significant mid-game progression bottleneck and a flattened late-game curve.
 **Action:** Smoothed the elite kills curve across all ranks. Adjusted C (to 40), A (to 95), S (to 135), and SS (to 185) to create a steady, progressive increase in effort (delta gaps of 15, 20, 25, 30, 40, 50).
+
+## 2026-03-14 — Rank C Kill Requirement Overlap Fix
+
+**Learning:** Rank C's `normal_kills` requirement was 400 while Rank D's was 300, requiring only 100 extra kills to progress. Since the rank also required 10 additional completed quests (which naturally involve 50-80 kills), the kill requirement was largely trivialized by quest completion, removing the need for deliberate exploration or auto-adventure engagement.
+**Action:** Increased Rank C's `normal_kills` requirement from 400 to 450 to reintroduce a dedicated exploration gap and maintain the grim survival progression curve.
