@@ -341,6 +341,15 @@ RECIPES = {
         "cost": 1000,
         "description": "Construct a pedestal to house a Void Wraith's core.",
     },
+    "craft_abyssal_rebreather": {
+        "id": "craft_abyssal_rebreather",
+        "name": "Abyssal Rebreather",
+        "output_key": "acc_abyssal_rebreather",
+        "output_amount": 1,
+        "materials": {"abyssal_ore": 1, "siren_voice_box": 1, "bioluminescent_scale": 2},
+        "cost": 1500,
+        "description": "Construct a sealed diving helmet with a rebreather apparatus using deep sea materials.",
+    },
 }
 
 # --- Hidden Experiment Recipes ---
