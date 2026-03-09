@@ -17,3 +17,8 @@
 
 **Learning:** Centralizing class skills from Python dictionaries into `skills.json` and adding a formal `SKILL_SCHEMA` ensures skill integrity at startup and prevents typos from breaking the combat engine. Using PEP 562 `__getattr__` allows lazy loading without breaking external imports.
 **Action:** Continue identifying large hardcoded dictionaries (like class stats or descriptions) and extracting them into structured JSON files with schema validation.
+
+## 2026-03-13 — Designing Codex System Data Schemas
+
+**Learning:** When expanding data systems like the Codex, it's essential to define robust validation schemas in `schemas.py` that match the expected JSON structure in `codex.json`. Incorporating required nested dictionaries (like `unlock_thresholds`) ensures that systems relying on this data won't encounter `KeyError`s during runtime.
+**Action:** When creating new static data features, always co-develop the JSON data structure alongside a strict Pydantic or custom schema definition, and provide a migration template for existing entities (monsters, items, locations).
