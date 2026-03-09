@@ -81,7 +81,7 @@
             "STR": 1,
             "MAG": 1
         },
-        "description": "A heavy iron tool used for grinding herbs—and bones."
+        "description": "A heavy iron tool used for grinding herbs\u2014and bones."
     },
     "gen_wand_005": {
         "name": "Crystal Focus",
@@ -598,16 +598,16 @@
         },
         "description": "A cloak worn by the Drake-Riders. It hums with latent lightning and protects against the biting cold."
     },
-    "abyssal_rebreather": {
+    "acc_abyssal_rebreather": {
         "name": "Abyssal Rebreather",
         "slot": "accessory",
         "rarity": "Epic",
         "level_req": 30,
         "rank_restriction": "A",
         "stats_bonus": {
-            "END": 25,
-            "oxygen_efficiency": 1
+            "END": 15,
+            "AGI": 10
         },
-        "description": "A complex apparatus of enchanted glass and deep-sea flora. It constantly filters water into breathable air."
+        "description": "A heavy, sealed diving helmet forged from Abyssal Ore, complete with a rebreather apparatus that scrubs toxic gases and filters oxygen from water. Essential for surviving the crushing depths of The Sunken Grotto."
     }
 }

@@ -28,8 +28,3 @@
 
 **Learning:** When a new adventure location is created, it defaults to standard weather weights if not explicitly defined. For locations with distinct environmental characteristics (like Howling Peaks), defaulting to "Clear" or "Rain" breaks immersion and the established realism mechanics.
 **Action:** Always add explicit weather probability weights to `LOCATION_WEATHER_WEIGHTS` in `game_systems/core/world_time.py` for newly introduced environments to ensure atmospheric consistency.
-
-## 2026-03-13 — Sunken Grotto Oxygen and Currents
-
-**Learning:** When reviewing the new Sunken Grotto location added for Task SG.1, the region lacked atmospheric survival mechanics. Without oxygen limits, underwater exploration felt exactly like running through a forest. Strong currents and the persistent threat of drowning are essential to ground the player in this environment.
-**Action:** Implemented `_apply_sunken_grotto_penalties` in `adventure_session.py` to enforce an `_oxygen_depletion` meter that builds over time and eventually deals scaling drowning damage unless the player consumes an `air_bladder` supply. Added a random chance to be swept by a current (increasing `steps_completed` and fatigue). Added `sunken_grotto` to the double-fatigue multiplier check, representing the physical toll of underwater exploration.
