@@ -51,8 +51,9 @@ class RewardSystem:
             if not quest_row:
                 return f"{E.ERROR} Error: Quest definition not found."
 
+            rewards_raw = quest_row.get("rewards", {})
             try:
-                rewards_data = json.loads(quest_row["rewards"])
+                rewards_data = json.loads(rewards_raw) if isinstance(rewards_raw, str) else rewards_raw
             except json.JSONDecodeError:
                 logger.error(f"Corrupt reward JSON for quest {quest_id}")
                 return f"{E.ERROR} Error: Reward data corrupted."
