@@ -22,3 +22,8 @@
 
 **Learning:** When expanding data systems like the Codex, it's essential to define robust validation schemas in `schemas.py` that match the expected JSON structure in `codex.json`. Incorporating required nested dictionaries (like `unlock_thresholds`) ensures that systems relying on this data won't encounter `KeyError`s during runtime.
 **Action:** When creating new static data features, always co-develop the JSON data structure alongside a strict Pydantic or custom schema definition, and provide a migration template for existing entities (monsters, items, locations).
+
+## 2026-03-14 — Implemented `player_halls` Database Schema
+
+**Learning:** When expanding major features like the Guild Halls, establishing the underlying database schema early is crucial. Leaving it out causes dependency chains to break when other agents try to integrate their components (like items or costs).
+**Action:** Created the `player_halls` database collection, added it to `INDEX_DEFINITIONS` in `create_database.py`, and established the primary CRUD operations (`get_player_hall`, `create_player_hall`, `update_player_hall_room`, `add_player_hall_trophy`) in `DatabaseManager` to unblock further development for the expansion.
