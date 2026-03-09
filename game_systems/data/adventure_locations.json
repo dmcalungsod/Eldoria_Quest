@@ -1672,6 +1672,7 @@
             "vial_of_drake_blood"
         ],
         "floor_depth": 50,
-        "danger_level": 8
+        "danger_level": 8,
+        "description": "A frozen, storm-battered mountain range where stone guardians like Frost Gargoyles reside."
     }
 }

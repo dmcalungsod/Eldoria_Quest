@@ -39,3 +39,12 @@
 **Learning:** When writing tests that use discord modules it's essential to not just stub the module `discord` but also specific properties and classes used (e.g., `discord.Embed`, `discord.Color`) properly with robust mocking implementations (e.g., mock classes). Also, when changing test imports inside test suites like `tests/run_all_tests.py`, verify not just that individual tests run properly but also that the `run_all_tests.py` comprehensive test suite passes fully to prevent regression `ImportError` bugs.
 
 **Action:** Before running tests always double check what dependencies need to be specifically patched and ensure `PYTHONPATH=. python tests/run_all_tests.py` finishes flawlessly after any refactoring.
+## 2026-03-14 — Fix Codex Test Assertions Mock Mapping
+
+**Learning:** When using mock setups in tests (e.g. `test_codex_unlocks.py`), asserting on deeply chained `__getitem__` mock objects like `self.mock_client.__getitem__(self.db._db_name).__getitem__("player_codex")` can fail because the test runner interprets the reference differently than the system under test (`DatabaseManager`), leading to assertion mismatches (`Expected call not found`).
+**Action:** Always retrieve the mock object for assertion using the same internal method the system uses. In this case, `self.db._col("player_codex")` correctly returns the patched Mock object that the `update_one` and `find_one` calls were actually made against.
+
+## 2026-03-08 — [Test] Auto-Adventure: Stress Test Scheduler
+
+**Learning:** Stress testing the scheduler logic using `tests/stress_adventure_realistic.py` required converting it into a proper `unittest` structure to be integrated into `run_all_tests.py` and run properly in CI.
+**Action:** Always wrap manual load/stress scripts into automated test cases with realistic lower bounds (e.g., asserting `throughput >= 167`) to catch regressions in processing efficiency before they hit production.
