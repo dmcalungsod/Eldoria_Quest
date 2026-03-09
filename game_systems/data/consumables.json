@@ -338,9 +338,5 @@
         },
         "rarity": "Uncommon",
         "description": "A sealed, reinforced bladder holding compressed air. Provides a crucial refill of oxygen while submerged."
-            "oxygen": true
-        },
-        "rarity": "Uncommon",
-        "description": "An inflated, buoyant organ salvaged from deep-sea creatures. Squeezing it releases a precious breath of fresh air."
     }
 }

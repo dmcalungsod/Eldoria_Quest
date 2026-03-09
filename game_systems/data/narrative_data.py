@@ -6,43 +6,6 @@ Used by StoryWeaver to enhance immersion.
 """
 
 MISSION_FLAVOR_TEXT = {
-    "howling_peaks": [
-        "The biting frost of the peaks finally gives way to the gentler chill of the lowlands. You have survived the storm.",
-        "You shake the ice from your cloak. The Howling Peaks have silenced their roaring winds... for now.",
-        "Your breath still plucks at the air, but the murderous cold of the high crags is behind you.",
-        "The frozen stone of the mountains recedes into the distance. You bring back their bitter secrets."
-    ],
-    "the_undergrove": [
-        "The sickly sweet scent of bioluminescent rot fades as you emerge from the deep subterranean fungal forests.",
-        "You scrape glowing spores from your boots. The under-earth breathes a sigh of relief as you leave its domain.",
-        "The oppressive, damp darkness of the Undergrove is replaced by the blinding, blessed light of the surface.",
-        "Whispers of ancient fungal intelligence stop echoing in your mind as you step out of the roots."
-    ],
-    "thunder_crag_coast": [
-        "The smell of ozone and salt spray washes away. The lightning-scarred shores are far behind you.",
-        "Your ears stop ringing from the constant crash of thunder and wave. The coast has not claimed you.",
-        "You step away from the volatile waters, the crackling energy of the storm still lingering on your armor.",
-        "The relentless pounding of the sea gives way to the steady rhythm of the city. You have weathered the tempest."
-    ],
-    "abyssal_descent": [
-        "The crushing pressure of the deep vanishes, leaving you gasping the sweet air of the surface.",
-        "You leave the absolute blackness behind. The abyss stared back, but you did not blink.",
-        "The cold, dead silence of the descent is broken by the chaotic noise of Astraeon.",
-        "You pull yourself from the fathomless depths, carrying the weight of the dark ocean."
-    ],
-    "whispering_archives": [
-        "The scent of ancient parchment and dust gives way to the fresh breeze. The knowledge of the dead is secured.",
-        "The ghostly murmurs of forgotten scholars fade from your ears as you close the heavy tomes.",
-        "You step out of the labyrinthine shelves, the secrets of the past safely tucked in your pack.",
-        "The oppressive silence of the ruined library breaks. You have returned with the wisdom of the ancients."
-    ],
-    "rust_wastes": [
-        "The tang of oxidized iron leaves your tongue. The desolate expanse of corroded metal is finally behind you.",
-        "You shake flakes of red rust from your gear. The mechanical graveyard has not claimed you as one of its own.",
-        "The grinding, screeching sounds of the wastes fade into the comforting hum of civilization.",
-        "You step off the jagged scrap plains, bringing back salvage from a forgotten age."
-    ],
-
     "forest_outskirts": [
         "The canopy breaks, revealing the familiar walls of Astraeon. The forest's edge feels tame now compared to what lies beyond.",
         "You emerge from the treeline, boots caked in mud but spirit unbroken. The safety of the Guild Hall beckons.",

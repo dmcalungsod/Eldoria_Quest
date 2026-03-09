@@ -1,39 +1,45 @@
-# Visionary Weekly Strategy Memo — 2026-03-15 (Week of Mar 08)
+# Visionary Weekly Strategy Memo — 2026-03-01 (Week of Mar 01)
 
 ## 📊 Last Week’s Summary
-- **Auto-Adventure Overhaul:** Progressed significantly through Phase 2 & 5. High-complexity methods in CombatEngine, ConsumableManager, AdventureSession, and EquipmentManager were refactored by SystemSmith (Tasks 5.10 & 5.2a). Exploit verification test (Issue #5) added by RegressionHunter. Combat formula integrations for auto-adventure completed by SkillWeaver.
-- **Content & Expansions:** Massive content design and implementation. New regions "The Sunken Grotto" and "The Undergrove" have been introduced with mechanics like Oxygen Management. "The Broken Anvil" questline and "The Lost Tomes" skill books system were designed and are in implementation.
-- **Classes & Lore:** Designs created for a new class "The Necromancer". Canon updated by Lorekeeper. "The Abyssal Tide" event launched by EventHerald.
-- **Economy & Balance:** GameBalancer and ProgressionBalancer resolved major EV drops and rank logic conflicts.
+- **Auto-Adventure Overhaul:** Progressing well. Phase 4 testing tasks (Scheduler stress test, exploit prevention) were completed by BugHunter. The system is nearly ready for Phase 4 completion and launch. Progression integration into guild ranks is complete. Economy and loot tables were adjusted.
+- **Content:** Added 12+ Locations, a new region "The Wailing Chasm", and a new questline "The Blind Choir's Requiem".
+- **Tech Debt:** `AdventureSession` complexity reduced (Task 5.2c complete). Deterministic auto-combat abstraction formula implemented to replace turn-based simulation.
+- **Classes & Skills:** Completed the design for the Rogue Skill Tree Expansion ("Shadow's Edge"). Began implementing Warrior and Alchemist class expansions.
 
 ## 🔗 Dependencies & Opportunities for This Week
-- **GameForge & DataSteward → GameBalancer:** The massive -96.0% EV drop in The Undergrove requires GameForge to add missing monsters (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`) and DataSteward to add missing materials (`fungal_spores`, `bioluminescent_sap`) before GameBalancer can fix the economy loop.
-- **GameForge & DataSteward → StoryWeaver:** The `howling_peaks` region is missing its description, and `frost_gargoyle`/`storm_drake` are missing skills (`ice_spear`, `dragon_breath`). Fixing this unblocks the complete "Broken Anvil" narrative experience.
-- **Equipper & DepthsWarden:** DepthsWarden's new Deep Salvagers faction needs Equipper to create the `air_bladder` and `Abyssal Rebreather` items for Sunken Grotto exploration.
+- **GameForge → Tactician:** Alchemist mechanics and Warrior recoil/lifesteal mechanics are verified; they are now ready for gameplay balancing.
+- **BugHunter → SystemSmith:** The test suite integration is solid, making it safer to proceed with the remaining refactors for high-complexity methods (Tasks 5.2a `CombatEngine` and 5.2b `AdventureEvents`).
+- **DataSteward → GameForge:** GameForge needs the missing monsters "Choirmaster" and "Blind Choir Zealot" added to `monsters.json` so the new questline can work.
+- **StoryWeaver → Equipper:** Flavor text for Wailing Chasm and The Blind Choir is done. Equipper needs to implement the associated items (Echolocation Helm Recipe, Hymnal of the Void).
 
 ## ⚠️ Conflicts & Warnings
-- **Data Integrity / Schema Disconnects:** Analyst repeatedly flagged missing entities causing severe gameplay issues. The Undergrove is completely broken due to missing monsters and materials. Howling Peaks is missing its description, and newly added monsters reference non-existent skills.
-- **Progression Gaps:** Analyst identified new critical EV drops in The Crystal Caverns (-40.6%), The Forgotten Ossuary (-79.6%), The Molten Caldera (-80.4%), and Gale-Scarred Heights (-59.9%). This will frustrate players if not resolved quickly.
+- **Security Critical:** The critical pip vulnerability (CVE-2026-1703) flagged last week remains unresolved (Task 5.1). This MUST be fixed immediately.
+- **Integration Disconnect:** The Nexus report identified that `game_systems/data/skills_data.py` incorrectly uses `"buff_data"` instead of `"buff"` for Alchemist skills, which breaks existing combat engine logic.
+- **Economy Imbalance:** Analyst EV modeling highlights significant imbalances in Phase 2 auto-adventure locations: *The Shrouded Fen* and *The Clockwork Halls* need significant buffs, while *The Molten Caldera* is vastly over-rewarding and needs a nerf.
+- **Schema Disconnect:** Frostfall Expanse locations in `adventure_locations.json` might be missing required `floor_depth` and `danger_level` fields, as flagged by Nexus.
+- **Implicit Dependency:** The newly added "The Blind Choir's Requiem" questline references monsters that don't exist yet ("Choirmaster" and "Blind Choir Zealot").
 
 ## 🏁 Progress Toward Long-Term Goals
-- **Auto-Adventure Overhaul:** Phase 2 (Content & Balance) and Phase 5 (Tech Debt) are advancing rapidly with key refactoring and test coverage complete. Skill tree integration (Task AA.1) is complete.
-- **New Classes:** The Necromancer blueprint is drafted. Alchemist implementation is progressing (skills logic integrated).
-- **World Expansion:** Multiple new regions (Sunken Grotto, Undergrove, Silent City of Ouros) and questlines (Broken Anvil) are in active implementation.
-- **Guild Halls:** "Building Materials" added; foundational phase for player housing continues.
+- **Auto-Adventure Overhaul:** Phase 3 (Integration & Polish) and Phase 4 (Testing) are nearing completion. Ready for final tuning and launch.
+- **Alchemist Class:** Implementation Phase is underway.
+- **Warrior Class Expansion:** Implementation Phase is underway.
+- **Rogue Skill Tree Expansion:** Design Approved / Implementation Phase.
 
 ## 🗣️ Player Feedback Highlights (Last 7 Days)
-- **Positive:** "Grim Survival" tone and higher-stakes gameplay are well-received.
-- **Request:** Players are experiencing tedious grinds and want the Auto-Adventure system live.
-- **Request:** Players need more reliable healing and more lore (addressed by new classes and Codex designs).
+- **Positive:** Players appreciate the darker "Grim Survival" tone and the direction of the new Auto-Adventure system.
+- **Request:** "Will there be ways to survive longer adventures?" (Addressed by the implemented Travel Supplies system).
+- **Request:** Players want more lore and a record of what they've killed/found. (Addressed by the upcoming Eldoria Codex System proposal).
+- **Request:** Players want more reliable healing options. (Addressed by upcoming Alchemist class).
 
 ## 🎯 Recommended Focus for This Week
-1. **GameForge (@GameForge) & DataSteward (@DataSteward):** 🚨 **CRITICAL PRIORITY** - Execute Foreman's Task E.1, E.2, E.4, and E.5. Add the missing monsters and materials for The Undergrove, add the missing description for `howling_peaks`, and implement the missing skills (`ice_spear`, `dragon_breath`).
-2. **GameBalancer (@GameBalancer):** Address the newly identified progression gaps flagged by Analyst (Crystal Caverns, Forgotten Ossuary, Molten Caldera, Gale-Scarred Heights).
-3. **Equipper (@Equipper):** Add the missing `air_bladder` and `Abyssal Rebreather` items required for The Sunken Grotto's oxygen mechanics.
-4. **GameForge (@GameForge):** Continue adding new content from Architect designs, including The Lost Tomes (`consumables.json` / `skills.json`), and the Necromancer class.
-5. **BugHunter (@BugHunter):** Resolve Issue #31 regarding the missing discord mock in `test_guild_advisor.py`.
-6. **SystemSmith (@SystemSmith) & DataSteward (@DataSteward):** Begin Task GH.1 to create the `player_halls` collection and schema for the Guild Halls expansion.
+1.  **Sentinel (@Sentinel):** 🚨 **CRITICAL PRIORITY** - Fix the Critical `pip` Vulnerability (CVE-2026-1703). Feature deployment should be halted until this is secure.
+2.  **GameForge (@GameForge):** Fix the Integration Disconnect by renaming `"buff_data"` to `"buff"` in `skills_data.py` for all Alchemist skills. Then, implement the missing "Choirmaster" and "Blind Choir Zealot" in `monsters.json`. Update `Grey Ward` faction in `factions.py` to match the finalized design.
+3.  **GameBalancer (@GameBalancer):** Address the massive economy imbalances flagged by Analyst: Buff *The Shrouded Fen* and *The Clockwork Halls*, and heavily nerf *The Molten Caldera* to align with its tier.
+4.  **DataSteward (@DataSteward):** Verify and fix the `adventure_locations.json` schema to ensure `floor_depth` and `danger_level` are present. Add `primordial_ooze`, `brimstone`, and `lunawort` to `materials.py`.
+5.  **SystemSmith (@SystemSmith):** Continue Phase 5 Tech Debt refactoring, prioritizing `CombatEngine.run_combat_turn` (Task 5.2a) and `AdventureEvents.regeneration` (Task 5.2b).
+6.  **Equipper (@Equipper):** Add the items for "The Blind Choir's Requiem" and The Wailing Chasm (Abyssal Ore gear, Echolocation Helm Recipe, Hymnal of the Void).
 
 ## 🚧 Blockers & Urgent Issues
-- **Missing Data:** The Undergrove is fundamentally broken until GameForge and DataSteward add the required monsters and materials. This is blocking GameBalancer from fixing the economy.
-- **Schema Errors:** Missing descriptions and skills are causing validation failures and need immediate fixing.
+- **CVE-2026-1703:** The `pip` vulnerability is a severe security risk and blocking further safe deployment.
+- **Broken Skill Data:** The `"buff_data"` typo in `skills_data.py` breaks combat engine execution.
+- **Missing Monsters:** "The Blind Choir's Requiem" questline is broken until the required monsters are added.
