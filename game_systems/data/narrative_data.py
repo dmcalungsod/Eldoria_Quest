@@ -96,6 +96,12 @@ MISSION_FLAVOR_TEXT = {
         "Sand that sparkles like diamonds falls from your gear. You have walked the mirror lands and returned.",
         "The disorientation passes as you see the city gates. The Wastes are beautiful, but deadly.",
     ],
+    "abyssal_descent": [
+        "The crushing dark finally yields. You drag yourself out of the abyss, gasping for untainted air.",
+        "Your shadow feels heavier, clinging to you as you escape the suffocating depths of the descent.",
+        "The maddening pull of the void loses its grip. You are back in the land of the living.",
+        "You shudder as the oppressive weight of the chasm recedes. The light of the surface feels blindingly pure.",
+    ],
     "silent_city_ouros": [
         "The oppressive perfection of the silent streets fades behind you. Your own footsteps finally make a sound again.",
         "You wipe unnervingly clean dust from your armor. The preserved city slumbers on, undisturbed by your passing.",
