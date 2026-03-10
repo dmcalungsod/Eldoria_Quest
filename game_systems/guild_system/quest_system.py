@@ -314,10 +314,21 @@ class QuestSystem:
                 )
             # ------------------------------------------------
 
-            progress = json.loads(pq["progress"]) if isinstance(pq["progress"], str) else pq["progress"]
-            objectives = (
-                json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
-            )
+            try:
+                progress = json.loads(pq["progress"]) if isinstance(pq["progress"], str) else pq["progress"]
+                if not isinstance(progress, dict):
+                    progress = {}
+            except json.JSONDecodeError:
+                progress = {}
+
+            try:
+                objectives = (
+                    json.loads(quest["objectives"]) if isinstance(quest["objectives"], str) else quest["objectives"]
+                )
+                if not isinstance(objectives, dict):
+                    objectives = {}
+            except json.JSONDecodeError:
+                objectives = {}
 
             if not self.check_completion(progress, objectives):
                 return False, f"{WARNING} Objectives not met."

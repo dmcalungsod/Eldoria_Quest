@@ -58,6 +58,10 @@ class RewardSystem:
                 logger.error(f"Corrupt reward JSON for quest {quest_id}")
                 return f"{E.ERROR} Error: Reward data corrupted."
 
+            if not isinstance(rewards_data, dict):
+                logger.error(f"Reward data is not a dictionary for quest {quest_id}")
+                rewards_data = {}
+
             exp_reward = rewards_data.get("exp", 0)
             aurum_reward = rewards_data.get("aurum", 0)
             merit_reward = rewards_data.get("merit", 5)
