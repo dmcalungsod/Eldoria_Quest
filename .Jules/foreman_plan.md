@@ -224,6 +224,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 ### The Silent City of Ouros (New)
 **Design:** `.Jules/region_silent_city_ouros.md`
 **Status:** **Design Approved / Implementation Phase**
+- [ ] **Task SC.0 (New):** Implement "The Void Seekers" faction and rewards.
+    - **Agent:** @DepthsWarden / @StoryWeaver
+    - **Due:** 2026-03-14
 - [ ] **Task SC.1:** Connect Ouros beneath the Void Sanctum.
     - **Agent:** @DepthsWarden
     - **Due:** 2026-03-14
