@@ -225,6 +225,25 @@ FACTION_SCHEMA = {
 }
 
 
+# --- Player Halls Schema ---
+PLAYER_HALLS_SCHEMA = {
+    "discord_id": {"type": int, "required": True},
+    "the_hearth_level": {"type": int, "required": True, "min": 0},
+    "infirmary_level": {"type": int, "required": True, "min": 0},
+    "apothecary_level": {"type": int, "required": True, "min": 0},
+    "armory_level": {"type": int, "required": True, "min": 0},
+    "trophies": {
+        "type": list,
+        "required": True,
+        "element_schema": {"type": str},
+    },
+    "vault_displays": {
+        "type": list,
+        "required": True,
+        "element_schema": {"type": str},
+    },
+}
+
 # --- Codex Schema ---
 CODEX_SCHEMA = {
     "monsters": {
