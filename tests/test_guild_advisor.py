@@ -4,8 +4,6 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-if "discord" not in sys.modules:
-    sys.modules["discord"] = MagicMock()
 
 
 class MockField:
@@ -27,20 +25,22 @@ class MockEmbed:
 class TestGuildAdvisor(unittest.TestCase):
     def setUp(self):
         # Patch sys.modules to mock dependencies BEFORE importing the unit under test
-        self.modules_patcher = patch.dict(sys.modules)
-        self.modules_patcher.start()
+
+        mock_discord = MagicMock()
+        mock_discord.Embed = MockEmbed
+        mock_discord.Color.blue.return_value = "blue"
+        mock_discord.Color.gold.return_value = "gold"
 
         mock_pymongo = MagicMock()
         mock_pymongo.errors = MagicMock()
-        sys.modules["pymongo"] = mock_pymongo
-        sys.modules["pymongo.errors"] = mock_pymongo.errors
-        sys.modules["pymongo.MongoClient"] = MagicMock()
-        sys.modules["discord"] = MagicMock()
 
-        # Crucial for test_checklist_embed
-        sys.modules["discord"].Embed = MockEmbed
-        sys.modules["discord"].Color.blue.return_value = "blue"
-        sys.modules["discord"].Color.gold.return_value = "gold"
+        self.modules_patcher = patch.dict('sys.modules', {
+            "pymongo": mock_pymongo,
+            "pymongo.errors": mock_pymongo.errors,
+            "pymongo.MongoClient": MagicMock(),
+            "discord": mock_discord
+        })
+        self.modules_patcher.start()
 
         # Add repo root to path if not present
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
