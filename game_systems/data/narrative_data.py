@@ -37,10 +37,10 @@ MISSION_FLAVOR_TEXT = {
         "You scrape the mire from your armor. The Fen takes many, but it did not take you.",
     ],
     "sunken_grotto": [
-        "You emerge from the depths, eyes adjusting to the surface light. The crushing weight of the Grotto is gone.",
-        "Salt crusts on your skin and gear. The ocean's secrets remain below, but its treasures are yours.",
-        "The roar of the tides is replaced by the roar of the city. You have returned from the abyss.",
-        "Dripping wet and shivering, you step onto dry land. The Grotto's cold grip has finally loosened.",
+        "You breach the surface, gasping as the claustrophobic, crushing weight of the Grotto finally releases you.",
+        "Salt and bioluminescent algae crust on your gear. The watery tombs remain below, but their ancient treasures are yours.",
+        "The distant, echoing roars from the deep fade, replaced by the chaotic comfort of the city. You have survived the abyss.",
+        "Dripping wet and shivering from the cold grip of the currents, you finally step onto dry land, glad to breathe free air.",
     ],
     "crystal_caverns": [
         "The hum of the crystals still resonates in your bones. You step out of the glow and into the sun.",
@@ -97,10 +97,10 @@ MISSION_FLAVOR_TEXT = {
         "The disorientation passes as you see the city gates. The Wastes are beautiful, but deadly.",
     ],
     "silent_city_ouros": [
-        "The oppressive perfection of the silent streets fades behind you. Your own footsteps finally make a sound again.",
-        "You wipe unnervingly clean dust from your armor. The preserved city slumbers on, undisturbed by your passing.",
-        "The air grows warm and chaotic once more. You have escaped the cold, beautiful stasis of Ouros.",
-        "You glance back, half-expecting the statues to follow. They don't. The city remains a perfectly frozen nightmare.",
+        "The deafening, absolute silence finally breaks as you cross the threshold. You can hear your own heartbeat again, racing from the terror of Ouros' unnerving perfection.",
+        "You leave the perfectly preserved streets behind, wiping unnervingly clean dust from your gear. The dead city slumbers on, undisturbed and eternally waiting.",
+        "The air grows warm and chaotic once more, a stark relief from the cold, beautiful stasis and the maddening sensory deprivation of the temporal ruins.",
+        "You glance back, half-expecting the statues to follow, their hollow eyes burning into your memory. The Void Seekers' madness feels far too close to your own thoughts.",
     ],
     "wailing_chasm": [
         "The crushing silence of the abyss recedes, replaced by the chaotic, comforting sounds of the surface.",
