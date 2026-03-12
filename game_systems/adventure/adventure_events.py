@@ -338,6 +338,21 @@ class AdventureEvents:
         "The shadows here do not flicker; they are as static as the stone.",
     ]
 
+    ATMOSPHERE_CRIMSON = [
+        "The architecture twists in ways that make your eyes ache.",
+        "Aether drips from the ceiling like coagulated blood.",
+        "You hear the phantom clash of steel from a battle fought ages ago.",
+        "An Echo of a Vanguard knight screams a silent order before shattering.",
+        "The walls pulse with a sickening, rhythmic heartbeat.",
+        "You catch the scent of ozone, copper, and profound despair.",
+        "A shadow on the wall replays a horrific death on a loop.",
+        "The air itself feels toxic, burning your throat with every breath.",
+        "You step around a floating chunk of obsidian, defying gravity.",
+        "The rift above watches you like a massive, unblinking eye.",
+        "Voices of the fallen whisper tactical commands that lead to ruin.",
+        "The red light casts long, impossible shadows that seem to grasp at you.",
+    ]
+
     # --- REGENERATION PHRASES ---
     REGEN_PHRASES = [
         f"{E.FOREST} You pause to catch your breath by a stream...",
@@ -458,6 +473,16 @@ class AdventureEvents:
         f"{E.TIME} A moment of pause stretches uncomfortably long in the dead city.",
         f"{E.TIME} The pristine cobblestones offer a strange, unsettling comfort.",
         f"{E.TIME} You close your eyes, trying to conjure a memory of sound.",
+    ]
+
+    REGEN_PHRASES_CRIMSON = [
+        f"{E.BLOOD} You huddle behind a jagged outcrop, wiping Aether from your face.",
+        f"{E.BLOOD} The veil bleeds around you as you force a bandage over your wound.",
+        f"{E.BLOOD} You close your eyes to block out the shifting geometries and rest.",
+        f"{E.BLOOD} A phantom knight falls beside you, an Echo fading as you catch your breath.",
+        f"{E.BLOOD} You choke on the metallic air, steeling your resolve against the corruption.",
+        f"{E.BLOOD} A brief lull in the whispers allows you a moment of desperate respite.",
+        f"{E.BLOOD} You lean against a warm, pulsing wall, drawing whatever strength remains.",
     ]
 
     REGEN_LOW_HP = [
@@ -625,6 +650,7 @@ class AdventureEvents:
         "whispering_archives": REGEN_PHRASES_ARCHIVES,
         "abyssal_descent": REGEN_PHRASES_ABYSSAL,
         "silent_city_ouros": REGEN_PHRASES_OUROS,
+        "the_crimson_citadel": REGEN_PHRASES_CRIMSON,
     }
 
     _LOCATION_ATMOSPHERE = {
@@ -640,6 +666,7 @@ class AdventureEvents:
         "whispering_archives": ATMOSPHERE_ARCHIVES,
         "abyssal_descent": ATMOSPHERE_ABYSSAL,
         "silent_city_ouros": ATMOSPHERE_OUROS,
+        "the_crimson_citadel": ATMOSPHERE_CRIMSON,
     }
 
     _EVENT_ATMOSPHERE = {

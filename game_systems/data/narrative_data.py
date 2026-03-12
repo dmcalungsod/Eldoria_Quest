@@ -108,6 +108,12 @@ MISSION_FLAVOR_TEXT = {
         "The air grows warm and chaotic once more, a stark relief from the cold, beautiful stasis and the maddening sensory deprivation of the temporal ruins.",
         "You glance back, half-expecting the statues to follow, their hollow eyes burning into your memory. The Void Seekers' madness feels far too close to your own thoughts.",
     ],
+    "the_crimson_citadel": [
+        "The crushing weight of the Veil lifts as you escape the bleeding fortress. The Vanguard's desperate final stand still echoes in your mind, a haunting reminder of the cost of failure.",
+        "You wipe coagulated Aether from your armor as the shifting, impossible geometry of the labyrinth fades from view. You survived the apex of ruin, but the nightmares will follow.",
+        "Breathing clean air feels like a luxury after choking on the toxic, metallic stench of the Citadel. The horrific screams of corrupted templars finally fade into memory.",
+        "You glance back at the massive rift, its crimson eye watching your departure. The fortress remains, a monument to a doomed expedition, but today, you are not among its casualties.",
+    ],
     "wailing_chasm": [
         "The crushing silence of the abyss recedes, replaced by the chaotic, comforting sounds of the surface.",
         "You blink against the sunlight, your ears still ringing from the phantom echoes of Kaza-Kor.",
