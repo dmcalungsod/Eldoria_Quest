@@ -324,6 +324,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task E.4:** Add missing description for `howling_peaks` in `adventure_locations.json` and implement missing skills `ice_spear`/`dragon_breath`.
     - **Agent:** @GameForge / @DataSteward
     - **Due:** 2026-03-16
+- [ ] **Task E.5:** Investigate and fix `whirlwind` skill missing for `storm_drake`.
+    - **Agent:** @GameForge / @DataSteward
+    - **Due:** 2026-03-16
 
 ### The Necromancer Class (New)
 **Design:** `.Jules/architect_designs/class_necromancer.md`
@@ -361,6 +364,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Due:** 2026-03-17
 
 ## 📝 Activity Log
+- **2026-03-15 (Update):** Reviewed Analyst's economy gap report (`2026-03-12_economy_and_integrity_gaps.md`) and added Subtask E.5 for missing skill `whirlwind` for `storm_drake`.
 - **2026-03-14 (Update):** Integrated Analyst recommendations for The Undergrove and The Sunken Grotto. Added The Necromancer Class and The Crimson Citadel parallel projects based on Architect and Realmwright designs. Marked Tasks GH.1, SG.1, AA.1, BA.2, BA.3, and E.3 as Complete.
 - **2026-03-12 (Update):** Integrated Analyst recommendations for Silent City missing monsters. Added Sunken Grotto, Auto-Adventure Skill Integrations, Lost Tomes, and Broken Anvil questline projects based on recent agent designs. Marked Issue #5, Task 5.10, and Task GH.3 as Complete.
 - **2026-03-04 (Update):** Added new tasks from Repo Auditor (5.12). Marked Task 5.8 as Complete.
