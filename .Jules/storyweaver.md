@@ -15,3 +15,13 @@
 
 **Learning:** When requested by Foreman to add narrative context to a newly implemented region (e.g., The Silent City of Ouros), appending to `MISSION_FLAVOR_TEXT` in `game_systems/data/narrative_data.py` is the safest and most effective way to enhance the player's immersion. This avoids inadvertently making gameplay changes or adding mechanical content like quests.
 **Action:** Future narrative improvements for new regions should focus on expanding `game_systems/data/narrative_data.py` or existing text repositories strictly without modifying mechanical arrays (such as `quests.json`), unless specifically tasked to update the flavor text of existing elements.
+
+## 2026-03-14 — Flavor Text for The Silent City of Ouros
+
+**Learning:** When writing for subterranean or sensory-deprived environments (like The Silent City of Ouros), focusing on the *absence* of something (e.g., "absolute, terrifying silence") or the physical sensation of sound (e.g., "the silence is absolute, a crushing weight against your eardrums") creates a much stronger emotional reaction than simply describing what is seen.
+**Action:** In future updates to sound-based or void-corrupted mechanics, emphasize the physical, bodily impact of the corruption rather than just visual descriptors.
+
+## 2026-03-14 — Flavor Text for The Abyssal Descent
+
+**Learning:** When requested by Foreman to add narrative context to a newly implemented region (e.g., The Abyssal Descent), appending to `MISSION_FLAVOR_TEXT` in `game_systems/data/narrative_data.py` is the safest and most effective way to enhance the player's immersion. This avoids inadvertently making gameplay changes or adding mechanical content like quests.
+**Action:** Future narrative improvements for new regions should focus on expanding `game_systems/data/narrative_data.py` or existing text repositories strictly without modifying mechanical arrays (such as `quests.json`), unless specifically tasked to update the flavor text of existing elements.
