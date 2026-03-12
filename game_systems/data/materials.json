@@ -155,6 +155,18 @@
         "rarity": "Uncommon",
         "value": 30
     },
+    "fungal_spores": {
+        "name": "Fungal Spores",
+        "description": "Volatile spores that cloud the air. Handle with care.",
+        "rarity": "Common",
+        "value": 20
+    },
+    "bioluminescent_sap": {
+        "name": "Bioluminescent Sap",
+        "description": "Glowing sap harvested from subterranean fungi.",
+        "rarity": "Uncommon",
+        "value": 45
+    },
     "pearl": {
         "name": "Pearl",
         "description": "A lustrous sphere formed inside a giant clam.",

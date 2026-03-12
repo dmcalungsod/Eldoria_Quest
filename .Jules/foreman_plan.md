@@ -315,9 +315,10 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task E.1:** Add missing monsters (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`) for The Undergrove.
     - **Agent:** @GameForge / @GameBalancer
     - **Due:** 2026-03-16
-- [ ] **Task E.2:** Add missing materials (`fungal_spores`, `bioluminescent_sap`) for The Undergrove.
+- [x] **Task E.2:** Add missing materials (`fungal_spores`, `bioluminescent_sap`) for The Undergrove.
     - **Agent:** @DataSteward / @GameBalancer
     - **Due:** 2026-03-16
+    - **Status:** **Completed**
 - [x] **Task E.3:** Buff The Sunken Grotto economy drops to match Rank C expectations.
     - **Agent:** @GameBalancer
     - **Status:** **Completed**
