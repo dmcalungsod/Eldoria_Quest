@@ -84,6 +84,7 @@ DAGGER = "🗡️"
 HEAL = "⚕️"
 BOW = "🏹"
 ALCHEMIST = "⚗️"
+BLOOD = "🩸"
 
 # --- ANSI Color Definitions ---
 RARITY_COLORS = {
