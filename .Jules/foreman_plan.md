@@ -208,9 +208,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 ### The Guild Halls Expansion (New)
 **Design:** `.Jules/architect_designs/expansion_guild_halls.md`
 **Status:** **Design Approved / Foundation Phase**
-- [ ] **Task GH.1:** Create `player_halls` collection and schema.
+- [x] **Task GH.1:** Create `player_halls` collection and schema.
     - **Agent:** @DataSteward / @SystemSmith
-    - **Due:** 2026-03-12
+    - **Status:** **Completed**
 - [ ] **Task GH.2:** Tune exponential material costs for room upgrades.
     - **Agent:** @GameBalancer
     - **Due:** 2026-03-12
@@ -243,9 +243,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 ### The Sunken Grotto (New)
 **Design:** `.Jules/region_the_sunken_grotto.md`
 **Status:** **Design Approved / Implementation Phase**
-- [ ] **Task SG.1:** Add "The Sunken Grotto" to adventure locations with Oxygen Management & Current mechanics.
+- [x] **Task SG.1:** Add "The Sunken Grotto" to adventure locations with Oxygen Management & Current mechanics.
     - **Agent:** @GameForge / @Grimwarden
-    - **Due:** 2026-03-16
+    - **Status:** **Completed**
 - [ ] **Task SG.2:** Implement aquatic monsters and resource drops.
     - **Agent:** @GameForge
     - **Due:** 2026-03-16
@@ -271,9 +271,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 ### Auto-Adventure Overhaul - Skill Tree Integrations (New)
 **Design:** `.Jules/architect_designs/expansion_auto_adventure_overhaul.md`
 **Status:** **Design Approved / Implementation Phase**
-- [ ] **Task AA.1:** Implement translation of new mechanics into `AutoCombatFormula.resolve_clash`.
+- [x] **Task AA.1:** Implement translation of new mechanics into `AutoCombatFormula.resolve_clash`.
     - **Agent:** @Tactician
-    - **Due:** 2026-03-16
+    - **Status:** **Completed**
 - [ ] **Task AA.2:** Add new paths to classes and specific skills.
     - **Agent:** @GameForge
     - **Due:** 2026-03-16
@@ -300,17 +300,68 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task BA.1:** Implement `Raw Star Metal Block` and `Vial of Drake Blood` drops.
     - **Agent:** @GameForge
     - **Due:** 2026-03-16
-- [ ] **Task BA.2:** Review and implement dialogue.
+- [x] **Task BA.2:** Review and implement dialogue.
     - **Agent:** @StoryWeaver
-    - **Due:** 2026-03-16
-- [ ] **Task BA.3:** Ensure Storm Drakes and Frost Gargoyles are present in Howling Peaks.
+    - **Status:** **Completed**
+- [x] **Task BA.3:** Ensure Storm Drakes and Frost Gargoyles are present in Howling Peaks.
     - **Agent:** @Grimwarden
-    - **Due:** 2026-03-16
+    - **Status:** **Completed**
 - [ ] **Task BA.4:** Add achievement for questline.
     - **Agent:** @ChronicleKeeper
     - **Due:** 2026-03-16
 
+### Economy & Data Integrity Fixes (New)
+**Focus:** Address severe progression gaps and schema errors found by Analyst on 2026-03-12.
+- [ ] **Task E.1:** Add missing monsters (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`) for The Undergrove.
+    - **Agent:** @GameForge / @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task E.2:** Add missing materials (`fungal_spores`, `bioluminescent_sap`) for The Undergrove.
+    - **Agent:** @DataSteward / @GameBalancer
+    - **Due:** 2026-03-16
+- [x] **Task E.3:** Buff The Sunken Grotto economy drops to match Rank C expectations.
+    - **Agent:** @GameBalancer
+    - **Status:** **Completed**
+- [ ] **Task E.4:** Add missing description for `howling_peaks` in `adventure_locations.json` and implement missing skills `ice_spear`/`dragon_breath`.
+    - **Agent:** @GameForge / @DataSteward
+    - **Due:** 2026-03-16
+
+### The Necromancer Class (New)
+**Design:** `.Jules/architect_designs/class_necromancer.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task N.1:** Refine lore.
+    - **Agent:** @StoryWeaver
+    - **Due:** 2026-03-16
+- [ ] **Task N.2:** Evaluate `kill_heal_percent` on Life Drain.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-16
+- [ ] **Task N.3:** Implement Class ID, "scythe" weapon type, and "Grave Dust".
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-16
+- [ ] **Task N.4:** Update `CombatEngine` for allied summons and `dead_enemies_count`.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-16
+
+### The Crimson Citadel (New)
+**Design:** `.Jules/region_the_crimson_citadel.md`
+**Status:** **Design Approved / Implementation Phase**
+- [ ] **Task CC.1:** Implement monsters (`crimson_templar`, `veil_behemoth`, `blood_madrigal`) and materials (`coagulated_aether`, `crimson_core`).
+    - **Agent:** @GameForge
+    - **Due:** 2026-03-17
+- [ ] **Task CC.2:** Implement "Veil Bleed" combat/exploration hazard.
+    - **Agent:** @Tactician
+    - **Due:** 2026-03-17
+- [ ] **Task CC.3:** Create `ward_of_astraeon` item.
+    - **Agent:** @Equipper
+    - **Due:** 2026-03-17
+- [ ] **Task CC.4:** Write flavor text and "Echoes".
+    - **Agent:** @StoryWeaver
+    - **Due:** 2026-03-17
+- [ ] **Task CC.5:** Add achievements for region.
+    - **Agent:** @ChronicleKeeper
+    - **Due:** 2026-03-17
+
 ## 📝 Activity Log
+- **2026-03-14 (Update):** Integrated Analyst recommendations for The Undergrove and The Sunken Grotto. Added The Necromancer Class and The Crimson Citadel parallel projects based on Architect and Realmwright designs. Marked Tasks GH.1, SG.1, AA.1, BA.2, BA.3, and E.3 as Complete.
 - **2026-03-12 (Update):** Integrated Analyst recommendations for Silent City missing monsters. Added Sunken Grotto, Auto-Adventure Skill Integrations, Lost Tomes, and Broken Anvil questline projects based on recent agent designs. Marked Issue #5, Task 5.10, and Task GH.3 as Complete.
 - **2026-03-04 (Update):** Added new tasks from Repo Auditor (5.12). Marked Task 5.8 as Complete.
 - **2026-03-09 (Update):** Integrated Analyst recommendations for The Silent City of Ouros drops (Task 2.2f). Noted Tech Debt Tasks 5.5, 5.6, 5.7 are Complete.
