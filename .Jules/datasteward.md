@@ -27,3 +27,8 @@
 
 **Learning:** When expanding major features like the Guild Halls, establishing the underlying database schema early is crucial. Leaving it out causes dependency chains to break when other agents try to integrate their components (like items or costs).
 **Action:** Created the `player_halls` database collection, added it to `INDEX_DEFINITIONS` in `create_database.py`, and established the primary CRUD operations (`get_player_hall`, `create_player_hall`, `update_player_hall_room`, `add_player_hall_trophy`) in `DatabaseManager` to unblock further development for the expansion.
+
+## 2026-03-14 — Fixed Missing Materials for The Undergrove
+
+**Learning:** Missing materials or monsters in the data dictionary for new regions can cause severe economy disruptions and reward cliffs (like the -96.0% EV drop in The Undergrove reported by the Analyst).
+**Action:** When game designers create new locations, verify all associated `gatherables` and `monsters` strings explicitly map to existing IDs in `materials.json` and `monsters.json` respectively.
