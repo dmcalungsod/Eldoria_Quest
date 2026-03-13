@@ -145,3 +145,18 @@ OUTCOME_FLAVOR_TEXT = {
         "The wilds are vast and unforgiving, but you have carved a path through them once more.",
     ],
 }
+
+
+ECHOES = {
+    "the_crimson_citadel": [
+        '"Hold the line! If the Vanguard breaks here, Astraeon falls!" — *The Echo of Commander Valerius*',
+        '"The Aether... it burns! It burns!" — *A screaming Echo of a corrupted Pyromancer*',
+        '"Do not look into the rift! Close your eyes and strike!" — *A fading Echo of a Vanguard Shieldbearer*',
+        '"We were promised salvation. We found only the Veil." — *A despairing Echo written in coagulated Aether*',
+    ],
+}
+
+
+CLASS_LORE = {
+    "Necromancer": "The Sundering broke the world, and in its breaking, it left a stain. We do not fear the rot; we harvest it. When a body falls, its story is not over—it simply awaits new direction. Necromancers are scholars of the macabre, using forbidden rites to sustain themselves and overwhelm their enemies with numbers and decay.",
+}
