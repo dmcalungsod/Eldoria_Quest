@@ -342,9 +342,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 ### The Necromancer Class (New)
 **Design:** `.Jules/architect_designs/class_necromancer.md`
 **Status:** **Design Approved / Implementation Phase**
-- [ ] **Task N.1:** Refine lore.
+- [x] **Task N.1:** Refine lore.
     - **Agent:** @StoryWeaver
-    - **Due:** 2026-03-16
+    - **Status:** **Completed**
 - [ ] **Task N.2:** Evaluate `kill_heal_percent` on Life Drain.
     - **Agent:** @GameBalancer
     - **Due:** 2026-03-16
@@ -367,15 +367,15 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task CC.3:** Create `ward_of_astraeon` item.
     - **Agent:** @Equipper
     - **Due:** 2026-03-17
-- [ ] **Task CC.4:** Write flavor text and "Echoes".
+- [x] **Task CC.4:** Write flavor text and "Echoes".
     - **Agent:** @StoryWeaver
-    - **Due:** 2026-03-17
+    - **Status:** **Completed**
 - [ ] **Task CC.5:** Add achievements for region.
     - **Agent:** @ChronicleKeeper
     - **Due:** 2026-03-17
 
 ## 📝 Activity Log
-- **2026-03-16 (Update):** Marked Task SC.4 as completed based on StoryWeaver's log. Documented Repo Auditor tasks (5.13-5.15) under Phase 5.
+- **2026-03-16 (Update):** Marked Tasks SC.4, N.1, and CC.4 as completed based on StoryWeaver's log. Documented Repo Auditor tasks (5.13-5.15) under Phase 5.
 - **2026-03-15 (Update):** Reviewed Analyst's economy gap report (`2026-03-12_economy_and_integrity_gaps.md`) and added Subtask E.5 for missing skill `whirlwind` for `storm_drake`.
 - **2026-03-14 (Update):** Integrated Analyst recommendations for The Undergrove and The Sunken Grotto. Added The Necromancer Class and The Crimson Citadel parallel projects based on Architect and Realmwright designs. Marked Tasks GH.1, SG.1, AA.1, BA.2, BA.3, and E.3 as Complete.
 - **2026-03-12 (Update):** Integrated Analyst recommendations for Silent City missing monsters. Added Sunken Grotto, Auto-Adventure Skill Integrations, Lost Tomes, and Broken Anvil questline projects based on recent agent designs. Marked Issue #5, Task 5.10, and Task GH.3 as Complete.

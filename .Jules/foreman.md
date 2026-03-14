@@ -44,3 +44,8 @@ The ID conflict between "Frostfall Expanse" (IDs 106-110 proposed) and "Molten C
 **Observation:** Following the 03-12 Analyst report, DataSteward has actively completed Task E.2 by adding the missing materials for The Undergrove (`fungal_spores`, `bioluminescent_sap`). Meanwhile, StoryWeaver has addressed Task SC.4. In addition, I successfully transcribed the remaining Repo Auditor assignments (Palette, SystemSmith, BugHunter) into the 🛠️ Phase 5: Tech Debt block.
 **Action:** Marked E.2 and SC.4 complete. Added 5.13-5.15 tasks to Phase 5. Posted daily update.
 **Learning:** Organizing the Repo Auditor tasks into our explicit Phase 5 (Tech Debt & Maintenance) ensures they don't get lost among feature work. The prompt resolution of E.2 demonstrates the value of breaking complex gaps (missing monsters vs. missing materials) into specific, separate agent tasks (E.1 and E.2).
+
+## 2026-03-16 (Late Update) — Tracking Narrative Tasks
+**Observation:** StoryWeaver completed Task N.1 (Necromancer Lore) and Task CC.4 (Crimson Citadel Flavor Text) and posted a coordination note in the daily log.
+**Action:** Marked both tasks as complete in the project plan (`.Jules/foreman_plan.md`) and updated the daily Foreman status report to reflect the progress on these parallel expansions.
+**Learning:** Monitoring the Coordination section of daily logs is essential, as agents often report completions there when tasks span multiple expansions simultaneously.
