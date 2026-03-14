@@ -125,6 +125,36 @@ MISSION_FLAVOR_TEXT = {
         "Sand pours from your boots. The Arena has measured your worth.",
         "You sheathe your weapon, the adrenaline of the duel slowly fading. The Examiner has seen enough.",
     ],
+    "thunder_crag_coast": [
+        "The deafening roar of the endless storm fades into a distant rumble. You leave the electrified shores, your gear humming with residual charge.",
+        "You wipe the salty, ozone-tinged mist from your face. The wreckage of the Iron Armada remains, but you have claimed your prize.",
+        "Your boots no longer crackle against fulgurite sand. You have braved the lightning and returned with tales of the drowned.",
+        "The static charge leaves your skin, replaced by the damp comfort of the city. Surviving the crag is a testament to your endurance.",
+    ],
+    "whispering_archives": [
+        "The maddening murmur of a thousand floating tomes finally ceases. You step back into reality, the weight of forbidden knowledge heavy in your pack.",
+        "You blink against the light, the endless rows of shifting bookshelves fading from your mind like a restless dream.",
+        "A cold chill leaves your spine. The shadows of the Archives could not claim you, though their whispers still echo faintly in your ears.",
+        "You close the threshold behind you, glad to be free of the suffocating scent of ancient paper and secrets better left unread.",
+    ],
+    "rust_wastes": [
+        "You scrape the viscous oil and tetanus-laced grime from your boots. The mechanical horrors of the wastes are far behind.",
+        "The grinding of rusted gears gives way to the familiar bustle of Astraeon. You survived the scrap heap.",
+        "The stench of burning fuel fades from your cloak. You have scavenged the refuse of the ancients and lived to tell the tale.",
+        "Your armor is dented and scarred, but intact. The Galvanized could not build their future from your bones.",
+    ],
+    "the_undergrove": [
+        "The toxic, bioluminescent glow fades, replaced by the natural light of the surface. You breathe deep, free of the choking spores.",
+        "You brush luminescent moss from your shoulder. The subterranean jungle is beautiful, but you are glad to have escaped its predatory grasp.",
+        "The eerie chittering of the fungal horrors is finally gone. You have walked beneath the roots of the world and returned.",
+        "The oppressive humidity lifts. You survived the radiant, poisonous heart of the deep woods.",
+    ],
+    "howling_peaks": [
+        "The bone-chilling wind finally dies as you descend. Your breath still clouds the air, but the danger has passed.",
+        "You rub feeling back into your numb hands. The frost gargoyles and drakes still rule the heights, but you are out of their reach.",
+        "The dizzying vertigo of the peaks is replaced by solid, level ground. You have conquered the ascent.",
+        "Snow and ice crack off your armor as you approach the gates. You survived the frozen fury of the summit.",
+    ],
 }
 
 OUTCOME_FLAVOR_TEXT = {

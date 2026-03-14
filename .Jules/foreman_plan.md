@@ -259,9 +259,10 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task SG.2:** Implement aquatic monsters and resource drops.
     - **Agent:** @GameForge
     - **Due:** 2026-03-16
-- [ ] **Task SG.3:** Write flavor text for The Sunken Grotto.
+- [x] **Task SG.3:** Write flavor text for The Sunken Grotto.
     - **Agent:** @StoryWeaver
     - **Due:** 2026-03-16
+    - **Status:** **Completed**
 - [x] **Task SG.4:** Add Abyssal Rebreather equipment.
     - **Status:** **Completed**
     - **Agent:** @Equipper
