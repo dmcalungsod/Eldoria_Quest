@@ -15,10 +15,10 @@ except ImportError:
     sys.modules["pymongo"] = mock_pymongo
     sys.modules["pymongo.errors"] = mock_pymongo.errors
 
-import unittest
+import unittest  # noqa: E402
 
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.core.world_time import TimePhase, Weather
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.core.world_time import TimePhase, Weather  # noqa: E402
 
 
 class TestAdventureDayNight(unittest.TestCase):

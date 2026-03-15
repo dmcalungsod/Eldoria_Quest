@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 # Add repo root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from game_systems.combat.combat_engine import CombatEngine
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
 
 
 class TestCombatCounter(unittest.TestCase):

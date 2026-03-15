@@ -4,8 +4,8 @@ import sys
 
 sys.path.append(os.getcwd())
 
-import unittest
-from unittest.mock import MagicMock, patch
+import unittest  # noqa: E402
+from unittest.mock import MagicMock, patch  # noqa: E402
 
 
 class TestQuestOptimization(unittest.TestCase):

@@ -19,47 +19,47 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing test suites
-import test_abyssal_tide_event
-import test_adventure_embeds  # New Embed test
-import test_adventure_loop_regression
-import test_adventure_race  # New race condition test
-import test_adventure_retreat_exploit
-import test_adventure_rewards  # Adventure Rewards regression test
-import test_adventure_session_concurrency  # New session concurrency test
-import test_auto_adventure_regression
-import test_auto_combat_formula
-import test_character_cog
-import test_codex_unlocks as test_codex_unlocks
-import test_combat_actions  # New Combat Actions test
-import test_crafting_expanded  # Expanded crafting tests
-import test_crafting_ui  # New Crafting UI tests
+import test_abyssal_tide_event  # noqa: E402
+import test_adventure_embeds  # New Embed test  # noqa: E402
+import test_adventure_loop_regression  # noqa: E402
+import test_adventure_race  # New race condition test  # noqa: E402
+import test_adventure_retreat_exploit  # noqa: E402
+import test_adventure_rewards  # Adventure Rewards regression test  # noqa: E402
+import test_adventure_session_concurrency  # New session concurrency test  # noqa: E402
+import test_auto_adventure_regression  # noqa: E402
+import test_auto_combat_formula  # noqa: E402
+import test_character_cog  # noqa: E402
+import test_codex_unlocks as test_codex_unlocks  # noqa: E402
+import test_combat_actions  # New Combat Actions test  # noqa: E402
+import test_crafting_expanded  # Expanded crafting tests  # noqa: E402
+import test_crafting_ui  # New Crafting UI tests  # noqa: E402
 
 # New Coverage Tests
-import test_developer_cog
-import test_dos_prevention  # New DoS prevention tests
-import test_echoes_of_the_deep_event
-import test_event_cog
-import test_exploration_view_ux  # New UX test
-import test_faction_system  # New Faction System tests
-import test_fungal_bloom_event
-import test_game_systems
-import test_general_cog
-import test_guild_hub_cog
-import test_item_manager
-import test_monster_actions
-import test_onboarding_ux  # New Onboarding UX test
-import test_permafrost_thaw_event
-import test_populate_database
-import test_quest_security  # New security test
-import test_quest_update_efficiency  # Optimization test
-import test_scavenge_mechanic  # Scavenge & Surge tests
-import test_security  # General security test
-import test_shop_ux_enhancement  # New Shop UX test
-import test_stack_limits  # New Stack Limits tests
-import test_stress_adventure_realistic
-import test_time_quake_event
-import test_tournament_cog
-import test_tournament_system  # New Tournament System tests
+import test_developer_cog  # noqa: E402
+import test_dos_prevention  # New DoS prevention tests  # noqa: E402
+import test_echoes_of_the_deep_event  # noqa: E402
+import test_event_cog  # noqa: E402
+import test_exploration_view_ux  # New UX test  # noqa: E402
+import test_faction_system  # New Faction System tests  # noqa: E402
+import test_fungal_bloom_event  # noqa: E402
+import test_game_systems  # noqa: E402
+import test_general_cog  # noqa: E402
+import test_guild_hub_cog  # noqa: E402
+import test_item_manager  # noqa: E402
+import test_monster_actions  # noqa: E402
+import test_onboarding_ux  # New Onboarding UX test  # noqa: E402
+import test_permafrost_thaw_event  # noqa: E402
+import test_populate_database  # noqa: E402
+import test_quest_security  # New security test  # noqa: E402
+import test_quest_update_efficiency  # Optimization test  # noqa: E402
+import test_scavenge_mechanic  # Scavenge & Surge tests  # noqa: E402
+import test_security  # General security test  # noqa: E402
+import test_shop_ux_enhancement  # New Shop UX test  # noqa: E402
+import test_stack_limits  # New Stack Limits tests  # noqa: E402
+import test_stress_adventure_realistic  # noqa: E402
+import test_time_quake_event  # noqa: E402
+import test_tournament_cog  # noqa: E402
+import test_tournament_system  # New Tournament System tests  # noqa: E402
 
 
 def check_mongodb_connection():

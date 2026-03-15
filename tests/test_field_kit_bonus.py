@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.items.consumable_manager import ConsumableManager
+from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
 
 
 class TestFieldKit:

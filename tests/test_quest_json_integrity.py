@@ -7,9 +7,9 @@ from pathlib import Path
 # Add root to path
 sys.path.append(os.getcwd())
 
-from game_systems.data.consumables import CONSUMABLES
-from game_systems.data.materials import MATERIALS
-from game_systems.data.quest_items import QUEST_ITEMS
+from game_systems.data.consumables import CONSUMABLES  # noqa: E402
+from game_systems.data.materials import MATERIALS  # noqa: E402
+from game_systems.data.quest_items import QUEST_ITEMS  # noqa: E402
 
 
 class TestQuestJsonIntegrity(unittest.TestCase):

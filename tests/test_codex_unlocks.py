@@ -13,7 +13,7 @@ if "pymongo" not in sys.modules:
 if "discord" not in sys.modules:
     sys.modules["discord"] = MagicMock()
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
 
 
 class TestCodexUnlocks(unittest.TestCase):

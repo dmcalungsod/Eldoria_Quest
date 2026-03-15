@@ -60,7 +60,7 @@ sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
 # Import after mocking
-from cogs.quest_hub_cog import QuestBoardView, QuestDetailView, QuestLedgerView, QuestLogView
+from cogs.quest_hub_cog import QuestBoardView, QuestDetailView, QuestLedgerView, QuestLogView  # noqa: E402
 
 
 class TestQuestViews(unittest.IsolatedAsyncioTestCase):

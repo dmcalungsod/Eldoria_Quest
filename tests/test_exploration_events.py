@@ -11,8 +11,8 @@ from unittest.mock import MagicMock, patch
 # Adjust path for standalone execution
 sys.path.insert(0, ".")
 
-from game_systems.adventure.exploration_events import ExplorationEvents
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.exploration_events import ExplorationEvents  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestExplorationEvents(unittest.TestCase):

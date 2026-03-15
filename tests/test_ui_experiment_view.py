@@ -60,7 +60,7 @@ sys.modules["discord.ui"] = mock_discord.ui
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
-from game_systems.crafting.ui.experiment_view import ExperimentView
+from game_systems.crafting.ui.experiment_view import ExperimentView  # noqa: E402
 
 
 class TestExperimentView(unittest.IsolatedAsyncioTestCase):

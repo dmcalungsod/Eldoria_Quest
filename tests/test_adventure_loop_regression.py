@@ -48,7 +48,7 @@ sys.modules["discord.ext.commands"] = mock_commands
 sys.modules["discord.ext.tasks"] = mock_tasks
 
 # Import after mocking
-from cogs.adventure_loop import AdventureLoop
+from cogs.adventure_loop import AdventureLoop  # noqa: E402
 
 
 class TestAdventureLoopRegression(unittest.TestCase):

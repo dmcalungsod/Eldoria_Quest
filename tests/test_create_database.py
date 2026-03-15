@@ -11,7 +11,7 @@ mock_pymongo = MagicMock()
 sys.modules["pymongo"] = mock_pymongo
 sys.modules["pymongo.errors"] = MagicMock()
 
-from database.create_database import create_tables
+from database.create_database import create_tables  # noqa: E402
 
 
 class TestCreateDatabase(unittest.TestCase):

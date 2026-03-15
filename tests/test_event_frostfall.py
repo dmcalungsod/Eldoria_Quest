@@ -18,12 +18,12 @@ sys.modules["pymongo.errors"] = MagicMock()
 sys.modules["pymongo.collection"] = MagicMock()
 sys.modules["pymongo.database"] = MagicMock()
 
-import pytest
+import pytest  # noqa: E402
 
-from game_systems.adventure.adventure_rewards import AdventureRewards
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.events.world_event_system import WorldEventSystem
-from game_systems.player.player_stats import PlayerStats
+from game_systems.adventure.adventure_rewards import AdventureRewards  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 @pytest.fixture

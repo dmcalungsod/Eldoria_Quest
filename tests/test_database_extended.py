@@ -17,7 +17,7 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager import DatabaseManager
+from database.database_manager import DatabaseManager  # noqa: E402
 
 
 class TestDatabaseManagerExtended(unittest.TestCase):

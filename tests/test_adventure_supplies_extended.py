@@ -25,9 +25,9 @@ except ImportError:
     sys.modules["discord"] = mock_discord
     sys.modules["discord.ext"] = mock_discord.ext
 
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.core.world_time import TimePhase, Weather
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.core.world_time import TimePhase, Weather  # noqa: E402
 
 
 class TestAdventureSuppliesExtended(unittest.TestCase):

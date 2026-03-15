@@ -5,12 +5,12 @@ import unittest
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from game_systems.adventure.adventure_events import AdventureEvents
-from game_systems.data import emojis as E
-from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.materials import MATERIALS
-from game_systems.data.monsters import MONSTERS
-from game_systems.monsters.monster_skills import MONSTER_SKILLS
+from game_systems.adventure.adventure_events import AdventureEvents  # noqa: E402
+from game_systems.data import emojis as E  # noqa: E402
+from game_systems.data.adventure_locations import LOCATIONS  # noqa: E402
+from game_systems.data.materials import MATERIALS  # noqa: E402
+from game_systems.data.monsters import MONSTERS  # noqa: E402
+from game_systems.monsters.monster_skills import MONSTER_SKILLS  # noqa: E402
 
 
 class TestClockworkHalls(unittest.TestCase):

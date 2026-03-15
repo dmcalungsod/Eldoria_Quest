@@ -5,8 +5,8 @@ import unittest
 # Ensure root dir is in path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.player.level_up import LevelUpSystem
-from game_systems.player.player_stats import PlayerStats
+from game_systems.player.level_up import LevelUpSystem  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestLevelUpSystem(unittest.TestCase):

@@ -10,10 +10,10 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.data.class_data import CLASSES
-from game_systems.items.consumable_manager import ConsumableManager
-from game_systems.items.equipment_manager import EquipmentManager
-from game_systems.player.player_stats import PlayerStats
+from game_systems.data.class_data import CLASSES  # noqa: E402
+from game_systems.items.consumable_manager import ConsumableManager  # noqa: E402
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestAlchemistMechanics(unittest.TestCase):

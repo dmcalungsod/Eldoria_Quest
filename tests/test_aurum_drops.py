@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.rewards.aurum_calculator import AurumCalculator
+from game_systems.rewards.aurum_calculator import AurumCalculator  # noqa: E402
 
 
 class TestAurumDrops(unittest.TestCase):

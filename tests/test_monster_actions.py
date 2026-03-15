@@ -6,7 +6,7 @@ from unittest.mock import patch
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.monsters.monster_actions import MonsterAI
+from game_systems.monsters.monster_actions import MonsterAI  # noqa: E402
 
 
 class TestMonsterActions(unittest.TestCase):

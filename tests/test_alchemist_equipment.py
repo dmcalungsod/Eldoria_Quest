@@ -15,10 +15,10 @@ sys.modules["pymongo.errors"] = MagicMock()
 # Add project root
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import pytest
+import pytest  # noqa: E402
 
-from game_systems.data.class_equipments import CLASS_EQUIPMENTS, STAT_BUDGETS
-from game_systems.items.equipment_manager import EquipmentManager
+from game_systems.data.class_equipments import CLASS_EQUIPMENTS, STAT_BUDGETS  # noqa: E402
+from game_systems.items.equipment_manager import EquipmentManager  # noqa: E402
 
 
 @pytest.fixture
