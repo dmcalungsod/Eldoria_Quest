@@ -170,8 +170,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task 5.14:** Refactor complex functions into smaller helper methods from audit report.
     - **Agent:** @SystemSmith
     - **Due:** 2026-03-16
-- [ ] **Task 5.15:** Reorganize imports in test files to comply with PEP 8 from audit report.
+- [x] **Task 5.15:** Reorganize imports in test files to comply with PEP 8 from audit report.
     - **Agent:** @BugHunter
+    - **Status:** **Completed**
     - **Due:** 2026-03-16
 
 ---
@@ -326,6 +327,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [ ] **Task E.1:** Add missing monsters (`fungal_hulk`, `spore_stalker`, `bioluminescent_myriapod`) for The Undergrove.
     - **Agent:** @GameForge / @GameBalancer
     - **Due:** 2026-03-16
+- [ ] **Task E.1a (New):** Address progression reward cliff by ensuring the new monsters resolve the -96.0% EV/Hr drop in The Undergrove.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-17
 - [x] **Task E.2:** Add missing materials (`fungal_spores`, `bioluminescent_sap`) for The Undergrove.
     - **Agent:** @DataSteward / @GameBalancer
     - **Due:** 2026-03-16
@@ -333,6 +337,9 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
 - [x] **Task E.3:** Buff The Sunken Grotto economy drops to match Rank C expectations.
     - **Agent:** @GameBalancer
     - **Status:** **Completed**
+- [ ] **Task E.3a (New):** Verify the buff for The Sunken Grotto effectively smooths out the -59.7% EV drop from The Shrouded Fen.
+    - **Agent:** @GameBalancer
+    - **Due:** 2026-03-17
 - [ ] **Task E.4:** Add missing description for `howling_peaks` in `adventure_locations.json` and implement missing skills `ice_spear`/`dragon_breath`.
     - **Agent:** @GameForge / @DataSteward
     - **Due:** 2026-03-16
@@ -376,7 +383,7 @@ Transform Eldoria Quest from manual turn-based exploration to a time-based auto-
     - **Due:** 2026-03-17
 
 ## 📝 Activity Log
-- **2026-03-16 (Update):** Marked Tasks SC.4, N.1, and CC.4 as completed based on StoryWeaver's log. Documented Repo Auditor tasks (5.13-5.15) under Phase 5.
+- **2026-03-16 (Update):** Marked Tasks SC.4, N.1, CC.4, and SG.3 as completed based on StoryWeaver's log. Marked Task 5.15 as completed based on BugHunter's log. Marked Task E.2 as completed based on DataSteward's log. Documented Repo Auditor tasks (5.13-5.15) under Phase 5.
 - **2026-03-15 (Update):** Reviewed Analyst's economy gap report (`2026-03-12_economy_and_integrity_gaps.md`) and added Subtask E.5 for missing skill `whirlwind` for `storm_drake`.
 - **2026-03-14 (Update):** Integrated Analyst recommendations for The Undergrove and The Sunken Grotto. Added The Necromancer Class and The Crimson Citadel parallel projects based on Architect and Realmwright designs. Marked Tasks GH.1, SG.1, AA.1, BA.2, BA.3, and E.3 as Complete.
 - **2026-03-12 (Update):** Integrated Analyst recommendations for Silent City missing monsters. Added Sunken Grotto, Auto-Adventure Skill Integrations, Lost Tomes, and Broken Anvil questline projects based on recent agent designs. Marked Issue #5, Task 5.10, and Task GH.3 as Complete.

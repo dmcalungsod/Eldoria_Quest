@@ -49,3 +49,8 @@ The ID conflict between "Frostfall Expanse" (IDs 106-110 proposed) and "Molten C
 **Observation:** StoryWeaver completed Task N.1 (Necromancer Lore) and Task CC.4 (Crimson Citadel Flavor Text) and posted a coordination note in the daily log.
 **Action:** Marked both tasks as complete in the project plan (`.Jules/foreman_plan.md`) and updated the daily Foreman status report to reflect the progress on these parallel expansions.
 **Learning:** Monitoring the Coordination section of daily logs is essential, as agents often report completions there when tasks span multiple expansions simultaneously.
+
+## 2026-03-16 (Final Update) — Progression Reward Cliffs & Analyst Integration
+**Observation:** The Analyst report `2026-03-12_economy_and_integrity_gaps.md` highlighted severe progression reward cliffs, notably a -96.0% EV/Hr drop in The Undergrove (due to missing monsters and materials) and a -59.7% drop in The Sunken Grotto.
+**Action:** Created new tasks (E.1a and E.3a) for GameBalancer to ensure the newly added entities effectively resolve these specific progression reward drops.
+**Learning:** When adding missing elements, the follow-up balance check is just as critical as the initial addition. Expanding on data from Analyst's reports directly dictates new tracking assignments.
