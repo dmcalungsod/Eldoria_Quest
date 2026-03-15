@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.data.recipes import RECIPES
+from game_systems.data.recipes import RECIPES  # noqa: E402
 
 
 class TestCraftingSupplies(unittest.TestCase):

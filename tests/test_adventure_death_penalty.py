@@ -15,8 +15,8 @@ if "pymongo" not in sys.modules:
 if "discord" not in sys.modules:
     sys.modules["discord"] = MagicMock()
 
-from database.database_manager import DatabaseManager
-from game_systems.adventure.adventure_manager import AdventureManager
+from database.database_manager import DatabaseManager  # noqa: E402
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 
 
 class TestAdventureDeathPenalty(unittest.TestCase):

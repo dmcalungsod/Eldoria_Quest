@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.combat.combat_engine import CombatEngine
-from game_systems.player.player_stats import PlayerStats
+from game_systems.combat.combat_engine import CombatEngine  # noqa: E402
+from game_systems.player.player_stats import PlayerStats  # noqa: E402
 
 
 class TestAlchemistCombatSkills(unittest.TestCase):

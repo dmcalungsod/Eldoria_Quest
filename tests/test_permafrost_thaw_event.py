@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 sys.modules['pymongo'] = MagicMock()
 sys.modules['pymongo.errors'] = MagicMock()
 
-from game_systems.adventure.adventure_rewards import AdventureRewards
-from game_systems.adventure.adventure_session import AdventureSession
-from game_systems.events.world_event_system import WorldEventSystem
+from game_systems.adventure.adventure_rewards import AdventureRewards  # noqa: E402
+from game_systems.adventure.adventure_session import AdventureSession  # noqa: E402
+from game_systems.events.world_event_system import WorldEventSystem  # noqa: E402
 
 
 class TestPermafrostThawEvent(unittest.TestCase):

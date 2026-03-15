@@ -4,8 +4,8 @@ import sys
 # Add repo root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from game_systems.data.adventure_locations import LOCATIONS
-from game_systems.data.monsters import MONSTERS
+from game_systems.data.adventure_locations import LOCATIONS  # noqa: E402
+from game_systems.data.monsters import MONSTERS  # noqa: E402
 
 
 def test_monsters_balance():

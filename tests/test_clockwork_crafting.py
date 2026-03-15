@@ -18,10 +18,10 @@ if "pymongo" not in sys.modules:
 if "discord" not in sys.modules:
     sys.modules["discord"] = MagicMock()
 
-from game_systems.crafting.crafting_system import CraftingSystem
-from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES
-from game_systems.data.equipments import EQUIPMENT_DATA
-from game_systems.data.materials import MATERIALS
+from game_systems.crafting.crafting_system import CraftingSystem  # noqa: E402
+from game_systems.data.crafting_recipes import EQUIPMENT_RECIPES  # noqa: E402
+from game_systems.data.equipments import EQUIPMENT_DATA  # noqa: E402
+from game_systems.data.materials import MATERIALS  # noqa: E402
 
 
 class TestClockworkCrafting(unittest.TestCase):

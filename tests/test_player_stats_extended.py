@@ -5,7 +5,7 @@ import unittest
 # Ensure root dir is in path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold, calculate_tiered_bonus
+from game_systems.player.player_stats import PlayerStats, calculate_practice_threshold, calculate_tiered_bonus  # noqa: E402
 
 
 class TestPlayerStats(unittest.TestCase):

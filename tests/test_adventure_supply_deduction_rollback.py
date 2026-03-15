@@ -10,7 +10,7 @@ sys.path.append(os.getcwd())
 sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
-from game_systems.adventure.adventure_manager import AdventureManager
+from game_systems.adventure.adventure_manager import AdventureManager  # noqa: E402
 
 
 class TestAdventureSupplyDeduction(unittest.TestCase):

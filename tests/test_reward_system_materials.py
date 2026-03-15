@@ -12,7 +12,7 @@ sys.modules["pymongo"] = MagicMock()
 sys.modules["pymongo.errors"] = MagicMock()
 
 # Import after mocking
-from game_systems.guild_system.reward_system import RewardSystem
+from game_systems.guild_system.reward_system import RewardSystem  # noqa: E402
 
 
 class TestRewardSystemMaterials(unittest.TestCase):

@@ -74,7 +74,7 @@ sys.modules["discord.ui"] = mock_discord.ui
 sys.modules["discord.ext"] = MagicMock()
 sys.modules["discord.ext.commands"] = MagicMock()
 
-from game_systems.adventure.ui.status_view import AdventureStatusView
+from game_systems.adventure.ui.status_view import AdventureStatusView  # noqa: E402
 
 
 class TestAdventureStatusView(unittest.IsolatedAsyncioTestCase):
